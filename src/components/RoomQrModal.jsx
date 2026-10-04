@@ -42,12 +42,13 @@ export default function RoomQrModal({
     switch (qrType) {
       case 'dining':
         return `${origin}/?room=${selectedRoom}&source=room_qr`;
-      case 'keycard':
-        return `${origin}/?action=keycard&room=${selectedRoom}&pin=${guestPin}&t=${Date.now()}`;
       case 'standee':
-        return `upi://pay?pa=${HOTEL_CONFIG.upiId || 'hotelsai@sbi'}&pn=Hotel%20Sai%20International&cu=INR&tn=Lobby%20Reception%20Desk`;
-      case 'wifi':
-        return `WIFI:S:Hotel_Sai_Guest;T:WPA;P:SaiRayagada765;H:false;;`;
+        return `upi://pay?pa=${HOTEL_CONFIG.upiId || '6370757541@upi'}&pn=Hotel%20Elite%20Inn&cu=INR&tn=Hotel%20Elite%20Inn%20Reception`;
+      case 'wifi': {
+        const floor = selectedRoom && selectedRoom !== 'LOBBY' ? selectedRoom[0] : '1';
+        const ssid = floor === '2' ? 'TP 2ND FLOOR' : floor === '3' ? 'TP 3RD FLOOR' : 'TP 1ST FLOOR';
+        return `WIFI:S:${ssid};T:WPA;P:Elite@123;H:false;;`;
+      }
       default:
         return `${origin}/?room=${selectedRoom}&source=room_qr`;
     }
@@ -291,24 +292,19 @@ export default function RoomQrModal({
                 }}
               >
                 <option value="LOBBY">🏨 Lobby &amp; Reception Counter Standee</option>
-                <optgroup label="Floor 1 (Standard Deluxe)">
-                  {['101','102','103','104','105','106','107','108','109','110'].map(r => (
+                <optgroup label="Floor 1 (Rooms 101 - 109)">
+                  {['101','102','103','104','105','106','107','108','109'].map(r => (
                     <option key={r} value={r}>Room {r} (Floor 1)</option>
                   ))}
                 </optgroup>
-                <optgroup label="Floor 2 (Executive Deluxe)">
-                  {['201','202','203','204','205','206','207','208','209','210'].map(r => (
+                <optgroup label="Floor 2 (Rooms 201 - 209)">
+                  {['201','202','203','204','205','206','207','208','209'].map(r => (
                     <option key={r} value={r}>Room {r} (Floor 2)</option>
                   ))}
                 </optgroup>
-                <optgroup label="Floor 3 (Premium Deluxe)">
-                  {['301','302','303','304','305','306','307','308','309','310'].map(r => (
+                <optgroup label="Floor 3 (Rooms 301 - 309)">
+                  {['301','302','303','304','305','306','307','308','309'].map(r => (
                     <option key={r} value={r}>Room {r} (Floor 3)</option>
-                  ))}
-                </optgroup>
-                <optgroup label="Floor 4 (Royal Suites & Premium)">
-                  {['401','402','403','404','405','406','407','408','409','410'].map(r => (
-                    <option key={r} value={r}>Room {r} (Floor 4)</option>
                   ))}
                 </optgroup>
               </select>
@@ -429,7 +425,7 @@ export default function RoomQrModal({
               {HOTEL_CONFIG.legalName}
             </div>
             <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: '#b45309', fontWeight: 800, letterSpacing: '1.2px', marginTop: '2px' }}>
-              Rayagada, Odisha • Ph: {HOTEL_CONFIG.phone}
+              Muniguda, Rayagada (Odisha) • Ph: {HOTEL_CONFIG.phone}
             </div>
 
             <div style={{
@@ -477,8 +473,8 @@ export default function RoomQrModal({
             <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 0.5rem 0', lineHeight: 1.4 }}>
               {qrType === 'dining' ? '🍽️ Cannon Kitchen Menu • 🛎️ Fresh Towels & Care • 📶 High-Speed Wi-Fi' :
                 qrType === 'keycard' ? `Guest: ${guestName} • PIN: ${guestPin} • Valid for stay duration` :
-                qrType === 'wifi' ? 'Network: Hotel_Sai_Guest • Pass: SaiRayagada765' :
-                `UPI: ${HOTEL_CONFIG.upiId || 'hotelsai@sbi'} • Verified GST Check-In`}
+                qrType === 'wifi' ? `Network: ${selectedRoom && selectedRoom[0] === '2' ? 'TP 2ND FLOOR' : selectedRoom && selectedRoom[0] === '3' ? 'TP 3RD FLOOR' : 'TP 1ST FLOOR'} • Pass: Elite@123` :
+                `UPI: ${HOTEL_CONFIG.upiId || '6370757541@upi'} • Verified GST Check-In`}
             </p>
 
             <div style={{
@@ -489,11 +485,11 @@ export default function RoomQrModal({
               fontSize: '0.7rem',
               color: '#334155'
             }}>
-              📶 High-Speed Wi-Fi: <strong>Hotel_Sai_Guest</strong> | Key: <strong>SaiRayagada765</strong>
+              📶 Wi-Fi: <strong>{selectedRoom && selectedRoom[0] === '2' ? 'TP 2ND FLOOR' : selectedRoom && selectedRoom[0] === '3' ? 'TP 3RD FLOOR' : 'TP 1ST FLOOR'}</strong> | Password: <strong>Elite@123</strong>
             </div>
 
             <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '0.75rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.4rem' }}>
-              Front Desk Intercom: Dial <strong>'0'</strong> or <strong>'9'</strong> • 24/7 Room Service
+              Intercom: Dial <strong>'9'</strong> Reception • <strong>'111'</strong> Restaurant • <strong>'112'</strong> Kitchen
             </div>
           </div>
 

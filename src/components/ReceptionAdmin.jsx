@@ -507,9 +507,9 @@ export default function ReceptionAdmin({
   const [otaChannels, setOtaChannels] = useState([
     {
       id: 'direct',
-      name: 'Sri Sai Vasudev Direct Booking Engine',
-      type: 'Direct Brand (sai-vasudev-residency.pages.dev)',
-      allocatedRooms: 18,
+      name: 'Hotel Elite Inn Direct Booking Engine',
+      type: 'Direct Brand (hotel-elite-inn.pages.dev)',
+      allocatedRooms: 27,
       activeRate: 2199,
       commissionPct: 0,
       netRevPerRoom: 2199,
@@ -2418,7 +2418,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               label: '1. Front Desk & Reception', 
               icon: Hotel, 
               color: '#38bdf8', 
-              desc: 'Tape Chart, 39 Rooms, Walk-in, GRC',
+              desc: 'Tape Chart, 27 Rooms, Walk-in, GRC',
               onClick: () => {
                 setActiveDepartment('reception');
                 setActiveTab('tape-chart');
@@ -2633,7 +2633,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             onClick={() => setIsRoomRackPrintOpen(true)}
             className="btn-outline-gold"
             style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            title="Print 18-Room Daily Tape Chart Rack & Arrivals Manifest"
+            title="Print 27-Room Daily Tape Chart Rack & Arrivals Manifest"
           >
             <Printer size={15} color="var(--gold-glow)" /> Print Room Rack
           </button>
@@ -2712,7 +2712,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         border: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
         {[
-          { id: 'tape-chart', label: '📊 39-Room Tape Chart Matrix' },
+          { id: 'tape-chart', label: '📊 27-Room Tape Chart Matrix' },
           { id: 'd1-database-explorer', label: '🗄️ D1 Live DB Explorer (Master Hub - All 68 Tables)', isHub: true },
           { id: 'operations-settings', label: '⚙️ Operations & Policy Settings' },
           { id: 'transit-dayuse', label: '🚆 Transit & Station Transfer' },
@@ -9266,7 +9266,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         </div>
       )}
 
-      {/* MODAL 2: 18-ROOM DAILY TAPE CHART RACK & ARRIVALS MANIFEST PRINT */}
+      {/* MODAL 2: 27-ROOM DAILY TAPE CHART RACK & ARRIVALS MANIFEST PRINT */}
       {isRoomRackPrintOpen && (
         <div style={{
           position: 'fixed',
@@ -9323,10 +9323,10 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0284c7', paddingBottom: '0.6rem', marginBottom: '1rem' }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: '1.2rem', color: '#0284c7', fontWeight: 800 }}>
-                    {HOTEL_CONFIG.name.toUpperCase()} • 18-ROOM TAPE CHART RACK
+                    {HOTEL_CONFIG.name.toUpperCase()} • 27-ROOM TAPE CHART RACK
                   </h2>
                   <div style={{ fontSize: '0.8rem', color: '#475569' }}>
-                    Front Desk Physical Clipboard Summary • Rayagada, Odisha
+                    Front Desk Physical Clipboard Summary • Muniguda, Rayagada (Odisha)
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: '0.8rem' }}>

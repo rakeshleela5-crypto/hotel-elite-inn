@@ -7,7 +7,7 @@ export default function AiConciergeModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: `Namaskar! Welcome to ${HOTEL_CONFIG.name}, Rayagada. I am your 24/7 Chief Concierge grounded with real-time hotel facts, RGDA train transit details, and sacred Maa Majhighariani Temple timings. How may I assist your stay?`
+      text: `Namaskar! Welcome to ${HOTEL_CONFIG.name}, Muniguda. I am your 24/7 Chief Concierge grounded with real-time hotel facts, 27-room tariffs, Wi-Fi credentials, Intercom extensions, and Muniguda railway transit. How may I assist your stay?`
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
@@ -26,11 +26,11 @@ export default function AiConciergeModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const quickPrompts = [
-    "What time is Darshan at Maa Majhighariani Temple?",
-    "How far is Rayagada Railway Station?",
-    "What are the 18-room inventory tariffs?",
-    "Do you serve Jain & Satvik food without onion/garlic?",
-    "How can JK Paper / IMFA book corporate accounts?"
+    "What are the 27-room inventory tariffs?",
+    "What is the Wi-Fi password and network name?",
+    "What is the in-room Intercom directory?",
+    "What is the hotel check-out policy?",
+    "How close is Muniguda Railway Station?"
   ];
 
   const handleSend = async (queryText) => {
@@ -54,13 +54,13 @@ export default function AiConciergeModal({ isOpen, onClose }) {
       playReceptionChime();
       setMessages(prev => [...prev, { 
         sender: 'ai', 
-        text: data.reply || "Thank you for inquiring! Please feel free to reach our 24/7 reception desk at +91 6856 225555." 
+        text: data.reply || `Thank you for inquiring! Please feel free to reach our 24/7 reception desk at ${HOTEL_CONFIG.phone} or dial Intercom 9.` 
       }]);
     } catch (err) {
       playReceptionChime();
       setMessages(prev => [...prev, {
         sender: 'ai',
-        text: `Namaskar! ${HOTEL_CONFIG.name} is located Near Andhra Bank, New Colony, Rayagada (1.5 km to RGDA Station, 2.0 km to Maa Majhighariani Temple). We feature 18 rooms from ₹1,000 to ₹3,000 across Ground & 1st Floor. For immediate assistance, dial ${HOTEL_CONFIG.phone}.`
+        text: `Namaskar! ${HOTEL_CONFIG.name} is located Near Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) – PIN 765020. We feature 27 premium AC rooms across 3 floors (Standard ₹1,450, Deluxe ₹1,750–₹2,250, Executive ₹2,050–₹2,450, Suite ₹3,250–₹3,850) with 24-hr check-out, complimentary buffet breakfast, and high-speed Wi-Fi (Password: Elite@123). For immediate reservations or assistance, call ${HOTEL_CONFIG.phone} or dial Intercom 9.`
       }]);
     } finally {
       setLoading(false);
@@ -84,7 +84,7 @@ export default function AiConciergeModal({ isOpen, onClose }) {
             <div>
               <h3 style={{ fontSize: '1.2rem' }}>24/7 Grounded AI Concierge</h3>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                {HOTEL_CONFIG.name} • Rayagada Facts, Temple Sights & Room Guidance
+                {HOTEL_CONFIG.name} • Muniguda, Rayagada • 27 Rooms & 24/7 Desk Guidance
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function AiConciergeModal({ isOpen, onClose }) {
               type="text"
               className="form-input"
               style={{ flex: 1 }}
-              placeholder="Ask about 18-room tariffs, temple timings, or Rayagada trains..."
+              placeholder="Ask about 27-room tariffs, 24-hr check-out, Wi-Fi password, or Intercom..."
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value.slice(0, 400))}
               maxLength={400}

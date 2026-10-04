@@ -37,7 +37,9 @@ export default function InRoomGuestPortal({
 
   // Generate Wi-Fi QR code
   useEffect(() => {
-    const wifiString = `WIFI:S:Hotel_Sai_Guest;T:WPA;P:SaiRayagada765;H:false;;`;
+    const floor = roomNumber ? roomNumber[0] : '1';
+    const ssid = floor === '2' ? 'TP 2ND FLOOR' : floor === '3' ? 'TP 3RD FLOOR' : 'TP 1ST FLOOR';
+    const wifiString = `WIFI:S:${ssid};T:WPA;P:Elite@123;H:false;;`;
     QRCode.toDataURL(wifiString, {
       width: 320,
       margin: 2,
@@ -46,7 +48,7 @@ export default function InRoomGuestPortal({
     })
       .then(url => setWifiQrUrl(url))
       .catch(err => console.error('Wi-Fi QR error:', err));
-  }, []);
+  }, [roomNumber]);
 
   // Filter Menu
   const categories = ['All', 'Chef Specials', 'Odia Delicacies', 'Satvik & Jain', 'Main Course', 'Rice & Breads', 'Beverages'];
@@ -189,7 +191,7 @@ export default function InRoomGuestPortal({
   };
 
   const handleCopyWifi = () => {
-    navigator.clipboard.writeText('SaiRayagada765');
+    navigator.clipboard.writeText('Elite@123');
     setCopiedWifi(true);
     setTimeout(() => setCopiedWifi(false), 2500);
   };
@@ -281,7 +283,7 @@ export default function InRoomGuestPortal({
               <span>WhatsApp</span>
             </button>
             <a
-              href="tel:+917978043585"
+              href={`tel:${HOTEL_CONFIG.phone || '+916370757541'}`}
               style={{
                 background: 'rgba(16, 185, 129, 0.15)',
                 border: '1px solid #10b981',
@@ -950,7 +952,7 @@ export default function InRoomGuestPortal({
                   Wi-Fi Network (SSID)
                 </span>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
-                  Hotel_Sai_Guest
+                  {roomNumber && roomNumber[0] === '2' ? 'TP 2ND FLOOR' : roomNumber && roomNumber[0] === '3' ? 'TP 3RD FLOOR' : 'TP 1ST FLOOR'}
                 </div>
               </div>
 
@@ -969,7 +971,7 @@ export default function InRoomGuestPortal({
                   marginTop: '4px'
                 }}>
                   <span style={{ fontFamily: 'monospace', fontSize: '1rem', fontWeight: 800, color: '#fbbf24', letterSpacing: '1px' }}>
-                    SaiRayagada765
+                    Elite@123
                   </span>
                   <button
                     onClick={handleCopyWifi}
@@ -1004,6 +1006,56 @@ export default function InRoomGuestPortal({
               }}>
                 <span>Speed: <strong style={{ color: '#34d399' }}>100 Mbps Unlimited</strong></span>
                 <span>Security: <strong style={{ color: '#fff' }}>WPA2 Protected</strong></span>
+              </div>
+            </div>
+
+            {/* Intercom Telephone Directory Box */}
+            <div style={{
+              width: '100%',
+              background: 'linear-gradient(145deg, #0e1726, #090e18)',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              borderRadius: '14px',
+              padding: '1.25rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem' }}>
+                <Phone size={18} color="#d4af37" />
+                <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#fff' }}>
+                  In-Room Telephone &amp; Intercom Directory
+                </h3>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                {(HOTEL_CONFIG.intercomDirectory || [
+                  { label: "Hotel Reception", ext: "9" },
+                  { label: "Restaurant", ext: "111" },
+                  { label: "Kitchen", ext: "112" },
+                  { label: "Store Room", ext: "113" },
+                  { label: "Laundry", ext: "114" },
+                  { label: "GM Sir", ext: "115" },
+                  { label: "MD Sir", ext: "116" }
+                ]).map((item, idx) => (
+                  <div key={idx} style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '8px',
+                    padding: '0.5rem 0.75rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>{item.label}</span>
+                    <span style={{
+                      background: 'rgba(212, 175, 55, 0.15)',
+                      color: 'var(--gold-glow, #fbbf24)',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      fontFamily: 'monospace',
+                      fontWeight: 800,
+                      fontSize: '0.85rem'
+                    }}>
+                      Dial {item.ext}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

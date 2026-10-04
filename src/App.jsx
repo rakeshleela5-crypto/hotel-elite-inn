@@ -1286,7 +1286,7 @@ export default function App() {
           {
             title: "24/7 WhatsApp Concierge",
             icon: <MessageCircle className="h-5 w-5 text-emerald-400" />,
-            onClick: () => window.open('https://wa.me/917978043585?text=Hello%20Sri%20Sai%20Vasudev%20Residency%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking', '_blank', 'noopener,noreferrer')
+            onClick: () => window.open(`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`, '_blank', 'noopener,noreferrer')
           },
           {
             title: currentView === 'pms' ? "Exit PMS (Return to Website)" : "Reception PMS",
@@ -1307,7 +1307,7 @@ export default function App() {
       {/* 24/7 Floating WhatsApp Direct Concierge (Bottom Left) */}
       {currentView === 'guest' && (
         <a
-          href="https://wa.me/917978043585?text=Hello%20Sri%20Sai%20Vasudev%20Residency%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking"
+          href={`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`}
           target="_blank"
           rel="noopener noreferrer"
           style={{

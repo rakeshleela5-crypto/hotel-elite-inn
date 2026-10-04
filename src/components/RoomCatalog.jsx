@@ -16,9 +16,10 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
   const tabRefs = useRef({});
 
   const filterOptions = [
-    { id: 'all', label: 'All 18 Rooms' },
-    { id: '1', label: 'Ground Floor (101–107)' },
-    { id: '2', label: '1st Floor (201–211)' }
+    { id: 'all', label: 'All 27 Rooms' },
+    { id: '1', label: '1st Floor (101–109)' },
+    { id: '2', label: '2nd Floor (201–209)' },
+    { id: '3', label: '3rd Floor (301–309)' }
   ];
 
   // Update sliding gold pill position dynamically
@@ -38,7 +39,7 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
 
   const filteredTiers = selectedFloorFilter === 'all' 
     ? ROOM_TIERS 
-    : ROOM_TIERS.filter(t => t.floor === Number(selectedFloorFilter));
+    : ROOM_TIERS.filter(t => t.floor === Number(selectedFloorFilter) || (Array.isArray(t.floors) && t.floors.includes(Number(selectedFloorFilter))));
 
   const getTierStats = (tierName) => {
     const tierRooms = rooms.filter(r => r.tier === tierName);
@@ -70,13 +71,13 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
               letterSpacing: '0.08em',
               marginBottom: '0.5rem'
             }}>
-              <Sparkles size={14} /> 18 Curated Inventory Rooms
+              <Sparkles size={14} /> 27 Curated Inventory Rooms
             </div>
             <h2 style={{ fontSize: '2.4rem' }}>
-              4 Accommodation Categories Across <span className="gold-gradient-text">2 Dedicated Floors</span>
+              4 Accommodation Categories Across <span className="gold-gradient-text">3 Dedicated Floors</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '0.5rem', maxWidth: 650 }}>
-              Engineered with soundproof glazing, high-speed 5G Wi-Fi, 24-hr hot water, and authentic Odia hospitality. Featuring 7 rooms on the Ground Floor and 11 rooms on the 1st Floor.
+              Engineered with soundproof glazing, high-speed Wi-Fi, 24-hr check-out, and authentic hospitality. Featuring 9 rooms on the 1st Floor, 9 rooms on the 2nd Floor, and 9 rooms on the 3rd Floor.
             </p>
           </div>
 
@@ -391,8 +392,8 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
               cta="View Restaurant Menu"
             />
             <BentoCard
-              name="1.5 km RGDA Junction Fast Transit"
-              description="Seamless train transit assistance for Visakhapatnam, Bhubaneswar, and Raipur rail routes with 24/7 luggage concierge."
+              name="Muniguda Station Fast Transit"
+              description="Located Near Railway Station Main Road, Muniguda with instant walkable access to Muniguda Railway Station and 24/7 luggage concierge."
               Icon={Car}
               cta="Transit Information"
               className="md:col-span-2"
@@ -402,7 +403,7 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
             />
             <BentoCard
               name="Interactive 3D Isometric Navigation"
-              description="Tour all 18 authentic room keys across Ground and 1st Floors in real-time 3D rendered with Three.js web technology."
+              description="Tour all 27 authentic room keys across 3 Floors (101–309) in real-time 3D rendered with Three.js web technology."
               Icon={Layers}
               onClick={onOpen3DExplorer}
               cta="Launch 3D Explorer"

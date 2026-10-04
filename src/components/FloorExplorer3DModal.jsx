@@ -73,9 +73,9 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
     gridHelper.position.y = -0.05;
     scene.add(gridHelper);
 
-    // 5. Build 4 Floors with 10 rooms each
+    // 5. Build 3 Floors with 9 rooms each (27 rooms total)
     roomMeshesRef.current = [];
-    const floorHeights = [1, 4.5, 8, 11.5]; // Elevations for Floor 1, 2, 3, 4
+    const floorHeights = [1, 5, 9]; // Elevations for Floor 1, 2, 3
 
     const statusColors = {
       'Available': 0x10b981,
@@ -85,7 +85,7 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
       'VIP Hold': 0x8b5cf6
     };
 
-    [1, 2, 3, 4].forEach((floorNum, fIdx) => {
+    [1, 2, 3].forEach((floorNum, fIdx) => {
       const yPos = floorHeights[fIdx];
 
       // Floor Concrete Slab
@@ -110,18 +110,18 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
       corridor.userData = { isFloorSlab: true, floorNum };
       scene.add(corridor);
 
-      // 10 Rooms per floor (5 North side, 5 South side along corridor)
-      for (let i = 0; i < 10; i++) {
+      // 9 Rooms per floor (5 on one side, 4 on other side along corridor)
+      for (let i = 0; i < 9; i++) {
         const roomNum = `${floorNum}${String(i + 1).padStart(2, '0')}`;
         const roomData = rooms.find(r => r.roomNumber === roomNum) || {
           roomNumber: roomNum,
           floor: floorNum,
           status: 'Available',
-          tariff: floorNum === 1 ? 1699 : floorNum === 2 ? 2199 : floorNum === 3 ? 2899 : 3999
+          tariff: 2050
         };
 
         const isNorth = i < 5;
-        const xOffset = (i % 5) * 3.2 - 6.4;
+        const xOffset = isNorth ? (i * 3.2 - 6.4) : ((i - 5) * 3.6 - 5.4);
         const zOffset = isNorth ? -3.4 : 3.4;
 
         // Room Mesh
@@ -274,7 +274,7 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
             <div>
               <h3 style={{ fontSize: '1.25rem' }}>3D Architectural Floor Navigator</h3>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Sri Sai Vasudev Residency • 18 Rooms across Ground &amp; 1st Floors
+                Hotel Elite Inn • 27 Rooms across 3 Floors (Muniguda, Rayagada)
               </div>
             </div>
           </div>
@@ -295,7 +295,11 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
               >
                 All Floors
               </button>
-              {[1, 2].map(f => (
+              {[
+                { f: 1, label: 'Floor 1 (101-109)' },
+                { f: 2, label: 'Floor 2 (201-209)' },
+                { f: 3, label: 'Floor 3 (301-309)' }
+              ].map(({ f, label }) => (
                 <button
                   key={f}
                   onClick={() => setActiveFloorView(f)}
@@ -308,7 +312,7 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
                     color: activeFloorView === f ? '#060e1a' : '#fff'
                   }}
                 >
-                  {f === 1 ? 'Ground Floor (101-107)' : '1st Floor (201-211)'}
+                  {label}
                 </button>
               ))}
             </div>

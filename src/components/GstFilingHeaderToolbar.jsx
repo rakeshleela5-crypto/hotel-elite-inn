@@ -116,33 +116,24 @@ export default function GstFilingHeaderToolbar({
 
   // Button 4: WhatsApp CA
   const handleWhatsAppCa = () => {
-    const text = `🏛️ *SRI SAI VASUDEV RESIDENCY — GSTR-1 & TAX FILING BRIEFING*
+    const text = `🏛️ *${HOTEL_CONFIG.name.toUpperCase()} — TAX & FINANCIAL BRIEFING*
 📅 *Tax Period:* September 2026 (092026)
-🆔 *GSTIN:* ${HOTEL_CONFIG.gstin}
-📍 *Tax Office:* Rayagada Division (Odisha Code 21)
-👤 *Proprietor:* ${CA_FILING_STATION_METADATA.proprietorship.legalName}
+📍 *Location:* ${HOTEL_CONFIG.address}
+📞 *Phone:* ${HOTEL_CONFIG.phone}
 
 📊 *OUTWARD TAX RECONCILIATION:*
 • *Gross Turnover:* ₹13,57,660.00
 • *Taxable Base:* ₹12,93,009.52
-  - Room Accommodation (SAC 996311): ₹9,38,057.14 (Tax: ₹46,902.86)
-  - Pure Satvik Dining (HSN 996331): ₹3,09,047.62 (Tax: ₹15,452.38)
-  - Auxiliary Hospitality (SAC 996337): ₹45,904.76 (Tax: ₹2,295.24)
-• *CGST 2.5%:* ₹32,325.24
-• *SGST 2.5%:* ₹32,325.24
+  - Room Accommodation: ₹9,38,057.14
+  - Dining & Services: ₹3,54,952.38
 • *Total 5% Output GST:* *₹64,650.48*
 • *Eligible Input Tax Credit (ITC):* ₹14,820.00
-• *Net Cash GST Payable (GSTR-3B):* *₹49,830.48*
+• *Net Cash GST Payable:* *₹49,830.48*
 
-⏰ *STATUTORY FILING DUE DATES:*
-• GSTR-1 Due Date: *11th October 2026*
-• GSTR-3B Due Date: *20th October 2026*
+✅ *Statutory Status:* Audit trail reconciled with 27-room inventory and daily register.`;
 
-✅ *Statutory Status:* Indian GST Act Section 122 Compliant.
-Official GSTR-1 JSON (GSTN v1.7 Schema) and GSTR-1 Excel audit sheets generated and ready for direct upload at gst.gov.in.`;
-
-    openWhatsAppLink('917978043585', text);
-    triggerNotice('✓ Dispatched GSTR-1 Statutory Filing Summary to CA via WhatsApp!');
+    openWhatsAppLink('916370757541', text);
+    triggerNotice('✓ Dispatched Statutory Filing Summary via WhatsApp!');
   };
 
   return (

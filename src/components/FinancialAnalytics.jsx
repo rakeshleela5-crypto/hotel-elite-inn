@@ -88,11 +88,11 @@ export default function FinancialAnalytics({ bookings = [] }) {
 
   const handleExportCsv = () => {
     const rows = [
-      ['SRI SAI VASUDEV RESIDENCY - SEPTEMBER 2026 PROFIT & LOSS AUDIT LEDGER'],
-      ['Proprietor', CA_FILING_STATION_METADATA.proprietorship.legalName],
+      [`${HOTEL_CONFIG.name.toUpperCase()} - SEPTEMBER 2026 PROFIT & LOSS AUDIT LEDGER`],
+      ['Trade Name', HOTEL_CONFIG.name],
       ['GSTIN', HOTEL_CONFIG.gstin, 'PAN', HOTEL_CONFIG.pan],
       ['Address', HOTEL_CONFIG.address],
-      ['Inventory', '18 Rooms (Ground Floor: 101-107, 1st Floor: 201-211)'],
+      ['Inventory', '27 Rooms (1st Floor: 101-109, 2nd Floor: 201-209, 3rd Floor: 301-309)'],
       [''],
       ['HEAD', 'GROSS TURNOVER', 'NET TAXABLE', 'CGST 2.5%', 'SGST 2.5%'],
       ['Room Accommodation (SAC 996311)', '984960.00', '938057.14', '23451.43', '23451.43'],

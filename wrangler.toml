@@ -11,8 +11,8 @@ database_id = "4d58260c-d200-4493-9b1c-2ef44d891b0d"
 # Public environment variables (safe to commit)
 [vars]
 HOTEL_NAME  = "Hotel Elite Inn"
-HOTEL_PHONE = "+919999999999"
-HOTEL_EMAIL = "contact@hoteleliteinn.com"
+HOTEL_PHONE = "+916370757541"
+HOTEL_EMAIL = "hotelelitinn2023@gmail.com"
 
 # ──────────────────────────────────────────────────────────
 # SECRET bindings — NEVER put real values here.

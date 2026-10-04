@@ -1,21 +1,21 @@
 /**
- * Sri Sai Vasudev Residency - Enterprise WhatsApp Dispatch Engine
+ * Hotel Elite Inn - Enterprise WhatsApp Dispatch Engine
  * Provides pre-formatted, branded WhatsApp messaging templates for all hotel workflows.
- * Property: Sri Sai Vasudev Residency | Proprietor: Paidisetty Manmadha Rao
- * GSTIN: 21AEKPP8689J1ZS | Address: Near Andhra Bank, New Colony, Rayagada, Odisha - 765001
- * Primary Desk / Management Helpline: +91 79780 43585
+ * Property: Hotel Elite Inn
+ * Address: Near Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) – PIN 765020
+ * Helpline: +91 6370757541 | Email: hotelelitinn2023@gmail.com
  */
 
 import { HOTEL_CONFIG } from '../data/hotelData';
 
-const DEFAULT_HELPLINE = '917978043585';
-const PROPRIETOR_PHONE = '917978043585';
-const HOUSEKEEPING_LEAD_PHONE = '917978043585';
-const KITCHEN_CHEF_PHONE = '917978043585';
-const TECHNICIAN_PHONE = '917978043585';
+const DEFAULT_HELPLINE = '916370757541';
+const PROPRIETOR_PHONE = '916370757541';
+const HOUSEKEEPING_LEAD_PHONE = '916370757541';
+const KITCHEN_CHEF_PHONE = '916370757541';
+const TECHNICIAN_PHONE = '916370757541';
 
 /**
- * Normalizes phone number into an international standard (e.g. 917978043585).
+ * Normalizes phone number into an international standard (e.g. 916370757541).
  */
 export function formatWhatsAppPhone(phone) {
   if (!phone) return '';
@@ -38,9 +38,9 @@ export function openWhatsAppLink(phone, messageText) {
   return url;
 }
 
-const BRAND_HEADER = `🏨 *${HOTEL_CONFIG?.name || 'SRI SAI VASUDEV RESIDENCY'}*
-📍 _Near Andhra Bank, New Colony, Rayagada, Odisha - 765001_
-GSTIN: ${HOTEL_CONFIG?.gstin || '21AEKPP8689J1ZS'} | Front Desk: +91 79780 43585
+const BRAND_HEADER = `🏨 *${HOTEL_CONFIG?.name || 'HOTEL ELITE INN'}*
+📍 _${HOTEL_CONFIG?.address || 'Near Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) – PIN 765020'}_
+Phone: ${HOTEL_CONFIG?.phone || '+91 6370757541'} | Email: ${HOTEL_CONFIG?.email || 'hotelelitinn2023@gmail.com'}
 ─────────────────────────────────`;
 
 /**
@@ -49,31 +49,30 @@ GSTIN: ${HOTEL_CONFIG?.gstin || '21AEKPP8689J1ZS'} | Front Desk: +91 79780 43585
 export function sendBookingConfirmationWhatsApp(booking) {
   const text = `${BRAND_HEADER}
 🎉 *OFFICIAL BOOKING CONFIRMATION PASS*
-Reference ID: *${booking.id || booking.bookingId || 'SSVR-' + Date.now().toString().slice(-6)}*
+Reference ID: *${booking.id || booking.bookingId || 'HEI-' + Date.now().toString().slice(-6)}*
 
 Dear *${booking.guestName || 'Valued Guest'}*,
-Namaste! Your reservation at ${HOTEL_CONFIG?.name || 'Sri Sai Vasudev Residency'} is confirmed.
+Namaste! Your reservation at ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'} is confirmed.
 
 📋 *Stay Details:*
-• *Room Tier:* ${booking.roomTier || booking.tier || 'Executive Room'} (Room Key: *${booking.roomNumber || 'Allocated on Arrival'}*)
-• *Check-in Date:* ${booking.checkInDate || 'Today'} (12:00 PM)
-• *Check-out Date:* ${booking.checkOutDate || 'Tomorrow'} (11:00 AM)
+• *Room Tier:* ${booking.roomTier || booking.tier || 'Executive King Bed'} (Room Key: *${booking.roomNumber || 'Allocated on Arrival'}*)
+• *Check-in Date:* ${booking.checkInDate || 'Today'}
+• *Check-out Date:* ${booking.checkOutDate || 'Tomorrow'} (24-Hour Stay Cycle)
 • *Duration:* ${booking.nights || 1} Night(s) | Adults: ${booking.adults || 1}
 • *Total Tariff:* ₹${Number(booking.totalAmount || 0).toLocaleString('en-IN')}
 • *Advance Paid:* ₹${Number(booking.advanceDeposit || 0).toLocaleString('en-IN')}
 • *Balance Due:* ₹${Number(booking.balanceDue || 0).toLocaleString('en-IN')}
 
 ✨ *Complimentary Amenities Included:*
-• High-Speed Fiber Wi-Fi Pass
-• Pure Satvik Dining Option
-• Rayagada Railway Station (RGDA) Transfer Assistance
-• 24x7 Power Backup & Hot Water
+• High-Speed Wi-Fi Pass (Elite@123)
+• Complimentary Buffet Breakfast & 1L Mineral Water
+• In-Room Intercom (Dial 9 for Reception)
+• 24 Hours Check-out System
 
-🗺️ *Google Maps Property Pin:*
-https://maps.google.com/?q=Rayagada,Odisha,Near+Andhra+Bank
+🗺️ *Location:* Near Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) – PIN 765020
 
-Need assistance? Reply directly to this WhatsApp or dial +91 79780 43585.
-_We wish you a blessed, comfortable stay!_`;
+Need assistance? Reply directly to this WhatsApp or dial +91 6370757541.
+_We wish you a pleasant and comfortable stay!_`;
 
   return openWhatsAppLink(booking.phone || booking.guestPhone, text);
 }
@@ -90,14 +89,14 @@ export function sendRoomServiceOrderWhatsApp(order, target = 'kitchen') {
 🍽️ *${target === 'kitchen' ? 'KITCHEN ORDER TICKET (KOT) - LIVE DISPATCH' : 'IN-ROOM DINING ORDER SLIP'}*
 Order ID: *#${order.orderId || order.id || Date.now().toString().slice(-4)}* | Room: *ROOM ${order.roomNumber}*
 
-📋 *Itemized Satvik Menu:*
-${itemsText || '  • Satvik Pure Veg Dining Selection'}
+📋 *Itemized Dining Menu:*
+${itemsText || '  • In-Room Dining Selection'}
 
 💰 *Order Total:* ₹${Number(order.totalAmount || 0).toLocaleString('en-IN')}
 ⏱️ *Preparation ETA:* 20 - 25 Minutes
-📝 *Chef Notes:* ${order.notes || order.cookingNotes || 'No onion/garlic, pure satvik preparation.'}
+📝 *Chef Notes:* ${order.notes || order.cookingNotes || 'Fresh preparation.'}
 
-_${target === 'kitchen' ? 'Sent to Cannon Kitchen for immediate preparation.' : 'Thank you for dining with Sri Sai Vasudev Residency!'}_`;
+_${target === 'kitchen' ? 'Sent to Kitchen for immediate preparation.' : 'Thank you for dining with Hotel Elite Inn!'}_`;
 
   const phone = target === 'kitchen' ? KITCHEN_CHEF_PHONE : order.guestPhone;
   return openWhatsAppLink(phone, text);
@@ -249,7 +248,7 @@ ${quote.includeBanquet ? '• Banquet / Conference Hall: Included' : ''}
 🏦 *Bank Remittance Details:*
 • Bank: State Bank of India (SBI) Rayagada Main
 • Account: 3892019482 | IFSC: SBIN0000169
-• Beneficiary: Sri Sai Vasudev Residency
+• Beneficiary: ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}
 
 _Valid for 15 days. To confirm this block, please reply with approval._`;
 
@@ -268,7 +267,7 @@ Debtor: *${companyName}*
 ${gstin ? `GSTIN: ${gstin}` : ''}
 
 Dear Accounts Team,
-This is a courteous reminder regarding pending lodging billing balances for Sri Sai Vasudev Residency, Rayagada.
+This is a courteous reminder regarding pending lodging billing balances for ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}, Muniguda, Rayagada.
 
 💰 *Total Overdue Balance:* *₹${Number(balanceDue || 0).toLocaleString('en-IN')}*
 Aging Status: *${agingDays} Days Overdue*
@@ -277,11 +276,8 @@ Aging Status: *${agingDays} Days Overdue*
 ${invoiceList || '  • Outstanding Corporate Bill Vouchers Pending Settlement'}
 
 🏦 *Remittance Channel (NEFT / RTGS / UPI):*
-• Bank: SBI Rayagada Main Branch
-• A/C No: 3892019482
-• IFSC: SBIN0000169
-• Beneficiary: Sri Sai Vasudev Residency
-• UPI ID: 7978043585@sbi
+• Beneficiary: ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}
+• Phone / UPI: 6370757541
 
 _Please remit payment and share UTR reference on this WhatsApp for ledger reconciliation._`;
 
@@ -293,7 +289,7 @@ _Please remit payment and share UTR reference on this WhatsApp for ledger reconc
  */
 export function sendCheckoutSplitWhatsApp({ billType, billNo, companyOrGuest, gstin, roomNumber, period, amount, recipientPhone }) {
   const text = `${BRAND_HEADER}
-🧾 *GST TAX INVOICE - DIGITAL RECEIPT*
+🧾 *TAX INVOICE - DIGITAL RECEIPT*
 Invoice Number: *#${billNo}*
 Invoice Type: *${billType}* (Room ${roomNumber})
 
@@ -305,10 +301,11 @@ Stay Duration: ${period || 'Current Stay'}
 Status: *PAID & SETTLED*
 
 ✨ *Features & Amenities:*
-• Rule 46 Compliant India GST Tax Invoice
-• HSN/SAC Code: 996311 (Lodging) / 996331 (F&B)
+• 24 Hours Check-out System
+• Complimentary Buffet Breakfast & Mineral Water
+• In-Room Wi-Fi & Intercom Assistance
 
-Thank you for choosing ${HOTEL_CONFIG?.name || 'Sri Sai Vasudev Residency'}, Rayagada!`;
+Thank you for choosing ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}, Muniguda!`;
 
   return openWhatsAppLink(recipientPhone, text);
 }
@@ -318,9 +315,9 @@ Thank you for choosing ${HOTEL_CONFIG?.name || 'Sri Sai Vasudev Residency'}, Ray
  */
 export function sendCaFilingSummaryWhatsApp(data) {
   const text = `${BRAND_HEADER}
-📑 *MONTHLY GST & P&L FINANCIAL BRIEFING*
+📑 *MONTHLY FINANCIAL BRIEFING*
 Filing Period: *${data.period || 'Current Month'}*
-Property: Sri Sai Vasudev Residency | 18 Keys
+Property: ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'} | 27 Keys (Floors 1-3)
 
 📊 *Turnover & Tax Position:*
 • Gross Turnover: *₹${Number(data.grossTurnover || 0).toLocaleString('en-IN')}*

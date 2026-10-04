@@ -44,7 +44,7 @@ export default function Footer({
               </h3>
             </div>
             <p style={{ fontSize: '0.85rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-              Premier 18-room executive and pilgrim destination in Rayagada, Odisha. Offering refined comfort, authentic Odia cuisine, and seamless access to sacred shrines and regional industrial hubs.
+              Premier 27-room executive and hospitality destination in Muniguda, Rayagada, Odisha. Offering refined comfort, multi-cuisine dining, high-speed Wi-Fi, and 24-hour checkout.
             </p>
             <div style={{ fontSize: '0.8rem', color: 'var(--gold-glow)' }}>
               GSTIN: {HOTEL_CONFIG.gstin} • SAC: {HOTEL_CONFIG.sacCode}
@@ -59,7 +59,7 @@ export default function Footer({
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.88rem' }}>
               <li>
                 <a href="#inventory" style={{ color: 'inherit', transition: 'color 0.2s', textDecoration: 'none' }}>
-                  18-Room Inventory Catalog
+                  27-Room Inventory Catalog
                 </a>
               </li>
               <li>

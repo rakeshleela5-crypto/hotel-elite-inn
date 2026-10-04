@@ -102,9 +102,9 @@ export const TOTAL_MONTHLY_EXPENDITURES_SEP2026 = DAILY_EXPENDITURES_SEP2026.red
 
 // ─── 3. Real-Time 5% GST Compliance Ledger (Full Month Sep 2026) ───────────────
 export const GST_COMPLIANCE_LEDGER_SEP2026 = {
-  gstin: '21AEKPP8689J1ZS',
-  tradeName: 'Sri Sai Vasudev Residency',
-  legalName: 'PAIDISETTY MANMADHA RAO',
+  gstin: HOTEL_CONFIG.gstin,
+  tradeName: HOTEL_CONFIG.name,
+  legalName: HOTEL_CONFIG.name,
   stateCode: '21',
   jurisdiction: 'RAYAGADA DIVISION',
   filingPeriod: 'September 2026 (09/2026)',
@@ -489,18 +489,18 @@ export const CA_FILING_STATION_METADATA = {
   systemNumber: 'System #36',
   systemName: 'CA Filing Station & Financial Intelligence Engine',
   proprietorship: {
-    tradeName: 'Sri Sai Vasudev Residency',
-    legalName: 'PAIDISETTY MANMADHA RAO',
-    proprietor: 'Paidisetty Manmadha Rao',
-    gstin: '21AEKPP8689J1ZS',
-    pan: 'AEKPP8689J',
+    tradeName: HOTEL_CONFIG.name,
+    legalName: HOTEL_CONFIG.name,
+    proprietor: 'Management',
+    gstin: HOTEL_CONFIG.gstin,
+    pan: HOTEL_CONFIG.pan,
     stateCode: '21',
     state: 'Odisha',
     division: 'RAYAGADA DIVISION',
-    taxAuthority: 'Gulshan Sanodiya, Superintendent (Centre)',
-    regDate: '05/02/2025',
+    taxAuthority: 'Superintendent (Centre)',
+    regDate: '01/01/2023',
     regType: 'Regular Taxpayer',
-    address: 'Near Andhra Bank, New Colony, Rayagada, Odisha - 765001'
+    address: HOTEL_CONFIG.address
   },
   caAuditVerificationChecklist: [
     { rule: 'Section 16 CGST Act', check: 'All ITC claims backed by valid tax invoices & supplier GSTIN verification', status: 'Passed (100% Validated)' },

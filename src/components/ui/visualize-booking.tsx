@@ -222,14 +222,14 @@ const DEFAULT_SEPTEMBER_EVENTS: CalendarEventType[] = [
     day: '22',
     dateStr: 'Tue, 22 Sep 2026 (TODAY)',
     time: 'In-House Stay (Check-out 24-Sep)',
-    title: 'Mr. P. Ashok - JK Paper Mills Technical Consultant',
+    title: 'Mr. P. Ashok - Technical Consultant',
     category: 'room',
-    venue: 'Room 402 (Floor 4 Executive Room)',
-    organizer: 'JK Paper Mills Corporate Account',
+    venue: 'Room 302 (Floor 3 Executive King Bed)',
+    organizer: 'Corporate Account',
     contactPerson: 'P. Ashok (+91 94371 88201)',
     pax: '1 Guest (Occupied)',
     setup: 'Executive Room AC with King Bed',
-    billing: 'BTC (CORP-01) • Current Folio Balance: ₹10,084.38',
+    billing: 'Direct Bill • Current Folio Balance: ₹10,084.38',
     status: 'In-House',
     amount: 10084.38
   },
@@ -238,10 +238,10 @@ const DEFAULT_SEPTEMBER_EVENTS: CalendarEventType[] = [
     day: '22',
     dateStr: 'Tue, 22 Sep 2026 (TODAY)',
     time: 'In-House Stay (Check-out 23-Sep)',
-    title: 'Mr. Bijay Paswan - PRADAN Livelihood Project Field Lead',
+    title: 'Mr. Bijay Paswan - Field Operations Lead',
     category: 'corporate',
-    venue: 'Room 410 (Floor 4 Executive Room)',
-    organizer: 'PRADAN Rayagada Office',
+    venue: 'Room 304 (Floor 3 Executive King Bed)',
+    organizer: 'Corporate Account',
     contactPerson: 'Bijay Paswan (+91 88950 11422)',
     pax: '1 Guest (Occupied)',
     setup: 'Executive Room AC Single',
@@ -424,7 +424,7 @@ export const InteractiveCalendar = React.forwardRef<HTMLDivElement, InteractiveC
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-[rgba(212,175,55,0.15)] text-[#f3c64c] border border-[rgba(212,175,55,0.3)]">
                 <Sparkles className="size-3.5 text-[#f3c64c]" />
-                Sri Sai Vasudev Residency • Rayagada
+                Hotel Elite Inn • Muniguda, Rayagada
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[rgba(16,185,129,0.18)] text-[#34d399] border border-[rgba(16,185,129,0.35)]">
                 <span className="size-2 rounded-full bg-[#10b981] animate-pulse" />
@@ -848,7 +848,7 @@ export const InteractiveCalendar = React.forwardRef<HTMLDivElement, InteractiveC
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="bg-[#d4af37] text-[#060e1a] text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider">
-                        Sri Sai Vasudev Residency BEO
+                        Hotel Elite Inn BEO
                       </span>
                       <span className="text-[#fceec5] font-mono text-xs">
                         BEO #{selectedBeoEvent.id}

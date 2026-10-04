@@ -5,38 +5,38 @@ const FAQS = [
   {
     id: 'checkin',
     icon: Clock,
-    question: "What are the standard check-in and check-out timings?",
-    answer: "Standard Check-In is at 12:00 PM (Noon) and Check-Out is at 12:00 PM (24-hour stay cycle). Early check-in and late check-out are subject to real-time room availability and can be coordinated directly with our 24/7 reception desk at +91 6856 225555."
+    question: "What are the check-in and check-out timings?",
+    answer: "Hotel Elite Inn operates on a true 24-Hours Check-out System as stated on our official tariff card. Your 24-hour stay cycle begins when you check in! Every room stay includes complimentary buffet breakfast and 1 liter packaged drinking mineral water in the room. For early arrivals or custom timings, call +91 6370757541 or dial Intercom 9."
   },
   {
     id: 'proximity',
     icon: MapPin,
-    question: "How close is the hotel to Rayagada Railway Station & Maa Majhighariani Temple?",
-    answer: "Sri Sai Vasudev Residency is centrally located Near Andhra Bank, New Colony, Rayagada. Rayagada Railway Junction (RGDA) is just 1.5 km away (a 5-minute drive; complimentary station pickup is included for Executive & Suite guests). The sacred Maa Majhighariani Temple is only 2.0 km away (7-minute drive) with specialized early morning darshan coordination."
+    question: "Where is Hotel Elite Inn located and how close is the Railway Station?",
+    answer: "Hotel Elite Inn is strategically situated Near Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) – PIN 765020. The hotel is within quick walking distance of Muniguda Railway Station, providing seamless transit access for business travelers and tourists."
+  },
+  {
+    id: 'wifi-intercom',
+    icon: Sparkles,
+    question: "What are the in-room Wi-Fi networks and Intercom directory?",
+    answer: "High-speed Wi-Fi is provided complimentary on every floor: Floor 1 (SSID: 'TP 1ST FLOOR'), Floor 2 (SSID: 'TP 2ND FLOOR'), Floor 3 (SSID: 'TP 3RD FLOOR') with password 'Elite@123'. In-room Intercom extensions connect directly to Reception (9), Restaurant (111), Kitchen (112), Store Room (113), Laundry (114), GM Sir (115), and MD Sir (116)."
   },
   {
     id: 'id-proof',
     icon: ShieldCheck,
     question: "What government identity proofs are mandatory for check-in?",
-    answer: "As mandated by the District Police Administration under the Sarai Act 1867, every adult guest (18+ years) must present an original government-issued photo ID at check-in (Aadhaar, Passport, Voter ID, or Driving License). Under UIDAI guidelines, we only record masked Aadhaar numbers (last 4 digits) for your privacy. PAN cards are not accepted as proof of address."
+    answer: "As mandated by statutory hospitality regulations under the Sarai Act, all adult guests (18+ years) must present an original government-issued photo ID at check-in (Aadhaar, Passport, Voter ID, or Driving License). Under privacy guidelines, Aadhaar numbers are masked for guest security."
   },
   {
-    id: 'satvik-dining',
+    id: 'dining-plans',
     icon: Utensils,
-    question: "Do you serve authentic Odia cuisine and pure Satvik / Jain food?",
-    answer: "Yes. Our in-house Fenugreek Restaurant specializes in authentic regional Odia delicacies (such as Dalma, Pakhala Thali, and fresh Rayagada Chhena Poda) as well as 100% pure vegetarian, onion-garlic-free Satvik and Jain thalis prepared according to strict dietary traditions."
+    question: "What meal plans and dining options are available?",
+    answer: "All room bookings include complimentary buffet breakfast. In addition, guests can opt for MAP Plan (+₹600) or AP Plan (+₹1,000) for complete in-house dining. Room service can be ordered anytime by calling Intercom 111 (Restaurant) or 112 (Kitchen)."
   },
   {
-    id: 'corporate-gst',
-    icon: FileText,
-    question: "Can we receive corporate GST tax invoices for business travel?",
-    answer: "Absolutely. We generate Rule 46 compliant B2B tax invoices carrying our Odisha GSTIN (21AEKPP8689J1ZS) with statutory SAC codes (996311 for room accommodation, 996331 for dining). Corporate guests from JK Paper, IMFA, Utkal Alumina, and East Coast Railway can enter their company GSTIN during reservation to pass through 100% Input Tax Credit (ITC)."
-  },
-  {
-    id: 'refund-policy',
+    id: 'tariffs-cards',
     icon: CreditCard,
-    question: "What is your reservation cancellation and refund policy?",
-    answer: "Cancellations submitted more than 48 hours prior to check-in receive a 100% full refund (less gateway fees). Cancellations between 24 to 48 hours receive a 50% refund. Cancellations within 24 hours of arrival or no-shows are non-refundable to cover inventory displacement. Refunds are disbursed to the original UPI/bank account within 5–7 banking days."
+    question: "What are the room tariffs and accepted payment modes?",
+    answer: "Our 27 AC rooms are structured across 4 tiers: Standard Room (Single ₹1,450), Deluxe Room (Single ₹1,750 / Double ₹2,250), Executive Room (Single ₹2,050 / Double ₹2,450), and Suite Room (Single ₹3,250 / Double ₹3,850). Extra person/bed is ₹550. We accept Master & Visa credit/debit cards, UPI, and cash."
   }
 ];
 
@@ -87,7 +87,7 @@ export default function FaqSection({ onOpenBooking }) {
             Frequently Asked Questions
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: 600, margin: '0 auto' }}>
-            Everything you need to know regarding check-in procedures, temple transit, Satvik dining, and corporate invoicing at Rayagada's premier hospitality address.
+            Everything you need to know regarding 24-hr check-out, Wi-Fi credentials, Intercom directory, and tariffs at Hotel Elite Inn, Muniguda (Rayagada).
           </p>
         </div>
 
@@ -212,7 +212,7 @@ export default function FaqSection({ onOpenBooking }) {
               Have a special request or large group reservation?
             </div>
             <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-              Our front desk manager is on duty 24/7 at +91 6856 225555.
+              Our front desk manager is on duty 24/7 at +91 6370757541.
             </div>
           </div>
 

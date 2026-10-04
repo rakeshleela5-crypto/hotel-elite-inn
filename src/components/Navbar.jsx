@@ -182,7 +182,7 @@ export default function Navbar({
           </span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>|</span>
           <a 
-            href={`https://wa.me/917978043585?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`} 
+            href={`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`} 
             target="_blank" 
             rel="noopener noreferrer"
             style={{ 
@@ -530,7 +530,7 @@ export default function Navbar({
                 </span>
               </div>
               <div className="hide-on-mobile" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                Premier 18-Room Executive &amp; Pilgrim Hotel • Near Andhra Bank, New Colony • Emil Kowalski UI Motion
+                Premier 27-Room Executive &amp; Hospitality Destination • Near Railway Station Main Road, Muniguda (Odisha)
               </div>
             </div>
           </div>
@@ -746,7 +746,7 @@ export default function Navbar({
               )}
             </button>
             <button onClick={() => { setCurrentView('guest'); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fff', padding: '0.4rem 0' }}>
-              🏨 18-Room Inventory Catalog
+              🏨 27-Room Inventory Catalog
             </button>
             <button onClick={() => { onOpen3DExplorer(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#38bdf8', padding: '0.4rem 0' }}>
               🏛️ 3D Multi-Floor Explorer
@@ -790,7 +790,7 @@ export default function Navbar({
             </div>
             <div className="modal-body">
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem' }}>
-                Access to {HOTEL_CONFIG.name} Front Desk Management, 18-Room Tape Chart, Night Audit, and Sarai Act Police Register requires duty staff authorization.
+                Access to {HOTEL_CONFIG.name} Front Desk Management, 27-Room Tape Chart, Night Audit, and Sarai Act Police Register requires duty staff authorization.
               </p>
 
               <form onSubmit={verifyPin}>

@@ -187,7 +187,7 @@ export default function GstPreviewGuideModal({
               Preview GSTN GSTR-1 Portal JSON &amp; CA Statutory Filing Guide
             </h2>
             <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.2rem' }}>
-              Sri Sai Vasudev Residency • Tax Period: Full Month Sep 2026 (092026) • Rayagada Division (Odisha Code 21)
+              Hotel Elite Inn • Tax Period: Full Month Sep 2026 (092026) • Rayagada Division (Odisha Code 21)
             </div>
           </div>
 

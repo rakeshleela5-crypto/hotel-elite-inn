@@ -204,7 +204,7 @@ export default function DarshanAdvisorModal({ isOpen, onClose }) {
                   Dispatch Driver
                 </button>
                 <a
-                  href={`https://wa.me/917978043585?text=${encodeURIComponent(`Hello Sri Sai Vasudev Travel Desk, I would like to schedule a station transfer or cab for: ${selectedSight}.`)}`}
+                  href={`https://wa.me/916370757541?text=${encodeURIComponent(`Hello Hotel Elite Inn Travel Desk, I would like to schedule a station transfer or cab for: ${selectedSight}.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
