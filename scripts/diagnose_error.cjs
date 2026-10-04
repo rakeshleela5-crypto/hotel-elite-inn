@@ -23,6 +23,7 @@ async function run() {
 
         ws.onopen = () => {
           ws.send(JSON.stringify({ id: 1, method: 'Runtime.enable' }));
+          ws.send(JSON.stringify({ id: 10, method: 'Log.enable' }));
           setTimeout(() => {
             ws.send(JSON.stringify({
               id: 2,
@@ -36,17 +37,21 @@ async function run() {
                   footerExists: !!document.querySelector('footer'),
                   bodyChildCount: document.body.children.length,
                   rootChildCount: document.getElementById('root')?.children.length,
+                  rootHtml: document.getElementById('root')?.innerHTML?.slice(0, 300),
                   h1Text: document.querySelector('h1')?.innerText,
                   navbarBrandText: document.querySelector('.font-serif')?.innerText,
                   allHeadings: Array.from(document.querySelectorAll('h1, h2, h3')).map(h => h.innerText)
                 })`
               }
             }));
-          }, 2000);
+          }, 3000);
         };
 
         ws.onmessage = (event) => {
           const parsed = JSON.parse(event.data);
+          if (parsed.method === 'Runtime.exceptionThrown') {
+            console.error('EXCEPTION:', JSON.stringify(parsed.params.exceptionDetails, null, 2));
+          }
           if (parsed.id === 2) {
             console.log('DOM STATE:\n', JSON.parse(parsed.result?.result?.value || '{}'));
           }

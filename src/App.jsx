@@ -51,7 +51,7 @@ const LegalPoliciesModal = lazyWithRetry(() => import('./components/LegalPolicie
 const DpdpDataRightsModal = lazyWithRetry(() => import('./components/DpdpDataRightsModal'));
 const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPortal'));
 
-import { INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
+import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database } from 'lucide-react';

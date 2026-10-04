@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, Clock, MapPin, ShieldCheck, Utensils, FileText, CreditCard } from 'lucide-react';
+import { HelpCircle, ChevronDown, ChevronUp, Clock, MapPin, ShieldCheck, Utensils, FileText, CreditCard, Sparkles } from 'lucide-react';
 
 const FAQS = [
   {
