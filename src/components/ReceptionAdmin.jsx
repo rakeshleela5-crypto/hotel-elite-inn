@@ -31,6 +31,8 @@ import UniversalDateFilterBar from './UniversalDateFilterBar';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
 import { useUniversalInlineEdit, InlineEditorBanner, InlineText, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
+import StewardQrManagerModal from './StewardQrManagerModal';
+import { playOrderAlert } from '../utils/soundAlert';
 
 // Frequent VIP & Corporate Guests for instant Walk-in auto-fill
 const FREQUENT_VIP_GUESTS = [
@@ -131,6 +133,7 @@ export default function ReceptionAdmin({
   // Operational Modals: Room QR, Backup JSON, Live Food Orders, Room Services Care, Transit, Transfer, Wake-Up
   const [roomQrOpen, setRoomQrOpen] = useState(false);
   const [selectedRoomForQr, setSelectedRoomForQr] = useState('101');
+  const [qrHubOpen, setQrHubOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const [liveOrdersOpen, setLiveOrdersOpen] = useState(false);
   const [roomServicesCareOpen, setRoomServicesCareOpen] = useState(false);
@@ -2735,7 +2738,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             { key: 'F7', label: 'Night Audit', color: '#c084fc', onClick: onOpenNightAuditModal || (() => setActiveTab('cashier-audit')) },
             { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal },
             { key: 'F9', label: '26-Col Sales Reg', color: 'var(--gold-glow)', onClick: onOpenAuditedSalesRegister },
-            { key: 'F10', label: 'Rest. Sales Reg', color: '#fbbf24', onClick: onOpenAuditedRestaurantRegister }
+            { key: 'F10', label: 'Rest. Sales Reg', color: '#fbbf24', onClick: onOpenAuditedRestaurantRegister },
+            { key: 'F11', label: '📱 QR Code Hub', color: '#10b981', onClick: () => setQrHubOpen(true) }
           ].map(item => (
             <button
               key={item.key}
@@ -9843,6 +9847,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         isOpen={roomQrOpen}
         onClose={() => setRoomQrOpen(false)}
         initialRoomNumber={selectedRoomForQr}
+        rooms={rooms}
+      />
+
+      <StewardQrManagerModal
+        isOpen={qrHubOpen}
+        onClose={() => setQrHubOpen(false)}
         rooms={rooms}
       />
 

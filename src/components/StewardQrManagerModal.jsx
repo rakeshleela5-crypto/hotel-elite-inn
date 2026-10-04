@@ -1,98 +1,222 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'qrcode';
 import { 
   X, QrCode, Smartphone, ChefHat, UserCheck, Copy, Check, 
-  Printer, ExternalLink, Sparkles, ShieldCheck 
+  Printer, ExternalLink, Sparkles, ShieldCheck, Building2,
+  Utensils, Wifi, Bed, Download
 } from 'lucide-react';
 import { RECOGNIZED_STEWARDS } from './StewardMobileOrderPad';
+import { HOTEL_CONFIG } from '../data/hotelData';
 
-export default function StewardQrManagerModal({ isOpen, onClose }) {
-  const [selectedTab, setSelectedTab] = useState('stewards'); // 'stewards', 'kitchen'
-  const [activeStewardId, setActiveStewardId] = useState('SADANANDA');
-  const [qrDataUrl, setQrDataUrl] = useState('');
+// All 27 rooms across 3 floors
+const ALL_ROOMS = [
+  '101','102','103','104','105','106','107','108','109',
+  '201','202','203','204','205','206','207','208','209',
+  '301','302','303','304','305','306','307','308','309'
+];
+
+// Individual QR Card Component (generates its own QR inline)
+function QrBadgeCard({ label, sublabel, url, colorAccent = '#fbbf24', icon, badgeCode, darkColor = '#0f172a' }) {
+  const [qrUrl, setQrUrl] = useState('');
   const [copied, setCopied] = useState(false);
-  const printRef = useRef(null);
+
+  useEffect(() => {
+    QRCode.toDataURL(url, {
+      width: 260,
+      margin: 2,
+      color: { dark: darkColor, light: '#ffffff' },
+      errorCorrectionLevel: 'H'
+    })
+    .then(dataUrl => setQrUrl(dataUrl))
+    .catch(err => console.error('QR err:', err));
+  }, [url, darkColor]);
+
+  const handleCopy = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{
+      background: '#0b1120',
+      border: `1px solid ${colorAccent}33`,
+      borderRadius: '12px',
+      padding: '1rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '0.6rem',
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      cursor: 'default'
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = `0 8px 25px ${colorAccent}22`;
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = 'none';
+    }}
+    >
+      {/* Badge Header */}
+      <div style={{ textAlign: 'center', width: '100%' }}>
+        <div style={{ fontSize: '0.62rem', color: '#94a3b8', letterSpacing: '0.06em', fontWeight: 700 }}>
+          HOTEL ELITE INN • MUNIGUDA
+        </div>
+        <div style={{ fontSize: '0.92rem', fontWeight: 900, color: colorAccent, marginTop: '2px' }}>
+          {icon} {label}
+        </div>
+        {sublabel && (
+          <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '1px' }}>{sublabel}</div>
+        )}
+      </div>
+
+      {/* QR Code */}
+      <div style={{
+        background: '#fff',
+        padding: '6px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 15px rgba(0,0,0,0.6)'
+      }}>
+        {qrUrl ? (
+          <img src={qrUrl} alt={`QR: ${label}`} style={{ width: 130, height: 130, display: 'block' }} />
+        ) : (
+          <div style={{ width: 130, height: 130, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666', fontSize: '0.7rem' }}>
+            Generating...
+          </div>
+        )}
+      </div>
+
+      {/* Badge Code */}
+      {badgeCode && (
+        <div style={{
+          fontSize: '0.65rem',
+          fontWeight: 800,
+          color: colorAccent,
+          background: `${colorAccent}15`,
+          padding: '2px 8px',
+          borderRadius: '10px',
+          letterSpacing: '0.04em'
+        }}>
+          {badgeCode}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div style={{ display: 'flex', gap: '4px', width: '100%' }}>
+        <button
+          type="button"
+          onClick={handleCopy}
+          style={{
+            flex: 1,
+            padding: '4px 6px',
+            borderRadius: '5px',
+            background: copied ? '#10b981' : 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: copied ? '#fff' : '#cbd5e1',
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '3px'
+          }}
+        >
+          {copied ? <Check size={10} /> : <Copy size={10} />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            flex: 1,
+            padding: '4px 6px',
+            borderRadius: '5px',
+            background: `${colorAccent}20`,
+            border: `1px solid ${colorAccent}40`,
+            color: colorAccent,
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            textDecoration: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '3px'
+          }}
+        >
+          <ExternalLink size={10} />
+          Open
+        </a>
+      </div>
+    </div>
+  );
+}
+
+export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
+  const [selectedTab, setSelectedTab] = useState('stewards'); // 'stewards', 'kitchen', 'rooms'
+  const [roomFloorFilter, setRoomFloorFilter] = useState('all'); // 'all', '1', '2', '3'
 
   const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hotel-elite-inn.pages.dev';
 
-  const currentSteward = RECOGNIZED_STEWARDS.find(s => s.id === activeStewardId) || RECOGNIZED_STEWARDS[0];
-
-  const targetUrl = selectedTab === 'stewards'
-    ? `${origin}/?view=steward&staff=${currentSteward.id}`
-    : `${origin}/?view=kds`;
-
-  // Generate QR Code data URL
-  useEffect(() => {
-    if (!isOpen) return;
-
-    QRCode.toDataURL(targetUrl, {
-      width: 320,
-      margin: 2,
-      color: {
-        dark: selectedTab === 'stewards' ? '#0f172a' : '#7f1d1d',
-        light: '#ffffff'
-      }
-    })
-    .then(url => setQrDataUrl(url))
-    .catch(err => console.error('QR generation error:', err));
-  }, [isOpen, selectedTab, activeStewardId, targetUrl]);
-
   if (!isOpen) return null;
-
-  const handleCopyLink = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(targetUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    }
-  };
 
   const handlePrint = () => {
     window.print();
   };
 
+  // Filtered rooms by floor
+  const filteredRooms = roomFloorFilter === 'all' 
+    ? ALL_ROOMS 
+    : ALL_ROOMS.filter(r => r[0] === roomFloorFilter);
+
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(0,0,0,0.85)',
+      background: 'rgba(0,0,0,0.88)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 100000,
-      padding: '1rem',
+      padding: '0.75rem',
       backdropFilter: 'blur(6px)',
       fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
     }}>
-      <div className="glass-panel emil-modal-enter" style={{
+      <div style={{
         width: '100%',
-        maxWidth: 720,
-        maxHeight: '90vh',
+        maxWidth: 960,
+        maxHeight: '92vh',
         display: 'flex',
         flexDirection: 'column',
         background: '#0c1220',
         border: '1px solid rgba(212, 175, 55, 0.4)',
         borderRadius: '14px',
-        padding: '1.25rem',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.95)'
+        boxShadow: '0 25px 60px rgba(0,0,0,0.95)',
+        overflow: 'hidden'
       }}>
         {/* Header */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '1rem',
+          padding: '1rem 1.25rem',
           borderBottom: '1px solid rgba(255,255,255,0.08)',
-          paddingBottom: '0.75rem'
+          background: 'rgba(0,0,0,0.3)',
+          flexShrink: 0
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '1.35rem' }}>📱</span>
+            <QrCode size={22} color="#fbbf24" />
             <div>
-              <h3 style={{ fontSize: '1.2rem', color: '#fff', margin: 0, fontWeight: 800 }}>
-                Steward &amp; Kitchen Mobile QR Badges
+              <h3 style={{ fontSize: '1.15rem', color: '#fff', margin: 0, fontWeight: 900 }}>
+                Hotel Elite Inn — Complete QR Code Hub
               </h3>
               <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                Scan to open instant mobile portals without typing passwords
+                6 Steward Badges + 1 Kitchen KDS + 27 Room QR Codes — All in One Place
               </div>
             </div>
           </div>
@@ -100,249 +224,288 @@ export default function StewardQrManagerModal({ isOpen, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+            style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '6px', borderRadius: '6px' }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Tab Switcher: Stewards vs Kitchen KDS */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+        {/* 3-Tab Switcher: Stewards | Kitchen KDS | Room QR Codes */}
+        <div style={{
+          display: 'flex',
+          gap: '0.5rem',
+          padding: '0.75rem 1.25rem',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(0,0,0,0.2)',
+          flexShrink: 0,
+          flexWrap: 'wrap'
+        }}>
           <button
             type="button"
             onClick={() => setSelectedTab('stewards')}
             style={{
-              flex: 1,
-              padding: '0.6rem',
+              flex: '1 1 auto',
+              padding: '0.55rem 0.75rem',
               borderRadius: '8px',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.45rem',
+              gap: '0.4rem',
               background: selectedTab === 'stewards' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255,255,255,0.04)',
               border: selectedTab === 'stewards' ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.08)',
               color: selectedTab === 'stewards' ? '#fbbf24' : '#94a3b8'
             }}
           >
-            <Smartphone size={16} />
-            <span>Steward Floor Order Pads ({RECOGNIZED_STEWARDS.length})</span>
+            <Smartphone size={15} />
+            👨‍🍳 Steward Pads ({RECOGNIZED_STEWARDS.length})
           </button>
 
           <button
             type="button"
             onClick={() => setSelectedTab('kitchen')}
             style={{
-              flex: 1,
-              padding: '0.6rem',
+              flex: '1 1 auto',
+              padding: '0.55rem 0.75rem',
               borderRadius: '8px',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.45rem',
+              gap: '0.4rem',
               background: selectedTab === 'kitchen' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.04)',
               border: selectedTab === 'kitchen' ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.08)',
               color: selectedTab === 'kitchen' ? '#f87171' : '#94a3b8'
             }}
           >
-            <ChefHat size={16} />
-            <span>Master Kitchen Display (KDS)</span>
+            <ChefHat size={15} />
+            🍳 Kitchen KDS (1)
           </button>
-        </div>
 
-        {/* Content Area */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
-          {/* Left Column: Steward Badges Selector */}
-          {selectedTab === 'stewards' && (
-            <div style={{ flex: '1 1 240px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.2rem' }}>
-                SELECT STEWARD BADGE:
-              </div>
-              {RECOGNIZED_STEWARDS.map(stw => (
-                <button
-                  key={stw.id}
-                  type="button"
-                  onClick={() => setActiveStewardId(stw.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.6rem 0.85rem',
-                    borderRadius: '8px',
-                    background: activeStewardId === stw.id ? 'rgba(245, 158, 11, 0.18)' : 'rgba(255,255,255,0.03)',
-                    border: activeStewardId === stw.id ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.06)',
-                    color: activeStewardId === stw.id ? '#fbbf24' : '#fff',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    textAlign: 'left'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '1.1rem' }}>👨‍🍳</span>
-                    <div>
-                      <div style={{ fontSize: '0.88rem' }}>{stw.name}</div>
-                      <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Badge: {stw.code}</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize: '0.72rem', opacity: 0.8 }}>Scan QR ➔</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Right Column / Center: QR Card Preview */}
-          <div style={{
-            flex: '1 1 300px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(255,255,255,0.02)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '12px',
-            padding: '1.25rem'
-          }}>
-            {/* Laminated Badge Header */}
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '1rem',
-              color: selectedTab === 'stewards' ? '#fbbf24' : '#f87171'
-            }}>
-              <div style={{ fontSize: '0.72rem', letterSpacing: '0.08em', fontWeight: 800 }}>
-                HOTEL ELITE INN • MUNIGUDA
-              </div>
-              <div style={{ fontSize: '1.15rem', fontWeight: 900, color: '#fff', marginTop: '2px' }}>
-                {selectedTab === 'stewards' ? `STEWARD: ${currentSteward.name.toUpperCase()}` : 'CHEF KITCHEN DISPLAY (KDS)'}
-              </div>
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                {selectedTab === 'stewards' ? `Floor Order Pad • Badge ${currentSteward.code}` : 'Live Kitchen Orders Feed'}
-              </div>
-            </div>
-
-            {/* QR Code Container */}
-            <div style={{
-              background: '#fff',
-              padding: '10px',
-              borderRadius: '12px',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-              marginBottom: '1rem'
-            }}>
-              {qrDataUrl ? (
-                <img src={qrDataUrl} alt="Portal QR Code" style={{ width: 190, height: 190, display: 'block' }} />
-              ) : (
-                <div style={{ width: 190, height: 190, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000' }}>
-                  Generating QR...
-                </div>
-              )}
-            </div>
-
-            <div style={{ fontSize: '0.72rem', color: '#cbd5e1', textAlign: 'center', maxWidth: '280px', marginBottom: '1rem', lineHeight: 1.4 }}>
-              📷 <strong>Scan with any mobile camera:</strong> Instantly opens the portal with zero login required.
-            </div>
-
-            {/* Actions: Copy Link & Open */}
-            <div style={{ display: 'flex', gap: '0.5rem', width: '100%', maxWidth: '300px' }}>
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                style={{
-                  flex: 1,
-                  padding: '0.55rem',
-                  borderRadius: '6px',
-                  background: copied ? '#10b981' : 'rgba(255,255,255,0.08)',
-                  border: copied ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.15)',
-                  color: '#fff',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '4px'
-                }}
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-                <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-              </button>
-
-              <a
-                href={targetUrl}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  flex: 1,
-                  padding: '0.55rem',
-                  borderRadius: '6px',
-                  background: '#2563eb',
-                  border: 'none',
-                  color: '#fff',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '4px'
-                }}
-              >
-                <ExternalLink size={14} />
-                <span>Open View</span>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{
-          marginTop: '1rem',
-          paddingTop: '0.75rem',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
           <button
             type="button"
-            onClick={handlePrint}
+            onClick={() => setSelectedTab('rooms')}
             style={{
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              background: 'rgba(212, 175, 55, 0.15)',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              color: '#fbbf24',
-              fontSize: '0.78rem',
-              fontWeight: 700,
+              flex: '1 1 auto',
+              padding: '0.55rem 0.75rem',
+              borderRadius: '8px',
+              fontSize: '0.82rem',
+              fontWeight: 800,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px'
+              justifyContent: 'center',
+              gap: '0.4rem',
+              background: selectedTab === 'rooms' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255,255,255,0.04)',
+              border: selectedTab === 'rooms' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
+              color: selectedTab === 'rooms' ? '#38bdf8' : '#94a3b8'
             }}
           >
-            <Printer size={15} />
-            <span>Print Laminated Badge Sheet (A4)</span>
+            <Building2 size={15} />
+            🏨 Room QR Codes ({ALL_ROOMS.length})
           </button>
+        </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              padding: '0.5rem 1.25rem',
-              background: '#334155',
-              border: 'none',
-              color: '#fff',
-              borderRadius: '6px',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              cursor: 'pointer'
-            }}
-          >
-            Close
-          </button>
+        {/* Scrollable Content Area */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.25rem' }}>
+
+          {/* ========== TAB 1: STEWARD QR BADGES ========== */}
+          {selectedTab === 'stewards' && (
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <UserCheck size={14} />
+                INDIVIDUAL STEWARD FLOOR ORDER PAD QR BADGES — Each steward scans their personal QR to open their order pad instantly
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '1rem'
+              }}>
+                {RECOGNIZED_STEWARDS.map(stw => (
+                  <QrBadgeCard
+                    key={stw.id}
+                    label={`STEWARD: ${stw.name}`}
+                    sublabel={`Floor Order Pad • Badge ${stw.code}`}
+                    url={`${origin}/?view=steward&staff=${stw.id}`}
+                    colorAccent="#fbbf24"
+                    icon="👨‍🍳"
+                    badgeCode={stw.code}
+                    darkColor="#0f172a"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========== TAB 2: KITCHEN KDS QR ========== */}
+          {selectedTab === 'kitchen' && (
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <ChefHat size={14} />
+                KITCHEN MANAGER DISPLAY (KDS) — Chef scans this QR to see all live incoming orders from stewards in real-time
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '1rem',
+                maxWidth: '600px'
+              }}>
+                <QrBadgeCard
+                  label="CHEF KITCHEN DISPLAY"
+                  sublabel="Live Real-Time Orders Feed (KDS)"
+                  url={`${origin}/?view=kds`}
+                  colorAccent="#ef4444"
+                  icon="🍳"
+                  badgeCode="KITCHEN-KDS-MASTER"
+                  darkColor="#7f1d1d"
+                />
+              </div>
+
+              <div style={{
+                marginTop: '1.5rem',
+                padding: '1rem',
+                background: 'rgba(239, 68, 68, 0.08)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                color: '#fca5a5',
+                lineHeight: 1.5
+              }}>
+                <strong>📋 Kitchen Display Instructions:</strong>
+                <ul style={{ margin: '0.5rem 0 0 1.2rem', padding: 0 }}>
+                  <li>Mount a tablet or spare phone on the kitchen dispatch counter wall.</li>
+                  <li>Scan the QR code above or open the link directly.</li>
+                  <li>The display will show all KOTs (Kitchen Order Tickets) from stewards in real-time.</li>
+                  <li>A <strong>loud bell chime 🔔</strong> will ring whenever a new order arrives.</li>
+                  <li>Chef taps <strong>"Food Ready"</strong> when cooking is done — steward sees the update instantly.</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* ========== TAB 3: ROOM QR CODES ========== */}
+          {selectedTab === 'rooms' && (
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Building2 size={14} />
+                IN-ROOM GUEST QR CODES — Place in each room for guests to scan for in-room dining, room service, WiFi & hotel services
+              </div>
+
+              {/* Floor Filter Chips */}
+              <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                {[
+                  { key: 'all', label: `All Floors (${ALL_ROOMS.length})` },
+                  { key: '1', label: '1st Floor (101-109)' },
+                  { key: '2', label: '2nd Floor (201-209)' },
+                  { key: '3', label: '3rd Floor (301-309)' }
+                ].map(f => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => setRoomFloorFilter(f.key)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '16px',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      background: roomFloorFilter === f.key ? '#38bdf8' : 'rgba(255,255,255,0.06)',
+                      color: roomFloorFilter === f.key ? '#000' : '#cbd5e1',
+                      border: roomFloorFilter === f.key ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)'
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))',
+                gap: '0.85rem'
+              }}>
+                {filteredRooms.map(roomNum => {
+                  const floor = roomNum[0];
+                  const floorColor = floor === '1' ? '#10b981' : floor === '2' ? '#38bdf8' : '#a78bfa';
+                  return (
+                    <QrBadgeCard
+                      key={roomNum}
+                      label={`Room ${roomNum}`}
+                      sublabel={`${floor === '1' ? '1st' : floor === '2' ? '2nd' : '3rd'} Floor • In-Room Dining`}
+                      url={`${origin}/?room=${roomNum}&source=room_qr`}
+                      colorAccent={floorColor}
+                      icon="🏨"
+                      badgeCode={`ROOM-${roomNum}`}
+                      darkColor="#0a192f"
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer with Print & Summary */}
+        <div style={{
+          padding: '0.75rem 1.25rem',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(0,0,0,0.3)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          flexShrink: 0
+        }}>
+          <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+            <strong style={{ color: '#fbbf24' }}>{RECOGNIZED_STEWARDS.length} Steward</strong> + <strong style={{ color: '#ef4444' }}>1 Kitchen</strong> + <strong style={{ color: '#38bdf8' }}>{ALL_ROOMS.length} Room</strong> QR Codes = <strong style={{ color: '#fff' }}>{RECOGNIZED_STEWARDS.length + 1 + ALL_ROOMS.length} Total</strong>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              type="button"
+              onClick={handlePrint}
+              style={{
+                padding: '0.45rem 0.9rem',
+                borderRadius: '6px',
+                background: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.4)',
+                color: '#fbbf24',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              <Printer size={14} />
+              Print QR Badge Sheet (A4)
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                padding: '0.45rem 1rem',
+                background: '#334155',
+                border: 'none',
+                color: '#fff',
+                borderRadius: '6px',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer'
+              }}
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>
