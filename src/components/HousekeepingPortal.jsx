@@ -25,11 +25,13 @@ export default function HousekeepingPortal({
   const [cleaningNotes, setCleaningNotes] = useState('');
 
   const ATTENDANTS = [
-    { name: 'Bikram Mohanty', phone: '+91 6370757541', role: 'Floor Lead' },
-    { name: 'Ramesh Gouda', phone: '+91 94371 00214', role: 'Room Attendant' },
-    { name: 'Suresh Nayak', phone: '+91 98610 55431', role: 'Room Attendant' },
-    { name: 'Muna Pradhan', phone: '+91 94378 12398', role: 'Housekeeping Boy' },
-    { name: 'Sadananda Rao', phone: '+91 63702 44901', role: 'General Services' }
+    { name: 'Bikram Mohanty', phone: '+91 63707 57541', role: 'Floor Lead' },
+    { name: 'Siddu Rao', phone: '+91 94371 00214', role: 'Room Attendant' },
+    { name: 'Sakti Majhi', phone: '+91 98610 55431', role: 'Room Attendant' },
+    { name: 'Krishna Nayak', phone: '+91 94378 12398', role: 'Linen & Laundry' },
+    { name: 'Monnu Pradhan', phone: '+91 63702 44901', role: 'Housekeeping Boy' },
+    { name: 'Ramesh Gouda', phone: '+91 94382 77112', role: 'General Services' },
+    { name: 'Suresh Sabar', phone: '+91 98619 44320', role: 'Night Attendant' }
   ];
 
   const showToast = (msg) => {

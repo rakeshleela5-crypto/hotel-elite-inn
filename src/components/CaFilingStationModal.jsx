@@ -13,6 +13,7 @@ import { sendCaFilingSummaryWhatsApp } from '../utils/whatsappDispatch';
 import { exportGstr1ExcelWorkbook } from '../utils/gstGovExport';
 import GstFilingHeaderToolbar from './GstFilingHeaderToolbar';
 import GstPreviewGuideModal from './GstPreviewGuideModal';
+import { generateGstr1Json, downloadGstr1File, HOTEL_CREDENTIALS } from '../utils/taxUtils';
 import { 
   PAYMENT_METHOD_REVENUE_SEP2026,
   TOTAL_GROSS_REVENUE_SEP2026,
@@ -84,72 +85,34 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
     });
   }, [expenseSearch, expenseFilter]);
 
-  // Export CA-Ready GSTR-1 JSON
+  // Export CA-Ready GSTR-1 JSON with Official Multi-Tier GST (Rooms 12%, Dining 5%, Banquet 18%)
   const handleExportGstr1Json = () => {
-    const gstr1Payload = {
-      gstin: HOTEL_CONFIG.gstin,
-      fp: '092026',
-      legal_name: CA_FILING_STATION_METADATA.proprietorship.legalName,
-      trade_name: HOTEL_CONFIG.tradeName,
-      b2b: [
-        {
-          ctin: '21AAACJ1288P1ZZ',
-          cname: 'JK Paper Mills Ltd.',
-          inv: [
-            {
-              inum: 'SSVR-B2B-2026-0901',
-              idt: '24-09-2026',
-              val: 89600.00,
-              pos: '21',
-              rchrg: 'N',
-              inv_typ: 'R',
-              itms: [{ num: 1, itm_det: { rt: 5.0, txval: 85333.33, camt: 2133.33, samt: 2133.33, csamt: 0.0 } }]
-            }
-          ]
-        },
-        {
-          ctin: '07AAACG1509J1ZQ',
-          cname: 'GAIL (India) Limited',
-          inv: [
-            {
-              inum: 'SSVR-B2B-2026-0902',
-              idt: '25-09-2026',
-              val: 73320.00,
-              pos: '21',
-              rchrg: 'N',
-              inv_typ: 'R',
-              itms: [{ num: 1, itm_det: { rt: 5.0, txval: 69828.57, camt: 1745.71, samt: 1745.71, csamt: 0.0 } }]
-            }
-          ]
-        }
+    const gstr1Payload = generateGstr1Json({
+      bookings: [
+        { bookingId: 'BK-101', tariff: 2200, isB2b: true, corporateGstin: '21AABCL1234F1Z1', checkInDate: '2026-09-02' },
+        { bookingId: 'BK-102', tariff: 1800, isB2b: false, checkInDate: '2026-09-05' },
+        { bookingId: 'BK-204', tariff: 3500, isB2b: true, corporateGstin: '21AAACJ5678M1Z9', checkInDate: '2026-09-12' },
+        { bookingId: 'BK-206', tariff: 2400, isB2b: false, checkInDate: '2026-09-18' }
       ],
-      b2cs: [
-        { sply_ty: 'INTRA', pos: '21', rt: 5.0, txval: 1137847.62, camt: 28446.19, samt: 28446.19, csamt: 0.0 }
+      banquetEvents: [
+        { eventName: 'Vedanta Executive Annual Meet', amount: 85000, isB2b: true, gstin: '21AABCV9999P1Z2', date: '2026-09-12' },
+        { eventName: 'Maa Majhighariani Reception', amount: 45000, isB2b: false, date: '2026-09-22' }
       ],
-      hsn: {
-        data: [
-          { num: 1, hsn_sc: '996311', desc: 'Room Accommodation Services', uqc: 'NA', qty: 432, txval: 938057.14, rt: 5.0, camt: 23451.43, samt: 23451.43, csamt: 0.0 },
-          { num: 2, hsn_sc: '996331', desc: 'Restaurant & In-Room Dining', uqc: 'NA', qty: 1150, txval: 309047.62, rt: 5.0, camt: 7726.19, samt: 7726.19, csamt: 0.0 },
-          { num: 3, hsn_sc: '996337', desc: 'Auxiliary Hospitality Services', uqc: 'NA', qty: 140, txval: 45904.76, rt: 5.0, camt: 1147.62, samt: 1147.62, csamt: 0.0 }
-        ]
-      },
-      doc_issue: {
-        doc_det: [
-          { doc_num: 1, doc_typ: 'Invoices for outward supply', from: 'SSVR-2026-0001', to: 'SSVR-2026-0410', totnum: 410, canc: 12, net_issue: 398 }
-        ]
-      }
-    };
+      restaurantOrders: [
+        { amount: 188400, orderType: 'room' },
+        { amount: 82600, orderType: 'dining' },
+        { amount: 28500, orderType: 'pantry' },
+        { amount: 25000, orderType: 'catering' }
+      ],
+      month: '09',
+      year: '2026',
+      hotelGstin: HOTEL_CREDENTIALS.gstin,
+      pan: HOTEL_CREDENTIALS.pan,
+      fssai: HOTEL_CREDENTIALS.fssai
+    });
 
-    const blob = new Blob([JSON.stringify(gstr1Payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `GSTR1_${HOTEL_CONFIG.gstin}_092026_CA_FINAL.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showExportNotice('✓ Downloaded Official GSTR-1 JSON (GST Portal format) for CA Filing!');
+    downloadGstr1File(gstr1Payload, `GSTR1_${HOTEL_CREDENTIALS.gstin}_092026_OFFICIAL_ELITE_INN.json`);
+    showExportNotice('✓ Downloaded Official GSTR-1 JSON (GSTN Portal format with Multi-Tier 5%, 12%, 18% Banquet) for C.A.!');
   };
 
   // Export Official GSTR-1 Multi-Sheet Excel Workbook
@@ -168,17 +131,18 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
   // Export Complete P&L and Day Book CSV
   const handleExportPLCSV = () => {
     const rows = [
-      ['SRI SAI VASUDEV RESIDENCY - PROFIT & LOSS STATEMENT & AUDIT LEDGER (SEP 2026)'],
-      ['Proprietor', CA_FILING_STATION_METADATA.proprietorship.legalName],
-      ['GSTIN', HOTEL_CONFIG.gstin, 'PAN', HOTEL_CONFIG.pan, 'Period', 'September 2026'],
-      ['Address', HOTEL_CONFIG.address],
-      ['Total Inventory Keys', '18 Rooms (101-107 Ground Floor, 201-211 1st Floor)'],
+      ['HOTEL ELITE INN - PROFIT & LOSS STATEMENT & AUDIT LEDGER (SEP 2026)'],
+      ['Proprietor / Trade Name', HOTEL_CONFIG.name || 'Hotel Elite Inn'],
+      ['GSTIN', HOTEL_CREDENTIALS.gstin, 'PAN', HOTEL_CREDENTIALS.pan, 'Period', 'September 2026'],
+      ['Address', HOTEL_CREDENTIALS.address],
+      ['Total Inventory Keys', '18 Rooms + Banquet Hall (Ground & 1st Floor)'],
       [''],
-      ['SECTION 1: REVENUE SUMMARY', 'Gross Amount (INR)', 'Net Taxable (INR)', 'CGST 2.5% (INR)', 'SGST 2.5% (INR)'],
-      ['Room Accommodation (SAC 996311)', '984960.00', '938057.14', '23451.43', '23451.43'],
-      ['In-Room Dining & F&B (SAC 996331)', '324500.00', '309047.62', '7726.19', '7726.19'],
-      ['Auxiliary Guest Services (SAC 996337)', '48200.00', '45904.76', '1147.62', '1147.62'],
-      ['TOTAL GROSS REVENUE', '1357660.00', '1293009.52', '32325.24', '32325.24'],
+      ['SECTION 1: REVENUE SUMMARY', 'Gross Amount (INR)', 'Net Taxable (INR)', 'CGST (INR)', 'SGST (INR)', 'GST Rate'],
+      ['Room Accommodation (SAC 996311)', '984960.00', '879428.57', '52765.71', '52765.71', '12%'],
+      ['In-Room Dining & Restaurant F&B (SAC 996332)', '324500.00', '309047.62', '7726.19', '7726.19', '5%'],
+      ['Banquet Hall Functions (SAC 997212)', '145000.00', '122881.36', '11059.32', '11059.32', '18%'],
+      ['Auxiliary Guest Services (SAC 996337)', '48200.00', '45904.76', '1147.62', '1147.62', '5%'],
+      ['TOTAL GROSS REVENUE', '1502660.00', '1357262.31', '72698.84', '72698.84', 'Multi-Tier'],
       [''],
       ['SECTION 2: REVENUE BY PAYMENT METHOD', 'Channel', 'Gross Collections (INR)', 'Share %'],
       ...PAYMENT_METHOD_REVENUE_SEP2026.map(p => [p.method, p.channel, p.grossAmount.toFixed(2), `${p.percentage}%`]),
@@ -188,13 +152,13 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
       ['TOTAL EXPENDITURES', 'All 30 Days Audited', TOTAL_MONTHLY_EXPENDITURES_SEP2026.toFixed(2), '100%'],
       [''],
       ['SECTION 4: NET OPERATING PROFIT (P&L)', 'Amount (INR)'],
-      ['Gross Hotel Revenue', '1357660.00'],
-      ['Less: Total 5% GST Output', '-64650.48'],
-      ['Net Hotel Income', '1293009.52'],
+      ['Gross Hotel Revenue', '1502660.00'],
+      ['Less: Multi-Tier Output GST', '-145397.68'],
+      ['Net Hotel Income', '1357262.31'],
       ['Less: Operating Expenditures', '-401300.00'],
-      ['NET OPERATING PROFIT (EBITDA)', '891709.52'],
-      ['Operating Margin %', '68.96%'],
-      ['Net GST Payable (After ITC ₹14,820)', '49830.48']
+      ['NET OPERATING PROFIT (EBITDA)', '955962.31'],
+      ['Operating Margin %', '70.43%'],
+      ['Net GST Payable (After ITC ₹18,450)', '126947.68']
     ];
 
     const csvContent = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
@@ -202,7 +166,7 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `PL_and_Expenditures_SriSaiVasudevResidency_Sep2026.csv`;
+    a.download = `PL_and_Expenditures_HotelEliteInn_Sep2026.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -216,29 +180,38 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
 HOTEL ELITE INN — CHARTERED ACCOUNTANT STATUTORY AUDIT REPORT
 ================================================================================
 Business Trade Name : Hotel Elite Inn
-Legal Name / Status : Hotel Elite Inn
+Legal Status        : Hotel Elite Inn
 GSTIN               : 21AEWFS9433F1ZN
 PAN                 : AEWFS9433F
+FSSAI               : 10523016000047
 State / Division    : 21 - Odisha / RAYAGADA DIVISION
 Principal Address   : Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020
 Audit Period        : 01-September-2026 to 30-September-2026 (Full Month)
-Total Keys Checked  : 18 Keys (Ground Floor: 101-107, First Floor: 201-211)
+Total Keys Checked  : 18 Keys (Ground Floor: 101-107, First Floor: 201-211) + Banquet Hall
 
 --------------------------------------------------------------------------------
 1. FINANCIAL SUMMARY (INR)
 --------------------------------------------------------------------------------
-Gross Hotel Turnover          : ₹ 13,57,660.00
-Net Taxable Base              : ₹ 12,93,009.52
-Output CGST (2.5%)            : ₹     32,325.24
-Output SGST (2.5%)            : ₹     32,325.24
-Total Output GST (5%)         : ₹     64,650.48
-Eligible Input Tax Credit     : ₹     14,820.00
-Net Cash GST Payable (PMT-06) : ₹     49,830.48
-Total Operating Expenditures  : ₹  4,01,300.00
-Net Operating Profit (EBITDA) : ₹  8,91,709.52 (Margin: 65.7%)
+Gross Hotel Turnover          : ₹ 15,02,660.00
+Net Taxable Base              : ₹ 13,57,262.31
+Output CGST                   : ₹     72,698.84
+Output SGST                   : ₹     72,698.84
+Total Output GST (Multi-Tier) : ₹   1,45,397.68
+Eligible Input Tax Credit     : ₹     18,450.00
+Net Cash GST Payable (PMT-06) : ₹   1,26,947.68
+Total Operating Expenditures  : ₹   4,01,300.00
+Net Operating Profit (EBITDA) : ₹   9,55,962.31 (Margin: 70.4%)
 
 --------------------------------------------------------------------------------
-2. ROOM CAPACITY & OCCUPANCY (18 KEYS)
+2. GST MULTI-TIER REVENUE BREAKDOWN
+--------------------------------------------------------------------------------
+- Room Accommodation (SAC 996311) @ 12% : Gross ₹ 9,84,960.00 | Net ₹ 8,79,428.57 | GST ₹ 1,05,531.42
+- Restaurant Dining (SAC 996332)  @ 5%  : Gross ₹ 3,24,500.00 | Net ₹ 3,09,047.62 | GST ₹   15,452.38
+- Banquet Hall Rental (SAC 997212) @ 18% : Gross ₹ 1,45,000.00 | Net ₹ 1,22,881.36 | GST ₹   22,118.64
+- Auxiliary Services (SAC 996337) @ 5%  : Gross ₹   48,200.00 | Net ₹   45,904.76 | GST ₹    2,295.24
+
+--------------------------------------------------------------------------------
+3. ROOM CAPACITY & OCCUPANCY (18 KEYS)
 --------------------------------------------------------------------------------
 Total Room Nights Available   : 540 Nights (18 keys * 30 days)
 Total Room Nights Sold        : 432 Nights
@@ -253,33 +226,24 @@ Breakdown by 4 Room Categories:
 4. Premium Suite   (3 Keys)   :  22 Nights Sold | ₹    98,560.00 | Occ: 24.4%
 
 --------------------------------------------------------------------------------
-3. FOOD & BEVERAGE REVENUE
---------------------------------------------------------------------------------
-Cannon Kitchen Room Service   : ₹ 1,88,400.00 (486 KOT Orders)
-Pure Satvik Dining Hall       : ₹    82,600.00 (232 Pilgrimage Thalis)
-Beverages & Mineral Water     : ₹    28,500.00 (380 Pantry Dispatches)
-Corporate Executive Meals     : ₹    25,000.00 (52 B2B Bento Packs)
-Total F&B Dining Turnover     : ₹ 3,24,500.00
-
---------------------------------------------------------------------------------
 4. STATUTORY AUDIT & COMPLIANCE VERIFICATION
 --------------------------------------------------------------------------------
 [PASS] Section 16 CGST Act    : Valid tax invoices on record for all ITC claims.
-[PASS] Rule 46 Tax Invoices   : Sequential numbers, SAC 996311 / 996331 applied.
+[PASS] Rule 46 Tax Invoices   : Sequential numbers, SAC 996311, 996332, 997212 applied.
 [PASS] Section 194C TDS       : Corporate billing records aligned with Form 26AS.
 [PASS] Section 269ST          : Zero cash receipts exceeding ₹2,00,000 threshold.
 [PASS] Daily Night Audit      : Tamper-proof 12:00 AM closing with zero variances.
 
 Certified by:
 Audit Lead & Tax Advisory Team
-For: SRI SAI VASUDEV RESIDENCY (RAYAGADA)
+For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
 ================================================================================`;
 
     const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `CA_Audit_Certificate_SriSaiVasudevResidency_Sep2026.txt`;
+    a.download = `CA_Audit_Certificate_HotelEliteInn_Sep2026.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

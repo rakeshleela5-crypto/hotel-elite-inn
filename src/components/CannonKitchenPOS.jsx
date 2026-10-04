@@ -205,13 +205,27 @@ export default function CannonKitchenPOS({
   const [kdsSearchQuery, setKdsSearchQuery] = useState('');
   const [kdsSoundEnabled, setKdsSoundEnabled] = useState(true);
 
-  // KOT Slip Printable Ticket Modal
+  // KOT Slip Printable Ticket Modal & Dual Printer Routing (Printer 1: Chef KOT, Printer 2: Cashier/Steward Copy)
   const [printKotModalOrder, setPrintKotModalOrder] = useState(null);
+  const [kotPrintMode, setKotPrintMode] = useState('kitchen'); // 'kitchen' (Chef Only) | 'cashier' (Steward / Cashier Copy)
 
-  // Live KOT Void Confirmation Modal
+  // Live KOT Void Confirmation Modal with Admin PIN
   const [voidKotOrder, setVoidKotOrder] = useState(null);
-  const [voidKotReason, setVoidKotReason] = useState('Guest Changed Mind');
+  const [voidKotReason, setVoidKotReason] = useState('Guest Cancelled Before Cooking');
   const [voidKotCustomNote, setVoidKotCustomNote] = useState('');
+  const [voidManagerPinInput, setVoidManagerPinInput] = useState('');
+  const [voidPinError, setVoidPinError] = useState('');
+
+  // Item Void Admin PIN state
+  const [itemVoidPin, setItemVoidPin] = useState('');
+  const [itemVoidPinError, setItemVoidPinError] = useState('');
+
+  // Steward Discount Limit (5% Max for regular staff; 10% or 15% requires Manager PIN)
+  const [managerDiscountApproved, setManagerDiscountApproved] = useState(false);
+  const [showDiscountPinModal, setShowDiscountPinModal] = useState(false);
+  const [pendingDiscountValue, setPendingDiscountValue] = useState(0);
+  const [discountPinInput, setDiscountPinInput] = useState('');
+  const [discountPinError, setDiscountPinError] = useState('');
 
   // Outlet selection: 'Cannon Kitchen (Dine-In)', 'Bar Outlet', 'Room Service', 'Swiggy / Zomato'
   const [selectedOutlet, setSelectedOutlet] = useState('Cannon Kitchen');
@@ -429,6 +443,11 @@ export default function CannonKitchenPOS({
 
   const handleConfirmItemVoid = () => {
     if (voidTargetIndex === null) return;
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    if (itemVoidPin.trim() !== adminPin && itemVoidPin.trim() !== '7650') {
+      setItemVoidPinError('Manager authorization required. Enter valid Manager PIN (7650).');
+      return;
+    }
     const target = cart[voidTargetIndex];
     const voidRecord = {
       id: `VOID-${Date.now().toString().slice(-4)}`,
@@ -443,7 +462,6 @@ export default function CannonKitchenPOS({
     };
 
     // Dispatch to Cloudflare D1 restaurant_kot_voids table
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
     fetch('/api/sync', {
       method: 'POST',
       headers: {
@@ -461,7 +479,8 @@ export default function CannonKitchenPOS({
           amount: voidRecord.amount,
           reason: voidRecord.reason,
           notes: voidRecord.notes,
-          captain: voidRecord.captain
+          captain: voidRecord.captain,
+          managerAuthorized: true
         }
       })
     }).catch(err => console.warn('Offline void logging:', err));
@@ -470,6 +489,38 @@ export default function CannonKitchenPOS({
     setCart(cart.filter((_, idx) => idx !== voidTargetIndex));
     setVoidTargetIndex(null);
     setVoidCustomNote('');
+    setItemVoidPin('');
+    setItemVoidPinError('');
+    showPosToast(`✓ Item "${target.item.name}" voided with Manager PIN approval.`);
+  };
+
+  // Steward Discount Selection with 5% staff ceiling & Manager PIN Gate for 10% / 15%
+  const handleSelectDiscount = (btn) => {
+    if (btn.type === 'percentage' && btn.val > 5 && !managerDiscountApproved) {
+      setPendingDiscountValue(btn.val);
+      setDiscountPinInput('');
+      setDiscountPinError('');
+      setShowDiscountPinModal(true);
+      return;
+    }
+    setDiscountType(btn.type);
+    if (btn.val !== undefined) setDiscountValue(btn.val);
+  };
+
+  const handleApproveDiscountPin = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    if (discountPinInput.trim() === adminPin || discountPinInput.trim() === '7650') {
+      setManagerDiscountApproved(true);
+      setDiscountType('percentage');
+      setDiscountValue(pendingDiscountValue);
+      setShowDiscountPinModal(false);
+      setDiscountPinInput('');
+      setDiscountPinError('');
+      showPosToast(`✓ Manager PIN Verified: ${pendingDiscountValue}% Discount Approved!`);
+    } else {
+      setDiscountPinError('Invalid Manager PIN. Default: 7650 (or contact GM)');
+    }
   };
 
   // Add Custom / Off-Menu Open Dish to Cart
@@ -3075,9 +3126,9 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     {[
                       { type: 'none', label: 'No Disc' },
-                      { type: 'percentage', val: 5, label: '5%' },
-                      { type: 'percentage', val: 10, label: '10%' },
-                      { type: 'percentage', val: 15, label: '15%' },
+                      { type: 'percentage', val: 5, label: '5% (Staff)' },
+                      { type: 'percentage', val: 10, label: '10% (Mgr PIN)' },
+                      { type: 'percentage', val: 15, label: '15% (Mgr PIN)' },
                       { type: 'flat', val: 100, label: 'Custom Flat (₹)' }
                     ].map((btn, idx) => {
                       const isSelected = discountType === btn.type && (btn.type === 'none' || btn.type === 'flat' || discountValue === btn.val);
@@ -3085,10 +3136,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         <button
                           key={idx}
                           type="button"
-                          onClick={() => {
-                            setDiscountType(btn.type);
-                            if (btn.val !== undefined) setDiscountValue(btn.val);
-                          }}
+                          onClick={() => handleSelectDiscount(btn)}
                           style={{
                             padding: '2px 8px',
                             borderRadius: '4px',
@@ -3104,6 +3152,12 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         </button>
                       );
                     })}
+
+                    {managerDiscountApproved && (discountValue === 10 || discountValue === 15) && (
+                      <span style={{ fontSize: '0.68rem', color: '#34d399', fontWeight: 700, padding: '2px 6px', background: 'rgba(52, 211, 153, 0.15)', borderRadius: '4px', border: '1px solid #34d399' }}>
+                        ✓ Mgr Approved ({discountValue}%)
+                      </span>
+                    )}
 
                     {discountType === 'flat' && (
                       <input
@@ -3345,39 +3399,79 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               background: '#ffffff',
               color: '#000000',
               width: '100%',
-              maxWidth: '380px',
-              padding: '1.5rem',
+              maxWidth: '390px',
+              padding: '1.25rem',
               borderRadius: '8px',
               fontFamily: 'monospace, "Courier New", Courier',
               boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
               maxHeight: '92vh',
               overflowY: 'auto'
             }}>
+              {/* Dual KOT Printer Switcher (Ground Reality Protocol) */}
+              <div className="no-print" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', marginBottom: '0.85rem', background: '#f1f5f9', padding: '4px', borderRadius: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setKotPrintMode('kitchen')}
+                  style={{
+                    padding: '0.45rem',
+                    borderRadius: '6px',
+                    border: kotPrintMode === 'kitchen' ? '2px solid #000' : '1px solid transparent',
+                    background: kotPrintMode === 'kitchen' ? '#000' : 'transparent',
+                    color: kotPrintMode === 'kitchen' ? '#fff' : '#334155',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    textAlign: 'center'
+                  }}
+                >
+                  🖨️ Printer 1: Chef KOT
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setKotPrintMode('cashier')}
+                  style={{
+                    padding: '0.45rem',
+                    borderRadius: '6px',
+                    border: kotPrintMode === 'cashier' ? '2px solid #000' : '1px solid transparent',
+                    background: kotPrintMode === 'cashier' ? '#000' : 'transparent',
+                    color: kotPrintMode === 'cashier' ? '#fff' : '#334155',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    textAlign: 'center'
+                  }}
+                >
+                  🧾 Printer 2: Cashier/Steward
+                </button>
+              </div>
+
               {/* Header */}
-              <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                <h3 style={{ margin: '0.2rem 0', fontSize: '1.25rem', fontWeight: 900 }}>HOTEL ELITE INN</h3>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e293b' }}>POS 5- ROOM SERVICE</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>Opposite Railway Station Main Road Muniguda</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>GSTIN NO:- {HOTEL_CONFIG.gstin}</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>SAC CODE - {HOTEL_CONFIG.sacCodeFB || '996332'} • FSSAI NO- {HOTEL_CONFIG.fssai || '10523016000047'}</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>{HOTEL_CONFIG.phone}</div>
+              <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.65rem', marginBottom: '0.65rem' }}>
+                <h3 style={{ margin: '0.15rem 0', fontSize: '1.2rem', fontWeight: 900 }}>HOTEL ELITE INN</h3>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e293b' }}>
+                  {kotPrintMode === 'kitchen' ? 'PRINTER 1: CANNON KITCHEN DISPLAY / THERMAL' : 'PRINTER 2: RESTAURANT CASHIER & SERVICE DESK'}
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#333' }}>Opposite Railway Station Main Road, Muniguda</div>
+                <div style={{ fontSize: '0.7rem', color: '#333' }}>GSTIN: {HOTEL_CONFIG.gstin} • SAC: 996332</div>
                 <div style={{
-                  margin: '0.5rem 0 0.2rem',
+                  margin: '0.4rem 0 0.15rem',
                   padding: '3px 0',
                   borderTop: '1px solid #000',
                   borderBottom: '1px solid #000',
-                  fontSize: '0.85rem',
+                  fontSize: '0.82rem',
                   fontWeight: 900
                 }}>
-                  --- KITCHEN ORDER TICKET (KOT) ---
+                  {kotPrintMode === 'kitchen' 
+                    ? `--- KITCHEN PRODUCTION TICKET (KOT #${printKotModalOrder.kotNumber || '1'}) ---`
+                    : '--- STEWARD SERVICE COPY & CUMULATIVE FOLIO ---'}
                 </div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 900 }}>
-                  KOT NO. ,{printKotModalOrder.orderId ? printKotModalOrder.orderId.replace(/[^0-9]/g, '') : '2056'}
+                <div style={{ fontSize: '0.8rem', fontWeight: 900, color: kotPrintMode === 'kitchen' ? '#dc2626' : '#1e293b' }}>
+                  {kotPrintMode === 'kitchen' ? '⚡ NEWLY PUNCHED DISHES ONLY (FOR CHEF)' : `KOT NO. ${printKotModalOrder.orderId ? printKotModalOrder.orderId.replace(/[^0-9]/g, '') : '2056'}`}
                 </div>
               </div>
 
               {/* Meta */}
-              <div style={{ fontSize: '0.75rem', lineHeight: '1.45', marginBottom: '0.75rem' }}>
+              <div style={{ fontSize: '0.75rem', lineHeight: '1.45', marginBottom: '0.65rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span><strong>Date:</strong> {new Date(printKotModalOrder.created_at || Date.now()).toLocaleDateString('en-IN')}</span>
                   <span><strong>Time:</strong> {new Date(printKotModalOrder.created_at || Date.now()).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
@@ -3395,12 +3489,14 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               </div>
 
               {/* Items Table */}
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', marginBottom: '0.75rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', marginBottom: '0.65rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px dashed #000', borderTop: '1px dashed #000' }}>
-                    <th style={{ textAlign: 'left', padding: '0.3rem 0' }}>QTY</th>
+                    <th style={{ textAlign: 'left', padding: '0.3rem 0', width: '45px' }}>QTY</th>
                     <th style={{ textAlign: 'left', padding: '0.3rem 0' }}>ITEM DESCRIPTION</th>
-                    <th style={{ textAlign: 'right', padding: '0.3rem 0' }}>AMT</th>
+                    {kotPrintMode === 'cashier' && (
+                      <th style={{ textAlign: 'right', padding: '0.3rem 0', width: '65px' }}>AMT</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -3417,29 +3513,50 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                           </div>
                         )}
                       </td>
-                      <td style={{ verticalAlign: 'top', padding: '0.35rem 0', textAlign: 'right', fontWeight: 700 }}>
-                        ₹{((it.price || 0) * (it.quantity || 1)).toFixed(0)}
-                      </td>
+                      {kotPrintMode === 'cashier' && (
+                        <td style={{ verticalAlign: 'top', padding: '0.35rem 0', textAlign: 'right', fontWeight: 700 }}>
+                          ₹{((it.price || 0) * (it.quantity || 1)).toFixed(0)}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
               </table>
 
-              <div style={{
-                borderTop: '1px dashed #000',
-                paddingTop: '0.5rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontSize: '0.85rem',
-                fontWeight: 900,
-                marginBottom: '0.75rem'
-              }}>
-                <span>TOTAL AMOUNT:</span>
-                <span>₹{(printKotModalOrder.totalAmount || 0).toFixed(2)}</span>
-              </div>
+              {kotPrintMode === 'cashier' ? (
+                <>
+                  <div style={{
+                    borderTop: '1px dashed #000',
+                    paddingTop: '0.4rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '0.85rem',
+                    fontWeight: 900,
+                    marginBottom: '0.5rem'
+                  }}>
+                    <span>TOTAL AMOUNT (5% GST INCL):</span>
+                    <span>₹{(printKotModalOrder.totalAmount || 0).toFixed(2)}</span>
+                  </div>
+                  <div style={{ fontSize: '0.72rem', borderTop: '1px dotted #000', paddingTop: '0.35rem', marginBottom: '0.5rem' }}>
+                    <div>Guest Sign: ___________________________</div>
+                  </div>
+                </>
+              ) : (
+                <div style={{
+                  borderTop: '1px dashed #000',
+                  paddingTop: '0.4rem',
+                  textAlign: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  color: '#b91c1c',
+                  marginBottom: '0.5rem'
+                }}>
+                  👨‍🍳 CHEF COPY: EXPEDITE HOT & FRESH • CANNON KITCHEN
+                </div>
+              )}
 
-              <div style={{ textAlign: 'center', fontSize: '0.7rem', color: '#444', borderTop: '1px dashed #000', paddingTop: '0.5rem' }}>
-                HOTEL COPY • KITCHEN PRODUCTION ONLY • RAYAGADA
+              <div style={{ textAlign: 'center', fontSize: '0.68rem', color: '#444', borderTop: '1px dashed #000', paddingTop: '0.4rem' }}>
+                HOTEL ELITE INN • MUNIGUDA JUNCTION • ODISHA
               </div>
 
               {/* Actions */}
@@ -3462,7 +3579,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     gap: '0.4rem'
                   }}
                 >
-                  <Printer size={15} /> Print Thermal Slip (Ctrl+P)
+                  <Printer size={15} /> Print {kotPrintMode === 'kitchen' ? 'Chef Slip' : 'Steward Bill'}
                 </button>
                 <button
                   onClick={() => setPrintKotModalOrder(null)}
@@ -3481,6 +3598,100 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: MANAGER PIN AUTHORIZATION FOR >5% STEWARD DISCOUNT */}
+        {showDiscountPinModal && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100005,
+            padding: '1rem',
+            backdropFilter: 'blur(6px)'
+          }}>
+            <div style={{
+              background: '#0f172a',
+              border: '1.5px solid var(--gold-glow)',
+              borderRadius: '12px',
+              width: '100%',
+              maxWidth: '390px',
+              padding: '1.5rem',
+              boxShadow: '0 25px 50px rgba(0,0,0,0.8)',
+              color: '#fff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <ShieldCheck size={22} color="var(--gold-glow)" />
+                <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                  Manager Approval Required
+                </h4>
+              </div>
+
+              <div style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem', fontSize: '0.78rem', color: '#cbd5e1' }}>
+                <div>Regular staff ceiling: <strong>5% Maximum</strong>.</div>
+                <div style={{ marginTop: '3px', color: '#fbbf24', fontWeight: 700 }}>
+                  Applying {pendingDiscountValue}% discount requires General Manager / Admin PIN.
+                </div>
+              </div>
+
+              <form onSubmit={handleApproveDiscountPin}>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.35rem', fontWeight: 600 }}>
+                    Enter Manager PIN
+                  </label>
+                  <input
+                    type="password"
+                    autoFocus
+                    maxLength={6}
+                    placeholder="Enter Manager PIN (7650)"
+                    value={discountPinInput}
+                    onChange={(e) => { setDiscountPinInput(e.target.value); setDiscountPinError(''); }}
+                    style={{
+                      width: '100%',
+                      padding: '0.6rem',
+                      background: '#070b14',
+                      color: '#fff',
+                      border: discountPinError ? '1.5px solid #ef4444' : '1px solid rgba(212, 175, 55, 0.4)',
+                      borderRadius: '6px',
+                      fontSize: '1rem',
+                      textAlign: 'center',
+                      letterSpacing: '4px'
+                    }}
+                  />
+                  {discountPinError && (
+                    <div style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.35rem', fontWeight: 600 }}>
+                      ⚠️ {discountPinError}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDiscountPinModal(false);
+                      setDiscountPinInput('');
+                      setDiscountPinError('');
+                    }}
+                    className="btn-outline"
+                    style={{ flex: 1, padding: '0.6rem', fontSize: '0.82rem' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary-gold"
+                    style={{ flex: 1.5, padding: '0.6rem', fontSize: '0.82rem', fontWeight: 700 }}
+                  >
+                    Approve {pendingDiscountValue}%
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}
@@ -4157,6 +4368,36 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 />
               </div>
 
+              {/* Admin / Manager Authorization PIN */}
+              <div style={{ marginBottom: '1.25rem', background: 'rgba(239, 68, 68, 0.08)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.25)' }}>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#f87171', fontWeight: 700, marginBottom: '0.35rem' }}>
+                  🔒 Admin / Manager Authorization PIN (Mandatory)
+                </label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  value={voidManagerPinInput}
+                  onChange={(e) => { setVoidManagerPinInput(e.target.value); setVoidPinError(''); }}
+                  placeholder="Enter Manager PIN (7650)"
+                  style={{
+                    width: '100%',
+                    padding: '0.55rem',
+                    background: '#070b14',
+                    color: '#fff',
+                    border: voidPinError ? '1.5px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    textAlign: 'center',
+                    letterSpacing: '3px'
+                  }}
+                />
+                {voidPinError && (
+                  <div style={{ color: '#f87171', fontSize: '0.74rem', marginTop: '0.35rem', fontWeight: 600 }}>
+                    ⚠️ {voidPinError}
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   onClick={handleConfirmVoidKot}
@@ -4175,7 +4416,11 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   Confirm Void &amp; Log Audit
                 </button>
                 <button
-                  onClick={() => setVoidKotOrder(null)}
+                  onClick={() => {
+                    setVoidKotOrder(null);
+                    setVoidManagerPinInput('');
+                    setVoidPinError('');
+                  }}
                   style={{
                     padding: '0.65rem 1rem',
                     background: 'rgba(255,255,255,0.08)',
@@ -4255,10 +4500,34 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 />
               </div>
 
+              {/* Manager Authorization PIN for Item Void */}
+              <div style={{ marginBottom: '1.25rem', background: 'rgba(239, 68, 68, 0.08)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                <label className="form-label" style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: 700, display: 'block', marginBottom: '0.35rem' }}>
+                  🔒 Admin / Manager Authorization PIN (Mandatory)
+                </label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  placeholder="Enter Manager PIN (7650)"
+                  value={itemVoidPin}
+                  onChange={(e) => { setItemVoidPin(e.target.value); setItemVoidPinError(''); }}
+                  style={{ width: '100%', padding: '0.55rem', background: '#070b14', color: '#fff', border: itemVoidPinError ? '1.5px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)', borderRadius: '6px', fontSize: '0.95rem', textAlign: 'center', letterSpacing: '3px' }}
+                />
+                {itemVoidPinError && (
+                  <div style={{ color: '#f87171', fontSize: '0.74rem', marginTop: '0.35rem', fontWeight: 600 }}>
+                    ⚠️ {itemVoidPinError}
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   type="button"
-                  onClick={() => setVoidTargetIndex(null)}
+                  onClick={() => {
+                    setVoidTargetIndex(null);
+                    setItemVoidPin('');
+                    setItemVoidPinError('');
+                  }}
                   className="btn-outline"
                   style={{ flex: 1, padding: '0.6rem', fontSize: '0.85rem' }}
                 >

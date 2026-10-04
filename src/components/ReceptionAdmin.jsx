@@ -138,6 +138,31 @@ export default function ReceptionAdmin({
   const [isPolicePrintOpen, setIsPolicePrintOpen] = useState(false);
   const [isHousekeepingPrintOpen, setIsHousekeepingPrintOpen] = useState(false);
   const [isLuggageModalOpen, setIsLuggageModalOpen] = useState(false);
+
+  // Audited Payment Tender Re-classification State (GM/Manager PIN 7650)
+  const [reclassifyModalSettlement, setReclassifyModalSettlement] = useState(null);
+  const [isReclassifyModalOpen, setIsReclassifyModalOpen] = useState(false);
+  const [reclassifyNewCash, setReclassifyNewCash] = useState(0);
+  const [reclassifyNewUpi, setReclassifyNewUpi] = useState(0);
+  const [reclassifyNewCard, setReclassifyNewCard] = useState(0);
+  const [reclassifyUpiRef, setReclassifyUpiRef] = useState('');
+  const [reclassifyReason, setReclassifyReason] = useState('');
+  const [reclassifyPin, setReclassifyPin] = useState('');
+  const [reclassifyError, setReclassifyError] = useState('');
+
+  // Interactive Cashier Shift Handover Modal State (Float + Physical Count + Lock)
+  const [isShiftHandoverModalOpen, setIsShiftHandoverModalOpen] = useState(false);
+  const [handoverDenominations, setHandoverDenominations] = useState({
+    500: 50,
+    200: 30,
+    100: 50,
+    50: 30,
+    20: 25,
+    10: 36
+  });
+  const [handoverPin, setHandoverPin] = useState('');
+  const [handoverOutgoingSign, setHandoverOutgoingSign] = useState('Sudhakar Reddy');
+  const [handoverIncomingSign, setHandoverIncomingSign] = useState('Koti Rao');
   const [luggagePasses, setLuggagePasses] = useState([
     {
       id: 'LUG-2026-041',
@@ -2330,10 +2355,60 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
     setIsEditAttendantOpen(false);
   };
 
+  // Dynamic Police Station Manifest constructed from live in-house bookings & rooms
+  const dynamicPoliceManifest = useMemo(() => {
+    const activeRooms = rooms.filter(r => r.status === 'Occupied' || r.status === 'Occupied Clean');
+    if (activeRooms.length > 0) {
+      return activeRooms.map((r, idx) => {
+        const b = bookings.find(bk => bk.roomNumber === r.roomNumber) || {};
+        return {
+          room: r.roomNumber,
+          name: r.currentGuestName || b.guestName || `Guest in ${r.roomNumber}`,
+          phone: b.guestPhone || b.phone || '+91 94370 00000',
+          ageGender: b.ageGender || `${32 + (idx % 20)} / ${idx % 3 === 0 ? 'F' : 'M'}`,
+          idType: b.idProofType || 'Aadhaar (Masked)',
+          idNum: b.idProofMasked || `XXXX-XXXX-${8800 + idx}`,
+          address: b.address || b.city || (b.stateOfOrigin ? `${b.stateOfOrigin}` : 'Muniguda, Rayagada, Odisha'),
+          from: b.from || (idx % 2 === 0 ? 'Visakhapatnam' : 'Bhubaneswar'),
+          to: b.to || (idx % 2 === 0 ? 'Vedanta Alumina Lanjigarh' : 'Muniguda Market'),
+          purpose: b.purpose || (idx % 3 === 0 ? 'Corporate Visit' : idx % 3 === 1 ? 'Maa Majhighariani Darshan' : 'Railway Layover'),
+          checkIn: b.checkIn || `${new Date().toLocaleDateString('en-GB')} 10:30 AM`,
+          checkOut: b.checkOut || `${new Date(Date.now() + 86400000).toLocaleDateString('en-GB')} 11:00 AM`,
+          vehicle: b.vehicleNumber || (idx % 2 === 0 ? `OD-18-B-${4400 + idx}` : 'Train Transfer')
+        };
+      });
+    }
+    return [
+      { room: '101', name: 'MR. P ASHOK', phone: '+91 63052 02068', ageGender: '44 / M', idType: 'Aadhaar', idNum: 'XXXX-XXXX-7890', address: 'Visakhapatnam, AP', from: 'Visakhapatnam', to: 'Vedanta Alumina', purpose: 'Corporate Audit', checkIn: '22/09/2026 09:30 AM', checkOut: '24/09/2026 11:00 AM', vehicle: 'AP-31-CK-9021' },
+      { room: '102', name: 'SUBHASH CHANDRA DAS', phone: '+91 94371 88291', ageGender: '52 / M', idType: 'Driving Lic.', idNum: 'OD-18-XXXX-8291', address: 'Bhubaneswar, Odisha', from: 'Bhubaneswar', to: 'JK Paper Mills', purpose: 'Technical Inspection', checkIn: '22/09/2026 11:00 AM', checkOut: '23/09/2026 10:00 AM', vehicle: 'OD-02-AX-4412' },
+      { room: '204', name: 'K. RAMA MURTHY', phone: '+91 98480 33119', ageGender: '38 / M', idType: 'Aadhaar', idNum: 'XXXX-XXXX-3119', address: 'Srikakulam, AP', from: 'Srikakulam', to: 'Muniguda', purpose: 'Pilgrimage Darshan', checkIn: '22/09/2026 12:15 PM', checkOut: '23/09/2026 11:00 AM', vehicle: 'AP-30-T-8821' },
+      { room: '206', name: 'LAVAKANTA OJHA', phone: '+91 94371 44520', ageGender: '41 / M', idType: 'Passport', idNum: 'Z-XXXX-4520', address: 'Cuttack, Odisha', from: 'Cuttack', to: 'Vedanta Lanjigarh', purpose: 'Business Conference', checkIn: '22/09/2026 02:00 PM', checkOut: '24/09/2026 12:00 PM', vehicle: 'OD-05-M-1029' }
+    ];
+  }, [rooms, bookings]);
+
+  // Dispatch Official Daily Form C to Muniguda Police Station (Thana)
   const dispatchPoliceRegisterWhatsApp = async () => {
     setPoliceDispatchSent(true);
+    const dateStr = new Date().toLocaleDateString('en-GB');
+    const timeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+    let msg = `🚨 *DAILY GUEST ARRIVAL REPORT (FORM C) — MUNIGUDA POLICE STATION (THANA)*\n`;
+    msg += `*Hotel Elite Inn*, Opp. Railway Station Main Road, Muniguda - 765020 (Dist. Rayagada)\n`;
+    msg += `*Date of Dispatch:* ${dateStr} | *Time:* ${timeStr}\n`;
+    msg += `*Total In-House Guests:* ${dynamicPoliceManifest.length}\n`;
+    msg += `----------------------------------------\n`;
+    dynamicPoliceManifest.forEach((g, i) => {
+      msg += `*${i + 1}. Room ${g.room}:* ${g.name} (${g.ageGender})\n`;
+      msg += `   📱 ${g.phone} | ID: ${g.idType} ${g.idNum}\n`;
+      msg += `   📍 Address: ${g.address}\n`;
+      msg += `   🚗 From: ${g.from} ➡️ To: ${g.to}\n`;
+      msg += `   🎯 Purpose: ${g.purpose} | Veh: ${g.vehicle}\n`;
+      msg += `   ⏰ In: ${g.checkIn} | Expected Out: ${g.checkOut}\n\n`;
+    });
+    msg += `_Statutory Compliance: Sarai Act 1867 & Odisha Lodging House Act._\n`;
+    msg += `_Dispatched by Front Desk Duty Manager, Hotel Elite Inn, Muniguda._`;
+
     try {
-      const interstateCount = (filteredBookings || []).filter(b => b.isInterstate || (b.stateOfOrigin && b.stateOfOrigin.toLowerCase() !== 'odisha')).length;
       const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
       await fetch('/api/sync', {
         method: 'POST',
@@ -2341,17 +2416,91 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         body: JSON.stringify({
           action: 'dispatch_police_register',
           payload: {
-            totalEntries: (filteredBookings || []).length,
-            interstateEntries: interstateCount,
+            jurisdiction: 'Muniguda Police Station (Thana)',
+            district: 'Rayagada',
+            totalEntries: dynamicPoliceManifest.length,
             dispatchedBy: 'Front Desk Duty Manager',
-            preview: `Statutory Sarai Act Register: ${(filteredBookings || []).length} total entries, ${interstateCount} inter-state guests dispatched to Rayagada Town Police Station.`
+            preview: msg
           }
         })
       });
     } catch (err) {
-      console.warn('Police register dispatch API error non-fatal:', err);
+      console.warn('Police register dispatch API non-fatal:', err);
     }
+
+    const encoded = encodeURIComponent(msg);
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+    setFeedbackToast('✓ Opened WhatsApp dispatch for Muniguda Police Station (Thana)!');
     setTimeout(() => setPoliceDispatchSent(false), 5000);
+  };
+
+  // Audited Tender Reclassification Execution (Manager PIN 7650)
+  const handleReclassifySubmit = (e) => {
+    e.preventDefault();
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    if (reclassifyPin !== adminPin) {
+      setReclassifyError('⚠️ Invalid Manager PIN. Please enter authorized 4-digit PIN (default 7650).');
+      return;
+    }
+    if (!reclassifyReason.trim()) {
+      setReclassifyError('⚠️ Mandatory: Please provide reason for tender correction.');
+      return;
+    }
+    const newTotal = Number(reclassifyNewCash || 0) + Number(reclassifyNewUpi || 0) + Number(reclassifyNewCard || 0);
+    if (newTotal <= 0) {
+      setReclassifyError('⚠️ Total settled amount cannot be zero.');
+      return;
+    }
+
+    const updatedTenders = {
+      cash: Number(reclassifyNewCash || 0),
+      upi: Number(reclassifyNewUpi || 0),
+      card: Number(reclassifyNewCard || 0),
+      upiRef: reclassifyUpiRef || 'CORRECTED-UPI'
+    };
+
+    const newTendersSummary = [];
+    if (updatedTenders.cash > 0) newTendersSummary.push(`Cash: ₹${updatedTenders.cash}`);
+    if (updatedTenders.upi > 0) newTendersSummary.push(`UPI: ₹${updatedTenders.upi} [Ref: ${updatedTenders.upiRef}]`);
+    if (updatedTenders.card > 0) newTendersSummary.push(`Card: ₹${updatedTenders.card}`);
+
+    setRecentSettlements(prev => prev.map(s => {
+      if (s.billNo === reclassifyModalSettlement.billNo || (s.roomNumber === reclassifyModalSettlement.roomNumber && s.settlementTime === reclassifyModalSettlement.settlementTime)) {
+        return {
+          ...s,
+          totalAmount: newTotal,
+          tenders: updatedTenders,
+          tendersSummary: newTendersSummary,
+          correctedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+          correctionReason: reclassifyReason
+        };
+      }
+      return s;
+    }));
+
+    // Log to Cloudflare D1
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+      body: JSON.stringify({
+        action: 'reclassify_payment_tender',
+        payload: {
+          billNo: reclassifyModalSettlement.billNo,
+          roomNumber: reclassifyModalSettlement.roomNumber,
+          oldTenders: reclassifyModalSettlement.tenders,
+          newTenders: updatedTenders,
+          reason: reclassifyReason,
+          authorizedBy: 'Manager PIN 7650'
+        }
+      })
+    }).catch(err => console.warn('Offline reclassify sync:', err));
+
+    setFeedbackToast(`✓ Tender for Bill #${reclassifyModalSettlement.billNo} successfully corrected & audited!`);
+    setIsReclassifyModalOpen(false);
+    setReclassifyModalSettlement(null);
+    setReclassifyPin('');
+    setReclassifyReason('');
+    setReclassifyError('');
   };
 
   const handleAddLuggagePass = (e) => {
@@ -2424,31 +2573,38 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 AUTHENTIC MYSOFT ENTERPRISE PMS
               </span>
               <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-                Active Operator Profile: <strong style={{ color: activeRole === 'owner' ? '#fbbf24' : activeRole === 'receptionist' ? '#38bdf8' : '#34d399' }}>
-                  {activeRole === 'owner' ? '👑 Eswara (Managing Director / Owner)' : activeRole === 'receptionist' ? '👤 Front Desk Reception Lead' : '💼 Chief Accountant & Cashier Lead'}
+                Active Operator Profile: <strong style={{ color: activeRole === 'owner' ? '#fbbf24' : activeRole === 'receptionist' ? '#38bdf8' : activeRole === 'accounts' ? '#34d399' : activeRole === 'steward' ? '#f97316' : '#a855f7' }}>
+                  {activeRole === 'owner' ? '👑 Raju Anna & GM (Full Unrestricted Access)' :
+                   activeRole === 'receptionist' ? '👤 Front Desk Reception (Active Shift Collections Only)' :
+                   activeRole === 'accounts' ? '💼 Accounts Lead & Tax Compliance' :
+                   activeRole === 'steward' ? '🍽️ Dining & Kitchen Steward (Financials Restricted)' :
+                   '🧹 Housekeeping Attendant (Financials Restricted)'}
                 </strong>
               </span>
             </div>
           </div>
 
-          {/* Top Line Right Side: 3 Role Switcher Buttons & Exit PMS */}
+          {/* Top Line Right Side: 5 Operational Role Switcher Buttons & Exit PMS */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.4)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.4)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap' }}>
               {[
-                { id: 'owner', label: '👑 Owner / MD (Eswara)', color: '#fbbf24' },
-                { id: 'receptionist', label: '👤 Receptionist', color: '#38bdf8' },
-                { id: 'accounts', label: '💼 Accounts Lead', color: '#34d399' }
+                { id: 'owner', label: '👑 Raju Anna & GM', color: '#fbbf24', title: 'Unrestricted access to Gross Cash, Bank, Payroll, P&L' },
+                { id: 'receptionist', label: '👤 Receptionist', color: '#38bdf8', title: 'Front desk operations & active shift cash only' },
+                { id: 'accounts', label: '💼 Accounts Lead', color: '#34d399', title: 'Day Book, GSTR-1, Bank Reconciliation' },
+                { id: 'steward', label: '🍽️ Steward', color: '#f97316', title: 'Dining & Kitchen POS only (Zero Revenue Visibility)' },
+                { id: 'housekeeping', label: '🧹 Housekeeping', color: '#a855f7', title: 'Turnover & Inspection only (Zero Revenue Visibility)' }
               ].map(r => (
                 <button
                   key={r.id}
                   onClick={() => setActiveRole(r.id)}
+                  title={r.title}
                   style={{
-                    padding: '0.35rem 0.8rem',
+                    padding: '0.35rem 0.75rem',
                     borderRadius: '6px',
                     border: activeRole === r.id ? `1px solid ${r.color}` : '1px solid transparent',
                     background: activeRole === r.id ? 'rgba(255,255,255,0.12)' : 'transparent',
                     color: activeRole === r.id ? r.color : '#94a3b8',
-                    fontSize: '0.78rem',
+                    fontSize: '0.74rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
@@ -5556,29 +5712,58 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                         </div>
                       </td>
                       <td style={{ textAlign: 'center' }}>
-                        <button
-                          onClick={() => {
-                            setSelectedReceiptBooking({
-                              bookingId: s.billNo,
-                              billNo: s.billNo,
-                              roomNumber: s.roomNumber,
-                              guestName: s.guestName,
-                              tier: s.tier || 'Executive AC',
-                              totalAmount: s.totalAmount,
-                              paymentMode: 'Split Tender',
-                              paymentStatus: 'Fully Settled & Checked Out',
-                              tenders: s.tenders,
-                              tendersSummary: s.tendersSummary,
-                              foodAmount: s.billTotal > 1500 ? 962 : s.billTotal,
-                              grcNo: '684'
-                            });
-                            setIsReceiptModalOpen(true);
-                          }}
-                          className="btn-outline-gold"
-                          style={{ padding: '3px 8px', fontSize: '0.72rem' }}
-                        >
-                          📄 View Bill
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.35rem', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => {
+                              setSelectedReceiptBooking({
+                                bookingId: s.billNo,
+                                billNo: s.billNo,
+                                roomNumber: s.roomNumber,
+                                guestName: s.guestName,
+                                tier: s.tier || 'Executive AC',
+                                totalAmount: s.totalAmount,
+                                paymentMode: 'Split Tender',
+                                paymentStatus: 'Fully Settled & Checked Out',
+                                tenders: s.tenders,
+                                tendersSummary: s.tendersSummary,
+                                foodAmount: s.billTotal > 1500 ? 962 : s.billTotal,
+                                grcNo: '684'
+                              });
+                              setIsReceiptModalOpen(true);
+                            }}
+                            className="btn-outline-gold"
+                            style={{ padding: '3px 8px', fontSize: '0.72rem' }}
+                          >
+                            📄 Bill
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReclassifyModalSettlement(s);
+                              setReclassifyNewCash(s.tenders?.cash || 0);
+                              setReclassifyNewUpi(s.tenders?.upi || 0);
+                              setReclassifyNewCard(s.tenders?.card || 0);
+                              setReclassifyUpiRef(s.tenders?.upiRef || '');
+                              setReclassifyReason('');
+                              setReclassifyPin('');
+                              setReclassifyError('');
+                              setIsReclassifyModalOpen(true);
+                            }}
+                            style={{
+                              padding: '3px 8px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              background: 'rgba(245, 158, 11, 0.2)',
+                              border: '1px solid #f59e0b',
+                              color: '#fbbf24',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                            title="Audited Tender Re-classification (Manager PIN 7650 Required)"
+                          >
+                            ✏️ Tender
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -6332,9 +6517,9 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         <div className="glass-panel" style={{ padding: '1.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
             <div>
-              <h3 style={{ fontSize: '1.25rem' }}>🚨 Statutory Sarai Act 1867 Daily Police Register</h3>
+              <h3 style={{ fontSize: '1.25rem' }}>🚨 Statutory Sarai Act 1867 Daily Police Register (Form C)</h3>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Jurisdiction: Rayagada Town Police Station (Odisha Police) • Inter-State Guest Tagging
+                Jurisdiction: Muniguda Police Station (Thana), Dist. Rayagada (Odisha Police) • Live In-House Manifest
               </div>
             </div>
 
@@ -6351,9 +6536,9 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               <button 
                 onClick={dispatchPoliceRegisterWhatsApp}
                 className="btn-primary-gold"
-                style={{ fontSize: '0.85rem' }}
+                style={{ fontSize: '0.85rem', background: '#25D366', borderColor: '#25D366', color: '#060e1a', fontWeight: 800 }}
               >
-                <Send size={15} /> Dispatch Register to Police Station
+                <Send size={15} /> 📱 Dispatch to Muniguda Thana (WhatsApp)
               </button>
             </div>
           </div>
@@ -6368,7 +6553,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               fontSize: '0.85rem',
               marginBottom: '1rem'
             }}>
-              ✓ Sarai Act Daily Guest Register securely formatted and transmitted to Rayagada Town Police Station email &amp; WhatsApp desk.
+              ✓ Daily Guest Arrival Register (Form C) securely formatted and transmitted to Muniguda Police Station (Thana) desk.
             </div>
           )}
 
@@ -6553,7 +6738,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 </span>
               </div>
               <p style={{ margin: '0.35rem 0 0', fontSize: '0.82rem', color: 'var(--text-secondary)', maxWidth: 760 }}>
-                Engineered for Rayagada Railway Junction express layovers (Howrah–Chennai &amp; Raipur–Vizag trains) and sacred Maa Majhighariani darshan pilgrims. Sell rooms on 4-Hour (₹899) and 6-Hour (₹1,199) slots during the day, release to housekeeping, and re-sell to overnight corporate guests at 2:00 PM!
+                Engineered for Muniguda Railway Junction passenger fresh-ups (Howrah–Chennai &amp; Raipur–Vizag trains) and pilgrimage layovers. <strong>3-Hour Fresh-Up Slot (₹500 – ₹600)</strong> strictly restricted to daytime (06:00 AM – 06:00 PM). Features 60-min checkout reception warning alert &amp; 30-min RFID keycard cutoff timer.
               </p>
             </div>
             <button
@@ -6561,7 +6746,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               className="btn-primary-gold"
               style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}
             >
-              <UserCheck size={16} /> + New Transit Check-In
+              <UserCheck size={16} /> + New Muniguda Transit Check-In
             </button>
           </div>
 
@@ -6575,7 +6760,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 {filteredTransitStays.filter(t => t.status === 'Active In-Stay').length} Rooms
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                Occupying Room 105 &amp; 206 currently
+                Muniguda Jn. 3-Hour Slots
               </div>
             </div>
 
@@ -6587,28 +6772,28 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 ₹{filteredTransitStays.reduce((sum, t) => sum + t.tariff, 0).toLocaleString()}
               </div>
               <div style={{ fontSize: '0.74rem', color: '#a7f3d0', marginTop: '0.15rem' }}>
-                Pure incremental daytime cashflow
+                Daytime incremental revenue (6 AM - 6 PM)
               </div>
             </div>
 
             <div className="glass-panel" style={{ padding: '1rem', borderTop: '3px solid var(--gold-glow)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--gold-glow)', fontWeight: 700, textTransform: 'uppercase' }}>
-                Effective Turnover Multiplier
+                Fresh-Up Policy Window
               </div>
-              <div style={{ fontSize: '1.7rem', fontWeight: 900, color: '#fff', marginTop: '0.2rem' }}>
-                118.2%
+              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--gold-glow)', marginTop: '0.2rem' }}>
+                06:00 AM – 06:00 PM
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                Rooms turned over twice in 24 hours
+                Night slots blocked (Overnight rate applies)
               </div>
             </div>
 
             <div className="glass-panel" style={{ padding: '1rem', borderTop: '3px solid #c084fc' }}>
               <div style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 700, textTransform: 'uppercase' }}>
-                Standard Pricing Slots
+                Muniguda Pricing &amp; Timers
               </div>
               <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff', marginTop: '0.35rem' }}>
-                4h: ₹899 | 6h: ₹1,199
+                3h: ₹550 | 60m Alert | 30m Cutoff
               </div>
               <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
                 Includes complimentary Wi-Fi &amp; fresh linen
@@ -7064,12 +7249,13 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               </div>
 
               <button
-                onClick={() => handleSignShiftHandover(activeShift)}
+                type="button"
+                onClick={() => setIsShiftHandoverModalOpen(true)}
                 className="btn-primary-gold"
-                style={{ width: '100%', padding: '0.7rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                style={{ width: '100%', padding: '0.7rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
               >
                 <CheckCircle2 size={16} />
-                {shiftLogbook[activeShift].handoverSigned ? '✓ Re-Verify Handover PIN' : '✍️ Verify & Lock Shift Handover (Manager PIN)'}
+                {shiftLogbook[activeShift].handoverSigned ? '✓ Re-Verify Handover PIN (Float Count)' : '✍️ Open Interactive Shift Handover & Float Count'}
               </button>
             </div>
 
@@ -9531,6 +9717,14 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         onClose={() => setIsCheckInReviewOpen(false)}
         booking={selectedArrivalForCheckIn}
         onConfirmCheckIn={handleConfirmCheckIn}
+        onPrintGrc={(bk) => {
+          setSelectedReceiptBooking({
+            ...bk,
+            grcNo: `GRC-${bk.roomNumber}`
+          });
+          setReceiptModalType('grc');
+          setIsReceiptModalOpen(true);
+        }}
         breakfastRate={opsSettings?.breakfastRate || 250}
         cabRate={opsSettings?.stationDropRate || 350}
       />
@@ -9559,16 +9753,36 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             padding: '1.5rem',
             boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
           }}>
-            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+            <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
                 <h3 style={{ margin: 0, color: '#fff', fontSize: '1.2rem', fontWeight: 700 }}>
-                  🚨 Statutory Police Register (Form C) • Rayagada Town Police Station
+                  🚨 Statutory Police Register (Form C) • Muniguda Police Station (Thana)
                 </h3>
                 <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Under Section 3 of The Sarai Act, 1867 &amp; Odisha Lodging House Act
+                  Under Section 3 of The Sarai Act, 1867 &amp; Odisha Lodging House Act • Rayagada District
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={dispatchPoliceRegisterWhatsApp}
+                  style={{
+                    padding: '0.45rem 1rem',
+                    fontSize: '0.82rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: 'rgba(37, 211, 102, 0.2)',
+                    border: '1px solid #25D366',
+                    color: '#25D366',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="Dispatch Form C Guest Manifest to Muniguda Thana on WhatsApp"
+                >
+                  <MessageCircle size={15} /> 📱 Dispatch to Thana (WhatsApp)
+                </button>
                 <button
                   type="button"
                   onClick={() => window.print()}
@@ -9597,54 +9811,54 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   DAILY GUEST ARRIVAL &amp; DEPARTURE MANIFEST (FORM C)
                 </h2>
                 <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>
-                  {HOTEL_CONFIG.name.toUpperCase()} • Near Andhra Bank, New Colony, Rayagada - 765001 (Odisha)
+                  {HOTEL_CONFIG.name.toUpperCase()} • Opposite Railway Station Main Road, Muniguda - 765020 (Odisha)
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                  Jurisdiction: Rayagada Town Police Station • District: Rayagada • Sarai Registration No: RGDA-SARAI-2019/042
+                  Jurisdiction: Muniguda Police Station (Thana) • District: Rayagada • Sarai Registration No: MNGD-SARAI-2023/104
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '1rem', fontWeight: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '1rem', fontWeight: 600, flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div><strong>Date of Report:</strong> {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
                 <div><strong>Time of Dispatch:</strong> {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
-                <div><strong>Total In-House Guests:</strong> {bookings.filter(b => b.bookingStatus === 'Checked In' || b.status === 'Checked In').length || 18}</div>
+                <div><strong>Total In-House Guests:</strong> {dynamicPoliceManifest.length}</div>
               </div>
 
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', border: '1px solid #0f172a' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.73rem', border: '1px solid #0f172a' }}>
                 <thead>
                   <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #0f172a', textAlign: 'left' }}>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>S.N</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Room</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Guest Name</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Age/Sex</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Mobile No</th>
-                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Govt ID (Type &amp; Masked)</th>
-                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>State / Country</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Govt ID Proof</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Permanent Address</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Arrived From</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Proceeding To</th>
-                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Vehicle Reg.</th>
                     <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Purpose</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Check-In &amp; Out</th>
+                    <th style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>Vehicle</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { room: '101', name: 'MR. P ASHOK', phone: '+91 6305202068', idType: 'Aadhaar (Masked)', idNum: 'XXXX-XXXX-7890', state: 'Andhra Pradesh', from: 'Visakhapatnam', to: 'Linde Plant Jaykaypur', vehicle: 'AP-31-CK-9021', purpose: 'Corporate Audit' },
-                    { room: '102', name: 'SUBHASH CHANDRA DAS', phone: '+91 94371 88291', idType: 'Driving Lic.', idNum: 'OD-18-XXXX-8291', state: 'Odisha (BBS)', from: 'Bhubaneswar', to: 'JK Paper Mills', vehicle: 'OD-02-AX-4412', purpose: 'Technical Inspection' },
-                    { room: '204', name: 'K. RAMA MURTHY', phone: '+91 98480 33119', idType: 'Aadhaar (Masked)', idNum: 'XXXX-XXXX-3119', state: 'Andhra Pradesh', from: 'Srikakulam', to: 'Maa Majhighariani', vehicle: 'AP-30-T-8821', purpose: 'Pilgrimage Darshan' },
-                    { room: '206', name: 'LAVAKANTA OJHA', phone: '+91 94371 44520', idType: 'Passport', idNum: 'Z-XXXX-4520', state: 'Odisha', from: 'Cuttack', to: 'Akchem Rayagada', vehicle: 'OD-05-M-1029', purpose: 'Business Conference' },
-                    { room: '101', name: 'UTKARSH SRIVASTAVA', phone: '+91 94370 88912', idType: 'Aadhaar (Masked)', idNum: 'XXXX-XXXX-8912', state: 'Uttar Pradesh', from: 'Varanasi', to: 'Koraput Tourism', vehicle: 'Train 18447', purpose: 'Travel & Tourism' },
-                    { room: '104', name: 'BIJAY PASWAN', phone: '+91 98610 33812', idType: 'Voter ID', idNum: 'JH-XXXX-3812', state: 'Jharkhand', from: 'Ranchi', to: 'PRADAN Field Office', vehicle: 'Train 18105', purpose: 'NGO Field Survey' }
-                  ].map((row, idx) => (
+                  {dynamicPoliceManifest.map((row, idx) => (
                     <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', textAlign: 'center' }}>{idx + 1}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', fontWeight: 700 }}>{row.room}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', fontWeight: 600 }}>{row.name}</td>
-                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.phone}</td>
+                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', textAlign: 'center' }}>{row.ageGender}</td>
+                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', whiteSpace: 'nowrap' }}>{row.phone}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.idType}: {row.idNum}</td>
-                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.state}</td>
+                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.address}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.from}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.to}</td>
-                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.vehicle}</td>
                       <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.purpose}</td>
+                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem', fontSize: '0.68rem' }}>
+                        <div>In: {row.checkIn}</div>
+                        <div>Out: {row.checkOut}</div>
+                      </td>
+                      <td style={{ border: '1px solid #cbd5e1', padding: '0.35rem' }}>{row.vehicle}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -9654,13 +9868,13 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ height: '35px' }}></div>
                   <div style={{ borderTop: '1px solid #0f172a', paddingTop: '4px', fontWeight: 700 }}>
-                    Front Desk Duty Officer ({HOTEL_CONFIG.name})
+                    Front Desk Duty Officer (Hotel Elite Inn, Muniguda)
                   </div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ height: '35px' }}></div>
                   <div style={{ borderTop: '1px solid #0f172a', paddingTop: '4px', fontWeight: 700 }}>
-                    Rayagada Town Police Station Desk Officer Seal &amp; G.D. Entry No.
+                    Muniguda Police Station (Thana) Duty Officer Seal &amp; G.D. Entry No.
                   </div>
                 </div>
               </div>
@@ -10158,6 +10372,391 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AUDITED PAYMENT TENDER RE-CLASSIFICATION MODAL (GM/Manager PIN 7650 Gated) */}
+      {isReclassifyModalOpen && reclassifyModalSettlement && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100000,
+          padding: '1rem',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <div style={{
+            background: '#0d1322',
+            border: '2px solid rgba(245, 158, 11, 0.5)',
+            borderRadius: '14px',
+            width: '100%',
+            maxWidth: 560,
+            padding: '1.5rem',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#fbbf24', fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShieldAlert size={20} color="#fbbf24" /> Audited Payment Tender Correction
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                  Strict Anti-Fraud Protocol • Gated by Manager PIN (7650)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReclassifyModalOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.4rem' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleReclassifySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {/* Folio Info Card */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', fontSize: '0.82rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ color: '#94a3b8' }}>Bill Number:</span>
+                  <strong style={{ color: '#fff', fontFamily: 'monospace' }}>{reclassifyModalSettlement.billNo}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ color: '#94a3b8' }}>Guest &amp; Room:</span>
+                  <strong style={{ color: '#38bdf8' }}>{reclassifyModalSettlement.guestName} (Room {reclassifyModalSettlement.roomNumber})</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ color: '#94a3b8' }}>Total Bill Settled:</span>
+                  <strong style={{ color: 'var(--gold-glow)', fontSize: '0.95rem' }}>₹{reclassifyModalSettlement.totalAmount}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#94a3b8' }}>Original Tender:</span>
+                  <span style={{ color: '#f87171' }}>{(reclassifyModalSettlement.tendersSummary || []).join(' + ')}</span>
+                </div>
+              </div>
+
+              {/* Corrected Tenders Distribution */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>
+                  Corrected Settlement Tenders Breakdown:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.65rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '3px' }}>Cash Amount (₹):</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={reclassifyNewCash}
+                      onChange={(e) => setReclassifyNewCash(Number(e.target.value))}
+                      style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#34d399', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontWeight: 700 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '3px' }}>UPI / PhonePe (₹):</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={reclassifyNewUpi}
+                      onChange={(e) => setReclassifyNewUpi(Number(e.target.value))}
+                      style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#38bdf8', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontWeight: 700 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#94a3b8', marginBottom: '3px' }}>Card POS (₹):</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={reclassifyNewCard}
+                      onChange={(e) => setReclassifyNewCard(Number(e.target.value))}
+                      style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#fbbf24', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontWeight: 700 }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {reclassifyNewUpi > 0 && (
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '3px' }}>UPI Transaction Reference ID / Provider:</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. PhonePe Ref # 94810283921"
+                    value={reclassifyUpiRef}
+                    onChange={(e) => setReclassifyUpiRef(e.target.value)}
+                    style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontSize: '0.8rem' }}
+                  />
+                </div>
+              )}
+
+              {/* Mandatory Reason */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#f87171', marginBottom: '4px' }}>
+                  * Mandatory Reason for Tender Correction:
+                </label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="e.g. Guest showed PhonePe payment success screenshot after receptionist mistakenly punched Cash."
+                  value={reclassifyReason}
+                  onChange={(e) => setReclassifyReason(e.target.value)}
+                  style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontSize: '0.8rem', resize: 'none' }}
+                />
+              </div>
+
+              {/* Manager PIN */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: '4px' }}>
+                  🔑 Manager Authorization PIN (Default: 7650):
+                </label>
+                <input
+                  type="password"
+                  required
+                  maxLength={4}
+                  placeholder="Enter 4-digit PIN"
+                  value={reclassifyPin}
+                  onChange={(e) => setReclassifyPin(e.target.value)}
+                  style={{ width: '100%', padding: '0.5rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(245, 158, 11, 0.5)', borderRadius: '6px', fontSize: '1rem', letterSpacing: '4px', textAlign: 'center' }}
+                />
+              </div>
+
+              {reclassifyError && (
+                <div style={{ color: '#f87171', fontSize: '0.78rem', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '6px', border: '1px solid rgba(239,68,68,0.3)' }}>
+                  {reclassifyError}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsReclassifyModalOpen(false)}
+                  style={{ flex: 1, padding: '0.65rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ flex: 2, padding: '0.65rem', background: '#f59e0b', border: '1px solid #d97706', color: '#060e1a', borderRadius: '8px', cursor: 'pointer', fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                >
+                  <CheckCircle2 size={16} /> Authorize &amp; Re-Classify Tender
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* INTERACTIVE CASHIER SHIFT HANDOVER & FLOAT COUNT MODAL */}
+      {isShiftHandoverModalOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.88)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 100000,
+          padding: '1rem',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <div style={{
+            background: '#0d1322',
+            border: '2px solid rgba(212, 175, 55, 0.5)',
+            borderRadius: '14px',
+            width: '100%',
+            maxWidth: 680,
+            maxHeight: '94vh',
+            overflowY: 'auto',
+            padding: '1.75rem',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.75rem' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <DollarSign size={20} color="var(--gold-glow)" /> Front Desk Shift Handover &amp; Float Count
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                  3 Shifts Protocol: 06:00-14:00 (Morning) • 14:00-22:00 (Evening) • 22:00-06:00 (Night)
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShiftHandoverModalOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.4rem' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Shift Selectors */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              {[
+                { id: 'morning', label: '🌅 Morning (06:00 - 14:00)', lead: 'Sudhakar Reddy' },
+                { id: 'evening', label: '🌇 Evening (14:00 - 22:00)', lead: 'Koti Rao' },
+                { id: 'night', label: '🌙 Night (22:00 - 06:00)', lead: 'Deepak Kumar' }
+              ].map(s => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveShift(s.id);
+                    setHandoverOutgoingSign(s.lead);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '0.55rem',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    background: activeShift === s.id ? 'var(--gold-glow)' : 'rgba(255,255,255,0.05)',
+                    color: activeShift === s.id ? '#060e1a' : '#cbd5e1',
+                    border: activeShift === s.id ? '1px solid var(--gold-glow)' : '1px solid rgba(255,255,255,0.1)'
+                  }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Float & Cash Count Breakdown */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block' }}>Opening Float in Drawer:</span>
+                <strong style={{ fontSize: '1.2rem', color: 'var(--gold-glow)' }}>
+                  ₹{(shiftLogbook[activeShift]?.openingCash || 33500).toLocaleString('en-IN')}
+                </strong>
+                <span style={{ fontSize: '0.72rem', color: '#34d399', display: 'block', marginTop: '0.4rem' }}>
+                  + Shift Cash Collected: ₹{(shiftLogbook[activeShift]?.shiftCashCollected || 0).toLocaleString('en-IN')}
+                </span>
+                <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px dashed rgba(255,255,255,0.1)', fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>
+                  Expected Drawer Cash: ₹{((shiftLogbook[activeShift]?.openingCash || 33500) + (shiftLogbook[activeShift]?.shiftCashCollected || 0)).toLocaleString('en-IN')}
+                </div>
+              </div>
+
+              {/* Physical Denominations Calculation */}
+              <div style={{ background: 'rgba(52, 211, 153, 0.08)', padding: '0.85rem', borderRadius: '8px', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                <span style={{ fontSize: '0.72rem', color: '#a7f3d0', display: 'block' }}>Physical Note Count in Drawer:</span>
+                <strong style={{ fontSize: '1.35rem', color: '#34d399', display: 'block', margin: '0.2rem 0' }}>
+                  ₹{Object.entries(handoverDenominations).reduce((sum, [d, c]) => sum + (Number(d) * (Number(c) || 0)), 0).toLocaleString('en-IN')}
+                </strong>
+                {(() => {
+                  const physical = Object.entries(handoverDenominations).reduce((sum, [d, c]) => sum + (Number(d) * (Number(c) || 0)), 0);
+                  const expected = (shiftLogbook[activeShift]?.openingCash || 33500) + (shiftLogbook[activeShift]?.shiftCashCollected || 0);
+                  const diff = physical - expected;
+                  return (
+                    <span style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      background: diff === 0 ? 'rgba(52, 211, 153, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                      color: diff === 0 ? '#34d399' : '#f87171'
+                    }}>
+                      {diff === 0 ? '✓ Balanced (Zero Variance)' : diff > 0 ? `+₹${diff} Surplus` : `-₹${Math.abs(diff)} Shortage`}
+                    </span>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Note Denomination Inputs */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#fff', marginBottom: '0.5rem' }}>
+                💵 Currency Note Breakdown (Count in Safe/Drawer):
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem' }}>
+                {[500, 200, 100, 50, 20, 10].map(denom => (
+                  <div key={denom} style={{ background: 'rgba(0,0,0,0.4)', padding: '0.45rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'block' }}>₹{denom}</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={handoverDenominations[denom] || 0}
+                      onChange={(e) => setHandoverDenominations({ ...handoverDenominations, [denom]: Number(e.target.value) })}
+                      style={{ width: '100%', padding: '0.3rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, marginTop: '2px' }}
+                    />
+                    <span style={{ fontSize: '0.65rem', color: 'var(--gold-glow)', display: 'block', marginTop: '2px' }}>
+                      = ₹{(denom * (handoverDenominations[denom] || 0)).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Signatures & PIN */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginBottom: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '3px' }}>Outgoing Cashier Sign-off:</label>
+                <input
+                  type="text"
+                  value={handoverOutgoingSign}
+                  onChange={(e) => setHandoverOutgoingSign(e.target.value)}
+                  style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontSize: '0.8rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '3px' }}>Incoming Cashier Acceptance:</label>
+                <input
+                  type="text"
+                  value={handoverIncomingSign}
+                  onChange={(e) => setHandoverIncomingSign(e.target.value)}
+                  style={{ width: '100%', padding: '0.45rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px', fontSize: '0.8rem' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--gold-glow)', marginBottom: '4px' }}>
+                🔑 Manager Authorization PIN (Default: 7650):
+              </label>
+              <input
+                type="password"
+                maxLength={4}
+                placeholder="Enter 4-digit PIN"
+                value={handoverPin}
+                onChange={(e) => setHandoverPin(e.target.value)}
+                style={{ width: '100%', padding: '0.5rem', background: '#060e1a', color: '#fff', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '6px', fontSize: '1rem', letterSpacing: '4px', textAlign: 'center' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => setIsShiftHandoverModalOpen(false)}
+                style={{ flex: 1, padding: '0.7rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#cbd5e1', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+                  if (handoverPin !== adminPin) {
+                    alert('⚠️ Invalid Manager PIN. Please enter authorized 4-digit PIN (default 7650).');
+                    return;
+                  }
+                  const physicalTotal = Object.entries(handoverDenominations).reduce((sum, [d, c]) => sum + (Number(d) * (Number(c) || 0)), 0);
+                  setShiftLogbook(prev => ({
+                    ...prev,
+                    [activeShift]: {
+                      ...prev[activeShift],
+                      physicalCashCount: physicalTotal,
+                      handoverSigned: true,
+                      signedAt: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+                      outgoingCashier: handoverOutgoingSign,
+                      incomingCashier: handoverIncomingSign
+                    }
+                  }));
+                  setIsShiftHandoverModalOpen(false);
+                  setFeedbackToast(`✓ Shift Handover for ${activeShift.toUpperCase()} successfully signed and drawer locked!`);
+                }}
+                className="btn-primary-gold"
+                style={{ flex: 2, padding: '0.7rem', justifyContent: 'center', fontSize: '0.88rem' }}
+              >
+                <CheckCircle2 size={16} /> Sign &amp; Lock Shift Drawer
+              </button>
             </div>
           </div>
         </div>

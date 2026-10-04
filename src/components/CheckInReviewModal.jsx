@@ -20,6 +20,7 @@ export default function CheckInReviewModal({
   onClose,
   booking,
   onConfirmCheckIn,
+  onPrintGrc,
   breakfastRate = 250,
   cabRate = 350
 }) {
@@ -442,6 +443,28 @@ export default function CheckInReviewModal({
             >
               Cancel
             </button>
+            {onPrintGrc && (
+              <button
+                type="button"
+                onClick={() => onPrintGrc(booking)}
+                style={{
+                  padding: '0.65rem 1.15rem',
+                  borderRadius: '8px',
+                  background: 'rgba(212, 175, 55, 0.15)',
+                  border: '1px solid var(--gold-glow)',
+                  color: 'var(--gold-glow)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+                title="Print Guest Registration Card (Sarai Act Form A)"
+              >
+                <FileText size={15} /> 📄 Print GRC Form
+              </button>
+            )}
             <button
               type="submit"
               disabled={!idVerified}
