@@ -50,9 +50,11 @@ const RevenueManagementModal = lazyWithRetry(() => import('./components/RevenueM
 const LegalPoliciesModal = lazyWithRetry(() => import('./components/LegalPoliciesModal'));
 const DpdpDataRightsModal = lazyWithRetry(() => import('./components/DpdpDataRightsModal'));
 const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPortal'));
+const HousekeepingPortal = lazyWithRetry(() => import('./components/HousekeepingPortal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
+import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database } from 'lucide-react';
 
@@ -292,6 +294,21 @@ export default function App() {
   const [accountsModalOpen, setAccountsModalOpen] = useState(false);
   const [accountsInitialTab, setAccountsInitialTab] = useState('tally-erp');
   const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
+  const [nightAudits, setNightAudits] = useState([]);
+  const [housekeepingModalOpen, setHousekeepingModalOpen] = useState(false);
+
+  // Requirement 2: Automated Midnight Day Close (Night Audit) Background Scheduler
+  useEffect(() => {
+    const cleanup = initMidnightAuditScheduler({
+      rooms,
+      bookings,
+      transactions,
+      onAuditExecuted: (auditPayload) => {
+        setNightAudits(prev => [auditPayload, ...prev]);
+      }
+    });
+    return cleanup;
+  }, [rooms, bookings, transactions]);
 
   const handleOpenAccountsWithTab = (tab = 'tally-erp') => {
     setAccountsInitialTab(tab);
@@ -930,6 +947,7 @@ export default function App() {
         onOpenRevenueManagement={() => setRevenueModalOpen(true)}
         onOpenD1Database={handleOpenD1Database}
         onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
+        onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
         rooms={rooms}
         adminPinVerified={adminPinVerified}
         setAdminPinVerified={setAdminPinVerified}
@@ -1003,6 +1021,8 @@ export default function App() {
                 onOpenDirectorPortal={() => setDirectorPortalOpen(true)}
                 onOpenRevenueManagement={() => setRevenueModalOpen(true)}
                 onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
+                onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
+                nightAudits={nightAudits}
                 foodOrders={foodOrders}
                 onUpdateOrderStatus={handleUpdateOrderStatus}
                 roomServices={roomServices}
@@ -1216,6 +1236,16 @@ export default function App() {
           <CaFilingStationModal 
             isOpen={caFilingModalOpen}
             onClose={() => setCaFilingModalOpen(false)}
+          />
+        )}
+
+        {/* Dedicated Mobile Housekeeping Attendant Portal (Audio 3 Turnaround Protocol) */}
+        {housekeepingModalOpen && (
+          <HousekeepingPortal 
+            isOpen={housekeepingModalOpen}
+            onClose={() => setHousekeepingModalOpen(false)}
+            rooms={rooms}
+            onUpdateRoomStatus={handleUpdateRoomStatus}
           />
         )}
       </Suspense>

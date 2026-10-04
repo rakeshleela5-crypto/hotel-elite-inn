@@ -28,6 +28,9 @@ dist-ssr
 *.sln
 *.sw?
 .agents/*
+recordings/
+*.mp3
+*.wav
 !.agents/rules/
 
 # Raw Screenshots Cache

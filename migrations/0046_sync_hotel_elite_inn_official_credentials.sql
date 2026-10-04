@@ -1,41 +1,43 @@
 -- ============================================================================
--- HOTEL ELITE INN - MUNIGUDA, RAYAGADA (OFFICIAL CREDENTIALS & STATUTORY SYNC)
--- Trade Name: Hotel Elite Inn
--- Legal Name: Hotel Elite Inn
--- GSTIN: 21AEWFS9433F1ZN | PAN: AEWFS9433F | State Code: 21 (Odisha)
--- FSSAI Lic No: 10523016000047
--- SAC Code Lodging: 996311 | SAC Code F&B: 996332
--- Address: Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020
--- Phone: +91-6370757541 | Cashless Policy: PLEASE DO NOT PAY CASH
+-- Migration 0046: Sync Authentic Hotel Elite Inn Credentials
+-- Verified directly from printed Room Service Tax Invoice (Receipt R.S/2913)
+-- Legal & Trade Name: Hotel Elite Inn
+-- GSTIN: 21AEWFS9433F1ZN | PAN: AEWFS9433F | FSSAI: 10523016000047
+-- SAC: 996311 (Lodging) | 996332 (Restaurant / Room Service F&B)
+-- Location: Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020
+-- Phone: +91-6370757541
 -- ============================================================================
 
--- 1. Insert or Replace Hotel Configuration Master Records
-INSERT OR REPLACE INTO hotel_config (key, value, description) VALUES
-('hotel_name', 'Hotel Elite Inn', 'Official Trade Name'),
-('trade_name', 'Hotel Elite Inn', 'Form GST REG-06 Trade Name'),
-('legal_name', 'Hotel Elite Inn', 'Form GST REG-06 Legal Name'),
-('hotel_address', 'Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020', 'Principal Place of Business'),
-('landmark', 'Opposite Railway Station Main Road', 'Address Landmark'),
-('street', 'Station Main Road', 'Road/Street'),
-('city', 'Muniguda', 'City/Town/Village'),
-('district', 'Rayagada', 'District'),
-('state', 'Odisha', 'State Name'),
-('pin_code', '765020', 'PIN Code'),
-('gstin', '21AEWFS9433F1ZN', 'Official GST Identification Number'),
-('pan', 'AEWFS9433F', 'Permanent Account Number'),
-('state_code', '21', 'GST State Code for Odisha'),
-('fssai', '10523016000047', 'FSSAI Food Safety License Number'),
-('sac_code_rooms', '996311', 'SAC Code for Lodging and Room Accommodation'),
-('sac_code_fb', '996332', 'SAC Code for Restaurant and Room Service F&B'),
-('pos_outlet', 'POS 5- ROOM SERVICE', 'Primary F&B Point of Sale Outlet'),
-('bill_series_rs', 'R.S/', 'Room Service Invoice Numbering Prefix'),
-('cashless_policy', 'PLEASE DO NOT PAY CASH', 'Mandatory Cashless Guest Policy Notice'),
-('phone', '+91-6370757541', 'Primary Reception Switchboard'),
-('alt_phone', '+91 6370757541', 'Secondary Reception Desk Phone'),
-('email', 'hoteleliteinn@gmail.com', 'Official Reservations Email'),
-('upi_id', 'hoteleliteinn@upi', 'Official Merchant UPI ID');
+-- Ensure hotel_config table exists
+CREATE TABLE IF NOT EXISTS hotel_config (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- 2. Update existing GSTR-1 records with the official Hotel Elite Inn GSTIN
+-- Upsert official credentials
+INSERT OR REPLACE INTO hotel_config (key, value, updated_at) VALUES
+('hotel_name', 'Hotel Elite Inn', CURRENT_TIMESTAMP),
+('trade_name', 'Hotel Elite Inn', CURRENT_TIMESTAMP),
+('legal_name', 'Hotel Elite Inn', CURRENT_TIMESTAMP),
+('gstin', '21AEWFS9433F1ZN', CURRENT_TIMESTAMP),
+('pan', 'AEWFS9433F', CURRENT_TIMESTAMP),
+('fssai', '10523016000047', CURRENT_TIMESTAMP),
+('sac_code_rooms', '996311', CURRENT_TIMESTAMP),
+('sac_code_fb', '996332', CURRENT_TIMESTAMP),
+('phone', '+91-6370757541', CURRENT_TIMESTAMP),
+('email', 'hoteleliteinn.mngd@gmail.com', CURRENT_TIMESTAMP),
+('address_street', 'Opposite Railway Station Main Road', CURRENT_TIMESTAMP),
+('city', 'Muniguda', CURRENT_TIMESTAMP),
+('district', 'Rayagada', CURRENT_TIMESTAMP),
+('state', 'Odisha', CURRENT_TIMESTAMP),
+('state_code', '21', CURRENT_TIMESTAMP),
+('pin_code', '765020', CURRENT_TIMESTAMP),
+('pos_outlet_name', 'POS 5- ROOM SERVICE', CURRENT_TIMESTAMP),
+('bill_series_prefix', 'R.S/', CURRENT_TIMESTAMP),
+('cashless_policy_notice', '------PLEASE DONOT PAY CASH------', CURRENT_TIMESTAMP);
+
+-- Update any past GSTR-1 filings with official GSTIN
 UPDATE gstr1_filings 
-SET gstin = '21AEWFS9433F1ZN'
-WHERE gstin != '21AEWFS9433F1ZN';
+SET gstin = '21AEWFS9433F1ZN' 
+WHERE gstin IS NULL OR gstin = '' OR gstin = '21ABCDE1234F1Z5';

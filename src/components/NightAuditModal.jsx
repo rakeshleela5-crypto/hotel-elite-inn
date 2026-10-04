@@ -144,6 +144,36 @@ export default function NightAuditModal({
     window.print();
   };
 
+  const handleSendDayBookWhatsApp = () => {
+    const text = `🏨 *${HOTEL_CONFIG.name}, MUNIGUDA - DAILY DAY BOOK SUMMARY*
+📅 Business Date: ${businessDate}
+🔒 Audit Protocol: 12:00 AM Automated Day Close
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 *DAILY REVENUE BREAKDOWN:*
+• Room Lodging Revenue: ₹${roomRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• F&B Cannon Kitchen: ₹${fnbRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• Gross Daily Turnover: ₹${grossRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• Occupancy: ${occupancyPct}% (${occupiedRooms}/${totalRooms} Rooms)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *COLLECTIONS BY PAYMENT CHANNEL:*
+• 💵 Cash Collection: ₹${cashCollected.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• 📱 UPI (PhonePe / GPay): ₹${upiCollected.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• 💳 Card Swipe POS: ₹${cardCollected.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• 🏢 Corporate Credit / BTC: ₹${companyCredit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💼 *CASH DRAWER RECONCILIATION:*
+• Opening Float: ₹${openingFloat.toLocaleString('en-IN')}
+• Total Expected Cash in Drawer: ₹${expectedDrawerCash.toLocaleString('en-IN')}
+• Physical Drawer Count: ₹${physicalDrawerCash}
+• Cash Variance: ₹${cashVariance.toLocaleString('en-IN')} ${cashVariance === 0 ? '✓ Balanced' : '⚠️ Discrepancy'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Duty Auditor: ${auditorName}
+Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
+
+    const encoded = encodeURIComponent(text);
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  };
+
   const stepsList = [
     { step: 1, title: 'Pre-Audit Verification' },
     { step: 2, title: 'Auto-Post Room Tariffs' },
@@ -198,7 +228,7 @@ export default function NightAuditModal({
           gap: '1rem'
         }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
               <span 
                 className="badge" 
                 style={{ 
@@ -213,13 +243,50 @@ export default function NightAuditModal({
               >
                 12:00 MIDNIGHT PROTOCOL
               </span>
+              <span style={{
+                background: 'rgba(16, 185, 129, 0.2)',
+                color: '#34d399',
+                border: '1px solid #10b981',
+                padding: '0.2rem 0.6rem',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                borderRadius: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }}></span>
+                Automated 12:00 AM Midnight Auto-Close Active
+              </span>
               <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: 700, letterSpacing: '0.02em' }}>
-                Night Audit & Business Day-Closing Engine
+                Night Audit &amp; Daily Day Book Engine
               </h2>
             </div>
             <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-              Hard-locks transactions against backdating • Auto-posts night tariffs • Rolls business date
+              Automatic midnight rollover • Cash / UPI / Card / Corporate BTC daily breakdown • Ledger freeze
             </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleSendDayBookWhatsApp}
+              style={{
+                padding: '0.45rem 0.85rem',
+                borderRadius: '8px',
+                background: 'rgba(37, 211, 102, 0.2)',
+                border: '1px solid #25D366',
+                color: '#25D366',
+                cursor: 'pointer',
+                fontWeight: 800,
+                fontSize: '0.78rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+              title="Share Daily Day Book breakdown to Raju Anna & GM via WhatsApp"
+            >
+              <MessageCircle size={15} /> 📱 WhatsApp Day Book
+            </button>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>

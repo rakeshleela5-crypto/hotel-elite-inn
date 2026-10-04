@@ -2175,7 +2175,166 @@ export async function onRequestPost({ request, env }) {
           `).bind(quantity || 0, quantity || 0, itemId).run().catch(() => {});
         }
       }
-      return jsonResponse({ success: true, itemId });
+    // 53. CANNON KITCHEN POS: Save Running Table Session (Multi-KOT)
+    if (action === 'save_running_table_session') {
+      const s = payload || {};
+      const sessionId = s.sessionId || `SESSION-T${s.tableNumber || '0'}-${Date.now()}`;
+      await db.prepare(`
+        INSERT INTO pos_table_sessions (
+          session_id, table_number, outlet, guest_name, cover, status,
+          kots_json, cumulative_items_json, subtotal, gst, net_total,
+          captain, first_kot_time, last_kot_time, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE(?, datetime('now')), datetime('now'), datetime('now'))
+        ON CONFLICT(session_id) DO UPDATE SET
+          status = excluded.status,
+          cover = excluded.cover,
+          kots_json = excluded.kots_json,
+          cumulative_items_json = excluded.cumulative_items_json,
+          subtotal = excluded.subtotal,
+          gst = excluded.gst,
+          net_total = excluded.net_total,
+          last_kot_time = datetime('now'),
+          updated_at = datetime('now')
+      `).bind(
+        sessionId,
+        String(s.tableNumber || '1'),
+        s.outlet || 'Cannon Kitchen',
+        s.guestName || `Table ${s.tableNumber} Guest`,
+        Number(s.cover || 2),
+        s.status || 'OCCUPIED',
+        typeof s.kots === 'string' ? s.kots : JSON.stringify(s.kots || []),
+        typeof s.cumulativeItems === 'string' ? s.cumulativeItems : JSON.stringify(s.cumulativeItems || []),
+        Number(s.subtotal || 0),
+        Number(s.gst || 0),
+        Number(s.netTotal || 0),
+        s.captain || 'KOTI',
+        s.firstKotTime || null
+      ).run().catch(err => console.warn("Running table session upsert error:", err));
+
+      return jsonResponse({ success: true, sessionId });
+    }
+
+    // 54. CANNON KITCHEN POS: Settle Running Table Session
+    if (action === 'settle_running_table_session') {
+      const s = payload || {};
+      await db.prepare(`
+        UPDATE pos_table_sessions 
+        SET status = 'SETTLED',
+            settled_at = datetime('now'),
+            settlement_mode = ?,
+            updated_at = datetime('now')
+        WHERE session_id = ? OR (table_number = ? AND status = 'OCCUPIED')
+      `).bind(
+        s.paymentMode || 'Cash',
+        s.sessionId || '',
+        String(s.tableNumber || '')
+      ).run().catch(err => console.warn("Settle table session error:", err));
+
+      return jsonResponse({ success: true });
+    }
+
+    // 55. HOUSEKEEPING: Update Room Cleaning Status & Floor Attendant Log
+    if (action === 'update_housekeeping_status') {
+      const h = payload || {};
+      const roomNumber = String(h.roomNumber || '');
+      const newStatus = h.newStatus || 'Clean & Inspected'; // 'Dirty', 'Under Cleaning', 'Clean & Inspected', 'Maintenance'
+      const attendantName = h.attendantName || 'Floor Attendant';
+      const logId = `HK-${Date.now().toString().slice(-6)}`;
+
+      // 1. Update room status in rooms table
+      const dbRoomStatus = (newStatus === 'Clean & Inspected' || newStatus === 'Clean') ? 'Available' : 
+                           (newStatus === 'Dirty' ? 'Dirty' : 
+                           (newStatus === 'Under Cleaning' ? 'Cleaning' : 'Maintenance'));
+
+      await db.prepare(`
+        UPDATE rooms 
+        SET status = ?,
+            current_guest_name = CASE WHEN ? = 'Available' THEN NULL ELSE current_guest_name END,
+            current_booking_id = CASE WHEN ? = 'Available' THEN NULL ELSE current_booking_id END
+        WHERE room_number = ?
+      `).bind(dbRoomStatus, dbRoomStatus, dbRoomStatus, roomNumber).run().catch(err => console.warn("Room status HK update error:", err));
+
+      // 2. Insert into housekeeping audit logs
+      await db.prepare(`
+        INSERT INTO housekeeping_logs (
+          log_id, room_number, previous_status, new_status, attendant_name, notes, cleaned_at
+        ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))
+      `).bind(
+        logId,
+        roomNumber,
+        h.previousStatus || 'Dirty',
+        newStatus,
+        attendantName,
+        h.notes || 'Status updated via Mobile Housekeeping Attendant Portal'
+      ).run().catch(err => console.warn("Housekeeping log insert error:", err));
+
+      return jsonResponse({ success: true, logId, roomNumber, newStatus });
+    }
+
+    // 56. AUTOMATED MIDNIGHT AUDIT: Day Close Snapshot & Day Book Log
+    if (action === 'execute_automated_night_audit') {
+      const a = payload || {};
+      const businessDate = a.businessDate || new Date().toISOString().split('T')[0];
+      const auditId = `AUTO-NA-${businessDate}`;
+
+      await db.prepare(`
+        INSERT OR REPLACE INTO night_audit_records (
+          audit_id, business_date, closed_at, auto_triggered,
+          total_rooms, occupied_rooms, occupancy_pct,
+          room_revenue, fnb_revenue, other_revenue, gross_revenue,
+          cash_collected, upi_collected, card_collected, btc_corporate_credit,
+          drawer_cash_opening, drawer_cash_physical, cash_variance,
+          auditor_name, notes
+        ) VALUES (?, ?, datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        auditId,
+        businessDate,
+        a.autoTriggered !== undefined ? (a.autoTriggered ? 1 : 0) : 1,
+        Number(a.totalRooms || 18),
+        Number(a.occupiedRooms || 0),
+        Number(a.occupancyPct || 0),
+        Number(a.roomRevenue || 0),
+        Number(a.fnbRevenue || 0),
+        Number(a.otherRevenue || 0),
+        Number(a.grossRevenue || 0),
+        Number(a.cashCollected || 0),
+        Number(a.upiCollected || 0),
+        Number(a.cardCollected || 0),
+        Number(a.btcCorporateCredit || a.companyCredit || 0),
+        Number(a.drawerCashOpening || 5000),
+        Number(a.drawerCashPhysical || a.cashPhysical || 0),
+        Number(a.cashVariance || 0),
+        a.auditorName || 'Automated System (12:00 AM Midnight Trigger)',
+        a.notes || 'Automated 12:00 AM Midnight Day Close (Night Audit Rollover)'
+      ).run().catch(err => console.warn("Automated night audit log error:", err));
+
+      return jsonResponse({ success: true, auditId, businessDate });
+    }
+
+    // 57. ANTI-THEFT: Record Stay Duration Extension
+    if (action === 'record_stay_extension') {
+      const e = payload || {};
+      const extensionId = `EXT-${Date.now().toString().slice(-6)}`;
+      await db.prepare(`
+        INSERT INTO room_stay_extensions (
+          extension_id, room_number, booking_id, guest_name, stay_type,
+          extended_hours, extended_nights, additional_tariff, payment_mode,
+          receptionist_name, receptionist_pin_verified, extended_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, datetime('now'))
+      `).bind(
+        extensionId,
+        String(e.roomNumber || ''),
+        e.bookingId || '',
+        e.guestName || 'In-House Guest',
+        e.stayType || 'STANDARD_24H',
+        Number(e.extendedHours || 0),
+        Number(e.extendedNights || 0),
+        Number(e.additionalTariff || 0),
+        e.paymentMode || 'CASH',
+        e.receptionistName || 'Front Desk'
+      ).run().catch(err => console.warn("Stay extension record error:", err));
+
+      return jsonResponse({ success: true, extensionId });
     }
 
     return jsonResponse({ error: `Unknown action: ${action}` }, 400);

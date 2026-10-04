@@ -60,6 +60,7 @@ export default function ReceptionAdmin({
   onOpenDirectorPortal,
   onOpenRevenueManagement,
   onOpenCaFilingStation,
+  onOpenHousekeeping,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
   initialTab
@@ -347,11 +348,14 @@ export default function ReceptionAdmin({
       slotType: '4-Hour Transit',
       hoursAllowed: 4,
       checkInTime: '07:30 AM',
+      checkInTimestamp: Date.now() - 2.5 * 3600 * 1000,
       expectedCheckoutTime: '11:30 AM',
+      expectedCheckoutTimestamp: Date.now() + 1.5 * 3600 * 1000,
       tariff: 899,
       paymentMode: 'UPI (PhonePe)',
       status: 'Active In-Stay',
-      depositPaid: 1000
+      depositPaid: 1000,
+      extensions: []
     },
     {
       id: 'TR-1082',
@@ -360,14 +364,17 @@ export default function ReceptionAdmin({
       phone: '+91 98480 33119',
       origin: 'Visakhapatnam (Tirupati Spl 07488)',
       purpose: 'Maa Majhighariani Sacred Darshan',
-      slotType: '6-Hour Transit',
-      hoursAllowed: 6,
-      checkInTime: '06:15 AM',
-      expectedCheckoutTime: '12:15 PM',
-      tariff: 1199,
+      slotType: '2-Hour Quick Refresh',
+      hoursAllowed: 2,
+      checkInTime: '11:45 AM',
+      checkInTimestamp: Date.now() - 1.6 * 3600 * 1000,
+      expectedCheckoutTime: '01:45 PM',
+      expectedCheckoutTimestamp: Date.now() + 0.4 * 3600 * 1000, // ~24 mins remaining, RFID cutoff alert
+      tariff: 599,
       paymentMode: 'Cash',
       status: 'Active In-Stay',
-      depositPaid: 1500
+      depositPaid: 1000,
+      extensions: []
     }
   ]);
   const [transitForm, setTransitForm] = useState({
@@ -376,12 +383,20 @@ export default function ReceptionAdmin({
     phone: '',
     origin: '',
     purpose: 'Maa Majhighariani Pilgrimage',
-    slotType: '4-Hour Transit',
-    hoursAllowed: 4,
-    tariff: 899,
+    slotType: '2-Hour Transit',
+    hoursAllowed: 2,
+    tariff: 599,
     paymentMode: 'UPI',
     depositPaid: 1000
   });
+
+  // Anti-Fraud Stay Extension States (Audio 3: 2-Hour Room Flip Prevention)
+  const [stayExtensionModalOpen, setStayExtensionModalOpen] = useState(false);
+  const [extensionTargetRoom, setExtensionTargetRoom] = useState(null);
+  const [extensionDurationHours, setExtensionDurationHours] = useState(2);
+  const [extensionTariffAdded, setExtensionTariffAdded] = useState(400);
+  const [extensionPaymentMode, setExtensionPaymentMode] = useState('UPI (PhonePe)');
+  const [extensionReason, setExtensionReason] = useState('Guest requested stay extension');
 
   // 1B. Rayagada Junction (RGDA) Station Transfer & Logistics Dispatch (Inspired by Open-Hotel-PMS)
   const [stationTransfers, setStationTransfers] = useState([
@@ -1381,6 +1396,11 @@ export default function ReceptionAdmin({
       alert('Please fill in Room Number, Guest Name, and Mobile Number.');
       return;
     }
+    const hours = Number(transitForm.hoursAllowed) || 2;
+    const nowMs = Date.now();
+    const expectedCheckoutTimestamp = nowMs + hours * 3600 * 1000;
+    const expectedCheckoutTime = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
     const newStay = {
       id: `TR-${Date.now().toString().slice(-4)}`,
       roomNumber: transitForm.roomNumber,
@@ -1389,13 +1409,16 @@ export default function ReceptionAdmin({
       origin: transitForm.origin || 'Rayagada Railway Junction Transit',
       purpose: transitForm.purpose,
       slotType: transitForm.slotType,
-      hoursAllowed: transitForm.hoursAllowed,
+      hoursAllowed: hours,
       checkInTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      expectedCheckoutTime: `In ${transitForm.hoursAllowed} Hours`,
-      tariff: Number(transitForm.tariff) || 899,
+      checkInTimestamp: nowMs,
+      expectedCheckoutTime: expectedCheckoutTime,
+      expectedCheckoutTimestamp: expectedCheckoutTimestamp,
+      tariff: Number(transitForm.tariff) || 599,
       paymentMode: transitForm.paymentMode,
       status: 'Active In-Stay',
-      depositPaid: Number(transitForm.depositPaid) || 1000
+      depositPaid: Number(transitForm.depositPaid) || 1000,
+      extensions: []
     };
     setTransitStays(prev => [newStay, ...prev]);
     onUpdateRoomStatus(transitForm.roomNumber, 'Occupied', transitForm.guestName, newStay.id);
@@ -1415,11 +1438,11 @@ export default function ReceptionAdmin({
           roomNumber: transitForm.roomNumber,
           guestName: transitForm.guestName,
           guestPhone: transitForm.phone,
-          idProofType: transitForm.idType,
-          idProofNumber: transitForm.idNumber,
+          idProofType: transitForm.idType || 'Aadhaar Card',
+          idProofNumber: transitForm.idNumber || 'XXXX-XXXX-9921',
           nights: 1,
-          tariffPerNight: Number(transitForm.tariff) || 899,
-          totalAmount: Number(transitForm.tariff) || 899,
+          tariffPerNight: Number(transitForm.tariff) || 599,
+          totalAmount: Number(transitForm.tariff) || 599,
           advanceDeposit: Number(transitForm.depositPaid) || 1000,
           paymentMode: transitForm.paymentMode,
           purposeOfVisit: `Transit Stay (${transitForm.slotType}) - ${transitForm.purpose}`
@@ -1429,6 +1452,113 @@ export default function ReceptionAdmin({
 
     setIsTransitModalOpen(false);
     showToast(`✓ Transit Check-In complete for Room ${transitForm.roomNumber} (${transitForm.slotType} - ₹${transitForm.tariff}).`);
+  };
+
+  // Anti-Fraud Stay Extension Handlers (Audio 3: 2-Hour Room Flip Audit)
+  const handleOpenStayExtension = (room) => {
+    setExtensionTargetRoom(room);
+    setExtensionDurationHours(2);
+    setExtensionTariffAdded(400);
+    setExtensionPaymentMode('UPI (PhonePe)');
+    setExtensionReason('Guest requested stay extension');
+    setStayExtensionModalOpen(true);
+  };
+
+  const handleConfirmStayExtension = (e) => {
+    e.preventDefault();
+    if (!extensionTargetRoom) return;
+
+    const roomNo = String(extensionTargetRoom.roomNumber);
+    const now = Date.now();
+    const addedMs = Number(extensionDurationHours) * 3600 * 1000;
+
+    // 1. Update transit stays state
+    setTransitStays(prev => {
+      const existing = prev.find(t => String(t.roomNumber) === roomNo && t.status === 'Active In-Stay');
+      if (existing) {
+        const baseEnd = (existing.expectedCheckoutTimestamp && existing.expectedCheckoutTimestamp > now)
+          ? existing.expectedCheckoutTimestamp
+          : now;
+        const newEnd = baseEnd + addedMs;
+        return prev.map(t => {
+          if (t.id === existing.id) {
+            return {
+              ...t,
+              expectedCheckoutTimestamp: newEnd,
+              expectedCheckoutTime: new Date(newEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+              hoursAllowed: (t.hoursAllowed || 2) + Number(extensionDurationHours),
+              tariff: (t.tariff || 0) + Number(extensionTariffAdded),
+              slotType: `${(t.hoursAllowed || 2) + Number(extensionDurationHours)}-Hour Extended Transit`,
+              extensions: [
+                ...(t.extensions || []),
+                {
+                  extendedAt: new Date().toISOString(),
+                  hours: Number(extensionDurationHours),
+                  amount: Number(extensionTariffAdded),
+                  paymentMode: extensionPaymentMode,
+                  reason: extensionReason
+                }
+              ]
+            };
+          }
+          return t;
+        });
+      } else {
+        const newEnd = now + addedMs;
+        const newStay = {
+          id: `EXT-${Date.now().toString().slice(-4)}`,
+          roomNumber: roomNo,
+          guestName: extensionTargetRoom.effectiveGuestName || 'In-House Guest',
+          phone: extensionTargetRoom.effectivePhone || '+91 94370 00000',
+          origin: 'Front Desk Extension',
+          purpose: 'Stay Extended',
+          slotType: `${extensionDurationHours}-Hour Extension`,
+          hoursAllowed: Number(extensionDurationHours),
+          checkInTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          checkInTimestamp: now,
+          expectedCheckoutTime: new Date(newEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          expectedCheckoutTimestamp: newEnd,
+          tariff: Number(extensionTariffAdded),
+          paymentMode: extensionPaymentMode,
+          status: 'Active In-Stay',
+          depositPaid: Number(extensionTariffAdded),
+          extensions: [
+            {
+              extendedAt: new Date().toISOString(),
+              hours: Number(extensionDurationHours),
+              amount: Number(extensionTariffAdded),
+              paymentMode: extensionPaymentMode,
+              reason: extensionReason
+            }
+          ]
+        };
+        return [newStay, ...prev];
+      }
+    });
+
+    // 2. Sync stay extension directly to Cloudflare D1 Remote Database
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Key': adminPin
+      },
+      body: JSON.stringify({
+        action: 'record_stay_extension',
+        payload: {
+          roomNumber: roomNo,
+          guestName: extensionTargetRoom.effectiveGuestName || 'In-House Guest',
+          extensionHours: Number(extensionDurationHours),
+          tariffAdded: Number(extensionTariffAdded),
+          paymentMode: extensionPaymentMode,
+          reason: extensionReason
+        }
+      })
+    }).catch(err => console.warn('Stay extension D1 sync error:', err));
+
+    setStayExtensionModalOpen(false);
+    showToast(`✓ Stay extended +${extensionDurationHours}h for Room ${roomNo} (₹${extensionTariffAdded} via ${extensionPaymentMode}). Synced to D1 & Anti-Fraud Log.`);
   };
 
   // Station Transfer Handlers (Open-Hotel-PMS Logistics Engine)
@@ -1796,6 +1926,28 @@ export default function ReceptionAdmin({
         effectiveBalanceDue = 0;
       }
 
+      // Check for active transit stay (Audio 3: Anti-Fraud 2h/4h/6h transit day-use)
+      const matchedTransit = transitStays.find(t => String(t.roomNumber) === rNo && t.status === 'Active In-Stay');
+      let remainingMins = null;
+      let isOverdue = false;
+      let isKeyCutoffImminent = false;
+
+      if (matchedTransit) {
+        const nowMs = Date.now();
+        remainingMins = matchedTransit.expectedCheckoutTimestamp 
+          ? Math.round((matchedTransit.expectedCheckoutTimestamp - nowMs) / 60000) 
+          : 45;
+        isOverdue = remainingMins <= 0;
+        isKeyCutoffImminent = remainingMins > 0 && remainingMins <= 30;
+
+        effectiveStatus = 'Occupied';
+        effectiveGuestName = matchedTransit.guestName || effectiveGuestName;
+        effectivePhone = matchedTransit.phone || effectivePhone;
+        effectiveCompany = `Transit Day-Use (${matchedTransit.origin || 'Rayagada Link'})`;
+        effectiveTariff = matchedTransit.tariff || 599;
+        effectiveStayPeriod = `${matchedTransit.slotType} (Out: ${matchedTransit.expectedCheckoutTime})`;
+      }
+
       return {
         ...room,
         effectiveStatus,
@@ -1805,10 +1957,14 @@ export default function ReceptionAdmin({
         effectiveStayPeriod,
         effectiveTariff,
         effectiveBalanceDue,
-        matchedBooking
+        matchedBooking,
+        matchedTransit,
+        remainingMins,
+        isOverdue,
+        isKeyCutoffImminent
       };
     });
-  }, [rooms, allKnownBookings, filterFromDate, filterToDate, todayStr]);
+  }, [rooms, allKnownBookings, transitStays, filterFromDate, filterToDate, todayStr]);
 
   // Counts based on projected room state for selected date window
   const totalCount = projectedRooms.length;
@@ -3835,7 +3991,50 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
 
                           {/* Stay Period */}
                           <td style={{ color: '#94a3b8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
-                            {room.effectiveStayPeriod}
+                            {room.matchedTransit ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                {room.isOverdue ? (
+                                  <span style={{ 
+                                    background: 'rgba(239, 68, 68, 0.25)', 
+                                    color: '#f87171', 
+                                    border: '1px solid #ef4444', 
+                                    padding: '2px 6px', 
+                                    borderRadius: '4px', 
+                                    fontWeight: 800, 
+                                    fontSize: '0.7rem' 
+                                  }}>
+                                    🚨 OVERSTAY (+{Math.abs(room.remainingMins)}m)
+                                  </span>
+                                ) : room.isKeyCutoffImminent ? (
+                                  <span style={{ 
+                                    background: 'rgba(245, 158, 11, 0.25)', 
+                                    color: '#fbbf24', 
+                                    border: '1px solid #f59e0b', 
+                                    padding: '2px 6px', 
+                                    borderRadius: '4px', 
+                                    fontWeight: 800, 
+                                    fontSize: '0.7rem' 
+                                  }}>
+                                    ⚠️ RFID CUTOFF ({room.remainingMins}m)
+                                  </span>
+                                ) : (
+                                  <span style={{ 
+                                    background: 'rgba(14, 165, 233, 0.2)', 
+                                    color: '#38bdf8', 
+                                    border: '1px solid rgba(14, 165, 233, 0.4)', 
+                                    padding: '2px 6px', 
+                                    borderRadius: '4px', 
+                                    fontWeight: 700, 
+                                    fontSize: '0.7rem' 
+                                  }}>
+                                    ⏱️ {room.remainingMins > 60 ? `${Math.floor(room.remainingMins/60)}h ${room.remainingMins%60}m` : `${room.remainingMins}m`}
+                                  </span>
+                                )}
+                                <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>({room.matchedTransit.slotType})</span>
+                              </div>
+                            ) : (
+                              room.effectiveStayPeriod
+                            )}
                           </td>
 
                           {/* Tariff (₹) - Google Sheets Currency Cell */}
@@ -3901,6 +4100,26 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                   >
                                     📄 Folio (1-17)
                                   </button>
+                                  {room.matchedTransit && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleOpenStayExtension(room)}
+                                      style={{
+                                        padding: '3px 7px',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        background: 'rgba(234, 179, 8, 0.25)',
+                                        color: '#facc15',
+                                        border: '1px solid #facc15',
+                                        whiteSpace: 'nowrap'
+                                      }}
+                                      title="Official Stay Extension (Prevent Cash Pocketing)"
+                                    >
+                                      ⏳ Extend
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -4256,6 +4475,23 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                     <div style={{ color: '#fb923c', fontWeight: 800, marginTop: '2px', fontSize: '0.8rem' }}>
                                       ₹{(room.outstandingBalance || room.tariff || 0).toLocaleString('en-IN')}
                                     </div>
+                                    {room.matchedTransit && (
+                                      <div style={{ marginTop: '3px' }}>
+                                        {room.isOverdue ? (
+                                          <span style={{ background: '#ef4444', color: '#fff', padding: '1px 5px', borderRadius: '3px', fontWeight: 800, fontSize: '0.66rem' }}>
+                                            🚨 OVERSTAY (+{Math.abs(room.remainingMins)}m)
+                                          </span>
+                                        ) : room.isKeyCutoffImminent ? (
+                                          <span style={{ background: '#f59e0b', color: '#000', padding: '1px 5px', borderRadius: '3px', fontWeight: 800, fontSize: '0.66rem' }}>
+                                            ⚠️ RFID CUTOFF ({room.remainingMins}m)
+                                          </span>
+                                        ) : (
+                                          <span style={{ background: '#0284c7', color: '#fff', padding: '1px 5px', borderRadius: '3px', fontWeight: 700, fontSize: '0.66rem' }}>
+                                            ⏱️ {room.remainingMins > 60 ? `${Math.floor(room.remainingMins/60)}h ${room.remainingMins%60}m` : `${room.remainingMins}m`} left
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 ) : isMaint ? (
                                   <div style={{ color: '#f87171', fontWeight: 700 }}>
@@ -4425,8 +4661,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                     </button>
                                   </div>
 
-                                  {/* Row 2: Shift Room, Edit Stay, WhatsApp Pass */}
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3px', width: '100%' }}>
+                                  {/* Row 2: Shift Room, Edit Stay, WhatsApp Pass, Stay Extension */}
+                                  <div style={{ display: 'grid', gridTemplateColumns: room.matchedTransit ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)', gap: '3px', width: '100%' }}>
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -4469,6 +4705,29 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                     >
                                       ✏️ Stay
                                     </button>
+                                    {room.matchedTransit && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleOpenStayExtension(room);
+                                        }}
+                                        title="Official Stay Extension (Prevent Cash Pocketing)"
+                                        style={{
+                                          padding: '3px 2px',
+                                          fontSize: '0.62rem',
+                                          fontWeight: 800,
+                                          background: 'rgba(234, 179, 8, 0.3)',
+                                          color: '#facc15',
+                                          border: '1px solid #facc15',
+                                          borderRadius: '3px',
+                                          cursor: 'pointer',
+                                          whiteSpace: 'nowrap',
+                                          textAlign: 'center'
+                                        }}
+                                      >
+                                        ⏳ Ext
+                                      </button>
+                                    )}
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -5472,6 +5731,28 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {onOpenHousekeeping && (
+                  <button
+                    type="button"
+                    onClick={onOpenHousekeeping}
+                    className="btn-primary-gold"
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      fontSize: '0.8rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      borderColor: '#10b981',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.4)'
+                    }}
+                    title="Open Dedicated Mobile Housekeeping Staff Sanitation Portal (5-Point Checklist, Room Status Sync)"
+                  >
+                    📱 Mobile Attendant App
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setIsHousekeepingPrintOpen(true)}
@@ -8500,15 +8781,20 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                     className="form-select"
                     value={transitForm.slotType}
                     onChange={(e) => {
-                      const is6h = e.target.value.includes('6-Hour');
+                      const val = e.target.value;
+                      const is2h = val.includes('2-Hour');
+                      const is6h = val.includes('6-Hour');
+                      const hours = is2h ? 2 : is6h ? 6 : 4;
+                      const tariff = is2h ? 599 : is6h ? 1199 : 899;
                       setTransitForm({
                         ...transitForm,
-                        slotType: e.target.value,
-                        hoursAllowed: is6h ? 6 : 4,
-                        tariff: is6h ? 1199 : 899
+                        slotType: val,
+                        hoursAllowed: hours,
+                        tariff: tariff
                       });
                     }}
                   >
+                    <option value="2-Hour Transit">2-Hour Rapid Fresh-Up (₹599)</option>
                     <option value="4-Hour Transit">4-Hour Transit Slot (₹899)</option>
                     <option value="6-Hour Transit">6-Hour Transit Slot (₹1,199)</option>
                   </select>
@@ -8569,6 +8855,123 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 </button>
                 <button type="submit" className="btn-primary-gold" style={{ flex: 2, justifyContent: 'center', background: '#0284c7', borderColor: '#0284c7', color: '#fff' }}>
                   Confirm Transit Check-In
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ANTI-FRAUD STAY EXTENSION MODAL (Audio 3: 2-Hour Room Flip Audit) */}
+      {stayExtensionModalOpen && extensionTargetRoom && (
+        <div className="modal-backdrop">
+          <div className="modal-content" style={{ maxWidth: 540 }}>
+            <div className="modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1.3rem' }}>⏳</span>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>Formal Stay Extension (Anti-Fraud Lock)</h3>
+                  <div style={{ fontSize: '0.74rem', color: '#38bdf8' }}>
+                    Room {extensionTargetRoom.roomNumber} • Logged to Night Audit &amp; Remote D1
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setStayExtensionModalOpen(false)} className="modal-close-btn">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmStayExtension} className="modal-body">
+              <div style={{ background: 'rgba(234, 179, 8, 0.12)', border: '1px solid rgba(234, 179, 8, 0.35)', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, color: '#facc15' }}>Guest Name:</span>
+                  <span style={{ fontWeight: 800, color: '#fff' }}>{extensionTargetRoom.effectiveGuestName || 'In-House Guest'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem', fontSize: '0.8rem' }}>
+                  <span style={{ color: 'var(--text-muted)' }}>Current Checkout Status:</span>
+                  <span style={{ color: extensionTargetRoom.isOverdue ? '#f87171' : '#38bdf8', fontWeight: 700 }}>
+                    {extensionTargetRoom.effectiveStayPeriod || 'Active Stay'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Select Extension Duration *</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                  {[
+                    { hours: 2, label: '+2 Hours', price: 400, desc: 'Quick Refresh' },
+                    { hours: 4, label: '+4 Hours', price: 700, desc: 'Train Layover' },
+                    { hours: 12, label: 'Full 24H', price: 1200, desc: 'Overnight Upgrade' }
+                  ].map(opt => (
+                    <button
+                      key={opt.hours}
+                      type="button"
+                      onClick={() => {
+                        setExtensionDurationHours(opt.hours);
+                        setExtensionTariffAdded(opt.price);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.5rem',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        background: extensionDurationHours === opt.hours ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                        border: extensionDurationHours === opt.hours ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                        color: extensionDurationHours === opt.hours ? '#38bdf8' : '#e2e8f0'
+                      }}
+                    >
+                      <div style={{ fontWeight: 800, fontSize: '0.88rem' }}>{opt.label}</div>
+                      <div style={{ fontSize: '0.78rem', color: '#facc15', marginTop: '2px', fontWeight: 700 }}>+₹{opt.price}</div>
+                      <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Tariff Added to Bill (₹)</label>
+                  <input
+                    type="number"
+                    required
+                    min={0}
+                    className="form-input"
+                    value={extensionTariffAdded}
+                    onChange={(e) => setExtensionTariffAdded(Number(e.target.value))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Payment Mode *</label>
+                  <select
+                    className="form-select"
+                    value={extensionPaymentMode}
+                    onChange={(e) => setExtensionPaymentMode(e.target.value)}
+                  >
+                    <option value="UPI (PhonePe)">UPI (PhonePe / GPay)</option>
+                    <option value="Cash">Front Desk Cash</option>
+                    <option value="Card">POS Debit / Credit Card</option>
+                    <option value="Corporate Credit (BTC)">Bill to Company (BTC)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Reason / Remarks for Extension</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. Connecting train delayed / Plant review extended"
+                  value={extensionReason}
+                  onChange={(e) => setExtensionReason(e.target.value)}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
+                <button type="button" onClick={() => setStayExtensionModalOpen(false)} className="btn-outline-gold" style={{ flex: 1, justifyContent: 'center' }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary-gold" style={{ flex: 2, justifyContent: 'center', background: '#eab308', borderColor: '#eab308', color: '#000', fontWeight: 800 }}>
+                  Confirm &amp; Log Extension (+{extensionDurationHours}h)
                 </button>
               </div>
             </form>

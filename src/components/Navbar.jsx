@@ -25,6 +25,7 @@ export default function Navbar({
   onOpenRevenueManagement,
   onOpenD1Database,
   onOpenCaFilingStation,
+  onOpenHousekeeping,
   cartCount = 0,
   rooms = [],
   adminPinVerified,
@@ -365,6 +366,26 @@ export default function Navbar({
             }}
           >
             🌙 12 AM Night Audit Lock
+          </button>
+
+          <button
+            onClick={onOpenHousekeeping}
+            style={{
+              padding: '0.3rem 0.65rem',
+              borderRadius: '6px',
+              background: 'rgba(16, 185, 129, 0.2)',
+              border: '1px solid #10b981',
+              color: '#34d399',
+              cursor: 'pointer',
+              fontWeight: 800,
+              fontSize: '0.78rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem'
+            }}
+            title="Open Mobile Housekeeping & Room Turnaround Console"
+          >
+            🧹 Housekeeping Attendant
           </button>
 
           <button

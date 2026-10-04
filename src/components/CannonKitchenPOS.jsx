@@ -106,6 +106,99 @@ export default function CannonKitchenPOS({
   const [localFoodOrders, setLocalFoodOrders] = useState(DEFAULT_KITCHEN_ORDERS);
   const currentOrders = (propFoodOrders && propFoodOrders.length > 0) ? propFoodOrders : localFoodOrders;
 
+  // Multi-KOT Running Table Folios (Audio 1: Append KOT #7 into Table 1 running bill)
+  const [runningTableSessions, setRunningTableSessions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hotel_elite_inn_table_sessions');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      '6': {
+        sessionId: 'SES-T6-INIT',
+        tableNumber: '6',
+        outlet: 'Cannon Kitchen',
+        guestName: 'P. K. Mohapatra',
+        cover: 3,
+        status: 'OCCUPIED',
+        firstKotTime: '12:30 PM',
+        captain: 'KOTI',
+        kots: [
+          {
+            kotNumber: 1,
+            kotId: 'KOT-7514',
+            items: [
+              { name: 'Mutton Kassa (Odisha Style)', quantity: 2, price: 420, notes: 'Spicy mustard & whole spices' },
+              { name: 'Butter Tandoori Roti', quantity: 6, price: 25, notes: 'Extra butter' },
+              { name: 'Fresh Lime Soda (Sweet/Salt)', quantity: 2, price: 70, notes: 'Chilled with ice' }
+            ],
+            time: '12:30 PM',
+            captain: 'KOTI'
+          }
+        ],
+        cumulativeItems: [
+          { name: 'Mutton Kassa (Odisha Style)', quantity: 2, price: 420 },
+          { name: 'Butter Tandoori Roti', quantity: 6, price: 25 },
+          { name: 'Fresh Lime Soda (Sweet/Salt)', quantity: 2, price: 70 }
+        ],
+        subtotal: 1133.33,
+        gst: 56.67,
+        netTotal: 1190
+      },
+      'B': {
+        sessionId: 'SES-TB-INIT',
+        tableNumber: 'B',
+        outlet: 'Drop In Bar',
+        guestName: 'Dr. Tripathy',
+        cover: 2,
+        status: 'OCCUPIED',
+        firstKotTime: '12:45 PM',
+        captain: 'SADANANDA',
+        kots: [
+          {
+            kotNumber: 1,
+            kotId: 'KOT-7515',
+            items: [
+              { name: 'Chicken Dum Biryani (Chef Special)', quantity: 2, price: 260, notes: 'Dum cooked, with raita' },
+              { name: 'Chilli Chicken Dry', quantity: 1, price: 240, notes: 'Crispy starter' }
+            ],
+            time: '12:45 PM',
+            captain: 'SADANANDA'
+          }
+        ],
+        cumulativeItems: [
+          { name: 'Chicken Dum Biryani (Chef Special)', quantity: 2, price: 260 },
+          { name: 'Chilli Chicken Dry', quantity: 1, price: 240 }
+        ],
+        subtotal: 723.81,
+        gst: 36.19,
+        netTotal: 760
+      }
+    };
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(runningTableSessions));
+    } catch (e) {}
+  }, [runningTableSessions]);
+
+  useEffect(() => {
+    const handleSync = (e) => {
+      if (e.detail) setRunningTableSessions(e.detail);
+    };
+    const handleStorage = (e) => {
+      if (e.key === 'hotel_elite_inn_table_sessions' && e.newValue) {
+        try { setRunningTableSessions(JSON.parse(e.newValue)); } catch (err) {}
+      }
+    };
+    window.addEventListener('hotel_table_sessions_sync', handleSync);
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('hotel_table_sessions_sync', handleSync);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
   // KDS Filters & Sound Controls
   const [kdsStatusFilter, setKdsStatusFilter] = useState('all'); // 'all', 'Received', 'Preparing', 'Out for Delivery', 'Delivered'
   const [kdsOutletFilter, setKdsOutletFilter] = useState('all'); // 'all', 'Cannon Kitchen', 'Drop In Bar', 'Room Service', 'Online'
@@ -598,25 +691,39 @@ Thank you for dining at Cannon Kitchen! 🙏`;
 
   const handlePrintAndSendTableKOT = () => {
     if (cart.length === 0) return;
+
+    // Multi-KOT Running Table Logic (Audio 1: Append KOT #7 into Table 1 running bill)
+    const existingSession = runningTableSessions[tableNumber];
+    const isRunningAddition = !!(existingSession && existingSession.status === 'OCCUPIED');
+    const nextKotNumber = isRunningAddition ? ((existingSession.kots?.length || 0) + 1) : 1;
     const kotId = `CK-KOT-${Date.now().toString().slice(-4)}`;
+
+    // 1. Incremental items from current cart (Only new dishes sent to Kitchen)
+    const incrementalItems = cart.map(c => ({
+      name: c.item.name,
+      itemCode: c.item.itemCode || '0',
+      quantity: c.quantity,
+      price: getItemPrice(c.item),
+      notes: `${c.notes || ''}${c.cookingTags?.length ? ` [${c.cookingTags.join(', ')}]` : ''}`
+    }));
+
+    // 2. Kitchen KDS & Printable Slip order receives ONLY new items
     const newKotOrder = {
       orderId: kotId,
+      kotNumber: nextKotNumber,
       tableNumber,
       roomNumber: null,
-      guestName: `Table ${tableNumber} Guest`,
+      guestName: existingSession?.guestName || `Table ${tableNumber} Guest`,
       outlet: selectedOutlet,
       orderType: 'table',
       status: 'Received',
-      items: cart.map(c => ({
-        name: c.item.name,
-        quantity: c.quantity,
-        price: getItemPrice(c.item),
-        notes: `${c.notes || ''}${c.cookingTags?.length ? ` [${c.cookingTags.join(', ')}]` : ''}`
-      })),
+      items: incrementalItems,
       totalAmount: netTotal,
       is_jain_satvik: cart.some(c => c.cookingTags?.includes('Satvik')) ? 1 : 0,
       captain: captainName,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      isIncremental: isRunningAddition,
+      runningNotice: isRunningAddition ? `RUNNING ORDER #KOT-${nextKotNumber} (APPEND TO TABLE ${tableNumber})` : null
     };
 
     if (propAddFoodOrder) {
@@ -624,33 +731,116 @@ Thank you for dining at Cannon Kitchen! 🙏`;
     }
     setLocalFoodOrders(prev => [newKotOrder, ...prev]);
 
+    // 3. Update active table session with cumulative items and new KOT
+    const updatedKots = isRunningAddition 
+      ? [...(existingSession.kots || []), { kotNumber: nextKotNumber, kotId, items: incrementalItems, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), captain: captainName }]
+      : [{ kotNumber: 1, kotId, items: incrementalItems, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), captain: captainName }];
+
+    // Merge cumulative items for final Tax Invoice
+    const mergedCumulative = isRunningAddition ? (existingSession.cumulativeItems || []).map(i => ({ ...i })) : [];
+    incrementalItems.forEach(incItem => {
+      const match = mergedCumulative.find(m => m.name === incItem.name);
+      if (match) {
+        match.quantity += incItem.quantity;
+      } else {
+        mergedCumulative.push({ ...incItem });
+      }
+    });
+
+    const cumulativeGross = mergedCumulative.reduce((acc, it) => acc + ((it.price || 0) * (it.quantity || 1)), 0);
+    const cumulativeBase = cumulativeGross / 1.05;
+    const cumulativeGst = cumulativeGross - cumulativeBase;
+
+    const newSessionData = {
+      sessionId: existingSession?.sessionId || `SES-T${tableNumber}-${Date.now().toString().slice(-6)}`,
+      tableNumber,
+      outlet: selectedOutlet,
+      guestName: existingSession?.guestName || `Table ${tableNumber} Guest`,
+      cover: existingSession?.cover || 2,
+      status: 'OCCUPIED',
+      firstKotTime: existingSession?.firstKotTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      captain: captainName,
+      kots: updatedKots,
+      cumulativeItems: mergedCumulative,
+      subtotal: cumulativeBase,
+      gst: cumulativeGst,
+      netTotal: cumulativeGross,
+      lastUpdated: new Date().toISOString()
+    };
+
+    setRunningTableSessions(prev => ({
+      ...prev,
+      [tableNumber]: newSessionData
+    }));
+
+    // Broadcast real-time event across all tabs (Reception & Kitchen)
+    window.dispatchEvent(new CustomEvent('hotel_table_sessions_sync', { detail: { ...runningTableSessions, [tableNumber]: newSessionData } }));
+    window.dispatchEvent(new CustomEvent('hotel_kot_dispatched', { detail: newKotOrder }));
+
+    // Edge D1 Cloudflare Sync
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+      body: JSON.stringify({
+        action: 'save_running_table_session',
+        payload: newSessionData
+      })
+    }).catch(e => console.warn('Offline session sync:', e));
+
     if (kdsSoundEnabled) playOrderAlert();
     setPrintKotModalOrder(newKotOrder);
     setCart([]);
-    showPosToast(`✓ KOT #${kotId} for Table ${tableNumber} sent to Kitchen KDS queue!`);
+    showPosToast(isRunningAddition 
+      ? `✓ KOT #${nextKotNumber} (${kotId}) merged into Table ${tableNumber} running bill! Sent to Kitchen.`
+      : `✓ KOT #1 (${kotId}) started for Table ${tableNumber}! Sent to Kitchen.`);
   };
 
-  // Direct Table Bill Settlement (Cash, Dynamic UPI QR, Card, Split)
-  const handleConfirmTableSettlement = () => {
-    if (cart.length === 0) return;
+  // Direct Table Bill Settlement (Cash, Dynamic UPI QR, Card, Split) with Cumulative Multi-KOT Invoicing
+  const handleConfirmTableSettlement = (targetTbl = null) => {
+    const tableToSettle = targetTbl || tableNumber;
+    const activeSession = runningTableSessions[tableToSettle];
+
+    let billItems = [];
+    let totalPayable = 0;
+    let subtotalCalc = 0;
+    let gstCalc = 0;
+
+    if (activeSession && activeSession.status === 'OCCUPIED' && activeSession.cumulativeItems?.length > 0) {
+      billItems = activeSession.cumulativeItems.map((c, i) => ({
+        name: c.name,
+        itemCode: c.itemCode || String(i + 1),
+        quantity: c.quantity || 1,
+        price: c.price || 0,
+        amount: (c.price || 0) * (c.quantity || 1)
+      }));
+      totalPayable = activeSession.netTotal || billItems.reduce((s, it) => s + it.amount, 0);
+      subtotalCalc = totalPayable / 1.05;
+      gstCalc = totalPayable - subtotalCalc;
+    } else if (cart.length > 0) {
+      billItems = cart.map(c => ({
+        name: c.item.name,
+        itemCode: c.item.itemCode || '0',
+        quantity: c.quantity,
+        price: getItemPrice(c.item),
+        amount: getItemPrice(c.item) * c.quantity
+      }));
+      totalPayable = netTotal;
+      subtotalCalc = taxableSubtotal;
+      gstCalc = gst;
+    } else {
+      alert(`No active orders or items to settle for Table ${tableToSettle}. Please punch items or select an active table.`);
+      return;
+    }
 
     const invoiceId = `CK-INV-${Date.now().toString().slice(-4)}`;
-    const billItems = cart.map(c => ({
-      name: c.item.name,
-      itemCode: c.item.itemCode || '0',
-      quantity: c.quantity,
-      price: getItemPrice(c.item),
-      amount: getItemPrice(c.item) * c.quantity
-    }));
-    const totalPayable = netTotal;
-
     const receipt = {
       invoiceId,
-      tableNumber,
+      tableNumber: tableToSettle,
       outlet: selectedOutlet,
       items: billItems,
-      subtotal: taxableSubtotal,
-      gst,
+      subtotal: subtotalCalc,
+      gst: gstCalc,
       totalAmount: totalPayable,
       paymentMode: settlementPaymentMode,
       cashTendered: settlementPaymentMode === 'cash' ? (parseFloat(cashTendered) || totalPayable) : null,
@@ -659,27 +849,39 @@ Thank you for dining at Cannon Kitchen! 🙏`;
         cash: parseFloat(splitCashAmount) || 0,
         upi: Math.max(0, totalPayable - (parseFloat(splitCashAmount) || 0))
       } : null,
-      captain: captainName,
-      created_at: new Date().toISOString()
+      captain: activeSession?.captain || captainName,
+      created_at: new Date().toISOString(),
+      firstKotTime: activeSession?.firstKotTime || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      kotsCount: activeSession?.kots?.length || 1,
+      guestName: activeSession?.guestName || `Table ${tableToSettle} Guest`
     };
 
     setSettledTaxReceipt(receipt);
     setTableSettlementModalOpen(false);
     setCart([]);
-    showPosToast(`✓ Table ${tableNumber} Settled (₹${totalPayable.toFixed(2)}) via ${settlementPaymentMode.toUpperCase()}!`);
+    showPosToast(`✓ Table ${tableToSettle} Settled (₹${totalPayable.toFixed(2)}) via ${settlementPaymentMode.toUpperCase()}! Official Tax Invoice generated.`);
     playSuccessChime();
+
+    // Mark session as settled
+    setRunningTableSessions(prev => {
+      const copy = { ...prev };
+      if (copy[tableToSettle]) {
+        copy[tableToSettle] = { ...copy[tableToSettle], status: 'SETTLED' };
+      }
+      return copy;
+    });
 
     // Log settlement to local orders list as Delivered / Settled
     const settlementKot = {
       orderId: invoiceId,
-      tableNumber,
-      guestName: `Table ${tableNumber} Guest`,
+      tableNumber: tableToSettle,
+      guestName: activeSession?.guestName || `Table ${tableToSettle} Guest`,
       outlet: selectedOutlet,
       orderType: 'table',
       status: 'Delivered',
       items: billItems,
       totalAmount: totalPayable,
-      captain: captainName,
+      captain: activeSession?.captain || captainName,
       created_at: new Date().toISOString()
     };
     setLocalFoodOrders(prev => [settlementKot, ...prev]);
@@ -693,8 +895,13 @@ Thank you for dining at Cannon Kitchen! 🙏`;
         'X-Admin-Key': adminPin
       },
       body: JSON.stringify({
-        action: 'record_table_settlement',
-        payload: receipt
+        action: 'settle_running_table_session',
+        payload: {
+          tableNumber: tableToSettle,
+          paymentMode: settlementPaymentMode,
+          totalAmount: totalPayable,
+          receipt
+        }
       })
     }).catch(err => console.debug('Settlement log:', err));
   };
@@ -2006,22 +2213,31 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     </div>
 
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <span style={{
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          background: tableNumber === '6' || tableNumber === 'B' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.2)',
-                          color: tableNumber === '6' || tableNumber === 'B' ? '#fbbf24' : '#34d399',
-                          border: tableNumber === '6' || tableNumber === 'B' ? '1px solid #f59e0b' : '1px solid #10b981'
-                        }}>
-                          {tableNumber === '6' ? 'KOT #F2627-7514 RUNNING (₹1,190)' : tableNumber === 'B' ? 'KOT #F2627-7515 RUNNING (₹760)' : 'VACANT / READY'}
-                        </span>
-                        <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                          Captain: <strong style={{ color: 'var(--gold-glow)' }}>{captainName}</strong>
-                        </span>
-                      </div>
+                      {(() => {
+                        const activeSession = runningTableSessions[tableNumber];
+                        const isOccupied = activeSession && activeSession.status === 'OCCUPIED';
+                        const runningKotCount = isOccupied ? (activeSession.kots?.length || 1) : 0;
+                        const runningAmount = isOccupied ? activeSession.netTotal : 0;
+
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              background: isOccupied ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.2)',
+                              color: isOccupied ? '#f87171' : '#34d399',
+                              border: isOccupied ? '1px solid #ef4444' : '1px solid #10b981'
+                            }}>
+                              {isOccupied ? `🔴 RUNNING FOLIO: ₹${runningAmount.toFixed(0)} (${runningKotCount} KOT${runningKotCount > 1 ? 's' : ''} PUNCHED)` : 'VACANT / READY FOR NEW ORDER'}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+                              Captain: <strong style={{ color: 'var(--gold-glow)' }}>{activeSession?.captain || captainName}</strong>
+                            </span>
+                          </div>
+                        );
+                      })()}
                       
                       {/* Captain Quick Switchers */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.35rem' }}>
@@ -2097,26 +2313,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                       🔗 Merge Tables
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setTableSettlementModalOpen(true)}
-                      style={{
-                        padding: '0.45rem 0.85rem',
-                        borderRadius: '6px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        background: 'rgba(16, 185, 129, 0.2)',
-                        border: '1px solid rgba(16, 185, 129, 0.4)',
-                        color: '#34d399',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.35rem',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <CreditCard size={14} /> 💳 Direct Settle
-                    </button>
-
+                    {/* Quick Add Running KOT vs Start Order Button */}
                     <button
                       type="button"
                       onClick={() => setPosViewMode('menu')}
@@ -2125,7 +2322,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         borderRadius: '6px',
                         fontSize: '0.75rem',
                         fontWeight: 800,
-                        background: 'var(--gold-glow)',
+                        background: runningTableSessions[tableNumber]?.status === 'OCCUPIED' ? '#f59e0b' : 'var(--gold-glow)',
                         border: '1px solid var(--gold-glow)',
                         color: '#000',
                         display: 'inline-flex',
@@ -2134,7 +2331,35 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         cursor: 'pointer'
                       }}
                     >
-                      🍽️ Punch / Add Dishes
+                      {runningTableSessions[tableNumber]?.status === 'OCCUPIED' 
+                        ? `➕ Add Running KOT #${(runningTableSessions[tableNumber].kots?.length || 1) + 1}`
+                        : '🍽️ Start New Order'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (runningTableSessions[tableNumber]?.status === 'OCCUPIED' || cart.length > 0) {
+                          handleConfirmTableSettlement(tableNumber);
+                        } else {
+                          setTableSettlementModalOpen(true);
+                        }
+                      }}
+                      style={{
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(5, 150, 105, 0.4))',
+                        border: '1px solid rgba(16, 185, 129, 0.6)',
+                        color: '#34d399',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <CreditCard size={14} /> 🧾 Settle &amp; Print Tax Invoice
                     </button>
                   </div>
                 </div>
@@ -2142,11 +2367,18 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 {/* Section 1: Main Dining Tables (1 - 18) */}
                 <div>
                   <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--gold-glow)', marginBottom: '0.5rem' }}>
-                    🍽️ Ground Floor Main Dining (Tables 1 – 18)
+                    🍽️ Ground Floor Main Dining (Tables 1 – 18) • Live Multi-KOT Running Folios
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(95px, 1fr))', gap: '0.65rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(115px, 1fr))', gap: '0.65rem' }}>
                     {MYPOS_CANNON_KITCHEN_LAYOUT.tables.filter(t => t.section === 'Main Dining').map(table => {
-                      const activeKot = MYPOS_CANNON_KITCHEN_LAYOUT.activeKotOrders.find(k => k.tableId === table.id);
+                      const session = runningTableSessions[table.id];
+                      const isOccupied = session && session.status === 'OCCUPIED';
+                      const activeKot = isOccupied ? {
+                        amount: session.netTotal,
+                        steward: session.captain,
+                        kotsCount: session.kots?.length || 1
+                      } : MYPOS_CANNON_KITCHEN_LAYOUT.activeKotOrders.find(k => k.tableId === table.id);
+
                       const isSelected = tableNumber === table.id;
 
                       return (
@@ -2155,27 +2387,45 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                           onClick={() => {
                             setTableNumber(table.id);
                             setOrderType('table');
-                            if (activeKot) setCaptainName(activeKot.steward);
+                            if (activeKot?.steward) setCaptainName(activeKot.steward);
                           }}
                           style={{
-                            background: activeKot 
+                            background: isOccupied 
+                              ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35))'
+                              : activeKot 
                               ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(180, 83, 9, 0.35))'
                               : 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.25))',
                             border: isSelected 
                               ? '2px solid var(--gold-glow)' 
-                              : activeKot ? '1px solid #f59e0b' : '1px solid rgba(16, 185, 129, 0.4)',
+                              : isOccupied ? '1.5px solid #ef4444' : activeKot ? '1px solid #f59e0b' : '1px solid rgba(16, 185, 129, 0.4)',
                             borderRadius: '8px',
                             padding: '0.6rem 0.4rem',
                             textAlign: 'center',
                             cursor: 'pointer',
-                            transition: 'all 0.15s ease'
+                            transition: 'all 0.15s ease',
+                            position: 'relative'
                           }}
                         >
-                          <div style={{ fontWeight: 800, fontSize: '0.95rem', color: activeKot ? '#fbbf24' : '#34d399' }}>
+                          {isOccupied && (
+                            <span style={{
+                              position: 'absolute',
+                              top: 3,
+                              right: 3,
+                              background: '#ef4444',
+                              color: '#fff',
+                              fontSize: '0.58rem',
+                              fontWeight: 900,
+                              padding: '1px 4px',
+                              borderRadius: '4px'
+                            }}>
+                              {activeKot.kotsCount || 1} KOT
+                            </span>
+                          )}
+                          <div style={{ fontWeight: 800, fontSize: '0.95rem', color: isOccupied ? '#f87171' : activeKot ? '#fbbf24' : '#34d399' }}>
                             {table.label}
                           </div>
-                          <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                            {activeKot ? `₹${activeKot.amount} (${activeKot.steward})` : 'VACANT'}
+                          <div style={{ fontSize: '0.65rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                            {isOccupied ? `₹${Number(activeKot.amount).toFixed(0)} • Running` : activeKot ? `₹${activeKot.amount}` : 'VACANT'}
                           </div>
                         </div>
                       );
