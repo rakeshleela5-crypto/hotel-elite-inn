@@ -2,14 +2,19 @@
 // Handles autonomous fleet scheduled triggers & maintenance jobs
 
 const ALLOWED_ORIGINS = [
+  "https://hotel-elite-inn.pages.dev",
   "https://hotel-sai-international.pages.dev",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ];
 
 function getSecurityHeaders(originHeader = null) {
-  const isAllowed = originHeader && (ALLOWED_ORIGINS.includes(originHeader) || originHeader.endsWith(".hotel-sai-international.pages.dev"));
-  const allowOrigin = isAllowed ? originHeader : "https://hotel-sai-international.pages.dev";
+  const isAllowed = originHeader && (
+    ALLOWED_ORIGINS.includes(originHeader) || 
+    originHeader.endsWith(".hotel-elite-inn.pages.dev") || 
+    originHeader.endsWith(".hotel-sai-international.pages.dev")
+  );
+  const allowOrigin = isAllowed ? originHeader : "https://hotel-elite-inn.pages.dev";
 
   return {
     "Content-Type": "application/json",

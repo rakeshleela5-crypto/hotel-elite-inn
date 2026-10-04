@@ -3,16 +3,21 @@
 // This is the critical security gate — payment is only confirmed if signature matches.
 
 const ALLOWED_ORIGINS = [
+  "https://hotel-elite-inn.pages.dev",
   "https://hotel-sai-international.pages.dev",
   "http://localhost:5173",
   "http://127.0.0.1:5173"
 ];
 
 function getHeaders(origin) {
-  const allowed = origin && (ALLOWED_ORIGINS.includes(origin) || origin.endsWith(".hotel-sai-international.pages.dev"));
+  const allowed = origin && (
+    ALLOWED_ORIGINS.includes(origin) || 
+    origin.endsWith(".hotel-elite-inn.pages.dev") || 
+    origin.endsWith(".hotel-sai-international.pages.dev")
+  );
   return {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": allowed ? origin : "https://hotel-sai-international.pages.dev",
+    "Access-Control-Allow-Origin": allowed ? origin : "https://hotel-elite-inn.pages.dev",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Vary": "Origin",

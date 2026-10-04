@@ -37,7 +37,7 @@ export default function RoomQrModal({
 
   // Generate target QR string based on active mode
   const getQrString = () => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hotel-sai-international.pages.dev';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://hotel-elite-inn.pages.dev';
     
     switch (qrType) {
       case 'dining':

@@ -2,6 +2,7 @@
 // Connected to Cloudflare D1 Database binding "DB"
 
 const ALLOWED_ORIGINS = [
+  "https://hotel-elite-inn.pages.dev",
   "https://sai-vasudev-residency.pages.dev",
   "https://hotel-sai-international.pages.dev",
   "http://localhost:5173",
@@ -11,10 +12,11 @@ const ALLOWED_ORIGINS = [
 function getSecurityHeaders(originHeader = null) {
   const isAllowed = originHeader && (
     ALLOWED_ORIGINS.includes(originHeader) || 
+    originHeader.endsWith(".hotel-elite-inn.pages.dev") || 
     originHeader.endsWith(".sai-vasudev-residency.pages.dev") || 
     originHeader.endsWith(".hotel-sai-international.pages.dev")
   );
-  const allowOrigin = isAllowed ? originHeader : "https://sai-vasudev-residency.pages.dev";
+  const allowOrigin = isAllowed ? originHeader : "https://hotel-elite-inn.pages.dev";
 
   return {
     "Content-Type": "application/json",

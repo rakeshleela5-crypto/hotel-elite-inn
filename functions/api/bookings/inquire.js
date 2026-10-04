@@ -2,6 +2,7 @@
 // Saves guest room inquiry to D1 and returns a reference ID
 
 const ALLOWED_ORIGINS = [
+  "https://hotel-elite-inn.pages.dev",
   "https://sai-vasudev-residency.pages.dev",
   "https://hotel-sai-international.pages.dev",
   "http://localhost:5173",
@@ -11,12 +12,13 @@ const ALLOWED_ORIGINS = [
 function getHeaders(origin) {
   const allowed = origin && (
     ALLOWED_ORIGINS.includes(origin) || 
+    origin.endsWith(".hotel-elite-inn.pages.dev") || 
     origin.endsWith(".sai-vasudev-residency.pages.dev") || 
     origin.endsWith(".hotel-sai-international.pages.dev")
   );
   return {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": allowed ? origin : "https://sai-vasudev-residency.pages.dev",
+    "Access-Control-Allow-Origin": allowed ? origin : "https://hotel-elite-inn.pages.dev",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Vary": "Origin",
