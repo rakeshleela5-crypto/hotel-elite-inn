@@ -18,7 +18,8 @@ export default function CannonKitchenPOS({
   onBillToRoom,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
-  onAddFoodOrder: propAddFoodOrder
+  onAddFoodOrder: propAddFoodOrder,
+  onOpenAuditedRestaurantRegister
 }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -2412,6 +2413,33 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     >
                       <CreditCard size={14} /> 🧾 Settle &amp; Print Tax Invoice
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onOpenAuditedRestaurantRegister) {
+                          onOpenAuditedRestaurantRegister();
+                        } else {
+                          window.dispatchEvent(new CustomEvent('open_audited_restaurant_modal'));
+                        }
+                      }}
+                      style={{
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.25), rgba(180, 83, 9, 0.35))',
+                        border: '1px solid #d97706',
+                        color: '#fbbf24',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        cursor: 'pointer'
+                      }}
+                      title="View June 2026 Audited Dining Sales Register (1,320 Bills & Statutory Summary)"
+                    >
+                      <UtensilsCrossed size={14} /> 📊 June Audited Register (1,320 Bills)
+                    </button>
                   </div>
                 </div>
 
@@ -2597,6 +2625,99 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         >
                           R-{rNum}
                         </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 5: Take Away & Online Delivery Counters */}
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#38bdf8', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>📦 Take Away &amp; Online Delivery Desks (Counters 20, 21, Swiggy, Zomato, Direct Parcel)</span>
+                    <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Audited in June Register (₹1.88L Revenue)</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '0.65rem' }}>
+                    {[
+                      { id: '20', label: 'Take Away 20', section: 'Take Away', pax: 1 },
+                      { id: '21', label: 'Take Away 21', section: 'Take Away', pax: 1 },
+                      { id: 'SWIGGY', label: 'Swiggy Online', section: 'Delivery', pax: 1 },
+                      { id: 'ZOMATO', label: 'Zomato Online', section: 'Delivery', pax: 1 },
+                      { id: 'PARCEL', label: 'Direct Parcel', section: 'Take Away', pax: 1 }
+                    ].map(outletItem => {
+                      const isSelected = tableNumber === outletItem.id;
+                      return (
+                        <div
+                          key={outletItem.id}
+                          onClick={() => {
+                            setTableNumber(outletItem.id);
+                            setOrderType('table');
+                            setSelectedOutlet(outletItem.section === 'Delivery' ? 'Swiggy / Zomato' : 'Cannon Kitchen');
+                          }}
+                          style={{
+                            background: isSelected ? 'rgba(56, 189, 248, 0.25)' : 'rgba(56, 189, 248, 0.08)',
+                            border: isSelected ? '2px solid #38bdf8' : '1px solid rgba(56, 189, 248, 0.25)',
+                            borderRadius: '8px',
+                            padding: '0.65rem 0.5rem',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <div style={{ fontWeight: 800, fontSize: '0.85rem', color: '#38bdf8' }}>
+                            {outletItem.label}
+                          </div>
+                          <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                            {outletItem.section} • 5% GST
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Section 6: Management & Duty Complimentary Dining */}
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#f43f5e', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>👑 Management &amp; Duty Complimentary Dining (Table 444 VIP &amp; Table 555 Staff)</span>
+                    <span style={{ fontSize: '0.68rem', color: '#fda4af', background: 'rgba(244, 63, 94, 0.15)', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
+                      Audited Sheet 2: ₹90,478.00 (0% Tax Internal Non-Revenue)
+                    </span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.65rem' }}>
+                    {[
+                      { id: '444', label: 'Table 444 (Director / VIP Dining)', desc: 'Management VIP Dining & Protocol Meals', pax: 6, tag: 'Director Table' },
+                      { id: '555', label: 'Table 555 (Staff & Duty Meals)', desc: 'Hotel Elite Staff & On-Duty Dining', pax: 10, tag: 'Staff Mess' }
+                    ].map(mgmt => {
+                      const isSelected = tableNumber === mgmt.id;
+                      return (
+                        <div
+                          key={mgmt.id}
+                          onClick={() => {
+                            setTableNumber(mgmt.id);
+                            setOrderType('table');
+                            setSelectedOutlet('Cannon Kitchen');
+                          }}
+                          style={{
+                            background: isSelected 
+                              ? 'linear-gradient(135deg, rgba(244, 63, 94, 0.3), rgba(190, 18, 60, 0.4))'
+                              : 'linear-gradient(135deg, rgba(244, 63, 94, 0.12), rgba(159, 18, 57, 0.2))',
+                            border: isSelected ? '2px solid #f43f5e' : '1px solid rgba(244, 63, 94, 0.35)',
+                            borderRadius: '8px',
+                            padding: '0.75rem',
+                            textAlign: 'left',
+                            cursor: 'pointer',
+                            boxShadow: isSelected ? '0 0 15px rgba(244, 63, 94, 0.3)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fda4af' }}>{mgmt.label}</span>
+                            <span style={{ fontSize: '0.65rem', background: '#f43f5e', color: '#fff', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>{mgmt.tag}</span>
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#fecdd3' }}>{mgmt.desc}</div>
+                          <div style={{ fontSize: '0.65rem', color: '#fda4af', marginTop: '0.35rem', fontWeight: 600 }}>
+                            ⚠️ Non-Revenue internal ledger: Exempt from GSTR-1/3B commercial liability
+                          </div>
+                        </div>
                       );
                     })}
                   </div>

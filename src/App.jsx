@@ -322,6 +322,17 @@ export default function App() {
   const [caFilingModalOpen, setCaFilingModalOpen] = useState(false);
   const [auditedSalesRegisterOpen, setAuditedSalesRegisterOpen] = useState(false);
   const [auditedRestaurantRegisterOpen, setAuditedRestaurantRegisterOpen] = useState(false);
+
+  useEffect(() => {
+    const handleSales = () => setAuditedSalesRegisterOpen(true);
+    const handleRest = () => setAuditedRestaurantRegisterOpen(true);
+    window.addEventListener('open_audited_sales_modal', handleSales);
+    window.addEventListener('open_audited_restaurant_modal', handleRest);
+    return () => {
+      window.removeEventListener('open_audited_sales_modal', handleSales);
+      window.removeEventListener('open_audited_restaurant_modal', handleRest);
+    };
+  }, []);
   const [dynamicRates, setDynamicRates] = useState(() => calculateAllTierMicroRates({ occupancyRate: 68, daysToArrival: 3, pickupVelocity48h: 4 }));
 
   // Live Food Orders & KDS State shared across Front Desk & Cannon Kitchen POS
@@ -1146,6 +1157,7 @@ export default function App() {
             foodOrders={foodOrders}
             onUpdateOrderStatus={handleUpdateOrderStatus}
             onAddFoodOrder={handleAddFoodOrder}
+            onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
           />
         )}
 
