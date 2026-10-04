@@ -79,7 +79,7 @@ export const DAILY_EXPENDITURES_SEP2026 = [
   { day: 12, date: '2026-09-12', voucher: 'EXP-SEP-012', head: 'RO Water Plant Filter Cartridge Service', vendor: 'Aqua Safe Rayagada', amount: 2450.00, mode: 'Cash', approvedBy: 'Duty Manager', itcEligible: true },
   { day: 13, date: '2026-09-13', voucher: 'EXP-SEP-013', head: 'Diesel Generator Backup (50 Ltrs)', vendor: 'BPCL Rayagada Highway Station', amount: 4650.00, mode: 'UPI', approvedBy: 'Duty Manager', itcEligible: true },
   { day: 14, date: '2026-09-14', voucher: 'EXP-SEP-014', head: 'Fresh Dairy & Sweet Curd Supplies', vendor: 'Omfed Rayagada Dairy Booth', amount: 1650.00, mode: 'Cash', approvedBy: 'Chef Babu', itcEligible: false },
-  { day: 15, date: '2026-09-15', voucher: 'EXP-SEP-015', head: 'Mid-Month Staff Salary Disbursal (Part 1)', vendor: 'Front Desk & Service Team (8 Staff)', amount: 74000.00, mode: 'Bank Transfer', approvedBy: 'P. Manmadha Rao', itcEligible: false },
+  { day: 15, date: '2026-09-15', voucher: 'EXP-SEP-015', head: 'Mid-Month Staff Salary Disbursal (Part 1)', vendor: '30 Ground Staff (Reception 3, Restaurant 7, Kitchen 10, Housekeeping 8, Security 2)', amount: 74000.00, mode: 'Bank Transfer', approvedBy: 'P. Manmadha Rao', itcEligible: false },
   { day: 16, date: '2026-09-16', voucher: 'EXP-SEP-016', head: 'Kitchen Mandi Fresh Produce', vendor: 'Rayagada Vegetable Mandi', amount: 4200.00, mode: 'UPI', approvedBy: 'Chef Babu', itcEligible: true },
   { day: 17, date: '2026-09-17', voucher: 'EXP-SEP-017', head: 'Linen Washing & Sheet Pressing', vendor: 'Maa Majhighariani Laundry Hub', amount: 2150.00, mode: 'Cash', approvedBy: 'Housekeeping Lead', itcEligible: false },
   { day: 18, date: '2026-09-18', voucher: 'EXP-SEP-018', head: 'Plumbing Repairs (Room 205 & 208)', vendor: 'Local Plumbing Contractor', amount: 1850.00, mode: 'Cash', approvedBy: 'Duty Manager', itcEligible: false },
@@ -94,7 +94,7 @@ export const DAILY_EXPENDITURES_SEP2026 = [
   { day: 27, date: '2026-09-27', voucher: 'EXP-SEP-027', head: 'High-Speed Fiber Lease & Telephony', vendor: 'BSNL Rayagada Circle', amount: 3495.00, mode: 'UPI', approvedBy: 'Duty Manager', itcEligible: true },
   { day: 28, date: '2026-09-28', voucher: 'EXP-SEP-028', head: 'Linen Washing & Bed Runners Restock', vendor: 'Maa Majhighariani Laundry Hub', amount: 2400.00, mode: 'Cash', approvedBy: 'Housekeeping Lead', itcEligible: false },
   { day: 29, date: '2026-09-29', voucher: 'EXP-SEP-029', head: 'TPCODL Electricity Bill (Sept Consumption)', vendor: 'TP Central Odisha Dist. Ltd.', amount: 48520.00, mode: 'Bank Transfer', approvedBy: 'P. Manmadha Rao', itcEligible: true },
-  { day: 30, date: '2026-09-30', voucher: 'EXP-SEP-030', head: 'Staff Month-End Balance Salaries (Part 2)', vendor: 'Front Desk & Service Team (8 Staff)', amount: 74000.00, mode: 'Bank Transfer', approvedBy: 'P. Manmadha Rao', itcEligible: false }
+  { day: 30, date: '2026-09-30', voucher: 'EXP-SEP-030', head: 'Staff Month-End Balance Salaries (Part 2)', vendor: '30 Ground Staff (Reception 3, Restaurant 7, Kitchen 10, Housekeeping 8, Security 2)', amount: 74000.00, mode: 'Bank Transfer', approvedBy: 'P. Manmadha Rao', itcEligible: false }
 ];
 
 export const TOTAL_MONTHLY_EXPENDITURES_SEP2026 = DAILY_EXPENDITURES_SEP2026.reduce((sum, e) => sum + e.amount, 0); // ₹4,01,300
@@ -358,7 +358,7 @@ export const ALL_18_ROOMS_REVENUE_SEP2026 = [
 export const DAILY_EXPENSE_CATEGORIES_SUMMARY = [
   {
     category: 'Staff Salaries & Team Honorarium',
-    subtext: '8 Full-Time Staff (Front Desk, Housekeeping & Kitchen)',
+    subtext: '30 Full-Time Ground Staff (Reception 3, Restaurant 7, Kitchen 10, Housekeeping 8, Security 2)',
     monthlyAmount: 148000.00,
     dailyAverage: 4933.33,
     percentage: 36.9,

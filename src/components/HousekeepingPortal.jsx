@@ -25,13 +25,14 @@ export default function HousekeepingPortal({
   const [cleaningNotes, setCleaningNotes] = useState('');
 
   const ATTENDANTS = [
-    { name: 'Bikram Mohanty', phone: '+91 63707 57541', role: 'Floor Lead' },
-    { name: 'Siddu Rao', phone: '+91 94371 00214', role: 'Room Attendant' },
-    { name: 'Sakti Majhi', phone: '+91 98610 55431', role: 'Room Attendant' },
-    { name: 'Krishna Nayak', phone: '+91 94378 12398', role: 'Linen & Laundry' },
-    { name: 'Monnu Pradhan', phone: '+91 63702 44901', role: 'Housekeeping Boy' },
-    { name: 'Ramesh Gouda', phone: '+91 94382 77112', role: 'General Services' },
-    { name: 'Suresh Sabar', phone: '+91 98619 44320', role: 'Night Attendant' }
+    { name: 'Anita Majhi', phone: '+91 98611 52365', role: 'Housekeeping In-Charge / Supervisor' },
+    { name: 'Sabitri Majhi', phone: '+91 98611 62366', role: 'Female Housekeeper / Linen Sorting' },
+    { name: 'Kuni Nayak', phone: '+91 98611 72367', role: 'Female Housekeeper / Commercial Laundry' },
+    { name: 'Parvati Sabar', phone: '+91 98611 82368', role: 'Female Housekeeper / Linen Pressing' },
+    { name: 'Bikram Mohanty', phone: '+91 63707 57541', role: 'Floor Lead / Senior Room Boy (1st Fl)' },
+    { name: 'Siddu Rao', phone: '+91 94371 00214', role: 'Room Attendant (2nd Fl)' },
+    { name: 'Sakti Majhi', phone: '+91 98610 55431', role: 'Room Attendant (3rd Fl)' },
+    { name: 'Monnu Pradhan', phone: '+91 63702 44901', role: 'Heavy Linen Porter & Utility' }
   ];
 
   const showToast = (msg) => {

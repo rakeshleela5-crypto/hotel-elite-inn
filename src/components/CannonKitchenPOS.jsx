@@ -234,7 +234,7 @@ export default function CannonKitchenPOS({
   const [orderType, setOrderType] = useState('room'); // 'room', 'table', 'delivery'
   const [targetRoom, setTargetRoom] = useState('402');
   const [tableNumber, setTableNumber] = useState('6');
-  const [captainName, setCaptainName] = useState('KOTI');
+  const [captainName, setCaptainName] = useState('Pradeep Jena');
 
   // Fast numeric code input state
   const [codeQuery, setCodeQuery] = useState('');
@@ -2291,9 +2291,9 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                       })()}
                       
                       {/* Captain Quick Switchers */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.35rem' }}>
-                        <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Switch Captain:</span>
-                        {['KOTI', 'SADANANDA', 'RAMESH', 'SURESH'].map(cName => (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Steward:</span>
+                        {['Pradeep Jena (Mgr)', 'Raju Gouda', 'Santosh Nayak', 'Muna Patra', 'Papu Pradhan', 'Kalia Sahu', 'Bikash Majhi'].map(cName => (
                           <button
                             key={cName}
                             type="button"

@@ -161,8 +161,8 @@ export default function ReceptionAdmin({
     10: 36
   });
   const [handoverPin, setHandoverPin] = useState('');
-  const [handoverOutgoingSign, setHandoverOutgoingSign] = useState('Sudhakar Reddy');
-  const [handoverIncomingSign, setHandoverIncomingSign] = useState('Koti Rao');
+  const [handoverOutgoingSign, setHandoverOutgoingSign] = useState('Ramesh Mohanty (Morning Lead)');
+  const [handoverIncomingSign, setHandoverIncomingSign] = useState('Deepak Kumar Sahu (Evening Lead)');
   const [luggagePasses, setLuggagePasses] = useState([
     {
       id: 'LUG-2026-041',
@@ -1288,11 +1288,12 @@ export default function ReceptionAdmin({
     }
   ]);
 
-  // Housekeeping Floor Attendants State
+  // Housekeeping Floor Attendants State (Synced with 30 Ground Staff Roster)
   const [floorAttendants, setFloorAttendants] = useState({
-    2: { name: 'Santosh Nayak', phone: '+91 94371 88201', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' },
-    3: { name: 'Kailash Gouda', phone: '+91 94372 66314', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' },
-    4: { name: 'Ramesh Rao', phone: '+91 94370 55192', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' }
+    1: { name: 'Bikram Mohanty', phone: '+91 63707 57541', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' },
+    2: { name: 'Siddu Rao', phone: '+91 94371 00214', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' },
+    3: { name: 'Sakti Majhi', phone: '+91 98610 55431', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' },
+    4: { name: 'Monnu Pradhan', phone: '+91 63702 44901', shift: 'Morning (07:00 - 15:30)', status: 'On Floor' }
   });
   const [isEditAttendantOpen, setIsEditAttendantOpen] = useState(false);
   const [selectedFloorToEdit, setSelectedFloorToEdit] = useState(2);
