@@ -2175,6 +2175,9 @@ export async function onRequestPost({ request, env }) {
           `).bind(quantity || 0, quantity || 0, itemId).run().catch(() => {});
         }
       }
+      return jsonResponse({ success: true });
+    }
+
     // 53. CANNON KITCHEN POS: Save Running Table Session (Multi-KOT)
     if (action === 'save_running_table_session') {
       const s = payload || {};
