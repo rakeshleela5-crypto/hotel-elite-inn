@@ -1,15 +1,16 @@
-# Hotel Sai International — Cloudflare Edge Hospitality Operating System
+# Hotel Elite Inn — Cloudflare Edge Hospitality Operating System
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-hotel--sai--international.pages.dev-d4af37?style=for-the-badge&logo=cloudflare&logoColor=white)](https://hotel-sai-international.pages.dev)
-[![Deployed on Cloudflare Pages](https://img.shields.io/badge/Deployed%20on-Cloudflare%20Pages-f38020?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://hotel-sai-international.pages.dev)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-hotel--elite--inn.pages.dev-d4af37?style=for-the-badge&logo=cloudflare&logoColor=white)](https://hotel-elite-inn.pages.dev)
+[![Deployed on Cloudflare Pages](https://img.shields.io/badge/Deployed%20on-Cloudflare%20Pages-f38020?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://hotel-elite-inn.pages.dev)
 [![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178c6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![shadcn/ui](https://img.shields.io/badge/UI-shadcn%2Fui-black?style=for-the-badge&logo=shadcnui&logoColor=white)](https://ui.shadcn.com)
 
-> **Official Live Production URL**: [https://hotel-sai-international.pages.dev](https://hotel-sai-international.pages.dev)  
-> **Location**: Sai Priya Nagar, Rayagada, Odisha – 765001  
-> **Connectivity**: 1.5 km to RGDA Railway Junction • 2.0 km to sacred Maa Majhighariani Mandir
+> **Official Live Production URL**: [https://hotel-elite-inn.pages.dev](https://hotel-elite-inn.pages.dev)  
+> **Location**: Main Road, Near Railway Station, Rayagada, Odisha – 765001  
+> **Connectivity**: Walking distance to RGDA Railway Junction • Near Maa Majhighariani Mandir
+
 
 ---
 
@@ -55,10 +56,10 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/rakeshleela5-crypto/hotel-sai-international.git
+git clone https://github.com/rakeshleela5-crypto/hotel-elite-inn.git
 
 # Navigate into project directory
-cd hotel-sai-international
+cd hotel-elite-inn
 
 # Install dependencies
 npm install
@@ -76,12 +77,13 @@ npm run dev
 npm run build
 
 # Deploy directly via Wrangler CLI
-npm run deploy
+npx wrangler pages deploy dist --project-name hotel-elite-inn --branch main
 ```
 
 ---
 
 ## 🔗 Links & Resources
 
-- **Production URL**: [https://hotel-sai-international.pages.dev](https://hotel-sai-international.pages.dev)
-- **GitHub Repository**: [https://github.com/rakeshleela5-crypto/hotel-sai-international](https://github.com/rakeshleela5-crypto/hotel-sai-international)
+- **Production URL**: [https://hotel-elite-inn.pages.dev](https://hotel-elite-inn.pages.dev)
+- **GitHub Repository**: [https://github.com/rakeshleela5-crypto/hotel-elite-inn](https://github.com/rakeshleela5-crypto/hotel-elite-inn)
+
