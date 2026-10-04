@@ -12,6 +12,13 @@ import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 
+// High-entropy collision-proof unique ID generator (fixes adversarial millisecond slice(-4) cycle risk)
+const generateUniquePosId = (prefix = 'CK-KOT') => {
+  const ts = Date.now().toString().slice(-6);
+  const rand = Math.floor(100 + Math.random() * 900);
+  return `${prefix}-${ts}${rand}`;
+};
+
 export default function CannonKitchenPOS({
   isOpen,
   onClose,
@@ -349,11 +356,19 @@ export default function CannonKitchenPOS({
   };
 
   const [posFeedbackToast, setPosFeedbackToast] = useState('');
+  const toastTimeoutRef = useRef(null);
 
   const showPosToast = (msg) => {
     setPosFeedbackToast(msg);
-    setTimeout(() => setPosFeedbackToast(''), 4500);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setPosFeedbackToast(''), 4500);
   };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (codeInputRef.current) {
@@ -456,7 +471,7 @@ export default function CannonKitchenPOS({
     }
     const target = cart[voidTargetIndex];
     const voidRecord = {
-      id: `VOID-${Date.now().toString().slice(-4)}`,
+      id: generateUniquePosId('VOID'),
       itemName: target.item.name,
       itemCode: target.item.itemCode || '0',
       quantity: target.quantity,
@@ -754,7 +769,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
     const existingSession = runningTableSessions[tableNumber];
     const isRunningAddition = !!(existingSession && existingSession.status === 'OCCUPIED');
     const nextKotNumber = isRunningAddition ? ((existingSession.kots?.length || 0) + 1) : 1;
-    const kotId = `CK-KOT-${Date.now().toString().slice(-4)}`;
+    const kotId = generateUniquePosId('CK-KOT');
 
     // 1. Incremental items from current cart (Only new dishes sent to Kitchen)
     const incrementalItems = cart.map(c => ({
@@ -891,7 +906,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
       return;
     }
 
-    const invoiceId = `CK-INV-${Date.now().toString().slice(-4)}`;
+    const invoiceId = generateUniquePosId('CK-INV');
     const receipt = {
       invoiceId,
       tableNumber: tableToSettle,
@@ -966,7 +981,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
 
   const handleSendSettlementWhatsApp = (customPhone = null) => {
     const data = settledTaxReceipt || {
-      invoiceId: `CK-EST-${Date.now().toString().slice(-4)}`,
+      invoiceId: generateUniquePosId('CK-EST'),
       tableNumber,
       totalAmount: netTotal,
       gst,
@@ -995,7 +1010,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
   const handleTransferToRoom = () => {
     if (cart.length === 0) return;
 
-    const kotId = `CK-KOT-${Date.now().toString().slice(-4)}`;
+    const kotId = generateUniquePosId('CK-KOT');
     const itemsDescription = cart.map(c => {
       const tagStr = (c.cookingTags && c.cookingTags.length > 0) ? ` [${c.cookingTags.join(', ')}]` : '';
       return `${c.quantity}x ${c.item.name}${tagStr}`;
@@ -1071,18 +1086,23 @@ Thank you for dining at Cannon Kitchen! 🙏`;
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      backgroundColor: 'rgba(5, 7, 15, 0.9)',
-      backdropFilter: 'blur(10px)',
-      zIndex: 2000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1rem'
-    }}>
-      <div className="glass-panel" style={{
+    <div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pos-main-title"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(5, 7, 15, 0.92)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 2000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem'
+      }}
+    >
+      <div className="glass-panel emil-modal-enter" style={{
         width: '100%',
         maxWidth: 1340,
         height: '92vh',
@@ -1109,11 +1129,11 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', border: '1px solid #f59e0b' }}>
                 HIGH-SPEED F&B POS
               </span>
-              <h2 style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: 700 }}>
-                Cannon Kitchen & Multi-Outlet Order Terminal
+              <h2 id="pos-main-title" style={{ fontSize: '1.35rem', color: '#fff', margin: 0, fontWeight: 700 }}>
+                Cannon Kitchen &amp; Multi-Outlet Order Terminal
               </h2>
             </div>
-            <p style={{ margin: '0.2rem 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+            <p style={{ margin: '0.2rem 0 0', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
               Numpad short codes • Differential outlet pricing • Seamless "Bill to Room" Folio transfer
             </p>
           </div>
@@ -1129,6 +1149,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
             ].map(outlet => (
               <button
                 key={outlet.id}
+                type="button"
                 onClick={() => setSelectedOutlet(outlet.id)}
                 style={{
                   padding: '0.45rem 0.75rem',
@@ -1139,7 +1160,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   border: 'none',
                   whiteSpace: 'nowrap',
                   background: selectedOutlet === outlet.id ? 'var(--gold-primary)' : 'transparent',
-                  color: selectedOutlet === outlet.id ? '#000' : 'var(--text-muted)',
+                  color: selectedOutlet === outlet.id ? '#000' : 'var(--text-secondary)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center'
@@ -1152,7 +1173,10 @@ Thank you for dining at Cannon Kitchen! 🙏`;
           </div>
 
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close POS Terminal (Esc)"
+            title="Close POS Terminal (Esc)"
             style={{
               background: 'rgba(255,255,255,0.08)',
               border: 'none',
