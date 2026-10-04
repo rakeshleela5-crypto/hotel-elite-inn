@@ -3105,22 +3105,24 @@ Thank you for dining at Cannon Kitchen! 🙏`;
             }}>
               {/* Header */}
               <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ fontSize: '0.7rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{HOTEL_CONFIG.name}</div>
-                <h3 style={{ margin: '0.2rem 0', fontSize: '1.15rem', fontWeight: 900 }}>CANNON KITCHEN</h3>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>Near Andhra Bank, New Colony, Rayagada (Odisha)</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>GSTIN: {HOTEL_CONFIG.gstin}</div>
+                <h3 style={{ margin: '0.2rem 0', fontSize: '1.25rem', fontWeight: 900 }}>HOTEL ELITE INN</h3>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e293b' }}>POS 5- ROOM SERVICE</div>
+                <div style={{ fontSize: '0.72rem', color: '#333' }}>Opposite Railway Station Main Road Muniguda</div>
+                <div style={{ fontSize: '0.72rem', color: '#333' }}>GSTIN NO:- {HOTEL_CONFIG.gstin}</div>
+                <div style={{ fontSize: '0.72rem', color: '#333' }}>SAC CODE - {HOTEL_CONFIG.sacCodeFB || '996332'} • FSSAI NO- {HOTEL_CONFIG.fssai || '10523016000047'}</div>
+                <div style={{ fontSize: '0.72rem', color: '#333' }}>{HOTEL_CONFIG.phone}</div>
                 <div style={{
                   margin: '0.5rem 0 0.2rem',
                   padding: '3px 0',
                   borderTop: '1px solid #000',
                   borderBottom: '1px solid #000',
-                  fontSize: '0.8rem',
+                  fontSize: '0.85rem',
                   fontWeight: 900
                 }}>
                   --- KITCHEN ORDER TICKET (KOT) ---
                 </div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 900 }}>
-                  TOKEN #{printKotModalOrder.orderId || printKotModalOrder.order_id}
+                <div style={{ fontSize: '0.85rem', fontWeight: 900 }}>
+                  KOT NO. ,{printKotModalOrder.orderId ? printKotModalOrder.orderId.replace(/[^0-9]/g, '') : '2056'}
                 </div>
               </div>
 
@@ -3596,91 +3598,142 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               maxHeight: '92vh',
               overflowY: 'auto'
             }}>
-              {/* Header */}
-              <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                <div style={{ fontSize: '0.75rem', letterSpacing: '1px', textTransform: 'uppercase', fontWeight: 800 }}>{HOTEL_CONFIG.name}</div>
-                <h3 style={{ margin: '0.2rem 0', fontSize: '1.25rem', fontWeight: 900 }}>CANNON KITCHEN</h3>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>Near Andhra Bank, New Colony, Rayagada (Odisha)</div>
-                <div style={{ fontSize: '0.72rem', color: '#333' }}>GSTIN: {HOTEL_CONFIG.gstin} • SAC: 996331</div>
-                <div style={{
-                  margin: '0.5rem 0 0.2rem',
-                  padding: '3px 0',
-                  borderTop: '1px solid #000',
-                  borderBottom: '1px solid #000',
-                  fontSize: '0.85rem',
-                  fontWeight: 900
-                }}>
-                  *** RETAIL TAX INVOICE ***
-                </div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 900 }}>
-                  INVOICE #{settledTaxReceipt.invoiceId}
-                </div>
+              {/* Header: Official Hotel Elite Inn Tax Invoice */}
+              <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.65rem', marginBottom: '0.65rem' }}>
+                <div style={{ fontSize: '0.85rem', fontWeight: 900, letterSpacing: '0.5px' }}>TAX INVOICE</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '0.2rem' }}>ORIGINAL FOR RECIPIENT</div>
+                <h3 style={{ margin: '0.15rem 0', fontSize: '1.25rem', fontWeight: 900 }}>HOTEL ELITE INN</h3>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1e293b' }}>{HOTEL_CONFIG.posOutletName || 'POS 5- ROOM SERVICE'}</div>
+                <div style={{ fontSize: '0.72rem', color: '#222' }}>Opposite Railway Station Main Road Muniguda</div>
+                <div style={{ fontSize: '0.72rem', color: '#222' }}>GSTIN NO:- {HOTEL_CONFIG.gstin}</div>
+                <div style={{ fontSize: '0.72rem', color: '#222' }}>SAC CODE - {HOTEL_CONFIG.sacCodeFB || '996332'}</div>
+                <div style={{ fontSize: '0.72rem', color: '#222' }}>FSSAI NO- {HOTEL_CONFIG.fssai || '10523016000047'}</div>
+                <div style={{ fontSize: '0.72rem', color: '#222' }}>{HOTEL_CONFIG.phone}</div>
               </div>
 
-              {/* Meta */}
-              <div style={{ fontSize: '0.75rem', lineHeight: '1.45', marginBottom: '0.75rem' }}>
+              {/* Meta matching the official receipt */}
+              <div style={{ fontSize: '0.75rem', lineHeight: '1.4', marginBottom: '0.65rem' }}>
+                <div>Guest Name:- {settledTaxReceipt.guestName || (settledTaxReceipt.roomNumber ? `Guest (Room ${settledTaxReceipt.roomNumber})` : 'Walk-in Guest')}</div>
+                <div>Company GST No:- {settledTaxReceipt.corporateGstin || ''}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.2rem' }}>
+                  <span>{settledTaxReceipt.roomNumber ? `Room No:- ${settledTaxReceipt.roomNumber}` : `Table No:- ${settledTaxReceipt.tableNumber || '6'}`}</span>
+                  <span><strong>Bill no:- R.S/{settledTaxReceipt.invoiceId ? String(settledTaxReceipt.invoiceId).replace(/[^0-9]/g, '').slice(-4) : '2913'}</strong></span>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span><strong>Date:</strong> {new Date(settledTaxReceipt.created_at).toLocaleDateString('en-IN')}</span>
-                  <span><strong>Time:</strong> {new Date(settledTaxReceipt.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>Cover - 1</span>
+                  <span>Date - {new Date(settledTaxReceipt.created_at || Date.now()).toLocaleDateString('en-GB')}</span>
                 </div>
-                <div><strong>Outlet:</strong> {settledTaxReceipt.outlet || 'Cannon Kitchen'}</div>
-                <div style={{ fontSize: '0.85rem', fontWeight: 900, marginTop: '2px', color: '#000' }}>
-                  TABLE: {settledTaxReceipt.tableNumber} (Dine-In)
+                <div style={{ textAlign: 'right' }}>
+                  Time - {new Date(settledTaxReceipt.created_at || Date.now()).toLocaleTimeString('en-GB')}
                 </div>
-                <div><strong>Payment Tender:</strong> {settledTaxReceipt.paymentMode?.toUpperCase()}</div>
-                <div><strong>Captain / Cashier:</strong> {settledTaxReceipt.captain}</div>
+                <div style={{ marginTop: '0.2rem' }}>
+                  Day Session {new Date().getHours() < 11 ? 'BREAKFAST' : new Date().getHours() < 16 ? 'LUNCH' : 'DINNER'}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>First KOT Time :- {new Date(new Date(settledTaxReceipt.created_at || Date.now()).getTime() - 15 * 60000).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>KOT NO. ,{settledTaxReceipt.kotNo || (settledTaxReceipt.invoiceId ? String(settledTaxReceipt.invoiceId).replace(/[^0-9]/g, '').slice(-4) : '2056')}</span>
+                </div>
               </div>
 
-              {/* Items Table */}
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', marginBottom: '0.75rem' }}>
+              {/* Items Table matching exact columns: No. Dish Name Rate Qty Total */}
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', marginBottom: '0.65rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px dashed #000', borderTop: '1px dashed #000' }}>
-                    <th style={{ textAlign: 'left', padding: '0.3rem 0' }}>QTY</th>
-                    <th style={{ textAlign: 'left', padding: '0.3rem 0' }}>ITEM</th>
-                    <th style={{ textAlign: 'right', padding: '0.3rem 0' }}>RATE</th>
-                    <th style={{ textAlign: 'right', padding: '0.3rem 0' }}>AMT</th>
+                    <th style={{ textAlign: 'left', padding: '0.25rem 0', width: '25px' }}>No.</th>
+                    <th style={{ textAlign: 'left', padding: '0.25rem 0' }}>Dish Name</th>
+                    <th style={{ textAlign: 'right', padding: '0.25rem 0' }}>Rate</th>
+                    <th style={{ textAlign: 'center', padding: '0.25rem 0', width: '35px' }}>Qty</th>
+                    <th style={{ textAlign: 'right', padding: '0.25rem 0' }}>Total</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {settledTaxReceipt.items.map((it, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px dotted #ccc' }}>
-                      <td style={{ padding: '0.3rem 0', fontWeight: 700 }}>{it.quantity}</td>
-                      <td style={{ padding: '0.3rem 0' }}>{it.name}</td>
-                      <td style={{ textAlign: 'right', padding: '0.3rem 0' }}>₹{it.price}</td>
-                      <td style={{ textAlign: 'right', padding: '0.3rem 0', fontWeight: 700 }}>₹{it.amount || it.price * it.quantity}</td>
-                    </tr>
-                  ))}
+                  {settledTaxReceipt.items.map((it, idx) => {
+                    const grossPrice = it.price || 0;
+                    const baseRate = grossPrice / 1.05;
+                    const lineTotal = baseRate * it.quantity;
+                    return (
+                      <tr key={idx} style={{ borderBottom: '1px dotted #e2e8f0' }}>
+                        <td style={{ padding: '0.25rem 0' }}>{idx + 1}</td>
+                        <td style={{ padding: '0.25rem 0', fontWeight: 600 }}>{it.name}</td>
+                        <td style={{ textAlign: 'right', padding: '0.25rem 0' }}>{baseRate.toFixed(2)}</td>
+                        <td style={{ textAlign: 'center', padding: '0.25rem 0' }}>{it.quantity}</td>
+                        <td style={{ textAlign: 'right', padding: '0.25rem 0' }}>{lineTotal.toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
 
-              {/* Calculations */}
-              <div style={{ fontSize: '0.78rem', borderTop: '1px dashed #000', paddingTop: '0.5rem', marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span>Taxable Subtotal:</span>
-                  <span>₹{settledTaxReceipt.subtotal?.toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span>CGST (2.5%):</span>
-                  <span>₹{(settledTaxReceipt.gst / 2).toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span>SGST (2.5%):</span>
-                  <span>₹{(settledTaxReceipt.gst / 2).toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '0.95rem', borderTop: '1px solid #000', paddingTop: '4px', marginTop: '4px' }}>
-                  <span>TOTAL PAID:</span>
-                  <span>₹{settledTaxReceipt.totalAmount.toFixed(2)}</span>
-                </div>
-                {settledTaxReceipt.cashTendered && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#555', marginTop: '3px' }}>
-                    <span>Cash Tendered / Change:</span>
-                    <span>₹{settledTaxReceipt.cashTendered} / ₹{settledTaxReceipt.changeDue?.toFixed(2)}</span>
-                  </div>
-                )}
+              {/* Totals & Tax Split matching the receipt */}
+              <div style={{ fontSize: '0.78rem', borderTop: '1px dashed #000', paddingTop: '0.45rem', marginBottom: '0.65rem' }}>
+                {(() => {
+                  const totalQty = settledTaxReceipt.items.reduce((s, it) => s + (it.quantity || 1), 0);
+                  const grandTotal = settledTaxReceipt.totalAmount || 0;
+                  const baseSubtotal = grandTotal / 1.05;
+                  const totalTax = grandTotal - baseSubtotal;
+                  const halfTax = totalTax / 2;
+                  return (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                        <span>Total Qty :{totalQty}</span>
+                        <span>Total &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{baseSubtotal.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2rem', marginBottom: '2px' }}>
+                        <span>CGST @ 2.5 %</span>
+                        <span>{halfTax.toFixed(2)}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2rem', marginBottom: '4px' }}>
+                        <span>SGST @ 2.5 %</span>
+                        <span>{halfTax.toFixed(2)}</span>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontWeight: 900,
+                        fontSize: '0.95rem',
+                        borderTop: '1px solid #000',
+                        borderBottom: '1px solid #000',
+                        padding: '4px 0',
+                        margin: '4px 0'
+                      }}>
+                        <span>Grand Total</span>
+                        <span>{grandTotal.toFixed(2)}</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
-              <div style={{ textAlign: 'center', fontSize: '0.7rem', color: '#444', borderTop: '1px dashed #000', paddingTop: '0.5rem' }}>
-                THANK YOU FOR VISITING CANNON KITCHEN! • HAVE A BLESSED JOURNEY
+              {/* Cashless Notice & Footer */}
+              <div style={{
+                textAlign: 'center',
+                fontWeight: 900,
+                fontSize: '0.8rem',
+                letterSpacing: '0.5px',
+                padding: '4px 0',
+                borderTop: '1px dashed #000',
+                borderBottom: '1px dashed #000',
+                margin: '0.5rem 0'
+              }}>
+                ------PLEASE DONOT PAY CASH------
+              </div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+                Cashier :- {settledTaxReceipt.captain || 'Bikram26'}
+              </div>
+              <div style={{ textAlign: 'center', fontSize: '0.75rem', lineHeight: '1.4', margin: '0.5rem 0' }}>
+                Allow Us To Serve You Again<br />
+                <strong>Thank You, Visit Again !</strong>
+              </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '0.72rem',
+                borderTop: '1px dashed #000',
+                paddingTop: '0.35rem',
+                fontWeight: 600
+              }}>
+                <span>E & O E</span>
+                <span>PLACE OF SUPPLY 'O.D'</span>
               </div>
 
               {/* Actions */}

@@ -1,7 +1,7 @@
 // ============================================================================
 // OFFICIAL INDIAN GST PORTAL COMPLIANT EXPORTER & RECONCILIATION ENGINE
 // Implements GSTN Offline Tool Schema (v1.7) for GSTR-1, HSN Summary & GSTR-2B Reconciliation
-// Sri Sai Vasudev Residency - Rayagada, Odisha (GSTIN: 21AEKPP8689J1ZS, State Code: 21)
+// Hotel Elite Inn - Muniguda, Rayagada, Odisha (GSTIN: 21AEWFS9433F1ZN, State Code: 21)
 // ============================================================================
 
 export const INDIAN_STATE_CODES = {
@@ -103,7 +103,7 @@ export function validateGstin(gstin) {
  * Generates standard GSTR-1 JSON Schema (v1.7) for upload to gst.gov.in
  */
 export function generateOfficialGstr1Json({
-  hotelGstin = "21AEKPP8689J1ZS",
+  hotelGstin = "21AEWFS9433F1ZN",
   hotelStateCode = "21",
   fp = "092026", // MMYYYY
   curGt = 0,
@@ -467,7 +467,7 @@ export function reconcileGstr2bWithPurchases(gstr2bJson, hotelPurchases = []) {
  */
 export function exportGstr1ExcelWorkbook({
   gstr1Payload,
-  filename = `GSTR1_21AEKPP8689J1ZS_092026_OFFICIAL.xls`
+  filename = `GSTR1_21AEWFS9433F1ZN_092026_OFFICIAL.xls`
 }) {
   const p = gstr1Payload || {};
   const b2bList = p.b2b || [];
@@ -493,9 +493,9 @@ export function exportGstr1ExcelWorkbook({
  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
  xmlns:html="http://www.w3.org/TR/REC-html40">
  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
-  <Author>Sri Sai Vasudev Residency</Author>
+  <Author>Hotel Elite Inn</Author>
   <Created>${new Date().toISOString()}</Created>
-  <Company>Sri Sai Vasudev Residency</Company>
+  <Company>Hotel Elite Inn</Company>
  </DocumentProperties>
  <Styles>
   <Style ss:ID="Default" ss:Name="Normal">
@@ -812,10 +812,10 @@ export function exportGstr1ExcelWorkbook({
    <Column ss:Width="180"/>
    <Column ss:Width="300"/>
    <Row ss:Height="28">
-    <Cell ss:MergeAcross="2" ss:StyleID="TitleStyle"><Data ss:Type="String">SRI SAI VASUDEV RESIDENCY — CHARTERED ACCOUNTANT STATUTORY RECONCILIATION</Data></Cell>
+    <Cell ss:MergeAcross="2" ss:StyleID="TitleStyle"><Data ss:Type="String">HOTEL ELITE INN — CHARTERED ACCOUNTANT STATUTORY RECONCILIATION</Data></Cell>
    </Row>
-   <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">Proprietor Legal Name</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">${escapeXml(p.legal_name || 'PAIDISETTY MANMADHA RAO')}</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Form GST REG-06 Certified</Data></Cell></Row>
-   <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">GSTIN</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">${escapeXml(p.gstin || '21AEKPP8689J1ZS')}</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">State Code 21 - Odisha</Data></Cell></Row>
+   <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">Proprietor Legal Name</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">${escapeXml(p.legal_name || 'Hotel Elite Inn')}</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Form GST REG-06 Certified</Data></Cell></Row>
+   <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">GSTIN</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">${escapeXml(p.gstin || '21AEWFS9433F1ZN')}</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">State Code 21 - Odisha</Data></Cell></Row>
    <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">Tax Jurisdiction</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">RAYAGADA DIVISION</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Jurisdictional Superintendent: Gulshan Sanodiya</Data></Cell></Row>
    <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">Tax Filing Period</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">September 2026 (092026)</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Monthly Regular Taxpayer</Data></Cell></Row>
    <Row><Cell ss:StyleID="DataCell"><Data ss:Type="String">Statutory Compliance Basis</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Indian GST Act Section 122</Data></Cell><Cell ss:StyleID="DataCell"><Data ss:Type="String">Zero Penalty / Pure Positive Audit Trail</Data></Cell></Row>

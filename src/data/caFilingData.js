@@ -1,15 +1,14 @@
 /**
- * Sri Sai Vasudev Residency — CA Filing Station & Financial Intelligence Engine
+ * Hotel Elite Inn — CA Filing Station & Financial Intelligence Engine
  * ─────────────────────────────────────────────────────────────────────────────
- * Complete, verified accounting data for September 2026 (and live operational periods)
- * specifically calibrated to the authentic 18-room inventory (Ground & 1st Floor).
+ * Complete, verified accounting data for September 2026 (and live operational periods).
  *
  * Registered Business Credentials:
- *   Trade Name:    Sri Sai Vasudev Residency
- *   Legal Name:    PAIDISETTY MANMADHA RAO (Proprietorship)
- *   GSTIN:         21AEKPP8689J1ZS | PAN: AEKPP8689J | State: 21-Odisha
- *   Address:       Near Andhra Bank, New Colony, Rayagada, Odisha - 765001
- *   Total Keys:    18 Keys (101-107 Ground Floor, 201-211 First Floor)
+ *   Trade Name:    Hotel Elite Inn
+ *   Legal Name:    Hotel Elite Inn
+ *   GSTIN:         21AEWFS9433F1ZN | PAN: AEWFS9433F | State: 21-Odisha
+ *   Address:       Opposite Railway Station Main Road, Muniguda, Odisha - 765020
+ *   FSSAI Lic:     10523016000047 | SAC: 996311 (Rooms) / 996332 (F&B)
  */
 
 import { HOTEL_CONFIG } from './hotelData';

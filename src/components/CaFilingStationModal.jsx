@@ -213,14 +213,14 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
   // Download CA Verification Audit Report
   const handleDownloadAuditReport = () => {
     const reportText = `================================================================================
-SRI SAI VASUDEV RESIDENCY — CHARTERED ACCOUNTANT STATUTORY AUDIT REPORT
+HOTEL ELITE INN — CHARTERED ACCOUNTANT STATUTORY AUDIT REPORT
 ================================================================================
-Business Trade Name : Sri Sai Vasudev Residency
-Legal Name / Status : PAIDISETTY MANMADHA RAO (Proprietorship)
-GSTIN               : 21AEKPP8689J1ZS
-PAN                 : AEKPP8689J
+Business Trade Name : Hotel Elite Inn
+Legal Name / Status : Hotel Elite Inn
+GSTIN               : 21AEWFS9433F1ZN
+PAN                 : AEWFS9433F
 State / Division    : 21 - Odisha / RAYAGADA DIVISION
-Principal Address   : Near Andhra Bank, New Colony, Rayagada, Odisha - 765001
+Principal Address   : Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020
 Audit Period        : 01-September-2026 to 30-September-2026 (Full Month)
 Total Keys Checked  : 18 Keys (Ground Floor: 101-107, First Floor: 201-211)
 
@@ -1091,7 +1091,7 @@ For: SRI SAI VASUDEV RESIDENCY (RAYAGADA)
                   Real-Time 5% GST Compliance Ledger — Full Month September 2026
                 </h2>
                 <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>
-                  Tax ledger under SAC 996311 (Rooms) & SAC 996331 (Dining) with Input Tax Credit (ITC) reconciliation for GSTIN 21AEKPP8689J1ZS.
+                  Tax ledger under SAC 996311 (Rooms) & SAC 996332 (Dining) with Input Tax Credit (ITC) reconciliation for GSTIN 21AEWFS9433F1ZN.
                 </p>
               </div>
 

@@ -5903,12 +5903,12 @@ export default function AccountsLedgerModal({
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #0f172a', paddingBottom: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900, color: '#0f172a', letterSpacing: '0.5px' }}>
-                      SRI SAI VASUDEV RESIDENCY
+                      HOTEL ELITE INN
                     </h2>
                     <div style={{ fontSize: '11px', color: '#475569', marginTop: '3px', lineHeight: 1.4 }}>
-                      Near Andhra Bank, New Colony, Rayagada, Odisha - 765001<br />
-                      Proprietor: Paidisetty Manmadha Rao | Phone: +91 8895225555 / +91 8249258377<br />
-                      <strong>GSTIN: 21AEKPP8689J1ZS</strong> | State: 21 (Odisha) | PAN: AEKPP8689J
+                      Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020<br />
+                      FSSAI Lic No: 10523016000047 | Phone: +91-6370757541<br />
+                      <strong>GSTIN: 21AEWFS9433F1ZN</strong> | State: 21 (Odisha) | PAN: AEWFS9433F
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>

@@ -453,7 +453,7 @@ export default function GstPreviewGuideModal({
                 {
                   step: 'Step 1: Download GSTR-1 Portal JSON',
                   desc: 'Click [Download GSTN GSTR-1 JSON] to save the official JSON payload. It contains Table 4A (B2B Corporate Invoices), Table 7 (B2C Small Supplies), Table 12 (HSN Summary), and Table 13 (Document Issue Register).',
-                  action: 'Output file: GSTR1_21AEKPP8689J1ZS_092026_CA_FINAL.json'
+                  action: 'Output file: GSTR1_21AEWFS9433F1ZN_092026_CA_FINAL.json'
                 },
                 {
                   step: 'Step 2: Access Official GSTN Offline Utility or Portal',

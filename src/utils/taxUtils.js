@@ -1,8 +1,8 @@
 // Statutory Rule 46 GST & Official Government GSTN GSTR-1 JSON Generator
-// Sri Sai Vasudev Residency - Rayagada, Odisha (GSTIN: 21AEKPP8689J1ZS, SAC: 996311)
+// Hotel Elite Inn - Muniguda, Odisha (GSTIN: 21AEWFS9433F1ZN, SAC: 996311 / 996332)
 
 export const SAC_CODE_ACCOMMODATION = "996311";
-export const SAC_CODE_RESTAURANT = "996331";
+export const SAC_CODE_RESTAURANT = "996332";
 export const GST_RATE_ROOM = 5.0; // 2.5% CGST + 2.5% SGST (< ₹7,500/night)
 export const CGST_RATE = 2.5;
 export const SGST_RATE = 2.5;
@@ -36,7 +36,7 @@ export function calculateRoomTax(baseAmount) {
  * - Table 12: HSN/SAC Summary
  * - Table 13: Documents Issued Register
  */
-export function generateGstr1Json({ bookings = [], month = "09", year = "2026", hotelGstin = "21AEKPP8689J1ZS" }) {
+export function generateGstr1Json({ bookings = [], month = "09", year = "2026", hotelGstin = "21AEWFS9433F1ZN" }) {
   const fp = `${month}${year}`;
 
   const b2bInvoices = [];
