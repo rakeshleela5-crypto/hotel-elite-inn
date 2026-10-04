@@ -26,6 +26,7 @@ export default function Navbar({
   onOpenD1Database,
   onOpenCaFilingStation,
   onOpenHousekeeping,
+  onOpenAuditedSalesRegister,
   cartCount = 0,
   rooms = [],
   adminPinVerified,
@@ -326,6 +327,28 @@ export default function Navbar({
             title="Open System #36: CA Filing Station & Financial Intelligence Engine (10 Modules)"
           >
             <Scale size={13} color="var(--gold-glow)" /> 🏛️ System #36: CA Filing Station
+          </button>
+
+          <button
+            id="nav-audited-sales-btn"
+            onClick={onOpenAuditedSalesRegister}
+            style={{
+              padding: '0.3rem 0.75rem',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 95, 70, 0.35))',
+              border: '1.5px solid #10b981',
+              color: '#34d399',
+              cursor: 'pointer',
+              fontWeight: 800,
+              fontSize: '0.78rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              boxShadow: '0 0 12px rgba(16, 185, 129, 0.25)'
+            }}
+            title="Open 26-Column Audited Sales Register, Reconciler & Excel Importer"
+          >
+            <FileSpreadsheet size={13} color="#34d399" /> 📊 26-Col Audited Register
           </button>
 
           <button

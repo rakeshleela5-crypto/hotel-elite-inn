@@ -5,11 +5,12 @@ import {
   ArrowRight, Sparkles, X, Check, Bed, Utensils, Receipt, MessageCircle
 } from 'lucide-react';
 import { CORPORATE_PARTNERS, HOTEL_CONFIG, ROOM_TIERS } from '../data/hotelData';
+import { JUNE_2026_CORPORATE_LEDGER, JUNE_2026_TOTALS } from '../data/june2026SalesData';
 import { SheetsEditableCell } from './UniversalInlineEditor';
 import { sendCorporateQuotationWhatsApp } from '../utils/whatsappDispatch';
 
 export default function CorporatePortalModal({ isOpen, onClose }) {
-  const [activeTab, setActiveTab] = useState('quotation'); // 'quotation' | 'onboarding'
+  const [activeTab, setActiveTab] = useState('quotation'); // 'quotation' | 'onboarding' | 'btc-ledger'
   
   // ==========================================
   // TAB 1: B2B PROFORMA QUOTATION & ADVANCE ESCROW STATE
@@ -261,6 +262,25 @@ export default function CorporatePortalModal({ isOpen, onClose }) {
             }}
           >
             <ShieldCheck size={16} /> Corporate Rule 46 Account Application
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('btc-ledger')}
+            style={{
+              padding: '0.6rem 1.1rem',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: activeTab === 'btc-ledger' ? 'rgba(212, 175, 55, 0.25)' : 'transparent',
+              color: activeTab === 'btc-ledger' ? 'var(--gold-glow)' : 'var(--text-muted)',
+              border: activeTab === 'btc-ledger' ? '1px solid var(--gold-primary)' : '1px solid transparent'
+            }}
+          >
+            <Building2 size={16} /> B.T.C Corporate Debtors Ledger (June 2026)
           </button>
         </div>
 
@@ -874,6 +894,182 @@ export default function CorporatePortalModal({ isOpen, onClose }) {
                   </form>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 3: B.T.C CORPORATE DEBTORS LEDGER (JUNE 2026 AUDITED) */}
+          {activeTab === 'btc-ledger' && (
+            <div style={{ animation: 'fadeIn 0.2s ease' }}>
+              {/* Summary KPIs */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '1rem',
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{
+                  background: 'rgba(212, 175, 55, 0.1)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  borderRadius: '10px',
+                  padding: '1rem'
+                }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Active Corporate Credit (B.T.C)
+                  </div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace', margin: '0.25rem 0' }}>
+                    ₹{JUNE_2026_TOTALS.btc.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#34d399' }}>
+                    Sundry Debtors • 30-Day Credit Terms
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'rgba(56, 189, 248, 0.1)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  borderRadius: '10px',
+                  padding: '1rem'
+                }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Total Corporate B2B Revenue
+                  </div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace', margin: '0.25rem 0' }}>
+                    ₹5,47,900.47
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                    58.7% of Hotel Total Revenue
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'rgba(52, 211, 153, 0.1)',
+                  border: '1px solid rgba(52, 211, 153, 0.3)',
+                  borderRadius: '10px',
+                  padding: '1rem'
+                }}>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                    B2B Invoices with Verified GSTIN
+                  </div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace', margin: '0.25rem 0' }}>
+                    92 Tax Invoices
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#34d399' }}>
+                    GSTR-1 Table 4A Ready
+                  </div>
+                </div>
+              </div>
+
+              {/* Corporate Debtors Table */}
+              <div style={{
+                background: '#090e1c',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '10px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  padding: '0.85rem 1.25rem',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'rgba(15, 23, 42, 0.6)'
+                }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
+                      Audited B.T.C Corporate Accounts &amp; Debtors Register
+                    </h3>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                      Corporate accounts with official GSTIN, monthly billing volume, and accounts receivable credit ledger.
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ background: '#0d1b33', color: '#94a3b8', borderBottom: '1px solid #1e293b' }}>
+                        <th style={{ padding: '0.75rem 1rem' }}>COMPANY / CORPORATE CLIENT</th>
+                        <th style={{ padding: '0.75rem 1rem' }}>STATUTORY GSTIN</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>INVOICES</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>TOTAL BILLED (₹)</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>B.T.C CREDIT DUE (₹)</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>STATUS</th>
+                        <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {JUNE_2026_CORPORATE_LEDGER.map((corp, idx) => (
+                        <tr 
+                          key={corp.company}
+                          style={{
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                            background: idx % 2 === 0 ? 'rgba(15, 23, 42, 0.3)' : 'transparent'
+                          }}
+                        >
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#fff' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <Building2 size={14} color="var(--gold-glow)" />
+                              {corp.company}
+                            </div>
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', fontFamily: 'monospace', color: '#34d399' }}>
+                            {corp.gstin}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'center', fontFamily: 'monospace' }}>
+                            {corp.bills}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 600 }}>
+                            ₹{corp.totalBilled.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td style={{ 
+                            padding: '0.75rem 1rem', 
+                            textAlign: 'right', 
+                            fontFamily: 'monospace', 
+                            fontWeight: 700, 
+                            color: corp.btcCredit > 0 ? '#c084fc' : '#94a3b8' 
+                          }}>
+                            ₹{corp.btcCredit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                            <span style={{
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              padding: '0.2rem 0.5rem',
+                              borderRadius: '4px',
+                              background: corp.btcCredit > 0 ? 'rgba(192, 132, 252, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                              color: corp.btcCredit > 0 ? '#c084fc' : '#34d399',
+                              border: corp.btcCredit > 0 ? '1px solid rgba(192, 132, 252, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)'
+                            }}>
+                              {corp.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                            <button
+                              onClick={() => {
+                                const text = `*HOTEL ELITE INN - B2B STATEMENT*\nClient: ${corp.company}\nGSTIN: ${corp.gstin}\nMonth: June 2026\nTotal Billed: Rs. ${corp.totalBilled.toFixed(2)}\nB.T.C Balance Due: Rs. ${corp.btcCredit.toFixed(2)}\nStatus: ${corp.status}`;
+                                navigator.clipboard.writeText(text);
+                                alert(`Copied B2B statement for ${corp.company}!`);
+                              }}
+                              style={{
+                                background: '#1e293b',
+                                color: '#38bdf8',
+                                border: '1px solid #334155',
+                                padding: '0.25rem 0.55rem',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              Copy Statement
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
         </div>

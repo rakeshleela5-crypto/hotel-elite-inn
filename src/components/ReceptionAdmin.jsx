@@ -61,6 +61,7 @@ export default function ReceptionAdmin({
   onOpenRevenueManagement,
   onOpenCaFilingStation,
   onOpenHousekeeping,
+  onOpenAuditedSalesRegister,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
   initialTab
@@ -2678,7 +2679,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             { key: 'F5', label: 'Mandi Store', color: '#a78bfa', onClick: onOpenStoreInventory },
             { key: 'F6', label: 'G3 RMS Rates', color: '#f59e0b', onClick: onOpenRevenueManagement },
             { key: 'F7', label: 'Night Audit', color: '#c084fc', onClick: onOpenNightAuditModal || (() => setActiveTab('cashier-audit')) },
-            { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal }
+            { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal },
+            { key: 'F9', label: '26-Col Sales Reg', color: 'var(--gold-glow)', onClick: onOpenAuditedSalesRegister }
           ].map(item => (
             <button
               key={item.key}

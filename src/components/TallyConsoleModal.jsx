@@ -6,6 +6,7 @@ import {
   DollarSign, Building2, HelpCircle
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import { JUNE_2026_SALES_RECORDS } from '../data/june2026SalesData';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsColumnHeader, SheetsToolbarLegend, SheetsEditableCell } from './UniversalInlineEditor';
 
@@ -448,6 +449,29 @@ export default function TallyConsoleModal({
     setTimeout(() => setNotification(''), 3500);
   };
 
+  const handleLoadJuneVouchers = () => {
+    const juneVouchers = JUNE_2026_SALES_RECORDS.map(r => ({
+      voucherNo: `HEI/SAL/0626-${r.billNo}`,
+      type: 'Sales',
+      typeCode: 'F8',
+      date: r.date,
+      refNo: `ROOM-${r.roomNo}`,
+      narration: `Audited Checkout Folio #${r.billNo} for Room ${r.roomNo} - ${r.guestName} (${r.company}) | Mode: ${r.remark}`,
+      lines: [
+        { drCr: 'Dr', ledgerId: r.btc > 0 ? 'LED-010' : r.online > 0 ? 'LED-005' : r.cc > 0 ? 'LED-004' : 'LED-001', ledgerName: r.btc > 0 ? `Sundry Debtors - ${r.company}` : r.online > 0 ? 'PhonePe Merchant UPI QR' : r.cc > 0 ? 'HDFC Merchant POS Settlement' : 'Front Desk Cash Drawer', amount: r.netAmount },
+        { drCr: 'Cr', ledgerId: 'LED-030', ledgerName: 'Room Accommodation Revenue (SAC 996311)', amount: r.rent },
+        ...(r.roomService > 0 ? [{ drCr: 'Cr', ledgerId: 'LED-031', ledgerName: 'Cannon Restaurant Dining (SAC 996331)', amount: r.roomService }] : []),
+        ...(r.laundry > 0 ? [{ drCr: 'Cr', ledgerId: 'LED-033', ledgerName: 'Guest Laundry Services (SAC 996333)', amount: Number((r.laundry / 1.18).toFixed(2)) }] : []),
+        { drCr: 'Cr', ledgerId: 'LED-050', ledgerName: 'Output Central GST 2.5%', amount: r.cgst },
+        { drCr: 'Cr', ledgerId: 'LED-051', ledgerName: 'Output State GST 2.5%', amount: r.sgst }
+      ]
+    }));
+
+    setVouchers(juneVouchers);
+    setNotification(`⚡ Loaded 223 Audited Production Vouchers for June 2026 (₹9,33,663.13)! Ready for Tally XML Export.`);
+    setTimeout(() => setNotification(''), 5000);
+  };
+
   const handleExportTallyXml = () => {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <ENVELOPE>
@@ -764,6 +788,26 @@ export default function TallyConsoleModal({
             }}
           >
             📊 Chart of Accounts ({ledgers.length})
+          </button>
+
+          <button
+            onClick={handleLoadJuneVouchers}
+            style={{
+              background: 'rgba(212, 175, 55, 0.25)',
+              color: 'var(--gold-glow)',
+              border: '1px solid var(--gold-primary)',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '4px',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem'
+            }}
+            title="Load all 223 real production vouchers from June 2026 (₹9,33,663.13)"
+          >
+            ⚡ Load June 2026 Batch (223 Bills)
           </button>
 
           <button
