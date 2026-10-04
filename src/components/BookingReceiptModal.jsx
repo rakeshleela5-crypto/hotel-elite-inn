@@ -697,28 +697,59 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
               )}
 
               {invoiceType !== 'keycard' && (
-                <button 
-                  type="button"
-                  onClick={handleSendWhatsAppInvoice} 
-                  style={{ 
-                    padding: '5px 12px', 
-                    fontSize: '0.74rem', 
-                    fontWeight: 700,
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: '4px',
-                    background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-                    border: '1px solid #25D366',
-                    color: '#ffffff',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    boxShadow: '0 2px 8px rgba(37, 211, 102, 0.35)'
-                  }}
-                  title="Send Official GST Tax Invoice to Guest's WhatsApp"
-                >
-                  <MessageCircle size={13} /> WhatsApp Bill
-                </button>
+                <>
+                  <button 
+                    type="button"
+                    onClick={handleSendWhatsAppInvoice} 
+                    style={{ 
+                      padding: '5px 12px', 
+                      fontSize: '0.74rem', 
+                      fontWeight: 700,
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                      border: '1px solid #25D366',
+                      color: '#ffffff',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 2px 8px rgba(37, 211, 102, 0.35)'
+                    }}
+                    title="Send Official GST Tax Invoice to Guest's WhatsApp"
+                  >
+                    <MessageCircle size={13} /> WhatsApp Bill
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const guestName = currentBooking?.guestName || currentBooking?.name || 'Valued Guest';
+                      const rawPhone = (currentBooking?.guestPhone || currentBooking?.phone || '').replace(/\D/g, '');
+                      const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+                      const msg = encodeURIComponent(`Namaste ${guestName} ji! 🙏\n\nThank you for choosing Hotel Elite Inn, Muniguda! It was our pleasure hosting you in Room ${currentBooking?.roomNumber || ''}.\n\nIf you enjoyed your stay, please take 15 seconds to leave us a 5-star review on Google Maps:\n⭐ https://maps.app.goo.gl/HotelEliteInnMuniguda\n\nWishing you safe travels and looking forward to your next visit!\nWarm regards,\nHotel Elite Inn Management, Muniguda\n📞 +91 94370 00000 | 🌐 https://hotel-elite-inn.pages.dev`);
+                      window.open(`https://wa.me/${cleanPhone || '919437000000'}?text=${msg}`, '_blank');
+                    }}
+                    style={{ 
+                      padding: '5px 12px', 
+                      fontSize: '0.74rem', 
+                      fontWeight: 700,
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.35))',
+                      border: '1px solid #facc15',
+                      color: '#fef08a',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 2px 8px rgba(234, 179, 8, 0.25)'
+                    }}
+                    title="Send 1-Click Thank-You message & 5-Star Google Review link to guest WhatsApp"
+                  >
+                    ⭐ WhatsApp Google Review
+                  </button>
+                </>
               )}
             </div>
           </div>

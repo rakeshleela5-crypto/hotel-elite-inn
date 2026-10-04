@@ -16,6 +16,7 @@ export default function CannonKitchenPOS({
   isOpen,
   onClose,
   rooms = [],
+  bookings = [],
   onBillToRoom,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
@@ -232,11 +233,14 @@ export default function CannonKitchenPOS({
   // Outlet selection: 'Cannon Kitchen (Dine-In)', 'Bar Outlet', 'Room Service', 'Swiggy / Zomato'
   const [selectedOutlet, setSelectedOutlet] = useState('Cannon Kitchen');
   
-  // Table or Room selector
-  const [orderType, setOrderType] = useState('room'); // 'room', 'table', 'delivery'
+  // Table or Room or Take-Away selector
+  const [orderType, setOrderType] = useState('room'); // 'room', 'table', 'takeaway'
   const [targetRoom, setTargetRoom] = useState('402');
   const [tableNumber, setTableNumber] = useState('6');
   const [captainName, setCaptainName] = useState('Pradeep Jena');
+  const [packagingFee, setPackagingFee] = useState(15);
+  const [takeawayCustomerName, setTakeawayCustomerName] = useState('Parcel Guest');
+  const [takeawayCustomerPhone, setTakeawayCustomerPhone] = useState('+91 94370 00000');
 
   // Fast numeric code input state
   const [codeQuery, setCodeQuery] = useState('');
@@ -663,7 +667,8 @@ Thank you for dining at Cannon Kitchen! 🙏`;
 
   const taxableSubtotal = isNonCommercial ? 0 : Math.max(0, grossSubtotal - calculatedDiscount);
   const gst = isNonCommercial ? 0 : taxableSubtotal * 0.05;
-  const netTotal = isNonCommercial ? 0 : taxableSubtotal + gst;
+  const activePackaging = (orderType === 'takeaway' && !isNonCommercial) ? Number(packagingFee || 0) : 0;
+  const netTotal = isNonCommercial ? 0 : taxableSubtotal + gst + activePackaging;
 
   // Live Food Orders status counters
   const receivedOrdersCount = currentOrders.filter(o => o.status === 'Received').length;
@@ -2922,98 +2927,242 @@ Thank you for dining at Cannon Kitchen! 🙏`;
           <div style={{ flex: '1 1 40%', display: 'flex', flexDirection: 'column', background: 'rgba(10, 14, 25, 0.4)' }}>
             {/* Order Destination Header */}
             <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.75rem' }}>
                 <button
+                  type="button"
                   onClick={() => setOrderType('room')}
                   style={{
                     flex: 1,
-                    padding: '0.45rem',
+                    padding: '0.45rem 0.2rem',
                     borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
                     cursor: 'pointer',
-                    background: orderType === 'room' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                    background: orderType === 'room' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
                     color: orderType === 'room' ? '#38bdf8' : 'var(--text-muted)',
-                    border: orderType === 'room' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)'
+                    border: orderType === 'room' ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px'
                   }}
                 >
-                  Bill to In-House Room
+                  <Bed size={13} /> Room Service
                 </button>
                 <button
+                  type="button"
                   onClick={() => setOrderType('table')}
                   style={{
                     flex: 1,
-                    padding: '0.45rem',
+                    padding: '0.45rem 0.2rem',
                     borderRadius: '6px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
                     cursor: 'pointer',
-                    background: orderType === 'table' ? 'rgba(52, 211, 153, 0.2)' : 'transparent',
+                    background: orderType === 'table' ? 'rgba(52, 211, 153, 0.25)' : 'transparent',
                     color: orderType === 'table' ? '#34d399' : 'var(--text-muted)',
-                    border: orderType === 'table' ? '1px solid #34d399' : '1px solid rgba(255,255,255,0.1)'
+                    border: orderType === 'table' ? '1.5px solid #34d399' : '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px'
                   }}
                 >
-                  Restaurant Dine-In Table
+                  <UtensilsCrossed size={13} /> Dine-In Table
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderType('takeaway')}
+                  style={{
+                    flex: 1,
+                    padding: '0.45rem 0.2rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    background: orderType === 'takeaway' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
+                    color: orderType === 'takeaway' ? '#fbbf24' : 'var(--text-muted)',
+                    border: orderType === 'takeaway' ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <Truck size={13} /> Take-Away / Parcel
                 </button>
               </div>
 
               {orderType === 'room' ? (
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Target Room Folio</label>
-                    <select
-                      value={targetRoom}
-                      onChange={(e) => setTargetRoom(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '0.45rem',
-                        background: '#0d111d',
-                        color: '#fff',
-                        border: '1px solid rgba(56, 189, 248, 0.4)',
-                        borderRadius: '6px',
-                        fontSize: '0.85rem',
-                        fontWeight: 600
-                      }}
-                    >
-                      {rooms.filter(r => r.status === 'Occupied').length > 0 ? (
-                        rooms.filter(r => r.status === 'Occupied').map(r => (
-                          <option key={r.roomNumber} value={r.roomNumber}>
-                            Room {r.roomNumber} - {r.currentGuestName || 'Guest'} (₹{(r.balanceDue || 0).toLocaleString()})
-                          </option>
-                        ))
-                      ) : (
-                        <>
-                          <option value="402">Room 402 - P ASHOK (Linde India Ltd)</option>
-                          <option value="201">Room 201 - LAVAKANTA OJHA (Akchem)</option>
-                          <option value="202">Room 202 - SATYARANJAN SAHOO</option>
-                          <option value="410">Room 410 - BIJAY PASWAN (PRADAN)</option>
-                          <option value="206">Room 206 - S S HAMEED</option>
-                          <option value="207">Room 207 - SAHANAWAZ HUSSAIN</option>
-                          <option value="301">Room 301 - UTKARSH SRIVASTAVA</option>
-                          <option value="304">Room 304 - SUPHAL CHANDRA MAHATO</option>
-                          <option value="305">Room 305 - K RAJESH KUMAR</option>
-                          <option value="408">Room 408 - SARATH CHANDRA MADIREDDY</option>
-                          <option value="416">Room 416 - SUMER KUMA</option>
-                        </>
-                      )}
-                    </select>
+                <>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Target Room Folio</label>
+                      <select
+                        value={targetRoom}
+                        onChange={(e) => setTargetRoom(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.45rem',
+                          background: '#0d111d',
+                          color: '#fff',
+                          border: '1px solid rgba(56, 189, 248, 0.4)',
+                          borderRadius: '6px',
+                          fontSize: '0.85rem',
+                          fontWeight: 600
+                        }}
+                      >
+                        {rooms.filter(r => r.status === 'Occupied').length > 0 ? (
+                          rooms.filter(r => r.status === 'Occupied').map(r => (
+                            <option key={r.roomNumber} value={r.roomNumber}>
+                              Room {r.roomNumber} - {r.currentGuestName || 'Guest'} (₹{(r.balanceDue || 0).toLocaleString()})
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="402">Room 402 - P ASHOK (Linde India Ltd • CP Plan)</option>
+                            <option value="201">Room 201 - LAVAKANTA OJHA (Akchem • CP Plan)</option>
+                            <option value="202">Room 202 - SATYARANJAN SAHOO (CP Plan)</option>
+                            <option value="410">Room 410 - BIJAY PASWAN (PRADAN)</option>
+                            <option value="206">Room 206 - S S HAMEED</option>
+                            <option value="207">Room 207 - SAHANAWAZ HUSSAIN</option>
+                            <option value="301">Room 301 - UTKARSH SRIVASTAVA</option>
+                            <option value="304">Room 304 - SUPHAL CHANDRA MAHATO</option>
+                            <option value="305">Room 305 - K RAJESH KUMAR</option>
+                            <option value="408">Room 408 - SARATH CHANDRA MADIREDDY</option>
+                            <option value="416">Room 416 - SUMER KUMA</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+                    <div style={{ width: 130 }}>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Captain / Waiter</label>
+                      <input
+                        type="text"
+                        value={captainName}
+                        onChange={(e) => setCaptainName(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.45rem',
+                          background: '#0d111d',
+                          color: '#fff',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                          borderRadius: '6px',
+                          fontSize: '0.85rem'
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div style={{ width: 130 }}>
-                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Captain / Waiter</label>
-                    <input
-                      type="text"
-                      value={captainName}
-                      onChange={(e) => setCaptainName(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '0.45rem',
-                        background: '#0d111d',
-                        color: '#fff',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '6px',
-                        fontSize: '0.85rem'
-                      }}
-                    />
+
+                  {/* CP Complimentary Breakfast Alert Banner */}
+                  {(() => {
+                    const matchedBooking = (bookings || []).find(b => String(b.roomNumber) === String(targetRoom));
+                    const isCp = matchedBooking?.mealPlan === 'CP' || matchedBooking?.plan === 'CP' || targetRoom === '402' || targetRoom === '201' || targetRoom === '202';
+                    if (isCp) {
+                      return (
+                        <div style={{
+                          marginTop: '0.6rem',
+                          padding: '0.45rem 0.65rem',
+                          borderRadius: '6px',
+                          background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(202, 138, 4, 0.22))',
+                          border: '1px solid #facc15',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '0.5rem'
+                        }}>
+                          <div style={{ fontSize: '0.72rem', color: '#fef08a' }}>
+                            <strong>☕ CP Plan Active (Room {targetRoom}):</strong> Complimentary Breakfast Included.
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsNonCommercial(true);
+                              setNcReason(`Room ${targetRoom} CP Plan Complimentary Breakfast`);
+                              showPosToast(`✓ Applied 0% CP Complimentary Breakfast for Room ${targetRoom}`);
+                            }}
+                            style={{
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              background: '#facc15',
+                              color: '#000',
+                              border: 'none',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Apply 0% CP Bill
+                          </button>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </>
+              ) : orderType === 'takeaway' ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.5rem' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Customer Name / Token</label>
+                      <input
+                        type="text"
+                        value={takeawayCustomerName}
+                        onChange={(e) => setTakeawayCustomerName(e.target.value)}
+                        placeholder="e.g. Train Passenger / Walk-in"
+                        style={{ width: '100%', padding: '0.4rem', background: '#0d111d', color: '#fff', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: '6px', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Mobile (WhatsApp Bill)</label>
+                      <input
+                        type="text"
+                        value={takeawayCustomerPhone}
+                        onChange={(e) => setTakeawayCustomerPhone(e.target.value)}
+                        placeholder="+91 94370 00000"
+                        style={{ width: '100%', padding: '0.4rem', background: '#0d111d', color: '#fff', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: '6px', fontSize: '0.8rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Parcel Packaging Fee Selector */}
+                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '0.45rem 0.65rem', borderRadius: '6px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#fbbf24' }}>
+                        📦 Parcel Packaging &amp; Container Fee:
+                      </span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fff' }}>
+                        +₹{packagingFee}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.35rem' }}>
+                      {[
+                        { label: '₹0 (None)', val: 0 },
+                        { label: '₹15 (1 Box)', val: 15 },
+                        { label: '₹30 (2 Boxes)', val: 30 },
+                        { label: '₹50 (Family)', val: 50 }
+                      ].map(p => (
+                        <button
+                          key={p.val}
+                          type="button"
+                          onClick={() => setPackagingFee(p.val)}
+                          style={{
+                            flex: 1,
+                            padding: '3px 4px',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: packagingFee === p.val ? '#f59e0b' : 'rgba(255,255,255,0.06)',
+                            color: packagingFee === p.val ? '#000' : '#cbd5e1',
+                            border: packagingFee === p.val ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)'
+                          }}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -3404,6 +3553,13 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 <span>₹{gst.toFixed(2)}</span>
               </div>
 
+              {orderType === 'takeaway' && packagingFee > 0 && !isNonCommercial && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#fbbf24' }}>
+                  <span>📦 Parcel Packaging &amp; Container:</span>
+                  <span>+₹{Number(packagingFee).toFixed(2)}</span>
+                </div>
+              )}
+
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -3461,6 +3617,33 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     }}
                   >
                     <Bed size={16} /> Bill to Room {targetRoom} Folio
+                  </button>
+                ) : orderType === 'takeaway' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTableNumber('TAKEAWAY');
+                      setTableSettlementModalOpen(true);
+                    }}
+                    disabled={cart.length === 0}
+                    className="btn-primary"
+                    style={{
+                      flex: 1.5,
+                      padding: '0.7rem',
+                      fontSize: '0.85rem',
+                      fontWeight: 800,
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: '#000',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)',
+                      opacity: cart.length === 0 ? 0.5 : 1,
+                      cursor: cart.length === 0 ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    <Truck size={16} /> Settle Take-Away Parcel (₹{netTotal.toFixed(2)})
                   </button>
                 ) : (
                   <>

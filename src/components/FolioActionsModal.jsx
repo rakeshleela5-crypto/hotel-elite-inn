@@ -1805,6 +1805,51 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
                 <p style={{ margin: '0 0 1.5rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
                   Post dining, laundry, extra bed, or miscellaneous charges directly to Room {room.roomNumber} folio.
                 </p>
+                {/* 1-Click Incident & Asset Damage Presets */}
+                <div style={{
+                  marginBottom: '1.25rem',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  maxWidth: 620
+                }}>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fca5a5', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    ⚡ Quick Incident &amp; Damage Presets (1-Click Auto-Fill):
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    {[
+                      { label: '🏷️ Lost RFID Keycard', category: 'MISC', amount: 200, desc: 'Replacement Charge for Lost Smart RFID Keycard' },
+                      { label: '🧺 Stained Bath Towel', category: 'LAUNDRY', amount: 150, desc: 'Housekeeping Damaged/Stained Towel Replacement' },
+                      { label: '🛏️ Burned/Damaged Bed Linen', category: 'MISC', amount: 500, desc: 'Damaged Bedsheet/Duvet Cover Replacement' },
+                      { label: '🚭 In-Room Smoking Fine', category: 'MISC', amount: 1000, desc: 'Strict Non-Smoking Room Violation & Ozone Sanitization Fee' },
+                      { label: '💧 Extra Mineral Water', category: 'F&B', amount: 30, desc: 'Packaged Drinking Water Bottle (1 Litre)' }
+                    ].map(p => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => {
+                          setChargeCategory(p.category);
+                          setChargeAmount(p.amount);
+                          setChargeRemarks(p.desc);
+                        }}
+                        style={{
+                          padding: '4px 8px',
+                          borderRadius: '5px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid rgba(248, 113, 113, 0.3)',
+                          color: '#fecaca',
+                          cursor: 'pointer'
+                        }}
+                        title={`Auto-fill: ₹${p.amount} under ${p.category}`}
+                      >
+                        {p.label} (+₹{p.amount})
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 <form onSubmit={handlePostCharge} style={{ maxWidth: 620, display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
                   <div className="form-group">

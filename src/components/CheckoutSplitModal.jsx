@@ -1171,6 +1171,35 @@ export default function CheckoutSplitModal({
               Cancel
             </button>
 
+            {/* Post-Checkout 1-Click WhatsApp Google Review Link */}
+            <button
+              type="button"
+              onClick={() => {
+                const guestName = room.currentGuestName || matchedBooking.guestName || 'Valued Guest';
+                const rawPhone = (room.guestPhone || matchedBooking.guestPhone || '').replace(/\D/g, '');
+                const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+                const msg = encodeURIComponent(`Namaste ${guestName} ji! 🙏\n\nThank you for choosing Hotel Elite Inn, Muniguda! It was our pleasure hosting you in Room ${room.roomNumber}.\n\nIf you enjoyed your stay, please take 15 seconds to share a 5-star review on Google Maps:\n⭐ https://maps.app.goo.gl/HotelEliteInnMuniguda\n\nWishing you safe travels and looking forward to your next visit!\nWarm regards,\nHotel Elite Inn Management, Muniguda\n📞 +91 94370 00000 | 🌐 https://hotel-elite-inn.pages.dev`);
+                window.open(`https://wa.me/${cleanPhone || '919437000000'}?text=${msg}`, '_blank');
+              }}
+              title="Send personalized Thank-You message & 5-Star Google Maps Review Link to guest WhatsApp"
+              style={{
+                padding: '0.6rem 1rem',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.35))',
+                color: '#fde047',
+                border: '1px solid #facc15',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                boxShadow: '0 2px 10px rgba(234, 179, 8, 0.2)'
+              }}
+            >
+              ⭐ WhatsApp Review Link
+            </button>
+
             {/* Instant Money Receipt Button (Owner Video Demonstration) */}
             <button
               type="button"

@@ -141,6 +141,7 @@ export default function ReceptionAdmin({
   const [isPolicePrintOpen, setIsPolicePrintOpen] = useState(false);
   const [isHousekeepingPrintOpen, setIsHousekeepingPrintOpen] = useState(false);
   const [isLuggageModalOpen, setIsLuggageModalOpen] = useState(false);
+  const [activeLuggagePrint, setActiveLuggagePrint] = useState(null);
 
   // Audited Payment Tender Re-classification State (GM/Manager PIN 7650)
   const [reclassifyModalSettlement, setReclassifyModalSettlement] = useState(null);
@@ -10399,7 +10400,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                         <div style={{ display: 'inline-flex', gap: '0.35rem' }}>
                           <button
                             type="button"
-                            onClick={() => window.print()}
+                            onClick={() => setActiveLuggagePrint(pass)}
                             style={{ padding: '0.25rem 0.5rem', fontSize: '0.72rem', background: 'rgba(212, 175, 55, 0.2)', border: '1px solid var(--gold-glow)', color: 'var(--gold-glow)', borderRadius: '4px', cursor: 'pointer' }}
                             title="Print 2-Part Luggage Tag &amp; Slip"
                           >
@@ -10428,6 +10429,169 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2-PART LUGGAGE CLAIM PASS & LOCKER THERMAL SLIP MODAL */}
+      {activeLuggagePrint && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.92)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 110000,
+          padding: '1rem',
+          backdropFilter: 'blur(8px)'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            color: '#000000',
+            width: '100%',
+            maxWidth: 420,
+            borderRadius: '10px',
+            padding: '1.5rem',
+            fontFamily: 'monospace',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+            maxHeight: '92vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ textAlign: 'center', borderBottom: '2px dashed #000', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
+              <h2 style={{ margin: '0 0 0.25rem', fontSize: '1.15rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                HOTEL ELITE INN
+              </h2>
+              <div style={{ fontSize: '0.75rem', fontWeight: 600 }}>Station Road, Muniguda, Rayagada, Odisha</div>
+              <div style={{ fontSize: '0.72rem', color: '#444' }}>Ph: +91 94370 00000 • GSTIN: 21XXXXX1234Z1</div>
+              <div style={{
+                marginTop: '0.4rem',
+                display: 'inline-block',
+                background: '#000',
+                color: '#fff',
+                padding: '2px 8px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                borderRadius: '4px'
+              }}>
+                CLOAK ROOM LUGGAGE CUSTODY PASS
+              </div>
+            </div>
+
+            {/* PART 1: GUEST CLAIM TICKET */}
+            <div style={{ fontSize: '0.78rem', lineHeight: '1.4', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>CLAIM TOKEN:</span>
+                <strong style={{ fontSize: '0.9rem' }}>{activeLuggagePrint.id}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>LOCKER SLOT:</span>
+                <strong style={{ fontSize: '0.9rem', color: '#000' }}>{activeLuggagePrint.lockerNo}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+                <span>GUEST NAME:</span>
+                <strong>{activeLuggagePrint.guestName}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>ROOM / STATUS:</span>
+                <span>{activeLuggagePrint.roomNumber} (Transit Custody)</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>TOTAL BAGS:</span>
+                <strong>{activeLuggagePrint.bagsCount} Pieces</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>BAG TYPE:</span>
+                <span>{activeLuggagePrint.bagType}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>TRAIN / PICKUP:</span>
+                <strong>{activeLuggagePrint.pickupTime} • {activeLuggagePrint.trainNo}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>DROP TIME:</span>
+                <span>{new Date().toLocaleDateString('en-IN')} {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            </div>
+
+            <div style={{ fontSize: '0.65rem', borderTop: '1px solid #ccc', paddingTop: '4px', color: '#555', marginBottom: '0.75rem' }}>
+              * Present this slip to Front Desk to claim bags. Hotel management is not liable for fragile contents or cash left inside luggage.
+            </div>
+
+            {/* PERFORATION DIVIDER */}
+            <div style={{
+              textAlign: 'center',
+              borderTop: '2px dashed #000',
+              borderBottom: '2px dashed #000',
+              padding: '4px 0',
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              letterSpacing: '0.1em',
+              margin: '0.75rem 0'
+            }}>
+              ✂ CUT HERE • ATTACH TO LUGGAGE HANDLE ✂
+            </div>
+
+            {/* PART 2: BAG / LOCKER TAG */}
+            <div style={{ fontSize: '0.78rem', lineHeight: '1.4' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>LOCKER TAG:</span>
+                <strong style={{ fontSize: '1rem', border: '1px solid #000', padding: '1px 6px' }}>{activeLuggagePrint.lockerNo}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+                <span>TOKEN:</span>
+                <strong>{activeLuggagePrint.id}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>GUEST:</span>
+                <strong>{activeLuggagePrint.guestName}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>BAG PIECES:</span>
+                <strong>{activeLuggagePrint.bagsCount} BAGS</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>SCHEDULED TRAIN:</span>
+                <span>{activeLuggagePrint.pickupTime} ({activeLuggagePrint.trainNo})</span>
+              </div>
+            </div>
+
+            {/* ACTION BUTTONS (NO-PRINT ON PRINTER) */}
+            <div className="no-print" style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem' }}>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                style={{
+                  flex: 1,
+                  padding: '0.6rem',
+                  background: '#000',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: 800,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                🖨️ Print Slip (80mm / A4)
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveLuggagePrint(null)}
+                style={{
+                  padding: '0.6rem 1rem',
+                  background: '#f1f5f9',
+                  color: '#34d399',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '6px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

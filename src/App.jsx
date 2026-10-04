@@ -1153,6 +1153,7 @@ export default function App() {
             isOpen={posModalOpen}
             onClose={() => setPosModalOpen(false)}
             rooms={rooms}
+            bookings={bookings}
             onBillToRoom={handleBillToRoomFromPOS}
             foodOrders={foodOrders}
             onUpdateOrderStatus={handleUpdateOrderStatus}
