@@ -51,7 +51,7 @@ export default function InRoomGuestPortal({
   }, [roomNumber]);
 
   // Filter Menu
-  const categories = ['All', 'Chef Specials', 'Odia Delicacies', 'Satvik & Jain', 'Main Course', 'Rice & Breads', 'Beverages'];
+  const categories = ['All', 'Chef Specials', 'Breakfast', 'Beverages', 'Mocktails & Shakes', 'Soups & Shorba', 'Veg Starters', 'Non-Veg Starters', 'Chicken Specialities', 'Seafood & Mutton', 'Indian Breads', 'Rice & Biryani', 'Continental & Sizzlers', 'Desserts'];
   
   const filteredDishes = RESTAURANT_MENU.filter(dish => {
     if (satvikOnly && !dish.isJain) return false;

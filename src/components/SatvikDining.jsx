@@ -6,9 +6,10 @@ export default function SatvikDining({ onOpenOrderModal }) {
   const [jainFilterOnly, setJainFilterOnly] = useState(false);
   const [activeCategory, setActiveCategory] = useState('All');
 
-  const categories = ['All', 'Odia Delicacies', 'Satvik & Jain', 'Breakfast', 'Main Course', 'Beverages'];
+  const categories = ['All', 'Breakfast', 'Veg Starters', 'Indian Breads', 'Rice & Biryani', 'Soups & Shorba', 'Beverages', 'Desserts'];
 
   const filteredMenu = RESTAURANT_MENU.filter(item => {
+    if (!item.isVeg) return false;
     const matchesJain = !jainFilterOnly || item.isJain;
     const matchesCat = activeCategory === 'All' || item.category === activeCategory;
     return matchesJain && matchesCat;

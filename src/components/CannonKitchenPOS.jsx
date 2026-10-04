@@ -137,15 +137,15 @@ export default function CannonKitchenPOS({
   // Cart / KOT Items with Cooking Modifiers
   const [cart, setCart] = useState([
     {
-      item: RESTAURANT_MENU.find(m => m.itemCode === '214') || RESTAURANT_MENU[4],
-      quantity: 1,
-      notes: 'Stone-ground mustard gravy',
+      item: RESTAURANT_MENU.find(m => m.itemCode === '220') || RESTAURANT_MENU[0],
+      quantity: 2,
+      notes: 'Crispy butter naan',
       cookingTags: ['Satvik', 'Mild']
     },
     {
-      item: RESTAURANT_MENU.find(m => m.itemCode === '307') || RESTAURANT_MENU[7],
-      quantity: 2,
-      notes: 'Extra hot and steamed fresh',
+      item: RESTAURANT_MENU.find(m => m.itemCode === '180') || RESTAURANT_MENU[1],
+      quantity: 1,
+      notes: 'Rich makhani gravy',
       cookingTags: ['Spicy']
     }
   ]);
@@ -1892,13 +1892,15 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 <Sparkles size={13} /> Quick Codes:
               </span>
               {[
-                { code: '54', label: 'Salt & Pepper Corn' },
-                { code: '214', label: 'Mushroom Masala' },
-                { code: '215', label: 'Paneer Butter' },
-                { code: '307', label: 'Steam Rice' },
-                { code: '347', label: 'Butter Naan' },
-                { code: '116', label: 'Andhra Chicken' },
-                { code: '1', label: 'Tea' }
+                { code: '1', label: 'Tea' },
+                { code: '45', label: 'Masala Dosa' },
+                { code: '134', label: 'Paneer Tikka' },
+                { code: '155', label: 'Chicken Tikka' },
+                { code: '180', label: 'Butter Chicken' },
+                { code: '205', label: 'Champaran Meat' },
+                { code: '220', label: 'Butter Naan' },
+                { code: '240', label: 'Chicken Dum Biryani' },
+                { code: '272', label: 'Gulab Jamun' }
               ].map(qc => {
                 const item = RESTAURANT_MENU.find(m => m.itemCode === qc.code);
                 return (
