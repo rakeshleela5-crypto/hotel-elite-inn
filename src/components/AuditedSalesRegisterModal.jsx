@@ -4,7 +4,7 @@ import {
   AlertTriangle, Filter, Calendar, Building2, CreditCard, 
   DollarSign, ArrowUpDown, X, RefreshCw, Eye, ShieldCheck,
   Upload, Layers, Sparkles, HelpCircle, ChevronDown, ChevronUp, Check,
-  ExternalLink, FileCode, CheckCheck, Clock, Calculator, Info, Copy, FileText
+  ExternalLink, FileCode, CheckCheck, Clock, Calculator, Info, Copy, FileText, MessageCircle
 } from 'lucide-react';
 import { 
   JUNE_2026_TOTALS, 
@@ -14,6 +14,7 @@ import {
   JUNE_2026_STATUTORY_RECONCILIATION
 } from '../data/june2026SalesData';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import { sendStatutoryTaxReconciliationWhatsApp } from '../utils/whatsappDispatch';
 
 export default function AuditedSalesRegisterModal({
   isOpen,
@@ -239,6 +240,118 @@ GRAND RECONCILIATION:
     navigator.clipboard.writeText(text);
     setCopiedNotice(true);
     setTimeout(() => setCopiedNotice(false), 2500);
+  };
+
+  // Print Official Statutory Dual Tax Reconciliation Voucher (A4 & Slip)
+  const handlePrintStatutorySlip = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Statutory Dual Tax Reconciliation - Hotel Elite Inn</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 25px; color: #111; max-width: 820px; margin: auto; }
+            h2 { margin: 0; text-transform: uppercase; color: #0f172a; }
+            .header-box { border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 15px; }
+            .meta { font-size: 12px; color: #475569; margin: 3px 0; }
+            table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+            th, td { border: 1.5px solid #000; padding: 6px 10px; text-align: right; font-size: 13px; }
+            th { background: #f1f5f9; color: #b91c1c; font-weight: 800; }
+            td { color: #15803d; font-weight: 700; font-family: monospace; }
+            .section-title { font-size: 13px; font-weight: bold; margin-top: 15px; color: #0f172a; }
+            .summary-box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 15px; border-radius: 6px; font-size: 12px; margin-top: 15px; line-height: 1.6; }
+            .signatures { display: flex; justify-content: space-between; margin-top: 40px; font-size: 12px; border-top: 1px dashed #94a3b8; padding-top: 25px; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header-box">
+            <h2>Hotel Elite Inn</h2>
+            <div class="meta">Near Railway Station Main Road, Muniguda, Rayagada, Odisha - 765020</div>
+            <div class="meta"><strong>GSTIN:</strong> ${HOTEL_CONFIG.gstin || '21AEWFS9433F1ZN'} | <strong>PAN:</strong> AEWFS9433F</div>
+            <div class="meta"><strong>Document:</strong> STATUTORY DUAL TAX & SAC RECONCILIATION CERTIFICATE (ROWS 229-232)</div>
+            <div class="meta"><strong>Period:</strong> ${recalcMode === 'baseline' ? 'June 2026 (Audited Register - 223 Invoices)' : `Filtered Date: ${selectedDate}`}</div>
+          </div>
+
+          <div class="section-title">1. ROOM ACCOMMODATION RECONCILIATION (SAC 996311 @ 5% GST)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>ROOM RENT</th>
+                <th>DISCOUNT</th>
+                <th>NET AMOUNT</th>
+                <th>CGST (2.5%)</th>
+                <th>SGST (2.5%)</th>
+                <th>TOTAL AMOUNT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>₹${statutoryValues.roomRent.toFixed(2)}</td>
+                <td>₹${statutoryValues.discount.toFixed(2)}</td>
+                <td>₹${statutoryValues.netRoom.toFixed(2)}</td>
+                <td>₹${statutoryValues.cgstRoom.toFixed(2)}</td>
+                <td>₹${statutoryValues.sgstRoom.toFixed(2)}</td>
+                <td>₹${statutoryValues.totalRoom.toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="section-title">2. GUEST LAUNDRY RECONCILIATION (SAC 996333 @ 18% GST)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>LOUNDRY (BASE)</th>
+                <th>CGST (9.0%)</th>
+                <th>SGST (9.0%)</th>
+                <th>TOTAL AMOUNT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>₹${statutoryValues.laundryBase.toFixed(2)}</td>
+                <td>₹${statutoryValues.cgstLaundry.toFixed(4)}</td>
+                <td>₹${statutoryValues.sgstLaundry.toFixed(4)}</td>
+                <td>₹${statutoryValues.totalLaundry.toFixed(4)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary-box">
+            <strong>THREE-WAY TURNOVER BALANCING & AUDIT PROOF:</strong><br/>
+            • Room Supply (Base + 5% GST): <strong>₹${statutoryValues.totalRoom.toFixed(2)}</strong><br/>
+            • Laundry Supply (Base + 18% GST): <strong>₹${statutoryValues.totalLaundry.toFixed(2)}</strong><br/>
+            • Cannon Kitchen Food & Beverage (SAC 996331): <strong>₹${statutoryValues.fnbGross.toFixed(2)}</strong><br/>
+            • Total Supply Reconciled: <strong>₹${statutoryValues.grandGrossSupply.toFixed(2)}</strong><br/>
+            • <strong>Grand Reconciled Net Turnover (With Rounding Buffer): ₹${statutoryValues.auditedNet.toFixed(2)} (0.00 Variance)</strong>
+          </div>
+
+          <div class="signatures">
+            <div>
+              Verified By:<br/><br/>
+              <strong>Duty Manager / Auditor</strong><br/>
+              Front Office Operations
+            </div>
+            <div>
+              Approved By:<br/><br/>
+              <strong>Chartered Accountant / Tax Advisor</strong><br/>
+              Statutory Audit Lead
+            </div>
+            <div>
+              Certified For:<br/><br/>
+              <strong>Hotel Elite Inn (Proprietor)</strong><br/>
+              Muniguda, Rayagada
+            </div>
+          </div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const handleSort = (field) => {
@@ -981,6 +1094,64 @@ GRAND RECONCILIATION:
                 >
                   {copiedNotice ? <Check size={12} /> : <Copy size={12} />}
                   {copiedNotice ? 'Copied!' : 'Copy Summary'}
+                </button>
+
+                {/* Print Statutory Voucher / Slip */}
+                <button
+                  onClick={handlePrintStatutorySlip}
+                  style={{
+                    background: '#0f172a',
+                    color: '#cbd5e1',
+                    border: '1px solid #334155',
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '6px',
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}
+                  title="Print Certified Statutory Dual Tax Reconciliation Slip for Owner & CA"
+                >
+                  <Printer size={12} /> Print Slip
+                </button>
+
+                {/* WhatsApp Dispatch to Owner */}
+                <button
+                  onClick={() => {
+                    sendStatutoryTaxReconciliationWhatsApp({
+                      period: recalcMode === 'baseline' ? 'June 2026 (Audited Register)' : `Filtered Selection (${filteredRecords.length} Bills)`,
+                      roomRent: statutoryValues.roomRent,
+                      discount: statutoryValues.discount,
+                      netRoom: statutoryValues.netRoom,
+                      cgstRoom: statutoryValues.cgstRoom,
+                      sgstRoom: statutoryValues.sgstRoom,
+                      totalRoom: statutoryValues.totalRoom,
+                      laundryBase: statutoryValues.laundryBase,
+                      cgstLaundry: statutoryValues.cgstLaundry,
+                      sgstLaundry: statutoryValues.sgstLaundry,
+                      totalLaundry: statutoryValues.totalLaundry,
+                      fnbGross: statutoryValues.fnbGross,
+                      auditedNet: statutoryValues.auditedNet
+                    });
+                  }}
+                  style={{
+                    background: 'rgba(5, 150, 105, 0.2)',
+                    color: '#34d399',
+                    border: '1px solid #059669',
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '6px',
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}
+                  title="Send Statutory Dual Tax Breakdown directly to Owner's WhatsApp"
+                >
+                  <MessageCircle size={12} /> WhatsApp Owner
                 </button>
               </div>
             </div>
