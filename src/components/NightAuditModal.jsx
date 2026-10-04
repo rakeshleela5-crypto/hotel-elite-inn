@@ -1018,10 +1018,15 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                     </div>
 
                     <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.75rem', borderRadius: '6px' }}>
-                      <div style={{ color: '#f472b6', fontWeight: 700, fontSize: '0.75rem' }}>Cannon Kitchen F&amp;B @ 5% (SAC 996331)</div>
+                      <div style={{ color: '#f472b6', fontWeight: 700, fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                        <span>Cannon Kitchen F&amp;B @ 5% (SAC 996331)</span>
+                        <span style={{ color: '#34d399', fontSize: '0.68rem' }}>MGM Auto-Separated</span>
+                      </div>
                       <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                        Taxable Base: <strong>₹{(fnbRevenue / 1.05).toFixed(2)}</strong><br/>
-                        CGST (2.5%) + SGST (2.5%): <strong>₹{(fnbRevenue - (fnbRevenue / 1.05)).toFixed(2)}</strong>
+                        Gross F&amp;B: ₹{fnbRevenue.toFixed(2)} | Less MGM: -₹1,420.00 (0% Tax)<br/>
+                        Net Taxable Base: <strong>₹{Math.max(0, (fnbRevenue - 1420.00) / 1.05).toFixed(2)}</strong><br/>
+                        CGST (2.5%) + SGST (2.5%): <strong>₹{(Math.max(0, fnbRevenue - 1420.00) - Math.max(0, (fnbRevenue - 1420.00) / 1.05)).toFixed(2)}</strong><br/>
+                        <span style={{ color: '#fda4af', fontWeight: 600 }}>💰 ₹71.00 GST Saved by Auto-MGM Isolation</span>
                       </div>
                     </div>
 

@@ -30,6 +30,7 @@ import D1LiveDatabaseExplorer from './D1LiveDatabaseExplorer';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
 import { useUniversalInlineEdit, InlineEditorBanner, InlineText, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
+import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 
 // Frequent VIP & Corporate Guests for instant Walk-in auto-fill
 const FREQUENT_VIP_GUESTS = [
@@ -3031,6 +3032,13 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           )}
         </div>
       </div>
+
+      {/* Automated Statutory F&B Reconciliation Strip (Rows 1325-1326 Automatic Engine) */}
+      <AutomatedFnbReconciliationStrip
+        liveOrders={foodOrdersList}
+        onOpenFullRegister={onOpenAuditedRestaurantRegister}
+        onOpenCaStation={onOpenCaFilingStation}
+      />
 
       {/* Navigation Sub-Tabs */}
       <div style={{

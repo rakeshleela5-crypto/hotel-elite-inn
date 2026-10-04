@@ -10,6 +10,7 @@ import { RESTAURANT_MENU, HOTEL_CONFIG, MYPOS_CANNON_KITCHEN_LAYOUT } from '../d
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
+import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 
 export default function CannonKitchenPOS({
   isOpen,
@@ -2442,6 +2443,13 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     </button>
                   </div>
                 </div>
+
+                {/* Live Statutory Reconciliation Strip (Owner Automatic Feature) */}
+                <AutomatedFnbReconciliationStrip 
+                  liveOrders={currentOrders} 
+                  onOpenFullRegister={onOpenAuditedRestaurantRegister} 
+                  compact={true} 
+                />
 
                 {/* Section 1: Main Dining Tables (1 - 18) */}
                 <div>
