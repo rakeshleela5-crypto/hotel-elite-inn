@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Scale, Hotel, Phone, Clock, Layers, Utensils, Compass, Bot, 
   ShieldCheck, Lock, Sparkles, Building2, Menu, X, ShoppingBag, 
-  MapPin, CheckCircle2, FileText, MessageCircle, LogOut, Database
+  MapPin, CheckCircle2, FileText, MessageCircle, LogOut, Database,
+  FileSpreadsheet, UtensilsCrossed
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
 
@@ -27,6 +28,7 @@ export default function Navbar({
   onOpenCaFilingStation,
   onOpenHousekeeping,
   onOpenAuditedSalesRegister,
+  onOpenAuditedRestaurantRegister,
   cartCount = 0,
   rooms = [],
   adminPinVerified,
@@ -348,7 +350,29 @@ export default function Navbar({
             }}
             title="Open 26-Column Audited Sales Register, Reconciler & Excel Importer"
           >
-            <FileSpreadsheet size={13} color="#34d399" /> 📊 26-Col Audited Register
+            <FileSpreadsheet size={13} color="#34d399" /> 📊 26-Col Sales Reg
+          </button>
+
+          <button
+            id="nav-audited-restaurant-btn"
+            onClick={onOpenAuditedRestaurantRegister}
+            style={{
+              padding: '0.3rem 0.75rem',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.28), rgba(180, 83, 9, 0.35))',
+              border: '1.5px solid #d97706',
+              color: '#fbbf24',
+              cursor: 'pointer',
+              fontWeight: 800,
+              fontSize: '0.78rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              boxShadow: '0 0 12px rgba(217, 119, 6, 0.25)'
+            }}
+            title="Open 1,320 Bills Restaurant Sales Register, POS Channels & Statutory Reconciliation (F10)"
+          >
+            <UtensilsCrossed size={13} color="#fbbf24" /> 🍽️ Rest. Sales Reg (F10)
           </button>
 
           <button

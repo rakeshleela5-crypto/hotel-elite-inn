@@ -62,6 +62,7 @@ export default function ReceptionAdmin({
   onOpenCaFilingStation,
   onOpenHousekeeping,
   onOpenAuditedSalesRegister,
+  onOpenAuditedRestaurantRegister,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
   initialTab
@@ -142,6 +143,21 @@ export default function ReceptionAdmin({
 
   // Audited Payment Tender Re-classification State (GM/Manager PIN 7650)
   const [reclassifyModalSettlement, setReclassifyModalSettlement] = useState(null);
+
+  // Global F9 & F10 Keyboard Shortcuts for Audited Sales Registers
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'F9') {
+        e.preventDefault();
+        if (onOpenAuditedSalesRegister) onOpenAuditedSalesRegister();
+      } else if (e.key === 'F10') {
+        e.preventDefault();
+        if (onOpenAuditedRestaurantRegister) onOpenAuditedRestaurantRegister();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onOpenAuditedSalesRegister, onOpenAuditedRestaurantRegister]);
   const [isReclassifyModalOpen, setIsReclassifyModalOpen] = useState(false);
   const [reclassifyNewCash, setReclassifyNewCash] = useState(0);
   const [reclassifyNewUpi, setReclassifyNewUpi] = useState(0);
@@ -2680,7 +2696,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             { key: 'F6', label: 'G3 RMS Rates', color: '#f59e0b', onClick: onOpenRevenueManagement },
             { key: 'F7', label: 'Night Audit', color: '#c084fc', onClick: onOpenNightAuditModal || (() => setActiveTab('cashier-audit')) },
             { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal },
-            { key: 'F9', label: '26-Col Sales Reg', color: 'var(--gold-glow)', onClick: onOpenAuditedSalesRegister }
+            { key: 'F9', label: '26-Col Sales Reg', color: 'var(--gold-glow)', onClick: onOpenAuditedSalesRegister },
+            { key: 'F10', label: 'Rest. Sales Reg', color: '#fbbf24', onClick: onOpenAuditedRestaurantRegister }
           ].map(item => (
             <button
               key={item.key}

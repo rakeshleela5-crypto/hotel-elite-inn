@@ -52,6 +52,7 @@ const DpdpDataRightsModal = lazyWithRetry(() => import('./components/DpdpDataRig
 const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPortal'));
 const HousekeepingPortal = lazyWithRetry(() => import('./components/HousekeepingPortal'));
 const AuditedSalesRegisterModal = lazyWithRetry(() => import('./components/AuditedSalesRegisterModal'));
+const AuditedRestaurantRegisterModal = lazyWithRetry(() => import('./components/AuditedRestaurantRegisterModal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
@@ -320,6 +321,7 @@ export default function App() {
   const [revenueModalOpen, setRevenueModalOpen] = useState(false);
   const [caFilingModalOpen, setCaFilingModalOpen] = useState(false);
   const [auditedSalesRegisterOpen, setAuditedSalesRegisterOpen] = useState(false);
+  const [auditedRestaurantRegisterOpen, setAuditedRestaurantRegisterOpen] = useState(false);
   const [dynamicRates, setDynamicRates] = useState(() => calculateAllTierMicroRates({ occupancyRate: 68, daysToArrival: 3, pickupVelocity48h: 4 }));
 
   // Live Food Orders & KDS State shared across Front Desk & Cannon Kitchen POS
@@ -951,6 +953,7 @@ export default function App() {
         onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
         onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
         onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
+        onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
         rooms={rooms}
         adminPinVerified={adminPinVerified}
         setAdminPinVerified={setAdminPinVerified}
@@ -1026,6 +1029,7 @@ export default function App() {
                 onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
                 onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
                 onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
+                onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
                 nightAudits={nightAudits}
                 foodOrders={foodOrders}
                 onUpdateOrderStatus={handleUpdateOrderStatus}
@@ -1174,6 +1178,13 @@ export default function App() {
             isOpen={auditedSalesRegisterOpen}
             onClose={() => setAuditedSalesRegisterOpen(false)}
             initialMonth="2026-06"
+          />
+        )}
+
+        {auditedRestaurantRegisterOpen && (
+          <AuditedRestaurantRegisterModal 
+            isOpen={auditedRestaurantRegisterOpen}
+            onClose={() => setAuditedRestaurantRegisterOpen(false)}
           />
         )}
 
