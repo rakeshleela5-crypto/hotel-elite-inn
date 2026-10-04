@@ -1601,6 +1601,14 @@ export default function ReceptionAdmin({
       })
     }).catch(err => console.warn('Stay extension D1 sync error:', err));
 
+    if (extensionTargetRoom) {
+      extensionTargetRoom.effectiveTariff = (Number(extensionTargetRoom.effectiveTariff) || 0) + Number(extensionTariffAdded);
+      extensionTargetRoom.effectiveStayPeriod = `Stay Extended +${extensionDurationHours}h`;
+      if (onUpdateRoomStatus) {
+        onUpdateRoomStatus(roomNo, extensionTargetRoom.effectiveStatus || 'Occupied', extensionTargetRoom.effectiveGuestName, extensionTargetRoom.effectiveTariff);
+      }
+    }
+
     setStayExtensionModalOpen(false);
     showToast(`✓ Stay extended +${extensionDurationHours}h for Room ${roomNo} (₹${extensionTariffAdded} via ${extensionPaymentMode}). Synced to D1 & Anti-Fraud Log.`);
   };
@@ -2963,6 +2971,25 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             )}
           </button>
           <button 
+            type="button"
+            onClick={() => setIsPolicePrintOpen(true)}
+            className="btn-outline-gold"
+            style={{ 
+              padding: '0.55rem 0.95rem', 
+              fontSize: '0.82rem', 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '0.35rem',
+              background: 'rgba(239, 68, 68, 0.15)',
+              borderColor: '#ef4444',
+              color: '#fca5a5',
+              fontWeight: 700
+            }}
+            title="Muniguda Police Station (Thana) Daily Guest Manifest (Form C) • 1-Click WhatsApp & Print"
+          >
+            <ShieldCheck size={15} color="#ef4444" /> 👮 Thana Report (Form C)
+          </button>
+          <button 
             onClick={() => setIsRoomRackPrintOpen(true)}
             className="btn-outline-gold"
             style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
@@ -4284,7 +4311,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                   >
                                     📄 Folio (1-17)
                                   </button>
-                                  {room.matchedTransit && (
+                                  {isOccupied && (
                                     <button
                                       type="button"
                                       onClick={() => handleOpenStayExtension(room)}
@@ -4889,7 +4916,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                                     >
                                       ✏️ Stay
                                     </button>
-                                    {room.matchedTransit && (
+                                    {isOccupied && (
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -9111,11 +9138,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
 
               <div className="form-group">
                 <label className="form-label">Select Extension Duration *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.5rem' }}>
                   {[
                     { hours: 2, label: '+2 Hours', price: 400, desc: 'Quick Refresh' },
                     { hours: 4, label: '+4 Hours', price: 700, desc: 'Train Layover' },
-                    { hours: 12, label: 'Full 24H', price: 1200, desc: 'Overnight Upgrade' }
+                    { hours: 6, label: '+6 Hours', price: 950, desc: 'Half-Day Rest' },
+                    { hours: 24, label: '+24H (1 Night)', price: 1600, desc: 'Full Day Overnight' }
                   ].map(opt => (
                     <button
                       key={opt.hours}

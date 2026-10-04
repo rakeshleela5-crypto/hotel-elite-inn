@@ -1272,22 +1272,48 @@ Thank you for dining at Cannon Kitchen! 🙏`;
             <button
               type="button"
               onClick={() => setTableShiftModalOpen(true)}
-              title="Shift or Reassign Dining Table"
+              title="Shift Table: Transfer active session and cumulative KOTs from Table A to Table B"
               style={{
-                padding: '2px 8px',
+                padding: '3px 8px',
                 borderRadius: '4px',
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                background: 'rgba(168, 85, 247, 0.2)',
-                color: '#c084fc',
-                border: '1px solid rgba(168, 85, 247, 0.4)',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(217, 119, 6, 0.38))',
+                color: '#fbbf24',
+                border: '1px solid #f59e0b',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '3px'
+                gap: '4px',
+                boxShadow: '0 1px 6px rgba(245, 158, 11, 0.25)'
               }}
             >
-              <ArrowRightLeft size={11} /> Shift Table
+              <ArrowRightLeft size={12} /> ⇄ Shift Table
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTableMergeSource(tableNumber);
+                setTableMergeTarget(tableNumber === '6' ? '7' : '6');
+                setTableMergeModalOpen(true);
+              }}
+              title="Merge Tables: Combine multiple dining tables into a single consolidated folio"
+              style={{
+                padding: '3px 8px',
+                borderRadius: '4px',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(5, 150, 105, 0.38))',
+                color: '#34d399',
+                border: '1px solid #10b981',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                boxShadow: '0 1px 6px rgba(16, 185, 129, 0.25)'
+              }}
+            >
+              🔗 Merge Tables
             </button>
             <span>Target Room: <strong style={{ color: '#34d399' }}>Room {targetRoom}</strong></span>
           </div>
@@ -2329,15 +2355,17 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         padding: '0.45rem 0.85rem',
                         borderRadius: '6px',
                         fontSize: '0.75rem',
-                        fontWeight: 700,
-                        background: 'rgba(168, 85, 247, 0.2)',
-                        border: '1px solid rgba(168, 85, 247, 0.4)',
-                        color: '#c084fc',
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.28), rgba(217, 119, 6, 0.38))',
+                        border: '1.5px solid #f59e0b',
+                        color: '#fbbf24',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.35rem',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(245, 158, 11, 0.25)'
                       }}
+                      title="Shift Table: Transfer active session and cumulative KOTs from Table A to Table B"
                     >
                       <ArrowRightLeft size={14} /> ⇄ Shift Table
                     </button>
@@ -2353,15 +2381,17 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                         padding: '0.45rem 0.85rem',
                         borderRadius: '6px',
                         fontSize: '0.75rem',
-                        fontWeight: 700,
-                        background: 'rgba(6, 182, 212, 0.2)',
-                        border: '1px solid rgba(6, 182, 212, 0.4)',
-                        color: '#22d3ee',
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.28), rgba(5, 150, 105, 0.38))',
+                        border: '1.5px solid #10b981',
+                        color: '#34d399',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.35rem',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)'
                       }}
+                      title="Merge Tables: Combine multiple dining tables into a single consolidated folio"
                     >
                       🔗 Merge Tables
                     </button>
