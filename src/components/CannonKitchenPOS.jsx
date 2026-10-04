@@ -301,6 +301,37 @@ export default function CannonKitchenPOS({
   const [tableMergeSource, setTableMergeSource] = useState('7');
   const [tableMergeTarget, setTableMergeTarget] = useState('6');
 
+  // Operational 86 (Out of Stock / Sold Out) Kitchen Toggle State
+  const [outOfStockItems, setOutOfStockItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hotel_elite_inn_pos_86_items');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [show86ManagerModal, setShow86ManagerModal] = useState(false);
+  const [manager86Search, setManager86Search] = useState('');
+
+  const toggle86Item = (itemCode, itemName) => {
+    setOutOfStockItems(prev => {
+      const next = { ...prev, [itemCode]: !prev[itemCode] };
+      try {
+        localStorage.setItem('hotel_elite_inn_pos_86_items', JSON.stringify(next));
+      } catch (e) {}
+      showPosToast(next[itemCode] ? `🚫 Marked #${itemCode} (${itemName}) as 86 (SOLD OUT)` : `✓ Restocked #${itemCode} (${itemName}) (Available)`);
+      return next;
+    });
+  };
+
+  const resetAll86Items = () => {
+    setOutOfStockItems({});
+    try {
+      localStorage.removeItem('hotel_elite_inn_pos_86_items');
+    } catch (e) {}
+    showPosToast('✓ All dishes reset to In-Stock for new kitchen shift!');
+  };
+
   // Sheet 2 Requirement: Daily Item Sales & Quantity Register (Sale ఆ వివరణ)
   const [showDailySalesModal, setShowDailySalesModal] = useState(false);
   const [dailySalesCategoryFilter, setDailySalesCategoryFilter] = useState('all');
@@ -425,6 +456,11 @@ export default function CannonKitchenPOS({
   };
 
   const addItemToCart = (item, qty = 1) => {
+    if (outOfStockItems[item.itemCode]) {
+      playOrderAlert();
+      showPosToast(`⚠️ 86 ALERT: "${item.name}" [Code #${item.itemCode}] is marked SOLD OUT by Kitchen!`);
+      return;
+    }
     const quantityToAdd = Math.max(1, qty);
     const existingIndex = cart.findIndex(c => c.item.id === item.id);
     if (existingIndex > -1) {
@@ -1274,6 +1310,26 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   {receivedOrdersCount} New
                 </span>
               )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShow86ManagerModal(true)}
+              style={{
+                padding: '0.35rem 0.85rem',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                background: Object.values(outOfStockItems).filter(Boolean).length > 0 ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.06)',
+                color: Object.values(outOfStockItems).filter(Boolean).length > 0 ? '#f87171' : 'var(--text-secondary)',
+                border: Object.values(outOfStockItems).filter(Boolean).length > 0 ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.12)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+              title="Manage Kitchen 86 (Sold Out / Out of Stock) dishes"
+            >
+              🚫 86 / Stock Out ({Object.values(outOfStockItems).filter(Boolean).length})
             </button>
             <button
               onClick={() => setShowDailySalesModal(true)}
@@ -2879,65 +2935,113 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 }}>
                 {filteredMenu.map(dish => {
                   const activePrice = getItemPrice(dish);
+                  const is86 = !!outOfStockItems[dish.itemCode];
                   return (
                     <div
                       key={dish.id}
-                      onClick={() => addItemToCart(dish)}
+                      onClick={() => {
+                        if (is86) {
+                          playOrderAlert();
+                          showPosToast(`⚠️ "${dish.name}" is marked SOLD OUT by Kitchen!`);
+                        } else {
+                          addItemToCart(dish);
+                        }
+                      }}
                       style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: is86 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: is86 ? '1px dashed rgba(239, 68, 68, 0.45)' : '1px solid rgba(255,255,255,0.08)',
                         borderRadius: '10px',
                         padding: '0.85rem',
-                        cursor: 'pointer',
+                        cursor: is86 ? 'not-allowed' : 'pointer',
+                        opacity: is86 ? 0.6 : 1,
                         transition: 'all 0.15s ease',
                         position: 'relative'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#fbbf24';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        if (!is86) {
+                          e.currentTarget.style.borderColor = '#fbbf24';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                        e.currentTarget.style.transform = 'none';
+                        if (!is86) {
+                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                          e.currentTarget.style.transform = 'none';
+                        }
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
-                        <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700 }}>
-                          #{dish.itemCode}
-                        </span>
-                        <span style={{ fontSize: '0.7rem', color: dish.isVeg ? '#34d399' : '#f87171' }}>
-                          {dish.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
-                        </span>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700 }}>
+                            #{dish.itemCode}
+                          </span>
+                          {is86 && (
+                            <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.62rem', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>
+                              86 SOLD OUT
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '0.7rem', color: dish.isVeg ? '#34d399' : '#f87171' }}>
+                            {dish.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggle86Item(dish.itemCode, dish.name);
+                            }}
+                            title={is86 ? 'Mark Available / Restock' : 'Mark 86 / Sold Out'}
+                            style={{
+                              background: is86 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.15)',
+                              border: is86 ? '1px solid #22c55e' : '1px solid rgba(239, 68, 68, 0.3)',
+                              color: is86 ? '#4ade80' : '#f87171',
+                              fontSize: '0.62rem',
+                              fontWeight: 700,
+                              padding: '1px 5px',
+                              borderRadius: '4px',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {is86 ? 'Restock' : '86'}
+                          </button>
+                        </div>
                       </div>
 
-                      <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.85rem', marginBottom: '0.25rem', lineHeight: '1.2' }}>
+                      <div style={{ fontWeight: 600, color: is86 ? '#94a3b8' : '#fff', fontSize: '0.85rem', marginBottom: '0.25rem', lineHeight: '1.2' }}>
                         {dish.name}
                       </div>
 
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                         {dish.category}
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '0.95rem' }}>
+                        <span style={{ fontWeight: 700, color: is86 ? '#94a3b8' : '#38bdf8', fontSize: '0.95rem' }}>
                           ₹{activePrice.toFixed(0)}
                         </span>
-                        <button
-                          style={{
-                            background: 'rgba(255,255,255,0.1)',
-                            border: 'none',
-                            color: '#fff',
-                            width: 26,
-                            height: 26,
-                            borderRadius: '6px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Plus size={14} />
-                        </button>
+                        {!is86 ? (
+                          <button
+                            type="button"
+                            aria-label={`Add ${dish.name} to ticket`}
+                            style={{
+                              background: 'rgba(255,255,255,0.1)',
+                              border: 'none',
+                              color: '#fff',
+                              width: 26,
+                              height: 26,
+                              borderRadius: '6px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <Plus size={14} />
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: '0.65rem', color: '#ef4444', fontWeight: 700 }}>Unavailable</span>
+                        )}
                       </div>
                     </div>
                   );
@@ -5104,6 +5208,176 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: OPERATIONAL 86 / OUT OF STOCK KITCHEN MANAGER */}
+        {show86ManagerModal && (
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100000,
+            padding: '1rem',
+            backdropFilter: 'blur(6px)'
+          }}>
+            <div className="glass-panel emil-modal-enter" style={{
+              width: '100%',
+              maxWidth: 620,
+              maxHeight: '85vh',
+              display: 'flex',
+              flexDirection: 'column',
+              background: '#0c1220',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '1.25rem' }}>🚫</span>
+                  <div>
+                    <h3 style={{ fontSize: '1.15rem', color: '#fff', margin: 0, fontWeight: 800 }}>
+                      Kitchen 86 &amp; Stock-Out Manager
+                    </h3>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      Mark unavailable dishes to block steward numpad entry &amp; avoid guest disappointment
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShow86ManagerModal(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Search & Actions Bar */}
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                <input
+                  type="text"
+                  placeholder="Filter dish by name or code (e.g. 102 Biryani, Paneer)..."
+                  value={manager86Search}
+                  onChange={(e) => setManager86Search(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 0.75rem',
+                    background: '#05070f',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    fontSize: '0.8rem'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={resetAll86Items}
+                  style={{
+                    padding: '0.5rem 0.85rem',
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    border: '1px solid #22c55e',
+                    color: '#4ade80',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                  title="Reset all dishes to in-stock for start of new shift"
+                >
+                  ✓ Restock All ({Object.values(outOfStockItems).filter(Boolean).length})
+                </button>
+              </div>
+
+              {/* Items List */}
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem', paddingRight: '4px' }}>
+                {RESTAURANT_MENU.filter(m => 
+                  !manager86Search.trim() || 
+                  m.name.toLowerCase().includes(manager86Search.toLowerCase()) || 
+                  m.itemCode.includes(manager86Search) ||
+                  m.category.toLowerCase().includes(manager86Search.toLowerCase())
+                ).map(m => {
+                  const is86 = !!outOfStockItems[m.itemCode];
+                  return (
+                    <div
+                      key={m.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.55rem 0.75rem',
+                        borderRadius: '6px',
+                        background: is86 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(255,255,255,0.03)',
+                        border: is86 ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(255,255,255,0.06)'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <span style={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          color: '#fbbf24',
+                          background: 'rgba(245, 158, 11, 0.2)',
+                          padding: '2px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          #{m.itemCode}
+                        </span>
+                        <div>
+                          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: is86 ? '#fca5a5' : '#fff' }}>
+                            {m.name}
+                          </div>
+                          <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                            {m.category} • ₹{m.price}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => toggle86Item(m.itemCode, m.name)}
+                        style={{
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          background: is86 ? '#ef4444' : 'rgba(255,255,255,0.08)',
+                          color: is86 ? '#fff' : '#94a3b8',
+                          border: is86 ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.15)'
+                        }}
+                      >
+                        {is86 ? '🚫 86 (SOLD OUT)' : '✓ In Stock'}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setShow86ManagerModal(false)}
+                  style={{
+                    padding: '0.5rem 1.25rem',
+                    background: '#2563eb',
+                    border: 'none',
+                    color: '#fff',
+                    borderRadius: '6px',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         )}

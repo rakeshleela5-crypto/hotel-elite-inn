@@ -1226,6 +1226,9 @@ export default function ReceptionAdmin({
   const [editStayVehicle, setEditStayVehicle] = useState('');
   const [editStayExtendNights, setEditStayExtendNights] = useState(0);
   const [editStayAddExtraBed, setEditStayAddExtraBed] = useState(false);
+  const [editStayCompany, setEditStayCompany] = useState('');
+  const [editStayGstin, setEditStayGstin] = useState('');
+  const [editStayTariffOverride, setEditStayTariffOverride] = useState('');
   const [editStayNotes, setEditStayNotes] = useState('');
 
   // Live Notification Toast State
@@ -2196,6 +2199,9 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
     setEditStayGuestName(room.currentGuestName || matchedBooking?.guestName || '');
     setEditStayPhone(matchedBooking?.guestPhone || '+91 94370 00000');
     setEditStayVehicle(matchedBooking?.vehicleNumber || '');
+    setEditStayCompany(matchedBooking?.company || matchedBooking?.companyName || '');
+    setEditStayGstin(matchedBooking?.gstin || matchedBooking?.corporateGstin || '');
+    setEditStayTariffOverride(String(room.tariff || matchedBooking?.tariff || 1699));
     setEditStayExtendNights(0);
     setEditStayAddExtraBed(false);
     setEditStayNotes('');
@@ -2205,14 +2211,15 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
     e.preventDefault();
     if (!editStayRoom) return;
 
+    const effectiveNightlyRate = parseFloat(editStayTariffOverride) || editStayRoom.tariff || 1699;
     let extraTariff = 0;
     if (editStayExtendNights > 0) {
-      extraTariff = Math.round((editStayRoom.tariff || 1699) * editStayExtendNights * 1.12);
+      extraTariff = Math.round(effectiveNightlyRate * editStayExtendNights * 1.12);
     }
     const extraBed = editStayAddExtraBed ? 560 : 0;
     const totalAdded = extraTariff + extraBed;
 
-    // Update room with modified guest name
+    // Update room with modified guest name & tariff
     onUpdateRoomStatus(editStayRoom.roomNumber, 'Occupied', editStayGuestName, editStayRoom.bookingId);
 
     // Dispatch update to D1
@@ -2227,6 +2234,9 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           guestName: editStayGuestName,
           guestPhone: editStayPhone,
           vehicleNumber: editStayVehicle,
+          company: editStayCompany,
+          gstin: editStayGstin,
+          negotiatedTariff: effectiveNightlyRate,
           extendedNights: editStayExtendNights,
           extraBedAdded: editStayAddExtraBed,
           totalAddedToFolio: totalAdded,
@@ -2235,7 +2245,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
       })
     }).catch(err => console.warn('Offline stay update fallback:', err));
 
-    showToast(`✓ Stay updated for Room ${editStayRoom.roomNumber}! ${totalAdded > 0 ? `Added ₹${totalAdded} (Nights: +${editStayExtendNights}, Bed: ₹${extraBed}) to Folio.` : 'Guest details refreshed.'}`);
+    showToast(`✓ Stay updated for Room ${editStayRoom.roomNumber}! ${editStayCompany ? `[${editStayCompany}] ` : ''}${totalAdded > 0 ? `Added ₹${totalAdded} to Folio.` : 'Details refreshed.'}`);
     setEditStayRoom(null);
   };
 
@@ -8871,6 +8881,81 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                     placeholder="e.g. OD-18-B-9988"
                     value={editStayVehicle}
                     onChange={(e) => setEditStayVehicle(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Corporate Billing & Tariff Override */}
+              <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', borderRadius: '8px', padding: '0.85rem', margin: '0.5rem 0 1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--gold-glow)' }}>
+                    🏢 Corporate Account &amp; Negotiated Tariff:
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {[
+                      { name: 'Linde India', gstin: '21AAACB2528H1ZA' },
+                      { name: 'Akchem', gstin: '21AAACA9876K1Z2' },
+                      { name: 'PRADAN', gstin: '21AABTP5432G1Z8' },
+                      { name: 'Vedanta', gstin: '21AABCV9999M1Z5' }
+                    ].map(corp => (
+                      <button
+                        key={corp.name}
+                        type="button"
+                        onClick={() => {
+                          setEditStayCompany(corp.name);
+                          setEditStayGstin(corp.gstin);
+                        }}
+                        style={{
+                          fontSize: '0.62rem',
+                          background: 'rgba(212, 175, 55, 0.15)',
+                          border: '1px solid rgba(212, 175, 55, 0.3)',
+                          color: '#fde047',
+                          padding: '1px 5px',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        +{corp.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.75rem', marginBottom: '0.6rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '0.2rem' }}>Company / Account Name</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ padding: '0.45rem', fontSize: '0.8rem' }}
+                      placeholder="e.g. Linde India Ltd"
+                      value={editStayCompany}
+                      onChange={(e) => setEditStayCompany(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '0.2rem' }}>Corporate GSTIN</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ padding: '0.45rem', fontSize: '0.8rem', fontFamily: 'monospace', textTransform: 'uppercase' }}
+                      placeholder="e.g. 21AAACB2528H1ZA"
+                      value={editStayGstin}
+                      onChange={(e) => setEditStayGstin(e.target.value.toUpperCase())}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', color: '#cbd5e1', marginBottom: '0.2rem' }}>
+                    Negotiated Tariff (₹ / Night Base)
+                  </label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ padding: '0.45rem', fontSize: '0.8rem', width: '160px' }}
+                    value={editStayTariffOverride}
+                    onChange={(e) => setEditStayTariffOverride(e.target.value)}
                   />
                 </div>
               </div>

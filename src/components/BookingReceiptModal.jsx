@@ -1183,12 +1183,49 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                   <span className="field-colon">:</span>
                   <span className="field-value">
                     {isLiveEditMode ? (
-                      <input 
-                        type="text" 
-                        value={editHeader.company} 
-                        onChange={(e) => setEditHeader(prev => ({ ...prev, company: e.target.value }))}
-                        style={{ border: '1px dashed #cbd5e1', padding: '1px 4px', fontSize: '10px', width: '180px' }}
-                      />
+                      <div>
+                        <input 
+                          type="text" 
+                          value={editHeader.company} 
+                          onChange={(e) => setEditHeader(prev => ({ ...prev, company: e.target.value }))}
+                          style={{ border: '1px dashed #cbd5e1', padding: '1px 4px', fontSize: '10px', width: '180px' }}
+                        />
+                        <div style={{ display: 'flex', gap: '3px', marginTop: '3px', flexWrap: 'wrap' }}>
+                          {[
+                            { name: 'Linde India', gstin: '21AAACB2528H1ZA' },
+                            { name: 'Akchem', gstin: '21AAACA9876K1Z2' },
+                            { name: 'PRADAN', gstin: '21AABTP5432G1Z8' },
+                            { name: 'Vedanta', gstin: '21AABCV9999M1Z5' },
+                            { name: 'Utkal Alumina', gstin: '21AAACU5555L1Z1' }
+                          ].map(corp => (
+                            <button
+                              key={corp.name}
+                              type="button"
+                              onClick={() => {
+                                setEditHeader(prev => ({
+                                  ...prev,
+                                  company: corp.name,
+                                  corporateGstin: corp.gstin
+                                }));
+                                const statePrefix = corp.gstin.slice(0, 2);
+                                setTaxType(statePrefix !== '21' ? 'inter' : 'intra');
+                              }}
+                              style={{
+                                fontSize: '8px',
+                                background: '#eff6ff',
+                                border: '1px solid #93c5fd',
+                                color: '#1d4ed8',
+                                padding: '1px 4px',
+                                borderRadius: '3px',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                              }}
+                            >
+                              +{corp.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ) : (
                       <span>{editHeader.company}</span>
                     )}
