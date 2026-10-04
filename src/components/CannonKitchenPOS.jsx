@@ -132,6 +132,8 @@ export default function CannonKitchenPOS({
   // Fast numeric code input state
   const [codeQuery, setCodeQuery] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [posCategory, setPosCategory] = useState('All');
+  const [posDietFilter, setPosDietFilter] = useState('all'); // 'all', 'veg', 'nonveg'
   const codeInputRef = useRef(null);
 
   // Cart / KOT Items with Cooking Modifiers
@@ -788,12 +790,17 @@ Thank you for dining at Cannon Kitchen! 🙏`;
     showPosToast(`✓ In-Room KOT #${kotId} debited to Room ${targetRoom} & routed to Live KDS!`);
   };
 
-  // Filtered menu list for visual clicking
+  // Filtered menu list for visual clicking (Supports Category & Diet Filters across all 204 items)
   const filteredMenu = RESTAURANT_MENU.filter(m => {
-    const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = !searchQuery.trim() ||
+                          m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           m.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           m.itemCode.includes(searchQuery);
-    return matchesSearch;
+    const matchesCategory = posCategory === 'All' || m.category === posCategory;
+    const matchesDiet = posDietFilter === 'all' || 
+                        (posDietFilter === 'veg' && m.isVeg) || 
+                        (posDietFilter === 'nonveg' && !m.isVeg);
+    return matchesSearch && matchesCategory && matchesDiet;
   });
 
   if (!isOpen) return null;
@@ -939,10 +946,13 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 background: posViewMode === 'menu' ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
                 color: posViewMode === 'menu' ? '#fbbf24' : 'var(--text-muted)',
                 border: posViewMode === 'menu' ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
               }}
             >
-              📋 Fast Code & Dish Catalog
+              📋 Fast Code & Dish Catalog ({RESTAURANT_MENU.length})
             </button>
             <button
               onClick={() => setPosViewMode('liveOrders')}
@@ -1889,7 +1899,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               whiteSpace: 'nowrap'
             }}>
               <span style={{ fontWeight: 700, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Sparkles size={13} /> Quick Codes:
+                <Sparkles size={13} /> {RESTAURANT_MENU.length} Menu Items • Quick Codes:
               </span>
               {[
                 { code: '1', label: 'Tea' },
@@ -2292,82 +2302,159 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 </div>
               </div>
             ) : (
-              /* Fast Dish Catalog View */
-              <div style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '1.25rem 1.5rem',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                gap: '0.85rem',
-                alignContent: 'flex-start'
-              }}>
-              {filteredMenu.map(dish => {
-                const activePrice = getItemPrice(dish);
-                return (
-                  <div
-                    key={dish.id}
-                    onClick={() => addItemToCart(dish)}
-                    style={{
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: '10px',
-                      padding: '0.85rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      position: 'relative'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#fbbf24';
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.transform = 'none';
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
-                      <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700 }}>
-                        #{dish.itemCode}
-                      </span>
-                      <span style={{ fontSize: '0.7rem', color: dish.isVeg ? '#34d399' : '#f87171' }}>
-                        {dish.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
-                      </span>
-                    </div>
-
-                    <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.85rem', marginBottom: '0.25rem', lineHeight: '1.2' }}>
-                      {dish.name}
-                    </div>
-
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                      {dish.category}
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '0.95rem' }}>
-                        ₹{activePrice.toFixed(0)}
-                      </span>
+              /* Fast Dish Catalog View with Categories & Diet Filtering */
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                {/* Category Pills & Diet Filter Bar */}
+                <div style={{
+                  padding: '0.6rem 1.5rem',
+                  background: 'rgba(0,0,0,0.25)',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  overflowX: 'auto',
+                  flexShrink: 0
+                }}>
+                  {['All', 'Beverages', 'Mocktails & Shakes', 'Breakfast', 'Salads & Raita', 'Soups & Shorba', 'Veg Starters', 'Non-Veg Starters', 'Chicken Specialities', 'Seafood & Mutton', 'Indian Breads', 'Rice & Biryani', 'Continental & Sizzlers', 'Desserts'].map(cat => {
+                    const count = cat === 'All' ? RESTAURANT_MENU.length : RESTAURANT_MENU.filter(m => m.category === cat).length;
+                    const isActive = posCategory === cat;
+                    return (
                       <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setPosCategory(cat)}
                         style={{
-                          background: 'rgba(255,255,255,0.1)',
-                          border: 'none',
-                          color: '#fff',
-                          width: 26,
-                          height: 26,
-                          borderRadius: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer'
+                          padding: '0.3rem 0.65rem',
+                          borderRadius: '20px',
+                          border: isActive ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.1)',
+                          background: isActive ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255,255,255,0.04)',
+                          color: isActive ? '#fbbf24' : 'var(--text-secondary)',
+                          fontSize: '0.72rem',
+                          fontWeight: isActive ? 700 : 500,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap'
                         }}
                       >
-                        <Plus size={14} />
+                        {cat} ({count})
                       </button>
-                    </div>
+                    );
+                  })}
+                  {/* Veg / Non-Veg Toggles */}
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.35rem', flexShrink: 0 }}>
+                    <button
+                      type="button"
+                      onClick={() => setPosDietFilter(posDietFilter === 'veg' ? 'all' : 'veg')}
+                      style={{
+                        padding: '0.25rem 0.55rem',
+                        borderRadius: '6px',
+                        border: posDietFilter === 'veg' ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                        background: posDietFilter === 'veg' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                        color: posDietFilter === 'veg' ? '#34d399' : 'var(--text-muted)',
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      🟢 Veg ({RESTAURANT_MENU.filter(m => m.isVeg).length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPosDietFilter(posDietFilter === 'nonveg' ? 'all' : 'nonveg')}
+                      style={{
+                        padding: '0.25rem 0.55rem',
+                        borderRadius: '6px',
+                        border: posDietFilter === 'nonveg' ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.1)',
+                        background: posDietFilter === 'nonveg' ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+                        color: posDietFilter === 'nonveg' ? '#f87171' : 'var(--text-muted)',
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      🔴 Non-Veg ({RESTAURANT_MENU.filter(m => !m.isVeg).length})
+                    </button>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+
+                {/* Fast Dish Catalog Grid */}
+                <div style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  padding: '1.25rem 1.5rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                  gap: '0.85rem',
+                  alignContent: 'flex-start'
+                }}>
+                {filteredMenu.map(dish => {
+                  const activePrice = getItemPrice(dish);
+                  return (
+                    <div
+                      key={dish.id}
+                      onClick={() => addItemToCart(dish)}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '10px',
+                        padding: '0.85rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#fbbf24';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+                        e.currentTarget.style.transform = 'none';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                        <span className="badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700 }}>
+                          #{dish.itemCode}
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: dish.isVeg ? '#34d399' : '#f87171' }}>
+                          {dish.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
+                        </span>
+                      </div>
+
+                      <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.85rem', marginBottom: '0.25rem', lineHeight: '1.2' }}>
+                        {dish.name}
+                      </div>
+
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                        {dish.category}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '0.95rem' }}>
+                          ₹{activePrice.toFixed(0)}
+                        </span>
+                        <button
+                          style={{
+                            background: 'rgba(255,255,255,0.1)',
+                            border: 'none',
+                            color: '#fff',
+                            width: 26,
+                            height: 26,
+                            borderRadius: '6px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                </div>
+              </div>
             )}
           </div>
 
