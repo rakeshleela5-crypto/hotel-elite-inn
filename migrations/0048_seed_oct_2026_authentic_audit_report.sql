@@ -1,0 +1,46 @@
+-- Hotel Elite Inn - Migration 0048: Seed Authentic Owner Audit Report (02-10-2026)
+-- Integrates authentic manager morning flash data received directly from ownership.
+
+INSERT OR REPLACE INTO night_audit_records (
+    audit_id,
+    business_date,
+    closed_at,
+    auto_triggered,
+    total_rooms,
+    occupied_rooms,
+    occupancy_pct,
+    room_revenue,
+    fnb_revenue,
+    other_revenue,
+    gross_revenue,
+    cash_collected,
+    upi_collected,
+    card_collected,
+    btc_corporate_credit,
+    drawer_cash_opening,
+    drawer_cash_physical,
+    cash_variance,
+    auditor_name,
+    notes
+) VALUES (
+    'AUDIT-2026-10-02',
+    '2026-10-02',
+    '2026-10-03 00:05:00',
+    1,
+    22,
+    4,
+    18.0,
+    6444.00,
+    33793.00,
+    0.00,
+    40237.00,
+    18400.00,
+    21837.00,
+    0.00,
+    0.00,
+    5000.00,
+    23400.00,
+    0.00,
+    'Sudhakar Reddy (Certified FO Auditor)',
+    'Authentic Owner Morning Flash 02-10-2026: F&B Room Service 805, Restaurant 28651, Take Away 4337, Total F&B 33793, MTD 53690, ARR 1611, Occ 18%.'
+);

@@ -2293,7 +2293,7 @@ export async function onRequestPost({ request, env }) {
         auditId,
         businessDate,
         a.autoTriggered !== undefined ? (a.autoTriggered ? 1 : 0) : 1,
-        Number(a.totalRooms || 18),
+        Number(a.totalRooms || 22),
         Number(a.occupiedRooms || 0),
         Number(a.occupancyPct || 0),
         Number(a.roomRevenue || 0),
@@ -2313,6 +2313,12 @@ export async function onRequestPost({ request, env }) {
 
       return jsonResponse({ success: true, auditId, businessDate });
     }
+
+    if (action === 'get_night_audit_records') {
+      const records = await db.prepare(`SELECT * FROM night_audit_records ORDER BY business_date DESC LIMIT 30`).all();
+      return jsonResponse({ success: true, records: records.results || [] });
+    }
+
 
     // 57. ANTI-THEFT: Record Stay Duration Extension
     if (action === 'record_stay_extension') {

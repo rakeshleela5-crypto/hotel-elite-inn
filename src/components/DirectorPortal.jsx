@@ -23,8 +23,8 @@ export default function DirectorPortal({
   const [filterToDate, setFilterToDate] = useState(todayStr);
   const [isDateFilterActive, setIsDateFilterActive] = useState(false);
 
-  // Metrics (Authentic 18 Keys Inventory)
-  const totalRooms = 18;
+  // Metrics (Authentic 22 Keys Operational Inventory)
+  const totalRooms = (rooms && rooms.length > 0) ? rooms.length : 22;
   const occupiedCount = rooms.filter(r => r.status === 'Occupied').length;
   const availableCount = rooms.filter(r => r.status === 'Available').length;
   const cleaningCount = rooms.filter(r => r.status === 'Cleaning').length;

@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { 
   Moon, Lock, CheckCircle2, AlertTriangle, Printer, 
   Calendar, DollarSign, Bed, UtensilsCrossed, ShieldCheck, 
-  RotateCcw, ArrowRight, X, User, FileText, Loader2, MessageCircle
+  RotateCcw, ArrowRight, X, User, FileText, Loader2, MessageCircle,
+  Sun, Copy, Sparkles, Share2
 } from 'lucide-react';
 import { HOTEL_CONFIG, INITIAL_NIGHT_AUDITS } from '../data/hotelData';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
-import { sendNightAuditFlashWhatsApp } from '../utils/whatsappDispatch';
+import { sendNightAuditFlashWhatsApp, sendOwnerMorningFlashWhatsApp } from '../utils/whatsappDispatch';
+import { AUTHENTIC_OWNER_AUDIT_REPORTS, formatOwnerRawFlashText, formatUpgradedExecutiveFlashText } from '../data/dailyFlashReports';
+
 
 export default function NightAuditModal({
   isOpen,
@@ -32,10 +35,12 @@ export default function NightAuditModal({
   const [isAuditDateFilterActive, setIsAuditDateFilterActive] = useState(true);
   const nextBusinessDate = '2026-09-22';
 
-  // Metrics for today's audit (18-Room Registered Inventory)
-  const totalRooms = 18;
-  const occupiedRooms = 12;
-  const occupancyPct = '66.7';
+  // Operational Inventory Metrics (22 Active Physical Inventory Keys)
+  const totalRooms = (rooms && rooms.length > 0) ? rooms.length : 22;
+  const occupiedRooms = (rooms && rooms.length > 0) 
+    ? rooms.filter(r => r.status === 'Occupied' || r.status === 'Occupied Clean').length 
+    : 12;
+  const occupancyPct = totalRooms > 0 ? ((occupiedRooms / totalRooms) * 100).toFixed(1) : '54.5';
 
   // Revenue figures (Screenshot 16 exact values)
   const roomRevenue = 46280.00;
@@ -43,8 +48,8 @@ export default function NightAuditModal({
   const otherRevenue = 0.00;
   const grossRevenue = roomRevenue + fnbRevenue + otherRevenue; // 58,247.07
 
-  const adr = '2618.00';
-  const revpar = '1248.00';
+  const adr = occupiedRooms > 0 ? (roomRevenue / occupiedRooms).toFixed(2) : '2618.00';
+  const revpar = totalRooms > 0 ? (roomRevenue / totalRooms).toFixed(2) : '1248.00';
 
   // Collections
   const cashCollected = 24500.00;
@@ -55,6 +60,59 @@ export default function NightAuditModal({
   const expectedDrawerCash = openingFloat + cashCollected; // 29,500.00
   const physicalCashNum = parseFloat(physicalDrawerCash) || 0;
   const cashVariance = physicalCashNum - expectedDrawerCash;
+
+  // Owner Morning Flash Engine States
+  const [showOwnerFlashModal, setShowOwnerFlashModal] = useState(false);
+  const [flashReportSource, setFlashReportSource] = useState('oct02'); // 'oct02' (Report #1) or 'live'
+  const [flashReportStyle, setFlashReportStyle] = useState('executive'); // 'executive' or 'raw'
+  const [copiedFlashText, setCopiedFlashText] = useState(false);
+
+  const getSelectedFlashData = () => {
+    if (flashReportSource === 'oct02') {
+      return AUTHENTIC_OWNER_AUDIT_REPORTS[0];
+    }
+    return {
+      reportDate: businessDate,
+      totalRoomsAvailable: totalRooms,
+      totalRoomsSaleable: Math.max(0, totalRooms - occupiedRooms),
+      arrActual: parseFloat(adr) || 1611,
+      occupancyPct: parseFloat(occupancyPct) || 18,
+      occupiedRooms: occupiedRooms,
+      mgmHold: 0,
+      underMaintenance: 0,
+      outOfOrder: 0,
+      roomRevenueActual: roomRevenue,
+      revPar: parseFloat(revpar) || 292.90,
+      fnbRoomServiceActual: 805.00,
+      restaurantActual: 28651.00,
+      takeAwayActual: 4337.00,
+      fnbTotalRevenueActual: fnbRevenue || 33793.00,
+      mtdFnbRevenueActual: 53690.00,
+      restaurantComplimentary: 5.00,
+      totalBtcAmount: companyCredit || 0.00,
+      combinedGrossTurnover: grossRevenue || 40237.00,
+      cashCollected: cashCollected,
+      upiCollected: upiCollected,
+      cardCollected: cardCollected,
+      cashVariance: cashVariance
+    };
+  };
+
+  const handleCopyFlashText = () => {
+    const data = getSelectedFlashData();
+    const text = flashReportStyle === 'raw' 
+      ? formatOwnerRawFlashText(data) 
+      : formatUpgradedExecutiveFlashText(data);
+    navigator.clipboard.writeText(text);
+    setCopiedFlashText(true);
+    setTimeout(() => setCopiedFlashText(false), 2200);
+  };
+
+  const handleSendOwnerFlashWhatsApp = (overrideStyle) => {
+    const data = getSelectedFlashData();
+    sendOwnerMorningFlashWhatsApp(data, overrideStyle || flashReportStyle);
+  };
+
 
   // Keyboard accessibility: ESC to dismiss modal (when not sealing)
   useEffect(() => {
@@ -267,7 +325,27 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowOwnerFlashModal(true)}
+              style={{
+                padding: '0.45rem 0.95rem',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.35))',
+                border: '1px solid #f59e0b',
+                color: '#fef3c7',
+                cursor: 'pointer',
+                fontWeight: 800,
+                fontSize: '0.78rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                boxShadow: '0 2px 10px rgba(245, 158, 11, 0.25)'
+              }}
+              title="Open Owner Executive Morning Audit Flash (02-10-2026 / Today)"
+            >
+              <Sun size={15} color="#fbbf24" /> 👑 Owner Morning Flash
+            </button>
             <button
               onClick={handleSendDayBookWhatsApp}
               style={{
@@ -926,7 +1004,7 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                   <div style={{ padding: '0.75rem', background: 'rgba(56, 189, 248, 0.05)', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.15)' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Occupancy %</span>
                     <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.2rem' }}>
-                      {occupancyPct}% ({occupiedRooms}/18)
+                      {occupancyPct}% ({occupiedRooms}/{totalRooms})
                     </div>
                   </div>
                   <div style={{ padding: '0.75rem', background: 'rgba(96, 165, 250, 0.05)', borderRadius: '8px', border: '1px solid rgba(96, 165, 250, 0.15)' }}>
@@ -1041,7 +1119,271 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                 </div>
               </div>
 
-              <div style={{ marginTop: '1.75rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+                {/* 👑 PROPRIETOR MORNING AUDIT FLASH SECTION (07:00 AM) */}
+                <div style={{
+                  marginTop: '1.75rem',
+                  background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(17, 24, 39, 0.95))',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  borderRadius: '14px',
+                  padding: '1.5rem',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(245, 158, 11, 0.1)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', borderBottom: '1px solid rgba(245, 158, 11, 0.25)', paddingBottom: '0.85rem', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <div style={{ width: 38, height: 38, borderRadius: '10px', background: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Sun size={20} color="#fbbf24" />
+                      </div>
+                      <div>
+                        <h4 style={{ margin: 0, color: '#fbbf24', fontSize: '1.05rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          👑 Proprietor Morning Audit Flash
+                          <span style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.25)', color: '#fef3c7', fontWeight: 700 }}>
+                            Daily 07:00 AM
+                          </span>
+                        </h4>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                          Verified owner format + 6 executive intelligence layers (RevPAR, Drawer Balancing &amp; GST)
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {/* Source Selector: Oct 02 vs Live */}
+                      <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <button
+                          type="button"
+                          onClick={() => setFlashReportSource('oct02')}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '6px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: flashReportSource === 'oct02' ? '#f59e0b' : 'transparent',
+                            color: flashReportSource === 'oct02' ? '#111827' : 'var(--text-muted)'
+                          }}
+                        >
+                          📅 Oct 02 (Audited #1)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFlashReportSource('live')}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '6px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: flashReportSource === 'live' ? '#f59e0b' : 'transparent',
+                            color: flashReportSource === 'live' ? '#111827' : 'var(--text-muted)'
+                          }}
+                        >
+                          🔴 Today Live
+                        </button>
+                      </div>
+
+                      {/* Style Selector: Executive vs Raw */}
+                      <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <button
+                          type="button"
+                          onClick={() => setFlashReportStyle('executive')}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '6px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: flashReportStyle === 'executive' ? '#10b981' : 'transparent',
+                            color: flashReportStyle === 'executive' ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          ⭐ 5-Star Executive
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFlashReportStyle('raw')}
+                          style={{
+                            padding: '0.35rem 0.75rem',
+                            borderRadius: '6px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            background: flashReportStyle === 'raw' ? '#10b981' : 'transparent',
+                            color: flashReportStyle === 'raw' ? '#ffffff' : 'var(--text-muted)'
+                          }}
+                        >
+                          📄 Owner Raw
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Highlights Strip */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.65rem', marginBottom: '1.2rem' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Combined Gross</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fbbf24', marginTop: '0.15rem' }}>
+                        ₹{getSelectedFlashData().combinedGrossTurnover.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Available Keys</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.15rem' }}>
+                        {getSelectedFlashData().totalRoomsAvailable} Keys (Occ: {getSelectedFlashData().occupancyPct}%)
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>ARR Actual</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#c084fc', marginTop: '0.15rem' }}>
+                        ₹{Math.round(getSelectedFlashData().arrActual)}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>F&amp;B Actual (3 Outlets)</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#34d399', marginTop: '0.15rem' }}>
+                        ₹{getSelectedFlashData().fnbTotalRevenueActual.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(244, 114, 182, 0.2)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>MTD F&amp;B Total</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f472b6', marginTop: '0.15rem' }}>
+                        ₹{getSelectedFlashData().mtdFnbRevenueActual.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Monospace WhatsApp Bubble Preview */}
+                  <div style={{
+                    background: '#091414',
+                    border: '1px solid #134e4a',
+                    borderRadius: '10px',
+                    padding: '1.15rem',
+                    position: 'relative',
+                    fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                    fontSize: '0.8rem',
+                    color: '#e2e8f0',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    maxHeight: '260px',
+                    overflowY: 'auto'
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '0.65rem',
+                      right: '0.75rem',
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      border: '1px solid #10b981',
+                      color: '#34d399',
+                      fontSize: '0.68rem',
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '6px',
+                      fontWeight: 700
+                    }}>
+                      WhatsApp Format
+                    </div>
+                    {flashReportStyle === 'raw' 
+                      ? formatOwnerRawFlashText(getSelectedFlashData()) 
+                      : formatUpgradedExecutiveFlashText(getSelectedFlashData())}
+                  </div>
+
+                  {/* Dispatch Action Toolbar */}
+                  <div style={{ marginTop: '1.15rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <button
+                      type="button"
+                      onClick={handleCopyFlashText}
+                      style={{
+                        padding: '0.55rem 1rem',
+                        fontSize: '0.82rem',
+                        background: 'rgba(255, 255, 255, 0.08)',
+                        color: copiedFlashText ? '#34d399' : '#fff',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem'
+                      }}
+                    >
+                      <Copy size={15} />
+                      {copiedFlashText ? '✓ Copied to Clipboard!' : 'Copy WhatsApp Text'}
+                    </button>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleSendOwnerFlashWhatsApp('raw')}
+                        style={{
+                          padding: '0.55rem 1rem',
+                          fontSize: '0.82rem',
+                          background: 'rgba(255, 255, 255, 0.08)',
+                          color: '#fef3c7',
+                          border: '1px solid rgba(245, 158, 11, 0.4)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 700,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.45rem'
+                        }}
+                        title="Send in the owner's exact original syntax"
+                      >
+                        📄 Send Owner Raw
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleSendOwnerFlashWhatsApp('executive')}
+                        style={{
+                          padding: '0.65rem 1.4rem',
+                          fontSize: '0.9rem',
+                          background: 'linear-gradient(135deg, #059669, #10b981)',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+                        }}
+                        title="Transmit 5-Star Executive Flash with all 6 intelligence layers"
+                      >
+                        <MessageCircle size={17} />
+                        <span>Transmit Executive Flash to Owner (+91 6370757541)</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '1.75rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => handleSendOwnerFlashWhatsApp('executive')}
+                  style={{
+                    padding: '0.7rem 1.4rem',
+                    fontSize: '0.92rem',
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 4px 14px rgba(245, 158, 11, 0.4)'
+                  }}
+                  title="Transmit Certified Morning Audit Flash to Proprietor Paidisetty Manmadha Rao"
+                >
+                  <Sun size={18} />
+                  <span>Send Executive Flash to Owner</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => sendNightAuditFlashWhatsApp({
@@ -1049,7 +1391,7 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                     auditorName,
                     occupancyPct,
                     occupiedRooms,
-                    totalRooms: 18,
+                    totalRooms: totalRooms,
                     adr,
                     revpar,
                     grossRevenue,
@@ -1075,10 +1417,10 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                     gap: '0.5rem',
                     boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
                   }}
-                  title="Transmit Certified Night Audit Flash to Proprietor Paidisetty Manmadha Rao"
+                  title="Transmit Certified Night Audit Daybook to Management on WhatsApp"
                 >
                   <MessageCircle size={18} />
-                  <span>Dispatch Flash Report to Proprietor on WhatsApp</span>
+                  <span>Dispatch Day Book on WhatsApp</span>
                 </button>
                 <button 
                   onClick={onClose} 
@@ -1087,6 +1429,197 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                 >
                   Done & Return to Front Office
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Standalone Owner Morning Flash Popup Modal */}
+          {showOwnerFlashModal && (
+            <div 
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 3000,
+                background: 'rgba(0, 0, 0, 0.85)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1rem'
+              }}
+              onClick={() => setShowOwnerFlashModal(false)}
+            >
+              <div 
+                style={{
+                  width: '100%',
+                  maxWidth: 680,
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                  background: 'linear-gradient(145deg, #111827, #0b0f19)',
+                  border: '1px solid #f59e0b',
+                  borderRadius: '16px',
+                  padding: '1.5rem',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(245, 158, 11, 0.2)'
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.85rem', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '8px', background: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Sun size={20} color="#fbbf24" />
+                    </div>
+                    <div>
+                      <h3 style={{ margin: 0, color: '#fff', fontSize: '1.15rem', fontWeight: 800 }}>
+                        👑 Owner Morning Audit Flash
+                      </h3>
+                      <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        Recipient: Proprietor Paidisetty Manmadha Rao (+91 6370757541)
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowOwnerFlashModal(false)}
+                    style={{ background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer' }}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Control switches */}
+                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setFlashReportSource('oct02')}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        background: flashReportSource === 'oct02' ? '#f59e0b' : 'transparent',
+                        color: flashReportSource === 'oct02' ? '#111827' : 'var(--text-muted)'
+                      }}
+                    >
+                      📅 Oct 02 (Audited #1)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFlashReportSource('live')}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        background: flashReportSource === 'live' ? '#f59e0b' : 'transparent',
+                        color: flashReportSource === 'live' ? '#111827' : 'var(--text-muted)'
+                      }}
+                    >
+                      🔴 Today's Live Shift
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setFlashReportStyle('executive')}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        background: flashReportStyle === 'executive' ? '#10b981' : 'transparent',
+                        color: flashReportStyle === 'executive' ? '#ffffff' : 'var(--text-muted)'
+                      }}
+                    >
+                      ⭐ 5-Star Executive
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFlashReportStyle('raw')}
+                      style={{
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: '6px',
+                        border: 'none',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        background: flashReportStyle === 'raw' ? '#10b981' : 'transparent',
+                        color: flashReportStyle === 'raw' ? '#ffffff' : 'var(--text-muted)'
+                      }}
+                    >
+                      📄 Owner Raw Syntax
+                    </button>
+                  </div>
+                </div>
+
+                {/* Formatted Text Box */}
+                <div style={{
+                  background: '#071616',
+                  border: '1px solid #115e59',
+                  borderRadius: '10px',
+                  padding: '1.25rem',
+                  fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+                  fontSize: '0.82rem',
+                  color: '#e2e8f0',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '340px',
+                  overflowY: 'auto'
+                }}>
+                  {flashReportStyle === 'raw' 
+                    ? formatOwnerRawFlashText(getSelectedFlashData()) 
+                    : formatUpgradedExecutiveFlashText(getSelectedFlashData())}
+                </div>
+
+                <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={handleCopyFlashText}
+                    style={{
+                      padding: '0.55rem 1rem',
+                      fontSize: '0.82rem',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: copiedFlashText ? '#34d399' : '#fff',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem'
+                    }}
+                  >
+                    <Copy size={15} />
+                    {copiedFlashText ? '✓ Copied!' : 'Copy to Clipboard'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSendOwnerFlashWhatsApp()}
+                    style={{
+                      padding: '0.65rem 1.4rem',
+                      fontSize: '0.9rem',
+                      background: 'linear-gradient(135deg, #059669, #10b981)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: 800,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+                    }}
+                  >
+                    <MessageCircle size={17} />
+                    <span>Open in WhatsApp &amp; Send</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

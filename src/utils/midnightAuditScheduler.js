@@ -73,7 +73,7 @@ export function initMidnightAuditScheduler({
         }
 
         const grossRev = roomRevTotal + fnbRevTotal;
-        const totalRooms = 18;
+        const totalRooms = (rooms && rooms.length > 0) ? rooms.length : 22;
         const occupiedCount = rooms.filter(r => r.status === 'Occupied' || r.status === 'Occupied Clean').length || 12;
         const occupancyPct = parseFloat(((occupiedCount / totalRooms) * 100).toFixed(1));
 
