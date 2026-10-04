@@ -468,7 +468,12 @@ export const MYPOS_CANNON_KITCHEN_LAYOUT = {
     { id: 'PAR6', label: 'Party Hall 6', section: 'Banquet', pax: 30 },
     { id: 'PAR15', label: 'Party Hall 15', section: 'Banquet', pax: 40 },
     { id: 'PAR16', label: 'Party Hall 16', section: 'Banquet', pax: 40 },
-    { id: 'G.M. OFFICE', label: 'GM Executive Suite', section: 'Admin', pax: 4 }
+    { id: 'G.M. OFFICE', label: 'GM Executive Suite', section: 'Admin', pax: 4 },
+    // Audited Operational Outlets (June 2026 Register)
+    { id: '20', label: 'Take Away Counter 20', section: 'Take Away', pax: 1 },
+    { id: '21', label: 'Take Away Counter 21', section: 'Take Away', pax: 1 },
+    { id: '444', label: 'Table 444 (Director / VIP Dining)', section: 'Management', pax: 6 },
+    { id: '555', label: 'Table 555 (Staff & Duty Meals)', section: 'Management', pax: 10 }
   ],
   stewards: ['SADANANDA', 'KOTI', 'DEEPAK', 'BIJAY', 'RAMESH', 'SANTOSH'],
   activeKotOrders: [

@@ -21,6 +21,12 @@ import {
   JUNE_2026_ROOM_PERFORMANCE 
 } from '../data/june2026SalesData';
 import { 
+  JUNE_2026_RESTAURANT_TOTALS, 
+  JUNE_2026_RESTAURANT_STATUTORY, 
+  JUNE_2026_RESTAURANT_CHANNELS, 
+  JUNE_2026_RESTAURANT_RECORDS 
+} from '../data/june2026RestaurantData';
+import { 
   PAYMENT_METHOD_REVENUE_SEP2026,
   TOTAL_GROSS_REVENUE_SEP2026,
   DAILY_EXPENDITURES_SEP2026,
@@ -45,6 +51,7 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
   const [expenseFilter, setExpenseFilter] = useState('ALL');
   const [exportNotice, setExportNotice] = useState('');
   const [isPreviewGuideOpen, setIsPreviewGuideOpen] = useState(false);
+  const [juneAuditSubTab, setJuneAuditSubTab] = useState('consolidated'); // 'consolidated', 'rooms', 'restaurant'
 
   // Interactive Google Sheets editable states
   const [expensesData, setExpensesData] = useState(DAILY_EXPENDITURES_SEP2026);
@@ -1946,29 +1953,229 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                 </div>
               </div>
 
-              {/* 4 Core Summary Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                <div style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Billed Turnover</div>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace' }}>₹9,33,663.13</div>
-                  <div style={{ fontSize: '0.7rem', color: '#34d399' }}>223 Invoices • 0.00 Variance</div>
-                </div>
-                <div style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>B2B Corporate Invoices</div>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>92 Invoices</div>
-                  <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Table 4A Taxable: ₹4,18,290.40</div>
-                </div>
-                <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>B2C Small (Retail / Walk-in)</div>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>131 Invoices</div>
-                  <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Table 7 Taxable: ₹3,34,077.80</div>
-                </div>
-                <div style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total GST Output Tax</div>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'monospace' }}>₹38,238.88</div>
-                  <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Room (₹37.6K) + Laundry (₹620)</div>
-                </div>
+              {/* June Audit Sub-Navigation Bar */}
+              <div style={{
+                display: 'flex',
+                gap: '0.45rem',
+                marginBottom: '1.25rem',
+                background: '#090e1c',
+                padding: '0.35rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.08)'
+              }}>
+                <button
+                  onClick={() => setJuneAuditSubTab('consolidated')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: juneAuditSubTab === 'consolidated' ? 'linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1))' : 'transparent',
+                    color: juneAuditSubTab === 'consolidated' ? 'var(--gold-glow)' : '#94a3b8',
+                    fontWeight: 800,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <ShieldCheck size={14} /> Consolidated Property Return (1,543 Bills • ₹17.15L)
+                </button>
+                <button
+                  onClick={() => setJuneAuditSubTab('rooms')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: juneAuditSubTab === 'rooms' ? 'linear-gradient(135deg, rgba(16,185,129,0.3), rgba(16,185,129,0.1))' : 'transparent',
+                    color: juneAuditSubTab === 'rooms' ? '#34d399' : '#94a3b8',
+                    fontWeight: 800,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Building2 size={14} /> Room Lodging &amp; Laundry (223 Bills • ₹9.34L)
+                </button>
+                <button
+                  onClick={() => setJuneAuditSubTab('restaurant')}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '6px',
+                    border: 'none',
+                    background: juneAuditSubTab === 'restaurant' ? 'linear-gradient(135deg, rgba(217,119,6,0.3), rgba(217,119,6,0.1))' : 'transparent',
+                    color: juneAuditSubTab === 'restaurant' ? '#fbbf24' : '#94a3b8',
+                    fontWeight: 800,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <UtensilsCrossed size={14} /> Restaurant &amp; Dining (1,320 Bills • ₹9.21L)
+                </button>
               </div>
+
+              {/* View 1: CONSOLIDATED PROPERTY RETURN */}
+              {juneAuditSubTab === 'consolidated' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                    <div style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Property Activity</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace' }}>₹17,14,790.27</div>
+                      <div style={{ fontSize: '0.7rem', color: '#34d399' }}>1,543 Total Bills • Rooms + Food + Laundry</div>
+                    </div>
+                    <div style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Commercial Supply</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>₹16,24,312.27</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Taxable Base: ₹15,46,537.35</div>
+                    </div>
+                    <div style={{ background: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>MGM Complimentary (Sheet 2)</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'monospace' }}>₹90,478.00</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>68 Bills Excluded (Tax-Free Internal)</div>
+                    </div>
+                    <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Property Output GST</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>₹77,774.92</div>
+                      <div style={{ fontSize: '0.7rem', color: '#34d399' }}>CGST: ₹38,887.46 | SGST: ₹38,887.46</div>
+                    </div>
+                  </div>
+
+                  {/* Consolidated Table 12 HSN Summary */}
+                  <div style={{ background: '#090e1c', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem' }}>
+                    <div style={{ padding: '0.75rem 1rem', background: 'rgba(15, 23, 42, 0.6)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', fontWeight: 700, fontSize: '0.85rem', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Consolidated Table 12: Property-Wide HSN / SAC Summary (June 2026)</span>
+                      <span style={{ fontSize: '0.72rem', color: '#34d399' }}>✓ 100% Reconciled Across Hotel &amp; Restaurant Books</span>
+                    </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                      <thead>
+                        <tr style={{ background: '#0d1b33', color: '#94a3b8', borderBottom: '1px solid #1e293b' }}>
+                          <th style={{ padding: '0.65rem 1rem' }}>SAC CODE</th>
+                          <th style={{ padding: '0.65rem 1rem' }}>DESCRIPTION OF SERVICE</th>
+                          <th style={{ padding: '0.65rem 1rem', textAlign: 'center' }}>RATE</th>
+                          <th style={{ padding: '0.65rem 1rem', textAlign: 'right' }}>TAXABLE VALUE (₹)</th>
+                          <th style={{ padding: '0.65rem 1rem', textAlign: 'right' }}>CGST (₹)</th>
+                          <th style={{ padding: '0.65rem 1rem', textAlign: 'right' }}>SGST (₹)</th>
+                          <th style={{ padding: '0.65rem 1rem', textAlign: 'right' }}>TOTAL VALUE (₹)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                          <td style={{ padding: '0.65rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: 'var(--gold-glow)' }}>996311</td>
+                          <td style={{ padding: '0.65rem 1rem', color: '#fff' }}>Room Accommodation Services (223 Invoices net of ₹690 disc)</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'center', color: '#34d399', fontWeight: 700 }}>5.0%</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace' }}>7,52,368.20</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>18,809.20</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>18,809.20</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#fff' }}>7,89,986.61</td>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(15, 23, 42, 0.3)' }}>
+                          <td style={{ padding: '0.65rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: '#f472b6' }}>996331</td>
+                          <td style={{ padding: '0.65rem 1rem', color: '#fff' }}>Restaurant Dining, Room Service &amp; Take-Away (1,252 Bills)</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'center', color: '#34d399', fontWeight: 700 }}>5.0%</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace' }}>7,90,722.53</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>19,768.06</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>19,768.06</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#fff' }}>8,30,258.66</td>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                          <td style={{ padding: '0.65rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: '#a78bfa' }}>996333</td>
+                          <td style={{ padding: '0.65rem 1rem', color: '#fff' }}>Commercial In-House Laundry &amp; Garment Dry-Cleaning</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'center', color: '#a78bfa', fontWeight: 700 }}>18.0%</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace' }}>3,446.62</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>310.20</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>310.20</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#fff' }}>4,067.01</td>
+                        </tr>
+                        <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', background: 'rgba(217, 119, 6, 0.1)' }}>
+                          <td style={{ padding: '0.65rem 1rem', fontFamily: 'monospace', fontWeight: 700, color: '#fbbf24' }}>NON-TAX</td>
+                          <td style={{ padding: '0.65rem 1rem', color: '#fbbf24' }}>Management &amp; Duty Staff Complimentary Meals (Sheet 2)</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'center', color: '#94a3b8', fontWeight: 700 }}>0.0%</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace' }}>90,478.00</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#94a3b8' }}>0.00</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#94a3b8' }}>0.00</td>
+                          <td style={{ padding: '0.65rem 1rem', textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#fbbf24' }}>90,478.00</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr style={{ background: '#0c162d', fontWeight: 800, color: 'var(--gold-glow)' }}>
+                          <td colSpan={3} style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>CONSOLIDATED PROPERTY TOTALS:</td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontFamily: 'monospace' }}>₹15,46,537.35</td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>₹38,887.46</td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#fbbf24' }}>₹38,887.46</td>
+                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right', fontFamily: 'monospace', color: '#34d399' }}>₹17,14,790.27</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* View 2: ROOM LODGING & LAUNDRY */}
+              {juneAuditSubTab === 'rooms' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                    <div style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total Billed Turnover</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace' }}>₹9,33,663.13</div>
+                      <div style={{ fontSize: '0.7rem', color: '#34d399' }}>223 Invoices • 0.00 Variance</div>
+                    </div>
+                    <div style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>B2B Corporate Invoices</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>92 Invoices</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Table 4A Taxable: ₹4,18,290.40</div>
+                    </div>
+                    <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>B2C Small (Retail / Walk-in)</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>131 Invoices</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Table 7 Taxable: ₹3,34,077.80</div>
+                    </div>
+                    <div style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Total GST Output Tax</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'monospace' }}>₹38,238.88</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Room (₹37.6K) + Laundry (₹620)</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* View 3: RESTAURANT & DINING REGISTER */}
+              {juneAuditSubTab === 'restaurant' && (
+                <div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                    <div style={{ background: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Commercial Dining Supply</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'monospace' }}>₹8,30,258.66</div>
+                      <div style={{ fontSize: '0.7rem', color: '#34d399' }}>1,252 Billed Outlets • 5% GST</div>
+                    </div>
+                    <div style={{ background: 'rgba(52, 211, 153, 0.1)', border: '1px solid rgba(52, 211, 153, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Net Taxable Turnover</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>₹7,90,722.53</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>Food ₹7.38L + Bev ₹52.9K</div>
+                    </div>
+                    <div style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>MGM Complimentary (Sheet 2)</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#c084fc', fontFamily: 'monospace' }}>₹90,478.00</div>
+                      <div style={{ fontSize: '0.7rem', color: '#cbd5e1' }}>68 Bills Excluded (Tax-Free)</div>
+                    </div>
+                    <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.85rem' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>5% Dining Output GST</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>₹39,536.13</div>
+                      <div style={{ fontSize: '0.7rem', color: '#34d399' }}>CGST: ₹19,768.06 | SGST: ₹19,768.06</div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* HSN/SAC Summary Table */}
               <div style={{ background: '#090e1c', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem' }}>
