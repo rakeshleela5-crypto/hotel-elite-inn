@@ -53,6 +53,9 @@ const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPo
 const HousekeepingPortal = lazyWithRetry(() => import('./components/HousekeepingPortal'));
 const AuditedSalesRegisterModal = lazyWithRetry(() => import('./components/AuditedSalesRegisterModal'));
 const AuditedRestaurantRegisterModal = lazyWithRetry(() => import('./components/AuditedRestaurantRegisterModal'));
+const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMobileOrderPad'));
+const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
+const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
@@ -72,6 +75,21 @@ export default function App() {
   const [rooms, setRooms] = useState(INITIAL_ROOMS_INVENTORY);
   const [transactions, setTransactions] = useState(INITIAL_FOLIO_TRANSACTIONS);
   const [pmsInitialTab, setPmsInitialTab] = useState('tape-chart');
+
+  // Dedicated Steward Mobile Order Pad & Kitchen KDS Portals
+  const [stewardPortalOpen, setStewardPortalOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'steward' || params.get('portal') === 'steward' || !!params.get('staff');
+  });
+
+  const [kitchenKdsOpen, setKitchenKdsOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'kds' || params.get('view') === 'kitchen' || params.get('portal') === 'kitchen';
+  });
+
+  const [stewardQrModalOpen, setStewardQrModalOpen] = useState(false);
 
   const handleOpenD1Database = () => {
     setPmsInitialTab('d1-database-explorer');
@@ -940,6 +958,38 @@ export default function App() {
     );
   }
 
+  // Dedicated Steward Floor Mobile Order Pad View (Triggered via Steward QR code)
+  if (stewardPortalOpen) {
+    return (
+      <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Cannon Kitchen Steward Pad...</div>}>
+        <StewardMobileOrderPad 
+          onClose={() => {
+            setStewardPortalOpen(false);
+            if (typeof window !== 'undefined' && window.history) {
+              window.history.pushState({}, '', window.location.pathname);
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // Dedicated Kitchen Display System (KDS) View (Triggered via Kitchen Display QR code)
+  if (kitchenKdsOpen) {
+    return (
+      <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#060913', minHeight: '100vh' }}>Loading Cannon Kitchen Display (KDS)...</div>}>
+        <KitchenDisplayKDS 
+          onClose={() => {
+            setKitchenKdsOpen(false);
+            if (typeof window !== 'undefined' && window.history) {
+              window.history.pushState({}, '', window.location.pathname);
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Navbar with 18-room counter & view switcher */}
@@ -1198,6 +1248,13 @@ export default function App() {
           <AuditedRestaurantRegisterModal 
             isOpen={auditedRestaurantRegisterOpen}
             onClose={() => setAuditedRestaurantRegisterOpen(false)}
+          />
+        )}
+
+        {stewardQrModalOpen && (
+          <StewardQrManagerModal 
+            isOpen={stewardQrModalOpen}
+            onClose={() => setStewardQrModalOpen(false)}
           />
         )}
 

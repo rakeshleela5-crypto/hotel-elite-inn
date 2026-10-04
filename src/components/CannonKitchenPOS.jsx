@@ -11,6 +11,7 @@ import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
+import StewardQrManagerModal from './StewardQrManagerModal';
 
 // High-entropy collision-proof unique ID generator (fixes adversarial millisecond slice(-4) cycle risk)
 const generateUniquePosId = (prefix = 'CK-KOT') => {
@@ -331,6 +332,26 @@ export default function CannonKitchenPOS({
     } catch (e) {}
     showPosToast('✓ All dishes reset to In-Stock for new kitchen shift!');
   };
+
+  // Steward QR Badges Modal State & Zero-Refresh Live Order Sync
+  const [stewardQrModalOpen, setStewardQrModalOpen] = useState(false);
+
+  useEffect(() => {
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('hotel_elite_inn_live_kds');
+      channel.onmessage = (event) => {
+        if (event.data?.type === 'NEW_KOT_ORDER' && event.data.order) {
+          const ord = event.data.order;
+          playOrderAlert();
+          showPosToast(`🔔 STEWARD PUNCH: ${ord.steward} sent KOT #${ord.kotNumber} for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
+        }
+      };
+    }
+    return () => {
+      if (channel) channel.close();
+    };
+  }, []);
 
   // Sheet 2 Requirement: Daily Item Sales & Quantity Register (Sale ఆ వివరణ)
   const [showDailySalesModal, setShowDailySalesModal] = useState(false);
@@ -1348,6 +1369,26 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               }}
             >
               📊 Daily Sales &amp; Qty (ఆ వివరణ)
+            </button>
+            <button
+              type="button"
+              onClick={() => setStewardQrModalOpen(true)}
+              style={{
+                padding: '0.35rem 0.85rem',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                background: 'rgba(56, 189, 248, 0.2)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+              title="Print or view individual QR badges for Stewards & Kitchen KDS"
+            >
+              📱 Steward QR Badges
             </button>
           </div>
 
@@ -5381,6 +5422,12 @@ Thank you for dining at Cannon Kitchen! 🙏`;
             </div>
           </div>
         )}
+
+        {/* MODAL: STEWARD & KITCHEN QR BADGES */}
+        <StewardQrManagerModal 
+          isOpen={stewardQrModalOpen} 
+          onClose={() => setStewardQrModalOpen(false)} 
+        />
 
         {/* MODAL: TABLE MERGE & CONSOLIDATION */}
         {tableMergeModalOpen && (

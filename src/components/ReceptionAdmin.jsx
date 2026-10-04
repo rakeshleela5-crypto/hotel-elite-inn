@@ -1238,6 +1238,24 @@ export default function ReceptionAdmin({
     setTimeout(() => setFeedbackToast(''), 4500);
   };
 
+  // Live KOT Real-Time Sync Listener from Steward Floor Mobiles
+  useEffect(() => {
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('hotel_elite_inn_live_kds');
+      channel.onmessage = (event) => {
+        if (event.data?.type === 'NEW_KOT_ORDER' && event.data.order) {
+          const ord = event.data.order;
+          playOrderAlert();
+          showToast(`🔔 LIVE RESTAURANT ORDER: Steward ${ord.steward} punched KOT for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
+        }
+      };
+    }
+    return () => {
+      if (channel) channel.close();
+    };
+  }, []);
+
   // Block Rooms Modal State (Screenshot 10 - block_rooms.php)
   const [blockRoomOpen, setBlockRoomOpen] = useState(false);
   const [blockSelectedRoom, setBlockSelectedRoom] = useState('');
