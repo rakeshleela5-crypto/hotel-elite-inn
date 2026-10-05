@@ -6,7 +6,8 @@ import {
   Check, X, ChevronRight, Lock, Bed, Send, Ban, Wrench, Eye,
   Calculator, ClipboardList, Utensils, ShoppingBag, Receipt, Sparkle,
   ArrowRightLeft, Edit3, MessageCircle, TrendingUp, QrCode, Database,
-  BellRing, Car, Globe, Radio, Bell, Sliders, LogOut, Coffee, Briefcase, PlusCircle
+  BellRing, Car, Globe, Radio, Bell, Sliders, LogOut, Coffee, Briefcase, PlusCircle,
+  ShieldAlert
 } from 'lucide-react';
 import { HOTEL_CONFIG, ROOM_TIERS, GST_FOM_RECORDS_2026_09_25 } from '../data/hotelData';
 import { maskAadhaar } from '../utils/security';

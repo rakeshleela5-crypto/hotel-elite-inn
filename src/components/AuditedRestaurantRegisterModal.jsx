@@ -5,7 +5,7 @@ import {
   DollarSign, ArrowUpDown, X, RefreshCw, Eye, ShieldCheck,
   Layers, Sparkles, ChevronDown, ChevronUp, Check,
   ExternalLink, FileCode, CheckCheck, Clock, Calculator, Info, Copy, FileText, MessageCircle,
-  Coffee, ShoppingBag, Bed, UserCheck
+  Coffee, ShoppingBag, Bed, UserCheck, FileSpreadsheet
 } from 'lucide-react';
 import { 
   JUNE_2026_RESTAURANT_TOTALS, 
