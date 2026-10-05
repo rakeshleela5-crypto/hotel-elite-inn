@@ -185,6 +185,27 @@ export default function InRoomGuestPortal({
       onRequestRoomService(newReq);
     }
 
+    // Direct broadcast to Housekeeping Manager & Supervisor mobile portals
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+        hkChannel.postMessage({
+          type: 'ROOM_SERVICE_REQUEST',
+          payload: {
+            roomNumber,
+            serviceType,
+            description,
+            priority: serviceType === 'Maintenance' ? 'Urgent' : 'Normal',
+            guestName: `Room ${roomNumber} Guest`,
+            requestId: reqId
+          }
+        });
+        hkChannel.close();
+      }
+    } catch (e) {
+      console.warn('HK guest broadcast error:', e);
+    }
+
     setServiceSuccessMsg(`✓ ${serviceType} request received for Room ${roomNumber}! Attendant dispatched (ETA ~10 mins).`);
     setCustomServiceDesc('');
     setTimeout(() => setServiceSuccessMsg(''), 6000);

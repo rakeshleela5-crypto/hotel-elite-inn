@@ -101,3 +101,38 @@ export function playOrderAlert() {
     console.debug("Order alert chime suppressed:", err);
   }
 }
+
+export function playHousekeepingChime() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    // Warm two-tone buzz (F#5 -> B5) - distinct from kitchen bell
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = 'sine';
+    osc2.type = 'sawtooth';
+
+    osc1.frequency.setValueAtTime(739.99, ctx.currentTime); // F#5
+    osc1.frequency.exponentialRampToValueAtTime(987.77, ctx.currentTime + 0.18); // B5
+
+    osc2.frequency.setValueAtTime(369.99, ctx.currentTime); // F#4 (sub-octave)
+    osc2.frequency.exponentialRampToValueAtTime(493.88, ctx.currentTime + 0.18);
+
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start(ctx.currentTime);
+    osc2.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.7);
+    osc2.stop(ctx.currentTime + 0.7);
+  } catch (err) {
+    console.debug("Housekeeping chime suppressed:", err);
+  }
+}

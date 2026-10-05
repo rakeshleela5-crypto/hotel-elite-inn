@@ -883,6 +883,24 @@ export default function ReceptionAdmin({
     // 1. Release room to Vacant Dirty (Owner requirement: "automatic ga Dirty ani padatadi")
     onUpdateRoomStatus(payload.roomNumber, 'Vacant Dirty', null, null);
 
+    // 1a. Broadcast to Housekeeping Mobile Portal (Turns room Dirty & alerts Manager/Supervisor)
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+        hkChannel.postMessage({
+          type: 'ROOM_CHECKOUT',
+          payload: {
+            roomNumber: payload.roomNumber,
+            guestName: payload.guestName || 'Checked-out Guest',
+            checkoutTime: new Date().toISOString()
+          }
+        });
+        hkChannel.close();
+      }
+    } catch(e) {
+      console.warn('HK checkout broadcast error:', e);
+    }
+
     // 1b. The Wild Oasis Protocol: Automated Housekeeping Turnover Task Dispatch
     const floorNum = Math.floor(Number(payload.roomNumber) / 100) || 2;
     const attendant = floorAttendants[floorNum]?.name || 'Floor Attendant';
@@ -1258,6 +1276,31 @@ export default function ReceptionAdmin({
       if (channel) channel.close();
     };
   }, []);
+
+  // Live Housekeeping Real-Time Sync Listener from Mobile Portal
+  useEffect(() => {
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+      channel.onmessage = (event) => {
+        const { type, payload } = event.data || {};
+        if (type === 'ROOM_CLEANED' && payload?.roomNumber) {
+          if (onUpdateRoomStatus) {
+            onUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
+          }
+          showToast(`✨ ROOM ${payload.roomNumber} CLEANED & INSPECTED by ${payload.cleanedBy || 'Housekeeping Staff'}! Room is now Available (Green).`);
+        } else if (type === 'ROOM_STATUS_UPDATE' && payload?.roomNumber) {
+          if (payload.newStatus === 'Cleaning' && onUpdateRoomStatus) {
+            onUpdateRoomStatus(payload.roomNumber, 'Under Cleaning', null, null);
+            showToast(`🧹 Room ${payload.roomNumber} is now Under Cleaning by ${payload.updatedBy || 'Staff'}`);
+          }
+        }
+      };
+    }
+    return () => {
+      if (channel) channel.close();
+    };
+  }, [onUpdateRoomStatus]);
 
   // Block Rooms Modal State (Screenshot 10 - block_rooms.php)
   const [blockRoomOpen, setBlockRoomOpen] = useState(false);

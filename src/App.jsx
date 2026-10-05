@@ -56,6 +56,7 @@ const AuditedRestaurantRegisterModal = lazyWithRetry(() => import('./components/
 const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMobileOrderPad'));
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
+const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
@@ -87,6 +88,20 @@ export default function App() {
     if (typeof window === 'undefined') return false;
     const params = new URLSearchParams(window.location.search);
     return params.get('view') === 'kds' || params.get('view') === 'kitchen' || params.get('portal') === 'kitchen';
+  });
+
+  // Dedicated Housekeeping Mobile Portal View (Manager & Supervisor)
+  const [housekeepingPortalOpen, setHousekeepingPortalOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'housekeeping' || params.get('portal') === 'housekeeping';
+  });
+
+  const [housekeepingStaffRole, setHousekeepingStaffRole] = useState(() => {
+    if (typeof window === 'undefined') return 'MANAGER';
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = (params.get('role') || '').toUpperCase();
+    return roleParam === 'SUPERVISOR' ? 'SUPERVISOR' : 'MANAGER';
   });
 
   const [stewardQrModalOpen, setStewardQrModalOpen] = useState(false);
@@ -508,6 +523,27 @@ export default function App() {
   const handleRequestRoomServiceFromGuestPortal = (newReq) => {
     setRoomServices(prev => [newReq, ...prev]);
 
+    // Broadcast immediately to Housekeeping Manager & Supervisor mobile portals
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+        hkChannel.postMessage({
+          type: 'ROOM_SERVICE_REQUEST',
+          payload: {
+            roomNumber: newReq.roomNumber,
+            serviceType: newReq.serviceType,
+            description: newReq.description,
+            priority: newReq.priority || 'Normal',
+            guestName: newReq.guestName || `Room ${newReq.roomNumber} Guest`,
+            requestId: newReq.requestId
+          }
+        });
+        hkChannel.close();
+      }
+    } catch (e) {
+      console.warn('HK broadcast room service error:', e);
+    }
+
     // Post to Cloudflare D1 via public guest action
     fetch('/api/sync', {
       method: 'POST',
@@ -749,6 +785,32 @@ export default function App() {
     }).catch(() => {});
   };
 
+  // Live Housekeeping Real-Time Sync via BroadcastChannel (turns rooms Green when Cleaned)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('BroadcastChannel' in window)) return;
+    let channel = null;
+    try {
+      channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+      channel.onmessage = (event) => {
+        const { type, payload } = event.data || {};
+        if (type === 'ROOM_CLEANED' && payload?.roomNumber) {
+          handleUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
+        } else if (type === 'ROOM_STATUS_UPDATE' && payload?.roomNumber) {
+          if (payload.newStatus === 'Cleaning') {
+            handleUpdateRoomStatus(payload.roomNumber, 'Under Cleaning', null, null);
+          }
+        } else if ((type === 'ROOM_CHECKOUT' || type === 'ROOM_DIRTY') && payload?.roomNumber) {
+          handleUpdateRoomStatus(payload.roomNumber, 'Vacant Dirty', null, null);
+        }
+      };
+    } catch (e) {
+      console.warn('HK BroadcastChannel setup error in App:', e);
+    }
+    return () => {
+      if (channel) channel.close();
+    };
+  }, []);
+
   const handleRunNightAudit = () => {
     setNightAuditModalOpen(true);
   };
@@ -981,6 +1043,23 @@ export default function App() {
         <KitchenDisplayKDS 
           onClose={() => {
             setKitchenKdsOpen(false);
+            if (typeof window !== 'undefined' && window.history) {
+              window.history.pushState({}, '', window.location.pathname);
+            }
+          }}
+        />
+      </Suspense>
+    );
+  }
+
+  // Dedicated Housekeeping Mobile Portal View (Triggered via Housekeeping QR code or /?view=housekeeping)
+  if (housekeepingPortalOpen) {
+    return (
+      <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Housekeeping Mobile Portal...</div>}>
+        <HousekeepingMobilePortal 
+          staffRole={housekeepingStaffRole}
+          onClose={() => {
+            setHousekeepingPortalOpen(false);
             if (typeof window !== 'undefined' && window.history) {
               window.history.pushState({}, '', window.location.pathname);
             }

@@ -6,6 +6,7 @@ import {
   Utensils, Wifi, Bed, Download
 } from 'lucide-react';
 import { RECOGNIZED_STEWARDS } from './StewardMobileOrderPad';
+import { HOUSEKEEPING_STAFF } from './HousekeepingMobilePortal';
 import { HOTEL_CONFIG } from '../data/hotelData';
 
 // All 27 rooms across 3 floors
@@ -216,7 +217,7 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
                 Hotel Elite Inn — Complete QR Code Hub
               </h3>
               <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                6 Steward Badges + 1 Kitchen KDS + 27 Room QR Codes — All in One Place
+                6 Steward Badges + 1 Kitchen KDS + 2 Housekeeping + 27 Room QR Codes — All in One Place
               </div>
             </div>
           </div>
@@ -284,6 +285,29 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
           >
             <ChefHat size={15} />
             🍳 Kitchen KDS (1)
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedTab('housekeeping')}
+            style={{
+              flex: '1 1 auto',
+              padding: '0.55rem 0.75rem',
+              borderRadius: '8px',
+              fontSize: '0.82rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              background: selectedTab === 'housekeeping' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.04)',
+              border: selectedTab === 'housekeeping' ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.08)',
+              color: selectedTab === 'housekeeping' ? '#34d399' : '#94a3b8'
+            }}
+          >
+            <Sparkles size={15} />
+            🧹 Housekeeping (2)
           </button>
 
           <button
@@ -449,6 +473,64 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
               </div>
             </div>
           )}
+
+          {/* ========== TAB 4: HOUSEKEEPING MOBILE PORTALS ========== */}
+          {selectedTab === 'housekeeping' && (
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Sparkles size={14} color="#10b981" />
+                HOUSEKEEPING MOBILE PORTAL BADGES — Manager & Supervisor scan their badge to track dirty rooms, receive guest service chimes, and mark rooms clean (turns reception green instantly)
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '1rem',
+                maxWidth: '650px'
+              }}>
+                <QrBadgeCard
+                  label="HK MANAGER: Anita Majhi"
+                  sublabel="Housekeeping Manager • Full Turnover Control"
+                  url={`${origin}/?view=housekeeping&role=MANAGER`}
+                  colorAccent="#10b981"
+                  icon="👩‍💼"
+                  badgeCode="HK-MGR-01"
+                  darkColor="#064e3b"
+                />
+
+                <QrBadgeCard
+                  label="HK SUPERVISOR: Bikram Mohanty"
+                  sublabel="Housekeeping Supervisor • Floor Inspections"
+                  url={`${origin}/?view=housekeeping&role=SUPERVISOR`}
+                  colorAccent="#38bdf8"
+                  icon="👨‍🔧"
+                  badgeCode="HK-SUP-01"
+                  darkColor="#0c4a6e"
+                />
+              </div>
+
+              <div style={{
+                marginTop: '1.5rem',
+                padding: '1rem',
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                borderRadius: '8px',
+                fontSize: '0.78rem',
+                color: '#6ee7b7',
+                lineHeight: 1.5
+              }}>
+                <strong>✨ How the Housekeeping Turnover Lifecycle Works:</strong>
+                <ul style={{ margin: '0.5rem 0 0 1.2rem', padding: 0 }}>
+                  <li><strong>Room Checkout:</strong> When Reception checks out a guest, the room turns 🔴 <strong>Vacant Dirty</strong> automatically.</li>
+                  <li><strong>Instant Alert:</strong> Manager (Anita Majhi) & Supervisor (Bikram Mohanty) receive an audio chime and notification on their mobile.</li>
+                  <li><strong>Turnover:</strong> Staff taps <strong>"Start Cleaning"</strong> (yellow) on their phone.</li>
+                  <li><strong>Turnover Cleaned:</strong> When finished, staff taps <strong>"Mark Clean & Inspected"</strong> (green).</li>
+                  <li><strong>Zero-Refresh Green on Reception:</strong> The reception desktop turns the room 🟢 <strong>Green (Available)</strong> immediately via BroadcastChannel!</li>
+                  <li><strong>Guest QR Requests:</strong> When guests scan the room QR and request towels/water/repairs, a prompt chime alerts the mobile portal.</li>
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer with Print & Summary */}
@@ -464,7 +546,7 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
           flexShrink: 0
         }}>
           <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-            <strong style={{ color: '#fbbf24' }}>{RECOGNIZED_STEWARDS.length} Steward</strong> + <strong style={{ color: '#ef4444' }}>1 Kitchen</strong> + <strong style={{ color: '#38bdf8' }}>{ALL_ROOMS.length} Room</strong> QR Codes = <strong style={{ color: '#fff' }}>{RECOGNIZED_STEWARDS.length + 1 + ALL_ROOMS.length} Total</strong>
+            <strong style={{ color: '#fbbf24' }}>{RECOGNIZED_STEWARDS.length} Steward</strong> + <strong style={{ color: '#ef4444' }}>1 Kitchen</strong> + <strong style={{ color: '#10b981' }}>2 Housekeeping</strong> + <strong style={{ color: '#38bdf8' }}>{ALL_ROOMS.length} Room</strong> QR Codes = <strong style={{ color: '#fff' }}>{RECOGNIZED_STEWARDS.length + 1 + 2 + ALL_ROOMS.length} Total</strong>
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>
