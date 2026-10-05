@@ -49,11 +49,22 @@ export default function KitchenDisplayKDS({ onClose }) {
     }
   });
 
-  const [filterStatus, setFilterStatus] = useState('active'); // 'active', 'preparing', 'ready', 'all'
+  const [filterStatus, setFilterStatus] = useState('active'); // 'active', 'preparing', 'ready', 'running', 'all'
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [now, setNow] = useState(Date.now());
   const [newOrderNotice, setNewOrderNotice] = useState(null);
   const seenOrderIds = useRef(new Set(orders.map(o => o.id)));
+
+  // Running Table Folios (Shared with Desktop POS & Steward Mobiles)
+  const [tableSessions, setTableSessions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hotel_elite_inn_table_sessions');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [expandedTableHistory, setExpandedTableHistory] = useState({});
 
   // Update live clock every second for elapsed kitchen timers
   useEffect(() => {
@@ -86,6 +97,16 @@ export default function KitchenDisplayKDS({ onClose }) {
         if (event.data?.type === 'NEW_KOT_ORDER' && event.data.order) {
           handleNewOrder(event.data.order);
         }
+        if (event.data?.tableSessions) {
+          setTableSessions(event.data.tableSessions);
+        }
+        if (event.data?.type === 'TABLE_SETTLED' && event.data.settledTable) {
+          setTableSessions(prev => {
+            const next = { ...prev };
+            delete next[event.data.settledTable];
+            return next;
+          });
+        }
       };
     }
 
@@ -99,6 +120,11 @@ export default function KitchenDisplayKDS({ onClose }) {
               handleNewOrder(order);
             }
           });
+        } catch (err) {}
+      }
+      if (e.key === 'hotel_elite_inn_table_sessions' && e.newValue) {
+        try {
+          setTableSessions(JSON.parse(e.newValue));
         } catch (err) {}
       }
     };
@@ -174,11 +200,15 @@ export default function KitchenDisplayKDS({ onClose }) {
     if (filterStatus === 'active') return o.status !== 'Served';
     if (filterStatus === 'preparing') return o.status === 'Preparing';
     if (filterStatus === 'ready') return o.status === 'Ready';
+    if (filterStatus === 'running') {
+      return Boolean(o.isRunningKot || o.runningKotIndex > 1 || (tableSessions[o.tableNumber]?.kots?.length > 1));
+    }
     return true;
   });
 
   const preparingCount = orders.filter(o => o.status === 'Preparing').length;
   const readyCount = orders.filter(o => o.status === 'Ready').length;
+  const runningKotsCount = orders.filter(o => Boolean(o.isRunningKot || o.runningKotIndex > 1 || (tableSessions[o.tableNumber]?.kots?.length > 1))).length;
 
   return (
     <div style={{
@@ -291,6 +321,22 @@ export default function KitchenDisplayKDS({ onClose }) {
               }}
             >
               Ready ({readyCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterStatus('running')}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '6px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: filterStatus === 'running' ? '#f59e0b' : 'transparent',
+                color: filterStatus === 'running' ? '#000' : '#fbbf24'
+              }}
+            >
+              🔥 Running ({runningKotsCount})
             </button>
           </div>
 
@@ -414,8 +460,30 @@ export default function KitchenDisplayKDS({ onClose }) {
                     TABLE {order.tableNumber}
                   </div>
                   <div style={{ fontSize: '0.72rem', color: '#cbd5e1', marginTop: '3px' }}>
-                    {order.kotNumber} • Steward: <strong style={{ color: '#fbbf24' }}>{order.steward}</strong>
+                    KOT #{order.kotNumber || order.runningKotIndex || 1} • Steward: <strong style={{ color: '#fbbf24' }}>{order.steward}</strong>
                   </div>
+
+                  {Boolean(order.isRunningKot || order.runningKotIndex > 1 || (tableSessions[order.tableNumber]?.kots?.length > 1)) && (
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: '#000',
+                      fontSize: '0.68rem',
+                      fontWeight: 900,
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      marginTop: '4px',
+                      letterSpacing: '0.02em',
+                      boxShadow: '0 2px 8px rgba(245, 158, 11, 0.4)'
+                    }}>
+                      <span>🔥 RUNNING KOT #{order.runningKotIndex || order.kotNumber}</span>
+                      <span style={{ fontSize: '0.62rem', background: '#000', color: '#fbbf24', padding: '1px 5px', borderRadius: '8px' }}>
+                        REPEAT COURSE
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ textAlign: 'right' }}>
@@ -449,6 +517,45 @@ export default function KitchenDisplayKDS({ onClose }) {
                   color: '#fbbf24'
                 }}>
                   ⚠️ NOTE: {order.generalNote}
+                </div>
+              )}
+
+              {/* Earlier Courses Accordion for Table */}
+              {tableSessions[order.tableNumber]?.kots?.length > 1 && (
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
+                  padding: '0.45rem 1rem'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedTableHistory(prev => ({ ...prev, [order.id]: !prev[order.id] }))}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#fbbf24',
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: 0
+                    }}
+                  >
+                    <span>{expandedTableHistory[order.id] ? '▼ Hide' : '▶ Show'} Earlier Courses (Table {order.tableNumber} History)</span>
+                  </button>
+
+                  {expandedTableHistory[order.id] && (
+                    <div style={{ marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {tableSessions[order.tableNumber].kots.filter(k => (k.id !== order.id && k.kotNumber !== order.kotNumber)).map((pk, pIdx) => (
+                        <div key={pk.id || pIdx} style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                          <strong style={{ color: '#cbd5e1' }}>KOT #{pk.kotNumber || pIdx + 1} ({pk.timeFormatted || pk.time}):</strong>{' '}
+                          {(pk.items || []).map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 

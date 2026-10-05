@@ -345,6 +345,9 @@ export default function CannonKitchenPOS({
           const ord = event.data.order;
           playOrderAlert();
           showPosToast(`🔔 STEWARD PUNCH: ${ord.steward} sent KOT #${ord.kotNumber} for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
+          if (event.data.tableSessions) {
+            setRunningTableSessions(event.data.tableSessions);
+          }
         }
       };
     }
@@ -1034,6 +1037,18 @@ Thank you for dining at Cannon Kitchen! 🙏`;
         }
       })
     }).catch(err => console.debug('Settlement log:', err));
+
+    // Broadcast table settlement to Steward Order Pad & Kitchen KDS
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const ch = new BroadcastChannel('hotel_elite_inn_live_kds');
+        ch.postMessage({
+          type: 'TABLE_SETTLED',
+          settledTable: tableToSettle
+        });
+        ch.close();
+      }
+    } catch (e) {}
   };
 
   const handleSendSettlementWhatsApp = (customPhone = null) => {

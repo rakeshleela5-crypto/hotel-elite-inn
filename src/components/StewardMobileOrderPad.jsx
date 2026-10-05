@@ -44,7 +44,18 @@ export default function StewardMobileOrderPad({
   const [lastSubmittedKot, setLastSubmittedKot] = useState(null);
   const [showStewardSelector, setShowStewardSelector] = useState(false);
   const [showTableSelector, setShowTableSelector] = useState(false);
+  const [showRunningTabModal, setShowRunningTabModal] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+
+  // Running Table Folios (Shared with Desktop POS & Kitchen KDS)
+  const [runningTableSessions, setRunningTableSessions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('hotel_elite_inn_table_sessions');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
 
   // 86 Out of stock status
   const [outOfStockItems, setOutOfStockItems] = useState(() => {
@@ -56,16 +67,44 @@ export default function StewardMobileOrderPad({
     }
   });
 
-  // Listen to 86 changes
+  // Listen to 86 changes & BroadcastChannel for running table sessions
   useEffect(() => {
     const handleStorageChange = () => {
       try {
-        const saved = localStorage.getItem('hotel_elite_inn_pos_86_items');
-        if (saved) setOutOfStockItems(JSON.parse(saved));
+        const saved86 = localStorage.getItem('hotel_elite_inn_pos_86_items');
+        if (saved86) setOutOfStockItems(JSON.parse(saved86));
+        const savedSessions = localStorage.getItem('hotel_elite_inn_table_sessions');
+        if (savedSessions) setRunningTableSessions(JSON.parse(savedSessions));
       } catch (e) {}
     };
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel('hotel_elite_inn_live_kds');
+      channel.onmessage = (event) => {
+        const { type, tableSessions, settledTable } = event.data || {};
+        if (type === 'TABLE_SESSIONS_UPDATE' && tableSessions) {
+          setRunningTableSessions(tableSessions);
+        } else if (type === 'TABLE_SETTLED' && settledTable) {
+          setRunningTableSessions(prev => {
+            const next = { ...prev };
+            delete next[settledTable];
+            return next;
+          });
+        } else if (type === 'NEW_KOT_ORDER') {
+          try {
+            const saved = localStorage.getItem('hotel_elite_inn_table_sessions');
+            if (saved) setRunningTableSessions(JSON.parse(saved));
+          } catch (e) {}
+        }
+      };
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      if (channel) channel.close();
+    };
   }, []);
 
   const showToast = (msg) => {
@@ -162,6 +201,11 @@ export default function StewardMobileOrderPad({
     return cart.reduce((sum, item) => sum + item.quantity, 0);
   }, [cart]);
 
+  // Running KOT Session for selected table
+  const currentTableSession = runningTableSessions[tableNumber];
+  const isTableOccupied = Boolean(currentTableSession && currentTableSession.status === 'OCCUPIED' && (currentTableSession.kots?.length > 0));
+  const nextKotNumber = isTableOccupied ? (currentTableSession.kots?.length || 1) + 1 : 1;
+
   // Dispatch Live KOT to Kitchen & Reception
   const handleDispatchKot = async () => {
     if (cart.length === 0) return;
@@ -170,19 +214,24 @@ export default function StewardMobileOrderPad({
     const kotId = `KOT-${Date.now().toString().slice(-6)}`;
     const newKotOrder = {
       id: kotId,
-      kotNumber: kotId,
+      kotNumber: nextKotNumber,
+      kotId: kotId,
       tableNumber: tableNumber,
       orderType: orderType,
       steward: activeSteward,
+      captain: activeSteward,
       timestamp: new Date().toISOString(),
       timeFormatted: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       status: 'Preparing',
+      isRunningKot: isTableOccupied,
+      runningKotIndex: nextKotNumber,
       items: cart.map(c => ({
         id: c.dish.id,
         itemCode: c.dish.itemCode,
         name: c.dish.name,
         quantity: c.quantity,
         rate: c.dish.price,
+        price: c.dish.price,
         isVeg: c.dish.isVeg,
         note: c.note || cookingNote || ''
       })),
@@ -191,22 +240,72 @@ export default function StewardMobileOrderPad({
     };
 
     try {
-      // 1. Save to localStorage for instant cross-tab sync
+      // 1. Update running table sessions (Multi-KOT running folio)
+      const existingSessions = JSON.parse(localStorage.getItem('hotel_elite_inn_table_sessions') || '{}');
+      const tableSession = existingSessions[tableNumber] || {
+        sessionId: `SES-T${tableNumber}-${Date.now().toString().slice(-4)}`,
+        tableNumber: tableNumber,
+        outlet: orderType === 'terrace' ? 'Terrace Dining' : orderType === 'bar' ? 'Drop In Bar' : 'Cannon Kitchen',
+        guestName: `Table ${tableNumber} Guest`,
+        cover: 2,
+        status: 'OCCUPIED',
+        firstKotTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+        captain: activeSteward,
+        kots: [],
+        cumulativeItems: [],
+        subtotal: 0,
+        gst: 0,
+        netTotal: 0
+      };
+
+      // Append new KOT
+      tableSession.status = 'OCCUPIED';
+      tableSession.kots = [...(tableSession.kots || []), newKotOrder];
+
+      // Merge cumulative items
+      const cumMap = {};
+      (tableSession.cumulativeItems || []).forEach(it => {
+        cumMap[it.name] = { ...it, quantity: Number(it.quantity) || 1 };
+      });
+      newKotOrder.items.forEach(it => {
+        if (cumMap[it.name]) {
+          cumMap[it.name].quantity += it.quantity;
+        } else {
+          cumMap[it.name] = { name: it.name, quantity: it.quantity, price: it.rate };
+        }
+      });
+      tableSession.cumulativeItems = Object.values(cumMap);
+
+      // Recompute running financial totals (5% GST for F&B)
+      const newGross = tableSession.cumulativeItems.reduce((acc, it) => acc + (it.quantity * (it.price || it.rate || 0)), 0);
+      tableSession.subtotal = Math.round((newGross / 1.05) * 100) / 100;
+      tableSession.gst = Math.round((newGross - tableSession.subtotal) * 100) / 100;
+      tableSession.netTotal = newGross;
+
+      const updatedSessions = {
+        ...existingSessions,
+        [tableNumber]: tableSession
+      };
+      localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(updatedSessions));
+      setRunningTableSessions(updatedSessions);
+
+      // 2. Save to live KOTs list
       const existingKots = JSON.parse(localStorage.getItem('hotel_elite_inn_live_kots') || '[]');
       const updatedKots = [newKotOrder, ...existingKots].slice(0, 100);
       localStorage.setItem('hotel_elite_inn_live_kots', JSON.stringify(updatedKots));
 
-      // 2. Broadcast via BroadcastChannel (zero-latency instant sync to KDS & Reception)
+      // 3. Broadcast via BroadcastChannel (zero-latency instant sync to KDS & Reception)
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('hotel_elite_inn_live_kds');
         channel.postMessage({
           type: 'NEW_KOT_ORDER',
-          order: newKotOrder
+          order: newKotOrder,
+          tableSessions: updatedSessions
         });
         channel.close();
       }
 
-      // 3. Dispatch to Cloudflare D1 Sync
+      // 4. Dispatch to Cloudflare D1 Sync
       const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
       fetch('/api/sync', {
         method: 'POST',
@@ -217,7 +316,7 @@ export default function StewardMobileOrderPad({
         })
       }).catch(err => console.warn('Offline KOT sync fallback:', err));
 
-      // 4. Success UI
+      // 5. Success UI
       playSuccessChime();
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
         navigator.vibrate([100, 100, 200]);
@@ -225,7 +324,10 @@ export default function StewardMobileOrderPad({
       setLastSubmittedKot(newKotOrder);
       setCart([]);
       setCookingNote('');
-      showToast(`🚀 ${kotId} sent to Kitchen Display for Table ${tableNumber}!`);
+      showToast(isTableOccupied 
+        ? `🔥 Running KOT #${nextKotNumber} sent to Kitchen for Table ${tableNumber}! Running: ₹${newGross}` 
+        : `🚀 KOT #1 sent to Kitchen for Table ${tableNumber}!`
+      );
     } catch (err) {
       console.error('Error dispatching KOT:', err);
       showToast('⚠️ Could not dispatch order. Please retry.');
@@ -377,6 +479,55 @@ export default function StewardMobileOrderPad({
           </button>
         </div>
       </div>
+
+      {/* Running KOT Active Banner */}
+      {isTableOccupied && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(217, 119, 6, 0.24))',
+          borderBottom: '1px solid rgba(245, 158, 11, 0.4)',
+          padding: '0.45rem 0.85rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '0.5rem'
+        }}>
+          <div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>🔥 RUNNING KOT ACTIVE</span>
+              <span style={{ fontSize: '0.62rem', background: '#f59e0b', color: '#000', padding: '1px 6px', borderRadius: '10px', fontWeight: 900 }}>
+                Next: KOT #{nextKotNumber}
+              </span>
+            </div>
+            <div style={{ fontSize: '0.68rem', color: '#cbd5e1', marginTop: '2px' }}>
+              {currentTableSession.kots?.length} prior ticket(s) • Running Total: <strong style={{ color: '#38bdf8' }}>₹{currentTableSession.netTotal || currentTableSession.subtotal}</strong>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowRunningTabModal(true)}
+            style={{
+              background: '#f59e0b',
+              border: 'none',
+              color: '#000',
+              fontWeight: 900,
+              fontSize: '0.72rem',
+              padding: '5px 9px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            <span>📋 View Tab</span>
+            <span style={{ background: '#000', color: '#fbbf24', padding: '1px 5px', borderRadius: '8px', fontSize: '0.62rem' }}>
+              {currentTableSession.cumulativeItems?.length || 0}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Fast Dish Search Bar */}
       <div style={{ padding: '0.5rem 0.85rem 0.35rem', background: '#090d16' }}>
@@ -647,11 +798,13 @@ export default function StewardMobileOrderPad({
               onClick={handleDispatchKot}
               style={{
                 flex: 1,
-                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                background: isTableOccupied
+                  ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 border: 'none',
-                color: '#000',
+                color: isTableOccupied ? '#000' : '#fff',
                 fontWeight: 900,
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 padding: '0.75rem',
                 borderRadius: '8px',
                 cursor: 'pointer',
@@ -659,11 +812,17 @@ export default function StewardMobileOrderPad({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '0.45rem',
-                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)'
+                boxShadow: isTableOccupied ? '0 4px 15px rgba(245, 158, 11, 0.4)' : '0 4px 15px rgba(16, 185, 129, 0.4)'
               }}
             >
               <Send size={16} />
-              <span>{isSubmitting ? 'Sending...' : '🚀 SEND KOT TO KITCHEN'}</span>
+              <span>
+                {isSubmitting
+                  ? 'Dispatching...'
+                  : isTableOccupied
+                  ? `➕ SEND RUNNING KOT #${nextKotNumber}`
+                  : '🚀 SEND KOT #1 TO KITCHEN'}
+              </span>
             </button>
           </div>
         </div>
@@ -778,30 +937,51 @@ export default function StewardMobileOrderPad({
                 GROUND FLOOR DINING (TABLES 1 - 18)
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem', marginBottom: '1rem' }}>
-                {Array.from({ length: 18 }, (_, i) => String(i + 1)).map(num => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => {
-                      setTableNumber(num);
-                      setOrderType('dining');
-                      setShowTableSelector(false);
-                      showToast(`Selected Table ${num}`);
-                    }}
-                    style={{
-                      padding: '0.65rem',
-                      borderRadius: '6px',
-                      fontSize: '0.85rem',
-                      fontWeight: 800,
-                      background: tableNumber === num ? '#38bdf8' : 'rgba(255,255,255,0.06)',
-                      color: tableNumber === num ? '#000' : '#fff',
-                      border: tableNumber === num ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    T-{num}
-                  </button>
-                ))}
+                {Array.from({ length: 18 }, (_, i) => String(i + 1)).map(num => {
+                  const sess = runningTableSessions[num];
+                  const hasActive = Boolean(sess && sess.status === 'OCCUPIED' && (sess.kots?.length > 0));
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => {
+                        setTableNumber(num);
+                        setOrderType('dining');
+                        setShowTableSelector(false);
+                        showToast(`Selected Table ${num}${hasActive ? ` (Running Tab ₹${sess.netTotal || sess.subtotal})` : ''}`);
+                      }}
+                      style={{
+                        padding: '0.55rem 0.35rem',
+                        borderRadius: '6px',
+                        fontSize: '0.85rem',
+                        fontWeight: 800,
+                        background: tableNumber === num 
+                          ? '#38bdf8' 
+                          : hasActive 
+                          ? 'rgba(245, 158, 11, 0.2)' 
+                          : 'rgba(255,255,255,0.06)',
+                        color: tableNumber === num ? '#000' : hasActive ? '#fbbf24' : '#fff',
+                        border: tableNumber === num 
+                          ? '1.5px solid #38bdf8' 
+                          : hasActive 
+                          ? '1.5px solid #f59e0b' 
+                          : '1px solid rgba(255,255,255,0.1)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '2px'
+                      }}
+                    >
+                      <span>T-{num}</span>
+                      {hasActive && (
+                        <span style={{ fontSize: '0.6rem', color: tableNumber === num ? '#000' : '#fde047', fontWeight: 700 }}>
+                          ₹{sess.netTotal || sess.subtotal}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Terrace Dining */}
@@ -809,30 +989,51 @@ export default function StewardMobileOrderPad({
                 TERRACE DINING (1A - 13A)
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem', marginBottom: '1rem' }}>
-                {Array.from({ length: 13 }, (_, i) => `${i + 1}A`).map(num => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => {
-                      setTableNumber(num);
-                      setOrderType('terrace');
-                      setShowTableSelector(false);
-                      showToast(`Selected Terrace Table ${num}`);
-                    }}
-                    style={{
-                      padding: '0.65rem',
-                      borderRadius: '6px',
-                      fontSize: '0.82rem',
-                      fontWeight: 800,
-                      background: tableNumber === num ? '#10b981' : 'rgba(255,255,255,0.06)',
-                      color: tableNumber === num ? '#000' : '#fff',
-                      border: tableNumber === num ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {num}
-                  </button>
-                ))}
+                {Array.from({ length: 13 }, (_, i) => `${i + 1}A`).map(num => {
+                  const sess = runningTableSessions[num];
+                  const hasActive = Boolean(sess && sess.status === 'OCCUPIED' && (sess.kots?.length > 0));
+                  return (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => {
+                        setTableNumber(num);
+                        setOrderType('terrace');
+                        setShowTableSelector(false);
+                        showToast(`Selected Terrace Table ${num}`);
+                      }}
+                      style={{
+                        padding: '0.55rem 0.35rem',
+                        borderRadius: '6px',
+                        fontSize: '0.82rem',
+                        fontWeight: 800,
+                        background: tableNumber === num 
+                          ? '#10b981' 
+                          : hasActive 
+                          ? 'rgba(245, 158, 11, 0.2)' 
+                          : 'rgba(255,255,255,0.06)',
+                        color: tableNumber === num ? '#000' : hasActive ? '#fbbf24' : '#fff',
+                        border: tableNumber === num 
+                          ? '1.5px solid #10b981' 
+                          : hasActive 
+                          ? '1.5px solid #f59e0b' 
+                          : '1px solid rgba(255,255,255,0.1)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '2px'
+                      }}
+                    >
+                      <span>{num}</span>
+                      {hasActive && (
+                        <span style={{ fontSize: '0.6rem', color: tableNumber === num ? '#000' : '#fde047', fontWeight: 700 }}>
+                          ₹{sess.netTotal || sess.subtotal}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Bar Lounge & Specials */}
@@ -840,32 +1041,182 @@ export default function StewardMobileOrderPad({
                 DROP IN BAR &amp; STREET PARCEL
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem' }}>
-                {['1B', '2B', '3B', 'PARCEL', 'ROOM-SVC'].map(item => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() => {
-                      setTableNumber(item);
-                      setOrderType(item === 'PARCEL' ? 'takeaway' : item === 'ROOM-SVC' ? 'room' : 'bar');
-                      setShowTableSelector(false);
-                      showToast(`Selected ${item}`);
-                    }}
-                    style={{
-                      padding: '0.65rem',
-                      borderRadius: '6px',
-                      fontSize: '0.8rem',
-                      fontWeight: 800,
-                      background: tableNumber === item ? '#f59e0b' : 'rgba(255,255,255,0.06)',
-                      color: tableNumber === item ? '#000' : '#fff',
-                      border: tableNumber === item ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {item}
-                  </button>
+                {['1B', '2B', '3B', 'PARCEL', 'ROOM-SVC'].map(item => {
+                  const sess = runningTableSessions[item];
+                  const hasActive = Boolean(sess && sess.status === 'OCCUPIED' && (sess.kots?.length > 0));
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => {
+                        setTableNumber(item);
+                        setOrderType(item === 'PARCEL' ? 'takeaway' : item === 'ROOM-SVC' ? 'room' : 'bar');
+                        setShowTableSelector(false);
+                        showToast(`Selected ${item}`);
+                      }}
+                      style={{
+                        padding: '0.55rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 800,
+                        background: tableNumber === item 
+                          ? '#a855f7' 
+                          : hasActive 
+                          ? 'rgba(245, 158, 11, 0.2)' 
+                          : 'rgba(255,255,255,0.06)',
+                        color: tableNumber === item ? '#000' : hasActive ? '#fbbf24' : '#fff',
+                        border: tableNumber === item 
+                          ? '1.5px solid #a855f7' 
+                          : hasActive 
+                          ? '1.5px solid #f59e0b' 
+                          : '1px solid rgba(255,255,255,0.1)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Running Tab Modal (Guest asks: "Humara bill kitna hua?") */}
+      {showRunningTabModal && currentTableSession && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000000,
+          padding: '1rem',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: '#0f172a',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            borderRadius: '14px',
+            width: '100%',
+            maxWidth: 420,
+            maxHeight: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '1.25rem',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🪑 Table {tableNumber} Running Tab</span>
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                  Started: {currentTableSession.firstKotTime || 'Earlier'} • Captain: {currentTableSession.captain || activeSteward}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRunningTabModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Previous KOT Tickets Accordion */}
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '2px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700 }}>
+                KOT TICKETS DISPATCHED ({currentTableSession.kots?.length || 0})
+              </div>
+
+              {(currentTableSession.kots || []).map((k, idx) => (
+                <div key={k.id || idx} style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '8px',
+                  padding: '0.65rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#fbbf24' }}>
+                      KOT #{k.kotNumber || idx + 1} ({k.timeFormatted || k.time || 'Logged'})
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: '#64748b' }}>
+                      By {k.steward || k.captain}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    {(k.items || []).map((item, itemIdx) => (
+                      <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#cbd5e1' }}>
+                        <span>{item.quantity}x {item.name}</span>
+                        <span style={{ color: '#fff', fontWeight: 700 }}>₹{(Number(item.quantity) * Number(item.rate || item.price || 0)).toFixed(0)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Cumulative Items Summary */}
+              <div style={{
+                marginTop: '0.5rem',
+                background: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '8px',
+                padding: '0.75rem'
+              }}>
+                <div style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800, marginBottom: '0.4rem' }}>
+                  CUMULATIVE CONSUMPTION TOTALS
+                </div>
+                {(currentTableSession.cumulativeItems || []).map((ci, cIdx) => (
+                  <div key={cIdx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#cbd5e1', marginBottom: '2px' }}>
+                    <span>{ci.quantity}x {ci.name}</span>
+                    <span style={{ fontWeight: 700, color: '#fff' }}>₹{(Number(ci.quantity) * Number(ci.price || ci.rate || 0)).toFixed(0)}</span>
+                  </div>
                 ))}
               </div>
             </div>
+
+            {/* Financial Summary */}
+            <div style={{
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              paddingTop: '0.75rem',
+              marginTop: '0.75rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '3px' }}>
+                <span>Subtotal (Food):</span>
+                <span>₹{currentTableSession.subtotal?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '6px' }}>
+                <span>GST (5% F&B):</span>
+                <span>₹{currentTableSession.gst?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>
+                <span>Running Net Bill:</span>
+                <span style={{ color: '#10b981' }}>₹{currentTableSession.netTotal?.toFixed(0) || '0'}</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowRunningTabModal(false)}
+              style={{
+                marginTop: '0.85rem',
+                width: '100%',
+                padding: '0.65rem',
+                background: '#334155',
+                border: 'none',
+                color: '#fff',
+                fontWeight: 800,
+                fontSize: '0.8rem',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Close Running Tab
+            </button>
           </div>
         </div>
       )}
