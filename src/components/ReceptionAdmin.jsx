@@ -9665,7 +9665,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '6px', padding: '0.75rem', marginTop: '0.5rem', fontSize: '0.8rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#38bdf8', fontWeight: 700 }}>
                   <span>Total Day-Use Fee:</span>
-                  <span style={{ fontSize: '1.1rem' }}>₹{transitForm.tariff.toFixed(2)}</span>
+                  <span style={{ fontSize: '1.1rem' }}>₹{Number(transitForm?.tariff || 0).toFixed(2)}</span>
                 </div>
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem', marginTop: '0.2rem' }}>
                   Auto-scheduled checkout in {transitForm.hoursAllowed} hours. Room will be released to Housekeeping for evening corporate re-sale.

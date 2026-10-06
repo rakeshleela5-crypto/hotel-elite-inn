@@ -884,7 +884,7 @@ export default function StoreInventoryModal({
                               fontWeight: 700,
                               fontSize: '0.75rem'
                             }}>
-                              {((dish.totalFoodCost / dish.sellingPrice) * 100).toFixed(1)}%
+                              {Number(((dish.totalFoodCost || 0) / (dish.sellingPrice || 1)) * 100 || 0).toFixed(1)}%
                             </span>
                           </td>
                           <td style={{ padding: '0.75rem', textAlign: 'center' }}>
@@ -957,7 +957,7 @@ export default function StoreInventoryModal({
                             <span style={{ color: '#fff', fontWeight: 600 }}>{ing.name}</span>
                             <span style={{ color: 'var(--text-muted)', marginLeft: '6px' }}>({ing.qty})</span>
                           </div>
-                          <span style={{ color: '#34d399', fontWeight: 700 }}>₹{ing.cost.toFixed(2)}</span>
+                          <span style={{ color: '#34d399', fontWeight: 700 }}>₹{Number(ing?.cost || 0).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -976,11 +976,11 @@ export default function StoreInventoryModal({
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8' }}>
                       <span>Total Raw Material Cost:</span>
-                      <span style={{ color: '#f87171', fontWeight: 700 }}>₹{currentRecipe.totalFoodCost.toFixed(2)}</span>
+                      <span style={{ color: '#f87171', fontWeight: 700 }}>₹{Number(currentRecipe?.totalFoodCost || 0).toFixed(2)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8' }}>
                       <span>Gross Profit Contribution:</span>
-                      <span style={{ color: '#34d399', fontWeight: 700 }}>₹{(currentRecipe.sellingPrice - currentRecipe.totalFoodCost).toFixed(2)}</span>
+                      <span style={{ color: '#34d399', fontWeight: 700 }}>₹{Number((currentRecipe?.sellingPrice || 0) - (currentRecipe?.totalFoodCost || 0)).toFixed(2)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dotted rgba(255,255,255,0.1)', paddingTop: '4px', marginTop: '2px', fontWeight: 800 }}>
                       <span style={{ color: '#fff' }}>Gross Profit Margin:</span>

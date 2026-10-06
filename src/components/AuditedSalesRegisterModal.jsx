@@ -271,24 +271,24 @@ export default function AuditedSalesRegisterModal({
   const handleCopyStatutoryBox = () => {
     const text = `HOTEL ELITE INN — STATUTORY DUAL TAX RECONCILIATION (EXCEL ROWS 229-232)
 ROOM RENT RECONCILIATION (5% GST - SAC 996311):
-- Gross Room Rent (Col E): ₹${statutoryValues.roomRent.toFixed(2)}
-- Less Discount (Col N): ₹${statutoryValues.discount.toFixed(2)}
-- Net Taxable Room Tariff (G230 = E230 - F230): ₹${statutoryValues.netRoom.toFixed(2)}
-- Output CGST @ 2.5% (H230 = G230 * 2.5%): ₹${statutoryValues.cgstRoom.toFixed(2)}
-- Output SGST @ 2.5% (I230 = G230 * 2.5%): ₹${statutoryValues.sgstRoom.toFixed(2)}
-- Total Room Accommodation Supply (J230 = G230 + H230 + I230): ₹${statutoryValues.totalRoom.toFixed(2)}
+- Gross Room Rent (Col E): ₹${Number(statutoryValues?.roomRent || 0).toFixed(2)}
+- Less Discount (Col N): ₹${Number(statutoryValues?.discount || 0).toFixed(2)}
+- Net Taxable Room Tariff (G230 = E230 - F230): ₹${Number(statutoryValues?.netRoom || 0).toFixed(2)}
+- Output CGST @ 2.5% (H230 = G230 * 2.5%): ₹${Number(statutoryValues?.cgstRoom || 0).toFixed(2)}
+- Output SGST @ 2.5% (I230 = G230 * 2.5%): ₹${Number(statutoryValues?.sgstRoom || 0).toFixed(2)}
+- Total Room Accommodation Supply (J230 = G230 + H230 + I230): ₹${Number(statutoryValues?.totalRoom || 0).toFixed(2)}
 
 LAUNDRY RECONCILIATION (18% GST - SAC 996333):
-- Net Taxable Laundry Base (E232 Reverse calculated 18%): ₹${statutoryValues.laundryBase.toFixed(2)}
-- Output CGST @ 9% (F232 = E232 * 9%): ₹${statutoryValues.cgstLaundry.toFixed(4)}
-- Output SGST @ 9% (G232 = E232 * 9%): ₹${statutoryValues.sgstLaundry.toFixed(4)}
-- Total Laundry Supply Gross (H232 = E232 + F232 + G232): ₹${statutoryValues.totalLaundry.toFixed(4)}
+- Net Taxable Laundry Base (E232 Reverse calculated 18%): ₹${Number(statutoryValues?.laundryBase || 0).toFixed(2)}
+- Output CGST @ 9% (F232 = E232 * 9%): ₹${Number(statutoryValues?.cgstLaundry || 0).toFixed(4)}
+- Output SGST @ 9% (G232 = E232 * 9%): ₹${Number(statutoryValues?.sgstLaundry || 0).toFixed(4)}
+- Total Laundry Supply Gross (H232 = E232 + F232 + G232): ₹${Number(statutoryValues?.totalLaundry || 0).toFixed(4)}
 
 F&B ROOM SERVICE (5% RESTAURANT GST - SAC 996331):
-- Gross Food & Beverage Billed (Col K): ₹${statutoryValues.fnbGross.toFixed(2)}
+- Gross Food & Beverage Billed (Col K): ₹${Number(statutoryValues?.fnbGross || 0).toFixed(2)}
 
 GRAND RECONCILIATION:
-- Room Supply (₹${statutoryValues.totalRoom.toFixed(2)}) + Laundry Supply (₹${statutoryValues.totalLaundry.toFixed(2)}) + F&B Supply (₹${statutoryValues.fnbGross.toFixed(2)}) = ₹${statutoryValues.grandGrossSupply.toFixed(2)} + Rounding Buffer = ₹${statutoryValues.auditedNet.toFixed(2)} (Net Amount)`;
+- Room Supply (₹${Number(statutoryValues?.totalRoom || 0).toFixed(2)}) + Laundry Supply (₹${Number(statutoryValues?.totalLaundry || 0).toFixed(2)}) + F&B Supply (₹${Number(statutoryValues?.fnbGross || 0).toFixed(2)}) = ₹${Number(statutoryValues?.grandGrossSupply || 0).toFixed(2)} + Rounding Buffer = ₹${Number(statutoryValues?.auditedNet || 0).toFixed(2)} (Net Amount)`;
 
     navigator.clipboard.writeText(text);
     setCopiedNotice(true);
@@ -375,12 +375,12 @@ GRAND RECONCILIATION:
             </thead>
             <tbody>
               <tr>
-                <td>₹${statutoryValues.roomRent.toFixed(2)}</td>
-                <td>₹${statutoryValues.discount.toFixed(2)}</td>
-                <td>₹${statutoryValues.netRoom.toFixed(2)}</td>
-                <td>₹${statutoryValues.cgstRoom.toFixed(2)}</td>
-                <td>₹${statutoryValues.sgstRoom.toFixed(2)}</td>
-                <td>₹${statutoryValues.totalRoom.toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.roomRent || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.discount || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.netRoom || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.cgstRoom || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.sgstRoom || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.totalRoom || 0).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -397,21 +397,21 @@ GRAND RECONCILIATION:
             </thead>
             <tbody>
               <tr>
-                <td>₹${statutoryValues.laundryBase.toFixed(2)}</td>
-                <td>₹${statutoryValues.cgstLaundry.toFixed(4)}</td>
-                <td>₹${statutoryValues.sgstLaundry.toFixed(4)}</td>
-                <td>₹${statutoryValues.totalLaundry.toFixed(4)}</td>
+                <td>₹${Number(statutoryValues?.laundryBase || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.cgstLaundry || 0).toFixed(4)}</td>
+                <td>₹${Number(statutoryValues?.sgstLaundry || 0).toFixed(4)}</td>
+                <td>₹${Number(statutoryValues?.totalLaundry || 0).toFixed(4)}</td>
               </tr>
             </tbody>
           </table>
 
           <div class="summary-box">
             <strong>THREE-WAY TURNOVER BALANCING & AUDIT PROOF:</strong><br/>
-            • Room Supply (Base + 5% GST): <strong>₹${statutoryValues.totalRoom.toFixed(2)}</strong><br/>
-            • Laundry Supply (Base + 18% GST): <strong>₹${statutoryValues.totalLaundry.toFixed(2)}</strong><br/>
-            • Cannon Kitchen Food & Beverage (SAC 996331): <strong>₹${statutoryValues.fnbGross.toFixed(2)}</strong><br/>
-            • Total Supply Reconciled: <strong>₹${statutoryValues.grandGrossSupply.toFixed(2)}</strong><br/>
-            • <strong>Grand Reconciled Net Turnover (With Rounding Buffer): ₹${statutoryValues.auditedNet.toFixed(2)} (0.00 Variance)</strong>
+            • Room Supply (Base + 5% GST): <strong>₹${Number(statutoryValues?.totalRoom || 0).toFixed(2)}</strong><br/>
+            • Laundry Supply (Base + 18% GST): <strong>₹${Number(statutoryValues?.totalLaundry || 0).toFixed(2)}</strong><br/>
+            • Cannon Kitchen Food & Beverage (SAC 996331): <strong>₹${Number(statutoryValues?.fnbGross || 0).toFixed(2)}</strong><br/>
+            • Total Supply Reconciled: <strong>₹${Number(statutoryValues?.grandGrossSupply || 0).toFixed(2)}</strong><br/>
+            • <strong>Grand Reconciled Net Turnover (With Rounding Buffer): ₹${Number(statutoryValues?.auditedNet || 0).toFixed(2)} (0.00 Variance)</strong>
           </div>
 
           <div class="signatures">
@@ -462,24 +462,24 @@ GRAND RECONCILIATION:
       r.date,
       `#${r.billNo}`,
       r.roomNo,
-      r.rent.toFixed(2),
-      r.cgst.toFixed(2),
-      r.sgst.toFixed(2),
-      r.misc.toFixed(2),
-      r.laundry.toFixed(2),
-      r.minibar.toFixed(2),
-      r.roomService.toFixed(2),
-      r.netAmount.toFixed(2),
-      r.advance.toFixed(2),
-      r.discount.toFixed(2),
-      r.complimentary.toFixed(2),
-      r.voidAmt.toFixed(2),
-      (r.allowances || 0).toFixed(2),
-      (r.paidOut || 0).toFixed(2),
-      r.cash.toFixed(2),
-      r.btc.toFixed(2),
-      r.cc.toFixed(2),
-      r.online.toFixed(2),
+      Number(r.rent || 0).toFixed(2),
+      Number(r.cgst || 0).toFixed(2),
+      Number(r.sgst || 0).toFixed(2),
+      Number(r.misc || 0).toFixed(2),
+      Number(r.laundry || 0).toFixed(2),
+      Number(r.minibar || 0).toFixed(2),
+      Number(r.roomService || 0).toFixed(2),
+      Number(r.netAmount || 0).toFixed(2),
+      Number(r.advance || 0).toFixed(2),
+      Number(r.discount || 0).toFixed(2),
+      Number(r.complimentary || 0).toFixed(2),
+      Number(r.voidAmt || 0).toFixed(2),
+      Number(r.allowances || 0).toFixed(2),
+      Number(r.paidOut || 0).toFixed(2),
+      Number(r.cash || 0).toFixed(2),
+      Number(r.btc || 0).toFixed(2),
+      Number(r.cc || 0).toFixed(2),
+      Number(r.online || 0).toFixed(2),
       `"${r.remark.replace(/"/g, '""')}"`,
       `"${r.guestName.replace(/"/g, '""')}"`,
       `"${r.company.replace(/"/g, '""')}"`,
@@ -526,32 +526,32 @@ GRAND RECONCILIATION:
             <ALLLEDGERENTRIES.LIST>
               <LEDGERNAME>Sales - Room Accommodation (SAC 996311)</LEDGERNAME>
               <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-              <AMOUNT>-${r.rent.toFixed(2)}</AMOUNT>
+              <AMOUNT>-${Number(r.rent || 0).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>
             <ALLLEDGERENTRIES.LIST>
               <LEDGERNAME>Sales - Cannon Kitchen F&amp;B (SAC 996331)</LEDGERNAME>
               <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-              <AMOUNT>-${r.roomService.toFixed(2)}</AMOUNT>
+              <AMOUNT>-${Number(r.roomService || 0).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>
-            ${r.laundry > 0 ? `<ALLLEDGERENTRIES.LIST>
+            ${Number(r.laundry || 0) > 0 ? `<ALLLEDGERENTRIES.LIST>
               <LEDGERNAME>Sales - Laundry Cleaning (SAC 996333)</LEDGERNAME>
               <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-              <AMOUNT>-${(r.laundry / 1.18).toFixed(2)}</AMOUNT>
+              <AMOUNT>-${Number((r.laundry || 0) / 1.18).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>` : ''}
             <ALLLEDGERENTRIES.LIST>
               <LEDGERNAME>Output CGST 2.5%</LEDGERNAME>
               <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-              <AMOUNT>-${r.cgst.toFixed(2)}</AMOUNT>
+              <AMOUNT>-${Number(r.cgst || 0).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>
             <ALLLEDGERENTRIES.LIST>
               <LEDGERNAME>Output SGST 2.5%</LEDGERNAME>
               <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-              <AMOUNT>-${r.sgst.toFixed(2)}</AMOUNT>
+              <AMOUNT>-${Number(r.sgst || 0).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>
             <ALLLEDGERENTRIES.LIST>
-              <LEDGERNAME>${r.btc > 0 ? `Sundry Debtors - ${r.company}` : r.online > 0 ? 'Bank - UPI Merchant QR' : r.cc > 0 ? 'Bank - POS EDC Card' : 'Front Desk Cash Drawer'}</LEDGERNAME>
+              <LEDGERNAME>${Number(r.btc || 0) > 0 ? `Sundry Debtors - ${r.company}` : Number(r.online || 0) > 0 ? 'Bank - UPI Merchant QR' : Number(r.cc || 0) > 0 ? 'Bank - POS EDC Card' : 'Front Desk Cash Drawer'}</LEDGERNAME>
               <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-              <AMOUNT>${r.netAmount.toFixed(2)}</AMOUNT>
+              <AMOUNT>${Number(r.netAmount || 0).toFixed(2)}</AMOUNT>
             </ALLLEDGERENTRIES.LIST>
           </VOUCHER>
         </TALLYMESSAGE>\n`;
@@ -1128,7 +1128,7 @@ GRAND RECONCILIATION:
               ₹{activeKpis.rent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              {((activeKpis.rent / (activeKpis.totalNet || 1)) * 100).toFixed(1)}% of Revenue
+              {Number(((activeKpis?.rent || 0) / (activeKpis?.totalNet || 1)) * 100 || 0).toFixed(1)}% of Revenue
             </div>
           </div>
 
@@ -1531,28 +1531,28 @@ GRAND RECONCILIATION:
                         <td style={excelRowHeaderTd}>230</td>
                         <td style={excelEmptyTd}></td>
                         <td style={{ ...excelValueTd, borderLeft: '2.5px solid #000', borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=E226' : statutoryValues.roomRent.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.roomRent.toFixed(1)}</span>}
+                          {showFormulas ? '=E226' : Number(statutoryValues?.roomRent || 0).toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.roomRent || 0).toFixed(1)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=N226' : statutoryValues.discount.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.discount.toFixed(0)}</span>}
+                          {showFormulas ? '=N226' : Number(statutoryValues?.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.discount || 0).toFixed(0)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=E230-F230' : statutoryValues.netRoom.toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.netRoom.toFixed(1)}</span>}
+                          {showFormulas ? '=E230-F230' : Number(statutoryValues?.netRoom || 0).toLocaleString('en-IN', { minimumFractionDigits: 1, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.netRoom || 0).toFixed(1)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=G230*2.5%' : statutoryValues.cgstRoom.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.cgstRoom.toFixed(2)}</span>}
+                          {showFormulas ? '=G230*2.5%' : Number(statutoryValues?.cgstRoom || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.cgstRoom || 0).toFixed(2)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=G230*2.5%' : statutoryValues.sgstRoom.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.sgstRoom.toFixed(2)}</span>}
+                          {showFormulas ? '=G230*2.5%' : Number(statutoryValues?.sgstRoom || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.sgstRoom || 0).toFixed(2)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderRight: '2.5px solid #000', borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=G230+H230+I230' : statutoryValues.totalRoom.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.totalRoom.toFixed(2)}</span>}
+                          {showFormulas ? '=G230+H230+I230' : Number(statutoryValues?.totalRoom || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.totalRoom || 0).toFixed(2)}</span>}
                         </td>
                       </tr>
 
@@ -1581,20 +1581,20 @@ GRAND RECONCILIATION:
                         <td style={excelRowHeaderTd}>232</td>
                         <td style={excelEmptyTd}></td>
                         <td style={{ ...excelValueTd, borderLeft: '2.5px solid #000', borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '4067/1.18' : statutoryValues.laundryBase.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.laundryBase.toFixed(2)}</span>}
+                          {showFormulas ? '4067/1.18' : Number(statutoryValues?.laundryBase || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.laundryBase || 0).toFixed(2)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=E232*9%' : statutoryValues.cgstLaundry.toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.cgstLaundry.toFixed(4)}</span>}
+                          {showFormulas ? '=E232*9%' : Number(statutoryValues?.cgstLaundry || 0).toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.cgstLaundry || 0).toFixed(4)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=E232*9%' : statutoryValues.sgstLaundry.toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.sgstLaundry.toFixed(4)}</span>}
+                          {showFormulas ? '=E232*9%' : Number(statutoryValues?.sgstLaundry || 0).toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.sgstLaundry || 0).toFixed(4)}</span>}
                         </td>
                         <td style={{ ...excelValueTd, borderRight: '2.5px solid #000', borderBottom: '2.5px solid #000' }}>
-                          {showFormulas ? '=E232+F232+G232' : statutoryValues.totalLaundry.toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-                          {showFormulas && <span style={formulaSubtext}>{statutoryValues.totalLaundry.toFixed(4)}</span>}
+                          {showFormulas ? '=E232+F232+G232' : Number(statutoryValues?.totalLaundry || 0).toLocaleString('en-IN', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
+                          {showFormulas && <span style={formulaSubtext}>{Number(statutoryValues?.totalLaundry || 0).toFixed(4)}</span>}
                         </td>
                         <td style={excelEmptyTd}></td>
                         <td style={excelEmptyTd}></td>
@@ -1641,9 +1641,9 @@ GRAND RECONCILIATION:
                     </span>
                   </div>
                   <div style={{ color: '#cbd5e1', lineHeight: 1.35, fontSize: '0.68rem' }}>
-                    Gross Rent ₹{statutoryValues.roomRent.toFixed(2)} − Discount ₹{statutoryValues.discount.toFixed(2)} = Taxable Base <strong style={{ color: '#34d399' }}>₹{statutoryValues.netRoom.toFixed(2)}</strong>.
-                    Total Output GST = <strong style={{ color: '#fbbf24' }}>₹{(statutoryValues.cgstRoom + statutoryValues.sgstRoom).toFixed(2)}</strong>. 
-                    Gross Room Supply = <strong style={{ color: '#fff' }}>₹{statutoryValues.totalRoom.toFixed(2)}</strong>.
+                    Gross Rent ₹{Number(statutoryValues?.roomRent || 0).toFixed(2)} − Discount ₹{Number(statutoryValues?.discount || 0).toFixed(2)} = Taxable Base <strong style={{ color: '#34d399' }}>₹{Number(statutoryValues?.netRoom || 0).toFixed(2)}</strong>.
+                    Total Output GST = <strong style={{ color: '#fbbf24' }}>₹{(Number(statutoryValues?.cgstRoom || 0) + Number(statutoryValues?.sgstRoom || 0)).toFixed(2)}</strong>. 
+                    Gross Room Supply = <strong style={{ color: '#fff' }}>₹{Number(statutoryValues?.totalRoom || 0).toFixed(2)}</strong>.
                   </div>
                 </div>
 
@@ -1665,8 +1665,8 @@ GRAND RECONCILIATION:
                     </span>
                   </div>
                   <div style={{ color: '#cbd5e1', lineHeight: 1.35, fontSize: '0.68rem' }}>
-                    Guest bills record gross laundry (₹{statutoryValues.totalLaundry.toFixed(2)}). As statutory laundry is taxed @ 18%, 
-                    rows 231-232 back-calculate taxable base <strong style={{ color: '#a78bfa' }}>₹{statutoryValues.laundryBase.toFixed(2)}</strong> + 18% GST (<strong style={{ color: '#fbbf24' }}>₹{(statutoryValues.cgstLaundry + statutoryValues.sgstLaundry).toFixed(2)}</strong>) for GSTR-1 Table 12.
+                    Guest bills record gross laundry (₹{Number(statutoryValues?.totalLaundry || 0).toFixed(2)}). As statutory laundry is taxed @ 18%, 
+                    rows 231-232 back-calculate taxable base <strong style={{ color: '#a78bfa' }}>₹{Number(statutoryValues?.laundryBase || 0).toFixed(2)}</strong> + 18% GST (<strong style={{ color: '#fbbf24' }}>₹{(Number(statutoryValues?.cgstLaundry || 0) + Number(statutoryValues?.sgstLaundry || 0)).toFixed(2)}</strong>) for GSTR-1 Table 12.
                   </div>
                 </div>
 
@@ -1689,23 +1689,23 @@ GRAND RECONCILIATION:
                   <div style={{ color: '#e2e8f0', fontFamily: 'monospace', fontSize: '0.65rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Room Supply (Gross):</span>
-                      <strong style={{ color: '#34d399' }}>₹{statutoryValues.totalRoom.toFixed(2)}</strong>
+                      <strong style={{ color: '#34d399' }}>₹{Number(statutoryValues?.totalRoom || 0).toFixed(2)}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>+ Laundry Supply (Gross):</span>
-                      <strong style={{ color: '#a78bfa' }}>₹{statutoryValues.totalLaundry.toFixed(2)}</strong>
+                      <strong style={{ color: '#a78bfa' }}>₹{Number(statutoryValues?.totalLaundry || 0).toFixed(2)}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>+ Cannon Kitchen F&amp;B:</span>
-                      <strong style={{ color: '#f472b6' }}>₹{statutoryValues.fnbGross.toFixed(2)}</strong>
+                      <strong style={{ color: '#f472b6' }}>₹{Number(statutoryValues?.fnbGross || 0).toFixed(2)}</strong>
                     </div>
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '2px', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--gold-glow)' }}>= Total Supply Reconciled:</span>
-                      <strong style={{ color: 'var(--gold-glow)' }}>₹{statutoryValues.grandGrossSupply.toFixed(2)}</strong>
+                      <strong style={{ color: 'var(--gold-glow)' }}>₹{Number(statutoryValues?.grandGrossSupply || 0).toFixed(2)}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8' }}>
                       <span>Turnover with Rounding Buffer:</span>
-                      <strong style={{ color: '#38bdf8' }}>₹{statutoryValues.auditedNet.toFixed(2)} (Net Amt)</strong>
+                      <strong style={{ color: '#38bdf8' }}>₹{Number(statutoryValues?.auditedNet || 0).toFixed(2)} (Net Amt)</strong>
                     </div>
                   </div>
                 </div>
@@ -1974,58 +1974,58 @@ GRAND RECONCILIATION:
 
                         {/* Sold / Bills */}
                         <td style={{ ...standardTd, textAlign: 'center', fontFamily: 'monospace' }}>
-                          <span style={{ color: '#f8fafc', fontWeight: 700 }}>{d.occupiedKeys}</span>
+                          <span style={{ color: '#f8fafc', fontWeight: 700 }}>{d.occupiedKeys ?? d.roomsSold ?? 0}</span>
                           <span style={{ color: '#64748b' }}> / 26 keys • </span>
-                          <span style={{ color: '#38bdf8' }}>{d.billsCount} b</span>
+                          <span style={{ color: '#38bdf8' }}>{d.billsCount || 0} b</span>
                         </td>
 
                         {/* Departmental Revenue */}
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{d.roomRent.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{d.foodBill.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{d.bevBill.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{d.fnbTotal.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{d.laundry.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{Number(d.roomRent || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{Number(d.foodBill || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{Number(d.bevBill || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{Number(d.fnbTotal || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{Number(d.laundry || 0).toFixed(2)}</td>
 
                         {/* Deductions */}
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff', fontWeight: 700 }}>₹{d.grossAmount.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.discount > 0 ? '#f87171' : '#64748b' }}>
-                          {d.discount > 0 ? `₹${d.discount.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff', fontWeight: 700 }}>₹{Number(d.grossAmount || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.discount || 0) > 0 ? '#f87171' : '#64748b' }}>
+                          {Number(d.discount || 0) > 0 ? `₹${Number(d.discount).toFixed(2)}` : '0.00'}
                         </td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.management > 0 ? '#c084fc' : '#64748b' }} title="Exempt from GST under CGST Section 7">
-                          {d.management > 0 ? `₹${d.management.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.management || 0) > 0 ? '#c084fc' : '#64748b' }} title="Exempt from GST under CGST Section 7">
+                          {Number(d.management || 0) > 0 ? `₹${Number(d.management).toFixed(2)}` : '0.00'}
                         </td>
 
                         {/* Statutory GST */}
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.taxableBase.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.cgst.toFixed(2)}</td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.sgst.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(d.taxableBase || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(d.cgst || 0).toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(d.sgst || 0).toFixed(2)}</td>
                         <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', fontWeight: 800, fontSize: '0.78rem' }}>
-                          ₹{d.totalAmount.toFixed(2)}
+                          ₹{Number(d.totalAmount || 0).toFixed(2)}
                         </td>
 
                         {/* Collections */}
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.cash > 0 ? '#fbbf24' : '#64748b' }}>
-                          {d.cash !== 0 ? `₹${d.cash.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.cash ?? d.settlement?.cash ?? 0) > 0 ? '#fbbf24' : '#64748b' }}>
+                          {Number(d.cash ?? d.settlement?.cash ?? 0) !== 0 ? `₹${Number(d.cash ?? d.settlement?.cash ?? 0).toFixed(2)}` : '0.00'}
                         </td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.online > 0 ? '#34d399' : '#64748b' }}>
-                          {d.online > 0 ? `₹${d.online.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.online ?? d.settlement?.online ?? 0) > 0 ? '#34d399' : '#64748b' }}>
+                          {Number(d.online ?? d.settlement?.online ?? 0) > 0 ? `₹${Number(d.online ?? d.settlement?.online ?? 0).toFixed(2)}` : '0.00'}
                         </td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.card > 0 ? '#38bdf8' : '#64748b' }}>
-                          {d.card > 0 ? `₹${d.card.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.card ?? d.cc ?? d.settlement?.cc ?? 0) > 0 ? '#38bdf8' : '#64748b' }}>
+                          {Number(d.card ?? d.cc ?? d.settlement?.cc ?? 0) > 0 ? `₹${Number(d.card ?? d.cc ?? d.settlement?.cc ?? 0).toFixed(2)}` : '0.00'}
                         </td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.btc > 0 ? '#c084fc' : '#64748b' }}>
-                          {d.btc > 0 ? `₹${d.btc.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.btc ?? d.settlement?.btc ?? 0) > 0 ? '#c084fc' : '#64748b' }}>
+                          {Number(d.btc ?? d.settlement?.btc ?? 0) > 0 ? `₹${Number(d.btc ?? d.settlement?.btc ?? 0).toFixed(2)}` : '0.00'}
                         </td>
-                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.advance > 0 ? '#a78bfa' : '#64748b' }}>
-                          {d.advance > 0 ? `₹${d.advance.toFixed(2)}` : '0.00'}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(d.advance ?? d.settlement?.advance ?? 0) > 0 ? '#a78bfa' : '#64748b' }}>
+                          {Number(d.advance ?? d.settlement?.advance ?? 0) > 0 ? `₹${Number(d.advance ?? d.settlement?.advance ?? 0).toFixed(2)}` : '0.00'}
                         </td>
 
                         {/* Variance */}
                         <td style={{ ...standardTd, textAlign: 'center', fontFamily: 'monospace' }}>
-                          {Math.abs(d.variance) < 0.05 ? (
+                          {Math.abs(Number(d.variance || 0)) < 0.05 ? (
                             <span style={{ color: '#34d399', fontWeight: 800 }}>✓ 0.00</span>
                           ) : (
-                            <span style={{ color: '#f87171', fontWeight: 800 }}>⚠️ ₹{d.variance.toFixed(2)}</span>
+                            <span style={{ color: '#f87171', fontWeight: 800 }}>⚠️ ₹{Number(d.variance || 0).toFixed(2)}</span>
                           )}
                         </td>
 
@@ -2097,37 +2097,37 @@ GRAND RECONCILIATION:
                       {pmsDailyRecords.filter(d => d.billsCount > 0).length} Days Active
                     </td>
                     <td style={{ ...standardTd, textAlign: 'center', color: '#f8fafc', fontFamily: 'monospace' }}>
-                      {pmsMonthTotals.occupiedKeys} keys • {pmsMonthTotals.totalBills} b
+                      {pmsMonthTotals.occupiedKeys ?? pmsMonthTotals.roomsSold ?? 0} keys • {pmsMonthTotals.totalBills || 0} b
                     </td>
 
                     {/* Departmental Totals */}
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{pmsMonthTotals.roomRent.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{pmsMonthTotals.foodBill.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{pmsMonthTotals.bevBill.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{pmsMonthTotals.fnbTotal.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{pmsMonthTotals.laundry.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{Number(pmsMonthTotals.roomRent || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{Number(pmsMonthTotals.foodBill || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{Number(pmsMonthTotals.bevBill || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{Number(pmsMonthTotals.fnbTotal || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{Number(pmsMonthTotals.laundry || 0).toFixed(2)}</td>
 
                     {/* Deductions */}
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff' }}>₹{pmsMonthTotals.grossAmount.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>₹{pmsMonthTotals.discount.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }} title={`Tax Saved: ₹${pmsMonthTotals.taxSaved.toFixed(2)}`}>
-                      ₹{pmsMonthTotals.management.toFixed(2)}
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff' }}>₹{Number(pmsMonthTotals.grossAmount || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>₹{Number(pmsMonthTotals.discount || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }} title={`Tax Saved: ₹${Number(pmsMonthTotals.taxSaved || 0).toFixed(2)}`}>
+                      ₹{Number(pmsMonthTotals.management || 0).toFixed(2)}
                     </td>
 
                     {/* GST Apportionment */}
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.taxableBase.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.cgst.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.sgst.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(pmsMonthTotals.taxableBase || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(pmsMonthTotals.cgst || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(pmsMonthTotals.sgst || 0).toFixed(2)}</td>
                     <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', fontWeight: 800, fontSize: '0.82rem' }}>
-                      ₹{pmsMonthTotals.totalAmount.toFixed(2)}
+                      ₹{Number(pmsMonthTotals.totalAmount || 0).toFixed(2)}
                     </td>
 
                     {/* Collections */}
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>₹{pmsMonthTotals.cash.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{pmsMonthTotals.online.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.card.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }}>₹{pmsMonthTotals.btc.toFixed(2)}</td>
-                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{pmsMonthTotals.advance.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>₹{Number(pmsMonthTotals.cash || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{Number(pmsMonthTotals.online || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{Number(pmsMonthTotals.card ?? pmsMonthTotals.cc ?? 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }}>₹{Number(pmsMonthTotals.btc || 0).toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{Number(pmsMonthTotals.advance || 0).toFixed(2)}</td>
 
                     {/* Variance */}
                     <td style={{ ...standardTd, textAlign: 'center', color: '#34d399' }}>✓ 0.00</td>
@@ -2213,7 +2213,7 @@ GRAND RECONCILIATION:
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
                     Formula: <code style={{ color: '#fff' }}>G230 = E230 (Gross) - F230 (Disc)</code><br/>
                     CGST @ 2.5% (<code style={{ color: '#38bdf8' }}>H230</code>) + SGST @ 2.5% (<code style={{ color: '#38bdf8' }}>I230</code>)<br/>
-                    Total Room Supply: <strong style={{ color: '#34d399' }}>₹{statutoryValues.totalRoom.toFixed(2)}</strong>
+                    Total Room Supply: <strong style={{ color: '#34d399' }}>₹{Number(statutoryValues?.totalRoom || 0).toFixed(2)}</strong>
                   </div>
                 </div>
 
@@ -2224,7 +2224,7 @@ GRAND RECONCILIATION:
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
                     Food Bill (93.5%) + Beverage Bill (6.5%)<br/>
                     CGST @ 2.5% + SGST @ 2.5%<br/>
-                    Total F&amp;B Billed: <strong style={{ color: '#f472b6' }}>₹{statutoryValues.fnbGross.toFixed(2)}</strong>
+                    Total F&amp;B Billed: <strong style={{ color: '#f472b6' }}>₹{Number(statutoryValues?.fnbGross || 0).toFixed(2)}</strong>
                   </div>
                 </div>
 
@@ -2235,7 +2235,7 @@ GRAND RECONCILIATION:
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
                     Taxable Base (<code style={{ color: '#fff' }}>E232 = Gross / 1.18</code>)<br/>
                     CGST @ 9.0% (<code style={{ color: '#a78bfa' }}>F232</code>) + SGST @ 9.0% (<code style={{ color: '#a78bfa' }}>G232</code>)<br/>
-                    Total Laundry Supply: <strong style={{ color: '#a78bfa' }}>₹{statutoryValues.totalLaundry.toFixed(4)}</strong>
+                    Total Laundry Supply: <strong style={{ color: '#a78bfa' }}>₹{Number(statutoryValues?.totalLaundry || 0).toFixed(4)}</strong>
                   </div>
                 </div>
 
@@ -2543,33 +2543,33 @@ GRAND RECONCILIATION:
                       <td style={{ ...stickyTd, left: 240, width: 75, fontWeight: 700, color: '#38bdf8' }}>{r.roomNo}</td>
 
                       {/* Revenue Columns */}
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{r.rent.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#cbd5e1' }}>{r.cgst.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#cbd5e1' }}>{r.sgst.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{r.misc.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.laundry > 0 ? '#a78bfa' : '#64748b' }}>{r.laundry.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{r.minibar.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.roomService > 0 ? '#f472b6' : '#64748b', fontWeight: r.roomService > 0 ? 700 : 400 }}>{r.roomService.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', fontWeight: 800, color: 'var(--gold-glow)', background: 'rgba(212, 175, 55, 0.05)' }}>{r.netAmount.toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{Number(r.rent || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#cbd5e1' }}>{Number(r.cgst || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#cbd5e1' }}>{Number(r.sgst || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{Number(r.misc || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.laundry || 0) > 0 ? '#a78bfa' : '#64748b' }}>{Number(r.laundry || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{Number(r.minibar || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.roomService || 0) > 0 ? '#f472b6' : '#64748b', fontWeight: Number(r.roomService || 0) > 0 ? 700 : 400 }}>{Number(r.roomService || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', fontWeight: 800, color: 'var(--gold-glow)', background: 'rgba(212, 175, 55, 0.05)' }}>{Number(r.netAmount || 0).toFixed(2)}</td>
 
                       {/* Settlement Columns */}
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.advance > 0 ? '#a78bfa' : '#64748b' }}>{r.advance.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.discount > 0 ? '#f87171' : '#64748b' }}>{r.discount.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.complimentary > 0 ? '#f87171' : '#64748b' }}>{r.complimentary.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.voidAmt > 0 ? '#f87171' : '#64748b' }}>{r.voidAmt.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{(r.allowances || 0).toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{(r.paidOut || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.advance || 0) > 0 ? '#a78bfa' : '#64748b' }}>{Number(r.advance || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.discount || 0) > 0 ? '#f87171' : '#64748b' }}>{Number(r.discount || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.complimentary || 0) > 0 ? '#f87171' : '#64748b' }}>{Number(r.complimentary || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.voidAmt || 0) > 0 ? '#f87171' : '#64748b' }}>{Number(r.voidAmt || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{Number(r.allowances || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: '#64748b' }}>{Number(r.paidOut || 0).toFixed(2)}</td>
                       <td style={{ 
                         ...standardTd, 
                         fontFamily: 'monospace', 
-                        color: isNegativeCash ? '#fbbf24' : r.cash > 0 ? '#34d399' : '#64748b',
+                        color: isNegativeCash ? '#fbbf24' : Number(r.cash || 0) > 0 ? '#34d399' : '#64748b',
                         fontWeight: isNegativeCash ? 700 : 400
                       }}>
-                        {r.cash.toFixed(2)}
+                        {Number(r.cash || 0).toFixed(2)}
                       </td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.btc > 0 ? '#c084fc' : '#64748b', fontWeight: r.btc > 0 ? 700 : 400 }}>{r.btc.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.cc > 0 ? '#38bdf8' : '#64748b', fontWeight: r.cc > 0 ? 700 : 400 }}>{r.cc.toFixed(2)}</td>
-                      <td style={{ ...standardTd, fontFamily: 'monospace', color: r.online > 0 ? '#34d399' : '#64748b', fontWeight: r.online > 0 ? 700 : 400 }}>{r.online.toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.btc || 0) > 0 ? '#c084fc' : '#64748b', fontWeight: Number(r.btc || 0) > 0 ? 700 : 400 }}>{Number(r.btc || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.cc || r.card || 0) > 0 ? '#38bdf8' : '#64748b', fontWeight: Number(r.cc || r.card || 0) > 0 ? 700 : 400 }}>{Number(r.cc || r.card || 0).toFixed(2)}</td>
+                      <td style={{ ...standardTd, fontFamily: 'monospace', color: Number(r.online || 0) > 0 ? '#34d399' : '#64748b', fontWeight: Number(r.online || 0) > 0 ? 700 : 400 }}>{Number(r.online || 0).toFixed(2)}</td>
 
                       {/* Metadata */}
                       <td style={{ ...standardTd, color: '#cbd5e1', fontSize: '0.68rem', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={r.remark}>
@@ -2629,25 +2629,25 @@ GRAND RECONCILIATION:
                 <td colSpan={4} style={{ ...stickyTd, left: 0, width: 315, textAlign: 'right', paddingRight: '1rem', color: 'var(--gold-glow)' }}>
                   AUDITED TOTALS ({filteredRecords.length} BILLS):
                 </td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{aggregates.rent.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{aggregates.cgst.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{aggregates.sgst.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace' }}>{aggregates.misc.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>{aggregates.laundry.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace' }}>{aggregates.minibar.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>{aggregates.roomService.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', background: 'rgba(212, 175, 55, 0.2)' }}>{aggregates.netAmount.toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{Number(aggregates.rent || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{Number(aggregates.cgst || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{Number(aggregates.sgst || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace' }}>{Number(aggregates.misc || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>{Number(aggregates.laundry || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace' }}>{Number(aggregates.minibar || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>{Number(aggregates.roomService || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', background: 'rgba(212, 175, 55, 0.2)' }}>{Number(aggregates.netAmount || 0).toFixed(2)}</td>
 
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>{aggregates.advance.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{aggregates.discount.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{aggregates.complimentary.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{aggregates.voidAmt.toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>{Number(aggregates.advance || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{Number(aggregates.discount || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{Number(aggregates.complimentary || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>{Number(aggregates.voidAmt || 0).toFixed(2)}</td>
                 <td style={{ ...standardTd, fontFamily: 'monospace' }}>0.00</td>
                 <td style={{ ...standardTd, fontFamily: 'monospace' }}>0.00</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{aggregates.cash.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }}>{aggregates.btc.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>{aggregates.cc.toFixed(2)}</td>
-                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{aggregates.online.toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>{Number(aggregates.cash || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }}>{Number(aggregates.btc || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>{Number(aggregates.cc || aggregates.card || 0).toFixed(2)}</td>
+                <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>{Number(aggregates.online || 0).toFixed(2)}</td>
 
                 <td colSpan={4} style={{ ...standardTd, color: '#34d399', fontSize: '0.72rem' }}>
                   ✓ 100% RECONCILED: Rent + GST + Laundry + R/S == Net == Adv + Disc + Comp + Void + Cash + BTC + CC + Online

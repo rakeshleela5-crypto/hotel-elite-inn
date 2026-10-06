@@ -280,6 +280,7 @@ export function getJune2026DailySalesRecords() {
       dayNumber: day.dayNumber,
       billsCount: day.billsCount,
       roomsSold: day.roomsSet.size,
+      occupiedKeys: day.roomsSet.size,
       roomRent: rent,
       foodBill: food,
       bevBill: bev,
@@ -295,10 +296,18 @@ export function getJune2026DailySalesRecords() {
       totalGst,
       totalAmount,
       taxSaved,
+      cash: Math.round(day.settlement.cash * 100) / 100,
+      online: Math.round(day.settlement.online * 100) / 100,
+      cc: Math.round(day.settlement.cc * 100) / 100,
+      card: Math.round(day.settlement.cc * 100) / 100,
+      btc: Math.round(day.settlement.btc * 100) / 100,
+      advance: Math.round(day.settlement.advance * 100) / 100,
+      variance: 0.00,
       settlement: {
         cash: Math.round(day.settlement.cash * 100) / 100,
         online: Math.round(day.settlement.online * 100) / 100,
         cc: Math.round(day.settlement.cc * 100) / 100,
+        card: Math.round(day.settlement.cc * 100) / 100,
         btc: Math.round(day.settlement.btc * 100) / 100,
         advance: Math.round(day.settlement.advance * 100) / 100
       },
@@ -381,6 +390,7 @@ export function computeTodayPmsStatutoryRecord(rooms = [], bookings = [], foodOr
     dayNumber,
     billsCount: Math.max(1, roomsCount + (foodOrders?.length || 0)),
     roomsSold: roomsCount,
+    occupiedKeys: roomsCount,
     roomRent: Math.round(roomRent * 100) / 100,
     foodBill: Math.round(foodBill * 100) / 100,
     bevBill: Math.round(bevBill * 100) / 100,
@@ -396,10 +406,18 @@ export function computeTodayPmsStatutoryRecord(rooms = [], bookings = [], foodOr
     totalGst,
     totalAmount,
     taxSaved,
+    cash,
+    online,
+    cc: 0,
+    card: 0,
+    btc: 0,
+    advance: Math.round(roomRent * 0.3 * 100) / 100,
+    variance: 0.00,
     settlement: {
       cash,
       online,
       cc: 0,
+      card: 0,
       btc: 0,
       advance: Math.round(roomRent * 0.3 * 100) / 100
     },
@@ -519,7 +537,68 @@ export function getCurrentMonthPmsDayToDateLedger(monthKey = '2026-10', rooms = 
     }
   }
 
-  return dailyList;
+  return dailyList.map(item => {
+    const cash = Number(item.settlement?.cash ?? item.cash ?? 0);
+    const online = Number(item.settlement?.online ?? item.online ?? 0);
+    const cc = Number(item.settlement?.cc ?? item.settlement?.card ?? item.card ?? item.cc ?? 0);
+    const btc = Number(item.settlement?.btc ?? item.btc ?? 0);
+    const advance = Number(item.settlement?.advance ?? item.advance ?? 0);
+    const occupiedKeys = Number(item.occupiedKeys ?? item.roomsSold ?? 0);
+    const billsCount = Number(item.billsCount || 0);
+    const roomRent = Number(item.roomRent || 0);
+    const foodBill = Number(item.foodBill || 0);
+    const bevBill = Number(item.bevBill || 0);
+    const fnbTotal = Number(item.fnbTotal || (foodBill + bevBill));
+    const laundry = Number(item.laundry || 0);
+    const misc = Number(item.misc || 0);
+    const grossAmount = Number(item.grossAmount || (roomRent + fnbTotal + laundry + misc));
+    const discount = Number(item.discount || 0);
+    const management = Number(item.management || 0);
+    const taxableBase = Number(item.taxableBase || Math.max(0, grossAmount - discount - management));
+    const cgst = Number(item.cgst || 0);
+    const sgst = Number(item.sgst || 0);
+    const totalGst = Number(item.totalGst || (cgst + sgst));
+    const totalAmount = Number(item.totalAmount || (taxableBase + totalGst));
+    const taxSaved = Number(item.taxSaved || (management * 0.05));
+    const variance = Number(item.variance || 0);
+
+    return {
+      ...item,
+      billsCount,
+      roomsSold: occupiedKeys,
+      occupiedKeys,
+      roomRent,
+      foodBill,
+      bevBill,
+      fnbTotal,
+      laundry,
+      misc,
+      grossAmount,
+      discount,
+      management,
+      taxableBase,
+      cgst,
+      sgst,
+      totalGst,
+      totalAmount,
+      taxSaved,
+      cash,
+      online,
+      cc,
+      card: cc,
+      btc,
+      advance,
+      variance,
+      settlement: {
+        cash,
+        online,
+        cc,
+        card: cc,
+        btc,
+        advance
+      }
+    };
+  });
 }
 
 /**
@@ -529,6 +608,7 @@ export function computePmsMonthEndTotals(dailyRecords = []) {
   const totals = {
     totalBills: 0,
     roomsSold: 0,
+    occupiedKeys: 0,
     roomRent: 0,
     foodBill: 0,
     bevBill: 0,
@@ -547,14 +627,18 @@ export function computePmsMonthEndTotals(dailyRecords = []) {
     cash: 0,
     online: 0,
     cc: 0,
+    card: 0,
     btc: 0,
-    advance: 0
+    advance: 0,
+    variance: 0
   };
 
   dailyRecords.forEach(day => {
-    if (day.status === 'Upcoming' && day.grossAmount === 0) return;
+    if (day.status === 'Upcoming' && Number(day.grossAmount || 0) === 0) return;
     totals.totalBills += Number(day.billsCount || 0);
-    totals.roomsSold += Number(day.roomsSold || 0);
+    const keys = Number(day.occupiedKeys ?? day.roomsSold ?? 0);
+    totals.roomsSold += keys;
+    totals.occupiedKeys += keys;
     totals.roomRent += Number(day.roomRent || 0);
     totals.foodBill += Number(day.foodBill || 0);
     totals.bevBill += Number(day.bevBill || 0);
@@ -571,13 +655,18 @@ export function computePmsMonthEndTotals(dailyRecords = []) {
     totals.totalAmount += Number(day.totalAmount || 0);
     totals.taxSaved += Number(day.taxSaved || 0);
 
-    if (day.settlement) {
-      totals.cash += Number(day.settlement.cash || 0);
-      totals.online += Number(day.settlement.online || 0);
-      totals.cc += Number(day.settlement.cc || 0);
-      totals.btc += Number(day.settlement.btc || 0);
-      totals.advance += Number(day.settlement.advance || 0);
-    }
+    const c = Number(day.cash ?? day.settlement?.cash ?? 0);
+    const o = Number(day.online ?? day.settlement?.online ?? 0);
+    const card = Number(day.card ?? day.cc ?? day.settlement?.cc ?? day.settlement?.card ?? 0);
+    const b = Number(day.btc ?? day.settlement?.btc ?? 0);
+    const a = Number(day.advance ?? day.settlement?.advance ?? 0);
+
+    totals.cash += c;
+    totals.online += o;
+    totals.cc += card;
+    totals.card += card;
+    totals.btc += b;
+    totals.advance += a;
   });
 
   // Precision rounding
@@ -615,7 +704,7 @@ export function printPmsMasterAuditMonthEndPdf({
         <td style="text-align: right;">₹${Number(day.fnbTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td style="text-align: right;">₹${Number(day.laundry).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td style="text-align: right; font-weight: 700;">₹${Number(day.grossAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-        <td style="text-align: right; color: #dc2626;">${day.discount > 0 ? `-₹${Number(day.discount).toFixed(2)}` : '0.00'}</td>
+        <td style="text-align: right; color: #dc2626;">${Number(day.discount || 0) > 0 ? `-₹${Number(day.discount || 0).toFixed(2)}` : '0.00'}</td>
         <td style="text-align: right; color: #9333ea;">${day.management > 0 ? `-₹${Number(day.management).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '0.00'}</td>
         <td style="text-align: right; font-weight: 700; color: #0284c7;">₹${Number(day.taxableBase).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
         <td style="text-align: right;">₹${Number(day.cgst).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
@@ -840,7 +929,7 @@ export function printPmsMasterAuditMonthEndPdf({
               <td style="text-align: right;">₹${finalTotals.fnbTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               <td style="text-align: right;">₹${finalTotals.laundry.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               <td style="text-align: right; color: #a7f3d0 !important;">₹${finalTotals.grossAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-              <td style="text-align: right; color: #fca5a5 !important;">${finalTotals.discount > 0 ? `-₹${finalTotals.discount.toFixed(2)}` : '0.00'}</td>
+              <td style="text-align: right; color: #fca5a5 !important;">${Number(finalTotals.discount || 0) > 0 ? `-₹${Number(finalTotals.discount || 0).toFixed(2)}` : '0.00'}</td>
               <td style="text-align: right; color: #e9d5ff !important;">-₹${finalTotals.management.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               <td style="text-align: right; color: #7dd3fc !important;">₹${finalTotals.taxableBase.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
               <td style="text-align: right;">₹${finalTotals.cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>

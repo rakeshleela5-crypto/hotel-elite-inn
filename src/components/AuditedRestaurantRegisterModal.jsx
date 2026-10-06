@@ -192,27 +192,27 @@ export default function AuditedRestaurantRegisterModal({
             </thead>
             <tbody>
               <tr>
-                <td>₹${statutoryValues.foodBase.toFixed(2)}</td>
-                <td>₹${statutoryValues.bevBase.toFixed(2)}</td>
-                <td>₹${statutoryValues.grossNetAmount.toFixed(2)}</td>
-                <td>₹${statutoryValues.discount.toFixed(2)}</td>
-                <td>₹${statutoryValues.mgmComplimentary.toFixed(2)}</td>
-                <td>₹${statutoryValues.netTaxableTurnover.toFixed(2)}</td>
-                <td>₹${statutoryValues.cgst.toFixed(2)}</td>
-                <td>₹${statutoryValues.sgst.toFixed(2)}</td>
-                <td>₹${statutoryValues.totalTaxableSupply.toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.foodBase || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.bevBase || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.grossNetAmount || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.discount || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.mgmComplimentary || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.netTaxableTurnover || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.cgst || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.sgst || 0).toFixed(2)}</td>
+                <td>₹${Number(statutoryValues?.totalTaxableSupply || 0).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
 
           <div class="summary-box">
             <strong>STATUTORY DEDUCTION & AUDIT PROOF:</strong><br/>
-            • Gross Production (Food + Beverage): <strong>₹${statutoryValues.grossNetAmount.toFixed(2)}</strong><br/>
-            • Less Guest Discounts: <strong>-₹${statutoryValues.discount.toFixed(2)}</strong><br/>
-            • Less Management / Complimentary Meals (Sheet 2): <strong>-₹${statutoryValues.mgmComplimentary.toFixed(2)}</strong> (Tax-Free Internal Cons.)<br/>
-            • <strong>Actual Commercial Taxable Base: ₹${statutoryValues.netTaxableTurnover.toFixed(2)}</strong><br/>
-            • 5% Output GST (2.5% CGST + 2.5% SGST): <strong>₹${statutoryValues.totalTax.toFixed(2)}</strong><br/>
-            • <strong>Commercial Taxable Supply: ₹${statutoryValues.totalTaxableSupply.toFixed(2)}</strong>
+            • Gross Production (Food + Beverage): <strong>₹${Number(statutoryValues?.grossNetAmount || 0).toFixed(2)}</strong><br/>
+            • Less Guest Discounts: <strong>-₹${Number(statutoryValues?.discount || 0).toFixed(2)}</strong><br/>
+            • Less Management / Complimentary Meals (Sheet 2): <strong>-₹${Number(statutoryValues?.mgmComplimentary || 0).toFixed(2)}</strong> (Tax-Free Internal Cons.)<br/>
+            • <strong>Actual Commercial Taxable Base: ₹${Number(statutoryValues?.netTaxableTurnover || 0).toFixed(2)}</strong><br/>
+            • 5% Output GST (2.5% CGST + 2.5% SGST): <strong>₹${Number(statutoryValues?.totalTax || 0).toFixed(2)}</strong><br/>
+            • <strong>Commercial Taxable Supply: ₹${Number(statutoryValues?.totalTaxableSupply || 0).toFixed(2)}</strong>
           </div>
 
           <div class="signatures">
@@ -245,16 +245,16 @@ export default function AuditedRestaurantRegisterModal({
   const handleCopySummary = () => {
     const text = `HOTEL ELITE INN - RESTAURANT STATUTORY TAX RECONCILIATION (ROWS 1325-1326)
 Period: ${recalcMode === 'baseline' ? 'June 2026' : `Filtered Selection (${filteredRecords.length} Bills)`}
-Food Base: ₹${statutoryValues.foodBase.toFixed(2)}
-Beverage Base: ₹${statutoryValues.bevBase.toFixed(2)}
-Gross Food & Bev: ₹${statutoryValues.grossNetAmount.toFixed(2)}
-Less Discount: -₹${statutoryValues.discount.toFixed(2)}
-Less Management Meals (Sheet 2): -₹${statutoryValues.mgmComplimentary.toFixed(2)}
-Net Taxable Base: ₹${statutoryValues.netTaxableTurnover.toFixed(2)}
-CGST @ 2.5%: ₹${statutoryValues.cgst.toFixed(2)}
-SGST @ 2.5%: ₹${statutoryValues.sgst.toFixed(2)}
-Total Output GST: ₹${statutoryValues.totalTax.toFixed(2)}
-Total Commercial Supply: ₹${statutoryValues.totalTaxableSupply.toFixed(2)}`;
+Food Base: ₹${Number(statutoryValues?.foodBase || 0).toFixed(2)}
+Beverage Base: ₹${Number(statutoryValues?.bevBase || 0).toFixed(2)}
+Gross Food & Bev: ₹${Number(statutoryValues?.grossNetAmount || 0).toFixed(2)}
+Less Discount: -₹${Number(statutoryValues?.discount || 0).toFixed(2)}
+Less Management Meals (Sheet 2): -₹${Number(statutoryValues?.mgmComplimentary || 0).toFixed(2)}
+Net Taxable Base: ₹${Number(statutoryValues?.netTaxableTurnover || 0).toFixed(2)}
+CGST @ 2.5%: ₹${Number(statutoryValues?.cgst || 0).toFixed(2)}
+SGST @ 2.5%: ₹${Number(statutoryValues?.sgst || 0).toFixed(2)}
+Total Output GST: ₹${Number(statutoryValues?.totalTax || 0).toFixed(2)}
+Total Commercial Supply: ₹${Number(statutoryValues?.totalTaxableSupply || 0).toFixed(2)}`;
 
     navigator.clipboard.writeText(text);
     setCopiedNotice(true);
@@ -268,13 +268,13 @@ Total Commercial Supply: ₹${statutoryValues.totalTaxableSupply.toFixed(2)}`;
       r.sNo,
       r.date,
       `#${r.billNo}`,
-      r.grossAmount.toFixed(2),
-      r.foodAmount.toFixed(2),
-      r.bevAmount.toFixed(2),
-      r.cgst.toFixed(2),
-      r.sgst.toFixed(2),
-      r.discount.toFixed(2),
-      r.netTotal.toFixed(2),
+      Number(r.grossAmount || 0).toFixed(2),
+      Number(r.foodAmount || 0).toFixed(2),
+      Number(r.bevAmount || 0).toFixed(2),
+      Number(r.cgst || 0).toFixed(2),
+      Number(r.sgst || 0).toFixed(2),
+      Number(r.discount || 0).toFixed(2),
+      Number(r.netTotal || 0).toFixed(2),
       r.posChannel,
       r.locationCode
     ]);
@@ -930,25 +930,25 @@ Total Commercial Supply: ₹${statutoryValues.totalTaxableSupply.toFixed(2)}`;
                           {r.locationCode}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, color: '#f8fafc' }}>
-                          ₹{r.grossAmount.toFixed(2)}
+                          ₹{Number(r.grossAmount || 0).toFixed(2)}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>
-                          ₹{r.foodAmount.toFixed(2)}
+                          ₹{Number(r.foodAmount || 0).toFixed(2)}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>
-                          ₹{r.bevAmount.toFixed(2)}
+                          ₹{Number(r.bevAmount || 0).toFixed(2)}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', color: '#34d399' }}>
-                          {r.cgst > 0 ? `₹${r.cgst.toFixed(2)}` : '—'}
+                          {Number(r.cgst || 0) > 0 ? `₹${Number(r.cgst || 0).toFixed(2)}` : '—'}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', color: '#34d399' }}>
-                          {r.sgst > 0 ? `₹${r.sgst.toFixed(2)}` : '—'}
+                          {Number(r.sgst || 0) > 0 ? `₹${Number(r.sgst || 0).toFixed(2)}` : '—'}
                         </td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: r.discount > 0 ? '#f87171' : '#64748b' }}>
-                          {r.discount > 0 ? `-₹${r.discount.toFixed(2)}` : '—'}
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: Number(r.discount || 0) > 0 ? '#f87171' : '#64748b' }}>
+                          {Number(r.discount || 0) > 0 ? `-₹${Number(r.discount || 0).toFixed(2)}` : '—'}
                         </td>
                         <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, color: r.isManagement ? '#fbbf24' : '#34d399' }}>
-                          {r.isManagement ? 'COMPLIMENTARY' : `₹${r.netTotal.toFixed(2)}`}
+                          {r.isManagement ? 'COMPLIMENTARY' : `₹${Number(r.netTotal || 0).toFixed(2)}`}
                         </td>
                       </tr>
                     ))}
@@ -1099,9 +1099,9 @@ Total Commercial Supply: ₹${statutoryValues.totalTaxableSupply.toFixed(2)}`;
                         <td style={{ padding: '6px 8px', textAlign: 'center', fontWeight: 700, color: r.locationCode.startsWith('444') ? '#38bdf8' : '#c084fc' }}>
                           {r.locationCode} {r.locationCode.startsWith('444') ? '(VIP/Director)' : '(Staff)'}
                         </td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>₹{r.foodAmount.toFixed(2)}</td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>₹{r.bevAmount.toFixed(2)}</td>
-                        <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, color: '#f8fafc' }}>₹{r.grossAmount.toFixed(2)}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>₹{Number(r.foodAmount || 0).toFixed(2)}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', color: '#94a3b8' }}>₹{Number(r.bevAmount || 0).toFixed(2)}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', fontWeight: 800, color: '#f8fafc' }}>₹{Number(r.grossAmount || 0).toFixed(2)}</td>
                         <td style={{ padding: '6px 8px', textAlign: 'center' }}>
                           <span style={{ background: 'rgba(52, 211, 153, 0.15)', color: '#34d399', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
                             Tax-Free Internal
