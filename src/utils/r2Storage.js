@@ -1,4 +1,4 @@
-// Sri Sai Vasudev Residency - 360 Panoramic CDN & Storage Manifest
+// Hotel Elite Inn - 360 Panoramic CDN & Storage Manifest
 // Cloudflare R2 / High-Resolution Equirectangular Panorama Loader & Fallbacks
 
 /**

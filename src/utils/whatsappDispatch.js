@@ -174,8 +174,8 @@ export function sendNightAuditFlashWhatsApp(audit) {
 Audited Date: *${audit.businessDate || new Date().toISOString().split('T')[0]}*
 Certified Auditor: *${audit.auditorName || 'Manager On Duty'}*
 
-🏨 *18-Room Inventory Performance:*
-• Occupancy: *${audit.occupancyPct || 0}%* (${audit.occupiedRooms || 0}/18 Rooms Sold)
+🏨 *27-Room Inventory Performance:*
+• Occupancy: *${audit.occupancyPct || 0}%* (${audit.occupiedRooms || 0}/${audit.totalRooms || 27} Rooms Sold)
 • ADR (Average Daily Rate): *₹${Number(audit.adr || 0).toLocaleString('en-IN')}*
 • RevPAR: *₹${Number(audit.revpar || 0).toLocaleString('en-IN')}*
 
@@ -192,7 +192,7 @@ Certified Auditor: *${audit.auditorName || 'Manager On Duty'}*
 • Corporate Credit (B2B): ₹${Number(audit.companyCredit || 0).toLocaleString('en-IN')}
 
 🔐 *Audit Certification:*
-All 18 room folios balanced, drawer reconciled, and day sealed with zero variance.
+All ${audit.totalRooms || 27} room folios balanced, drawer reconciled, and day sealed with zero variance.
 _Submitted for Proprietor Paidisetty Manmadha Rao's review._`;
 
   return openWhatsAppLink(PROPRIETOR_PHONE, text);

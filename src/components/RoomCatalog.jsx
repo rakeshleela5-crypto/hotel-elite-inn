@@ -4,7 +4,7 @@ import {
   ArrowRight, ShieldCheck, Users, Bed, Layers, Car, Briefcase,
   Zap, Clock, Utensils, MapPin, Building, CheckCircle2
 } from 'lucide-react';
-import { ROOM_TIERS } from '../data/hotelData';
+import { ROOM_TIERS, matchesTier } from '../data/hotelData';
 import { calculateRoomTax } from '../utils/taxUtils';
 import { CardSpotlight } from '@/components/ui/card-spotlight';
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid';
@@ -39,12 +39,15 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
 
   const filteredTiers = selectedFloorFilter === 'all' 
     ? ROOM_TIERS 
-    : ROOM_TIERS.filter(t => t.floor === Number(selectedFloorFilter) || (Array.isArray(t.floors) && t.floors.includes(Number(selectedFloorFilter))));
+    : ROOM_TIERS.filter(t => (Array.isArray(t.floors) && t.floors.includes(Number(selectedFloorFilter))) || t.floor === Number(selectedFloorFilter));
 
-  const getTierStats = (tierName) => {
-    const tierRooms = rooms.filter(r => r.tier === tierName);
-    const available = tierRooms.filter(r => r.status === 'Available').length;
-    return { available, total: tierRooms.length || 10 };
+  const getTierStats = (tier) => {
+    const tierRooms = rooms.filter(r => matchesTier(r, tier));
+    const scopedRooms = selectedFloorFilter === 'all'
+      ? tierRooms
+      : tierRooms.filter(r => r.floor === Number(selectedFloorFilter));
+    const available = scopedRooms.filter(r => r.status === 'Available').length;
+    return { available, total: scopedRooms.length || tierRooms.length || 1 };
   };
 
   return (
@@ -122,7 +125,7 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
             const effectiveTariff = (dynamicRates && dynamicRates[tier.id]) ? dynamicRates[tier.id].recommendedRate : tier.tariff;
             const isDynamic = dynamicRates && dynamicRates[tier.id] && dynamicRates[tier.id].recommendedRate !== tier.tariff;
             const tax = calculateRoomTax(effectiveTariff);
-            const stats = getTierStats(tier.name);
+            const stats = getTierStats(tier);
 
             return (
               <CardSpotlight 
@@ -318,7 +321,7 @@ export default function RoomCatalog({ onSelectTier, onOpen3DExplorer, onOpenVirt
                       {onOpenVirtualTour && (
                         <button 
                           onClick={() => {
-                            const tierRoom = rooms.find(r => r.tier === tier.name);
+                            const tierRoom = rooms.find(r => matchesTier(r, tier));
                             const sceneId = tierRoom ? `room-${tierRoom.roomNumber}` : (tier.floor === 2 ? 'room-201' : 'room-101');
                             onOpenVirtualTour(sceneId);
                           }}

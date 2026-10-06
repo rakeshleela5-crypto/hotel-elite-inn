@@ -4,7 +4,7 @@ import {
   X, RotateCw, ZoomIn, ZoomOut, Layers, Eye, 
   Sparkles, Check, MapPin, Building2, Sliders, CalendarCheck
 } from 'lucide-react';
-import { ROOM_TIERS } from '../data/hotelData';
+import { ROOM_TIERS, matchesTier } from '../data/hotelData';
 
 export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBookRoom, onOpen360Tour }) {
   const mountRef = useRef(null);
@@ -475,7 +475,7 @@ export default function FloorExplorer3DModal({ isOpen, onClose, rooms = [], onBo
                 {selectedRoom.status === 'Available' ? (
                   <button 
                     onClick={() => {
-                      const tier = ROOM_TIERS.find(t => t.floor === selectedRoom.floor) || ROOM_TIERS[0];
+                      const tier = ROOM_TIERS.find(t => matchesTier(selectedRoom, t)) || ROOM_TIERS[0];
                       onBookRoom(tier, selectedRoom.roomNumber);
                       onClose();
                     }}

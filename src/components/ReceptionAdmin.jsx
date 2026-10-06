@@ -1404,7 +1404,7 @@ export default function ReceptionAdmin({
     { date: '21/09/2026', day: 'Mon', totalRooms: 18, occupied: 13, vacant: 4, ooo: 1, rate: 72.2, revenue: 29120, adr: 2240 },
     { date: '22/09/2026', day: 'Tue', totalRooms: 18, occupied: 14, vacant: 3, ooo: 1, rate: 77.8, revenue: 31640, adr: 2260 },
     { date: '23/09/2026', day: 'Wed', totalRooms: 18, occupied: 15, vacant: 2, ooo: 1, rate: 83.3, revenue: 34050, adr: 2270 },
-    { date: '24/09/2026', day: 'Thu (Today)', totalRooms: 18, occupied: rooms.filter(r => r.status === 'Occupied').length || 14, vacant: rooms.filter(r => r.status === 'Available').length || 3, ooo: rooms.filter(r => r.status === 'Maintenance').length || 1, rate: Number((((rooms.filter(r => r.status === 'Occupied').length || 14) / 18) * 100).toFixed(1)), revenue: 31766, adr: 2269 }
+    { date: '24/09/2026', day: 'Thu (Today)', totalRooms: rooms.length || 27, occupied: rooms.filter(r => r.status === 'Occupied').length || 14, vacant: rooms.filter(r => r.status === 'Available').length || 3, ooo: rooms.filter(r => r.status === 'Maintenance').length || 1, rate: Number((((rooms.filter(r => r.status === 'Occupied').length || 14) / (rooms.length || 27)) * 100).toFixed(1)), revenue: 31766, adr: 2269 }
   ];
 
   // Monthly Occupancy Trend (Last 12 Months)
@@ -4576,15 +4576,15 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             </div>
           ) : tapeChartViewMode === 'mysoft' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {[2, 3, 4].map(floorNum => {
+              {[1, 2, 3].map(floorNum => {
                 const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
                 if (floorRooms.length === 0) return null;
 
-                const floorLabel = floorNum === 2 
-                  ? '2ND FLOOR (Rooms 201 - 208)' 
-                  : floorNum === 3 
-                    ? '3RD FLOOR (Rooms 301 - 316)' 
-                    : '4TH FLOOR (Rooms 401 - 416)';
+                const floorLabel = floorNum === 1
+                  ? '1ST FLOOR (Rooms 101 - 109)'
+                  : floorNum === 2 
+                    ? '2ND FLOOR (Rooms 201 - 209)' 
+                    : '3RD FLOOR (Rooms 301 - 309)';
 
                 return (
                   <div key={floorNum} style={{
@@ -5186,16 +5186,20 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           ) : (
             /* VIEW 2: MODERN CARD LAYOUT */
             <div className="tape-chart-container">
-              {[2, 3, 4].map(floorNum => {
+              {[1, 2, 3].map(floorNum => {
                 const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
                 if (floorRooms.length === 0) return null;
 
-                const tierName = floorNum === 2 ? 'Standard Deluxe (₹1,699)' : floorNum === 3 ? 'Deluxe Room (₹2,199)' : 'Executive / Suite (₹2,899 - ₹3,999)';
+                const floorLabel = floorNum === 1 
+                  ? 'FLOOR 1 • 9 Keys (101 - 109)' 
+                  : floorNum === 2 
+                    ? 'FLOOR 2 • 9 Keys (201 - 209)' 
+                    : 'FLOOR 3 • 9 Keys (301 - 309)';
 
                 return (
                   <div key={floorNum} className="tape-floor-group">
                     <div className="tape-floor-header">
-                      <span>FLOOR {floorNum} • {tierName}</span>
+                      <span>{floorLabel}</span>
                       <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                         {floorRooms.filter(r => r.status === 'Available').length} / {floorRooms.length} Available
                       </span>
@@ -6120,7 +6124,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              {[2, 3, 4].map(floorNum => {
+              {[1, 2, 3].map(floorNum => {
                 const att = floorAttendants[floorNum] || { name: 'Staff Assigned', phone: '-', shift: 'Morning' };
                 const floorRooms = rooms.filter(r => r.floor === floorNum);
                 const dirtyRooms = floorRooms.filter(r => r.status === 'Vacant Dirty' || r.status === 'Cleaning').length;

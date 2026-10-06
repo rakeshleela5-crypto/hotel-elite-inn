@@ -85,12 +85,14 @@ export const HOTEL_CONFIG = {
   ]
 };
 
-// 4-Tier Room Catalog
+// 4-Tier Room Catalog (Aligned with 27-Room Physical Inventory Across Floors 1, 2 & 3)
 export const ROOM_TIERS = [
   {
     id: "standard-room",
-    name: "Standard Room",
+    name: "Standard Deluxe",
+    tierAliases: ["Standard Deluxe", "Standard Room", "Standard Single"],
     floor: "Floor 1 & 2",
+    floors: [1, 2],
     roomsRange: "108, 208",
     tariff: 1450,
     singleTariff: 1450,
@@ -107,7 +109,9 @@ export const ROOM_TIERS = [
   {
     id: "deluxe-room",
     name: "Deluxe Room",
+    tierAliases: ["Deluxe Room", "Deluxe"],
     floor: "Floor 1 & 2",
+    floors: [1, 2],
     roomsRange: "102, 104, 106, 202, 204, 206",
     tariff: 1750,
     singleTariff: 1750,
@@ -124,7 +128,9 @@ export const ROOM_TIERS = [
   {
     id: "executive-room",
     name: "Executive Room",
+    tierAliases: ["Executive Room", "Executive"],
     floor: "Floor 1, 2 & 3",
+    floors: [1, 2, 3],
     roomsRange: "101, 103, 105, 107, 201, 203, 205, 207, 301-308",
     tariff: 2050,
     singleTariff: 2050,
@@ -140,8 +146,10 @@ export const ROOM_TIERS = [
   },
   {
     id: "suite-room",
-    name: "Suite Room",
+    name: "Premium Suite",
+    tierAliases: ["Premium Suite", "Suite Room", "Suite"],
     floor: "Floor 1, 2 & 3",
+    floors: [1, 2, 3],
     roomsRange: "109, 209, 309",
     tariff: 3250,
     singleTariff: 3250,
@@ -156,6 +164,22 @@ export const ROOM_TIERS = [
     image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1000&q=80"
   }
 ];
+
+// Helper to reliably match any room to a tier across naming conventions
+export const matchesTier = (room, tier) => {
+  if (!room || !tier) return false;
+  if (room.tier === tier.name || room.tier === tier.id) return true;
+  if (tier.tierAliases && tier.tierAliases.includes(room.tier)) return true;
+  if ((tier.id === 'standard-room' || tier.name === 'Standard Deluxe' || tier.name === 'Standard Room') && 
+      (room.tier === 'Standard Room' || room.tier === 'Standard Deluxe' || room.tier === 'Standard')) return true;
+  if ((tier.id === 'suite-room' || tier.name === 'Premium Suite' || tier.name === 'Suite Room') && 
+      (room.tier === 'Suite Room' || room.tier === 'Premium Suite' || room.tier === 'Suite')) return true;
+  if ((tier.id === 'deluxe-room' || tier.name === 'Deluxe Room') && 
+      (room.tier === 'Deluxe Room' || room.tier === 'Deluxe')) return true;
+  if ((tier.id === 'executive-room' || tier.name === 'Executive Room') && 
+      (room.tier === 'Executive Room' || room.tier === 'Executive')) return true;
+  return false;
+};
 
 // 27 Authentic Physical Inventory Keys (Floor 1: 101-109, Floor 2: 201-209, Floor 3: 301-309)
 export const INITIAL_ROOMS_INVENTORY = [

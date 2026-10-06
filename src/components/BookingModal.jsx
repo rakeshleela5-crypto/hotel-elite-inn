@@ -6,7 +6,7 @@ import {
   Building2, CheckCircle2, AlertCircle, Sparkles, MapPin, Lock,
   BedDouble, UtensilsCrossed, Clock, Car, Plus, Check, Percent, MessageCircle
 } from 'lucide-react';
-import { HOTEL_CONFIG, ROOM_TIERS, CORPORATE_PARTNERS } from '../data/hotelData';
+import { HOTEL_CONFIG, ROOM_TIERS, CORPORATE_PARTNERS, matchesTier } from '../data/hotelData';
 import { calculateRoomTax } from '../utils/taxUtils';
 import { maskAadhaar, hasDateCollision } from '../utils/security';
 import BookingCalendar from '@/components/ui/v-calendar-15';
@@ -129,7 +129,7 @@ export default function BookingModal({
   }, [isOpen, onClose]);
 
   // Compute available rooms for selected tier
-  const tierRooms = rooms.filter(r => r.tier === selectedTier.name);
+  const tierRooms = rooms.filter(r => matchesTier(r, selectedTier));
   const availableTierRooms = tierRooms.filter(r => {
     // Check real-time room status & any collision with active bookings
     if (r.status !== 'Available' && r.roomNumber !== initialRoomNumber) return false;
@@ -457,7 +457,7 @@ export default function BookingModal({
               {/* Specific Room Selection */}
               <div className="form-group">
                 <label className="form-label">
-                  <Lock size={14} color="var(--gold-glow)" /> Select 18-Inventory Key ({selectedTier.roomsRange})
+                  <Lock size={14} color="var(--gold-glow)" /> Select Room Key ({tierRooms.length} Total Keys • {selectedTier.roomsRange})
                 </label>
                 <select
                   className="form-select"

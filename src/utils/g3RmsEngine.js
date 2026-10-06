@@ -1,6 +1,6 @@
-// Sri Sai Vasudev Residency - IDeaS SAS G3 RMS Algorithmic Yield Engine
+// Hotel Elite Inn - IDeaS SAS G3 RMS Algorithmic Yield Engine
 // Benchmark: IDeaS SAS G3 Platform Architecture (Taj IHCL & Accor Hospitality Standard)
-// Target Property: 18-Room Premier Hotel, Rayagada, Odisha
+// Target Property: 27-Room Premier Hotel, Muniguda, Rayagada, Odisha
 
 export const BASE_ROOM_CONFIG = {
   'standard-deluxe': { id: 'standard-deluxe', name: 'Standard Deluxe', baseTariff: 1699, floor: 1499, ceiling: 3200, count: 10, compWeight: 0.35 },
@@ -134,7 +134,7 @@ export function calculateObpRates(baseMicroRate, guests = 2) {
  */
 export function calculateUnconstrainedDemandAndWash(params = {}) {
   const {
-    physicalCapacity = 18,
+    physicalCapacity = 27,
     currentOnTheBooks = 14,
     daysToArrival = 5,
     pickupPace = 3.5,
@@ -352,7 +352,7 @@ export function explainRateRecommendation(tierId, targetDateString = '2026-09-24
 export function simulateWhatIfScenario(scenarioType, inputs = {}) {
   const baseOccupancy = 68; // Baseline %
   const baseADR = 2280;     // Baseline Average Daily Rate
-  const totalRooms = 18;
+  const totalRooms = 27;
 
   if (scenarioType === 'renovation') {
     // Rooms taken offline for maintenance or remodeling
