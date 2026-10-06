@@ -420,7 +420,7 @@ export default function DirectorPortal({
 
                 <div style={{ marginTop: '0.5rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Room Revenue (18 Keys):</span>
+                    <span style={{ color: 'var(--text-muted)' }}>Room Revenue (27 Keys):</span>
                     <span style={{ fontWeight: 700, color: '#fff' }}>₹{todayRoomRevenue.toLocaleString('en-IN')} (59%)</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
@@ -457,11 +457,11 @@ export default function DirectorPortal({
             </div>
           </div>
 
-          {/* Section 3: 18-Room Visual Floor Matrix */}
+          {/* Section 3: 27-Room Visual Floor Matrix */}
           <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h4 style={{ color: '#fff', margin: 0, fontSize: '1.05rem' }}>
-                18-Room Property Inventory Status
+                27-Room Property Inventory Status
               </h4>
               <div style={{ display: 'flex', gap: '1rem', fontSize: '0.75rem' }}>
                 <span style={{ color: '#38bdf8' }}>● Occupied ({occupiedCount})</span>

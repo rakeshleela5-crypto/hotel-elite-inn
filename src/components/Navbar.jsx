@@ -616,7 +616,7 @@ export default function Navbar({
                 gap: '0.35rem'
               }}
             >
-              Rooms & 18-Inventory
+              Rooms & 27-Inventory
             </button>
 
             <button 

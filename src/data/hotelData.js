@@ -433,7 +433,7 @@ export const HOTEL_OUTLETS = [
     timings: '24 Hours', 
     sacCode: '996331', 
     gstRate: 5,
-    description: 'Direct in-room service serving fresh meals from Fenugreek Restaurant to all 18 rooms.'
+    description: 'Direct in-room service serving fresh meals from Fenugreek Restaurant to all 27 rooms.'
   },
   { 
     id: 'swiggy', 
@@ -4206,7 +4206,7 @@ export const AUTONOMOUS_BOT_FLEET = [
     category: "Operations & Management",
     channel: "Telegram & Management WhatsApp",
     status: "Active",
-    description: "Dispatches 18-room occupancy snapshot, VIP arrivals, expected corporate checkouts, and breakfast forecast to GM.",
+    description: "Dispatches 27-room occupancy snapshot, VIP arrivals, expected corporate checkouts, and breakfast forecast to GM.",
     defaultParams: { notifyManagers: ["GM", "FrontDeskSupervisor"], includeBreakfastCount: true }
   },
   {
@@ -4877,8 +4877,8 @@ export const INITIAL_NIGHT_AUDITS = [
     auditId: "NA-2026-09-24",
     businessDate: "2026-09-24",
     closedAt: "2026-09-25 00:02:10",
-    totalRooms: 18,
-    occupiedRooms: 12,
+    totalRooms: 27,
+    occupiedRooms: 18,
     occupancyPct: 66.7,
     adr: 2341.67,
     revpar: 1561.11,
@@ -4896,14 +4896,14 @@ export const INITIAL_NIGHT_AUDITS = [
     cashVariance: 0.00,
     isLocked: 1,
     auditorName: "Sudhakar Reddy (Front Office Lead)",
-    notes: "Verified 24-Sep-2026: 18-Room Capacity Night Audit. Room Revenue ₹28,100.00, F&B Sales ₹15,049.00."
+    notes: "Verified 24-Sep-2026: 27-Room Capacity Night Audit. Room Revenue ₹28,100.00, F&B Sales ₹15,049.00."
   },
   {
     auditId: "NA-2026-09-23",
     businessDate: "2026-09-23",
     closedAt: "2026-09-24 00:03:40",
-    totalRooms: 18,
-    occupiedRooms: 14,
+    totalRooms: 27,
+    occupiedRooms: 21,
     occupancyPct: 77.8,
     adr: 2484.45,
     revpar: 1932.35,
@@ -4921,17 +4921,17 @@ export const INITIAL_NIGHT_AUDITS = [
     cashVariance: 0.00,
     isLocked: 1,
     auditorName: "Sudhakar Reddy (Front Office Lead)",
-    notes: "Verified 23-Sep-2026: 18-Room Capacity Night Audit. Room Revenue ₹34,782.00, F&B Sales ₹16,679.00."
+    notes: "Verified 23-Sep-2026: 27-Room Capacity Night Audit. Room Revenue ₹34,782.00, F&B Sales ₹16,679.00."
   },
   {
     auditId: "NA-2026-09-20",
     businessDate: "2026-09-20",
     closedAt: "2026-09-21 00:05:12",
-    totalRooms: 18,
-    occupiedRooms: 15,
-    occupancyPct: 83.3,
+    totalRooms: 27,
+    occupiedRooms: 22,
+    occupancyPct: 81.5,
     adr: 2420.00,
-    revpar: 2016.67,
+    revpar: 1972.22,
     roomRevenue: 36300.00,
     fnbRevenue: 14800.00,
     otherRevenue: 3400.00,
@@ -4946,17 +4946,17 @@ export const INITIAL_NIGHT_AUDITS = [
     cashVariance: 0.00,
     isLocked: 1,
     auditorName: "Sudhakar Reddy (Front Office Lead)",
-    notes: "Day successfully balanced. Zero cash discrepancy. All 15 occupied room charges and GST posted."
+    notes: "Day successfully balanced. Zero cash discrepancy. All occupied room charges and GST posted."
   },
   {
     auditId: "NA-2026-09-19",
     businessDate: "2026-09-19",
     closedAt: "2026-09-20 00:03:45",
-    totalRooms: 18,
-    occupiedRooms: 13,
-    occupancyPct: 72.2,
+    totalRooms: 27,
+    occupiedRooms: 20,
+    occupancyPct: 74.1,
     adr: 2350.00,
-    revpar: 1697.22,
+    revpar: 1740.74,
     roomRevenue: 30550.00,
     fnbRevenue: 14400.00,
     otherRevenue: 2800.00,

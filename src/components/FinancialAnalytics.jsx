@@ -183,7 +183,7 @@ export default function FinancialAnalytics({ bookings = [] }) {
           { id: 'bookings-category', num: '4', name: 'Bookings by Category', icon: Table },
           { id: 'fnb-dining', num: '5', name: 'Dining Revenue', icon: UtensilsCrossed },
           { id: 'room-matrix', num: '6', name: 'Yield Matrix', icon: BarChart2 },
-          { id: 'all-18-rooms', num: '7', name: 'All 18 Rooms', icon: Layers },
+          { id: 'all-27-rooms', num: '7', name: 'All 27 Rooms', icon: Layers },
           { id: 'expense-heads', num: '8', name: 'Expense Heads', icon: PieChart },
           { id: 'ca-station', num: '10', name: 'CA Filing Engine', icon: ShieldCheck }
         ].map(tab => {
@@ -396,12 +396,12 @@ export default function FinancialAnalytics({ bookings = [] }) {
         </div>
       )}
 
-      {/* MODULE 7: ALL 18 ROOMS PREVIEW */}
-      {activeTab === 'all-18-rooms' && (
+      {/* MODULE 7: ALL 27 ROOMS PREVIEW */}
+      {activeTab === 'all-27-rooms' && (
         <div>
           <div style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '1rem' }}>
             <div style={{ fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--gold-glow)' }}>
-              18 Physical Keys Performance (7 Ground Floor: 101–107, 11 First Floor: 201–211)
+              27 Physical Keys Performance Across 3 Floors (101–309)
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.65rem' }}>
               {ALL_18_ROOMS_REVENUE_SEP2026.map(r => (

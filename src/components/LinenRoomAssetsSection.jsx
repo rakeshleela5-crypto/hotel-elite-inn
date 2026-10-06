@@ -215,10 +215,10 @@ export default function LinenRoomAssetsSection({
         {/* Left: Linen Par Stock Matrix */}
         <div>
           <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--gold-glow)', marginBottom: '0.65rem' }}>
-            🧺 Linen Par Stock &amp; Circulation Matrix (18 Rooms)
+            🧺 Linen Par Stock &amp; Circulation Matrix (27 Rooms)
           </div>
           <div style={{ overflowX: 'auto' }}>
-            <SheetsToolbarLegend tableName="Linen Par Stock & Circulation Matrix" subtitle="Housekeeping 18-Room Stock Control" />
+            <SheetsToolbarLegend tableName="Linen Par Stock & Circulation Matrix" subtitle="Housekeeping 27-Room Stock Control" />
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: 'rgba(255,255,255,0.04)', color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>

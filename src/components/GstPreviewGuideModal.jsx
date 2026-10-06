@@ -548,7 +548,7 @@ export default function GstPreviewGuideModal({
                       SAC 996311
                       <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 400 }}>Room Accommodation (Below ₹7.5k slab)</div>
                     </td>
-                    <td style={{ padding: '0.85rem 1rem', color: '#cbd5e1' }}>18 Keys (Ground &amp; 1st Floor)</td>
+                    <td style={{ padding: '0.85rem 1rem', color: '#cbd5e1' }}>27 Keys (Floors 1, 2 &amp; 3)</td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#fff' }}>₹9,84,960.00</td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#38bdf8', fontWeight: 700 }}>₹9,38,057.14</td>
                     <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#cbd5e1' }}>₹23,451.43</td>

@@ -832,18 +832,18 @@ export default function AccountsLedgerModal({
     setTimeout(() => setActionSuccessMsg(''), 4000);
   };
 
-  // Night Audit Flash Report Data (18-Room Authentic Inventory)
+  // Night Audit Flash Report Data (27-Room Authentic Inventory Across 3 Floors)
   const flashReportData = {
     auditDate: '20/09/2026',
     time: '23:59:59 IST',
     auditor: 'NIGHT AUDITOR / ADMIN',
-    totalRooms: 18,
+    totalRooms: 27,
     maintenanceBlocked: 1, // Room 107
-    availableRooms: 17,
-    occupiedRooms: 12,
-    vacantRooms: 5,
-    totalGuests: 18,
-    occupancyPct: 70.59, // 12 / 17
+    availableRooms: 26,
+    occupiedRooms: 19,
+    vacantRooms: 7,
+    totalGuests: 28,
+    occupancyPct: 73.08, // 19 / 26
     arr: 2618.00, // Average Room Rate
     revpar: 1848.00, // Revenue per available room
     todayRevenue: {

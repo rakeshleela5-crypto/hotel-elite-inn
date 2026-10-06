@@ -159,61 +159,61 @@ export const GST_COMPLIANCE_LEDGER_SEP2026 = {
 export const BOOKINGS_PER_CATEGORY_SEP2026 = [
   {
     category: 'Deluxe Room',
-    roomsCount: 5,
-    roomList: '101, 102, 103, 106, 202',
-    tariffs: '₹1,500 – ₹2,000',
-    totalBookings: 132,
-    roomNightsSold: 138,
-    occupancyPct: 92.0, // 138 / 150 available nights
-    guestCount: 214,
-    avgStayNights: 1.05,
-    totalRevenue: 248400.00,
+    roomsCount: 6,
+    roomList: '102, 104, 106, 202, 204, 206',
+    tariffs: '₹1,750 – ₹2,250',
+    totalBookings: 148,
+    roomNightsSold: 154,
+    occupancyPct: 85.6, // 154 / 180 available nights
+    guestCount: 242,
+    avgStayNights: 1.04,
+    totalRevenue: 275400.00,
     cancellations: 4
   },
   {
     category: 'Standard Deluxe',
-    roomsCount: 3,
-    roomList: '208, 209, 210',
-    tariffs: '₹2,000',
-    totalBookings: 78,
-    roomNightsSold: 84,
-    occupancyPct: 93.3, // 84 / 90 available nights
-    guestCount: 168,
-    avgStayNights: 1.08,
-    totalRevenue: 168000.00,
-    cancellations: 2
+    roomsCount: 2,
+    roomList: '108, 208',
+    tariffs: '₹1,450',
+    totalBookings: 49,
+    roomNightsSold: 52,
+    occupancyPct: 86.7, // 52 / 60 available nights
+    guestCount: 68,
+    avgStayNights: 1.06,
+    totalRevenue: 98600.00,
+    cancellations: 1
   },
   {
     category: 'Executive Room',
-    roomsCount: 7,
-    roomList: '104, 105, 107, 204, 205, 206, 207',
-    tariffs: '₹2,500',
-    totalBookings: 176,
-    roomNightsSold: 188,
-    occupancyPct: 89.5, // 188 / 210 available nights
-    guestCount: 362,
+    roomsCount: 16,
+    roomList: '101, 103, 105, 107, 201, 203, 205, 207, 301–308',
+    tariffs: '₹2,050 – ₹2,450',
+    totalBookings: 368,
+    roomNightsSold: 395,
+    occupancyPct: 82.3, // 395 / 480 available nights
+    guestCount: 580,
     avgStayNights: 1.07,
-    totalRevenue: 470000.00,
-    cancellations: 5
+    totalRevenue: 845300.00,
+    cancellations: 8
   },
   {
     category: 'Premium Suite',
     roomsCount: 3,
-    roomList: '201, 203, 211',
-    tariffs: '₹3,000',
-    totalBookings: 24,
-    roomNightsSold: 22,
-    occupancyPct: 24.4, // 22 / 90 available nights (Premium Pilgrimage / VIP stays)
-    guestCount: 52,
-    avgStayNights: 1.10,
-    totalRevenue: 98560.00,
-    cancellations: 1
+    roomList: '109, 209, 309',
+    tariffs: '₹3,250 – ₹3,850',
+    totalBookings: 44,
+    roomNightsSold: 47,
+    occupancyPct: 52.2, // 47 / 90 available nights (Premium VIP & Long-Stay)
+    guestCount: 96,
+    avgStayNights: 1.07,
+    totalRevenue: 152750.00,
+    cancellations: 2
   }
 ];
 
-export const TOTAL_ROOM_NIGHTS_AVAILABLE = 18 * 30; // 540 nights
-export const TOTAL_ROOM_NIGHTS_SOLD = 432;          // 80.0% Overall Occupancy
-export const TOTAL_ROOM_STAY_REVENUE = 984960.00;
+export const TOTAL_ROOM_NIGHTS_AVAILABLE = 27 * 30; // 810 nights
+export const TOTAL_ROOM_NIGHTS_SOLD = 648;          // 80.0% Overall Occupancy
+export const TOTAL_ROOM_STAY_REVENUE = 1372050.00;
 
 // ─── 5. In-Room Dining & Kitchen Partner Revenue (Sep 2026) ───────────────────
 export const DINING_KITCHEN_REVENUE_SEP2026 = [
@@ -329,30 +329,43 @@ export const ROOM_TYPE_REVENUE_MATRIX_SEP2026 = [
   }
 ];
 
-// ─── 7. Revenue Breakdown Across All 4 Room Categories (18 Rooms Total) ────────
+// ─── 7. Revenue Breakdown Across All 4 Room Categories (27 Rooms Total) ────────
 export const ALL_18_ROOMS_REVENUE_SEP2026 = [
-  // Ground Floor (7 Rooms: 101 - 107)
-  { room: '101', floor: 'Ground', tier: 'Deluxe Room', tariff: 1500, nightsSold: 28, revenue: 42000.00, fnbRevenue: 14800.00, total: 56800.00, occupancyPct: 93.3 },
-  { room: '102', floor: 'Ground', tier: 'Deluxe Room', tariff: 1500, nightsSold: 28, revenue: 42000.00, fnbRevenue: 13900.00, total: 55900.00, occupancyPct: 93.3 },
-  { room: '103', floor: 'Ground', tier: 'Deluxe Room', tariff: 2000, nightsSold: 27, revenue: 54000.00, fnbRevenue: 16500.00, total: 70500.00, occupancyPct: 90.0 },
-  { room: '104', floor: 'Ground', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 22100.00, total: 89600.00, occupancyPct: 90.0 },
-  { room: '105', floor: 'Ground', tier: 'Executive Room', tariff: 2500, nightsSold: 26, revenue: 65000.00, fnbRevenue: 21400.00, total: 86400.00, occupancyPct: 86.7 },
-  { room: '106', floor: 'Ground', tier: 'Deluxe Room', tariff: 2000, nightsSold: 28, revenue: 56000.00, fnbRevenue: 17200.00, total: 73200.00, occupancyPct: 93.3 },
-  { room: '107', floor: 'Ground', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 22800.00, total: 90300.00, occupancyPct: 90.0 },
+  // First Floor (9 Rooms: 101 - 109)
+  { room: '101', floor: '1st Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 26, revenue: 53300.00, fnbRevenue: 15200.00, total: 68500.00, occupancyPct: 86.7 },
+  { room: '102', floor: '1st Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 27, revenue: 47250.00, fnbRevenue: 14100.00, total: 61350.00, occupancyPct: 90.0 },
+  { room: '103', floor: '1st Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 16200.00, total: 71550.00, occupancyPct: 90.0 },
+  { room: '104', floor: '1st Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 28, revenue: 49000.00, fnbRevenue: 13800.00, total: 62800.00, occupancyPct: 93.3 },
+  { room: '105', floor: '1st Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 26, revenue: 53300.00, fnbRevenue: 15400.00, total: 68700.00, occupancyPct: 86.7 },
+  { room: '106', floor: '1st Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 28, revenue: 49000.00, fnbRevenue: 14500.00, total: 63500.00, occupancyPct: 93.3 },
+  { room: '107', floor: '1st Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15900.00, total: 71250.00, occupancyPct: 90.0 },
+  { room: '108', floor: '1st Floor', tier: 'Standard Deluxe', tariff: 1450, nightsSold: 28, revenue: 40600.00, fnbRevenue: 11200.00, total: 51800.00, occupancyPct: 93.3 },
+  { room: '109', floor: '1st Floor', tier: 'Premium Suite', tariff: 3250, nightsSold: 12, revenue: 39000.00, fnbRevenue: 18200.00, total: 57200.00, occupancyPct: 40.0 },
 
-  // First Floor (11 Rooms: 201 - 211)
-  { room: '201', floor: '1st Floor', tier: 'Premium Suite', tariff: 3000, nightsSold: 8, revenue: 35840.00, fnbRevenue: 18500.00, total: 54340.00, occupancyPct: 26.7 },
-  { room: '202', floor: '1st Floor', tier: 'Deluxe Room', tariff: 1500, nightsSold: 27, revenue: 54400.00, fnbRevenue: 14200.00, total: 68600.00, occupancyPct: 90.0 },
-  { room: '203', floor: '1st Floor', tier: 'Premium Suite', tariff: 3000, nightsSold: 7, revenue: 31360.00, fnbRevenue: 16400.00, total: 47760.00, occupancyPct: 23.3 },
-  { room: '204', floor: '1st Floor', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 22300.00, total: 89800.00, occupancyPct: 90.0 },
-  { room: '205', floor: '1st Floor', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 23400.00, total: 90900.00, occupancyPct: 90.0 },
-  { room: '206', floor: '1st Floor', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 22900.00, total: 90400.00, occupancyPct: 90.0 },
-  { room: '207', floor: '1st Floor', tier: 'Executive Room', tariff: 2500, nightsSold: 27, revenue: 67500.00, fnbRevenue: 23100.00, total: 90600.00, occupancyPct: 90.0 },
-  { room: '208', floor: '1st Floor', tier: 'Standard Deluxe', tariff: 2000, nightsSold: 28, revenue: 56000.00, fnbRevenue: 15400.00, total: 71400.00, occupancyPct: 93.3 },
-  { room: '209', floor: '1st Floor', tier: 'Standard Deluxe', tariff: 2000, nightsSold: 28, revenue: 56000.00, fnbRevenue: 15200.00, total: 71200.00, occupancyPct: 93.3 },
-  { room: '210', floor: '1st Floor', tier: 'Standard Deluxe', tariff: 2000, nightsSold: 28, revenue: 56000.00, fnbRevenue: 15800.00, total: 71800.00, occupancyPct: 93.3 },
-  { room: '211', floor: '1st Floor', tier: 'Premium Suite', tariff: 3000, nightsSold: 7, revenue: 31360.00, fnbRevenue: 16700.00, total: 48060.00, occupancyPct: 23.3 }
+  // Second Floor (9 Rooms: 201 - 209)
+  { room: '201', floor: '2nd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15800.00, total: 71150.00, occupancyPct: 90.0 },
+  { room: '202', floor: '2nd Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 27, revenue: 47250.00, fnbRevenue: 14200.00, total: 61450.00, occupancyPct: 90.0 },
+  { room: '203', floor: '2nd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 26, revenue: 53300.00, fnbRevenue: 15100.00, total: 68400.00, occupancyPct: 86.7 },
+  { room: '204', floor: '2nd Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 28, revenue: 49000.00, fnbRevenue: 14600.00, total: 63600.00, occupancyPct: 93.3 },
+  { room: '205', floor: '2nd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 16100.00, total: 71450.00, occupancyPct: 90.0 },
+  { room: '206', floor: '2nd Floor', tier: 'Deluxe Room', tariff: 1750, nightsSold: 28, revenue: 49000.00, fnbRevenue: 14400.00, total: 63400.00, occupancyPct: 93.3 },
+  { room: '207', floor: '2nd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15700.00, total: 71050.00, occupancyPct: 90.0 },
+  { room: '208', floor: '2nd Floor', tier: 'Standard Deluxe', tariff: 1450, nightsSold: 28, revenue: 40600.00, fnbRevenue: 11500.00, total: 52100.00, occupancyPct: 93.3 },
+  { room: '209', floor: '2nd Floor', tier: 'Premium Suite', tariff: 3250, nightsSold: 11, revenue: 35750.00, fnbRevenue: 17600.00, total: 53350.00, occupancyPct: 36.7 },
+
+  // Third Floor (9 Rooms: 301 - 309)
+  { room: '301', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15500.00, total: 70850.00, occupancyPct: 90.0 },
+  { room: '302', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 26, revenue: 53300.00, fnbRevenue: 15200.00, total: 68500.00, occupancyPct: 86.7 },
+  { room: '303', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15800.00, total: 71150.00, occupancyPct: 90.0 },
+  { room: '304', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 28, revenue: 57400.00, fnbRevenue: 16400.00, total: 73800.00, occupancyPct: 93.3 },
+  { room: '305', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15900.00, total: 71250.00, occupancyPct: 90.0 },
+  { room: '306', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15700.00, total: 71050.00, occupancyPct: 90.0 },
+  { room: '307', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 26, revenue: 53300.00, fnbRevenue: 15300.00, total: 68600.00, occupancyPct: 86.7 },
+  { room: '308', floor: '3rd Floor', tier: 'Executive Room', tariff: 2050, nightsSold: 27, revenue: 55350.00, fnbRevenue: 15800.00, total: 71150.00, occupancyPct: 90.0 },
+  { room: '309', floor: '3rd Floor', tier: 'Premium Suite', tariff: 3250, nightsSold: 14, revenue: 45500.00, fnbRevenue: 19100.00, total: 64600.00, occupancyPct: 46.7 }
 ];
+
+export const ALL_27_ROOMS_REVENUE_SEP2026 = ALL_18_ROOMS_REVENUE_SEP2026;
 
 // ─── 8. Daily Expense Categories (Where Is The Hotel Spending Today?) ───────────
 export const DAILY_EXPENSE_CATEGORIES_SUMMARY = [

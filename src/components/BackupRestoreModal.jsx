@@ -305,7 +305,7 @@ export default function BackupRestoreModal({
                   <CheckCircle2 size={16} /> Complete Hotel State Snapshot
                 </div>
                 <p style={{ margin: 0, fontSize: '0.82rem', color: '#cbd5e1', lineHeight: 1.5 }}>
-                  This tool extracts all active operational data across all <strong>55 database tables</strong> (18 rooms, active bookings, guest CRM profiles, KOT food orders, master folios, staff attendance, linen inventory, corporate statements) into an encrypted, portable JSON file.
+                  This tool extracts all active operational data across all <strong>55 database tables</strong> (27 rooms, active bookings, guest CRM profiles, KOT food orders, master folios, staff attendance, linen inventory, corporate statements) into an encrypted, portable JSON file.
                 </p>
               </div>
 
@@ -316,7 +316,7 @@ export default function BackupRestoreModal({
                 marginBottom: '1.5rem'
               }}>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.75rem', textAlign: 'center' }}>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--gold-glow)' }}>40</div>
+                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--gold-glow)' }}>27</div>
                   <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Rooms Inventory</div>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.75rem', textAlign: 'center' }}>

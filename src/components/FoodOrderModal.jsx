@@ -218,7 +218,7 @@ export default function FoodOrderModal({ isOpen, onClose, initialItem = null, ro
             <form onSubmit={handlePlaceOrder}>
               {/* Room Key Picker */}
               <div className="form-group">
-                <label className="form-label">Deliver to Room Key (18 Inventory)</label>
+                <label className="form-label">Deliver to Room Key (27 Inventory Keys)</label>
                 <select 
                   className="form-select"
                   value={roomNumber}

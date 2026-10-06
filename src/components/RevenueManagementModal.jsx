@@ -186,8 +186,8 @@ export default function RevenueManagementModal({
   // 2. Calculate Unconstrained Demand & Wash
   const unconstrainedData = useMemo(() => {
     return calculateUnconstrainedDemandAndWash({
-      physicalCapacity: 18,
-      currentOnTheBooks: Math.round((simOccupancy / 100) * 18),
+      physicalCapacity: 27,
+      currentOnTheBooks: Math.round((simOccupancy / 100) * 27),
       daysToArrival: simDta,
       pickupPace: simVelocity,
       isFestival: isFestivalSurge
@@ -239,7 +239,7 @@ export default function RevenueManagementModal({
       (liveMicroRates['executive-room'].recommendedRate * 0.20) +
       (liveMicroRates['premium-suite'].recommendedRate * 0.15)
     );
-    const roomsSold = Math.round((simOccupancy / 100) * 18);
+    const roomsSold = Math.round((simOccupancy / 100) * 27);
     return calculateChannelNetRevPAR(avgADR, roomsSold);
   }, [liveMicroRates, simOccupancy]);
 
@@ -337,7 +337,7 @@ export default function RevenueManagementModal({
               </span>
             </div>
             <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
-              Autonomous continuous dynamic micro-rate yielding, corporate RFP MAR solver, and unconstrained demand modeling for {HOTEL_CONFIG.name} (18 Rooms).
+              Autonomous continuous dynamic micro-rate yielding, corporate RFP MAR solver, and unconstrained demand modeling for {HOTEL_CONFIG.name} (27 Rooms).
             </p>
           </div>
 
@@ -435,7 +435,7 @@ export default function RevenueManagementModal({
           <div>
             <span style={{ color: '#64748b' }}>Simulated Occupancy:</span>
             <div style={{ color: '#38bdf8', fontWeight: 800, fontSize: '1rem' }}>
-              {simOccupancy}% <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>({Math.round((simOccupancy / 100) * 18)}/18 Rms)</span>
+              {simOccupancy}% <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>({Math.round((simOccupancy / 100) * 27)}/27 Rms)</span>
             </div>
           </div>
           <div>
@@ -610,7 +610,7 @@ export default function RevenueManagementModal({
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.35rem' }}>
                       <span style={{ color: '#94a3b8' }}>Live Occupancy Rate</span>
-                      <span style={{ color: '#38bdf8', fontWeight: 800 }}>{simOccupancy}% ({Math.round((simOccupancy / 100) * 18)}/18 rooms)</span>
+                      <span style={{ color: '#38bdf8', fontWeight: 800 }}>{simOccupancy}% ({Math.round((simOccupancy / 100) * 27)}/27 rooms)</span>
                     </div>
                     <input 
                       type="range" 
@@ -1773,7 +1773,7 @@ export default function RevenueManagementModal({
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
                       <span style={{ fontWeight: 700, color: '#f8fafc' }}>Rooms Taken Offline for Renovation:</span>
-                      <span style={{ color: '#38bdf8', fontWeight: 800 }}>{sandboxOfflineRooms} Rooms ({18 - sandboxOfflineRooms} Active Sellable)</span>
+                      <span style={{ color: '#38bdf8', fontWeight: 800 }}>{sandboxOfflineRooms} Rooms ({27 - sandboxOfflineRooms} Active Sellable)</span>
                     </div>
                     <input
                       type="range"

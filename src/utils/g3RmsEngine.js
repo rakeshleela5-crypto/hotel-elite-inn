@@ -129,7 +129,7 @@ export function calculateObpRates(baseMicroRate, guests = 2) {
 
 /**
  * 2. UNCONSTRAINED DEMAND & WASH MODELING
- * Calculates true customer acquisition appetite without 18-room capacity constraints
+ * Calculates true customer acquisition appetite without 27-room capacity constraints
  * and determines safe overbooking authorizations
  */
 export function calculateUnconstrainedDemandAndWash(params = {}) {
@@ -473,7 +473,7 @@ export function calculateChannelNetRevPAR(grossADR = 2450, totalRoomsSold = 30) 
   const totalGrossRevenue = directGross + otaGross + corpGross;
   const totalCommissionLost = directFee + otaFee + corpFee;
   const totalNetRevenue = directNetRevenue + otaNetRevenue + corpNetRevenue;
-  const blendedNetRevPAR = Math.round(totalNetRevenue / 18); // 18 room hotel
+  const blendedNetRevPAR = Math.round(totalNetRevenue / 27); // 27 room hotel
 
   // Direct Channel Savings Opportunity:
   // If 50% of OTA rooms were converted to direct bookings

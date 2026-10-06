@@ -657,7 +657,7 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
     showFeedback(`✓ Transferred ₹${txToMove.debit.toFixed(2)} [${txToMove.desc}] from Room ${room.roomNumber} to Room ${transferTargetRoom} successfully!`);
     setSelectedTxToTransfer(null);
   };
-  // 18 Rooms List for Universal Quick Switcher
+  // 27 Rooms List for Universal Quick Switcher
   const allRoomsCatalog = rooms && rooms.length > 0 ? rooms : [
     { roomNumber: '101', tier: 'Standard Non-AC', status: 'Available', tariff: 1000 },
     { roomNumber: '102', tier: 'Standard Non-AC', status: 'Available', tariff: 1000 },
@@ -859,7 +859,7 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
                 </button>
               ) : (
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.08)', padding: '2px 5px', borderRadius: '4px', whiteSpace: 'nowrap' }}>
-                  18 Rooms
+                  27 Rooms
                 </span>
               )}
             </div>

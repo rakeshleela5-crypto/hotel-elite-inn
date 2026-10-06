@@ -216,7 +216,7 @@ export default function CaFilingStationModal({ isOpen, onClose, initialModule = 
       ['Proprietor / Trade Name', HOTEL_CONFIG.name || 'Hotel Elite Inn'],
       ['GSTIN', HOTEL_CREDENTIALS.gstin, 'PAN', HOTEL_CREDENTIALS.pan, 'Period', 'September 2026'],
       ['Address', HOTEL_CREDENTIALS.address],
-      ['Total Inventory Keys', '18 Rooms + Banquet Hall (Ground & 1st Floor)'],
+      ['Total Inventory Keys', '27 Rooms + Banquet Hall (Floors 1, 2 & 3)'],
       [''],
       ['SECTION 1: REVENUE SUMMARY', 'Gross Amount (INR)', 'Net Taxable (INR)', 'CGST (INR)', 'SGST (INR)', 'GST Rate'],
       ['Room Accommodation (SAC 996311)', '984960.00', '879428.57', '52765.71', '52765.71', '12%'],
@@ -268,7 +268,7 @@ FSSAI               : 10523016000047
 State / Division    : 21 - Odisha / RAYAGADA DIVISION
 Principal Address   : Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020
 Audit Period        : 01-September-2026 to 30-September-2026 (Full Month)
-Total Keys Checked  : 18 Keys (Ground Floor: 101-107, First Floor: 201-211) + Banquet Hall
+Total Keys Checked  : 27 Keys (1st Floor: 101–109, 2nd Floor: 201–209, 3rd Floor: 301–309) + Banquet Hall
 
 --------------------------------------------------------------------------------
 1. FINANCIAL SUMMARY (INR)
@@ -292,19 +292,19 @@ Net Operating Profit (EBITDA) : ₹   9,55,962.31 (Margin: 70.4%)
 - Auxiliary Services (SAC 996337) @ 5%  : Gross ₹   48,200.00 | Net ₹   45,904.76 | GST ₹    2,295.24
 
 --------------------------------------------------------------------------------
-3. ROOM CAPACITY & OCCUPANCY (18 KEYS)
+3. ROOM CAPACITY & OCCUPANCY (27 KEYS)
 --------------------------------------------------------------------------------
-Total Room Nights Available   : 540 Nights (18 keys * 30 days)
-Total Room Nights Sold        : 432 Nights
+Total Room Nights Available   : 810 Nights (27 keys * 30 days)
+Total Room Nights Sold        : 648 Nights
 Overall Property Occupancy    : 80.0%
 Average Daily Rate (ADR)      : ₹ 2,280.00
 Revenue Per Available (RevPAR): ₹ 1,824.00
 
 Breakdown by 4 Room Categories:
-1. Executive Room  (7 Keys)   : 188 Nights Sold | ₹ 4,70,000.00 | Occ: 89.5%
-2. Deluxe Room     (5 Keys)   : 138 Nights Sold | ₹ 2,48,400.00 | Occ: 92.0%
-3. Standard Deluxe (3 Keys)   :  84 Nights Sold | ₹ 1,68,000.00 | Occ: 93.3%
-4. Premium Suite   (3 Keys)   :  22 Nights Sold | ₹    98,560.00 | Occ: 24.4%
+1. Executive Room  (16 Keys)  : 395 Nights Sold | ₹ 8,45,300.00 | Occ: 82.3%
+2. Deluxe Room     (6 Keys)   : 154 Nights Sold | ₹ 2,75,400.00 | Occ: 85.6%
+3. Standard Deluxe (2 Keys)   :  52 Nights Sold | ₹   98,600.00 | Occ: 86.7%
+4. Premium Suite   (3 Keys)   :  47 Nights Sold | ₹ 1,52,750.00 | Occ: 52.2%
 
 --------------------------------------------------------------------------------
 4. STATUTORY AUDIT & COMPLIANCE VERIFICATION
@@ -415,7 +415,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                 <span>Proprietor: <strong style={{ color: '#fff' }}>{CA_FILING_STATION_METADATA.proprietorship.legalName}</strong></span>
                 <span>GSTIN: <strong style={{ color: '#34d399', fontFamily: 'monospace' }}>{HOTEL_CONFIG.gstin}</strong></span>
                 <span>PAN: <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{HOTEL_CONFIG.pan}</strong></span>
-                <span>Capacity: <strong style={{ color: 'var(--gold-glow)' }}>18 Keys (2 Floors)</strong></span>
+                <span>Capacity: <strong style={{ color: 'var(--gold-glow)' }}>27 Keys (3 Floors)</strong></span>
                 <span>Address: <strong style={{ color: '#cbd5e1' }}>Near Andhra Bank, New Colony, Rayagada</strong></span>
               </div>
             </div>
@@ -642,7 +642,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
             { id: 'bookings-category', num: '4', name: 'Bookings by Category', icon: Table, color: '#a78bfa' },
             { id: 'fnb-dining', num: '5', name: 'Dining & Kitchen Revenue', icon: UtensilsCrossed, color: '#f472b6' },
             { id: 'room-matrix', num: '6', name: 'Room-Type Revenue Matrix', icon: BarChart2, color: '#38bdf8' },
-            { id: 'all-18-rooms', num: '7', name: 'All 18 Rooms Breakdown', icon: Layers, color: 'var(--gold-glow)' },
+            { id: 'all-27-rooms', num: '7', name: 'All 27 Rooms Breakdown', icon: Layers, color: 'var(--gold-glow)' },
             { id: 'expense-heads', num: '8', name: 'Daily Expense Distribution', icon: PieChart, color: '#fb923c' },
             { id: 'ca-station', num: '10', name: 'CA Filing & ITC Engine', icon: ShieldCheck, color: '#34d399' }
           ].map(tab => {
@@ -751,7 +751,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', padding: '0.75rem 0', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: '0.75rem' }}>
                       <div>
-                        <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Room Stay (18 Keys)</div>
+                        <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Room Stay (27 Keys)</div>
                         <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#38bdf8' }}>₹{period.roomRevenue.toLocaleString('en-IN')}</div>
                       </div>
                       <div>
@@ -788,7 +788,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                     onClick={() => copyTableToSheets(
                       ['#', 'Financial Metric & KPI', 'Today (24-Hour Live)', 'Mid-Month (1-15 Sep)', 'Full Month (1-30 Sep Final)'],
                       [
-                        [1, 'Total Inventory Capacity', '18 Keys', '18 Keys (270 Nights)', '18 Keys (540 Nights)'],
+                        [1, 'Total Inventory Capacity', '27 Keys', '27 Keys (405 Nights)', '27 Keys (810 Nights)'],
                         [2, 'Room Nights Sold', '14 Nights', '220 Nights', '432 Nights'],
                         [3, 'Average Occupancy %', '77.8%', '81.5%', '80.0%'],
                         [4, 'Room Stay Turnover (SAC 996311)', '₹32,500.00', '₹5,01,600.00', '₹9,84,960.00'],
@@ -821,7 +821,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                     </thead>
                     <tbody>
                       {[
-                        { kpi: 'Total Inventory Capacity', d1: '18 Keys', d2: '18 Keys (270 Nights)', d3: '18 Keys (540 Nights)', highlight: 'gold' },
+                        { kpi: 'Total Inventory Capacity', d1: '27 Keys', d2: '27 Keys (405 Nights)', d3: '27 Keys (810 Nights)', highlight: 'gold' },
                         { kpi: 'Room Nights Sold', d1: '14 Nights', d2: '220 Nights', d3: '432 Nights', highlight: 'blue' },
                         { kpi: 'Average Occupancy %', d1: '77.8%', d2: '81.5%', d3: '80.0%', highlight: 'green' },
                         { kpi: 'Room Stay Turnover (SAC 996311)', d1: '₹32,500.00', d2: '₹5,01,600.00', d3: '₹9,84,960.00' },
@@ -1332,7 +1332,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
               <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '1rem' }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total Physical Inventory</div>
-                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>18 Keys</div>
+                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>27 Keys</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Available Room Nights</div>
@@ -1504,11 +1504,11 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                       ))}
                       <tr style={{ background: 'rgba(212, 175, 55, 0.12)', fontWeight: 800 }}>
                         <td className="sheets-row-num">Σ</td>
-                        <td style={{ padding: '0.85rem 1rem', color: 'var(--gold-glow)' }}>TOTAL 18-ROOM PORTFOLIO</td>
-                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#fff' }}>18 Keys</td>
-                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#94a3b8' }}>2 Floors</td>
+                        <td style={{ padding: '0.85rem 1rem', color: 'var(--gold-glow)' }}>TOTAL 27-ROOM PORTFOLIO</td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#fff' }}>27 Keys</td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#94a3b8' }}>3 Floors</td>
                         <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#cbd5e1' }}>Blended</td>
-                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#38bdf8' }}>{roomMatrixData.reduce((s, r) => s + Number(r.soldNights || 0), 0)} / 540</td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#38bdf8' }}>{roomMatrixData.reduce((s, r) => s + Number(r.soldNights || 0), 0)} / 810</td>
                         <td style={{ padding: '0.85rem 1rem', textAlign: 'center', color: '#34d399' }}>80.0%</td>
                         <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#fbbf24' }}>₹2,280.00</td>
                         <td style={{ padding: '0.85rem 1rem', textAlign: 'right', color: '#38bdf8' }}>₹1,824.00</td>
@@ -1522,31 +1522,31 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
             </div>
           )}
 
-          {/* MODULE 7: REVENUE BREAKDOWN ACROSS ALL 4 ROOM CATEGORIES (18 ROOMS TOTAL) */}
-          {activeTab === 'all-18-rooms' && (
+          {/* MODULE 7: REVENUE BREAKDOWN ACROSS ALL 4 ROOM CATEGORIES (27 ROOMS TOTAL) */}
+          {activeTab === 'all-27-rooms' && (
             <div>
               <div style={{ marginBottom: '1.25rem' }}>
                 <span style={{ color: 'var(--gold-glow)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Module #7 • Physical Inventory Audit
                 </span>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0.2rem 0', color: '#fff' }}>
-                  Revenue Breakdown Across All 4 Room Categories (18 Rooms Total)
+                  Revenue Breakdown Across All 4 Room Categories (27 Rooms Total)
                 </h2>
                 <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.85rem' }}>
-                  Key-by-key operational performance for the authentic 18 keys (Ground Floor: 101–107, First Floor: 201–211).
+                  Key-by-key operational performance for the authentic 27 keys across 3 floors (Floor 1: 101–109, Floor 2: 201–209, Floor 3: 301–309).
                 </p>
               </div>
 
               {/* Floor Grouped Tables (Google Sheets Grid) */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: '1.25rem' }}>
-                {/* Ground Floor (7 Keys) */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '1.25rem' }}>
+                {/* 1st Floor (9 Keys: 101–109) */}
                 <div style={{ borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.25)', overflow: 'hidden' }}>
-                  <SheetsToolbarLegend tableName="Ground Floor Inventory (101–107)" subtitle="7 Physical Keys Yield & Consumption">
+                  <SheetsToolbarLegend tableName="Floor 1 Inventory (101–109)" subtitle="9 Physical Keys Yield & Consumption">
                     <button
                       onClick={() => copyTableToSheets(
                         ['#', 'Room', 'Tier', 'Tariff', 'Nights', 'Occ %', 'Room Rev', 'F&B Rev', 'Total Rev'],
-                        allRoomsData.filter(r => r.floor === 'Ground').map((r, i) => [i + 1, `Room ${r.room}`, r.tier, r.tariff, r.nightsSold, `${r.occupancyPct}%`, r.revenue, r.fnbRevenue, r.total]),
-                        'Ground Floor 7 Rooms'
+                        allRoomsData.filter(r => r.floor === '1st Floor').map((r, i) => [i + 1, `Room ${r.room}`, r.tier, r.tariff, r.nightsSold, `${r.occupancyPct}%`, r.revenue, r.fnbRevenue, r.total]),
+                        'Floor 1 (9 Rooms)'
                       )}
                       className="sheets-copy-btn"
                     >
@@ -1556,7 +1556,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                   <div style={{ overflowX: 'auto' }}>
                     <table className="sheets-grid-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
                       <thead>
-                        <tr style={{ background: '#0e1726', color: '#fbbf24', borderBottom: '2px solid rgba(212, 175, 55, 0.6)' }}>
+                        <tr style={{ background: '#0e1726', color: '#38bdf8', borderBottom: '2px solid rgba(56, 189, 248, 0.6)' }}>
                           <SheetsColumnHeader title="#" badge="locked" style={{ width: '34px', textAlign: 'center' }} />
                           <SheetsColumnHeader title="Room" badge="locked" />
                           <SheetsColumnHeader title="Tier" badge="locked" />
@@ -1569,7 +1569,7 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                         </tr>
                       </thead>
                       <tbody>
-                        {allRoomsData.filter(r => r.floor === 'Ground').map((r, idx) => (
+                        {allRoomsData.filter(r => r.floor === '1st Floor').map((r, idx) => (
                           <tr key={r.room} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)' }}>
                             <td className="sheets-row-num">{idx + 1}</td>
                             <td style={{ padding: '0.5rem', fontWeight: 800, color: '#fff' }}>Room {r.room}</td>
@@ -1604,14 +1604,14 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                   </div>
                 </div>
 
-                {/* First Floor (11 Keys) */}
+                {/* 2nd Floor (9 Keys: 201–209) */}
                 <div style={{ borderRadius: '12px', border: '1px solid rgba(192, 132, 252, 0.3)', overflow: 'hidden' }}>
-                  <SheetsToolbarLegend tableName="First Floor Inventory (201–211)" subtitle="11 Physical Keys Yield & Consumption">
+                  <SheetsToolbarLegend tableName="Floor 2 Inventory (201–209)" subtitle="9 Physical Keys Yield & Consumption">
                     <button
                       onClick={() => copyTableToSheets(
                         ['#', 'Room', 'Tier', 'Tariff', 'Nights', 'Occ %', 'Room Rev', 'F&B Rev', 'Total Rev'],
-                        allRoomsData.filter(r => r.floor === '1st Floor').map((r, i) => [i + 1, `Room ${r.room}`, r.tier, r.tariff, r.nightsSold, `${r.occupancyPct}%`, r.revenue, r.fnbRevenue, r.total]),
-                        'First Floor 11 Rooms'
+                        allRoomsData.filter(r => r.floor === '2nd Floor').map((r, i) => [i + 1, `Room ${r.room}`, r.tier, r.tariff, r.nightsSold, `${r.occupancyPct}%`, r.revenue, r.fnbRevenue, r.total]),
+                        'Floor 2 (9 Rooms)'
                       )}
                       className="sheets-copy-btn"
                     >
@@ -1634,7 +1634,72 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                         </tr>
                       </thead>
                       <tbody>
-                        {allRoomsData.filter(r => r.floor === '1st Floor').map((r, idx) => (
+                        {allRoomsData.filter(r => r.floor === '2nd Floor').map((r, idx) => (
+                          <tr key={r.room} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)' }}>
+                            <td className="sheets-row-num">{idx + 1}</td>
+                            <td style={{ padding: '0.5rem', fontWeight: 800, color: '#fff' }}>Room {r.room}</td>
+                            <td style={{ padding: '0.5rem', color: '#cbd5e1' }}>{r.tier}</td>
+                            <SheetsEditableCell
+                              value={r.tariff}
+                              type="currency"
+                              align="right"
+                              onSave={(newVal) => setAllRoomsData(prev => prev.map(x => x.room === r.room ? { ...x, tariff: Number(newVal), revenue: Number(newVal) * x.nightsSold, total: (Number(newVal) * x.nightsSold) + x.fnbRevenue } : x))}
+                            />
+                            <SheetsEditableCell
+                              value={r.nightsSold}
+                              type="number"
+                              align="center"
+                              min={0}
+                              max={30}
+                              onSave={(newVal) => setAllRoomsData(prev => prev.map(x => x.room === r.room ? { ...x, nightsSold: Number(newVal), occupancyPct: ((Number(newVal) / 30) * 100).toFixed(1), revenue: x.tariff * Number(newVal), total: (x.tariff * Number(newVal)) + x.fnbRevenue } : x))}
+                            />
+                            <td style={{ padding: '0.5rem', textAlign: 'center', color: '#34d399', fontWeight: 700 }}>{r.occupancyPct}%</td>
+                            <td style={{ padding: '0.5rem', textAlign: 'right', color: '#cbd5e1' }}>₹{r.revenue.toLocaleString('en-IN')}</td>
+                            <SheetsEditableCell
+                              value={r.fnbRevenue}
+                              type="currency"
+                              align="right"
+                              onSave={(newVal) => setAllRoomsData(prev => prev.map(x => x.room === r.room ? { ...x, fnbRevenue: Number(newVal), total: x.revenue + Number(newVal) } : x))}
+                            />
+                            <td style={{ padding: '0.5rem', textAlign: 'right', fontWeight: 700, color: 'var(--gold-glow)' }}>₹{r.total.toLocaleString('en-IN')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 3rd Floor (9 Keys: 301–309) */}
+                <div style={{ borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)', overflow: 'hidden' }}>
+                  <SheetsToolbarLegend tableName="Floor 3 Inventory (301–309)" subtitle="9 Physical Keys Yield & Consumption">
+                    <button
+                      onClick={() => copyTableToSheets(
+                        ['#', 'Room', 'Tier', 'Tariff', 'Nights', 'Occ %', 'Room Rev', 'F&B Rev', 'Total Rev'],
+                        allRoomsData.filter(r => r.floor === '3rd Floor').map((r, i) => [i + 1, `Room ${r.room}`, r.tier, r.tariff, r.nightsSold, `${r.occupancyPct}%`, r.revenue, r.fnbRevenue, r.total]),
+                        'Floor 3 (9 Rooms)'
+                      )}
+                      className="sheets-copy-btn"
+                    >
+                      📋 Copy for Google Sheets
+                    </button>
+                  </SheetsToolbarLegend>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="sheets-grid-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                      <thead>
+                        <tr style={{ background: '#0e1726', color: '#fbbf24', borderBottom: '2px solid rgba(212, 175, 55, 0.6)' }}>
+                          <SheetsColumnHeader title="#" badge="locked" style={{ width: '34px', textAlign: 'center' }} />
+                          <SheetsColumnHeader title="Room" badge="locked" />
+                          <SheetsColumnHeader title="Tier" badge="locked" />
+                          <SheetsColumnHeader title="Tariff" badge="editable" align="right" />
+                          <SheetsColumnHeader title="Nights" badge="editable" align="center" />
+                          <SheetsColumnHeader title="Occ %" badge="formula" align="center" />
+                          <SheetsColumnHeader title="Room Rev" badge="formula" align="right" />
+                          <SheetsColumnHeader title="F&B Rev" badge="editable" align="right" />
+                          <SheetsColumnHeader title="Total Rev" badge="formula" align="right" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allRoomsData.filter(r => r.floor === '3rd Floor').map((r, idx) => (
                           <tr key={r.room} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)' }}>
                             <td className="sheets-row-num">{idx + 1}</td>
                             <td style={{ padding: '0.5rem', fontWeight: 800, color: '#fff' }}>Room {r.room}</td>

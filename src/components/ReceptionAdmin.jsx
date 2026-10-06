@@ -2882,7 +2882,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               label: '5. Housekeeping & Turnover', 
               icon: Layers, 
               color: '#facc15', 
-              desc: '18-Room Vacant Dirty Turnover',
+              desc: '27-Room Vacant Dirty Turnover',
               badge: roomServicesList.filter(r => r.status === 'Pending').length > 0 ? `${roomServicesList.filter(r => r.status === 'Pending').length} Pending` : null,
               badgeColor: '#f59e0b',
               onClick: () => {
@@ -2964,7 +2964,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--gold-glow)', fontSize: '0.8rem', fontWeight: 600 }}>
             <ShieldCheck size={16} /> Central PMS Operations • {HOTEL_CONFIG.legalName}
           </div>
-          <h2 style={{ fontSize: '2rem', margin: '0.2rem 0' }}>Front Desk &amp; 18-Room Operations Console</h2>
+          <h2 style={{ fontSize: '2rem', margin: '0.2rem 0' }}>Front Desk &amp; 27-Room Operations Console</h2>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             GSTIN: <strong style={{ color: '#fbbf24' }}>{HOTEL_CONFIG.gstin}</strong> • Rayagada, Odisha • Sarai Act 1867 &amp; Rule 46 Compliant
           </div>
@@ -3577,7 +3577,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 </span>
               </div>
               <p style={{ margin: '0.35rem 0 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                Track Room Nights Sold, Available Inventory (18 Keys), Average Daily Rate (ADR), RevPAR, and statutory capacity metrics
+                Track Room Nights Sold, Available Inventory (27 Keys), Average Daily Rate (ADR), RevPAR, and statutory capacity metrics
               </p>
             </div>
 
@@ -4154,7 +4154,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 />
               </div>
 
-              <SheetsToolbarLegend tableName="Master Tabular Room Ledger" subtitle="Live 18-Room Direct Interactive Google Sheets Grid" />
+              <SheetsToolbarLegend tableName="Master Tabular Room Ledger" subtitle="Live 27-Room Direct Interactive Google Sheets Grid" />
               <table className="enterprise-data-table sheets-grid-table">
                 <thead>
                   <tr>
@@ -6079,7 +6079,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   onClick={() => setIsHousekeepingPrintOpen(true)}
                   className="btn-outline-gold"
                   style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                  title="Print Daily 18-Room Floor Attendant Assignment & Linen Checklist"
+                  title="Print Daily 27-Room Floor Attendant Assignment & Linen Checklist"
                 >
                   <Printer size={14} color="var(--gold-glow)" /> Print Housekeeping Work Order
                 </button>
@@ -6087,10 +6087,10 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   type="button"
                   onClick={() => {
                     const dirtyRoomsList = rooms.filter(r => r.status === 'Vacant Dirty' || r.status === 'Cleaning');
-                    const dirtyRoomNums = dirtyRoomsList.map(r => r.roomNumber).join(', ') || 'All 18 Rooms Clean';
+                    const dirtyRoomNums = dirtyRoomsList.map(r => r.roomNumber).join(', ') || 'All 27 Rooms Clean';
                     sendHousekeepingOrderWhatsApp({
                       roomNumber: dirtyRoomNums,
-                      floor: '18-Room Inventory',
+                      floor: '27-Room Inventory',
                       roomStatus: `${dirtyRoomsList.length} Rooms Requiring Turnover`,
                       priority: dirtyRoomsList.length > 2 ? 'High' : 'Standard',
                       notes: `Current Dirty/Cleaning Rooms: ${dirtyRoomNums}. Please complete turnover & sanitization.`
@@ -6099,7 +6099,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                   }}
                   className="btn-outline-gold"
                   style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', borderColor: '#22c55e', color: '#4ade80' }}
-                  title="Dispatch 18-Room Turnover Work Order to Housekeeping Lead on WhatsApp"
+                  title="Dispatch 27-Room Turnover Work Order to Housekeeping Lead on WhatsApp"
                 >
                   <MessageCircle size={14} color="#4ade80" /> WhatsApp Floor Lead
                 </button>
@@ -7505,7 +7505,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 </span>
               </div>
               <p style={{ margin: '0.35rem 0 0', fontSize: '0.82rem', color: 'var(--text-secondary)', maxWidth: 800 }}>
-                Synchronize 18-room inventory in real time across MakeMyTrip, Goibibo, and Booking.com. Protect direct brand rates against unauthorized OTA discount coupons and manage commission leakages.
+                Synchronize 27-room inventory in real time across MakeMyTrip, Goibibo, and Booking.com. Protect direct brand rates against unauthorized OTA discount coupons and manage commission leakages.
               </p>
             </div>
 
@@ -10199,12 +10199,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 <div style={{ background: '#faf5ff', border: '1px solid #d8b4fe', padding: '0.4rem', borderRadius: '4px' }}>
                   <div style={{ fontSize: '0.7rem', color: '#6b21a8', fontWeight: 700 }}>OCCUPANCY %</div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#7e22ce' }}>
-                    {Math.round((rooms.filter(r => r.status === 'Occupied').length / (rooms.length || 18)) * 100)}%
+                    {Math.round((rooms.filter(r => r.status === 'Occupied').length / (rooms.length || 27)) * 100)}%
                   </div>
                 </div>
               </div>
 
-              {/* 18 Rooms Detailed Grid */}
+              {/* 27 Rooms Detailed Grid */}
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.72rem', marginBottom: '1.25rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '2px solid #0f172a', textAlign: 'left' }}>

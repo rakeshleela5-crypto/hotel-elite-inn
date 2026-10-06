@@ -656,7 +656,7 @@ export default function App() {
         }
       })
       .catch(err => {
-        console.debug("Edge sync offline, initialized with 18-inventory state:", err);
+        console.debug("Edge sync offline, initialized with 27-inventory state:", err);
       });
   }, [currentView, adminPinVerified]);
 
@@ -1071,7 +1071,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Navbar with 18-room counter & view switcher */}
+      {/* Navbar with 27-room counter & view switcher */}
       <Navbar 
         currentView={currentView}
         setCurrentView={setCurrentView}
