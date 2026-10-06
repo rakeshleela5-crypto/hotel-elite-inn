@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   UtensilsCrossed, ShieldCheck, CheckCircle2, AlertTriangle, 
   Share2, Printer, Sparkles, RefreshCw, Calculator, FileSpreadsheet,
-  TrendingUp, Award, ExternalLink
+  TrendingUp, Award, ExternalLink, Calendar, ChevronDown, ChevronUp,
+  FileText, Download, Check, Eye
 } from 'lucide-react';
 import { JUNE_2026_RESTAURANT_STATUTORY, JUNE_2026_RESTAURANT_TOTALS } from '../data/june2026RestaurantData';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import { 
+  getCurrentMonthDayToDateLedger, 
+  getJune2026DailyStatutoryRecords, 
+  calculateMonthlyStatutoryTotals, 
+  printStatutoryMonthEndPdf,
+  computeTodayStatutoryRecord
+} from '../utils/fnbStatutoryLedger';
+import {
+  sendDailyFnbStatutoryEodWhatsApp,
+  sendMonthlyFnbStatutorySummaryWhatsApp
+} from '../utils/whatsappDispatch';
 
 /**
- * Automated Statutory F&B Reconciliation Strip
+ * Automated Statutory F&B Reconciliation Strip & Day-to-Date Ledger
  * Replaces manual Excel reconciliation (Rows 1325-1326) with automated real-time calculation.
  * Formula: Taxable Base = (Food + Beverage) - Customer Discount - MGM (Sheet 2 Management Meals)
  * Dual Tax: CGST 2.5% + SGST 2.5%
@@ -19,191 +31,140 @@ export default function AutomatedFnbReconciliationStrip({
   onOpenCaStation,
   compact = false
 }) {
-  const [dataMode, setDataMode] = useState('audited'); // 'audited' (June 2026) | 'live' (Today)
+  // Mode: 'live' (Today's Live POS) | 'dayToDate' (Current Month 31-Day Ledger) | 'audited' (June 2026 Baseline)
+  const [dataMode, setDataMode] = useState('live');
+  const [showDailyLedgerTable, setShowDailyLedgerTable] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
 
-  // Compute live orders if in live mode
-  const liveStats = React.useMemo(() => {
-    if (!liveOrders || liveOrders.length === 0) {
-      return {
-        food: 12450.00,
-        bev: 1850.00,
-        gross: 14300.00,
-        discount: 0.00,
-        mgm: 1420.00, // Table 444 or 555
-        taxable: 12880.00,
-        cgst: 322.00,
-        sgst: 322.00,
-        total: 13524.00,
-        taxSaved: 71.00
-      };
-    }
-
-    let food = 0;
-    let bev = 0;
-    let discount = 0;
-    let mgm = 0;
-
-    liveOrders.forEach(ord => {
-      const isMgm = ord.tableNumber === '444' || ord.tableNumber === '555' || 
-                    ord.orderType === 'management' || ord.is_management_meal;
-      const amt = Number(ord.totalAmount || 0);
-
-      if (isMgm) {
-        mgm += amt;
-      } else {
-        // Estimate 94% food, 6% beverage based on property historic ratio
-        food += (amt * 0.94);
-        bev += (amt * 0.06);
-      }
-      discount += Number(ord.discount || 0);
-    });
-
-    const gross = food + bev;
-    const taxable = Math.max(0, gross - discount);
-    const cgst = taxable * 0.025;
-    const sgst = taxable * 0.025;
-    const total = taxable + cgst + sgst;
-    const taxSaved = mgm * 0.05;
-
-    return {
-      food: Math.round(food * 100) / 100,
-      bev: Math.round(bev * 100) / 100,
-      gross: Math.round(gross * 100) / 100,
-      discount: Math.round(discount * 100) / 100,
-      mgm: Math.round(mgm * 100) / 100,
-      taxable: Math.round(taxable * 100) / 100,
-      cgst: Math.round(cgst * 100) / 100,
-      sgst: Math.round(sgst * 100) / 100,
-      total: Math.round(total * 100) / 100,
-      taxSaved: Math.round(taxSaved * 100) / 100
-    };
+  // 1. Current Live Today Record
+  const todayRecord = useMemo(() => {
+    return computeTodayStatutoryRecord(liveOrders);
   }, [liveOrders]);
 
-  const activeData = dataMode === 'audited' ? {
-    food: Number(JUNE_2026_RESTAURANT_STATUTORY?.foodBase || 828328.53),
-    bev: Number(JUNE_2026_RESTAURANT_STATUTORY?.bevBase || 52935.00),
-    gross: Number(JUNE_2026_RESTAURANT_STATUTORY?.grossNetAmount || 881263.53),
-    discount: Number(JUNE_2026_RESTAURANT_STATUTORY?.discount || 63.00),
-    mgm: Number(JUNE_2026_RESTAURANT_STATUTORY?.mgmComplimentary || 90478.00),
-    taxable: Number(JUNE_2026_RESTAURANT_STATUTORY?.netTaxableTurnover || 790722.53),
-    cgst: Number(JUNE_2026_RESTAURANT_STATUTORY?.cgst || 19768.06),
-    sgst: Number(JUNE_2026_RESTAURANT_STATUTORY?.sgst || 19768.06),
-    total: Number(JUNE_2026_RESTAURANT_STATUTORY?.totalTaxableSupply || 830258.66),
-    taxSaved: Math.round(Number(JUNE_2026_RESTAURANT_STATUTORY?.mgmComplimentary || 90478.00) * 0.05 * 100) / 100
-  } : (liveStats || {
-    food: 0, bev: 0, gross: 0, discount: 0, mgm: 0, taxable: 0, cgst: 0, sgst: 0, total: 0, taxSaved: 0
-  });
+  // 2. Full Month-to-Date Ledger (Days 1 to 31 for Current Month)
+  const currentMonthDailyRecords = useMemo(() => {
+    return getCurrentMonthDayToDateLedger(liveOrders);
+  }, [liveOrders]);
 
-  const handleShareWhatsApp = () => {
-    const text = `*HOTEL ELITE INN - AUTOMATED STATUTORY F&B RECONCILIATION*
-Date Scope: ${dataMode === 'audited' ? 'Audited June 2026 (1,320 Bills)' : "Today's Live POS"}
+  // 3. June 2026 Historical Daily Records (30 Days from 1,320 Bills)
+  const juneDailyRecords = useMemo(() => {
+    return getJune2026DailyStatutoryRecords();
+  }, []);
 
-1. FOOD: ₹${Number(activeData?.food || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-2. BEVERAGE: ₹${Number(activeData?.bev || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-3. NET GROSS F&B: ₹${Number(activeData?.gross || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-4. DISCOUNT: -₹${Number(activeData?.discount || 0).toFixed(2)}
-5. MGM (Table 444 VIP & 555 Staff): -₹${Number(activeData?.mgm || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })} (0% GST)
-----------------------------------------
-6. NET TAXABLE BASE: ₹${Number(activeData?.taxable || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-7. CGST @ 2.5%: ₹${Number(activeData?.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-8. SGST @ 2.5%: ₹${Number(activeData?.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-9. TOTAL COMMERCIAL AMOUNT: ₹${Number(activeData?.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+  // Active records based on selected mode
+  const activeDailyRecords = useMemo(() => {
+    if (dataMode === 'audited') return juneDailyRecords;
+    return currentMonthDailyRecords;
+  }, [dataMode, juneDailyRecords, currentMonthDailyRecords]);
 
-*STATUTORY AUDIT VARIANCE: 0.00*
-*GST Overpayment Prevented: ₹${Number(activeData?.taxSaved || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
-Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
+  // MTD Totals for current month
+  const currentMonthTotals = useMemo(() => {
+    return calculateMonthlyStatutoryTotals(currentMonthDailyRecords);
+  }, [currentMonthDailyRecords]);
 
-    const encoded = encodeURIComponent(text);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+  // June 2026 MTD Totals
+  const juneTotals = useMemo(() => {
+    return {
+      totalBills: 1320,
+      foodBase: Number(JUNE_2026_RESTAURANT_STATUTORY?.foodBase || 828328.53),
+      bevBase: Number(JUNE_2026_RESTAURANT_STATUTORY?.bevBase || 52935.00),
+      grossNetAmount: Number(JUNE_2026_RESTAURANT_STATUTORY?.grossNetAmount || 881263.53),
+      discount: Number(JUNE_2026_RESTAURANT_STATUTORY?.discount || 63.00),
+      mgmComplimentary: Number(JUNE_2026_RESTAURANT_STATUTORY?.mgmComplimentary || 90478.00),
+      netTaxableTurnover: Number(JUNE_2026_RESTAURANT_STATUTORY?.netTaxableTurnover || 790722.53),
+      cgst: Number(JUNE_2026_RESTAURANT_STATUTORY?.cgst || 19768.06),
+      sgst: Number(JUNE_2026_RESTAURANT_STATUTORY?.sgst || 19768.06),
+      totalTax: Number(JUNE_2026_RESTAURANT_STATUTORY?.totalTax || 39536.13),
+      totalTaxableSupply: Number(JUNE_2026_RESTAURANT_STATUTORY?.totalTaxableSupply || 830258.66),
+      taxSaved: Math.round(Number(JUNE_2026_RESTAURANT_STATUTORY?.mgmComplimentary || 90478.00) * 0.05 * 100) / 100,
+      statutoryVariance: 0.00
+    };
+  }, []);
+
+  // Currently displayed strip KPI data
+  const activeData = useMemo(() => {
+    if (dataMode === 'live') {
+      return {
+        food: todayRecord.foodAmount,
+        bev: todayRecord.bevAmount,
+        gross: todayRecord.grossAmount,
+        discount: todayRecord.discount,
+        mgm: todayRecord.mgmAmount,
+        taxable: todayRecord.taxableBase,
+        cgst: todayRecord.cgst,
+        sgst: todayRecord.sgst,
+        total: todayRecord.totalAmount,
+        taxSaved: todayRecord.taxSaved,
+        bills: todayRecord.billsCount
+      };
+    } else if (dataMode === 'dayToDate') {
+      return {
+        food: currentMonthTotals.foodBase,
+        bev: currentMonthTotals.bevBase,
+        gross: currentMonthTotals.grossNetAmount,
+        discount: currentMonthTotals.discount,
+        mgm: currentMonthTotals.mgmComplimentary,
+        taxable: currentMonthTotals.netTaxableTurnover,
+        cgst: currentMonthTotals.cgst,
+        sgst: currentMonthTotals.sgst,
+        total: currentMonthTotals.totalTaxableSupply,
+        taxSaved: currentMonthTotals.taxSaved,
+        bills: currentMonthTotals.totalBills
+      };
+    } else {
+      return {
+        food: juneTotals.foodBase,
+        bev: juneTotals.bevBase,
+        gross: juneTotals.grossNetAmount,
+        discount: juneTotals.discount,
+        mgm: juneTotals.mgmComplimentary,
+        taxable: juneTotals.netTaxableTurnover,
+        cgst: juneTotals.cgst,
+        sgst: juneTotals.sgst,
+        total: juneTotals.totalTaxableSupply,
+        taxSaved: juneTotals.taxSaved,
+        bills: juneTotals.totalBills
+      };
+    }
+  }, [dataMode, todayRecord, currentMonthTotals, juneTotals]);
+
+  // Export A4 PDF Statement
+  const handleExportA4Pdf = () => {
+    const title = dataMode === 'audited' ? 'June 2026 (Audited Baseline)' : 'Current Month Live (October 2026)';
+    const totals = dataMode === 'audited' ? juneTotals : currentMonthTotals;
+    printStatutoryMonthEndPdf({
+      monthTitle: title,
+      dailyRecords: activeDailyRecords,
+      totals
+    });
   };
 
-  const handlePrintSlip = () => {
-    const printWindow = window.open('', '_blank', 'width=700,height=800');
-    if (!printWindow) return;
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Statutory F&B Audit Strip - ${HOTEL_CONFIG.name}</title>
-          <style>
-            body { font-family: monospace; padding: 20px; color: #000; font-size: 13px; }
-            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 15px; }
-            .title { font-size: 16px; font-weight: bold; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th { border: 1px solid #000; padding: 6px; font-size: 12px; background: #eee; }
-            td { border: 1px solid #000; padding: 8px; font-size: 13px; text-align: right; }
-            .formula { margin-top: 15px; padding: 10px; border: 1px solid #333; background: #fafafa; font-size: 11px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <div class="title">${HOTEL_CONFIG.name.toUpperCase()}</div>
-            <div>${HOTEL_CONFIG.address} | GSTIN: ${HOTEL_CONFIG.gstin}</div>
-            <div><strong>STATUTORY F&B RECONCILIATION SLIP (AUTOMATED PMS ENGINE)</strong></div>
-            <div>Period: ${dataMode === 'audited' ? 'Audited June Month (Rows 1325-1326)' : 'Live Today'}</div>
-          </div>
+  // WhatsApp EOD Flash (Today)
+  const handleWhatsAppTodayFlash = () => {
+    sendDailyFnbStatutoryEodWhatsApp(todayRecord);
+  };
 
-          <table>
-            <thead>
-              <tr style="color: #b91c1c;">
-                <th>FOOD</th>
-                <th>BEV</th>
-                <th>NET AM (GROSS)</th>
-                <th>DISCOU</th>
-                <th>MGM (0% TAX)</th>
-                <th>NET AM (TAXABLE)</th>
-                <th>CGST (2.5%)</th>
-                <th>SGST (2.5%)</th>
-                <th>TOTAL AMOUNT</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="font-weight: bold; color: #047857;">
-                <td>₹${activeData.food.toFixed(2)}</td>
-                <td>₹${activeData.bev.toFixed(2)}</td>
-                <td>₹${activeData.gross.toFixed(2)}</td>
-                <td>₹${activeData.discount.toFixed(2)}</td>
-                <td>₹${activeData.mgm.toFixed(2)}</td>
-                <td>₹${activeData.taxable.toFixed(2)}</td>
-                <td>₹${activeData.cgst.toFixed(2)}</td>
-                <td>₹${activeData.sgst.toFixed(2)}</td>
-                <td>₹${activeData.total.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div class="formula">
-            <strong>STATUTORY FORMULA (AUTOMATIC ZERO-EXCEL ENGINE):</strong><br/>
-            Taxable Base = (Food + Bev) - Discount - MGM<br/>
-            ₹${activeData.gross.toFixed(2)} - ₹${activeData.discount.toFixed(2)} - ₹${activeData.mgm.toFixed(2)} = <strong>₹${activeData.taxable.toFixed(2)}</strong><br/>
-            Output GST = CGST (2.5%) + SGST (2.5%) = <strong>₹${(activeData.cgst + activeData.sgst).toFixed(2)}</strong><br/>
-            *Tax Saved by Legal MGM Isolation: ₹${activeData.taxSaved.toFixed(2)}*
-          </div>
-          <div style="text-align: center; margin-top: 25px; font-size: 11px;">
-            Audited &amp; Digitally Certified by Hotel Elite Inn Statutory Engine | Generated: ${new Date().toLocaleString('en-IN')}
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 400);
+  // WhatsApp Month-End Pack (MTD)
+  const handleWhatsAppMonthlyPack = () => {
+    const title = dataMode === 'audited' ? 'June 2026' : 'October 2026';
+    const totals = dataMode === 'audited' ? juneTotals : currentMonthTotals;
+    sendMonthlyFnbStatutorySummaryWhatsApp({
+      monthTitle: title,
+      totals
+    });
   };
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 14, 26, 0.98))',
-      border: '1.5px solid rgba(212, 175, 55, 0.4)',
+      background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(6, 14, 26, 0.98))',
+      border: '1.5px solid rgba(212, 175, 55, 0.45)',
       borderRadius: '12px',
       padding: compact ? '0.75rem 1rem' : '1.25rem 1.5rem',
       marginBottom: '1.5rem',
-      boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45)',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
       position: 'relative'
     }}>
-      {/* Top Banner Header with Mode Switcher */}
+      {/* Top Banner Header with Mode Switcher & Export Suite */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -216,76 +177,141 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <div style={{
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.3))',
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.35))',
             border: '1px solid #ef4444',
             borderRadius: '8px',
-            padding: '0.4rem 0.6rem',
+            padding: '0.4rem 0.65rem',
             color: '#f87171',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.4rem',
-            fontSize: '0.8rem',
+            gap: '0.45rem',
+            fontSize: '0.82rem',
             fontWeight: 800
           }}>
-            <Calculator size={15} /> AUTOMATED STATUTORY F&B STRIP
+            <Calculator size={16} /> AUTOMATED STATUTORY F&B STRIP
           </div>
           <div>
-            <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--gold-glow)' }}>
-              Official Restaurant Statutory Reconciliation (Rows 1325–1326 Engine)
+            <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--gold-glow)' }}>
+              Official Restaurant Statutory Reconciliation (Rows 1325–1326 Live Engine)
             </div>
             <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-              ⚡ Real-time automatic deduction of Management Dining (Sheet 2) • Eliminates manual Excel computation
+              ⚡ Continuous Day-to-Date Recording • Real-time Management Dining Isolation (Sheet 2) • Zero Manual Excel
             </div>
           </div>
         </div>
 
-        {/* Mode Toggle & Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {/* 3-Way Mode Switcher & Operational Action Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+          {/* Mode Segmented Controls */}
           <div style={{
             display: 'inline-flex',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+            background: 'rgba(255, 255, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.14)',
             borderRadius: '6px',
             padding: '2px'
           }}>
             <button
               type="button"
-              onClick={() => setDataMode('audited')}
+              onClick={() => setDataMode('live')}
               style={{
-                padding: '0.3rem 0.65rem',
+                padding: '0.35rem 0.65rem',
                 borderRadius: '4px',
                 border: 'none',
-                background: dataMode === 'audited' ? 'var(--gold-primary)' : 'transparent',
-                color: dataMode === 'audited' ? '#000' : '#94a3b8',
-                fontWeight: dataMode === 'audited' ? 800 : 500,
+                background: dataMode === 'live' ? '#10b981' : 'transparent',
+                color: dataMode === 'live' ? '#ffffff' : '#94a3b8',
+                fontWeight: dataMode === 'live' ? 800 : 500,
                 fontSize: '0.72rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
             >
-              Audited June (1,320 Bills)
+              ⚡ Today's Live POS
             </button>
             <button
               type="button"
-              onClick={() => setDataMode('live')}
+              onClick={() => setDataMode('dayToDate')}
               style={{
-                padding: '0.3rem 0.65rem',
+                padding: '0.35rem 0.65rem',
                 borderRadius: '4px',
                 border: 'none',
-                background: dataMode === 'live' ? '#38bdf8' : 'transparent',
-                color: dataMode === 'live' ? '#000' : '#94a3b8',
-                fontWeight: dataMode === 'live' ? 800 : 500,
+                background: dataMode === 'dayToDate' ? '#0284c7' : 'transparent',
+                color: dataMode === 'dayToDate' ? '#ffffff' : '#94a3b8',
+                fontWeight: dataMode === 'dayToDate' ? 800 : 500,
                 fontSize: '0.72rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
             >
-              Today's Live POS
+              📅 MTD Day-to-Date (31 Days)
+            </button>
+            <button
+              type="button"
+              onClick={() => setDataMode('audited')}
+              style={{
+                padding: '0.35rem 0.65rem',
+                borderRadius: '4px',
+                border: 'none',
+                background: dataMode === 'audited' ? 'var(--gold-primary)' : 'transparent',
+                color: dataMode === 'audited' ? '#000000' : '#94a3b8',
+                fontWeight: dataMode === 'audited' ? 800 : 500,
+                fontSize: '0.72rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              📊 June Audited (1,320 Bills)
             </button>
           </div>
 
+          {/* Toggle Full 31-Day Table */}
           <button
             type="button"
-            onClick={handleShareWhatsApp}
-            title="Share Statutory Strip with Management / Owner via WhatsApp"
+            onClick={() => setShowDailyLedgerTable(!showDailyLedgerTable)}
+            style={{
+              padding: '0.35rem 0.65rem',
+              borderRadius: '6px',
+              background: showDailyLedgerTable ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              color: '#38bdf8',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              cursor: 'pointer'
+            }}
+          >
+            <Calendar size={13} /> {showDailyLedgerTable ? 'Hide 31-Day Ledger' : 'View 31-Day Ledger'}
+            {showDailyLedgerTable ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </button>
+
+          {/* 1-Click A4 Official PDF Generator */}
+          <button
+            type="button"
+            onClick={handleExportA4Pdf}
+            title="Download / Print Official A4 Statutory Statement for Owner & CA"
+            style={{
+              padding: '0.35rem 0.65rem',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.25), rgba(185, 28, 28, 0.35))',
+              border: '1px solid #ef4444',
+              color: '#fca5a5',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              cursor: 'pointer'
+            }}
+          >
+            <FileText size={13} /> 📄 Official A4 PDF
+          </button>
+
+          {/* WhatsApp EOD Flash Button */}
+          <button
+            type="button"
+            onClick={handleWhatsAppTodayFlash}
+            title="Dispatch Today's Statutory Strip to Owner via WhatsApp"
             style={{
               padding: '0.35rem 0.65rem',
               borderRadius: '6px',
@@ -303,16 +329,17 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
             <Share2 size={13} /> WhatsApp Flash
           </button>
 
+          {/* WhatsApp Month-End Pack Button */}
           <button
             type="button"
-            onClick={handlePrintSlip}
-            title="Print Official Statutory Voucher"
+            onClick={handleWhatsAppMonthlyPack}
+            title="Send MTD Month-End Reconciliation Pack to Owner & CA"
             style={{
               padding: '0.35rem 0.65rem',
               borderRadius: '6px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: '#f8fafc',
+              background: 'rgba(217, 119, 6, 0.2)',
+              border: '1px solid #d97706',
+              color: '#fbbf24',
               fontSize: '0.72rem',
               fontWeight: 700,
               display: 'inline-flex',
@@ -321,7 +348,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
               cursor: 'pointer'
             }}
           >
-            <Printer size={13} /> Print
+            <Download size={13} /> WhatsApp MTD Pack
           </button>
 
           {onOpenFullRegister && (
@@ -348,7 +375,38 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
         </div>
       </div>
 
-      {/* THE AUTHENTIC 9-CELL STATUTORY TABLE STRIP (Matching the User's Photo) */}
+      {/* Scope Identifier Badge */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '0.55rem',
+        fontSize: '0.74rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{
+            background: dataMode === 'live' ? 'rgba(16, 185, 129, 0.15)' : dataMode === 'dayToDate' ? 'rgba(2, 132, 199, 0.15)' : 'rgba(212, 175, 55, 0.15)',
+            border: `1px solid ${dataMode === 'live' ? '#10b981' : dataMode === 'dayToDate' ? '#0284c7' : 'var(--gold-primary)'}`,
+            color: dataMode === 'live' ? '#34d399' : dataMode === 'dayToDate' ? '#38bdf8' : 'var(--gold-glow)',
+            padding: '0.15rem 0.5rem',
+            borderRadius: '4px',
+            fontWeight: 800
+          }}>
+            {dataMode === 'live' ? `⚡ Today's Live Active Operations (${activeData.bills || 0} Bills Closed)` : 
+             dataMode === 'dayToDate' ? `📅 October 2026 Month-to-Date (${activeData.bills || 0} Total Settled Bills)` : 
+             `📊 Audited June 2026 Baseline (1,320 Bills Reconciled)`}
+          </span>
+          <span style={{ color: '#94a3b8' }}>
+            Dual GST: <strong>2.5% CGST + 2.5% SGST (5% Total)</strong> | SAC 996331 / 996332
+          </span>
+        </div>
+
+        <div style={{ color: '#38bdf8', fontWeight: 600 }}>
+          {showDailyLedgerTable ? 'Showing 31-Day Ledger Breakdown below' : 'Click "View 31-Day Ledger" to inspect all days'}
+        </div>
+      </div>
+
+      {/* THE AUTHENTIC 9-CELL STATUTORY TABLE STRIP (Matching Rows 1325-1326) */}
       <div style={{ overflowX: 'auto', marginBottom: '0.75rem' }}>
         <table style={{
           width: '100%',
@@ -361,15 +419,15 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
           <thead>
             <tr style={{ background: 'rgba(239, 68, 68, 0.15)', borderBottom: '2px solid rgba(239, 68, 68, 0.4)' }}>
               {[
-                { label: 'FOOD', hint: 'Gross Food Sales' },
-                { label: 'BEV', hint: 'Beverage Sales' },
-                { label: 'NET AM (GROSS)', hint: 'Food + Beverage' },
-                { label: 'DISCOU', hint: 'Customer Discount' },
-                { label: 'MGM', hint: 'Table 444 VIP & 555 Staff (0% Tax)' },
-                { label: 'NET AM (TAXABLE)', hint: 'Gross - Disc - MGM' },
-                { label: 'CGST', hint: '2.5% Central Tax' },
-                { label: 'SGST', hint: '2.5% State Tax' },
-                { label: 'TOTAL AMOUNT', hint: 'Taxable + CGST + SGST' }
+                { label: 'FOOD', hint: 'Gross Food Sales (Col E)' },
+                { label: 'BEV', hint: 'Beverage Sales (Col F)' },
+                { label: 'NET AM (GROSS)', hint: 'Food + Beverage (Col D+E)' },
+                { label: 'DISCOU', hint: 'Customer Discount (Col I)' },
+                { label: 'MGM', hint: 'Table 444 VIP & 555 Staff (Sheet 2 Non-Revenue: 0% Tax)' },
+                { label: 'NET AM (TAXABLE)', hint: 'Gross - Disc - MGM (Col F-G-H)' },
+                { label: 'CGST', hint: '2.5% Central GST (Col I*2.5%)' },
+                { label: 'SGST', hint: '2.5% State GST (Col I*2.5%)' },
+                { label: 'TOTAL AMOUNT', hint: 'Taxable + CGST + SGST (Col I+J+K)' }
               ].map((h, idx) => (
                 <th
                   key={idx}
@@ -402,7 +460,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.food || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.food || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 2. BEVERAGE */}
@@ -415,7 +473,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.bev || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.bev || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 3. NET AM (GROSS) */}
@@ -428,7 +486,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.gross || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.gross || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 4. DISCOU */}
@@ -441,7 +499,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.discount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 5. MGM (MANAGEMENT COMPLIMENTARY) */}
@@ -453,11 +511,11 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontSize: '0.98rem',
                 fontWeight: 900,
                 fontFamily: 'monospace',
-                background: 'rgba(244, 63, 94, 0.12)'
+                background: 'rgba(244, 63, 94, 0.14)'
               }}
-              title="Sheet 2 Non-Revenue Internal Meals: Table 444 (Director VIP ₹76.2K) & Table 555 (Staff Mess ₹14.2K). 0% Tax."
+              title="Sheet 2 Non-Revenue Internal Meals: Table 444 (Director VIP) & Table 555 (Staff Mess). 0% Tax."
               >
-                {Number(activeData?.mgm || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.mgm || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 6. NET AM (TAXABLE BASE) */}
@@ -469,11 +527,11 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontSize: '0.98rem',
                 fontWeight: 900,
                 fontFamily: 'monospace',
-                background: 'rgba(56, 189, 248, 0.12)'
+                background: 'rgba(56, 189, 248, 0.14)'
               }}
               title="Commercial Taxable Supply = Gross - Discount - MGM"
               >
-                {Number(activeData?.taxable || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.taxable || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 7. CGST */}
@@ -486,7 +544,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 8. SGST */}
@@ -499,7 +557,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontWeight: 900,
                 fontFamily: 'monospace'
               }}>
-                {Number(activeData?.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{Number(activeData?.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
 
               {/* 9. TOTAL AMOUNT */}
@@ -510,7 +568,7 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
                 fontSize: '1.05rem',
                 fontWeight: 900,
                 fontFamily: 'monospace',
-                background: 'rgba(212, 175, 55, 0.15)'
+                background: 'rgba(212, 175, 55, 0.18)'
               }}>
                 ₹{Number(activeData?.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </td>
@@ -527,12 +585,13 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
         flexWrap: 'wrap',
         gap: '0.5rem',
         fontSize: '0.73rem',
-        color: '#94a3b8'
+        color: '#94a3b8',
+        marginBottom: showDailyLedgerTable ? '1rem' : 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
           <CheckCircle2 size={14} color="#10b981" />
           <span>
-            <strong>Statutory Rule:</strong> Net Taxable = <code style={{ color: '#38bdf8' }}>F1326 - G1326 - H1326</code> (Gross F&amp;B ₹{Number(activeData?.gross || 0).toLocaleString('en-IN')} - Disc ₹{Number(activeData?.discount || 0).toFixed(0)} - MGM ₹{Number(activeData?.mgm || 0).toLocaleString('en-IN')})
+            <strong>Statutory Formula:</strong> Net Taxable = <code style={{ color: '#38bdf8' }}>Gross F&amp;B ₹{Number(activeData?.gross || 0).toLocaleString('en-IN')} - Disc ₹{Number(activeData?.discount || 0).toFixed(0)} - MGM ₹{Number(activeData?.mgm || 0).toLocaleString('en-IN')}</code> = <strong style={{ color: '#38bdf8' }}>₹{Number(activeData?.taxable || 0).toLocaleString('en-IN')}</strong>
           </span>
         </div>
 
@@ -556,10 +615,202 @@ Zero manual Excel work - Automated Hotel Elite Inn PMS Engine.`;
             borderRadius: '4px',
             fontWeight: 700
           }}>
-            💰 ₹{Number(activeData?.taxSaved || 0).toLocaleString('en-IN')} Illegal Tax Overpayment Prevented
+            💰 ₹{Number(activeData?.taxSaved || 0).toLocaleString('en-IN')} Legal Tax Overpayment Prevented
           </span>
         </div>
       </div>
+
+      {/* EXPANDABLE CONTINUOUS 31-DAY DAY-TO-DATE STATUTORY LEDGER */}
+      {showDailyLedgerTable && (
+        <div style={{
+          marginTop: '1rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+          paddingTop: '1rem',
+          animation: 'fadeIn 0.2s ease-in-out'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '0.65rem',
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Calendar size={16} color="var(--gold-glow)" />
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--gold-glow)' }}>
+                {dataMode === 'audited' ? 'Audited June Month (Days 1 to 30) - 1,320 Bills Ledger' : 'Current Month Day-to-Date Continuous Ledger (Days 1 to 31)'}
+              </span>
+              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                ({activeDailyRecords.length} Daily Rows Recorded)
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <button
+                type="button"
+                onClick={handleExportA4Pdf}
+                style={{
+                  padding: '0.3rem 0.6rem',
+                  borderRadius: '5px',
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  border: '1px solid #ef4444',
+                  color: '#fca5a5',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                <Printer size={12} /> Print A4 PDF
+              </button>
+            </div>
+          </div>
+
+          <div style={{
+            maxHeight: '380px',
+            overflowY: 'auto',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: '8px',
+            background: 'rgba(0, 0, 0, 0.5)'
+          }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '0.75rem'
+            }}>
+              <thead style={{ position: 'sticky', top: 0, zIndex: 10, background: '#0f172a' }}>
+                <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.2)' }}>
+                  {['DAY', 'DATE', 'BILLS', 'FOOD', 'BEVERAGE', 'NET GROSS', 'DISCOUNT', 'MGM (0%)', 'NET TAXABLE', 'CGST', 'SGST', 'TOTAL AMOUNT', 'ACTION'].map((col, idx) => (
+                    <th
+                      key={idx}
+                      style={{
+                        padding: '0.5rem 0.4rem',
+                        textAlign: idx <= 2 ? 'center' : 'right',
+                        color: idx === 7 ? '#f43f5e' : idx === 8 ? '#38bdf8' : idx === 11 ? 'var(--gold-glow)' : '#cbd5e1',
+                        fontWeight: 800,
+                        fontSize: '0.72rem',
+                        borderRight: '1px solid rgba(255, 255, 255, 0.08)'
+                      }}
+                    >
+                      {col}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {activeDailyRecords.map((r, idx) => {
+                  const isToday = r.status === 'Live Today';
+                  return (
+                    <tr
+                      key={r.date}
+                      style={{
+                        background: isToday ? 'rgba(16, 185, 129, 0.12)' : idx % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+                      }}
+                    >
+                      <td style={{ textAlign: 'center', padding: '0.4rem', fontWeight: 800, color: isToday ? '#10b981' : '#94a3b8' }}>
+                        {r.dayNumber} {isToday && '⚡'}
+                      </td>
+                      <td style={{ textAlign: 'center', padding: '0.4rem', fontFamily: 'monospace', color: '#e2e8f0' }}>
+                        {r.date}
+                      </td>
+                      <td style={{ textAlign: 'center', padding: '0.4rem', color: '#cbd5e1' }}>
+                        {r.billsCount || '-'}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#34d399', fontFamily: 'monospace' }}>
+                        ₹{Number(r.foodAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#34d399', fontFamily: 'monospace' }}>
+                        ₹{Number(r.bevAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', fontWeight: 700, color: '#f8fafc', fontFamily: 'monospace' }}>
+                        ₹{Number(r.grossAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: Number(r.discount || 0) > 0 ? '#fbbf24' : '#64748b', fontFamily: 'monospace' }}>
+                        {Number(r.discount || 0) > 0 ? '₹' + Number(r.discount).toFixed(2) : '-'}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#f43f5e', fontWeight: 700, fontFamily: 'monospace', background: 'rgba(244, 63, 94, 0.08)' }}>
+                        {Number(r.mgmAmount || 0) > 0 ? '₹' + Number(r.mgmAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 }) : '-'}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#38bdf8', fontWeight: 700, fontFamily: 'monospace', background: 'rgba(56, 189, 248, 0.08)' }}>
+                        ₹{Number(r.taxableBase || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#34d399', fontFamily: 'monospace' }}>
+                        ₹{Number(r.cgst || 0).toFixed(2)}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', color: '#34d399', fontFamily: 'monospace' }}>
+                        ₹{Number(r.sgst || 0).toFixed(2)}
+                      </td>
+                      <td style={{ textAlign: 'right', padding: '0.4rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace' }}>
+                        ₹{Number(r.totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                      <td style={{ textAlign: 'center', padding: '0.4rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => sendDailyFnbStatutoryEodWhatsApp(r)}
+                          title={`Send WhatsApp Statutory Slip for ${r.date} to Owner`}
+                          style={{
+                            background: 'rgba(37, 211, 102, 0.15)',
+                            border: '1px solid #25d366',
+                            color: '#25d366',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.4rem',
+                            fontSize: '0.65rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Share2 size={11} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot style={{ position: 'sticky', bottom: 0, zIndex: 10, background: '#020617', borderTop: '2px solid rgba(212, 175, 55, 0.5)' }}>
+                <tr>
+                  <td colSpan={2} style={{ textAlign: 'center', padding: '0.55rem', fontWeight: 900, color: 'var(--gold-glow)' }}>
+                    GRAND MTD TOTAL
+                  </td>
+                  <td style={{ textAlign: 'center', padding: '0.55rem', fontWeight: 800, color: '#f8fafc' }}>
+                    {activeData.bills}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.food).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.bev).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 900, color: '#f8fafc', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.gross).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.discount).toFixed(2)}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 900, color: '#f43f5e', fontFamily: 'monospace', background: 'rgba(244, 63, 94, 0.2)' }}>
+                    ₹{Number(activeData.mgm).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 900, color: '#38bdf8', fontFamily: 'monospace', background: 'rgba(56, 189, 248, 0.2)' }}>
+                    ₹{Number(activeData.taxable).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.cgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
+                    ₹{Number(activeData.sgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td style={{ textAlign: 'right', padding: '0.55rem', fontWeight: 900, color: 'var(--gold-glow)', fontFamily: 'monospace', background: 'rgba(212, 175, 55, 0.2)' }}>
+                    ₹{Number(activeData.total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

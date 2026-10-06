@@ -4,7 +4,7 @@ import {
   Search, Hash, DollarSign, Smartphone, Bed, ShieldCheck, X, 
   Send, Sparkles, Clock, AlertCircle, ArrowRightLeft, MessageCircle, FilePlus,
   FileSpreadsheet, Download, ChefHat, Bell, Volume2, VolumeX, Truck, Flame, RefreshCw, Eye, AlertTriangle, Filter,
-  CreditCard, QrCode
+  CreditCard, QrCode, Share2
 } from 'lucide-react';
 import { RESTAURANT_MENU, HOTEL_CONFIG, MYPOS_CANNON_KITCHEN_LAYOUT } from '../data/hotelData';
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
@@ -12,6 +12,7 @@ import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 import StewardQrManagerModal from './StewardQrManagerModal';
+import { sendDiningGuestEBillReceiptWhatsApp, sendRoomServiceOrderWhatsApp } from '../utils/whatsappDispatch';
 
 // High-entropy collision-proof unique ID generator (fixes adversarial millisecond slice(-4) cycle risk)
 const generateUniquePosId = (prefix = 'CK-KOT') => {
@@ -4086,11 +4087,11 @@ Thank you for dining at Cannon Kitchen! 🙏`;
               </div>
 
               {/* Actions */}
-              <div className="no-print" style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem' }}>
+              <div className="no-print" style={{ display: 'flex', gap: '0.45rem', marginTop: '1.25rem', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => window.print()}
                   style={{
-                    flex: 1.5,
+                    flex: 1.2,
                     padding: '0.6rem',
                     background: '#000',
                     color: '#fff',
@@ -4108,9 +4109,36 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   <Printer size={15} /> Print {kotPrintMode === 'kitchen' ? 'Chef Slip' : 'Steward Bill'}
                 </button>
                 <button
+                  onClick={() => {
+                    if (kotPrintMode === 'kitchen') {
+                      sendRoomServiceOrderWhatsApp(printKotModalOrder, 'kitchen');
+                    } else {
+                      sendDiningGuestEBillReceiptWhatsApp(printKotModalOrder);
+                    }
+                  }}
+                  title="Send via WhatsApp (Chef KOT or Guest e-Bill Receipt)"
+                  style={{
+                    flex: 1.2,
+                    padding: '0.6rem',
+                    background: 'rgba(37, 211, 102, 0.15)',
+                    border: '1.5px solid #25d366',
+                    color: '#15803d',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Share2 size={15} color="#15803d" /> WhatsApp {kotPrintMode === 'kitchen' ? 'KOT' : 'e-Bill'}
+                </button>
+                <button
                   onClick={() => setPrintKotModalOrder(null)}
                   style={{
-                    flex: 1,
+                    flex: 0.8,
                     padding: '0.6rem',
                     background: '#e2e8f0',
                     color: '#0f172a',

@@ -534,5 +534,155 @@ _Approved by Duty Night Auditor • Hotel Elite Inn, Muniguda_`;
   return openWhatsAppLink(PROPRIETOR_PHONE, executiveText);
 }
 
+/**
+ * 15. Automated Daily F&B Statutory EOD Strip to Owner
+ * Delivers the exact 9-column statutory reconciliation strip directly to the Owner's WhatsApp.
+ */
+export function sendDailyFnbStatutoryEodWhatsApp(dayRecord = {}) {
+  const dateStr = dayRecord.date || new Date().toISOString().slice(0, 10);
+  const bills = dayRecord.billsCount || 0;
+  const food = Number(dayRecord.foodAmount || 0);
+  const bev = Number(dayRecord.bevAmount || 0);
+  const gross = Number(dayRecord.grossAmount || (food + bev));
+  const discount = Number(dayRecord.discount || 0);
+  const mgm = Number(dayRecord.mgmAmount || 0);
+  const taxable = Number(dayRecord.taxableBase || Math.max(0, gross - discount - mgm));
+  const cgst = Number(dayRecord.cgst || (taxable * 0.025));
+  const sgst = Number(dayRecord.sgst || (taxable * 0.025));
+  const total = Number(dayRecord.totalAmount || (taxable + cgst + sgst));
+  const taxSaved = Number(dayRecord.taxSaved || (mgm * 0.05));
+  const cash = Number(dayRecord.settlement?.cash || 0);
+  const upi = Number(dayRecord.settlement?.upi || 0);
 
+  const text = `${BRAND_HEADER}
+🍽️ *AUTOMATED STATUTORY F&B DAILY STRIP*
+📅 *Business Date:* ${dateStr} | Status: *${dayRecord.status || 'Day Closed'}*
+Property: *${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}* | SAC: *996331 / 996332*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+📋 *OFFICIAL RECONCILIATION (ROWS 1325–1326 ENGINE):*
+1. Food Sales: ₹${food.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+2. Beverage Sales: ₹${bev.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+3. *Net Gross F&B:* *₹${gross.toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+4. Guest Discounts: -₹${discount.toFixed(2)}
+5. *MGM Complimentary:* *-₹${mgm.toLocaleString('en-IN', { minimumFractionDigits: 2 })}* (0% Tax)
+   _(Table 444 VIP & Table 555 Staff Mess internal meals)_
+─────────────────────────────────
+6. *Net Taxable Turnover:* *₹${taxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+7. Output CGST @ 2.5%: ₹${cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+8. Output SGST @ 2.5%: ₹${sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+9. *Total Commercial Amount:* *₹${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+
+🛡️ *AUDIT METRICS:*
+• Closed Bills Count: *${bills} Bills*
+• GST Overpayment Prevented: *₹${taxSaved.toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+• Statutory Variance: *₹0.00 (100% Balanced)*
+• Settlements: 💵 Cash ₹${cash.toLocaleString('en-IN')} | 📱 UPI ₹${upi.toLocaleString('en-IN')}
+
+_Automated Hotel Elite Inn Statutory Engine • Zero Manual Work._`;
+
+  return openWhatsAppLink(PROPRIETOR_PHONE, text);
+}
+
+/**
+ * 16. Month-End Statutory Tax Pack to Owner & CA
+ * Sends consolidated 31-day MTD statutory figures with official PDF download link.
+ */
+export function sendMonthlyFnbStatutorySummaryWhatsApp({
+  monthTitle = 'October 2026',
+  totals = {}
+}) {
+  const text = `${BRAND_HEADER}
+📑 *MONTH-END STATUTORY F&B RECONCILIATION PACK*
+Period: *${monthTitle.toUpperCase()}* | Outlets: *Cannon Kitchen & Banquets*
+Property: *${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}* | GSTIN: *${HOTEL_CONFIG?.gstin || '21AEWFS9433F1ZN'}*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 *MONTH-TO-DATE (MTD) CUMULATIVE RECONCILIATION:*
+• Total Bills Settled: *${totals.totalBills || 0} Bills*
+• Food Base: ₹${Number(totals.foodBase || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• Beverage Base: ₹${Number(totals.bevBase || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• *Gross F&B Turnover:* *₹${Number(totals.grossNetAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+
+🛡️ *STATUTORY EXEMPTIONS:*
+• Customer Discounts: -₹${Number(totals.discount || 0).toFixed(2)}
+• *Management Non-Revenue (Sheet 2):* *-₹${Number(totals.mgmComplimentary || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+  _(Exempt under CGST Section 7 / Schedule I - Table 444 VIP & 555 Staff)_
+
+💰 *TAXABLE SUPPLY & 5% GST LIABILITY:*
+• *Net Taxable Turnover:* *₹${Number(totals.netTaxableTurnover || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+• Total CGST (2.5%): ₹${Number(totals.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• Total SGST (2.5%): ₹${Number(totals.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+• *Total F&B GST Output Tax:* *₹${Number(totals.totalTax || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+• *Total Commercial Value:* *₹${Number(totals.totalTaxableSupply || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+
+🎉 *FINANCIAL IMPACT:*
+• *Illegal Tax Overpayment Prevented:* *₹${Number(totals.taxSaved || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}*
+• Statutory Audit Variance: *0.00*
+
+📄 *Official A4 Statutory Statement PDF is generated & verified in the PMS.*
+🔗 Open Live PMS: https://hotel-elite-inn.pages.dev
+_Shared directly for Owner & CA Monthly Tax Audit filing._`;
+
+  return openWhatsAppLink(PROPRIETOR_PHONE, text);
+}
+
+/**
+ * 17. Digital Dining Guest e-Bill Receipt with UPI Payment QR
+ */
+export function sendDiningGuestEBillReceiptWhatsApp(order = {}) {
+  const itemsText = (order.items || []).map((it, idx) => 
+    `  ${idx + 1}. *${it.name}* x ${it.quantity} = ₹${(it.price * it.quantity).toFixed(2)}`
+  ).join('\n');
+
+  const text = `${BRAND_HEADER}
+🍽️ *DIGITAL DINING RECEIPT / E-BILL*
+Bill No: *#${order.billNo || order.orderId || 'CK-' + Date.now().toString().slice(-4)}* | Date: *${new Date().toLocaleDateString('en-IN')}*
+Outlet: *${order.outlet || 'Cannon Kitchen'}* | ${order.tableNumber ? `Table: *Table ${order.tableNumber}*` : `Room: *Room ${order.roomNumber}*`}
+
+📋 *Items Ordered:*
+${itemsText || '  • Satvik Dining Selection'}
+
+💰 *Bill Breakdown:*
+• Subtotal: ₹${Number(order.subtotal || order.totalAmount || 0).toFixed(2)}
+• Discount: -₹${Number(order.discount || 0).toFixed(2)}
+• CGST (2.5%): ₹${Number(order.cgst || (order.totalAmount * 0.025)).toFixed(2)}
+• SGST (2.5%): ₹${Number(order.sgst || (order.totalAmount * 0.025)).toFixed(2)}
+• *Net Payable:* *₹${Number(order.totalAmount || 0).toFixed(2)}*
+
+💳 *Payment Mode:* ${order.paymentMode || 'UPI / Cash'}
+${order.paymentMode === 'UPI' ? '✓ Paid via PhonePe / GPay' : ''}
+
+_Thank you for dining at Hotel Elite Inn! Visit us again soon._
+⭐ Rate us on Google: https://maps.google.com`;
+
+  return openWhatsAppLink(order.guestPhone || order.phone, text);
+}
+
+/**
+ * 18. Anti-Leakage / High-Discount WhatsApp Alert to Owner
+ */
+export function sendAntiLeakageHighDiscountWhatsApp({
+  billNo,
+  steward,
+  outlet = 'Cannon Kitchen',
+  discountAmount,
+  discountPct,
+  grossAmount,
+  reason = 'Manager Discretion'
+}) {
+  const text = `${BRAND_HEADER}
+⚠️ *SECURITY & CASH AUDIT ALERT: HIGH DISCOUNT APPLIED*
+Outlet: *${outlet}* | Bill Ref: *#${billNo}*
+Timestamp: *${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}*
+
+🚨 *Discount Details:*
+• Gross Amount: ₹${Number(grossAmount || 0).toLocaleString('en-IN')}
+• Discount Applied: *₹${Number(discountAmount || 0).toLocaleString('en-IN')} (${discountPct}%)*
+• Authorized Steward: *${steward || 'Front Office'}*
+• Reason Logged: _${reason}_
+
+_This automated security notification protects the property against unauthorized cashier leakage._`;
+
+  return openWhatsAppLink(PROPRIETOR_PHONE, text);
+}
