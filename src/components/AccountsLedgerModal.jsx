@@ -23,7 +23,8 @@ export default function AccountsLedgerModal({
   transactions = [],
   corporatePartners: propCorporatePartners = null,
   onAddTransaction,
-  initialTab = 'reconciliation-audit'
+  initialTab = 'reconciliation-audit',
+  onOpenAuditedSalesRegister
 }) {
   const [selectedBillBooking, setSelectedBillBooking] = useState(null);
   const [isBillModalOpen, setIsBillModalOpen] = useState(false);
@@ -2592,13 +2593,38 @@ export default function AccountsLedgerModal({
                 </p>
               </div>
 
-              <button
-                onClick={() => window.print()}
-                className="btn-outline"
-                style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
-              >
-                <Printer size={15} /> Print Flash Report
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {onOpenAuditedSalesRegister && (
+                  <button
+                    id="accounts-open-sales-reg-btn"
+                    onClick={onOpenAuditedSalesRegister}
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.3) 0%, rgba(6, 95, 70, 0.45) 100%)',
+                      color: '#34d399',
+                      border: '1.5px solid #10b981',
+                      padding: '0.45rem 0.9rem',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
+                    }}
+                    title="Open 26-Column Audited Sales & Night Audit Register"
+                  >
+                    <FileSpreadsheet size={15} color="#34d399" /> 📊 26-Col Audited Register
+                  </button>
+                )}
+                <button
+                  onClick={() => window.print()}
+                  className="btn-outline"
+                  style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                >
+                  <Printer size={15} /> Print Flash Report
+                </button>
+              </div>
             </div>
 
             {/* Top KPI Cards */}

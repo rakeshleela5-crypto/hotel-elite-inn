@@ -6,12 +6,12 @@
  * Management/Complimentary Exemptions, Statutory Dual-Tax (CGST/SGST), and Collections.
  */
 
-import { HOTEL_CONFIG } from '../data/hotelData';
+import { HOTEL_CONFIG } from '../data/hotelData.js';
 import { 
   JUNE_2026_TOTALS, 
   JUNE_2026_SALES_RECORDS, 
   JUNE_2026_STATUTORY_RECONCILIATION 
-} from '../data/june2026SalesData';
+} from '../data/june2026SalesData.js';
 
 export const PMS_DAILY_LEDGER_STORAGE_KEY = 'hotel_elite_inn_pms_daily_master_audit_ledger';
 
@@ -421,8 +421,10 @@ export function getCurrentMonthPmsDayToDateLedger(monthKey = '2026-10', rooms = 
   // Try reading local storage overrides if any
   let storedRecords = [];
   try {
-    const raw = localStorage.getItem(`${PMS_DAILY_LEDGER_STORAGE_KEY}_${monthKey}`);
-    if (raw) storedRecords = JSON.parse(raw);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = localStorage.getItem(`${PMS_DAILY_LEDGER_STORAGE_KEY}_${monthKey}`);
+      if (raw) storedRecords = JSON.parse(raw);
+    }
   } catch (e) {
     console.error('Failed to parse stored PMS daily ledger:', e);
   }

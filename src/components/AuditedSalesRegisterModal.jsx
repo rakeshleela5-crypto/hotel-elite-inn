@@ -80,6 +80,17 @@ export default function AuditedSalesRegisterModal({
   const [importNotice, setImportNotice] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Available unique dates
   const uniqueDates = useMemo(() => {
     const dates = Array.from(new Set(records.map(r => r.date))).sort();
@@ -94,17 +105,18 @@ export default function AuditedSalesRegisterModal({
 
   // Filtered and sorted records
   const filteredRecords = useMemo(() => {
-    return records.filter(item => {
+    return (records || []).filter(item => {
+      if (!item) return false;
       // Search
       if (searchTerm.trim()) {
         const q = searchTerm.toLowerCase();
         const matchSearch = 
-          item.guestName.toLowerCase().includes(q) ||
-          item.billNo.toLowerCase().includes(q) ||
-          item.roomNo.toLowerCase().includes(q) ||
-          item.company.toLowerCase().includes(q) ||
-          item.gstin.toLowerCase().includes(q) ||
-          item.remark.toLowerCase().includes(q);
+          String(item.guestName || '').toLowerCase().includes(q) ||
+          String(item.billNo || '').toLowerCase().includes(q) ||
+          String(item.roomNo || '').toLowerCase().includes(q) ||
+          String(item.company || '').toLowerCase().includes(q) ||
+          String(item.gstin || '').toLowerCase().includes(q) ||
+          String(item.remark || '').toLowerCase().includes(q);
         if (!matchSearch) return false;
       }
 
@@ -114,26 +126,26 @@ export default function AuditedSalesRegisterModal({
       // Floor
       if (selectedFloor !== 'ALL') {
         const floorPrefix = selectedFloor;
-        if (!item.roomNo.startsWith(floorPrefix)) return false;
+        if (!String(item.roomNo || '').startsWith(floorPrefix)) return false;
       }
 
       // Room
-      if (selectedRoom !== 'ALL' && item.roomNo !== selectedRoom) return false;
+      if (selectedRoom !== 'ALL' && String(item.roomNo || '') !== selectedRoom) return false;
 
       // Segment
       if (selectedSegment === 'B2B' && !item.isB2b) return false;
       if (selectedSegment === 'FIT' && item.isB2b) return false;
 
       // Payment
-      if (selectedPayment === 'ONLINE' && item.online <= 0) return false;
-      if (selectedPayment === 'CC' && item.cc <= 0) return false;
-      if (selectedPayment === 'BTC' && item.btc <= 0) return false;
-      if (selectedPayment === 'CASH' && item.cash <= 0) return false;
-      if (selectedPayment === 'ADVANCE' && item.advance <= 0) return false;
+      if (selectedPayment === 'ONLINE' && Number(item.online || 0) <= 0) return false;
+      if (selectedPayment === 'CC' && Number(item.cc || 0) <= 0) return false;
+      if (selectedPayment === 'BTC' && Number(item.btc || 0) <= 0) return false;
+      if (selectedPayment === 'CASH' && Number(item.cash || 0) <= 0) return false;
+      if (selectedPayment === 'ADVANCE' && Number(item.advance || 0) <= 0) return false;
 
       // Adjustments Only
       if (showAdjustmentsOnly) {
-        const hasAdj = item.cash < 0 || item.discount > 0 || item.complimentary > 0 || item.voidAmt > 0;
+        const hasAdj = Number(item.cash || 0) < 0 || Number(item.discount || 0) > 0 || Number(item.complimentary || 0) > 0 || Number(item.voidAmt || 0) > 0;
         if (!hasAdj) return false;
       }
 
@@ -576,41 +588,47 @@ GRAND RECONCILIATION:
 
   // Combined dynamic KPIs for top snapshot strip
   const activeKpis = useMemo(() => {
+    const pTotals = pmsMonthTotals || {};
+    const aggs = aggregates || {};
     if (activeView === 'dayToDate') {
       return {
-        gross: pmsMonthTotals.grossAmount,
-        bills: pmsMonthTotals.totalBills,
-        rent: pmsMonthTotals.roomRent,
-        fnb: pmsMonthTotals.fnbTotal,
-        food: pmsMonthTotals.foodBill,
-        bev: pmsMonthTotals.bevBill,
-        gst: pmsMonthTotals.totalGst,
-        management: pmsMonthTotals.management,
-        taxSaved: pmsMonthTotals.taxSaved,
-        taxable: pmsMonthTotals.taxableBase,
-        totalNet: pmsMonthTotals.totalAmount,
-        cash: pmsMonthTotals.cash,
-        online: pmsMonthTotals.online,
-        btc: pmsMonthTotals.btc,
-        advance: pmsMonthTotals.advance
+        gross: Number(pTotals.grossAmount || 0),
+        bills: Number(pTotals.totalBills || 0),
+        rent: Number(pTotals.roomRent || 0),
+        fnb: Number(pTotals.fnbTotal || 0),
+        food: Number(pTotals.foodBill || 0),
+        bev: Number(pTotals.bevBill || 0),
+        gst: Number(pTotals.totalGst || 0),
+        management: Number(pTotals.management || 0),
+        taxSaved: Number(pTotals.taxSaved || 0),
+        taxable: Number(pTotals.taxableBase || 0),
+        totalNet: Number(pTotals.totalAmount || 0),
+        cash: Number(pTotals.cash || 0),
+        online: Number(pTotals.online || 0),
+        btc: Number(pTotals.btc || 0),
+        advance: Number(pTotals.advance || 0)
       };
     } else {
+      const roomSvc = Number(aggs.roomService || 0);
+      const compl = Number(aggs.complimentary || 0);
+      const totalG = Number(aggs.cgst || 0) + Number(aggs.sgst || 0);
+      const netA = Number(aggs.netAmount || 0);
       return {
-        gross: aggregates.netAmount,
-        bills: aggregates.bills,
-        rent: aggregates.rent,
-        fnb: aggregates.roomService,
-        food: Math.round(aggregates.roomService * 0.935 * 100) / 100,
-        bev: Math.round(aggregates.roomService * 0.065 * 100) / 100,
-        gst: aggregates.cgst + aggregates.sgst,
-        management: aggregates.complimentary,
-        taxSaved: Math.round((aggregates.complimentary * 0.05) * 100) / 100,
-        taxable: Math.max(0, aggregates.netAmount - (aggregates.cgst + aggregates.sgst)),
-        totalNet: aggregates.netAmount,
-        cash: aggregates.cash,
-        online: aggregates.online,
-        btc: aggregates.btc,
-        advance: aggregates.advance
+        gross: netA,
+        bills: Number(aggs.bills || 0),
+        rent: Number(aggs.rent || 0),
+        fnb: roomSvc,
+        food: Math.round(roomSvc * 0.935 * 100) / 100,
+        bev: Math.round(roomSvc * 0.065 * 100) / 100,
+        gst: totalG,
+        management: compl,
+        taxSaved: Math.round((compl * 0.05) * 100) / 100,
+        taxable: Math.max(0, netA - totalG),
+        totalNet: netA,
+        cash: Number(aggs.cash || 0),
+        online: Number(aggs.online || 0),
+        btc: Number(aggs.btc || 0),
+        advance: Number(aggs.advance || 0)
       };
     }
   }, [activeView, pmsMonthTotals, aggregates]);

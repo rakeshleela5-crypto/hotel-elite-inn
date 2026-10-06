@@ -3547,7 +3547,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             { key: 'F6', label: 'G3 RMS Rates', color: '#f59e0b', onClick: onOpenRevenueManagement },
             { key: 'F7', label: 'Night Audit', color: '#c084fc', onClick: onOpenNightAuditModal || (() => setActiveTab('cashier-audit')) },
             { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal },
-            { key: 'F9', label: '26-Col Sales Reg', color: 'var(--gold-glow)', onClick: onOpenAuditedSalesRegister },
+            { key: 'F9', label: '📊 26-Col Audited Reg', color: '#34d399', onClick: onOpenAuditedSalesRegister },
             { key: 'F10', label: 'Rest. Sales Reg', color: '#fbbf24', onClick: onOpenAuditedRestaurantRegister },
             { key: 'F11', label: '📱 QR Code Hub', color: '#10b981', onClick: () => setQrHubOpen(true) }
           ].map(item => (
@@ -3877,6 +3877,28 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           >
             <Clock size={15} /> Night Audit
           </button>
+          <button 
+            id="pms-top-audited-sales-btn"
+            onClick={onOpenAuditedSalesRegister}
+            style={{ 
+              padding: '0.55rem 1.15rem', 
+              fontSize: '0.85rem',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 95, 70, 0.6))',
+              border: '1.5px solid #10b981',
+              color: '#34d399',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 0 16px rgba(16, 185, 129, 0.35)',
+              transition: 'all 0.15s ease'
+            }}
+            title="Open 26-Column Audited Sales & Night Audit Register (Days 1–31 Continuous Ledger & 223 Bills)"
+          >
+            <FileSpreadsheet size={16} color="#34d399" /> 📊 26-Col Audited Register
+          </button>
           {onExitPMS && (
             <button 
               onClick={onExitPMS}
@@ -3933,6 +3955,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           { id: 'visualize-bookings', label: '📅 Booking Visualizer & Calendar' },
           { id: 'occupancy-report', label: '📈 Occupancy Report (Day/Mo/Yr)' },
           { id: 'cashier-audit', label: '💰 Cashier Shift Handover & Night Audit' },
+          { id: 'audited-sales-register', label: '📊 26-Column Audited Sales & Night Audit Register', isAudited: true },
           { id: 'housekeeping', label: '🧹 Housekeeping & Linen Tracker' },
           { id: 'linen-assets', label: '🧺 Linen & Room Assets (Part 3)' },
           { id: 'staff-payroll', label: '👥 Staff Attendance & Payroll (Part 1)' },
@@ -3942,7 +3965,13 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           <button
             key={tab.id}
             type="button"
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              if (tab.id === 'audited-sales-register') {
+                if (onOpenAuditedSalesRegister) onOpenAuditedSalesRegister();
+              } else {
+                setActiveTab(tab.id);
+              }
+            }}
             className={`enterprise-tab-pill ${activeTab === tab.id ? 'active' : ''}`}
             style={tab.isHub ? {
               background: activeTab === tab.id 
@@ -3954,6 +3983,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               color: activeTab === tab.id ? '#ffffff' : '#38bdf8',
               fontWeight: 800,
               boxShadow: activeTab === tab.id ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none'
+            } : tab.isAudited ? {
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 95, 70, 0.4))',
+              border: '1.5px solid #10b981',
+              color: '#34d399',
+              fontWeight: 800,
+              boxShadow: '0 0 14px rgba(16, 185, 129, 0.3)'
             } : undefined}
           >
             {tab.label}
@@ -6085,6 +6120,81 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               >
                 <RefreshCw size={16} /> Execute 09:00 PM Night Audit Run
               </button>
+            </div>
+          </div>
+
+          {/* 26-Column Audited Sales & Night Audit Master Register Card */}
+          <div className="glass-panel" style={{ 
+            padding: '1.75rem', 
+            marginBottom: '1.5rem',
+            background: 'linear-gradient(135deg, rgba(6, 95, 70, 0.3) 0%, rgba(16, 185, 129, 0.12) 100%)',
+            border: '1.5px solid #10b981',
+            borderRadius: '12px',
+            boxShadow: '0 8px 30px rgba(16, 185, 129, 0.2)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  width: 42,
+                  height: 42,
+                  borderRadius: '10px',
+                  background: 'rgba(16, 185, 129, 0.25)',
+                  border: '1.5px solid #10b981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <FileSpreadsheet size={22} color="#34d399" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', margin: 0, color: '#fff', fontWeight: 800 }}>
+                    26-Column Audited Sales &amp; Night Audit Register
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                    Continuous Day-to-Date Master Ledger (Days 1–31) • SAC 996311 (Room) + SAC 996331 (F&amp;B) + SAC 996333 (Laundry) • 223 Audited Invoices
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button 
+                  id="tab11-open-audited-sales-btn"
+                  onClick={onOpenAuditedSalesRegister}
+                  style={{
+                    padding: '0.65rem 1.25rem',
+                    fontSize: '0.88rem',
+                    fontWeight: 800,
+                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                    color: '#ffffff',
+                    border: '1px solid #10b981',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 4px 14px rgba(16, 185, 129, 0.4)'
+                  }}
+                >
+                  <FileSpreadsheet size={16} /> Open 26-Column Register (F9)
+                </button>
+                <button 
+                  onClick={onOpenAuditedRestaurantRegister}
+                  style={{
+                    padding: '0.65rem 1.1rem',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    background: 'rgba(217, 119, 6, 0.2)',
+                    color: '#fbbf24',
+                    border: '1px solid #d97706',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <UtensilsCrossed size={15} /> 1,320 Restaurant Bills (F10)
+                </button>
+              </div>
             </div>
           </div>
 

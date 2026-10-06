@@ -45,7 +45,7 @@ import {
   CA_FILING_STATION_METADATA
 } from '../data/caFilingData';
 
-export default function CaFilingStationModal({ isOpen, onClose, initialModule = 'tri-period' }) {
+export default function CaFilingStationModal({ isOpen, onClose, initialModule = 'tri-period', onOpenAuditedSalesRegister }) {
   const [activeTab, setActiveTab] = useState(initialModule || 'tri-period');
   const [expenseSearch, setExpenseSearch] = useState('');
   const [expenseFilter, setExpenseFilter] = useState('ALL');
@@ -1951,6 +1951,29 @@ For: HOTEL ELITE INN (MUNIGUDA, RAYAGADA)
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {onOpenAuditedSalesRegister && (
+                    <button
+                      id="ca-station-open-sales-reg-btn"
+                      onClick={onOpenAuditedSalesRegister}
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(245, 158, 11, 0.3) 100%)',
+                        color: 'var(--gold-glow)',
+                        border: '1.5px solid var(--gold-primary)',
+                        padding: '0.5rem 0.9rem',
+                        borderRadius: '8px',
+                        fontSize: '0.8rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                        boxShadow: '0 2px 8px rgba(212, 175, 55, 0.25)'
+                      }}
+                      title="Open 26-Column Audited Sales Register, Reconciler & Excel Importer"
+                    >
+                      <FileSpreadsheet size={14} color="var(--gold-glow)" /> 📊 Open 26-Column Register
+                    </button>
+                  )}
                   <button
                     onClick={handleExportJuneGstr1Json}
                     style={{

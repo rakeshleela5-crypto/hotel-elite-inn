@@ -335,22 +335,24 @@ export default function Navbar({
             id="nav-audited-sales-btn"
             onClick={onOpenAuditedSalesRegister}
             style={{
-              padding: '0.3rem 0.75rem',
+              padding: '0.35rem 0.85rem',
               borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 95, 70, 0.35))',
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 95, 70, 0.45))',
               border: '1.5px solid #10b981',
               color: '#34d399',
               cursor: 'pointer',
               fontWeight: 800,
-              fontSize: '0.78rem',
+              fontSize: '0.8rem',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '0.35rem',
-              boxShadow: '0 0 12px rgba(16, 185, 129, 0.25)'
+              gap: '0.4rem',
+              boxShadow: '0 0 14px rgba(16, 185, 129, 0.3)',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
             }}
             title="Open 26-Column Audited Sales Register, Reconciler & Excel Importer"
           >
-            <FileSpreadsheet size={13} color="#34d399" /> 📊 26-Col Sales Reg
+            <FileSpreadsheet size={14} color="#34d399" /> 📊 26-Column Audited Sales Register
           </button>
 
           <button
@@ -682,6 +684,28 @@ export default function Navbar({
             </button>
 
             <button 
+              id="main-nav-audited-sales-btn"
+              onClick={onOpenAuditedSalesRegister}
+              style={{
+                color: '#34d399',
+                fontSize: '0.88rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 700,
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
+              }}
+              title="Open 26-Column Audited Sales & Night Audit Register"
+            >
+              <FileSpreadsheet size={15} color="#34d399" /> 📊 26-Col Sales Reg
+            </button>
+
+            <button 
               onClick={onOpenCorporate}
               style={{
                 color: 'var(--text-primary)',
@@ -827,6 +851,9 @@ export default function Navbar({
             </button>
             <button onClick={() => { onOpenAccountsLedger(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: 'var(--gold-glow)', padding: '0.4rem 0' }}>
               ⚖️ Accounts Day Book & GST Audit
+            </button>
+            <button onClick={() => { onOpenAuditedSalesRegister?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#34d399', padding: '0.45rem 0', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <FileSpreadsheet size={15} /> 📊 26-Column Audited Sales Register
             </button>
             <button onClick={() => { onOpenCorporate(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#a78bfa', padding: '0.4rem 0' }}>
               🏢 Corporate B2B (Ashok Leyland / JK Paper)

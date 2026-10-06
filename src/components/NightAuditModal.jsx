@@ -3,7 +3,7 @@ import {
   Moon, Lock, CheckCircle2, AlertTriangle, Printer, 
   Calendar, DollarSign, Bed, UtensilsCrossed, ShieldCheck, 
   RotateCcw, ArrowRight, X, User, FileText, Loader2, MessageCircle,
-  Sun, Copy, Sparkles, Share2
+  Sun, Copy, Sparkles, Share2, FileSpreadsheet
 } from 'lucide-react';
 import { HOTEL_CONFIG, INITIAL_NIGHT_AUDITS } from '../data/hotelData';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
@@ -17,7 +17,8 @@ export default function NightAuditModal({
   rooms = [],
   bookings = [],
   transactions = [],
-  onExecuteNightAudit
+  onExecuteNightAudit,
+  onOpenAuditedSalesRegister
 }) {
   const [currentStep, setCurrentStep] = useState(1); // 1: Pre-Audit Check, 2: Post Room Charges, 3: Cash Balancing, 4: Day Lock & Rollover, 5: Audit Summary
   const [auditorName, setAuditorName] = useState('Sudhakar Reddy (Front Office Lead)');
@@ -365,6 +366,29 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
             >
               <MessageCircle size={15} /> 📱 WhatsApp Day Book
             </button>
+            {onOpenAuditedSalesRegister && (
+              <button
+                id="night-audit-open-sales-reg-btn"
+                onClick={onOpenAuditedSalesRegister}
+                style={{
+                  padding: '0.45rem 0.95rem',
+                  borderRadius: '8px',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 95, 70, 0.45))',
+                  border: '1.5px solid #10b981',
+                  color: '#34d399',
+                  cursor: 'pointer',
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)'
+                }}
+                title="Open 26-Column Audited Sales & Night Audit Register"
+              >
+                <FileSpreadsheet size={15} color="#34d399" /> 📊 26-Col Sales Reg
+              </button>
+            )}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>

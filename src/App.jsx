@@ -51,8 +51,8 @@ const LegalPoliciesModal = lazyWithRetry(() => import('./components/LegalPolicie
 const DpdpDataRightsModal = lazyWithRetry(() => import('./components/DpdpDataRightsModal'));
 const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPortal'));
 const HousekeepingPortal = lazyWithRetry(() => import('./components/HousekeepingPortal'));
-const AuditedSalesRegisterModal = lazyWithRetry(() => import('./components/AuditedSalesRegisterModal'));
-const AuditedRestaurantRegisterModal = lazyWithRetry(() => import('./components/AuditedRestaurantRegisterModal'));
+import AuditedSalesRegisterModal from './components/AuditedSalesRegisterModal';
+import AuditedRestaurantRegisterModal from './components/AuditedRestaurantRegisterModal';
 const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMobileOrderPad'));
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
@@ -62,7 +62,7 @@ import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSA
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
 import { FloatingDock } from '@/components/ui/floating-dock';
-import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database } from 'lucide-react';
+import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database, FileSpreadsheet } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState(() => {
@@ -1301,6 +1301,7 @@ export default function App() {
             corporatePartners={corporatePartners}
             onAddTransaction={handleAddTransaction}
             initialTab={accountsInitialTab}
+            onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
           />
         )}
 
@@ -1312,26 +1313,31 @@ export default function App() {
             bookings={bookings}
             transactions={transactions}
             onExecuteNightAudit={handleExecuteNightAudit}
+            onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
           />
         )}
 
         {auditedSalesRegisterOpen && (
-          <AuditedSalesRegisterModal 
-            isOpen={auditedSalesRegisterOpen}
-            onClose={() => setAuditedSalesRegisterOpen(false)}
-            initialMonth="2026-10"
-            rooms={rooms}
-            bookings={bookings}
-            foodOrders={foodOrders}
-            transactions={transactions}
-          />
+          <ErrorBoundary onExit={() => setAuditedSalesRegisterOpen(false)}>
+            <AuditedSalesRegisterModal 
+              isOpen={auditedSalesRegisterOpen}
+              onClose={() => setAuditedSalesRegisterOpen(false)}
+              initialMonth="2026-10"
+              rooms={rooms}
+              bookings={bookings}
+              foodOrders={foodOrders}
+              transactions={transactions}
+            />
+          </ErrorBoundary>
         )}
 
         {auditedRestaurantRegisterOpen && (
-          <AuditedRestaurantRegisterModal 
-            isOpen={auditedRestaurantRegisterOpen}
-            onClose={() => setAuditedRestaurantRegisterOpen(false)}
-          />
+          <ErrorBoundary onExit={() => setAuditedRestaurantRegisterOpen(false)}>
+            <AuditedRestaurantRegisterModal 
+              isOpen={auditedRestaurantRegisterOpen}
+              onClose={() => setAuditedRestaurantRegisterOpen(false)}
+            />
+          </ErrorBoundary>
         )}
 
         {stewardQrModalOpen && (
@@ -1412,6 +1418,7 @@ export default function App() {
           <CaFilingStationModal 
             isOpen={caFilingModalOpen}
             onClose={() => setCaFilingModalOpen(false)}
+            onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
           />
         )}
 
@@ -1472,6 +1479,11 @@ export default function App() {
             title: "Accounts Day Book",
             icon: <Scale className="h-5 w-5" />,
             onClick: () => handleOpenAccountsWithTab('reconciliation-audit')
+          },
+          {
+            title: "26-Col Audited Sales Register",
+            icon: <FileSpreadsheet className="h-5 w-5 text-emerald-400" />,
+            onClick: () => setAuditedSalesRegisterOpen(true)
           },
           {
             title: "System #36: CA Filing Station",
