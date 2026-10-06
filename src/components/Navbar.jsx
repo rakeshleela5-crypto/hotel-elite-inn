@@ -3,7 +3,7 @@ import {
   Scale, Hotel, Phone, Clock, Layers, Utensils, Compass, Bot, 
   ShieldCheck, Lock, Sparkles, Building2, Menu, X, ShoppingBag, 
   MapPin, CheckCircle2, FileText, MessageCircle, LogOut, Database,
-  FileSpreadsheet, UtensilsCrossed
+  FileSpreadsheet, UtensilsCrossed, Search
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
 
@@ -29,6 +29,7 @@ export default function Navbar({
   onOpenHousekeeping,
   onOpenAuditedSalesRegister,
   onOpenAuditedRestaurantRegister,
+  onOpenRoomSearch,
   cartCount = 0,
   rooms = [],
   adminPinVerified,
@@ -252,6 +253,39 @@ export default function Navbar({
           }}>
             IDS NEXT ERP
           </span>
+
+          {/* 27-Room Quick Search Trigger */}
+          <button
+            onClick={onOpenRoomSearch}
+            style={{
+              padding: '0.3rem 0.75rem',
+              borderRadius: '20px',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(15, 23, 42, 0.95))',
+              border: '1.5px solid rgba(212, 175, 55, 0.6)',
+              color: '#fff',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+              whiteSpace: 'nowrap'
+            }}
+            title="Search all 27 rooms (Ctrl+K)"
+          >
+            <Search size={13} color="#fbbf24" />
+            <span>🔍 Search 27 Rooms</span>
+            <kbd style={{
+              background: 'rgba(0,0,0,0.6)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '4px',
+              padding: '1px 5px',
+              fontSize: '0.62rem',
+              color: '#fbbf24',
+              fontFamily: 'monospace'
+            }}>Ctrl+K</kbd>
+          </button>
 
           <button
             onClick={onOpenMasterFolio}
@@ -621,6 +655,38 @@ export default function Navbar({
               Rooms & 27-Inventory
             </button>
 
+            {/* Desktop Navbar Search 27 Rooms Button */}
+            <button
+              onClick={onOpenRoomSearch}
+              style={{
+                color: '#fbbf24',
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                background: 'rgba(212, 175, 55, 0.15)',
+                border: '1px solid rgba(212, 175, 55, 0.45)',
+                padding: '0.42rem 0.85rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 800,
+                boxShadow: '0 0 10px rgba(212, 175, 55, 0.15)'
+              }}
+              title="Instant 27-Room Quick Search (Ctrl+K)"
+            >
+              <Search size={14} color="#fbbf24" />
+              <span>Search 27 Rooms</span>
+              <kbd style={{
+                background: 'rgba(0,0,0,0.6)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '4px',
+                padding: '1px 5px',
+                fontSize: '0.62rem',
+                color: '#fbbf24',
+                fontFamily: 'monospace'
+              }}>Ctrl+K</kbd>
+            </button>
+
             <button 
               onClick={onOpen3DExplorer}
               style={{
@@ -836,6 +902,9 @@ export default function Navbar({
                   <Lock size={16} /> 🔒 Front Desk Enterprise PMS (Tape Chart & Billing)
                 </>
               )}
+            </button>
+            <button onClick={() => { onOpenRoomSearch?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fbbf24', padding: '0.55rem 0.75rem', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Search size={16} /> 🔍 Search 27 Rooms (Quick Navigator)
             </button>
             <button onClick={() => { setCurrentView('guest'); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fff', padding: '0.4rem 0' }}>
               🏨 27-Room Inventory Catalog

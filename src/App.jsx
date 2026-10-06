@@ -57,12 +57,14 @@ const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMo
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
+const RoomQuickSearchModal = lazyWithRetry(() => import('./components/RoomQuickSearchModal'));
+const RoomQrModal = lazyWithRetry(() => import('./components/RoomQrModal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
 import { FloatingDock } from '@/components/ui/floating-dock';
-import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database, FileSpreadsheet } from 'lucide-react';
+import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database, FileSpreadsheet, Search } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState(() => {
@@ -356,14 +358,38 @@ export default function App() {
   const [auditedSalesRegisterOpen, setAuditedSalesRegisterOpen] = useState(false);
   const [auditedRestaurantRegisterOpen, setAuditedRestaurantRegisterOpen] = useState(false);
 
+  // Universal 27-Room Quick Search & Command Navigator (Ctrl+K)
+  const [roomSearchModalOpen, setRoomSearchModalOpen] = useState(false);
+  const [roomQrModalOpen, setRoomQrModalOpen] = useState(false);
+  const [selectedRoomForQr, setSelectedRoomForQr] = useState('101');
+
+  const handleOpenRoomQr = (roomNum) => {
+    if (roomNum) setSelectedRoomForQr(String(roomNum));
+    setRoomQrModalOpen(true);
+  };
+
   useEffect(() => {
     const handleSales = () => setAuditedSalesRegisterOpen(true);
     const handleRest = () => setAuditedRestaurantRegisterOpen(true);
+    const handleRoomSearch = () => setRoomSearchModalOpen(true);
+
+    const handleGlobalKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setRoomSearchModalOpen(prev => !prev);
+      }
+    };
+
     window.addEventListener('open_audited_sales_modal', handleSales);
     window.addEventListener('open_audited_restaurant_modal', handleRest);
+    window.addEventListener('open_room_search_modal', handleRoomSearch);
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
     return () => {
       window.removeEventListener('open_audited_sales_modal', handleSales);
       window.removeEventListener('open_audited_restaurant_modal', handleRest);
+      window.removeEventListener('open_room_search_modal', handleRoomSearch);
+      window.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, []);
   const [dynamicRates, setDynamicRates] = useState(() => calculateAllTierMicroRates({ occupancyRate: 68, daysToArrival: 3, pickupVelocity48h: 4 }));
@@ -1094,6 +1120,7 @@ export default function App() {
         onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
         onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
         onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
+        onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
         rooms={rooms}
         adminPinVerified={adminPinVerified}
         setAdminPinVerified={setAdminPinVerified}
@@ -1170,6 +1197,7 @@ export default function App() {
                 onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
                 onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
                 onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
+                onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
                 nightAudits={nightAudits}
                 foodOrders={foodOrders}
                 onUpdateOrderStatus={handleUpdateOrderStatus}
@@ -1431,6 +1459,37 @@ export default function App() {
             onUpdateRoomStatus={handleUpdateRoomStatus}
           />
         )}
+
+        {/* Universal 27-Room Quick Search & Command Navigator (Ctrl+K) */}
+        {roomSearchModalOpen && (
+          <RoomQuickSearchModal 
+            isOpen={roomSearchModalOpen}
+            onClose={() => setRoomSearchModalOpen(false)}
+            rooms={rooms}
+            bookings={bookings}
+            onOpenMasterFolio={handleOpenMasterFolio}
+            onOpenCannonKitchenPOS={() => setPosModalOpen(true)}
+            onOpenRoomQr={handleOpenRoomQr}
+            onUpdateRoomStatus={handleUpdateRoomStatus}
+            onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
+            onSelectBooking={(b) => {
+              if (b) {
+                setCurrentReceiptBooking(b);
+                setReceiptModalOpen(true);
+              }
+            }}
+          />
+        )}
+
+        {/* Digital Room QR & Keycard Access Modal */}
+        {roomQrModalOpen && (
+          <RoomQrModal 
+            isOpen={roomQrModalOpen}
+            onClose={() => setRoomQrModalOpen(false)}
+            initialRoomNumber={selectedRoomForQr}
+            rooms={rooms}
+          />
+        )}
       </Suspense>
 
       <Footer 
@@ -1455,6 +1514,11 @@ export default function App() {
       {/* 21st.dev / Magic UI Floating Luxury Navigation Dock */}
       <FloatingDock 
         items={[
+          {
+            title: "Quick Search 27 Rooms (Ctrl+K)",
+            icon: <Search className="h-5 w-5 text-amber-300" />,
+            onClick: () => setRoomSearchModalOpen(true)
+          },
           {
             title: "Reserve Luxury Room",
             icon: <Hotel className="h-5 w-5" />,

@@ -68,6 +68,7 @@ export default function ReceptionAdmin({
   onOpenHousekeeping,
   onOpenAuditedSalesRegister,
   onOpenAuditedRestaurantRegister,
+  onOpenRoomSearch,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
   initialTab
@@ -3450,6 +3451,42 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                    '🧹 Housekeeping Attendant (Financials Restricted)'}
                 </strong>
               </span>
+
+              {/* 27-Room Quick Navigator Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenRoomSearch) onOpenRoomSearch();
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(15, 23, 42, 0.95))',
+                  border: '1.5px solid #fbbf24',
+                  color: '#fbbf24',
+                  padding: '3px 10px',
+                  borderRadius: '20px',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                  marginLeft: '0.4rem'
+                }}
+                title="Instant 27-Room Search & Operations (Ctrl+K)"
+              >
+                <Search size={13} color="#fbbf24" />
+                <span>🔍 Search 27 Rooms</span>
+                <kbd style={{
+                  background: 'rgba(0,0,0,0.6)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '4px',
+                  padding: '1px 5px',
+                  fontSize: '0.62rem',
+                  color: '#fbbf24',
+                  fontFamily: 'monospace'
+                }}>Ctrl+K</kbd>
+              </button>
             </div>
           </div>
 
