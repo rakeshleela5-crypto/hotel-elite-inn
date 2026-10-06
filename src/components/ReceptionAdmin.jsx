@@ -81,7 +81,7 @@ export default function ReceptionAdmin({
       setActiveTab(initialTab);
     }
   }, [initialTab]);
-  const [tapeChartViewMode, setTapeChartViewMode] = useState('table'); // 'table' (Master Tabular Ledger), 'mysoft' (Legacy Tape Matrix), or 'modern' (Cards)
+  const [tapeChartViewMode, setTapeChartViewMode] = useState('table'); // 'table' (Master Tabular Ledger), 'mysoft' (Tabular Matrix), or 'modern' (Cards)
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -2644,6 +2644,618 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
     setFeedbackToast(`Luggage pass ${passId} safely released to guest.`);
   };
 
+  // Standardized Operational Actions Renderer across Master Tabular Ledger, Tabular Matrix, and Modern Cards
+  const renderOperationalActionButtons = (room, mode = 'table') => {
+    const status = room.effectiveStatus || room.status || 'Available';
+    const isOccupied = status === 'Occupied' || status === 'Occupied Clean';
+    const isMaint = status === 'Maintenance';
+    const isCleaning = status === 'Cleaning' || status === 'Vacant Dirty';
+    const isVacant = status === 'Available';
+
+    const matchedBooking = room.matchedBooking || bookings.find(b => b.roomNumber === room.roomNumber || b.room_number === room.roomNumber) || {
+      bookingId: `FMBIL2627-${room.roomNumber}`,
+      billNo: `FMBIL2627-${room.roomNumber}`,
+      roomNumber: room.roomNumber,
+      guestName: room.effectiveGuestName || room.currentGuestName || (isOccupied ? 'Guest In-House' : 'WALK-IN GUEST'),
+      guestPhone: room.effectivePhone || '+91 94370 22555',
+      company: room.effectiveCompany || (isOccupied ? 'LINDE INDIA LTD' : 'INDIVIDUAL'),
+      corporateGstin: '21AAACB2528H1ZA',
+      tier: room.tier,
+      tariff: room.effectiveTariff || room.tariff || 2199,
+      totalAmount: room.effectiveBalanceDue || room.balanceDue || room.tariff || 2199,
+      nights: 1,
+      grcNo: `GRC-${room.roomNumber}`,
+      checkInDate: filterFromDate || '22/09/2026',
+      checkInTime: '11:00 AM',
+      checkOutDate: `${filterToDate || '23/09/2026'} (12:00 PM)`
+    };
+
+    if (mode === 'table') {
+      return (
+        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'nowrap' }}>
+          {isOccupied ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setSelectedFolioRoom(room)}
+                style={{
+                  padding: '3px 8px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(96, 165, 250, 0.35))',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.5)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Open Unified Primary Folio (All 17 Operations: Ledger, Charges, Transfers, Sub-Folio Windows, Dispute Hold, 50/50 Split, Caution Deposit)"
+              >
+                📄 Folio (1-17)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenStayExtension(room)}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(234, 179, 8, 0.25)',
+                  color: '#facc15',
+                  border: '1px solid #facc15',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Official Stay Extension (Prevent Cash Pocketing)"
+              >
+                ⏳ Extend
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setReceiptModalType('a4');
+                  setSelectedReceiptBooking(matchedBooking);
+                  setIsReceiptModalOpen(true);
+                }}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(212, 175, 55, 0.2)',
+                  color: 'var(--gold-glow)',
+                  border: '1px solid var(--gold-glow)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Official Tax Invoice / Bill"
+              >
+                🧾 Bill
+              </button>
+              <button
+                type="button"
+                onClick={() => setCheckoutRoom(room)}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(234, 179, 8, 0.25)',
+                  color: '#facc15',
+                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Check-Out & Settlement"
+              >
+                ⚡ Out
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSendWelcomePass(room)}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(37, 211, 102, 0.2)',
+                  color: '#4ade80',
+                  border: '1px solid rgba(37, 211, 102, 0.4)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="WhatsApp Guest Registration Card"
+              >
+                📲 Pass
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenShiftModal(room)}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Shift Room"
+              >
+                🔄 Shift
+              </button>
+            </>
+          ) : isVacant ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setWalkInRoom(room.roomNumber);
+                  setWalkInRate(room.effectiveTariff || room.tariff || 1699);
+                  setWalkInDeposit(room.effectiveTariff || room.tariff || 1699);
+                  setWalkInOpen(true);
+                }}
+                style={{
+                  padding: '3px 9px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(56, 189, 248, 0.25)',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.5)',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                + Walk-In Check-In
+              </button>
+              <button
+                type="button"
+                onClick={() => onUpdateRoomStatus(room.roomNumber, 'Vacant Dirty', null, null)}
+                style={{
+                  padding: '3px 7px',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  background: 'rgba(234, 179, 8, 0.15)',
+                  color: '#facc15',
+                  border: '1px solid rgba(234, 179, 8, 0.3)',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Mark Dirty / Needs Cleaning"
+              >
+                🧹 Clean
+              </button>
+            </>
+          ) : isCleaning ? (
+            <button
+              type="button"
+              onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
+              style={{
+                padding: '3px 10px',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                background: 'rgba(16, 185, 129, 0.25)',
+                color: '#34d399',
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              ✓ Mark Clean / Ready
+            </button>
+          ) : isMaint ? (
+            <button
+              type="button"
+              onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
+              style={{
+                padding: '3px 10px',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                background: 'rgba(16, 185, 129, 0.25)',
+                color: '#34d399',
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Release OOO
+            </button>
+          ) : null}
+        </div>
+      );
+    }
+
+    // mode === 'matrix' or 'card' (Dedicated Operational Actions Dock for Tabular Matrix & Modern Cards)
+    return (
+      <div 
+        style={{
+          marginTop: 'auto',
+          paddingTop: '0.45rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          width: '100%'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '0.35rem'
+        }}>
+          <span style={{
+            fontSize: '0.64rem',
+            fontWeight: 800,
+            color: 'var(--gold-glow)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '3px'
+          }}>
+            ⚡ Operational Actions
+          </span>
+          <span style={{
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            color: isOccupied ? '#fb923c' : isVacant ? '#34d399' : isCleaning ? '#facc15' : '#cbd5e1',
+            background: 'rgba(0,0,0,0.35)',
+            padding: '1px 5px',
+            borderRadius: '3px'
+          }}>
+            {status.toUpperCase()}
+          </span>
+        </div>
+
+        {isOccupied && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
+            {/* Primary Operations Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '3px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedFolioRoom(room)}
+                title="Open Unified Primary Folio (1-17): Ledger, Charges, Transfers, Sub-Folio Windows, Dispute Hold, 50/50 Split, Caution Deposit"
+                style={{
+                  padding: '4px 3px',
+                  fontSize: '0.67rem',
+                  fontWeight: 700,
+                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(96, 165, 250, 0.35))',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.5)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                📄 Folio (1-17)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setReceiptModalType('a4');
+                  setSelectedReceiptBooking(matchedBooking);
+                  setIsReceiptModalOpen(true);
+                }}
+                title="Official Tax Invoice / Bill (A4 Print / GST Breakdown)"
+                style={{
+                  padding: '4px 3px',
+                  fontSize: '0.67rem',
+                  fontWeight: 700,
+                  background: 'rgba(212, 175, 55, 0.2)',
+                  color: 'var(--gold-glow)',
+                  border: '1px solid var(--gold-glow)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                🧾 Bill
+              </button>
+              <button
+                type="button"
+                onClick={() => setCheckoutRoom(room)}
+                title="Check-Out & Settlement (PhonePe + Cash / Corporate BTC)"
+                style={{
+                  padding: '4px 3px',
+                  fontSize: '0.67rem',
+                  fontWeight: 800,
+                  background: 'rgba(234, 179, 8, 0.25)',
+                  color: '#facc15',
+                  border: '1px solid rgba(234, 179, 8, 0.5)',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                ⚡ Out
+              </button>
+            </div>
+
+            {/* Secondary Operations Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3px' }}>
+              <button
+                type="button"
+                onClick={() => handleOpenStayExtension(room)}
+                title="Official Stay Extension (Prevent Cash Pocketing)"
+                style={{
+                  padding: '3px 2px',
+                  fontSize: '0.62rem',
+                  fontWeight: 800,
+                  background: 'rgba(234, 179, 8, 0.2)',
+                  color: '#facc15',
+                  border: '1px solid #facc15',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                ⏳ Extend
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSendWelcomePass(room)}
+                title="Send WhatsApp Digital Keycard & GRC Pass"
+                style={{
+                  padding: '3px 2px',
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  background: 'rgba(37, 211, 102, 0.2)',
+                  color: '#4ade80',
+                  border: '1px solid rgba(37, 211, 102, 0.4)',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                📲 Pass
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenShiftModal(room)}
+                title="Shift Room to another Vacant room"
+                style={{
+                  padding: '3px 2px',
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  background: 'rgba(168, 85, 247, 0.2)',
+                  color: '#c084fc',
+                  border: '1px solid rgba(168, 85, 247, 0.4)',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                🔄 Shift
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenEditStay(room)}
+                title="Edit Stay & Guest Details: extend dates, extra bed, info"
+                style={{
+                  padding: '3px 2px',
+                  fontSize: '0.62rem',
+                  fontWeight: 700,
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  color: '#60a5fa',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center'
+                }}
+              >
+                ✏️ Stay
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isVacant && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '3px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                setWalkInRoom(room.roomNumber);
+                setWalkInRate(room.effectiveTariff || room.tariff || 1699);
+                setWalkInDeposit(room.effectiveTariff || room.tariff || 1699);
+                setWalkInOpen(true);
+              }}
+              style={{
+                padding: '4px 4px',
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                background: 'rgba(56, 189, 248, 0.25)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.5)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              + Walk-In
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdateRoomStatus(room.roomNumber, 'Vacant Dirty', null, null)}
+              title="Flag Room as Vacant Dirty (Needs Cleaning / Turnover)"
+              style={{
+                padding: '4px 3px',
+                fontSize: '0.66rem',
+                fontWeight: 600,
+                background: 'rgba(234, 179, 8, 0.18)',
+                color: '#facc15',
+                border: '1px solid rgba(234, 179, 8, 0.35)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              🧹 Clean
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setBlockSelectedRoom(room.roomNumber);
+                setBlockRoomOpen(true);
+              }}
+              title="Block Room / Maintenance"
+              style={{
+                padding: '4px 3px',
+                fontSize: '0.66rem',
+                fontWeight: 600,
+                background: 'rgba(239, 68, 68, 0.18)',
+                color: '#f87171',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              ⛔ Block
+            </button>
+          </div>
+        )}
+
+        {isCleaning && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: '3px' }}>
+            <button
+              type="button"
+              onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
+              title="Housekeeping inspection complete: Release room to Vacant Clean"
+              style={{
+                padding: '4px 4px',
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.45))',
+                color: '#34d399',
+                border: '1px solid #10b981',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              ✓ Ready
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setWalkInRoom(room.roomNumber);
+                setWalkInRate(room.effectiveTariff || room.tariff || 1699);
+                setWalkInDeposit(room.effectiveTariff || room.tariff || 1699);
+                setWalkInOpen(true);
+              }}
+              style={{
+                padding: '4px 3px',
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                background: 'rgba(56, 189, 248, 0.2)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              + Walk-In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setReceiptModalType('a4');
+                setSelectedReceiptBooking(matchedBooking);
+                setIsReceiptModalOpen(true);
+              }}
+              title="View Last Settled Tax Invoice / Bill"
+              style={{
+                padding: '4px 3px',
+                fontSize: '0.66rem',
+                fontWeight: 700,
+                background: 'rgba(212, 175, 55, 0.2)',
+                color: 'var(--gold-glow)',
+                border: '1px solid var(--gold-glow)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              🧾 Bill
+            </button>
+          </div>
+        )}
+
+        {isMaint && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px' }}>
+            <button
+              type="button"
+              onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
+              style={{
+                padding: '4px 4px',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                background: 'rgba(16, 185, 129, 0.25)',
+                color: '#34d399',
+                border: '1px solid rgba(16, 185, 129, 0.5)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              Release OOO
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setWorkOrderForm({
+                  roomNumber: room.roomNumber,
+                  issue: 'Maintenance Inspection Required',
+                  category: 'Civil / Carpentry',
+                  priority: 'High',
+                  technician: 'Bikram Patra (AC Specialist)',
+                  targetEta: 'Within 2 Hours',
+                  notes: 'Direct from Rooms Console'
+                });
+                setIsWorkOrderModalOpen(true);
+              }}
+              style={{
+                padding: '4px 4px',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                background: 'rgba(245, 158, 11, 0.2)',
+                color: '#fbbf24',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                textAlign: 'center'
+              }}
+            >
+              🛠️ Ticket
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <section 
       id="reception-admin-container" 
@@ -4018,7 +4630,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 className={`enterprise-tab-pill ${tapeChartViewMode === 'mysoft' ? 'active' : ''}`}
                 onClick={() => setTapeChartViewMode('mysoft')}
               >
-                📊 Legacy Tape Matrix
+                📊 Tabular Matrix
               </button>
               <button
                 type="button"
@@ -4367,205 +4979,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
 
                           {/* Operational Actions */}
                           <td>
-                            <div style={{ display: 'flex', gap: '4px', justifyContent: 'center', flexWrap: 'nowrap' }}>
-                              {isOccupied ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedFolioRoom(room)}
-                                    style={{
-                                      padding: '3px 8px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(96, 165, 250, 0.35))',
-                                      color: '#38bdf8',
-                                      border: '1px solid rgba(56, 189, 248, 0.5)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="Open Unified Primary Folio (All 17 Operations: Ledger, Charges, Transfers, Sub-Folio Windows, Dispute Hold, 50/50 Split, Caution Deposit)"
-                                  >
-                                    📄 Folio (1-17)
-                                  </button>
-                                  {isOccupied && (
-                                    <button
-                                      type="button"
-                                      onClick={() => handleOpenStayExtension(room)}
-                                      style={{
-                                        padding: '3px 7px',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 800,
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        background: 'rgba(234, 179, 8, 0.25)',
-                                        color: '#facc15',
-                                        border: '1px solid #facc15',
-                                        whiteSpace: 'nowrap'
-                                      }}
-                                      title="Official Stay Extension (Prevent Cash Pocketing)"
-                                    >
-                                      ⏳ Extend
-                                    </button>
-                                  )}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setReceiptModalType('a4');
-                                      setSelectedReceiptBooking(matchedBooking);
-                                      setIsReceiptModalOpen(true);
-                                    }}
-                                    style={{
-                                      padding: '3px 7px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(212, 175, 55, 0.2)',
-                                      color: 'var(--gold-glow)',
-                                      border: '1px solid var(--gold-glow)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="Official Tax Invoice / Bill"
-                                  >
-                                    🧾 Bill
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setCheckoutRoom(room)}
-                                    style={{
-                                      padding: '3px 7px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 800,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(234, 179, 8, 0.25)',
-                                      color: '#facc15',
-                                      border: '1px solid rgba(234, 179, 8, 0.5)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="Check-Out & Settlement"
-                                  >
-                                    ⚡ Out
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSendWelcomePass(room)}
-                                    style={{
-                                      padding: '3px 7px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(37, 211, 102, 0.2)',
-                                      color: '#4ade80',
-                                      border: '1px solid rgba(37, 211, 102, 0.4)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="WhatsApp Guest Registration Card"
-                                  >
-                                    📲 Pass
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenShiftModal(room)}
-                                    style={{
-                                      padding: '3px 7px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 600,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(255, 255, 255, 0.08)',
-                                      color: '#cbd5e1',
-                                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="Shift Room"
-                                  >
-                                    🔄 Shift
-                                  </button>
-                                </>
-                              ) : isVacant ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setWalkInRoom(room.roomNumber);
-                                      setWalkInRate(room.tariff || 1699);
-                                      setWalkInDeposit(room.tariff || 1699);
-                                      setWalkInOpen(true);
-                                    }}
-                                    style={{
-                                      padding: '3px 9px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(56, 189, 248, 0.25)',
-                                      color: '#38bdf8',
-                                      border: '1px solid rgba(56, 189, 248, 0.5)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                  >
-                                    + Walk-In Check-In
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => onUpdateRoomStatus(room.roomNumber, 'Vacant Dirty', null, null)}
-                                    style={{
-                                      padding: '3px 7px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 600,
-                                      borderRadius: '4px',
-                                      cursor: 'pointer',
-                                      background: 'rgba(234, 179, 8, 0.15)',
-                                      color: '#facc15',
-                                      border: '1px solid rgba(234, 179, 8, 0.3)',
-                                      whiteSpace: 'nowrap'
-                                    }}
-                                    title="Mark Dirty / Needs Cleaning"
-                                  >
-                                    🧹 Clean
-                                  </button>
-                                </>
-                              ) : isCleaning ? (
-                                <button
-                                  type="button"
-                                  onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
-                                  style={{
-                                    padding: '3px 10px',
-                                    fontSize: '0.7rem',
-                                    fontWeight: 700,
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    background: 'rgba(16, 185, 129, 0.25)',
-                                    color: '#34d399',
-                                    border: '1px solid rgba(16, 185, 129, 0.5)',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                >
-                                  ✓ Mark Clean / Ready
-                                </button>
-                              ) : isMaint ? (
-                                <button
-                                  type="button"
-                                  onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
-                                  style={{
-                                    padding: '3px 10px',
-                                    fontSize: '0.7rem',
-                                    fontWeight: 700,
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    background: 'rgba(16, 185, 129, 0.25)',
-                                    color: '#34d399',
-                                    border: '1px solid rgba(16, 185, 129, 0.5)',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                >
-                                  Release OOO
-                                </button>
-                              ) : null}
-                            </div>
+                            {renderOperationalActionButtons(room, 'table')}
                           </td>
                         </tr>
                       );
@@ -4612,7 +5026,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
 
                     <div style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                       gap: '0.65rem'
                     }}>
                       {floorRooms.map(room => {
@@ -4813,368 +5227,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                               </div>
                             </div>
 
-                            {/* Quick Action Strip (Enhanced with Folio Actions from hotel_documents.pdf Page 5) */}
-                            <div style={{
-                              display: 'flex',
-                              gap: '0.2rem',
-                              marginTop: '0.5rem',
-                              borderTop: '1px solid rgba(255,255,255,0.06)',
-                              paddingTop: '0.35rem'
-                            }}>
-                              {isOccupied && (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
-                                  {/* Row 1: Folio, Tax Bill, GRC, Quick Checkout */}
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '3px', width: '100%' }}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedFolioRoom(room);
-                                      }}
-                                      title="Open Upgraded Master Folio (Sub-Folio Windows, Dispute Escrow, Colleague Split, Caution Refund)"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(96, 165, 250, 0.35))',
-                                        color: '#38bdf8',
-                                        border: '1px solid rgba(56, 189, 248, 0.5)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      📑 Folio
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setReceiptModalType('a4');
-                                        const matchedBooking = bookings.find(b => b.roomNumber === room.roomNumber || b.room_number === room.roomNumber) || {
-                                          bookingId: `FMBIL2627-${room.roomNumber}`,
-                                          billNo: `FMBIL2627-${room.roomNumber}`,
-                                          roomNumber: room.roomNumber,
-                                          guestName: room.currentGuestName || 'SAHANAWAZ',
-                                          guestPhone: '+91 94370 22555',
-                                          company: room.currentGuestName?.includes('ASHOK') ? 'LINDE INDIA LTD' : 'Direct Guest',
-                                          corporateGstin: '21AAACB2528H1ZA',
-                                          tier: room.tier,
-                                          tariff: room.tariff || 2199,
-                                          totalAmount: room.balanceDue || room.tariff || 2199,
-                                          nights: 1,
-                                          grcNo: `GRC-${room.roomNumber}`,
-                                          checkInDate: '22/09/2026',
-                                          checkInTime: '11:00 AM',
-                                          checkOutDate: '23/09/2026 (12:00 PM)'
-                                        };
-                                        setSelectedReceiptBooking(matchedBooking);
-                                        setIsReceiptModalOpen(true);
-                                      }}
-                                      title="Consolidated Tax Invoice / Non-GST Bill (GST / Non-GST Toggle, Taxable Breakdown)"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'rgba(16, 185, 129, 0.25)',
-                                        color: '#34d399',
-                                        border: '1px solid rgba(16, 185, 129, 0.5)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      🧾 Bill
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setReceiptModalType('grc');
-                                        const matchedBooking = bookings.find(b => b.roomNumber === room.roomNumber || b.room_number === room.roomNumber) || {
-                                          bookingId: `FMBIL2627-${room.roomNumber}`,
-                                          billNo: `FMBIL2627-${room.roomNumber}`,
-                                          roomNumber: room.roomNumber,
-                                          guestName: room.currentGuestName || 'SAHANAWAZ',
-                                          guestPhone: '+91 94370 22555',
-                                          company: room.currentGuestName?.includes('ASHOK') ? 'LINDE INDIA LTD' : 'Direct Guest',
-                                          corporateGstin: '21AAACB2528H1ZA',
-                                          tier: room.tier,
-                                          tariff: room.tariff || 2199,
-                                          totalAmount: room.balanceDue || room.tariff || 2199,
-                                          nights: 1,
-                                          grcNo: `GRC-${room.roomNumber}`,
-                                          checkInDate: '22/09/2026',
-                                          checkInTime: '11:00 AM',
-                                          checkOutDate: '23/09/2026 (12:00 PM)'
-                                        };
-                                        setSelectedReceiptBooking(matchedBooking);
-                                        setIsReceiptModalOpen(true);
-                                      }}
-                                      title="Official Guest Registration Card (Page 1) - Print for Guest Signature"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'rgba(212, 175, 55, 0.25)',
-                                        color: 'var(--gold-glow)',
-                                        border: '1px solid var(--gold-glow)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      📄 GRC
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setCheckoutRoom(room);
-                                      }}
-                                      title="Check Out & Multi-Tender Split Settlement (PhonePe + Cash)"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 800,
-                                        background: 'rgba(234, 179, 8, 0.25)',
-                                        color: '#facc15',
-                                        border: '1px solid rgba(234, 179, 8, 0.5)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      ⚡ Out
-                                    </button>
-                                  </div>
-
-                                  {/* Row 2: Shift Room, Edit Stay, WhatsApp Pass, Stay Extension */}
-                                  <div style={{ display: 'grid', gridTemplateColumns: room.matchedTransit ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)', gap: '3px', width: '100%' }}>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleOpenShiftModal(room);
-                                      }}
-                                      title="Shift Room to another Vacant room"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'rgba(168, 85, 247, 0.2)',
-                                        color: '#c084fc',
-                                        border: '1px solid rgba(168, 85, 247, 0.4)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      ⇄ Shift
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleOpenEditStay(room);
-                                      }}
-                                      title="Edit Stay & Guest Details: extend dates, extra bed, info"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'rgba(59, 130, 246, 0.2)',
-                                        color: '#60a5fa',
-                                        border: '1px solid rgba(59, 130, 246, 0.4)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      ✏️ Stay
-                                    </button>
-                                    {isOccupied && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          handleOpenStayExtension(room);
-                                        }}
-                                        title="Official Stay Extension (Prevent Cash Pocketing)"
-                                        style={{
-                                          padding: '3px 2px',
-                                          fontSize: '0.62rem',
-                                          fontWeight: 800,
-                                          background: 'rgba(234, 179, 8, 0.3)',
-                                          color: '#facc15',
-                                          border: '1px solid #facc15',
-                                          borderRadius: '3px',
-                                          cursor: 'pointer',
-                                          whiteSpace: 'nowrap',
-                                          textAlign: 'center'
-                                        }}
-                                      >
-                                        ⏳ Ext
-                                      </button>
-                                    )}
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleSendWelcomePass(room);
-                                      }}
-                                      title="Send WhatsApp Digital Keycard & Welcome Pass"
-                                      style={{
-                                        padding: '3px 2px',
-                                        fontSize: '0.62rem',
-                                        fontWeight: 700,
-                                        background: 'rgba(34, 197, 94, 0.2)',
-                                        color: '#4ade80',
-                                        border: '1px solid rgba(34, 197, 94, 0.4)',
-                                        borderRadius: '3px',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        textAlign: 'center'
-                                      }}
-                                    >
-                                      💬 Pass
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                              {isCleaning && (
-                                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '3px', width: '100%' }}>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onUpdateRoomStatus(room.roomNumber, 'Available', null, null);
-                                    }}
-                                    title="Housekeeping complete: Release room to Vacant Clean (Ready for Guest)"
-                                    style={{
-                                      padding: '3px 2px',
-                                      fontSize: '0.62rem',
-                                      fontWeight: 800,
-                                      background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(5, 150, 105, 0.45))',
-                                      color: '#34d399',
-                                      border: '1px solid #10b981',
-                                      borderRadius: '3px',
-                                      cursor: 'pointer',
-                                      whiteSpace: 'nowrap',
-                                      textAlign: 'center'
-                                    }}
-                                  >
-                                    🧹 Ready
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setWalkInRoom(room.roomNumber);
-                                      setWalkInRate(room.tariff);
-                                      setWalkInDeposit(room.tariff);
-                                      setWalkInOpen(true);
-                                    }}
-                                    title="Immediate Walk-In Check-In"
-                                    style={{
-                                      padding: '3px 2px',
-                                      fontSize: '0.62rem',
-                                      fontWeight: 700,
-                                      background: 'rgba(56, 189, 248, 0.2)',
-                                      color: '#38bdf8',
-                                      border: '1px solid rgba(56, 189, 248, 0.4)',
-                                      borderRadius: '3px',
-                                      cursor: 'pointer',
-                                      whiteSpace: 'nowrap',
-                                      textAlign: 'center'
-                                    }}
-                                  >
-                                    + Walk-In
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setReceiptModalType('a4');
-                                      const matchedBooking = bookings.find(b => b.roomNumber === room.roomNumber || b.room_number === room.roomNumber) || {
-                                        bookingId: `FMBIL2627-${room.roomNumber}`,
-                                        billNo: `FMBIL2627-${room.roomNumber}`,
-                                        roomNumber: room.roomNumber,
-                                        guestName: room.currentGuestName || 'RECENT GUEST (CHECKED OUT)',
-                                        guestPhone: '+91 94370 22555',
-                                        company: 'LINDE INDIA LTD',
-                                        corporateGstin: '21AAACB2528H1ZA',
-                                        tier: room.tier,
-                                        tariff: room.tariff || 2199,
-                                        totalAmount: room.tariff || 2199,
-                                        nights: 1,
-                                        grcNo: `GRC-${room.roomNumber}`,
-                                        checkInDate: '22/09/2026',
-                                        checkInTime: '11:00 AM',
-                                        checkOutDate: '23/09/2026 (12:00 PM)'
-                                      };
-                                      setSelectedReceiptBooking(matchedBooking);
-                                      setIsReceiptModalOpen(true);
-                                    }}
-                                    title="View Last Settled Tax Invoice / Non-GST Bill"
-                                    style={{
-                                      padding: '3px 2px',
-                                      fontSize: '0.62rem',
-                                      fontWeight: 700,
-                                      background: 'rgba(212, 175, 55, 0.2)',
-                                      color: 'var(--gold-glow)',
-                                      border: '1px solid var(--gold-glow)',
-                                      borderRadius: '3px',
-                                      cursor: 'pointer',
-                                      whiteSpace: 'nowrap',
-                                      textAlign: 'center'
-                                    }}
-                                  >
-                                    🧾 Bill
-                                  </button>
-                                </div>
-                              )}
-                              {isVacant && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setWalkInRoom(room.roomNumber);
-                                    setWalkInRate(room.tariff);
-                                    setWalkInDeposit(room.tariff);
-                                    setWalkInOpen(true);
-                                  }}
-                                  style={{
-                                    flex: 1,
-                                    padding: '2px 4px',
-                                    fontSize: '0.68rem',
-                                    fontWeight: 700,
-                                    background: 'rgba(16, 185, 129, 0.2)',
-                                    color: '#34d399',
-                                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                                    borderRadius: '3px',
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  + Walk-In
-                                </button>
-                              )}
-                              {isMaint && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onUpdateRoomStatus(room.roomNumber, 'Available', null, null);
-                                  }}
-                                  style={{
-                                    flex: 1,
-                                    padding: '2px 4px',
-                                    fontSize: '0.68rem',
-                                    fontWeight: 700,
-                                    background: 'rgba(16, 185, 129, 0.2)',
-                                    color: '#34d399',
-                                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                                    borderRadius: '3px',
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  Release OOO
-                                </button>
-                              )}
-                            </div>
+                            {/* Standardized Operational Actions Dock */}
+                            {renderOperationalActionButtons(room, 'matrix')}
                           </div>
                         );
                       })}
@@ -5205,7 +5259,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                       </span>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.75rem', padding: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem', padding: '1rem' }}>
                       {floorRooms.map(room => (
                         <div 
                           key={room.roomNumber}
@@ -5263,218 +5317,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                             )}
                           </div>
 
-                          {/* Status-Specific Action Buttons */}
-                          <div style={{ display: 'flex', gap: '0.4rem', marginTop: 'auto', paddingTop: '0.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                            {room.status === 'Occupied' && (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedFolioRoom(room)}
-                                    title="Open Upgraded Master Folio (Sub-Folio Windows, Dispute Escrow, Colleague Split, Caution Refund)"
-                                    style={{
-                                      flex: 1,
-                                      padding: '0.35rem',
-                                      background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(96, 165, 250, 0.35))',
-                                      color: '#38bdf8',
-                                      border: '1px solid rgba(56, 189, 248, 0.5)',
-                                      borderRadius: '4px',
-                                      fontSize: '0.72rem',
-                                      fontWeight: 700,
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    📑 Folio
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => setCheckoutRoom(room)}
-                                    title="Guest Checkout & Multi-Tender Split Settlement"
-                                    style={{
-                                      flex: 1.5,
-                                      padding: '0.35rem 0.5rem',
-                                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(245, 158, 11, 0.2))',
-                                      color: 'var(--gold-glow)',
-                                      border: '1px solid var(--gold-glow)',
-                                      borderRadius: '4px',
-                                      fontSize: '0.74rem',
-                                      fontWeight: 800,
-                                      cursor: 'pointer',
-                                      display: 'inline-flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      gap: '4px'
-                                    }}
-                                  >
-                                    ⚡ Out &amp; Settle
-                                  </button>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenShiftModal(room)}
-                                    title="Shift Room"
-                                    style={{
-                                      padding: '0.3rem',
-                                      background: 'rgba(168, 85, 247, 0.2)',
-                                      color: '#c084fc',
-                                      border: '1px solid rgba(168, 85, 247, 0.4)',
-                                      borderRadius: '4px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    ⇄ Shift
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleOpenEditStay(room)}
-                                    title="Edit Stay & Guest Details"
-                                    style={{
-                                      padding: '0.3rem',
-                                      background: 'rgba(59, 130, 246, 0.2)',
-                                      color: '#60a5fa',
-                                      border: '1px solid rgba(59, 130, 246, 0.4)',
-                                      borderRadius: '4px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    ✏️ Stay
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleSendWelcomePass(room)}
-                                    title="WhatsApp Welcome Pass"
-                                    style={{
-                                      padding: '0.3rem',
-                                      background: 'rgba(34, 197, 94, 0.2)',
-                                      color: '#4ade80',
-                                      border: '1px solid rgba(34, 197, 94, 0.4)',
-                                      borderRadius: '4px',
-                                      fontSize: '0.7rem',
-                                      fontWeight: 700,
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    💬 Pass
-                                  </button>
-                                </div>
-                              </div>
-                            )}
-
-                            {room.status === 'Available' && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setWalkInRoom(room.roomNumber);
-                                    setWalkInRate(room.tariff);
-                                    setWalkInDeposit(room.tariff);
-                                    setWalkInOpen(true);
-                                  }}
-                                  style={{
-                                    flex: 2,
-                                    padding: '0.35rem 0.5rem',
-                                    background: 'rgba(16, 185, 129, 0.2)',
-                                    color: '#34d399',
-                                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                                    borderRadius: '5px',
-                                    fontSize: '0.74rem',
-                                    fontWeight: 700,
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  + Walk-In
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setBlockSelectedRoom(room.roomNumber);
-                                    setBlockRoomOpen(true);
-                                  }}
-                                  style={{
-                                    flex: 1,
-                                    padding: '0.35rem 0.5rem',
-                                    background: 'rgba(239, 68, 68, 0.15)',
-                                    color: '#f87171',
-                                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                                    borderRadius: '5px',
-                                    fontSize: '0.72rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  Block
-                                </button>
-                              </>
-                            )}
-
-                            {(room.status === 'Cleaning' || room.status === 'Vacant Dirty') && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
-                                  title="Housekeeping inspection complete: Release room to Vacant Clean"
-                                  style={{
-                                    flex: 2,
-                                    padding: '0.35rem 0.5rem',
-                                    background: 'rgba(16, 185, 129, 0.25)',
-                                    color: '#34d399',
-                                    border: '1px solid #10b981',
-                                    borderRadius: '5px',
-                                    fontSize: '0.74rem',
-                                    fontWeight: 700,
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  ✓ Mark Inspected Clean
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setBlockSelectedRoom(room.roomNumber);
-                                    setBlockRoomOpen(true);
-                                  }}
-                                  style={{
-                                    flex: 1,
-                                    padding: '0.35rem 0.5rem',
-                                    background: 'rgba(239, 68, 68, 0.15)',
-                                    color: '#f87171',
-                                    border: '1px solid rgba(239, 68, 68, 0.3)',
-                                    borderRadius: '5px',
-                                    fontSize: '0.72rem',
-                                    fontWeight: 600,
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  Block
-                                </button>
-                              </>
-                            )}
-
-                            {room.status === 'Maintenance' && (
-                              <button
-                                type="button"
-                                onClick={() => onUpdateRoomStatus(room.roomNumber, 'Available', null, null)}
-                                style={{
-                                  width: '100%',
-                                  padding: '0.35rem 0.5rem',
-                                  background: 'rgba(16, 185, 129, 0.2)',
-                                  color: '#34d399',
-                                  border: '1px solid rgba(16, 185, 129, 0.4)',
-                                  borderRadius: '5px',
-                                  fontSize: '0.74rem',
-                                  fontWeight: 700,
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                ✓ Release to Available
-                              </button>
-                            )}
-                          </div>
+                          {/* Standardized Operational Actions Dock */}
+                          {renderOperationalActionButtons(room, 'card')}
                         </div>
                       ))}
                     </div>
