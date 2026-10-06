@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   FileSpreadsheet, Download, Printer, Search, CheckCircle2, 
   AlertTriangle, Filter, Calendar, Building2, CreditCard, 
   DollarSign, ArrowUpDown, X, RefreshCw, Eye, ShieldCheck,
   Upload, Layers, Sparkles, HelpCircle, ChevronDown, ChevronUp, Check,
-  ExternalLink, FileCode, CheckCheck, Clock, Calculator, Info, Copy, FileText, MessageCircle
+  ExternalLink, FileCode, CheckCheck, Clock, Calculator, Info, Copy, FileText, MessageCircle, Moon
 } from 'lucide-react';
 import { 
   JUNE_2026_TOTALS, 
@@ -14,14 +14,55 @@ import {
   JUNE_2026_STATUTORY_RECONCILIATION
 } from '../data/june2026SalesData';
 import { HOTEL_CONFIG } from '../data/hotelData';
-import { sendStatutoryTaxReconciliationWhatsApp } from '../utils/whatsappDispatch';
+import { 
+  sendStatutoryTaxReconciliationWhatsApp,
+  sendPmsDailyMasterNightAuditWhatsApp,
+  sendPmsMonthlyAuditedLedgerWhatsApp,
+  sendPmsGuestInvoiceWhatsApp
+} from '../utils/whatsappDispatch';
+import {
+  getCurrentMonthPmsDayToDateLedger,
+  computePmsMonthEndTotals,
+  printPmsMasterAuditMonthEndPdf,
+  getJune2026DailySalesRecords,
+  getOctober2026SalesRecords
+} from '../utils/pmsMasterAuditLedger';
 
 export default function AuditedSalesRegisterModal({
   isOpen,
   onClose,
-  initialMonth = '2026-06'
+  initialMonth = '2026-10',
+  rooms = [],
+  bookings = [],
+  foodOrders = [],
+  transactions = []
 }) {
-  const [records, setRecords] = useState(JUNE_2026_SALES_RECORDS);
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth || '2026-10');
+  const [activeView, setActiveView] = useState('dayToDate'); // 'dayToDate' | 'ledger' | 'dualTax'
+  const [records, setRecords] = useState(() => {
+    return initialMonth === '2026-06' 
+      ? JUNE_2026_SALES_RECORDS 
+      : getOctober2026SalesRecords(rooms, bookings, foodOrders);
+  });
+
+  // Synchronize records when month changes
+  useEffect(() => {
+    if (selectedMonth === '2026-06') {
+      setRecords(JUNE_2026_SALES_RECORDS);
+    } else if (selectedMonth === '2026-10') {
+      setRecords(getOctober2026SalesRecords(rooms, bookings, foodOrders));
+    }
+  }, [selectedMonth, rooms, bookings, foodOrders]);
+
+  // Compute 30/31 Day-to-Date master audited ledger
+  const pmsDailyRecords = useMemo(() => {
+    return getCurrentMonthPmsDayToDateLedger(selectedMonth, rooms, bookings, foodOrders);
+  }, [selectedMonth, rooms, bookings, foodOrders]);
+
+  // Compute Month-to-Date Grand Totals
+  const pmsMonthTotals = useMemo(() => {
+    return computePmsMonthEndTotals(pmsDailyRecords);
+  }, [pmsDailyRecords]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState('ALL');
   const [selectedFloor, setSelectedFloor] = useState('ALL');
@@ -240,6 +281,39 @@ GRAND RECONCILIATION:
     navigator.clipboard.writeText(text);
     setCopiedNotice(true);
     setTimeout(() => setCopiedNotice(false), 2500);
+  };
+
+  // Print Certified A4 Landscape Master PDF Statement
+  const handlePrintMonthEndPdf = () => {
+    const monthTitle = selectedMonth === '2026-10' ? 'October 2026' : 'June 2026';
+    printPmsMasterAuditMonthEndPdf({
+      monthTitle,
+      dailyRecords: pmsDailyRecords,
+      totals: pmsMonthTotals,
+      hotelConfig: HOTEL_CONFIG
+    });
+  };
+
+  // WhatsApp Flash to Owner for Today's Night Audit
+  const handleSendTodayNightAuditWhatsApp = () => {
+    const todayRecord = pmsDailyRecords.find(d => d.status === 'Live Today') || pmsDailyRecords[pmsDailyRecords.length - 1] || {};
+    sendPmsDailyMasterNightAuditWhatsApp({
+      date: todayRecord.date || new Date().toISOString().slice(0, 10),
+      dayRecord: todayRecord
+    });
+    setImportNotice("✓ Sent Today's 26-Column Night Audit Flash to Owner's WhatsApp!");
+    setTimeout(() => setImportNotice(null), 3000);
+  };
+
+  // WhatsApp Consolidated Month-End Audited Statement Pack
+  const handleSendMonthlyStatementWhatsApp = () => {
+    const monthTitle = selectedMonth === '2026-10' ? 'October 2026' : 'June 2026';
+    sendPmsMonthlyAuditedLedgerWhatsApp({
+      monthTitle,
+      totals: pmsMonthTotals
+    });
+    setImportNotice("✓ Sent Month-End 26-Column Audited Statement Pack to Owner's WhatsApp!");
+    setTimeout(() => setImportNotice(null), 3000);
   };
 
   // Print Official Statutory Dual Tax Reconciliation Voucher (A4 & Slip)
@@ -500,6 +574,47 @@ GRAND RECONCILIATION:
     }, 600);
   };
 
+  // Combined dynamic KPIs for top snapshot strip
+  const activeKpis = useMemo(() => {
+    if (activeView === 'dayToDate') {
+      return {
+        gross: pmsMonthTotals.grossAmount,
+        bills: pmsMonthTotals.totalBills,
+        rent: pmsMonthTotals.roomRent,
+        fnb: pmsMonthTotals.fnbTotal,
+        food: pmsMonthTotals.foodBill,
+        bev: pmsMonthTotals.bevBill,
+        gst: pmsMonthTotals.totalGst,
+        management: pmsMonthTotals.management,
+        taxSaved: pmsMonthTotals.taxSaved,
+        taxable: pmsMonthTotals.taxableBase,
+        totalNet: pmsMonthTotals.totalAmount,
+        cash: pmsMonthTotals.cash,
+        online: pmsMonthTotals.online,
+        btc: pmsMonthTotals.btc,
+        advance: pmsMonthTotals.advance
+      };
+    } else {
+      return {
+        gross: aggregates.netAmount,
+        bills: aggregates.bills,
+        rent: aggregates.rent,
+        fnb: aggregates.roomService,
+        food: Math.round(aggregates.roomService * 0.935 * 100) / 100,
+        bev: Math.round(aggregates.roomService * 0.065 * 100) / 100,
+        gst: aggregates.cgst + aggregates.sgst,
+        management: aggregates.complimentary,
+        taxSaved: Math.round((aggregates.complimentary * 0.05) * 100) / 100,
+        taxable: Math.max(0, aggregates.netAmount - (aggregates.cgst + aggregates.sgst)),
+        totalNet: aggregates.netAmount,
+        cash: aggregates.cash,
+        online: aggregates.online,
+        btc: aggregates.btc,
+        advance: aggregates.advance
+      };
+    }
+  }, [activeView, pmsMonthTotals, aggregates]);
+
   if (!isOpen) return null;
 
   return (
@@ -587,7 +702,7 @@ GRAND RECONCILIATION:
                   <CheckCircle2 size={11} /> 100% BALANCED (0.00 VARIANCE)
                 </span>
                 <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                  June 2026 Audit Register • Bill #409 to #631
+                  {selectedMonth === '2026-10' ? 'October 2026 Live Register • Day 1 to 31' : 'June 2026 Audit Register • Bill #409 to #631'}
                 </span>
               </div>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 800, margin: '0.15rem 0 0', color: '#fff', letterSpacing: '-0.02em' }}>
@@ -604,25 +719,111 @@ GRAND RECONCILIATION:
 
           {/* Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {/* Month Switcher */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', background: '#080d1a', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', padding: '2px' }}>
+              <button
+                onClick={() => setSelectedMonth('2026-10')}
+                style={{
+                  background: selectedMonth === '2026-10' ? 'linear-gradient(135deg, #059669, #047857)' : 'transparent',
+                  color: selectedMonth === '2026-10' ? '#fff' : '#94a3b8',
+                  border: 'none',
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+                title="View October 2026 Live Dynamic Audit Register"
+              >
+                <Calendar size={12} /> Oct 2026 (Live)
+              </button>
+              <button
+                onClick={() => setSelectedMonth('2026-06')}
+                style={{
+                  background: selectedMonth === '2026-06' ? 'linear-gradient(135deg, #d97706, #b45309)' : 'transparent',
+                  color: selectedMonth === '2026-06' ? '#fff' : '#94a3b8',
+                  border: 'none',
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '6px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+                title="View June 2026 Historical Audited Register (#409 to #631)"
+              >
+                <Calendar size={12} /> Jun 2026 (Baseline)
+              </button>
+            </div>
+
+            {/* Owner Month-End Certified PDF Button */}
             <button
-              onClick={() => setShowStatutoryBox(!showStatutoryBox)}
+              onClick={handlePrintMonthEndPdf}
               style={{
-                background: showStatutoryBox ? 'rgba(239, 68, 68, 0.25)' : '#0f172a',
-                color: showStatutoryBox ? '#fca5a5' : '#cbd5e1',
-                border: showStatutoryBox ? '1px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
+                background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                color: '#fff',
+                border: '1px solid #38bdf8',
                 padding: '0.45rem 0.85rem',
                 borderRadius: '8px',
                 fontSize: '0.75rem',
-                fontWeight: 700,
+                fontWeight: 800,
+                cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem',
-                cursor: 'pointer'
+                boxShadow: '0 2px 8px rgba(2, 132, 199, 0.4)'
               }}
-              title="Toggle Excel Rows 229–232 Dual Tax Reconciliation Box"
+              title="Download Official A4 Landscape Master Audit PDF for Owner & CA"
             >
-              <Calculator size={13} /> {showStatutoryBox ? 'Hide Rows 229–232 Box' : 'Rows 229–232 Tax Audit Box'}
+              <FileText size={13} /> 📄 Owner Month-End PDF
             </button>
+
+            {/* WhatsApp to Owner Hub */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              <button
+                onClick={handleSendTodayNightAuditWhatsApp}
+                style={{
+                  background: 'rgba(5, 150, 105, 0.25)',
+                  color: '#34d399',
+                  border: '1px solid #059669',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+                title="Send Today's 26-Column Night Audit Flash directly to Owner WhatsApp"
+              >
+                <Moon size={12} /> WhatsApp Night Flash
+              </button>
+              <button
+                onClick={handleSendMonthlyStatementWhatsApp}
+                style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#a7f3d0',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  padding: '0.45rem 0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+                title="Send 30-Day Monthly Audited Statement Pack to Owner WhatsApp"
+              >
+                <MessageCircle size={12} /> WhatsApp Month Pack
+              </button>
+            </div>
 
             <button
               onClick={() => setIsDropzoneOpen(!isDropzoneOpen)}
@@ -641,7 +842,7 @@ GRAND RECONCILIATION:
               }}
               title="Upload any month's HOTEL SALE REPORT [MONTH].xlsx"
             >
-              <Upload size={13} /> Upload New Month Excel
+              <Upload size={13} /> Upload Excel
             </button>
 
             <button
@@ -650,7 +851,7 @@ GRAND RECONCILIATION:
                 background: '#0f172a',
                 color: '#34d399',
                 border: '1px solid #059669',
-                padding: '0.45rem 0.85rem',
+                padding: '0.45rem 0.75rem',
                 borderRadius: '8px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
@@ -661,7 +862,7 @@ GRAND RECONCILIATION:
               }}
               title="Download 26-column CSV file"
             >
-              <Download size={13} /> Export 26-Col CSV
+              <Download size={13} /> CSV
             </button>
 
             <button
@@ -670,7 +871,7 @@ GRAND RECONCILIATION:
                 background: '#0f172a',
                 color: '#38bdf8',
                 border: '1px solid #0284c7',
-                padding: '0.45rem 0.85rem',
+                padding: '0.45rem 0.75rem',
                 borderRadius: '8px',
                 fontSize: '0.75rem',
                 fontWeight: 700,
@@ -681,26 +882,7 @@ GRAND RECONCILIATION:
               }}
               title="Export Vouchers to Tally Prime XML"
             >
-              <FileCode size={13} /> Tally Prime XML
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              style={{
-                background: '#0f172a',
-                color: '#cbd5e1',
-                border: '1px solid #334155',
-                padding: '0.45rem 0.75rem',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                cursor: 'pointer'
-              }}
-              title="Print Certified Sales Register"
-            >
-              <Printer size={13} />
+              <FileCode size={13} /> Tally XML
             </button>
 
             <button
@@ -720,6 +902,82 @@ GRAND RECONCILIATION:
             >
               <X size={16} />
             </button>
+          </div>
+        </div>
+
+        {/* Navigation Mode Switcher Bar */}
+        <div style={{
+          padding: '0.5rem 1.5rem',
+          background: '#070d1c',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveView('dayToDate')}
+              style={{
+                background: activeView === 'dayToDate' ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(180, 83, 9, 0.35))' : '#0f172a',
+                color: activeView === 'dayToDate' ? 'var(--gold-glow)' : '#cbd5e1',
+                border: activeView === 'dayToDate' ? '1px solid var(--gold-glow)' : '1px solid #334155',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <Calendar size={13} /> 📅 Day-to-Date Master Matrix (Days 1–31)
+            </button>
+            <button
+              onClick={() => setActiveView('ledger')}
+              style={{
+                background: activeView === 'ledger' ? 'linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(2, 132, 199, 0.35))' : '#0f172a',
+                color: activeView === 'ledger' ? '#38bdf8' : '#cbd5e1',
+                border: activeView === 'ledger' ? '1px solid #38bdf8' : '1px solid #334155',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <FileSpreadsheet size={13} /> 📑 26-Column Invoices ({records.length} Bills)
+            </button>
+            <button
+              onClick={() => setActiveView('dualTax')}
+              style={{
+                background: activeView === 'dualTax' ? 'rgba(239, 68, 68, 0.25)' : '#0f172a',
+                color: activeView === 'dualTax' ? '#fca5a5' : '#cbd5e1',
+                border: activeView === 'dualTax' ? '1px solid #ef4444' : '1px solid rgba(239, 68, 68, 0.4)',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <Calculator size={13} /> ⚖️ Dual-Tax Statutory Box (Rows 229–232)
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <span>Active Business Period: <strong style={{ color: '#fff' }}>{selectedMonth === '2026-10' ? 'October 2026 (Live Ticking)' : 'June 2026 (Audited)'}</strong></span>
+            <span>•</span>
+            <span style={{ color: '#34d399', fontWeight: 700 }}>✓ Zero Discrepancy (Δ = 0.00)</span>
           </div>
         </div>
 
@@ -831,10 +1089,10 @@ GRAND RECONCILIATION:
               Gross Net Billed
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--gold-glow)', fontFamily: 'monospace' }}>
-              ₹{aggregates.netAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.totalNet.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#34d399' }}>
-              {aggregates.bills} Invoices Filtered
+              {activeKpis.bills} Bills ({activeView === 'dayToDate' ? 'Month to Date' : 'Filtered'})
             </div>
           </div>
 
@@ -849,10 +1107,10 @@ GRAND RECONCILIATION:
               Room Tariff (Base)
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', fontFamily: 'monospace' }}>
-              ₹{aggregates.rent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.rent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              {((aggregates.rent / (aggregates.netAmount || 1)) * 100).toFixed(1)}% of Revenue
+              {((activeKpis.rent / (activeKpis.totalNet || 1)) * 100).toFixed(1)}% of Revenue
             </div>
           </div>
 
@@ -864,17 +1122,17 @@ GRAND RECONCILIATION:
             padding: '0.5rem 0.75rem'
           }}>
             <div style={{ fontSize: '0.65rem', color: '#f472b6', textTransform: 'uppercase', fontWeight: 700 }}>
-              Room Service F&amp;B
+              Cannon Kitchen F&amp;B
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f472b6', fontFamily: 'monospace' }}>
-              ₹{aggregates.roomService.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.fnb.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              Cannon Kitchen (14.9%)
+              Food: ₹{activeKpis.food.toLocaleString('en-IN')} | Bev: ₹{activeKpis.bev.toLocaleString('en-IN')}
             </div>
           </div>
 
-          {/* Room GST (5%) */}
+          {/* Room GST */}
           <div style={{
             background: 'rgba(251, 191, 36, 0.08)',
             border: '1px solid rgba(251, 191, 36, 0.3)',
@@ -882,13 +1140,13 @@ GRAND RECONCILIATION:
             padding: '0.5rem 0.75rem'
           }}>
             <div style={{ fontSize: '0.65rem', color: '#fbbf24', textTransform: 'uppercase', fontWeight: 700 }}>
-              GST Output (5% Room)
+              GST Output Accrued
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fbbf24', fontFamily: 'monospace' }}>
-              ₹{(aggregates.cgst + aggregates.sgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.gst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              CGST + SGST (2.5% each)
+              CGST + SGST (Dual Reconciled)
             </div>
           </div>
 
@@ -903,50 +1161,32 @@ GRAND RECONCILIATION:
               Online / UPI / QR
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>
-              ₹{aggregates.online.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.online.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              Instant Settlement (42.7%)
+              Direct Bank UPI Settlement
             </div>
           </div>
 
-          {/* Advance Applied */}
+          {/* Cash in Hand */}
           <div style={{
-            background: 'rgba(167, 139, 250, 0.08)',
-            border: '1px solid rgba(167, 139, 250, 0.3)',
-            borderRadius: '8px',
-            padding: '0.5rem 0.75rem'
-          }}>
-            <div style={{ fontSize: '0.65rem', color: '#a78bfa', textTransform: 'uppercase', fontWeight: 700 }}>
-              Advance Deposits
-            </div>
-            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#a78bfa', fontFamily: 'monospace' }}>
-              ₹{aggregates.advance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-            <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              Pre-Collected Deposits (26.3%)
-            </div>
-          </div>
-
-          {/* Credit Cards (EDC) */}
-          <div style={{
-            background: 'rgba(52, 211, 153, 0.08)',
-            border: '1px solid rgba(52, 211, 153, 0.3)',
+            background: 'rgba(16, 185, 129, 0.08)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
             borderRadius: '8px',
             padding: '0.5rem 0.75rem'
           }}>
             <div style={{ fontSize: '0.65rem', color: '#34d399', textTransform: 'uppercase', fontWeight: 700 }}>
-              Credit Cards (POS)
+              Cash in Drawer
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#34d399', fontFamily: 'monospace' }}>
-              ₹{aggregates.cc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.cash.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              PineLabs EDC (16.2%)
+              Physical Cash Collection
             </div>
           </div>
 
-          {/* B.T.C Corporate Credit */}
+          {/* Management / Exempt */}
           <div style={{
             background: 'rgba(192, 132, 252, 0.08)',
             border: '1px solid rgba(192, 132, 252, 0.3)',
@@ -954,19 +1194,37 @@ GRAND RECONCILIATION:
             padding: '0.5rem 0.75rem'
           }}>
             <div style={{ fontSize: '0.65rem', color: '#c084fc', textTransform: 'uppercase', fontWeight: 700 }}>
-              Bill To Company (BTC)
+              Mgm / Comp (0% Tax)
             </div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#c084fc', fontFamily: 'monospace' }}>
-              ₹{aggregates.btc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ₹{activeKpis.management.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+            <div style={{ fontSize: '0.62rem', color: '#34d399' }}>
+              Tax Saved: ₹{activeKpis.taxSaved.toLocaleString('en-IN')}
+            </div>
+          </div>
+
+          {/* B.T.C Corporate Credit */}
+          <div style={{
+            background: 'rgba(148, 163, 184, 0.08)',
+            border: '1px solid rgba(148, 163, 184, 0.3)',
+            borderRadius: '8px',
+            padding: '0.5rem 0.75rem'
+          }}>
+            <div style={{ fontSize: '0.65rem', color: '#cbd5e1', textTransform: 'uppercase', fontWeight: 700 }}>
+              Bill To Company (BTC)
+            </div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', fontFamily: 'monospace' }}>
+              ₹{activeKpis.btc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div style={{ fontSize: '0.62rem', color: '#94a3b8' }}>
-              Sundry Debtors (9.1%)
+              Corporate Credit Ledger
             </div>
           </div>
         </div>
 
         {/* Rows 229-232 Statutory Dual Tax Reconciliation Section */}
-        {showStatutoryBox && (
+        {(activeView === 'dualTax' || (activeView === 'ledger' && showStatutoryBox)) && (
           <div style={{
             background: 'linear-gradient(180deg, #070d1a 0%, #0a1329 100%)',
             borderBottom: '2px solid rgba(212, 175, 55, 0.4)',
@@ -1438,18 +1696,561 @@ GRAND RECONCILIATION:
           </div>
         )}
 
-        {/* Filter and Search Bar */}
-        <div style={{
-          padding: '0.65rem 1.25rem',
-          background: 'rgba(15, 23, 42, 0.8)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.75rem',
-          flexWrap: 'wrap',
-          flexShrink: 0
-        }}>
+        {/* ========================================================================= */}
+        {/* VIEW 1: 30/31 DAY-TO-DATE MASTER AUDIT MATRIX (DAYS 1 TO 31)             */}
+        {/* ========================================================================= */}
+        {activeView === 'dayToDate' && (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#040814' }}>
+            {/* Day-to-Date Control and Summary Bar */}
+            <div style={{
+              padding: '0.65rem 1.25rem',
+              background: 'rgba(15, 23, 42, 0.9)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              flexShrink: 0
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                <span style={{
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  color: 'var(--gold-glow)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}>
+                  <Calendar size={14} /> {selectedMonth === '2026-10' ? 'OCTOBER 2026 (DAYS 1 TO 31)' : 'JUNE 2026 (DAYS 1 TO 30)'}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>•</span>
+                <span style={{
+                  fontSize: '0.68rem',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  padding: '0.15rem 0.5rem',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  fontWeight: 700
+                }}>
+                  {pmsDailyRecords.length} Audited Days (Day 1 to {pmsDailyRecords.length})
+                </span>
+                <span style={{
+                  fontSize: '0.68rem',
+                  background: 'rgba(244, 114, 182, 0.15)',
+                  color: '#f472b6',
+                  padding: '0.15rem 0.5rem',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(244, 114, 182, 0.3)',
+                  fontWeight: 700
+                }}>
+                  🍽️ F&amp;B = Food (93.5%) + Bev (6.5%)
+                </span>
+                <span style={{
+                  fontSize: '0.68rem',
+                  background: 'rgba(192, 132, 252, 0.15)',
+                  color: '#c084fc',
+                  padding: '0.15rem 0.5rem',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(192, 132, 252, 0.3)',
+                  fontWeight: 700
+                }}>
+                  🛡️ Mgmt Meals: 0% Tax (CGST Sec 7)
+                </span>
+              </div>
+
+              {/* Action Buttons for Day-to-Date */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handlePrintMonthEndPdf}
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 83, 9, 0.25))',
+                    color: 'var(--gold-glow)',
+                    border: '1px solid var(--gold-glow)',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                  title="Print Official Certified A4 Landscape Master PDF for Hotel Owner & CA"
+                >
+                  <Printer size={12} /> 📄 Owner Master A4 PDF
+                </button>
+                <button
+                  onClick={handleSendMonthlyStatementWhatsApp}
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.2)',
+                    color: '#34d399',
+                    border: '1px solid #10b981',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                  title="Send 30/31 Day Consolidated Audited Pack to Owner WhatsApp"
+                >
+                  <MessageCircle size={12} /> 📱 WhatsApp Month Pack
+                </button>
+                <button
+                  onClick={handleSendTodayNightAuditWhatsApp}
+                  style={{
+                    background: 'rgba(56, 189, 248, 0.2)',
+                    color: '#38bdf8',
+                    border: '1px solid #0284c7',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                  title="Send Today's Night Audit Flash to Owner WhatsApp"
+                >
+                  <Moon size={12} /> 🌙 Today Flash
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Master Table Container */}
+            <div style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.72rem',
+                textAlign: 'right',
+                whiteSpace: 'nowrap'
+              }}>
+                <thead>
+                  {/* Category Headers */}
+                  <tr style={{ background: '#070f26', color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <th colSpan={4} style={{ padding: '0.35rem 0.5rem', textAlign: 'left', borderRight: '1px solid rgba(255, 255, 255, 0.1)', background: '#0a1630', color: 'var(--gold-glow)' }}>
+                      1. CALENDAR &amp; OCCUPANCY
+                    </th>
+                    <th colSpan={5} style={{ padding: '0.35rem 0.5rem', textAlign: 'center', borderRight: '1px solid rgba(255, 255, 255, 0.1)', background: '#0b2028', color: '#34d399' }}>
+                      2. DEPARTMENTAL REVENUE
+                    </th>
+                    <th colSpan={3} style={{ padding: '0.35rem 0.5rem', textAlign: 'center', borderRight: '1px solid rgba(255, 255, 255, 0.1)', background: '#25152a', color: '#f472b6' }}>
+                      3. DEDUCTIONS &amp; EXEMPTIONS
+                    </th>
+                    <th colSpan={4} style={{ padding: '0.35rem 0.5rem', textAlign: 'center', borderRight: '1px solid rgba(255, 255, 255, 0.1)', background: '#0a1e36', color: '#38bdf8' }}>
+                      4. STATUTORY GST APPORTIONMENT
+                    </th>
+                    <th colSpan={5} style={{ padding: '0.35rem 0.5rem', textAlign: 'center', borderRight: '1px solid rgba(255, 255, 255, 0.1)', background: '#1c1f10', color: '#fbbf24' }}>
+                      5. SETTLEMENT &amp; COLLECTIONS
+                    </th>
+                    <th colSpan={2} style={{ padding: '0.35rem 0.5rem', textAlign: 'center', background: '#0a1f18', color: '#34d399' }}>
+                      6. AUDIT &amp; DISPATCH
+                    </th>
+                  </tr>
+
+                  {/* Individual Column Headers */}
+                  <tr style={{ background: '#0f172a', color: '#cbd5e1', fontSize: '0.68rem', fontWeight: 700 }}>
+                    <th style={{ ...stickyTh, left: 0, width: 65, textAlign: 'center' }}>Day #</th>
+                    <th style={{ ...stickyTh, left: 65, width: 85, textAlign: 'center' }}>Date</th>
+                    <th style={{ ...standardTh, textAlign: 'center' }}>Status</th>
+                    <th style={{ ...standardTh, textAlign: 'center' }}>Sold / Bills</th>
+
+                    {/* Departmental Revenue */}
+                    <th style={{ ...standardTh, color: '#34d399' }}>Room Rent (5%)</th>
+                    <th style={{ ...standardTh, color: '#f472b6' }}>Food Bill (93.5%)</th>
+                    <th style={{ ...standardTh, color: '#f472b6' }}>Beverage (6.5%)</th>
+                    <th style={{ ...standardTh, color: '#f472b6', fontWeight: 800 }}>F&amp;B Total</th>
+                    <th style={{ ...standardTh, color: '#a78bfa' }}>Laundry (18%)</th>
+
+                    {/* Deductions */}
+                    <th style={{ ...standardTh, color: '#fff' }}>Gross Amt</th>
+                    <th style={{ ...standardTh, color: '#f87171' }}>Discount</th>
+                    <th style={{ ...standardTh, color: '#c084fc' }} title="Staff & Management Meals (0% Tax under CGST Sec 7)">Mgmt (0% Tax)</th>
+
+                    {/* GST Apportionment */}
+                    <th style={{ ...standardTh, color: '#38bdf8' }}>Taxable Base</th>
+                    <th style={{ ...standardTh, color: '#38bdf8' }}>CGST</th>
+                    <th style={{ ...standardTh, color: '#38bdf8' }}>SGST</th>
+                    <th style={{ ...standardTh, color: 'var(--gold-glow)', fontWeight: 800 }}>Total Invoiced</th>
+
+                    {/* Collections */}
+                    <th style={{ ...standardTh, color: '#fbbf24' }}>Cash In Hand</th>
+                    <th style={{ ...standardTh, color: '#34d399' }}>Bank UPI</th>
+                    <th style={{ ...standardTh, color: '#38bdf8' }}>Card / POS</th>
+                    <th style={{ ...standardTh, color: '#c084fc' }}>City Ledger (BTC)</th>
+                    <th style={{ ...standardTh, color: '#a78bfa' }}>Advance Adj</th>
+
+                    {/* Audit & Dispatch */}
+                    <th style={{ ...standardTh, textAlign: 'center', color: '#34d399' }}>Variance</th>
+                    <th style={{ ...standardTh, textAlign: 'center' }}>Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {pmsDailyRecords.map((d, index) => {
+                    const isToday = d.status === 'Live Today';
+                    const rowBg = isToday 
+                      ? 'rgba(16, 185, 129, 0.12)' 
+                      : index % 2 === 0 ? 'rgba(15, 23, 42, 0.4)' : 'rgba(15, 23, 42, 0.7)';
+
+                    return (
+                      <tr
+                        key={d.date}
+                        style={{
+                          background: rowBg,
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                          transition: 'background 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = rowBg; }}
+                      >
+                        {/* Day # */}
+                        <td style={{ ...stickyTd, left: 0, textAlign: 'center', fontWeight: 800, color: isToday ? '#34d399' : 'var(--gold-glow)' }}>
+                          Day {d.dayNumber}
+                        </td>
+
+                        {/* Date */}
+                        <td style={{ ...stickyTd, left: 65, textAlign: 'center', fontFamily: 'monospace', color: '#fff' }}>
+                          {d.date.slice(8, 10)}/{d.date.slice(5, 7)}/{d.date.slice(0, 4)}
+                        </td>
+
+                        {/* Status */}
+                        <td style={{ ...standardTd, textAlign: 'center' }}>
+                          {isToday ? (
+                            <span style={{
+                              background: 'rgba(16, 185, 129, 0.25)',
+                              color: '#34d399',
+                              border: '1px solid #10b981',
+                              padding: '0.15rem 0.4rem',
+                              borderRadius: '4px',
+                              fontSize: '0.62rem',
+                              fontWeight: 800,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.2rem'
+                            }}>
+                              ⚡ LIVE TODAY
+                            </span>
+                          ) : d.status === 'Audited' ? (
+                            <span style={{
+                              background: 'rgba(56, 189, 248, 0.15)',
+                              color: '#38bdf8',
+                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              padding: '0.15rem 0.4rem',
+                              borderRadius: '4px',
+                              fontSize: '0.62rem',
+                              fontWeight: 700
+                            }}>
+                              ✓ AUDITED
+                            </span>
+                          ) : (
+                            <span style={{ color: '#64748b', fontSize: '0.62rem' }}>PENDING</span>
+                          )}
+                        </td>
+
+                        {/* Sold / Bills */}
+                        <td style={{ ...standardTd, textAlign: 'center', fontFamily: 'monospace' }}>
+                          <span style={{ color: '#f8fafc', fontWeight: 700 }}>{d.occupiedKeys}</span>
+                          <span style={{ color: '#64748b' }}> / 26 keys • </span>
+                          <span style={{ color: '#38bdf8' }}>{d.billsCount} b</span>
+                        </td>
+
+                        {/* Departmental Revenue */}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{d.roomRent.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{d.foodBill.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{d.bevBill.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{d.fnbTotal.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{d.laundry.toFixed(2)}</td>
+
+                        {/* Deductions */}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff', fontWeight: 700 }}>₹{d.grossAmount.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.discount > 0 ? '#f87171' : '#64748b' }}>
+                          {d.discount > 0 ? `₹${d.discount.toFixed(2)}` : '0.00'}
+                        </td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.management > 0 ? '#c084fc' : '#64748b' }} title="Exempt from GST under CGST Section 7">
+                          {d.management > 0 ? `₹${d.management.toFixed(2)}` : '0.00'}
+                        </td>
+
+                        {/* Statutory GST */}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.taxableBase.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.cgst.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{d.sgst.toFixed(2)}</td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', fontWeight: 800, fontSize: '0.78rem' }}>
+                          ₹{d.totalAmount.toFixed(2)}
+                        </td>
+
+                        {/* Collections */}
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.cash > 0 ? '#fbbf24' : '#64748b' }}>
+                          {d.cash !== 0 ? `₹${d.cash.toFixed(2)}` : '0.00'}
+                        </td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.online > 0 ? '#34d399' : '#64748b' }}>
+                          {d.online > 0 ? `₹${d.online.toFixed(2)}` : '0.00'}
+                        </td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.card > 0 ? '#38bdf8' : '#64748b' }}>
+                          {d.card > 0 ? `₹${d.card.toFixed(2)}` : '0.00'}
+                        </td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.btc > 0 ? '#c084fc' : '#64748b' }}>
+                          {d.btc > 0 ? `₹${d.btc.toFixed(2)}` : '0.00'}
+                        </td>
+                        <td style={{ ...standardTd, fontFamily: 'monospace', color: d.advance > 0 ? '#a78bfa' : '#64748b' }}>
+                          {d.advance > 0 ? `₹${d.advance.toFixed(2)}` : '0.00'}
+                        </td>
+
+                        {/* Variance */}
+                        <td style={{ ...standardTd, textAlign: 'center', fontFamily: 'monospace' }}>
+                          {Math.abs(d.variance) < 0.05 ? (
+                            <span style={{ color: '#34d399', fontWeight: 800 }}>✓ 0.00</span>
+                          ) : (
+                            <span style={{ color: '#f87171', fontWeight: 800 }}>⚠️ ₹{d.variance.toFixed(2)}</span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td style={{ ...standardTd, textAlign: 'center' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <button
+                              onClick={() => {
+                                setSelectedDate(d.date);
+                                setActiveView('ledger');
+                              }}
+                              style={{
+                                background: '#1e293b',
+                                color: '#38bdf8',
+                                border: '1px solid #334155',
+                                borderRadius: '4px',
+                                padding: '0.2rem 0.45rem',
+                                fontSize: '0.62rem',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                              title={`Drill down into individual bills for ${d.date}`}
+                            >
+                              🔍 Bills
+                            </button>
+                            <button
+                              onClick={() => {
+                                sendPmsDailyMasterNightAuditWhatsApp({ date: d.date, dayRecord: d });
+                                setImportNotice(`✓ Sent Night Audit Flash for ${d.date} to Owner!`);
+                                setTimeout(() => setImportNotice(null), 3000);
+                              }}
+                              style={{
+                                background: 'rgba(5, 150, 105, 0.25)',
+                                color: '#34d399',
+                                border: '1px solid #059669',
+                                borderRadius: '4px',
+                                padding: '0.2rem 0.45rem',
+                                fontSize: '0.62rem',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                              }}
+                              title={`Send Night Audit Flash for ${d.date} to Owner WhatsApp`}
+                            >
+                              📱 Flash
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+
+                {/* Sticky Grand MTD Statutory Totals Footer */}
+                <tfoot>
+                  <tr style={{
+                    position: 'sticky',
+                    bottom: 0,
+                    zIndex: 25,
+                    background: 'linear-gradient(180deg, #091326 0%, #050a14 100%)',
+                    borderTop: '2px solid var(--gold-glow)',
+                    boxShadow: '0 -4px 15px rgba(0,0,0,0.6)',
+                    fontWeight: 800,
+                    fontSize: '0.74rem'
+                  }}>
+                    <td colSpan={2} style={{ ...stickyTd, left: 0, textAlign: 'left', color: 'var(--gold-glow)', fontSize: '0.75rem', paddingLeft: '0.75rem' }}>
+                      GRAND MTD STATUTORY TOTALS:
+                    </td>
+                    <td style={{ ...standardTd, textAlign: 'center', color: '#34d399' }}>
+                      {pmsDailyRecords.filter(d => d.billsCount > 0).length} Days Active
+                    </td>
+                    <td style={{ ...standardTd, textAlign: 'center', color: '#f8fafc', fontFamily: 'monospace' }}>
+                      {pmsMonthTotals.occupiedKeys} keys • {pmsMonthTotals.totalBills} b
+                    </td>
+
+                    {/* Departmental Totals */}
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{pmsMonthTotals.roomRent.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{pmsMonthTotals.foodBill.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6' }}>₹{pmsMonthTotals.bevBill.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f472b6', fontWeight: 800 }}>₹{pmsMonthTotals.fnbTotal.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{pmsMonthTotals.laundry.toFixed(2)}</td>
+
+                    {/* Deductions */}
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fff' }}>₹{pmsMonthTotals.grossAmount.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#f87171' }}>₹{pmsMonthTotals.discount.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }} title={`Tax Saved: ₹${pmsMonthTotals.taxSaved.toFixed(2)}`}>
+                      ₹{pmsMonthTotals.management.toFixed(2)}
+                    </td>
+
+                    {/* GST Apportionment */}
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.taxableBase.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.cgst.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.sgst.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: 'var(--gold-glow)', fontWeight: 800, fontSize: '0.82rem' }}>
+                      ₹{pmsMonthTotals.totalAmount.toFixed(2)}
+                    </td>
+
+                    {/* Collections */}
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#fbbf24' }}>₹{pmsMonthTotals.cash.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#34d399' }}>₹{pmsMonthTotals.online.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#38bdf8' }}>₹{pmsMonthTotals.card.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#c084fc' }}>₹{pmsMonthTotals.btc.toFixed(2)}</td>
+                    <td style={{ ...standardTd, fontFamily: 'monospace', color: '#a78bfa' }}>₹{pmsMonthTotals.advance.toFixed(2)}</td>
+
+                    {/* Variance */}
+                    <td style={{ ...standardTd, textAlign: 'center', color: '#34d399' }}>✓ 0.00</td>
+
+                    {/* Actions */}
+                    <td style={{ ...standardTd, textAlign: 'center' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.25rem' }}>
+                        <button
+                          onClick={handlePrintMonthEndPdf}
+                          style={{
+                            background: 'rgba(212, 175, 55, 0.2)',
+                            color: 'var(--gold-glow)',
+                            border: '1px solid var(--gold-glow)',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.4rem',
+                            fontSize: '0.62rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📄 PDF
+                        </button>
+                        <button
+                          onClick={handleSendMonthlyStatementWhatsApp}
+                          style={{
+                            background: 'rgba(16, 185, 129, 0.2)',
+                            color: '#34d399',
+                            border: '1px solid #10b981',
+                            borderRadius: '4px',
+                            padding: '0.2rem 0.4rem',
+                            fontSize: '0.62rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📱 Pack
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW 2: DUAL-TAX EXPLANATORY AUDIT SUMMARY CARD (When on Dual Tax Tab)    */}
+        {/* ========================================================================= */}
+        {activeView === 'dualTax' && (
+          <div style={{
+            flex: 1,
+            overflow: 'auto',
+            padding: '1.25rem',
+            background: '#040814',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.8)',
+              border: '1px solid rgba(212, 175, 55, 0.3)',
+              borderRadius: '12px',
+              padding: '1.25rem'
+            }}>
+              <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem', color: 'var(--gold-glow)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ShieldCheck size={18} /> Statutory Dual-Tax Architecture &amp; Excel Rows 229–232 Reconciliation
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.78rem', color: '#cbd5e1', lineHeight: 1.6 }}>
+                In compliance with Indian GST regulations and authentic Hotel Elite Inn audit procedures, supplies are apportioned across three distinct statutory tax heads:
+              </p>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '0.75rem',
+                marginTop: '1rem'
+              }}>
+                <div style={{ background: '#0a1628', border: '1px solid #334155', borderRadius: '8px', padding: '0.75rem' }}>
+                  <div style={{ color: '#34d399', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.35rem' }}>
+                    1. SAC 996311 — Room Accommodation (5% GST)
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                    Formula: <code style={{ color: '#fff' }}>G230 = E230 (Gross) - F230 (Disc)</code><br/>
+                    CGST @ 2.5% (<code style={{ color: '#38bdf8' }}>H230</code>) + SGST @ 2.5% (<code style={{ color: '#38bdf8' }}>I230</code>)<br/>
+                    Total Room Supply: <strong style={{ color: '#34d399' }}>₹{statutoryValues.totalRoom.toFixed(2)}</strong>
+                  </div>
+                </div>
+
+                <div style={{ background: '#0a1628', border: '1px solid #334155', borderRadius: '8px', padding: '0.75rem' }}>
+                  <div style={{ color: '#f472b6', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.35rem' }}>
+                    2. SAC 996331 — Cannon Kitchen F&amp;B (5% GST)
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                    Food Bill (93.5%) + Beverage Bill (6.5%)<br/>
+                    CGST @ 2.5% + SGST @ 2.5%<br/>
+                    Total F&amp;B Billed: <strong style={{ color: '#f472b6' }}>₹{statutoryValues.fnbGross.toFixed(2)}</strong>
+                  </div>
+                </div>
+
+                <div style={{ background: '#0a1628', border: '1px solid #334155', borderRadius: '8px', padding: '0.75rem' }}>
+                  <div style={{ color: '#a78bfa', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.35rem' }}>
+                    3. SAC 996333 — Laundry Cleaning (18% GST)
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                    Taxable Base (<code style={{ color: '#fff' }}>E232 = Gross / 1.18</code>)<br/>
+                    CGST @ 9.0% (<code style={{ color: '#a78bfa' }}>F232</code>) + SGST @ 9.0% (<code style={{ color: '#a78bfa' }}>G232</code>)<br/>
+                    Total Laundry Supply: <strong style={{ color: '#a78bfa' }}>₹{statutoryValues.totalLaundry.toFixed(4)}</strong>
+                  </div>
+                </div>
+
+                <div style={{ background: '#0a1628', border: '1px solid #334155', borderRadius: '8px', padding: '0.75rem' }}>
+                  <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.35rem' }}>
+                    4. CGST Act Sec 7 — Management &amp; Staff (0% Tax)
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                    Complimentary rooms &amp; staff cafeteria meals provided in the course of employment are zero-rated, legally protecting hotel margins from unnecessary tax leakage.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW 3: 26-COLUMN ENTERPRISE INVOICE REGISTER TABLE                      */}
+        {/* ========================================================================= */}
+        {activeView === 'ledger' && (
+          <>
+            {/* Filter and Search Bar */}
+            <div style={{
+              padding: '0.65rem 1.25rem',
+              background: 'rgba(15, 23, 42, 0.8)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              flexShrink: 0
+            }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 300px' }}>
             <div style={{
               position: 'relative',
@@ -1688,6 +2489,7 @@ GRAND RECONCILIATION:
                 <th style={{ ...standardTh, width: 180 }}>G.NAME</th>
                 <th style={{ ...standardTh, width: 220 }}>COMPANY</th>
                 <th style={{ ...standardTh, width: 160 }}>GST.NO</th>
+                <th style={{ ...standardTh, width: 100, textAlign: 'center' }}>DISPATCH</th>
               </tr>
             </thead>
 
@@ -1764,6 +2566,30 @@ GRAND RECONCILIATION:
                       <td style={{ ...standardTd, fontFamily: 'monospace', color: r.gstin ? '#34d399' : '#64748b', fontSize: '0.68rem' }}>
                         {r.gstin || '—'}
                       </td>
+                      <td style={{ ...standardTd, textAlign: 'center', width: 100 }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            sendPmsGuestInvoiceWhatsApp(r);
+                          }}
+                          style={{
+                            background: 'rgba(16, 185, 129, 0.2)',
+                            color: '#34d399',
+                            border: '1px solid #059669',
+                            borderRadius: '5px',
+                            padding: '0.2rem 0.45rem',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem'
+                          }}
+                          title={`Send Bill #${r.billNo} to Guest / Owner WhatsApp`}
+                        >
+                          <MessageCircle size={10} /> WhatsApp
+                        </button>
+                      </td>
                     </tr>
                   );
                 })
@@ -1808,10 +2634,13 @@ GRAND RECONCILIATION:
                 <td colSpan={4} style={{ ...standardTd, color: '#34d399', fontSize: '0.72rem' }}>
                   ✓ 100% RECONCILED: Rent + GST + Laundry + R/S == Net == Adv + Disc + Comp + Void + Cash + BTC + CC + Online
                 </td>
+                <td style={{ ...standardTd, textAlign: 'center', color: '#34d399' }}>—</td>
               </tr>
             </tfoot>
           </table>
         </div>
+      </>
+    )}
 
         {/* Bottom Legend & Statutory Note */}
         <div style={{

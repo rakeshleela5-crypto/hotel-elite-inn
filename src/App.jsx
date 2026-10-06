@@ -1319,7 +1319,11 @@ export default function App() {
           <AuditedSalesRegisterModal 
             isOpen={auditedSalesRegisterOpen}
             onClose={() => setAuditedSalesRegisterOpen(false)}
-            initialMonth="2026-06"
+            initialMonth="2026-10"
+            rooms={rooms}
+            bookings={bookings}
+            foodOrders={foodOrders}
+            transactions={transactions}
           />
         )}
 
