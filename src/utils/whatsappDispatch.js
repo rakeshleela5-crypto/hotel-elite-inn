@@ -686,3 +686,35 @@ _This automated security notification protects the property against unauthorized
 
   return openWhatsAppLink(PROPRIETOR_PHONE, text);
 }
+
+/**
+ * 19. 2-Hour Pre-Checkout Courtesy WhatsApp Notice to Guest
+ * Notifies guest 2 hours before their 24-hour stay cycle expires with extension & bell desk options.
+ */
+export function sendGuestCheckout2HourReminderWhatsApp(room = {}, booking = null) {
+  const roomNumber = room.roomNumber || room.id;
+  const guestName = room.effectiveGuestName || room.currentGuestName || booking?.guestName || 'Valued Guest';
+  const phone = room.effectivePhone || room.guestPhone || booking?.guestPhone || booking?.phone;
+  const checkoutTime = booking?.checkOutTime || room.expectedCheckoutTime || '12:00 PM';
+  const remainingText = room.countdownText || 'approx. 2 hours';
+
+  const text = `${BRAND_HEADER}
+🛎️ *COURTESY 2-HOUR CHECKOUT REMINDER*
+Room Number: *ROOM ${roomNumber}*
+Dear *${guestName}*,
+
+Namaste from ${HOTEL_CONFIG?.name || 'Hotel Elite Inn'}! We hope you have had a restful stay with us.
+
+⏰ *Stay Expiration Notice:*
+Your 24-hour stay cycle in *Room ${roomNumber}* is scheduled to conclude today at *${checkoutTime}* (in *${remainingText}*).
+
+✨ *How would you like to proceed?*
+1. *Extend Stay:* If you wish to extend your reservation by another day or few hours, reply directly to this message or dial *9* from your room intercom.
+2. *Checking Out:* Our bell desk staff is ready to assist with your luggage. Express checkout is available at the front desk.
+3. *Cannon Kitchen Dining:* Enjoy hot refreshments before your train departure.
+
+🗺️ Near Railway Station Main Road, Muniguda (Odisha)
+_Thank you for choosing Hotel Elite Inn! Safe travels ahead._`;
+
+  return openWhatsAppLink(phone, text);
+}
