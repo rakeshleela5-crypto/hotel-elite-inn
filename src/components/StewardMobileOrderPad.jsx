@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Utensils, Search, Plus, Minus, Send, CheckCircle2, AlertTriangle, 
-  UserCheck, Flame, X, ArrowLeft, RefreshCw, Bell, Hash, Sparkles 
+  UserCheck, Flame, X, ArrowLeft, RefreshCw, Bell, Hash, Sparkles, LogOut 
 } from 'lucide-react';
 import { RESTAURANT_MENU } from '../data/hotelData';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
+import StaffShiftLoginModal from './StaffShiftLoginModal';
+import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 
 export const RECOGNIZED_STEWARDS = [
   { id: 'SADANANDA', name: 'Sadananda', code: 'STW-01', phone: '94370 12001' },
@@ -20,17 +22,20 @@ export default function StewardMobileOrderPad({
   initialSteward = null,
   initialTable = '1' 
 }) {
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('steward'));
+
   // Check URL params for pre-selected staff or table
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const staffParam = urlParams?.get('staff') || urlParams?.get('steward') || initialSteward;
   const tableParam = urlParams?.get('table') || initialTable;
 
   const [activeSteward, setActiveSteward] = useState(() => {
+    if (shiftSession?.staffName) return shiftSession.staffName;
     if (staffParam) {
       const match = RECOGNIZED_STEWARDS.find(s => s.id.toLowerCase() === staffParam.toLowerCase());
-      if (match) return match.id;
+      if (match) return match.name;
     }
-    return localStorage.getItem('hotel_elite_inn_active_steward') || 'SADANANDA';
+    return localStorage.getItem('hotel_elite_inn_active_steward') || 'Sadananda';
   });
 
   const [tableNumber, setTableNumber] = useState(tableParam || '1');
@@ -336,6 +341,26 @@ export default function StewardMobileOrderPad({
     }
   };
 
+  const handleClockOut = async () => {
+    if (window.confirm(`Clock out from ${shiftSession?.shift || 'current'} shift and end session?`)) {
+      await endStaffShiftSession('steward', shiftSession);
+      setShiftSession(null);
+    }
+  };
+
+  if (!shiftSession) {
+    return (
+      <StaffShiftLoginModal
+        portal="steward"
+        onLoginSuccess={(sess) => {
+          setShiftSession(sess);
+          setActiveSteward(sess.staffName);
+        }}
+        onCancel={onClose}
+      />
+    );
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -387,28 +412,51 @@ export default function StewardMobileOrderPad({
           </div>
         </div>
 
-        {/* Active Steward Chip */}
-        <button
-          type="button"
-          onClick={() => setShowStewardSelector(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.35rem',
-            background: 'rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.4)',
-            color: '#fbbf24',
-            padding: '4px 8px',
-            borderRadius: '20px',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer'
-          }}
-        >
-          <UserCheck size={14} />
-          <span>{activeSteward}</span>
-          <span style={{ fontSize: '0.65rem', opacity: 0.8 }}>▼</span>
-        </button>
+        {/* Active Steward Chip with Shift & Clock Out */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <button
+            type="button"
+            onClick={() => setShowStewardSelector(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: '#fbbf24',
+              padding: '4px 8px',
+              borderRadius: '20px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            <UserCheck size={14} />
+            <span>{shiftSession?.shift ? `${shiftSession.shift}: ` : ''}{activeSteward}</span>
+            <span style={{ fontSize: '0.65rem', opacity: 0.8 }}>▼</span>
+          </button>
+
+          <button
+            type="button"
+            title="Clock out and end shift"
+            onClick={handleClockOut}
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#f87171',
+              padding: '5px 7px',
+              borderRadius: '8px',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            <LogOut size={13} />
+          </button>
+        </div>
       </header>
 
       {/* Table & Section Quick-Bar */}

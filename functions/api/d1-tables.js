@@ -110,6 +110,8 @@ const KNOWN_TABLE_CATEGORIES = {
   gst_fom_records: { category: "Statutory & Compliance", label: "GST Front Office Module Register", icon: "📋" },
 
   staff: { category: "HR & Staff", label: "Staff Roster & Biometrics", icon: "👥" },
+  staff_credentials: { category: "HR & Staff", label: "Staff Portal PIN Credentials", icon: "🔑" },
+  staff_shift_logs: { category: "HR & Staff", label: "Mobile PWA Shift Clock-Ins & Audit", icon: "📱" },
   attendance: { category: "HR & Staff", label: "Daily Staff Attendance", icon: "⏱️" },
   biometric_logs: { category: "HR & Staff", label: "Biometric Punch Device Logs", icon: "👆" },
   salary_advances: { category: "HR & Staff", label: "Salary Advances & Loans", icon: "💵" },

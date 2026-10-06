@@ -3,10 +3,12 @@ import {
   Sparkles, CheckCircle2, AlertTriangle, Clock, User,
   ShieldCheck, Bed, Wrench, Search, RefreshCw, X, Phone,
   Bell, BellRing, Droplets, ChevronRight, Settings, LogOut,
-  Wifi, Building2, Check, AlertCircle
+  Wifi, Building2, Check, AlertCircle, ArrowLeft
 } from 'lucide-react';
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY } from '../data/hotelData';
 import { playHousekeepingChime } from '../utils/soundAlert';
+import StaffShiftLoginModal from './StaffShiftLoginModal';
+import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 
 // Housekeeping Staff Configuration
 const HOUSEKEEPING_STAFF = {
@@ -16,7 +18,7 @@ const HOUSEKEEPING_STAFF = {
     role: 'Housekeeping Manager',
     code: 'HK-MGR-01',
     phone: '+91 98611 52365',
-    emoji: '\uD83D\uDC69\u200D\uD83D\uDCBC',
+    emoji: '👩‍💼',
     color: '#10b981'
   },
   SUPERVISOR: {
@@ -25,7 +27,7 @@ const HOUSEKEEPING_STAFF = {
     role: 'Housekeeping Supervisor',
     code: 'HK-SUP-01',
     phone: '+91 63707 57541',
-    emoji: '\uD83D\uDC68\u200D\uD83D\uDD27',
+    emoji: '👨‍🔧',
     color: '#38bdf8'
   }
 };
@@ -34,18 +36,18 @@ export { HOUSEKEEPING_STAFF };
 
 // Room service request types for guest QR scans
 const SERVICE_TYPES = [
-  { id: 'towels', label: 'Extra Towels', icon: '\uD83E\uDDF4', priority: 'Normal', eta: '10 min' },
-  { id: 'water', label: 'Drinking Water', icon: '\uD83D\uDCA7', priority: 'Normal', eta: '5 min' },
-  { id: 'pillow', label: 'Extra Pillow', icon: '\uD83D\uDECF\uFE0F', priority: 'Normal', eta: '10 min' },
-  { id: 'blanket', label: 'Extra Blanket', icon: '\uD83D\uDECC', priority: 'Normal', eta: '10 min' },
-  { id: 'ac_repair', label: 'AC Not Working', icon: '\u2744\uFE0F', priority: 'Urgent', eta: '20 min' },
-  { id: 'plumbing', label: 'Plumbing Issue', icon: '\uD83D\uDEBF', priority: 'Urgent', eta: '25 min' },
-  { id: 'electrical', label: 'Electrical Issue', icon: '\u26A1', priority: 'Urgent', eta: '20 min' },
-  { id: 'cleaning', label: 'Room Cleaning', icon: '\uD83E\uDDF9', priority: 'Normal', eta: '15 min' },
-  { id: 'toiletries', label: 'Toiletry Kit', icon: '\uD83E\uDDF4', priority: 'Normal', eta: '5 min' },
-  { id: 'checkout_clean', label: 'Express Checkout Clean', icon: '\u2728', priority: 'High', eta: '30 min' },
-  { id: 'iron', label: 'Iron & Ironing Board', icon: '\uD83D\uDC54', priority: 'Normal', eta: '10 min' },
-  { id: 'minibar', label: 'Mini-Bar Refill', icon: '\uD83C\uDF7A', priority: 'Low', eta: '15 min' }
+  { id: 'towels', label: 'Extra Towels', icon: '🧺', priority: 'Normal', eta: '10 min' },
+  { id: 'water', label: 'Drinking Water', icon: '💧', priority: 'Normal', eta: '5 min' },
+  { id: 'pillow', label: 'Extra Pillow', icon: '🛏️', priority: 'Normal', eta: '10 min' },
+  { id: 'blanket', label: 'Extra Blanket', icon: '🛌', priority: 'Normal', eta: '10 min' },
+  { id: 'ac_repair', label: 'AC Not Working', icon: '❄️', priority: 'Urgent', eta: '20 min' },
+  { id: 'plumbing', label: 'Plumbing Issue', icon: '🚿', priority: 'Urgent', eta: '25 min' },
+  { id: 'electrical', label: 'Electrical Issue', icon: '⚡', priority: 'Urgent', eta: '20 min' },
+  { id: 'cleaning', label: 'Room Cleaning', icon: '🧹', priority: 'Normal', eta: '15 min' },
+  { id: 'toiletries', label: 'Toiletry Kit', icon: '🧴', priority: 'Normal', eta: '5 min' },
+  { id: 'checkout_clean', label: 'Express Checkout Clean', icon: '✨', priority: 'High', eta: '30 min' },
+  { id: 'iron', label: 'Iron & Ironing Board', icon: '👔', priority: 'Normal', eta: '10 min' },
+  { id: 'minibar', label: 'Mini-Bar Refill', icon: '🍺', priority: 'Low', eta: '15 min' }
 ];
 
 // BroadcastChannel name for housekeeping sync
@@ -54,7 +56,17 @@ const STORAGE_KEY = 'hei_hk_room_statuses';
 const SERVICE_STORAGE_KEY = 'hei_hk_service_requests';
 
 export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER' }) {
-  const staff = HOUSEKEEPING_STAFF[staffRole] || HOUSEKEEPING_STAFF.MANAGER;
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('housekeeping'));
+
+  const effectiveRole = shiftSession?.role === 'HK_SUPERVISOR' ? 'SUPERVISOR' : (shiftSession?.role === 'HK_MANAGER' ? 'MANAGER' : staffRole);
+  const baseStaff = HOUSEKEEPING_STAFF[effectiveRole] || HOUSEKEEPING_STAFF.MANAGER;
+  const staff = {
+    ...baseStaff,
+    name: shiftSession?.staffName || baseStaff.name,
+    code: shiftSession?.staffId || baseStaff.code,
+    role: shiftSession?.role === 'HK_SUPERVISOR' ? 'Housekeeping Supervisor' : (shiftSession?.role === 'HK_MANAGER' ? 'Housekeeping Manager' : baseStaff.role),
+    shift: shiftSession?.shift || 'Morning'
+  };
   
   // Room statuses: map of { roomNumber: status }
   const [roomStatuses, setRoomStatuses] = useState(() => {
@@ -384,6 +396,23 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
 
   // =================== RENDER ===================
 
+  const handleClockOut = async () => {
+    if (window.confirm(`Clock out from ${staff.name}'s ${shiftSession?.shift || 'current'} housekeeping shift?`)) {
+      await endStaffShiftSession('housekeeping', shiftSession);
+      setShiftSession(null);
+    }
+  };
+
+  if (!shiftSession) {
+    return (
+      <StaffShiftLoginModal
+        portal="housekeeping"
+        onLoginSuccess={(sess) => setShiftSession(sess)}
+        onCancel={onClose}
+      />
+    );
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -479,8 +508,31 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
             )}
           </div>
 
+          {/* Clock Out / Shift End Button */}
+          <button
+            type="button"
+            title="Clock out and end shift"
+            onClick={handleClockOut}
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#f87171',
+              padding: '5px 8px',
+              borderRadius: '6px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <LogOut size={13} />
+            <span>Clock Out</span>
+          </button>
+
           {onClose && (
-            <button type="button" onClick={onClose} style={{
+            <button type="button" onClick={onClose} title="Exit to portal" style={{
               background: 'rgba(255,255,255,0.08)',
               border: 'none',
               color: '#94a3b8',
@@ -488,7 +540,7 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
               borderRadius: '6px',
               cursor: 'pointer'
             }}>
-              <LogOut size={16} />
+              <ArrowLeft size={16} />
             </button>
           )}
         </div>

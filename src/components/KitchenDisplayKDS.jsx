@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Flame, Clock, CheckCircle2, Bell, Volume2, VolumeX, RefreshCw, 
-  ArrowLeft, Utensils, AlertTriangle, ChefHat, Sparkles, Filter, X 
+  ArrowLeft, Utensils, AlertTriangle, ChefHat, Sparkles, Filter, X, LogOut 
 } from 'lucide-react';
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
+import StaffShiftLoginModal from './StaffShiftLoginModal';
+import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 
 export default function KitchenDisplayKDS({ onClose }) {
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('kds'));
   const [orders, setOrders] = useState(() => {
     try {
       const saved = localStorage.getItem('hotel_elite_inn_live_kots');
@@ -210,6 +213,23 @@ export default function KitchenDisplayKDS({ onClose }) {
   const readyCount = orders.filter(o => o.status === 'Ready').length;
   const runningKotsCount = orders.filter(o => Boolean(o.isRunningKot || o.runningKotIndex > 1 || (tableSessions[o.tableNumber]?.kots?.length > 1))).length;
 
+  const handleClockOut = async () => {
+    if (window.confirm(`Clock out from Kitchen ${shiftSession?.shift || 'current'} shift and end session?`)) {
+      await endStaffShiftSession('kds', shiftSession);
+      setShiftSession(null);
+    }
+  };
+
+  if (!shiftSession) {
+    return (
+      <StaffShiftLoginModal
+        portal="kds"
+        onLoginSuccess={(sess) => setShiftSession(sess)}
+        onCancel={onClose}
+      />
+    );
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -384,6 +404,43 @@ export default function KitchenDisplayKDS({ onClose }) {
           >
             {isAudioMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
           </button>
+
+          {/* Active Chef Shift Badge & Clock Out */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: 'rgba(239, 68, 68, 0.15)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            padding: '4px 8px',
+            borderRadius: '8px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            color: '#fca5a5'
+          }}>
+            <ChefHat size={14} style={{ color: '#f87171' }} />
+            <span>{shiftSession?.shift ? `${shiftSession.shift}: ` : ''}{shiftSession?.staffName || 'Head Chef'}</span>
+            <button
+              type="button"
+              onClick={handleClockOut}
+              title="Clock out and end kitchen shift"
+              style={{
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: 'none',
+                color: '#fff',
+                padding: '3px 6px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '2px',
+                marginLeft: '4px'
+              }}
+            >
+              <LogOut size={12} />
+              <span style={{ fontSize: '0.65rem' }}>Out</span>
+            </button>
+          </div>
         </div>
       </header>
 
