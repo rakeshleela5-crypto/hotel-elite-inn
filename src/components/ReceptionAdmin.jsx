@@ -86,14 +86,29 @@ export default function ReceptionAdmin({
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Live ticking clock for 2-hour pre-checkout countdown (updates every 30 seconds)
+  // Live 1-second ticking clock for 2-hour pre-checkout digital countdown
   const [liveClock, setLiveClock] = useState(() => Date.now());
   useEffect(() => {
     const clockTimer = setInterval(() => {
       setLiveClock(Date.now());
-    }, 30000);
+    }, 1000); // 1-second tick for real-time countdown delivery
     return () => clearInterval(clockTimer);
   }, []);
+
+  // Stable anchor targets for demo / active occupied rooms so countdown visibly counts down second-by-second
+  const roomCheckoutAnchorsRef = useRef(null);
+  if (!roomCheckoutAnchorsRef.current) {
+    const baseNow = Date.now();
+    roomCheckoutAnchorsRef.current = {
+      102: baseNow + (45 * 60 + 35) * 1000, // 45m 35s remaining (within 2h window)
+      204: baseNow + (84 * 60 + 15) * 1000, // 1h 24m 15s remaining (within 2h window)
+      301: baseNow + (104 * 60 + 45) * 1000, // 1h 44m 45s remaining (within 2h window)
+      105: baseNow - (18 * 60 + 20) * 1000, // 18m 20s overdue
+      202: baseNow + (3 * 3600 + 15 * 60) * 1000, // 3h 15m remaining
+      208: baseNow + (4 * 3600 + 40 * 60) * 1000, // 4h 40m remaining
+      base: baseNow + (5 * 3600 + 20 * 60) * 1000 // default fallback
+    };
+  }
 
   // Filter state for expiring rooms only
   const [filterExpiringOnly, setFilterExpiringOnly] = useState(false);
@@ -2064,21 +2079,27 @@ export default function ReceptionAdmin({
       // Universal 2-Hour Pre-Checkout Expiration & Live Countdown Engine
       const isOccupiedRoom = (effectiveStatus === 'Occupied' || effectiveStatus === 'Occupied Clean');
       const matchedTransit = transitStays.find(t => String(t.roomNumber) === rNo && t.status === 'Active In-Stay');
+      const rNum = parseInt(room.roomNumber, 10);
+      let remainingDiffMs = null;
+      let remainingSeconds = null;
       let remainingMins = null;
       let isOverdue = false;
       let isExpiringSoon = false; // <= 120 minutes (2 Hours)
       let isKeyCutoffImminent = false;
       let countdownText = '—';
+      let digitalClockStr = '00:00:00';
       let expectedCheckoutTimeStr = '12:00 PM';
       let stayDurationLabel = '1 Night (24h)';
       let expectedCheckoutTimestamp = null;
 
       if (matchedTransit) {
-        expectedCheckoutTimestamp = matchedTransit.expectedCheckoutTimestamp || (liveClock + 45 * 60000);
-        remainingMins = Math.round((expectedCheckoutTimestamp - liveClock) / 60000);
-        isOverdue = remainingMins <= 0;
-        isExpiringSoon = remainingMins > 0 && remainingMins <= 120;
-        isKeyCutoffImminent = remainingMins > 0 && remainingMins <= 30;
+        expectedCheckoutTimestamp = matchedTransit.expectedCheckoutTimestamp || roomCheckoutAnchorsRef.current[rNum] || (Date.now() + 45 * 60000);
+        remainingDiffMs = expectedCheckoutTimestamp - liveClock;
+        remainingSeconds = Math.round(remainingDiffMs / 1000);
+        remainingMins = Math.round(remainingDiffMs / 60000);
+        isOverdue = remainingSeconds <= 0;
+        isExpiringSoon = remainingSeconds > 0 && remainingSeconds <= 7200; // <= 2 Hours (7200s)
+        isKeyCutoffImminent = remainingSeconds > 0 && remainingSeconds <= 1800;
         expectedCheckoutTimeStr = matchedTransit.expectedCheckoutTime || 'Today';
         stayDurationLabel = matchedTransit.slotType || 'Transit Stay';
 
@@ -2114,50 +2135,43 @@ export default function ReceptionAdmin({
           }
         }
 
-        // Realistic live operations timestamps for active rooms so receptionists observe the 2-hour alert immediately
+        // Anchor active rooms to fixed timestamp ref so the countdown counts down second-by-second
         if (!expectedCheckoutTimestamp) {
-          const rNum = parseInt(room.roomNumber, 10);
-          if (rNum === 102) {
-            expectedCheckoutTimestamp = liveClock + 45 * 60000; // 45m remaining (Imminent!)
-            expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-          } else if (rNum === 204) {
-            expectedCheckoutTimestamp = liveClock + 85 * 60000; // 1h 25m remaining (within 2 hours!)
-            expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-          } else if (rNum === 105) {
-            expectedCheckoutTimestamp = liveClock - 20 * 60000; // 20m overdue!
-            expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-          } else if (rNum === 301) {
-            expectedCheckoutTimestamp = liveClock + 105 * 60000; // 1h 45m remaining (within 2 hours!)
-            expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          if (roomCheckoutAnchorsRef.current[rNum]) {
+            expectedCheckoutTimestamp = roomCheckoutAnchorsRef.current[rNum];
           } else {
-            expectedCheckoutTimestamp = liveClock + ((rNum % 5) + 3) * 3600000;
-            expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            expectedCheckoutTimestamp = roomCheckoutAnchorsRef.current.base || (Date.now() + ((rNum % 5) + 3) * 3600000);
           }
+          expectedCheckoutTimeStr = new Date(expectedCheckoutTimestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
         }
 
-        remainingMins = Math.round((expectedCheckoutTimestamp - liveClock) / 60000);
-        isOverdue = remainingMins <= 0;
-        isExpiringSoon = remainingMins > 0 && remainingMins <= 120; // 2-Hour Alert Window!
-        isKeyCutoffImminent = remainingMins > 0 && remainingMins <= 30;
+        remainingDiffMs = expectedCheckoutTimestamp - liveClock;
+        remainingSeconds = Math.round(remainingDiffMs / 1000);
+        remainingMins = Math.round(remainingDiffMs / 60000);
+        isOverdue = remainingSeconds <= 0;
+        isExpiringSoon = remainingSeconds > 0 && remainingSeconds <= 7200; // <= 2 Hours (7200s)!
+        isKeyCutoffImminent = remainingSeconds > 0 && remainingSeconds <= 1800; // <= 30 mins
       }
 
-      // Format human-readable live countdown string
-      if (remainingMins !== null && remainingMins !== undefined) {
-        if (remainingMins <= 0) {
-          const overMins = Math.abs(remainingMins);
-          countdownText = overMins > 60 
-            ? `+${Math.floor(overMins / 60)}h ${overMins % 60}m` 
-            : `+${overMins}m`;
-        } else if (remainingMins > 1440) {
-          const d = Math.floor(remainingMins / 1440);
-          const h = Math.floor((remainingMins % 1440) / 60);
-          countdownText = `${d}d ${h}h left`;
-        } else if (remainingMins > 60) {
-          const h = Math.floor(remainingMins / 60);
-          const m = remainingMins % 60;
-          countdownText = `${h}h ${m}m left`;
+      // Format real-time live digital countdown string (ticks every 1 second)
+      if (remainingSeconds !== null && remainingSeconds !== undefined) {
+        const absSec = Math.abs(remainingSeconds);
+        const h = Math.floor(absSec / 3600);
+        const m = Math.floor((absSec % 3600) / 60);
+        const s = absSec % 60;
+        const pad = (n) => String(n).padStart(2, '0');
+        digitalClockStr = `${pad(h)}:${pad(m)}:${pad(s)}`;
+
+        if (isOverdue) {
+          countdownText = `+${pad(h)}h ${pad(m)}m ${pad(s)}s`;
+        } else if (h > 24) {
+          const days = Math.floor(h / 24);
+          const remH = h % 24;
+          countdownText = `${days}d ${pad(remH)}h ${pad(m)}m`;
+        } else if (h > 0) {
+          countdownText = `${pad(h)}h ${pad(m)}m ${pad(s)}s`;
         } else {
-          countdownText = `${remainingMins}m left`;
+          countdownText = `${pad(m)}m ${pad(s)}s`;
         }
       }
 
@@ -2172,11 +2186,14 @@ export default function ReceptionAdmin({
         effectiveBalanceDue,
         matchedBooking,
         matchedTransit,
+        remainingDiffMs,
+        remainingSeconds,
         remainingMins,
         isOverdue,
         isExpiringSoon,
         isKeyCutoffImminent,
         countdownText,
+        digitalClockStr,
         expectedCheckoutTimeStr,
         stayDurationLabel,
         expectedCheckoutTimestamp
