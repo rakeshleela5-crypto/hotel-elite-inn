@@ -148,6 +148,7 @@ export default function KitchenDisplayKDS({ onClose }) {
     };
 
     let channel = null;
+    let channelKot = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       channel = new BroadcastChannel('hotel_elite_inn_live_kds');
       channel.onmessage = (event) => {
@@ -166,6 +167,14 @@ export default function KitchenDisplayKDS({ onClose }) {
           setVoidAlert(voidData);
           playOrderAlert();
           setTimeout(() => playOrderAlert(), 500);
+        }
+      };
+
+      channelKot = new BroadcastChannel('hotel_elite_inn_kot');
+      channelKot.onmessage = (event) => {
+        const { type, order } = event.data || {};
+        if (type === 'NEW_KOT_ORDER' && order) {
+          handleNewOrder(order);
         }
       };
     }
@@ -218,6 +227,7 @@ export default function KitchenDisplayKDS({ onClose }) {
 
     return () => {
       if (channel) channel.close();
+      if (channelKot) channelKot.close();
       window.removeEventListener('storage', handleStorage);
       clearInterval(pollInterval);
     };

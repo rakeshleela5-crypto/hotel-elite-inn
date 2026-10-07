@@ -717,33 +717,43 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 3. PUBLIC GUEST ACTION: Place Food Order
-    if (action === 'place_food_order') {
-      const order = payload;
-      const orderId = `FOOD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+    // 3. PUBLIC GUEST ACTION: Place Food Order & Live KOT
+    if (action === 'place_food_order' || action === 'create_live_kot') {
+      const order = payload || {};
+      const orderId = order.id || order.kotId || order.orderId || `FOOD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
       await db.prepare(`
         INSERT INTO food_orders (
           order_id, room_number, guest_name, items_json,
           subtotal, gst, total_amount, is_jain_satvik, status, payment_status, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Received', 'Pending', datetime('now'))
       `).bind(
-        orderId, order.roomNumber, order.guestName || `Room ${order.roomNumber}`,
-        JSON.stringify(order.items || []), order.subtotal || 0, order.gst || 0,
-        order.totalAmount || 0, order.isJain ? 1 : 0
+        orderId, 
+        order.roomNumber || (order.tableNumber ? `Table ${order.tableNumber}` : 'Dining'), 
+        order.guestName || (order.roomNumber ? `Room ${order.roomNumber}` : 'Direct Guest'),
+        JSON.stringify(order.items || []), 
+        order.subtotal || Math.round(((order.totalAmount || 0) / 1.05) * 100) / 100, 
+        order.gst || Math.round(((order.totalAmount || 0) - ((order.totalAmount || 0) / 1.05)) * 100) / 100,
+        order.totalAmount || 0, 
+        (order.isJain || order.is_jain_satvik) ? 1 : 0
       ).run();
 
       return jsonResponse({ success: true, orderId });
     }
 
-    // 4. PUBLIC GUEST ACTION: Room Service Request
-    if (action === 'place_room_service') {
-      const req = payload;
-      const requestId = `SRV-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+    // 4. PUBLIC GUEST ACTION: Room Service Request & Housekeeping Ticket
+    if (action === 'place_room_service' || action === 'create_housekeeping_ticket') {
+      const req = payload || {};
+      const requestId = req.id || req.requestId || `SRV-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
       await db.prepare(`
         INSERT INTO room_service_requests (
           request_id, room_number, service_type, description, priority, status, requested_at
         ) VALUES (?, ?, ?, ?, ?, 'Pending', datetime('now'))
       `).bind(
-        requestId, req.roomNumber, req.serviceType, req.description || '', req.priority || 'Normal'
+        requestId, 
+        req.roomNumber || '101', 
+        req.serviceType || 'Room Service', 
+        req.description || '', 
+        req.priority || 'Normal'
       ).run();
 
       return jsonResponse({ success: true, requestId });

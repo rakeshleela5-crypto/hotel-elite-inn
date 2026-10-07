@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { RESTAURANT_MENU, HOTEL_CONFIG } from '../data/hotelData';
 import { sendInRoomConciergeWhatsApp } from '../utils/whatsappDispatch';
+import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 
 export default function InRoomGuestPortal({
   roomNumber = '204',
@@ -121,37 +122,131 @@ export default function InRoomGuestPortal({
   const cartTotal = cart.reduce((sum, c) => sum + (getDishPrice(c.dish) * c.quantity), 0);
   const cartItemCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
-  // Submit in-room food order
+  // Submit in-room food order & broadcast to Cannon Kitchen Live Orders & Production KDS
   const handlePlaceOrder = () => {
     if (cart.length === 0) return;
 
     const orderId = `KOT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const fullNote = cookingNotes || (cart.some(c => c.dish.isJain) ? 'Satvik Pure Veg' : '');
+    
     const newOrder = {
+      id: orderId,
+      kotId: orderId,
       orderId,
-      roomNumber,
-      outlet: 'Cannon Kitchen (Room Service)',
+      kotNumber: orderId.replace(/\D/g, '').slice(-3) || '1',
+      roomNumber: String(roomNumber),
+      tableNumber: null,
+      guestName: `Room ${roomNumber} Guest`,
+      outlet: 'Cannon Kitchen (In-Room Dining)',
       orderType: 'room',
       status: 'Received',
+      steward: 'In-Room QR Order',
+      captain: 'In-Room QR Order',
+      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      timeFormatted: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       items: cart.map(c => ({
+        id: c.dish.id,
+        itemCode: c.dish.itemCode || String(c.dish.id),
         name: c.dish.name,
         quantity: c.quantity,
+        rate: getDishPrice(c.dish),
         price: getDishPrice(c.dish),
-        notes: cookingNotes || (c.dish.isJain ? 'Satvik Pure Veg' : '')
+        isVeg: Boolean(c.dish.isVeg),
+        notes: c.dish.isJain ? 'Satvik Pure Veg' : (cookingNotes || '')
       })),
       totalAmount: cartTotal,
       is_jain_satvik: cart.some(c => c.dish.isJain) ? 1 : 0,
-      captain: 'In-Room QR Order',
-      created_at: new Date().toISOString()
+      generalNote: fullNote
     };
+
+    // 1. Dual Save to local registers
+    try {
+      const existingKots = JSON.parse(localStorage.getItem('hotel_elite_inn_live_kots') || '[]');
+      localStorage.setItem('hotel_elite_inn_live_kots', JSON.stringify([newOrder, ...existingKots].slice(0, 100)));
+
+      const existingFood = JSON.parse(localStorage.getItem('hotel_elite_inn_food_orders') || '[]');
+      localStorage.setItem('hotel_elite_inn_food_orders', JSON.stringify([newOrder, ...existingFood].slice(0, 100)));
+    } catch (e) {
+      console.warn('Storage sync error:', e);
+    }
+
+    // 2. Dual BroadcastChannel dispatch to Kitchen KDS & Cannon Kitchen Live Food Orders
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        // Broadcast to KDS channel (KitchenDisplayKDS + FenugreekLiveFoodOrdersKDS)
+        const kdsChannel = new BroadcastChannel('hotel_elite_inn_live_kds');
+        kdsChannel.postMessage({
+          type: 'NEW_KOT_ORDER',
+          order: newOrder,
+          source: 'GUEST_IN_ROOM_QR'
+        });
+        kdsChannel.close();
+
+        // Broadcast to Reception Admin Live Orders channel
+        const kotChannel = new BroadcastChannel('hotel_elite_inn_kot');
+        kotChannel.postMessage({
+          type: 'NEW_KOT_ORDER',
+          order: newOrder,
+          source: 'GUEST_IN_ROOM_QR'
+        });
+        kotChannel.close();
+      }
+    } catch (e) {
+      console.warn('BroadcastChannel error:', e);
+    }
+
+    // 3. Auto-post food transaction to active room folio (SAC 996331, 5% GST)
+    try {
+      const existingTxns = JSON.parse(localStorage.getItem('hotel_elite_inn_pms_transactions') || '[]');
+      const taxable = Math.round((cartTotal / 1.05) * 100) / 100;
+      const gstHalf = Math.round(((cartTotal - taxable) / 2) * 100) / 100;
+      const newTxn = {
+        transactionId: `TXN-${roomNumber}-${Date.now().toString().slice(-4)}`,
+        folioId: `FOLIO-${roomNumber}`,
+        bookingId: `BOOK-${roomNumber}`,
+        roomNumber: String(roomNumber),
+        transactionType: 'Food & Beverage',
+        outlet: 'Cannon Kitchen (In-Room Dining)',
+        itemCode: orderId,
+        description: `KOT #${orderId} - Cannon Kitchen In-Room Dining`,
+        debitAmount: cartTotal,
+        creditAmount: 0,
+        taxableBase: taxable,
+        gstRate: 5,
+        cgst: gstHalf,
+        sgst: gstHalf,
+        sacCode: '996331',
+        invoiceCategory: 'Food',
+        isLocked: 0,
+        createdBy: 'Guest QR Mobile Portal',
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('hotel_elite_inn_pms_transactions', JSON.stringify([newTxn, ...existingTxns]));
+    } catch (err) {
+      console.warn('Folio auto-post error:', err);
+    }
+
+    // 4. Remote Cloudflare D1 Sync
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+      body: JSON.stringify({
+        action: 'create_live_kot',
+        payload: newOrder
+      })
+    }).catch(err => console.warn('Offline in-room KOT sync fallback:', err));
 
     if (onPlaceFoodOrder) {
       onPlaceFoodOrder(newOrder);
     }
 
-    setOrderSuccessMsg(`✓ Order #${orderId} placed! Kitchen is preparing your dishes.`);
+    playSuccessChime();
+    setOrderSuccessMsg(`✓ Order #${orderId} placed & billed to Room ${roomNumber}! Cannon Kitchen KDS alerted.`);
     setCart([]);
     setCookingNotes('');
-    setTimeout(() => setOrderSuccessMsg(''), 6000);
+    setTimeout(() => setOrderSuccessMsg(''), 7000);
   };
 
   // Quick Room Service Request Presets
@@ -200,47 +295,80 @@ export default function InRoomGuestPortal({
     }
   ];
 
+  // Dispatch Room Service call directly to Housekeeping Supervisor & Manager Portals
   const handleSendServiceRequest = (serviceType, description) => {
     const reqId = `REQ-${Math.floor(1000 + Math.random() * 9000)}`;
+    const floorNumber = String(roomNumber)[0] || '1';
+    const assignedAttendant = floorNumber === '1' 
+      ? 'Floor 1 Attendant (Bikram)' 
+      : floorNumber === '2' 
+      ? 'Floor 2 Attendant (Ranjan)' 
+      : 'Floor 3 Attendant (Manoj)';
+
     const newReq = {
+      id: reqId,
       requestId: reqId,
-      roomNumber,
+      roomNumber: String(roomNumber),
+      floor: floorNumber,
       serviceType,
-      description,
-      priority: 'Normal',
+      description: description || serviceType,
+      priority: serviceType === 'Maintenance' ? 'Urgent' : 'Normal',
       status: 'Pending',
-      assignedStaff: 'On-Duty Steward',
+      assignedStaff: assignedAttendant,
+      guestName: `Room ${roomNumber} Guest`,
       requestedAt: new Date().toISOString()
     };
 
-    if (onRequestRoomService) {
-      onRequestRoomService(newReq);
+    // 1. Save to Housekeeping shared state in localStorage (read by Supervisor & Manager)
+    try {
+      const existingHk = JSON.parse(localStorage.getItem('hei_hk_service_requests') || '[]');
+      const updatedHk = [newReq, ...existingHk].slice(0, 100);
+      localStorage.setItem('hei_hk_service_requests', JSON.stringify(updatedHk));
+    } catch (e) {
+      console.warn('HK storage error:', e);
     }
 
-    // Direct broadcast to Housekeeping Manager & Supervisor mobile portals
+    // 2. Direct broadcast to Housekeeping Manager & Supervisor mobile portals
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
         hkChannel.postMessage({
           type: 'ROOM_SERVICE_REQUEST',
-          payload: {
-            roomNumber,
-            serviceType,
-            description,
-            priority: serviceType === 'Maintenance' ? 'Urgent' : 'Normal',
-            guestName: `Room ${roomNumber} Guest`,
-            requestId: reqId
-          }
+          payload: newReq
         });
         hkChannel.close();
+
+        // Also broadcast to Front Desk PMS bus
+        const pmsChannel = new BroadcastChannel('hotel_elite_inn_pms');
+        pmsChannel.postMessage({
+          type: 'ROOM_SERVICE_REQUEST',
+          payload: newReq
+        });
+        pmsChannel.close();
       }
     } catch (e) {
       console.warn('HK guest broadcast error:', e);
     }
 
-    setServiceSuccessMsg(`✓ ${serviceType} request received for Room ${roomNumber}! Attendant dispatched (ETA ~10 mins).`);
+    // 3. Dispatch to Cloudflare D1 Remote Database Sync
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+      body: JSON.stringify({
+        action: 'create_housekeeping_ticket',
+        payload: newReq
+      })
+    }).catch(err => console.warn('Offline HK sync fallback:', err));
+
+    if (onRequestRoomService) {
+      onRequestRoomService(newReq);
+    }
+
+    playSuccessChime();
+    setServiceSuccessMsg(`✓ ${serviceType} request received for Room ${roomNumber}! ${assignedAttendant} dispatched (ETA ~10 mins).`);
     setCustomServiceDesc('');
-    setTimeout(() => setServiceSuccessMsg(''), 6000);
+    setTimeout(() => setServiceSuccessMsg(''), 7000);
   };
 
   const handleCopyWifi = () => {

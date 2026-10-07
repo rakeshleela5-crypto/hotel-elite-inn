@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Utensils, Search, Plus, Minus, Send, CheckCircle2, AlertTriangle, 
   UserCheck, Flame, X, ArrowLeft, RefreshCw, Bell, Hash, Sparkles, LogOut,
-  Printer, QrCode, Timer, ShieldAlert, AlertOctagon, Check
+  Printer, QrCode, Timer, ShieldAlert, AlertOctagon, Check, Zap
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { RESTAURANT_MENU } from '../data/hotelData';
@@ -419,23 +419,38 @@ export default function StewardMobileOrderPad({
       localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(updatedSessions));
       setRunningTableSessions(updatedSessions);
 
-      // 2. Save to live KOTs list
+      // 2. Dual Save to live KOTs list & Live Food Orders register
       const existingKots = JSON.parse(localStorage.getItem('hotel_elite_inn_live_kots') || '[]');
       const updatedKots = [newKotOrder, ...existingKots].slice(0, 100);
       localStorage.setItem('hotel_elite_inn_live_kots', JSON.stringify(updatedKots));
 
-      // 3. Broadcast via BroadcastChannel (zero-latency instant sync to KDS & Reception)
+      const existingFoodOrders = JSON.parse(localStorage.getItem('hotel_elite_inn_food_orders') || '[]');
+      const updatedFoodOrders = [newKotOrder, ...existingFoodOrders].slice(0, 100);
+      localStorage.setItem('hotel_elite_inn_food_orders', JSON.stringify(updatedFoodOrders));
+
+      // 3. Dual Broadcast via BroadcastChannel (Kitchen KDS + Cannon Live Food Orders tab)
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const channel = new BroadcastChannel('hotel_elite_inn_live_kds');
-        channel.postMessage({
+        // Channel A: Live KDS Bus (KitchenDisplayKDS & FenugreekLiveFoodOrdersKDS)
+        const channelKds = new BroadcastChannel('hotel_elite_inn_live_kds');
+        channelKds.postMessage({
+          type: 'NEW_KOT_ORDER',
+          order: newKotOrder,
+          target: 'DUAL_KOT',
+          tableSessions: updatedSessions
+        });
+        channelKds.close();
+
+        // Channel B: Reception Admin Live Orders Bus
+        const channelKot = new BroadcastChannel('hotel_elite_inn_kot');
+        channelKot.postMessage({
           type: 'NEW_KOT_ORDER',
           order: newKotOrder,
           tableSessions: updatedSessions
         });
-        channel.close();
+        channelKot.close();
       }
 
-      // 4. Dispatch to Cloudflare D1 Sync
+      // 4. Dispatch to Cloudflare D1 Remote Database Sync
       const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
       fetch('/api/sync', {
         method: 'POST',
@@ -455,8 +470,8 @@ export default function StewardMobileOrderPad({
       setCookingNote('');
       setDietaryTag('');
       showToast(isTableOccupied 
-        ? `🔥 Repeat KOT #${nextKotNumber} sent to Kitchen for Table ${tableNumber}! Running: ₹${newGross}` 
-        : `🚀 KOT #1 sent to Kitchen for Table ${tableNumber}!`
+        ? `⚡ Dual Repeat KOT #${nextKotNumber} sent to Kitchen KDS + Cannon Live Production! Running: ₹${newGross}` 
+        : `⚡ Dual KOT #1 sent to Kitchen KDS + Cannon Live Production!`
       );
     } catch (err) {
       console.error('Error dispatching KOT:', err);
@@ -1088,38 +1103,63 @@ export default function StewardMobileOrderPad({
               </div>
             </div>
 
-            <button
-              type="button"
-              disabled={isSubmitting}
-              onClick={handleDispatchKot}
-              style={{
-                flex: 1,
-                background: isTableOccupied
-                  ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
-                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                border: 'none',
-                color: isTableOccupied ? '#000' : '#fff',
-                fontWeight: 900,
-                fontSize: '0.85rem',
-                padding: '0.75rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.45rem',
-                boxShadow: isTableOccupied ? '0 4px 15px rgba(245, 158, 11, 0.4)' : '0 4px 15px rgba(16, 185, 129, 0.4)'
-              }}
-            >
-              <Send size={16} />
-              <span>
-                {isSubmitting
-                  ? 'Dispatching...'
-                  : isTableOccupied
-                  ? `➕ SEND REPEAT KOT #${nextKotNumber}`
-                  : '🚀 SEND KOT #1 TO KITCHEN'}
-              </span>
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleDispatchKot}
+                style={{
+                  width: '100%',
+                  background: isTableOccupied
+                    ? 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
+                    : 'linear-gradient(135deg, #10b981 0%, #0d9488 100%)',
+                  border: 'none',
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: '0.86rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.55rem',
+                  boxShadow: isTableOccupied 
+                    ? '0 4px 18px rgba(245, 158, 11, 0.45)' 
+                    : '0 4px 18px rgba(16, 185, 129, 0.45)',
+                  letterSpacing: '0.3px',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Simultaneously dispatch KOT 1 to Kitchen KDS and KOT 2 to Cannon Kitchen Live Food Orders"
+              >
+                <Zap size={18} fill="#fff" />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', lineHeight: 1.15 }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 900 }}>
+                    {isSubmitting 
+                      ? 'Dispatching Dual Streams...'
+                      : isTableOccupied
+                      ? `⚡ SEND DUAL REPEAT KOT #${nextKotNumber}`
+                      : '⚡ SEND DUAL KOT 1 & KOT 2 INSTANTLY'}
+                  </span>
+                  <span style={{ fontSize: '0.67rem', opacity: 0.92, fontWeight: 600 }}>
+                    Kitchen KDS Hot-Line + Cannon Live Production KDS
+                  </span>
+                </div>
+              </button>
+
+              {/* Status Verification Sub-Chips */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 0.2rem', fontSize: '0.68rem', color: '#94a3b8' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#10b981', fontWeight: 700 }}>
+                  <Check size={11} /> KOT 1: Kitchen KDS
+                </span>
+                <span style={{ color: '#475569' }}>•</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#38bdf8', fontWeight: 700 }}>
+                  <Check size={11} /> KOT 2: Cannon Live KDS
+                </span>
+                <span style={{ color: '#475569' }}>•</span>
+                <span style={{ color: '#fbbf24', fontWeight: 600 }}>🔊 Chime Sync</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

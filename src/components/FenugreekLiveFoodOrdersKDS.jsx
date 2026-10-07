@@ -77,8 +77,9 @@ export default function FenugreekLiveFoodOrdersKDS({
       if (!seenOrderIds.current.has(idKey)) {
         seenOrderIds.current.add(idKey);
         const dest = normalized.orderType === 'room' ? `Room ${normalized.roomNumber}` : `Table ${normalized.tableNumber || 'Dining'}`;
-        setNewOrderNotice(`🔔 NEW KOT ${normalized.kotNumber} from Steward for ${dest}!`);
-        setTimeout(() => setNewOrderNotice(null), 7000);
+        const sourceLabel = normalized.steward === 'In-Room QR Order' || normalized.captain === 'In-Room QR Order' ? '🛎️ In-Room Guest QR' : 'Steward';
+        setNewOrderNotice(`🔔 NEW KOT #${normalized.kotNumber} from ${sourceLabel} for ${dest}!`);
+        setTimeout(() => setNewOrderNotice(null), 8000);
 
         if (!isAudioMuted) {
           playOrderAlert();
@@ -88,7 +89,10 @@ export default function FenugreekLiveFoodOrdersKDS({
     };
 
     let channel = null;
+    let channelKot = null;
+
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      // Primary KDS Bus
       channel = new BroadcastChannel(KDS_CHANNEL_NAME);
       channel.onmessage = (event) => {
         const { type, order, orderId, status, tableSessions: ts } = event.data || {};
@@ -106,14 +110,33 @@ export default function FenugreekLiveFoodOrdersKDS({
           setTableSessions(ts);
         }
       };
+
+      // Secondary Reception KOT Bus
+      channelKot = new BroadcastChannel('hotel_elite_inn_kot');
+      channelKot.onmessage = (event) => {
+        const { type, order } = event.data || {};
+        if (type === 'NEW_KOT_ORDER' && order) {
+          handleIncomingOrder(order);
+        }
+      };
     }
 
     const handleStorage = (e) => {
-      if (e.key === KOT_STORAGE_KEY && e.newValue) {
+      if ((e.key === KOT_STORAGE_KEY || e.key === 'hotel_elite_inn_food_orders') && e.newValue) {
         try {
           const fresh = JSON.parse(e.newValue);
           if (Array.isArray(fresh)) {
-            setOrders(fresh.map(normalizeKotOrder).filter(Boolean));
+            setOrders(prev => {
+              const freshNormalized = fresh.map(normalizeKotOrder).filter(Boolean);
+              // Merge maintaining any active states
+              const map = new Map();
+              freshNormalized.forEach(o => map.set(o.id || o.orderId, o));
+              prev.forEach(o => {
+                const k = o.id || o.orderId;
+                if (!map.has(k)) map.set(k, o);
+              });
+              return Array.from(map.values());
+            });
           }
         } catch (err) {}
       } else if (e.key === 'hotel_elite_inn_table_sessions' && e.newValue) {
@@ -127,6 +150,7 @@ export default function FenugreekLiveFoodOrdersKDS({
 
     return () => {
       if (channel) channel.close();
+      if (channelKot) channelKot.close();
       window.removeEventListener('storage', handleStorage);
     };
   }, [isAudioMuted]);
