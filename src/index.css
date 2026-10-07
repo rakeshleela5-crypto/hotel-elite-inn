@@ -2516,3 +2516,79 @@ td[data-no-edit]:hover {
   }
 }
 
+/* ==========================================================================
+   ENTERPRISE PMS: LUXURY DEPARTMENTAL SIDEBAR & 48PX CONTROL BAR INTERFACE
+   ========================================================================== */
+
+.pms-enterprise-shell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background: #040914;
+  color: #f1f5f9;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.pms-adaptive-sidebar {
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pms-adaptive-sidebar.collapsed {
+  width: 68px !important;
+  min-width: 68px !important;
+}
+
+.pms-adaptive-sidebar.expanded {
+  width: 250px !important;
+  min-width: 250px !important;
+}
+
+.pms-workspace-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 0%, rgba(15, 23, 42, 0.6) 0%, #040914 100%);
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Status Hierarchy Indicators for 27 Rooms */
+.pms-room-chip-available {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+}
+
+.pms-room-chip-occupied {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
+}
+
+.pms-room-chip-dueout {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+}
+
+.pms-room-chip-dirty {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+}
+
+/* Responsive adjustment for mobile screens */
+@media (max-width: 768px) {
+  .pms-adaptive-sidebar {
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1200 !important;
+  }
+  .pms-adaptive-sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+}

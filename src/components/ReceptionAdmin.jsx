@@ -15,6 +15,8 @@ import { calculateRoomTax } from '../utils/taxUtils';
 import FolioActionsModal from './FolioActionsModal';
 import BookingReceiptModal from './BookingReceiptModal';
 import CheckoutSplitModal from './CheckoutSplitModal';
+import PmsSidebar from './PmsSidebar';
+import PmsControlHeader from './PmsControlHeader';
 import InteractiveCalendar from '@/components/ui/visualize-booking';
 import RoomQrModal from './RoomQrModal';
 import StewardQrManagerModal from './StewardQrManagerModal';
@@ -86,6 +88,7 @@ export default function ReceptionAdmin({
   const [activeRole, setActiveRole] = useState('owner'); // 'owner' (Eswara MD), 'receptionist' (Front Desk), 'accounts' (Accounts Lead)
   const [activeDepartment, setActiveDepartment] = useState('reception'); // 'reception', 'restaurant', 'accounts', 'store', 'housekeeping'
   const [activeTab, setActiveTab] = useState(initialTab || 'tape-chart'); // 'tape-chart', 'd1-database-explorer', 'cashier-audit', etc.
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (initialTab) {
@@ -3716,555 +3719,171 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
   };
 
   return (
-    <section 
-      id="reception-admin-container" 
-      ref={receptionContainerRef} 
-      className="reception-admin-root hsi-live-edit-active" 
-      style={{ padding: '2rem 1.5rem 4rem 1.5rem', maxWidth: 1580, margin: '0 auto', position: 'relative' }}
-    >
-      {/* 5-DEPARTMENT CONSOLE & 3-ROLE AUTHORIZATION BAR (Owner Video Requirement) */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(12, 24, 43, 0.98), rgba(6, 14, 26, 0.99))',
-        border: '1px solid rgba(212, 175, 55, 0.4)',
-        borderRadius: '14px',
-        padding: '1rem 1.25rem',
-        marginBottom: '1.75rem',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-      }}>
-        {/* Top Line: 3 Authorized Operational Roles */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          paddingBottom: '0.85rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
-        }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span className="badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: 'var(--gold-glow)', border: '1px solid rgba(212, 175, 55, 0.4)', fontWeight: 800 }}>
-                AUTHENTIC MYSOFT ENTERPRISE PMS
-              </span>
-              <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
-                Active Operator Profile: <strong style={{ color: activeRole === 'owner' ? '#fbbf24' : activeRole === 'receptionist' ? '#38bdf8' : activeRole === 'accounts' ? '#34d399' : activeRole === 'steward' ? '#f97316' : '#a855f7' }}>
-                  {activeRole === 'owner' ? '👑 Raju Anna & GM (Full Unrestricted Access)' :
-                   activeRole === 'receptionist' ? '👤 Front Desk Reception (Active Shift Collections Only)' :
-                   activeRole === 'accounts' ? '💼 Accounts Lead & Tax Compliance' :
-                   activeRole === 'steward' ? '🍽️ Dining & Kitchen Steward (Financials Restricted)' :
-                   '🧹 Housekeeping Attendant (Financials Restricted)'}
-                </strong>
-              </span>
+    <div className="pms-enterprise-shell">
+      {/* 1. ADAPTIVE GLASS DEPARTMENTAL SIDEBAR (Pillar 1) */}
+      <PmsSidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
+        activeDepartment={activeDepartment}
+        onSelectDepartment={(dept) => {
+          setActiveDepartment(dept);
+          if (dept === 'reception') setActiveTab('tape-chart');
+          else if (dept === 'restaurant') {
+            setActiveTab('live-food-orders');
+            if (onOpenRestaurantPOS) onOpenRestaurantPOS();
+          }
+          else if (dept === 'accounts') {
+            setActiveTab('cashier-audit');
+            if (onOpenAccountsLedger) onOpenAccountsLedger('tally-erp');
+          }
+          else if (dept === 'housekeeping') setActiveTab('housekeeping');
+          else if (dept === 'store') {
+            setActiveTab('operations-settings');
+            if (onOpenStoreInventory) onOpenStoreInventory();
+          }
+          else if (dept === 'night-audit') {
+            if (onOpenNightAuditModal) onOpenNightAuditModal();
+            else setActiveTab('cashier-audit');
+          }
+        }}
+        activeRole={activeRole}
+        onChangeRole={setActiveRole}
+        cashCollected={cashCollected}
+        liveKotCount={foodOrdersList.filter(o => o.status === 'Received' || o.status === 'Preparing').length}
+        pendingHkCount={roomServicesList.filter(r => r.status === 'Pending').length}
+        onOpenRoomSearch={onOpenRoomSearch}
+        onOpenRestaurantPOS={onOpenRestaurantPOS}
+        onOpenAccountsLedger={onOpenAccountsLedger}
+        onOpenStoreInventory={onOpenStoreInventory}
+        onOpenRevenueManagement={onOpenRevenueManagement}
+        onOpenNightAuditModal={onOpenNightAuditModal}
+        onOpenDirectorPortal={onOpenDirectorPortal}
+        onOpenCaFilingStation={onOpenCaFilingStation}
+        onOpenAuditedSalesRegister={onOpenAuditedSalesRegister}
+        onOpenAuditedRestaurantRegister={onOpenAuditedRestaurantRegister}
+        onOpenQrHub={() => setQrHubOpen(true)}
+        onExitPMS={onExitPMS}
+      />
 
-              {/* 27-Room Quick Navigator Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (onOpenRoomSearch) onOpenRoomSearch();
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(15, 23, 42, 0.95))',
-                  border: '1.5px solid #fbbf24',
-                  color: '#fbbf24',
-                  padding: '3px 10px',
-                  borderRadius: '20px',
-                  fontSize: '0.76rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                  marginLeft: '0.4rem'
-                }}
-                title="Instant 27-Room Search & Operations (Ctrl+K)"
-              >
-                <Search size={13} color="#fbbf24" />
-                <span>🔍 Search 27 Rooms</span>
-                <kbd style={{
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  borderRadius: '4px',
-                  padding: '1px 5px',
-                  fontSize: '0.62rem',
-                  color: '#fbbf24',
-                  fontFamily: 'monospace'
-                }}>Ctrl+K</kbd>
-              </button>
-            </div>
-          </div>
+      {/* 2. MAIN WORKSPACE CONTENT CANVAS */}
+      <div className="pms-workspace-content">
+        {/* 48PX RAZOR-THIN TOP CONTROL BAR (Pillar 2) */}
+        <PmsControlHeader
+          isSidebarCollapsed={isSidebarCollapsed}
+          onToggleSidebar={() => setIsSidebarCollapsed(prev => !prev)}
+          activeDepartment={activeDepartment}
+          activeTab={activeTab}
+          onChangeTab={setActiveTab}
+          activeRole={activeRole}
+          cashCollected={cashCollected}
+          onOpenRoomSearch={onOpenRoomSearch}
+          onOpenWalkInModal={() => {
+            setWalkInRoom('101');
+            setWalkInRate(1699);
+            setWalkInDeposit(1699);
+            setWalkInOpen(true);
+          }}
+          onOpenCaFilingStation={onOpenCaFilingStation}
+          onOpenAuditedSalesRegister={onOpenAuditedSalesRegister}
+          onExitPMS={onExitPMS}
+        />
 
-          {/* Top Line Right Side: 5 Operational Role Switcher Buttons & Exit PMS */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(0,0,0,0.4)', padding: '3px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', flexWrap: 'wrap' }}>
-              {[
-                { id: 'owner', label: '👑 Raju Anna & GM', color: '#fbbf24', title: 'Unrestricted access to Gross Cash, Bank, Payroll, P&L' },
-                { id: 'receptionist', label: '👤 Receptionist', color: '#38bdf8', title: 'Front desk operations & active shift cash only' },
-                { id: 'accounts', label: '💼 Accounts Lead', color: '#34d399', title: 'Day Book, GSTR-1, Bank Reconciliation' },
-                { id: 'steward', label: '🍽️ Steward', color: '#f97316', title: 'Dining & Kitchen POS only (Zero Revenue Visibility)' },
-                { id: 'housekeeping', label: '🧹 Housekeeping', color: '#a855f7', title: 'Turnover & Inspection only (Zero Revenue Visibility)' }
-              ].map(r => (
-                <button
-                  key={r.id}
-                  onClick={() => setActiveRole(r.id)}
-                  title={r.title}
-                  style={{
-                    padding: '0.35rem 0.75rem',
-                    borderRadius: '6px',
-                    border: activeRole === r.id ? `1px solid ${r.color}` : '1px solid transparent',
-                    background: activeRole === r.id ? 'rgba(255,255,255,0.12)' : 'transparent',
-                    color: activeRole === r.id ? r.color : '#94a3b8',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-
-            {onExitPMS && (
-              <button
-                type="button"
-                onClick={onExitPMS}
-                style={{
-                  background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-                  border: '1px solid #f87171',
-                  color: '#ffffff',
-                  padding: '0.4rem 0.95rem',
-                  borderRadius: '7px',
-                  fontSize: '0.8rem',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.45)',
-                  transition: 'all 0.15s ease'
-                }}
-                title="Exit Front Desk PMS and Return to Guest Website (Shortcut: Esc)"
-              >
-                <LogOut size={14} color="#ffffff" /> Exit PMS (Esc)
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Rapid Cross-Module Interconnection Highway (F1-F8 One-Touch Switcher) */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.55rem 0.2rem',
-          overflowX: 'auto',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          scrollbarWidth: 'none'
-        }}>
-          <span style={{
-            fontSize: '0.72rem',
-            color: 'var(--gold-glow)',
-            fontWeight: 800,
-            letterSpacing: '0.04em',
-            paddingRight: '0.35rem',
-            display: 'inline-flex',
+        <section 
+          id="reception-admin-container" 
+          ref={receptionContainerRef} 
+          className="reception-admin-root hsi-live-edit-active" 
+          style={{ padding: '1rem 1.25rem 4rem 1.25rem', maxWidth: 1680, width: '100%', margin: '0 auto', position: 'relative' }}
+        >
+          {/* Streamlined Workspace Context Banner & Quick Operations Bar */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '0.3rem',
-            whiteSpace: 'nowrap'
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+            marginBottom: '1rem',
+            padding: '0.65rem 1rem',
+            background: 'linear-gradient(135deg, rgba(12, 24, 43, 0.95), rgba(6, 14, 26, 0.98))',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: '10px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.35)'
           }}>
-            ⚡ FAST RAIL:
-          </span>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap' }}>
+                <span className="badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: 'var(--gold-glow)', border: '1px solid rgba(212, 175, 55, 0.4)', fontWeight: 800 }}>
+                  {HOTEL_CONFIG.legalName.toUpperCase()}
+                </span>
+                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                  27-Room Luxury Boutique PMS • GSTIN: <strong style={{ color: '#fbbf24' }}>{HOTEL_CONFIG.gstin}</strong> • Rule 46 Compliant
+                </span>
+              </div>
+            </div>
 
-          {[
-            { key: 'F1', label: 'Front Desk', color: '#38bdf8', onClick: () => { setActiveDepartment('reception'); setActiveTab('tape-chart'); } },
-            { key: 'F2', label: 'Fenugreek POS', color: '#fbbf24', onClick: onOpenRestaurantPOS },
-            { key: 'F3', label: 'Day Book & Tax', color: '#34d399', onClick: onOpenAccountsLedger },
-            { key: 'F4', label: 'Primary Folio (1-17)', color: '#60a5fa', onClick: () => {
-              const targetRoom = rooms.find(r => r.status === 'Occupied') || rooms[0];
-              if (targetRoom) setSelectedFolioRoom(targetRoom);
-            } },
-            { key: 'F5', label: 'Mandi Store', color: '#a78bfa', onClick: onOpenStoreInventory },
-            { key: 'F6', label: 'G3 RMS Rates', color: '#f59e0b', onClick: onOpenRevenueManagement },
-            { key: 'F7', label: 'Night Audit', color: '#c084fc', onClick: onOpenNightAuditModal || (() => setActiveTab('cashier-audit')) },
-            { key: 'F8', label: 'Director Portal', color: '#facc15', onClick: onOpenDirectorPortal },
-            { key: 'F9', label: '📊 26-Col Audited Reg', color: '#34d399', onClick: onOpenAuditedSalesRegister },
-            { key: 'F10', label: 'Rest. Sales Reg', color: '#fbbf24', onClick: onOpenAuditedRestaurantRegister },
-            { key: 'F11', label: '📱 QR Code Hub', color: '#10b981', onClick: () => setQrHubOpen(true) }
-          ].map(item => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={item.onClick}
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: item.color,
-                borderRadius: '6px',
-                padding: '0.28rem 0.65rem',
-                fontSize: '0.74rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.15s ease'
-              }}
-              title={`Quick switch to ${item.label} (${item.key})`}
-            >
-              <kbd style={{
-                background: 'rgba(0,0,0,0.55)',
-                border: '1px solid rgba(255,255,255,0.22)',
-                borderRadius: '4px',
-                padding: '1px 5px',
-                fontSize: '0.66rem',
-                fontFamily: 'monospace',
-                color: '#fff',
-                boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.4)'
-              }}>
-                {item.key}
-              </kbd>
-              {item.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom Line: 5 Department Master Section Tabs */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: '0.65rem',
-          paddingTop: '0.85rem'
-        }}>
-          {[
-            { 
-              id: 'reception', 
-              label: '1. Front Desk & Reception', 
-              icon: Hotel, 
-              color: '#38bdf8', 
-              desc: 'Tape Chart, 27 Rooms, Walk-in, GRC',
-              onClick: () => {
-                setActiveDepartment('reception');
-                setActiveTab('tape-chart');
-              }
-            },
-            { 
-              id: 'restaurant', 
-              label: '2. Fenugreek Restaurant', 
-              icon: Utensils, 
-              color: '#fbbf24', 
-              desc: 'Live KOTs, In-Room Dining & POS',
-              badge: foodOrdersList.filter(o => o.status === 'Received' || o.status === 'Preparing').length > 0 ? `${foodOrdersList.filter(o => o.status === 'Received' || o.status === 'Preparing').length} Live` : null,
-              badgeColor: '#ef4444',
-              onClick: () => {
-                setActiveDepartment('restaurant');
-                setActiveTab('live-food-orders');
-              }
-            },
-            { 
-              id: 'accounts', 
-              label: '3. Accounts & Cashier', 
-              icon: DollarSign, 
-              color: '#34d399', 
-              desc: 'Cash Drawer, Split Tenders, Day Book',
-              onClick: () => {
-                setActiveDepartment('accounts');
-                setActiveTab('cashier-audit');
-              }
-            },
-            { 
-              id: 'store', 
-              label: '4. Mandi Store & Inventory', 
-              icon: ShoppingBag, 
-              color: '#a78bfa', 
-              desc: 'Kitchen Stock, Linen & Amenities',
-              onClick: () => {
-                setActiveDepartment('store');
-                if (onOpenStoreInventory) onOpenStoreInventory();
-              }
-            },
-            { 
-              id: 'housekeeping', 
-              label: '5. Housekeeping & Turnover', 
-              icon: Layers, 
-              color: '#facc15', 
-              desc: '27-Room Vacant Dirty Turnover',
-              badge: roomServicesList.filter(r => r.status === 'Pending').length > 0 ? `${roomServicesList.filter(r => r.status === 'Pending').length} Pending` : null,
-              badgeColor: '#f59e0b',
-              onClick: () => {
-                setActiveDepartment('housekeeping');
-                setActiveTab('housekeeping');
-              }
-            }
-          ].map(dept => {
-            const Icon = dept.icon;
-            const isSelected = activeDepartment === dept.id;
-            return (
-              <button
-                key={dept.id}
-                onClick={dept.onClick}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.65rem 0.85rem',
-                  borderRadius: '10px',
-                  background: isSelected ? 'rgba(212, 175, 55, 0.18)' : 'rgba(255, 255, 255, 0.03)',
-                  border: isSelected ? '1px solid var(--gold-glow)' : '1px solid rgba(255, 255, 255, 0.07)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease',
-                  position: 'relative'
-                }}
+            <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <button 
+                type="button"
+                onClick={() => setBlockRoomOpen(true)}
+                className="btn-outline-gold"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                title="Block room for Maintenance or Executive Hold"
               >
-                <div style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '8px',
-                  background: isSelected ? dept.color : 'rgba(255,255,255,0.08)',
-                  color: isSelected ? '#060e1a' : dept.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <Icon size={16} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 800, color: isSelected ? '#fff' : '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {dept.label}
-                    {dept.badge && (
-                      <span style={{
-                        background: dept.badgeColor,
-                        color: '#fff',
-                        fontSize: '0.65rem',
-                        padding: '1px 6px',
-                        borderRadius: '10px',
-                        fontWeight: 800
-                      }}>
-                        {dept.badge}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: '0.68rem', color: isSelected ? 'var(--gold-glow)' : 'var(--text-muted)' }}>
-                    {dept.desc}
-                  </div>
-                </div>
+                <Ban size={13} color="#f87171" /> Block Room
               </button>
-            );
-          })}
-        </div>
-      </div>
-      {/* Front Desk Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '1rem',
-        marginBottom: '1.75rem',
-        borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
-        paddingBottom: '1.25rem'
-      }}>
-        <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--gold-glow)', fontSize: '0.8rem', fontWeight: 600 }}>
-            <ShieldCheck size={16} /> Central PMS Operations • {HOTEL_CONFIG.legalName}
+              <button 
+                type="button"
+                onClick={() => setIsRoomRackPrintOpen(true)}
+                className="btn-outline-gold"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                title="Print 27-Room Daily Tape Chart Rack & Arrivals Manifest"
+              >
+                <Printer size={13} color="var(--gold-glow)" /> Room Rack
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsPolicePrintOpen(true)}
+                className="btn-outline-gold"
+                style={{ 
+                  padding: '0.35rem 0.75rem', 
+                  fontSize: '0.74rem', 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '0.35rem',
+                  borderColor: '#ef4444',
+                  color: '#fca5a5'
+                }}
+                title="Muniguda Police Station Daily Guest Manifest (Form C)"
+              >
+                <ShieldCheck size={13} color="#ef4444" /> Form C
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsLuggageModalOpen(true)}
+                className="btn-outline-gold"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                title="Bell Desk Luggage Custody Tags"
+              >
+                <Briefcase size={13} color="#38bdf8" /> Luggage
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsWakeUpModalOpen(true)}
+                className="btn-outline-gold"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                title="Pilgrim & Train Wake-Up Call Scheduler"
+              >
+                <Bell size={13} color="#facc15" /> Wake-Up
+              </button>
+              <button 
+                type="button"
+                onClick={() => setBackupOpen(true)}
+                className="btn-outline-gold"
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                title="Cloudflare D1 & Local JSON Full Backup"
+              >
+                <Database size={13} color="#38bdf8" /> Backup
+              </button>
+            </div>
           </div>
-          <h2 style={{ fontSize: '2rem', margin: '0.2rem 0' }}>Front Desk &amp; 27-Room Operations Console</h2>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            GSTIN: <strong style={{ color: '#fbbf24' }}>{HOTEL_CONFIG.gstin}</strong> • Rayagada, Odisha • Sarai Act 1867 &amp; Rule 46 Compliant
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.55rem', flexWrap: 'wrap', alignItems: 'center' }}>
-          <button 
-            onClick={onOpenCaFilingStation}
-            className="btn-outline-gold"
-            title="Open System #36: CA Filing Station & Financial Intelligence Engine (10 Modules)"
-            style={{ 
-              padding: '0.55rem 0.95rem', 
-              fontSize: '0.82rem', 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '0.35rem',
-              borderColor: 'var(--gold-primary)',
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(245, 158, 11, 0.15))',
-              color: 'var(--gold-glow)',
-              fontWeight: 700
-            }}
-          >
-            <Scale size={15} color="var(--gold-glow)" /> 🏛️ System #36: CA Filing
-          </button>
-          <button 
-            onClick={() => { setSelectedRoomForQr('101'); setRoomQrOpen(true); }}
-            className="btn-outline-gold"
-            title="Generate In-Room Dining, Digital Keycard & Standee QR"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <QrCode size={15} color="var(--gold-glow)" /> Room QR
-          </button>
-          <button 
-            onClick={() => setBackupOpen(true)}
-            className="btn-outline-gold"
-            title="One-click Complete JSON Database Dump & Restore"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <Database size={15} color="#38bdf8" /> Backup JSON
-          </button>
-          <button 
-            onClick={() => setLiveOrdersOpen(true)}
-            className="btn-outline-gold"
-            title="View Real-Time Cannon Kitchen In-Room Dining Orders"
-            style={{ 
-              padding: '0.55rem 0.95rem', 
-              fontSize: '0.82rem', 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '0.35rem',
-              borderColor: foodOrdersList.filter(o => o.status === 'Received').length > 0 ? '#ef4444' : undefined,
-              background: foodOrdersList.filter(o => o.status === 'Received').length > 0 ? 'rgba(239, 68, 68, 0.12)' : undefined
-            }}
-          >
-            <Utensils size={15} color="#fbbf24" /> Live Food Orders
-            {foodOrdersList.filter(o => o.status === 'Received').length > 0 && (
-              <span style={{ background: '#ef4444', color: '#fff', padding: '1px 6px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 800 }}>
-                {foodOrdersList.filter(o => o.status === 'Received').length} New
-              </span>
-            )}
-          </button>
-          <button 
-            onClick={() => setRoomServicesCareOpen(true)}
-            className="btn-outline-gold"
-            title="Manage Housekeeping, Extra Water, Linen & Maintenance Calls"
-            style={{ 
-              padding: '0.55rem 0.95rem', 
-              fontSize: '0.82rem', 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '0.35rem',
-              borderColor: roomServicesList.filter(r => r.status === 'Pending').length > 0 ? '#f59e0b' : undefined,
-              background: roomServicesList.filter(r => r.status === 'Pending').length > 0 ? 'rgba(245, 158, 11, 0.12)' : undefined
-            }}
-          >
-            <BellRing size={15} color="#facc15" /> Room Services &amp; Care
-            {roomServicesList.filter(r => r.status === 'Pending').length > 0 && (
-              <span style={{ background: '#f59e0b', color: '#060e1a', padding: '1px 6px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 800 }}>
-                {roomServicesList.filter(r => r.status === 'Pending').length} Pending
-              </span>
-            )}
-          </button>
-          <button 
-            type="button"
-            onClick={() => setIsPolicePrintOpen(true)}
-            className="btn-outline-gold"
-            style={{ 
-              padding: '0.55rem 0.95rem', 
-              fontSize: '0.82rem', 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '0.35rem',
-              background: 'rgba(239, 68, 68, 0.15)',
-              borderColor: '#ef4444',
-              color: '#fca5a5',
-              fontWeight: 700
-            }}
-            title="Muniguda Police Station (Thana) Daily Guest Manifest (Form C) • 1-Click WhatsApp & Print"
-          >
-            <ShieldCheck size={15} color="#ef4444" /> 👮 Thana Report (Form C)
-          </button>
-          <button 
-            onClick={() => setIsRoomRackPrintOpen(true)}
-            className="btn-outline-gold"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            title="Print 27-Room Daily Tape Chart Rack & Arrivals Manifest"
-          >
-            <Printer size={15} color="var(--gold-glow)" /> Print Room Rack
-          </button>
-          <button 
-            onClick={() => setIsLuggageModalOpen(true)}
-            className="btn-outline-gold"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            title="Bell Desk Luggage Storage & Custody Tags"
-          >
-            <Briefcase size={15} color="#38bdf8" /> Luggage Pass
-          </button>
-          <button 
-            onClick={() => setIsWakeUpModalOpen(true)}
-            className="btn-outline-gold"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-            title="Pilgrim & Train Wake-Up Call Scheduler"
-          >
-            <Bell size={15} color="#facc15" /> Wake-Up Calls
-          </button>
-          <button 
-            onClick={() => setBlockRoomOpen(true)}
-            className="btn-outline-gold"
-            style={{ padding: '0.55rem 0.95rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <Ban size={15} color="#f87171" /> Block Room
-          </button>
-          <button 
-            onClick={() => setWalkInOpen(true)}
-            className="btn-primary-gold"
-            style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem' }}
-          >
-            <UserCheck size={15} /> Express Walk-In
-          </button>
-          <button 
-            onClick={() => setActiveTab('cashier-audit')}
-            className="btn-secondary-sapphire"
-            style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem' }}
-          >
-            <Clock size={15} /> Night Audit
-          </button>
-          <button 
-            id="pms-top-audited-sales-btn"
-            onClick={onOpenAuditedSalesRegister}
-            style={{ 
-              padding: '0.55rem 1.15rem', 
-              fontSize: '0.85rem',
-              fontWeight: 800,
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 95, 70, 0.6))',
-              border: '1.5px solid #10b981',
-              color: '#34d399',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              boxShadow: '0 0 16px rgba(16, 185, 129, 0.35)',
-              transition: 'all 0.15s ease'
-            }}
-            title="Open 26-Column Audited Sales & Night Audit Register (Days 1–31 Continuous Ledger & 223 Bills)"
-          >
-            <FileSpreadsheet size={16} color="#34d399" /> 📊 26-Col Audited Register
-          </button>
-          {onExitPMS && (
-            <button 
-              onClick={onExitPMS}
-              style={{ 
-                padding: '0.55rem 1.15rem', 
-                fontSize: '0.85rem', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
-                gap: '0.4rem',
-                background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
-                border: '1px solid #f87171',
-                color: '#ffffff',
-                borderRadius: '8px',
-                fontWeight: 800,
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.45)',
-                transition: 'all 0.15s ease'
-              }}
-              title="Exit Front Desk PMS and Return to Guest Website (Shortcut: Esc)"
-            >
-              <LogOut size={15} color="#ffffff" /> Exit PMS (Esc)
-            </button>
-          )}
-        </div>
-      </div>
 
       {/* Automated Statutory F&B Reconciliation Strip (Rows 1325-1326 Automatic Engine) */}
       <AutomatedFnbReconciliationStrip
@@ -12380,5 +11999,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         }}
       />
     </section>
+      </div>
+    </div>
   );
 }
