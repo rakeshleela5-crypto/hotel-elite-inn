@@ -66,6 +66,8 @@ export default function BookingModal({
   onClose,
   initialTier = null,
   initialRoomNumber = null,
+  initialCheckInDate = null,
+  initialCheckOutDate = null,
   rooms = [],
   bookings = [],
   dynamicRates = null,
@@ -74,10 +76,12 @@ export default function BookingModal({
   const [selectedTier, setSelectedTier] = useState(initialTier || ROOM_TIERS[0]);
   const [selectedRoomNumber, setSelectedRoomNumber] = useState(initialRoomNumber || '');
   const [checkInDate, setCheckInDate] = useState(() => {
+    if (initialCheckInDate) return initialCheckInDate;
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
   const [checkOutDate, setCheckOutDate] = useState(() => {
+    if (initialCheckOutDate) return initialCheckOutDate;
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
@@ -116,7 +120,9 @@ export default function BookingModal({
   useEffect(() => {
     if (initialTier) setSelectedTier(initialTier);
     if (initialRoomNumber) setSelectedRoomNumber(initialRoomNumber);
-  }, [initialTier, initialRoomNumber]);
+    if (initialCheckInDate) setCheckInDate(initialCheckInDate);
+    if (initialCheckOutDate) setCheckOutDate(initialCheckOutDate);
+  }, [initialTier, initialRoomNumber, initialCheckInDate, initialCheckOutDate]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

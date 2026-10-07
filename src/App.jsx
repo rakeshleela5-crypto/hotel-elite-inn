@@ -301,6 +301,8 @@ export default function App() {
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedTierForBooking, setSelectedTierForBooking] = useState(null);
   const [selectedRoomNumForBooking, setSelectedRoomNumForBooking] = useState(null);
+  const [selectedCheckInForBooking, setSelectedCheckInForBooking] = useState(null);
+  const [selectedCheckOutForBooking, setSelectedCheckOutForBooking] = useState(null);
 
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [currentReceiptBooking, setCurrentReceiptBooking] = useState(null);
@@ -726,9 +728,11 @@ export default function App() {
     };
   }, [currentView, adminPinVerified]);
 
-  const handleOpenBooking = (tier, roomNumber = null) => {
+  const handleOpenBooking = (tier, roomNumber = null, checkInDate = null, checkOutDate = null) => {
     setSelectedTierForBooking(tier || ROOM_TIERS[0]);
     setSelectedRoomNumForBooking(roomNumber);
+    setSelectedCheckInForBooking(checkInDate);
+    setSelectedCheckOutForBooking(checkOutDate);
     setBookingModalOpen(true);
   };
 
@@ -1261,6 +1265,10 @@ export default function App() {
                 onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
                 onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
                 onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
+                onOpenBookingModal={(params) => {
+                  const targetTier = params?.tier ? ROOM_TIERS.find(t => t.name === params.tier || t.id === params.tier) || ROOM_TIERS[0] : ROOM_TIERS[0];
+                  handleOpenBooking(targetTier, params?.roomNumber, params?.checkInDate, params?.checkOutDate);
+                }}
                 nightAudits={nightAudits}
                 foodOrders={foodOrders}
                 onUpdateOrderStatus={handleUpdateOrderStatus}
@@ -1294,9 +1302,15 @@ export default function App() {
 
         <BookingModal 
           isOpen={bookingModalOpen}
-          onClose={() => setBookingModalOpen(false)}
+          onClose={() => {
+            setBookingModalOpen(false);
+            setSelectedCheckInForBooking(null);
+            setSelectedCheckOutForBooking(null);
+          }}
           initialTier={selectedTierForBooking}
           initialRoomNumber={selectedRoomNumForBooking}
+          initialCheckInDate={selectedCheckInForBooking}
+          initialCheckOutDate={selectedCheckOutForBooking}
           rooms={rooms}
           bookings={bookings}
           dynamicRates={dynamicRates}

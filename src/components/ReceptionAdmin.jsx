@@ -28,6 +28,7 @@ import CheckInReviewModal from './CheckInReviewModal';
 import { sendHousekeepingOrderWhatsApp, sendMaintenanceTicketWhatsApp } from '../utils/whatsappDispatch';
 import StayDurationAnalytics from './StayDurationAnalytics';
 import OperationsSettingsTab from './OperationsSettingsTab';
+import TapeChartCalendar from './TapeChartCalendar';
 import D1LiveDatabaseExplorer from './D1LiveDatabaseExplorer';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
@@ -78,6 +79,7 @@ export default function ReceptionAdmin({
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
   onShiftRoomTransactions,
+  onOpenBookingModal,
   initialTab
 }) {
   // The 3 Authorized Roles & 5 Department Console (Owner Video 2 Requirement)
@@ -90,7 +92,7 @@ export default function ReceptionAdmin({
       setActiveTab(initialTab);
     }
   }, [initialTab]);
-  const [tapeChartViewMode, setTapeChartViewMode] = useState('table'); // 'table' (Master Tabular Ledger), 'mysoft' (Tabular Matrix), or 'modern' (Cards)
+  const [tapeChartViewMode, setTapeChartViewMode] = useState('14day-calendar'); // '14day-calendar', 'table', 'mysoft', or 'modern'
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFloor, setSelectedFloor] = useState('all'); // 'all', 1, 2, or 3
@@ -5061,6 +5063,22 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             }}>
               <button
                 type="button"
+                className={`enterprise-tab-pill ${tapeChartViewMode === '14day-calendar' ? 'active' : ''}`}
+                onClick={() => setTapeChartViewMode('14day-calendar')}
+                style={{
+                  background: tapeChartViewMode === '14day-calendar' 
+                    ? 'linear-gradient(135deg, #d4af37, #f59e0b)' 
+                    : 'rgba(212, 175, 55, 0.15)',
+                  color: tapeChartViewMode === '14day-calendar' ? '#000000' : '#fbbf24',
+                  fontWeight: 900,
+                  border: tapeChartViewMode === '14day-calendar' ? 'none' : '1px solid rgba(212, 175, 55, 0.4)',
+                  boxShadow: tapeChartViewMode === '14day-calendar' ? '0 0 12px rgba(212, 175, 55, 0.4)' : 'none'
+                }}
+              >
+                📅 14-Day Reservation Tape Chart
+              </button>
+              <button
+                type="button"
                 className={`enterprise-tab-pill ${tapeChartViewMode === 'table' ? 'active' : ''}`}
                 onClick={() => setTapeChartViewMode('table')}
               >
@@ -5220,8 +5238,34 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             </button>
           </div>
 
-          {/* VIEW 0: ENTERPRISE MASTER TABULAR ROOM LEDGER (Spreadsheet Format) */}
-          {tapeChartViewMode === 'table' ? (
+          {/* VIEW MODE RENDERING: 14-DAY TAPE CHART VS MASTER LEDGER VS TABULAR MATRIX VS CARDS */}
+          {tapeChartViewMode === '14day-calendar' ? (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <TapeChartCalendar
+                rooms={rooms}
+                bookings={bookings}
+                onOpenBookingModal={(params) => {
+                  if (onOpenBookingModal) {
+                    onOpenBookingModal(params);
+                  } else {
+                    handleExpressWalkInFromSearch(params.roomNumber);
+                  }
+                }}
+                onOpenWalkInModal={(roomNumber, room) => {
+                  handleExpressWalkInFromSearch(roomNumber);
+                }}
+                onViewFolio={(room, booking) => {
+                  const targetRoom = rooms.find(r => r.roomNumber === room.roomNumber) || room;
+                  setSelectedFolioRoom(targetRoom);
+                }}
+                onOpenReceipt={(booking) => {
+                  setSelectedReceiptBooking(booking);
+                  setReceiptModalType('a4');
+                  setIsReceiptModalOpen(true);
+                }}
+              />
+            </div>
+          ) : tapeChartViewMode === 'table' ? (
             <div className="enterprise-data-table-container">
               {/* AUTHENTIC MYSOFT ENTERPRISE DATE COMMAND SECTION (Integrated in Master Tabular Room Ledger) */}
               <div style={{ padding: '0.65rem 0.85rem', background: '#071224', borderBottom: '1px solid rgba(56, 189, 248, 0.2)' }}>
