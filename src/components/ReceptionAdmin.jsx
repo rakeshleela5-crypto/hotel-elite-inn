@@ -481,13 +481,17 @@ export default function ReceptionAdmin({
     depositPaid: 1000
   });
 
-  // Anti-Fraud Stay Extension States (Audio 3: 2-Hour Room Flip Prevention)
+  // Anti-Fraud Stay Extension States (Multi-Day Nights & Hourly Late Checkout)
   const [stayExtensionModalOpen, setStayExtensionModalOpen] = useState(false);
   const [extensionTargetRoom, setExtensionTargetRoom] = useState(null);
+  const [extensionMode, setExtensionMode] = useState('days'); // 'days' or 'hours'
+  const [extensionDays, setExtensionDays] = useState(1);
   const [extensionDurationHours, setExtensionDurationHours] = useState(2);
-  const [extensionTariffAdded, setExtensionTariffAdded] = useState(400);
+  const [extensionTariffAdded, setExtensionTariffAdded] = useState(1750);
   const [extensionPaymentMode, setExtensionPaymentMode] = useState('UPI (PhonePe)');
+  const [extensionSettlementType, setExtensionSettlementType] = useState('folio'); // 'folio' (Post to Folio) or 'now' (Collect Now)
   const [extensionReason, setExtensionReason] = useState('Guest requested stay extension');
+  const [customNewCheckoutDate, setCustomNewCheckoutDate] = useState('');
 
   // 1B. Rayagada Junction (RGDA) Station Transfer & Logistics Dispatch (Inspired by Open-Hotel-PMS)
   const [stationTransfers, setStationTransfers] = useState([
@@ -1718,13 +1722,33 @@ export default function ReceptionAdmin({
     showToast(`✓ Transit Check-In complete for Room ${transitForm.roomNumber} (${transitForm.slotType} - ₹${transitForm.tariff}).`);
   };
 
-  // Anti-Fraud Stay Extension Handlers (Audio 3: 2-Hour Room Flip Audit)
+  // Comprehensive Stay Extension Handlers (Multi-Day Nights & Hourly Late Checkout)
   const handleOpenStayExtension = (room) => {
     setExtensionTargetRoom(room);
+    setExtensionMode('days');
+    setExtensionDays(1);
     setExtensionDurationHours(2);
-    setExtensionTariffAdded(400);
+
+    // Find room daily tariff
+    const dailyRate = Number(room.effectiveTariff || room.tariff || 1750);
+    setExtensionTariffAdded(dailyRate);
     setExtensionPaymentMode('UPI (PhonePe)');
+    setExtensionSettlementType('folio');
     setExtensionReason('Guest requested stay extension');
+
+    // Calculate base checkout date and +1 day
+    const matched = room.matchedBooking || bookings.find(b => String(b.roomNumber || b.room_number) === String(room.roomNumber) && b.bookingStatus !== 'Cancelled' && b.bookingStatus !== 'Checked Out');
+    let baseDate = new Date();
+    if (matched && (matched.checkOutDate || matched.check_out_date)) {
+      const parsed = new Date(matched.checkOutDate || matched.check_out_date);
+      if (!isNaN(parsed.getTime())) {
+        baseDate = parsed;
+      }
+    }
+    const nextDay = new Date(baseDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    setCustomNewCheckoutDate(nextDay.toISOString().split('T')[0]);
+
     setStayExtensionModalOpen(true);
   };
 
@@ -1734,73 +1758,145 @@ export default function ReceptionAdmin({
 
     const roomNo = String(extensionTargetRoom.roomNumber);
     const now = Date.now();
-    const addedMs = Number(extensionDurationHours) * 3600 * 1000;
+    const tariffNum = Number(extensionTariffAdded) || 0;
 
-    // 1. Update transit stays state
-    setTransitStays(prev => {
-      const existing = prev.find(t => String(t.roomNumber) === roomNo && t.status === 'Active In-Stay');
-      if (existing) {
-        const baseEnd = (existing.expectedCheckoutTimestamp && existing.expectedCheckoutTimestamp > now)
-          ? existing.expectedCheckoutTimestamp
-          : now;
-        const newEnd = baseEnd + addedMs;
-        return prev.map(t => {
-          if (t.id === existing.id) {
-            return {
-              ...t,
-              expectedCheckoutTimestamp: newEnd,
-              expectedCheckoutTime: new Date(newEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-              hoursAllowed: (t.hoursAllowed || 2) + Number(extensionDurationHours),
-              tariff: (t.tariff || 0) + Number(extensionTariffAdded),
-              slotType: `${(t.hoursAllowed || 2) + Number(extensionDurationHours)}-Hour Extended Transit`,
-              extensions: [
-                ...(t.extensions || []),
-                {
-                  extendedAt: new Date().toISOString(),
-                  hours: Number(extensionDurationHours),
-                  amount: Number(extensionTariffAdded),
-                  paymentMode: extensionPaymentMode,
-                  reason: extensionReason
-                }
-              ]
-            };
-          }
-          return t;
-        });
-      } else {
-        const newEnd = now + addedMs;
-        const newStay = {
-          id: `EXT-${Date.now().toString().slice(-4)}`,
-          roomNumber: roomNo,
-          guestName: extensionTargetRoom.effectiveGuestName || 'In-House Guest',
-          phone: extensionTargetRoom.effectivePhone || '+91 94370 00000',
-          origin: 'Front Desk Extension',
-          purpose: 'Stay Extended',
-          slotType: `${extensionDurationHours}-Hour Extension`,
-          hoursAllowed: Number(extensionDurationHours),
-          checkInTime: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          checkInTimestamp: now,
-          expectedCheckoutTime: new Date(newEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          expectedCheckoutTimestamp: newEnd,
-          tariff: Number(extensionTariffAdded),
-          paymentMode: extensionPaymentMode,
-          status: 'Active In-Stay',
-          depositPaid: Number(extensionTariffAdded),
-          extensions: [
-            {
-              extendedAt: new Date().toISOString(),
-              hours: Number(extensionDurationHours),
-              amount: Number(extensionTariffAdded),
-              paymentMode: extensionPaymentMode,
-              reason: extensionReason
-            }
-          ]
-        };
-        return [newStay, ...prev];
+    // Matched booking lookup
+    const matched = extensionTargetRoom.matchedBooking || bookings.find(b => String(b.roomNumber || b.room_number) === roomNo && b.bookingStatus !== 'Cancelled' && b.bookingStatus !== 'Checked Out') || null;
+
+    let newCheckOutDateStr = '';
+    let newExpectedCheckoutTimestamp = now;
+
+    if (extensionMode === 'days') {
+      let baseDate = new Date();
+      if (matched && (matched.checkOutDate || matched.check_out_date)) {
+        const parsed = new Date(matched.checkOutDate || matched.check_out_date);
+        if (!isNaN(parsed.getTime())) {
+          baseDate = parsed;
+        }
       }
-    });
+      const newD = new Date(baseDate);
+      newD.setDate(newD.getDate() + Number(extensionDays));
+      newCheckOutDateStr = customNewCheckoutDate || newD.toISOString().split('T')[0];
+      newExpectedCheckoutTimestamp = new Date(`${newCheckOutDateStr}T12:00:00`).getTime();
+    } else {
+      const addedMs = Number(extensionDurationHours) * 3600 * 1000;
+      newExpectedCheckoutTimestamp = now + addedMs;
+      newCheckOutDateStr = new Date(newExpectedCheckoutTimestamp).toISOString().split('T')[0];
+    }
 
-    // 2. Sync stay extension directly to Cloudflare D1 Remote Database
+    // 1. Update Booking record in database & state
+    if (matched && onUpdateBooking) {
+      const addedNights = extensionMode === 'days' ? Number(extensionDays) : 0;
+      const prevTotal = Number(matched.totalAmount || matched.tariff || 0);
+      const prevBal = Number(matched.balanceDue || 0);
+      const prevAdvance = Number(matched.advanceDeposit || 0);
+
+      const isPaidNow = extensionSettlementType === 'now';
+      const updatedTotal = prevTotal + tariffNum;
+      const updatedAdvance = isPaidNow ? (prevAdvance + tariffNum) : prevAdvance;
+      const updatedBal = isPaidNow ? prevBal : (prevBal + tariffNum);
+
+      const updatedBooking = {
+        ...matched,
+        checkOutDate: newCheckOutDateStr,
+        nights: (matched.nights || 1) + addedNights,
+        totalAmount: updatedTotal,
+        advanceDeposit: updatedAdvance,
+        balanceDue: updatedBal,
+        stayExtended: true,
+        lastExtension: {
+          extendedAt: new Date().toISOString(),
+          mode: extensionMode,
+          days: addedNights,
+          hours: extensionMode === 'hours' ? Number(extensionDurationHours) : 0,
+          tariffAdded: tariffNum,
+          settlementType: extensionSettlementType,
+          paymentMode: extensionPaymentMode,
+          reason: extensionReason
+        }
+      };
+
+      onUpdateBooking(updatedBooking);
+
+      // Direct sync to Cloudflare D1
+      try {
+        fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'save_booking', payload: updatedBooking })
+        }).catch(err => console.warn('D1 stay extension booking sync non-fatal:', err));
+      } catch (err) {}
+    }
+
+    // 2. Add transaction to Folio Ledger
+    if (onAddTransaction) {
+      onAddTransaction({
+        id: `TXN-EXT-${Date.now().toString().slice(-4)}`,
+        folioId: `FOLIO-${roomNo}`,
+        roomNumber: roomNo,
+        type: 'ROOM_RENT',
+        description: `Stay Extension (+${extensionMode === 'days' ? `${extensionDays} Night(s)` : `${extensionDurationHours}h`}) - ${extensionReason}`,
+        amount: tariffNum,
+        category: 'Room Tariff',
+        timestamp: new Date().toISOString(),
+        paymentMode: extensionSettlementType === 'now' ? extensionPaymentMode : 'Folio Debit (Pending Settlement)'
+      });
+    }
+
+    // 3. Update room status and outstanding balance on front desk matrix
+    if (onUpdateRoomStatus) {
+      const currentBal = Number(extensionTargetRoom.effectiveBalanceDue || extensionTargetRoom.balanceDue || 0);
+      const newBal = extensionSettlementType === 'now' ? currentBal : (currentBal + tariffNum);
+      onUpdateRoomStatus(
+        roomNo,
+        'Occupied',
+        extensionTargetRoom.effectiveGuestName || extensionTargetRoom.currentGuestName,
+        newBal
+      );
+    }
+
+    // 4. Update room object locally
+    if (extensionTargetRoom) {
+      extensionTargetRoom.effectiveTariff = (Number(extensionTargetRoom.effectiveTariff) || 0) + tariffNum;
+      extensionTargetRoom.effectiveStayPeriod = extensionMode === 'days' 
+        ? `Stay Extended +${extensionDays}d (Until ${newCheckOutDateStr})`
+        : `Stay Extended +${extensionDurationHours}h`;
+      extensionTargetRoom.isOverdue = false;
+      extensionTargetRoom.isExpiringSoon = false;
+      extensionTargetRoom.expectedCheckoutTimeStr = extensionMode === 'days' 
+        ? `${newCheckOutDateStr} 12:00 PM` 
+        : new Date(newExpectedCheckoutTimestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // 5. Update transitStays if in hourly mode
+    if (extensionMode === 'hours') {
+      const addedMs = Number(extensionDurationHours) * 3600 * 1000;
+      setTransitStays(prev => {
+        const existing = prev.find(t => String(t.roomNumber) === roomNo && t.status === 'Active In-Stay');
+        if (existing) {
+          const baseEnd = (existing.expectedCheckoutTimestamp && existing.expectedCheckoutTimestamp > now)
+            ? existing.expectedCheckoutTimestamp
+            : now;
+          const newEnd = baseEnd + addedMs;
+          return prev.map(t => {
+            if (t.id === existing.id) {
+              return {
+                ...t,
+                expectedCheckoutTimestamp: newEnd,
+                expectedCheckoutTime: new Date(newEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                hoursAllowed: (t.hoursAllowed || 2) + Number(extensionDurationHours),
+                tariff: (t.tariff || 0) + tariffNum,
+                slotType: `${(t.hoursAllowed || 2) + Number(extensionDurationHours)}-Hour Extended Transit`
+              };
+            }
+            return t;
+          });
+        }
+        return prev;
+      });
+    }
+
+    // 6. Record to Remote D1 Anti-Fraud Log
     const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
     fetch('/api/sync', {
       method: 'POST',
@@ -1812,25 +1908,21 @@ export default function ReceptionAdmin({
         action: 'record_stay_extension',
         payload: {
           roomNumber: roomNo,
-          guestName: extensionTargetRoom.effectiveGuestName || 'In-House Guest',
-          extensionHours: Number(extensionDurationHours),
-          tariffAdded: Number(extensionTariffAdded),
+          guestName: extensionTargetRoom.effectiveGuestName || extensionTargetRoom.currentGuestName || 'In-House Guest',
+          extensionMode,
+          extensionDays: extensionMode === 'days' ? Number(extensionDays) : 0,
+          extensionHours: extensionMode === 'hours' ? Number(extensionDurationHours) : 0,
+          tariffAdded: tariffNum,
+          newCheckoutDate: newCheckOutDateStr,
+          settlementType: extensionSettlementType,
           paymentMode: extensionPaymentMode,
           reason: extensionReason
         }
       })
     }).catch(err => console.warn('Stay extension D1 sync error:', err));
 
-    if (extensionTargetRoom) {
-      extensionTargetRoom.effectiveTariff = (Number(extensionTargetRoom.effectiveTariff) || 0) + Number(extensionTariffAdded);
-      extensionTargetRoom.effectiveStayPeriod = `Stay Extended +${extensionDurationHours}h`;
-      if (onUpdateRoomStatus) {
-        onUpdateRoomStatus(roomNo, extensionTargetRoom.effectiveStatus || 'Occupied', extensionTargetRoom.effectiveGuestName, extensionTargetRoom.effectiveTariff);
-      }
-    }
-
     setStayExtensionModalOpen(false);
-    showToast(`✓ Stay extended +${extensionDurationHours}h for Room ${roomNo} (₹${extensionTariffAdded} via ${extensionPaymentMode}). Synced to D1 & Anti-Fraud Log.`);
+    showToast(`✓ Stay successfully extended +${extensionMode === 'days' ? `${extensionDays} Day(s)` : `${extensionDurationHours}h`} for Room ${roomNo}! New Checkout: ${newCheckOutDateStr} (₹${tariffNum}). Synced to D1 & Folio.`);
   };
 
   // Station Transfer Handlers (Open-Hotel-PMS Logistics Engine)
@@ -10107,122 +10199,368 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
       )}
 
       {/* ANTI-FRAUD STAY EXTENSION MODAL (Audio 3: 2-Hour Room Flip Audit) */}
-      {stayExtensionModalOpen && extensionTargetRoom && (
-        <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: 540 }}>
-            <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.3rem' }}>⏳</span>
-                <div>
-                  <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>Formal Stay Extension (Anti-Fraud Lock)</h3>
-                  <div style={{ fontSize: '0.74rem', color: '#38bdf8' }}>
-                    Room {extensionTargetRoom.roomNumber} • Logged to Night Audit &amp; Remote D1
+      {stayExtensionModalOpen && extensionTargetRoom && (() => {
+        const currentMatchedBooking = extensionTargetRoom?.matchedBooking || bookings.find(b => String(b.roomNumber || b.room_number) === String(extensionTargetRoom?.roomNumber) && b.bookingStatus !== 'Cancelled' && b.bookingStatus !== 'Checked Out');
+        const baseCheckoutStr = currentMatchedBooking?.checkOutDate || currentMatchedBooking?.check_out_date || new Date().toISOString().split('T')[0];
+        const roomDailyRate = Number(extensionTargetRoom?.effectiveTariff || extensionTargetRoom?.tariff || 1750);
+
+        const updateDaysSelection = (daysCount) => {
+          setExtensionDays(daysCount);
+          const baseDate = new Date(baseCheckoutStr);
+          baseDate.setDate(baseDate.getDate() + Number(daysCount));
+          const dateStr = baseDate.toISOString().split('T')[0];
+          setCustomNewCheckoutDate(dateStr);
+          setExtensionTariffAdded(roomDailyRate * Number(daysCount));
+        };
+
+        const handleCustomDateChange = (pickedDate) => {
+          setCustomNewCheckoutDate(pickedDate);
+          const d1 = new Date(baseCheckoutStr);
+          const d2 = new Date(pickedDate);
+          const diffDays = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+          setExtensionDays(diffDays);
+          setExtensionTariffAdded(roomDailyRate * diffDays);
+        };
+
+        return (
+          <div className="modal-backdrop">
+            <div className="modal-content" style={{ maxWidth: 580, background: 'linear-gradient(145deg, #060e1a 0%, #0a1727 100%)', border: '1.5px solid rgba(212, 175, 55, 0.45)', borderRadius: '14px', boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8)' }}>
+              {/* MODAL HEADER */}
+              <div className="modal-header" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.85rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <div style={{ background: 'rgba(212, 175, 55, 0.2)', padding: '6px 8px', borderRadius: '8px', border: '1px solid #d4af37' }}>
+                    <span style={{ fontSize: '1.3rem' }}>⏳</span>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.25rem', margin: 0, fontWeight: 900, color: '#ffffff' }}>
+                      Formal Stay Extension Cockpit
+                    </h3>
+                    <div style={{ fontSize: '0.76rem', color: '#38bdf8', marginTop: '2px' }}>
+                      Room {extensionTargetRoom.roomNumber} ({extensionTargetRoom.tier || 'Deluxe Room'}) • Synced to Cloudflare D1 &amp; Master Folio
+                    </div>
                   </div>
                 </div>
-              </div>
-              <button onClick={() => setStayExtensionModalOpen(false)} className="modal-close-btn">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleConfirmStayExtension} className="modal-body">
-              <div style={{ background: 'rgba(234, 179, 8, 0.12)', border: '1px solid rgba(234, 179, 8, 0.35)', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 700, color: '#facc15' }}>Guest Name:</span>
-                  <span style={{ fontWeight: 800, color: '#fff' }}>{extensionTargetRoom.effectiveGuestName || 'In-House Guest'}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem', fontSize: '0.8rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Current Checkout Status:</span>
-                  <span style={{ color: extensionTargetRoom.isOverdue ? '#f87171' : '#38bdf8', fontWeight: 700 }}>
-                    {extensionTargetRoom.effectiveStayPeriod || 'Active Stay'}
-                  </span>
-                </div>
+                <button onClick={() => setStayExtensionModalOpen(false)} className="modal-close-btn">
+                  <X size={20} />
+                </button>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Select Extension Duration *</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.5rem' }}>
-                  {[
-                    { hours: 2, label: '+2 Hours', price: 400, desc: 'Quick Refresh' },
-                    { hours: 4, label: '+4 Hours', price: 700, desc: 'Train Layover' },
-                    { hours: 6, label: '+6 Hours', price: 950, desc: 'Half-Day Rest' },
-                    { hours: 24, label: '+24H (1 Night)', price: 1600, desc: 'Full Day Overnight' }
-                  ].map(opt => (
+              <form onSubmit={handleConfirmStayExtension} className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.25rem' }}>
+                {/* IN-HOUSE GUEST CONTEXT CARD */}
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.85)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1rem',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '0.75rem'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>In-House Guest:</span>
+                    <div style={{ fontWeight: 900, color: '#ffffff', fontSize: '0.95rem' }}>
+                      {extensionTargetRoom.effectiveGuestName || extensionTargetRoom.currentGuestName || 'In-House Guest'}
+                    </div>
+                    <div style={{ fontSize: '0.74rem', color: '#38bdf8' }}>
+                      {extensionTargetRoom.effectivePhone || '+91 94370 22555'}
+                    </div>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Current Scheduled Checkout:</span>
+                    <div style={{ fontWeight: 900, color: '#facc15', fontSize: '0.92rem' }}>
+                      {baseCheckoutStr} (12:00 PM)
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      Base Daily Rate: ₹{roomDailyRate.toLocaleString('en-IN')}/night
+                    </div>
+                  </div>
+                </div>
+
+                {/* EXTENSION TYPE DUAL-MODE SWITCHER (DAYS VS HOURS) */}
+                <div>
+                  <label className="form-label" style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.8rem', marginBottom: '0.4rem', display: 'block' }}>
+                    Select Extension Category:
+                  </label>
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '0.5rem',
+                    background: 'rgba(6, 14, 26, 0.8)',
+                    padding: '4px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                  }}>
                     <button
-                      key={opt.hours}
                       type="button"
                       onClick={() => {
-                        setExtensionDurationHours(opt.hours);
-                        setExtensionTariffAdded(opt.price);
+                        setExtensionMode('days');
+                        updateDaysSelection(extensionDays || 1);
                       }}
                       style={{
                         padding: '0.65rem 0.5rem',
                         borderRadius: '6px',
                         cursor: 'pointer',
                         textAlign: 'center',
-                        background: extensionDurationHours === opt.hours ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.04)',
-                        border: extensionDurationHours === opt.hours ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                        color: extensionDurationHours === opt.hours ? '#38bdf8' : '#e2e8f0'
+                        fontWeight: 900,
+                        fontSize: '0.85rem',
+                        border: extensionMode === 'days' ? '1.5px solid #d4af37' : 'none',
+                        background: extensionMode === 'days' ? 'linear-gradient(135deg, #d4af37, #f59e0b)' : 'transparent',
+                        color: extensionMode === 'days' ? '#000000' : '#cbd5e1',
+                        boxShadow: extensionMode === 'days' ? '0 0 12px rgba(212, 175, 55, 0.4)' : 'none',
+                        transition: 'all 0.15s ease'
                       }}
                     >
-                      <div style={{ fontWeight: 800, fontSize: '0.88rem' }}>{opt.label}</div>
-                      <div style={{ fontSize: '0.78rem', color: '#facc15', marginTop: '2px', fontWeight: 700 }}>+₹{opt.price}</div>
-                      <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>{opt.desc}</div>
+                      📅 Multi-Day Extension (Nights)
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExtensionMode('hours');
+                        setExtensionTariffAdded(400);
+                      }}
+                      style={{
+                        padding: '0.65rem 0.5rem',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        fontWeight: 900,
+                        fontSize: '0.85rem',
+                        border: extensionMode === 'hours' ? '1.5px solid #38bdf8' : 'none',
+                        background: extensionMode === 'hours' ? 'linear-gradient(135deg, #0284c7, #38bdf8)' : 'transparent',
+                        color: extensionMode === 'hours' ? '#ffffff' : '#cbd5e1',
+                        boxShadow: extensionMode === 'hours' ? '0 0 12px rgba(56, 189, 248, 0.4)' : 'none',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      ⏱️ Hourly Late Checkout (Transit)
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
-                <div className="form-group">
-                  <label className="form-label">Tariff Added to Bill (₹)</label>
-                  <input
-                    type="number"
-                    required
-                    min={0}
-                    className="form-input"
-                    value={extensionTariffAdded}
-                    onChange={(e) => setExtensionTariffAdded(Number(e.target.value))}
-                  />
+                {/* MODE A: MULTI-DAY EXTENSION OPTIONS (1 DAY, 2 DAYS, 3 DAYS, 4 DAYS, 5 DAYS, 7 DAYS) */}
+                {extensionMode === 'days' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 700 }}>Choose Number of Extra Nights:</span>
+                        <span style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 800 }}>+{extensionDays} Night(s) Selected</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.45rem' }}>
+                        {[
+                          { days: 1, label: '+1 Day' },
+                          { days: 2, label: '+2 Days' },
+                          { days: 3, label: '+3 Days' },
+                          { days: 4, label: '+4 Days' },
+                          { days: 5, label: '+5 Days' },
+                          { days: 7, label: '+7 Days' }
+                        ].map(opt => (
+                          <button
+                            key={opt.days}
+                            type="button"
+                            onClick={() => updateDaysSelection(opt.days)}
+                            style={{
+                              padding: '0.55rem 0.25rem',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              textAlign: 'center',
+                              background: extensionDays === opt.days ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                              border: extensionDays === opt.days ? '1.5px solid #d4af37' : '1px solid rgba(255, 255, 255, 0.12)',
+                              color: extensionDays === opt.days ? '#fbbf24' : '#e2e8f0',
+                              fontWeight: 800,
+                              fontSize: '0.82rem',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* DIRECT DATE PICKER & EXTENSION SUMMARY CARD */}
+                    <div style={{
+                      background: 'rgba(6, 14, 26, 0.75)',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      borderRadius: '8px',
+                      padding: '0.75rem 1rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '0.75rem'
+                    }}>
+                      <div>
+                        <span style={{ fontSize: '0.7rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Or Pick New Checkout Date:</span>
+                        <input
+                          type="date"
+                          value={customNewCheckoutDate}
+                          min={baseCheckoutStr}
+                          onChange={(e) => handleCustomDateChange(e.target.value)}
+                          style={{
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            border: '1px solid #38bdf8',
+                            borderRadius: '6px',
+                            color: '#ffffff',
+                            padding: '0.35rem 0.65rem',
+                            fontSize: '0.84rem',
+                            fontWeight: 800,
+                            outline: 'none',
+                            marginTop: '3px',
+                            display: 'block'
+                          }}
+                        />
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ fontSize: '0.7rem', color: '#34d399', textTransform: 'uppercase', fontWeight: 800 }}>New Extended Checkout:</span>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#34d399' }}>
+                          {customNewCheckoutDate} (12:00 PM)
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>
+                          Old: {baseCheckoutStr} ➔ <strong>+{extensionDays} Day(s)</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* MODE B: HOURLY LATE CHECKOUT OPTIONS (+2h, +4h, +6h, +8h) */
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 700 }}>
+                      Select Late Checkout Layover Hours:
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
+                      {[
+                        { hours: 2, label: '+2 Hours', price: 400, desc: 'Quick Refresh' },
+                        { hours: 4, label: '+4 Hours', price: 700, desc: 'Train Layover' },
+                        { hours: 6, label: '+6 Hours', price: 950, desc: 'Half-Day Rest' },
+                        { hours: 8, label: '+8 Hours', price: 1200, desc: 'Evening Transit' }
+                      ].map(opt => (
+                        <button
+                          key={opt.hours}
+                          type="button"
+                          onClick={() => {
+                            setExtensionDurationHours(opt.hours);
+                            setExtensionTariffAdded(opt.price);
+                          }}
+                          style={{
+                            padding: '0.65rem 0.4rem',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            background: extensionDurationHours === opt.hours ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.04)',
+                            border: extensionDurationHours === opt.hours ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                            color: extensionDurationHours === opt.hours ? '#38bdf8' : '#e2e8f0',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div style={{ fontWeight: 800, fontSize: '0.88rem' }}>{opt.label}</div>
+                          <div style={{ fontSize: '0.78rem', color: '#facc15', marginTop: '2px', fontWeight: 700 }}>+₹{opt.price}</div>
+                          <div style={{ fontSize: '0.64rem', color: 'var(--text-muted)' }}>{opt.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TARIFF, SETTLEMENT & PAYMENT DETAILS */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem' }}>
+                      Tariff Added for Extension (₹)
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      className="form-input"
+                      value={extensionTariffAdded}
+                      onChange={(e) => setExtensionTariffAdded(Number(e.target.value))}
+                      style={{ fontWeight: 900, color: '#facc15', fontSize: '1rem' }}
+                    />
+                    <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '2px' }}>
+                      {extensionMode === 'days' ? `Auto: ₹${roomDailyRate} × ${extensionDays} Night(s)` : 'Fixed layover charge'}
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem' }}>
+                      Settlement / Billing Option:
+                    </label>
+                    <select
+                      className="form-select"
+                      value={extensionSettlementType}
+                      onChange={(e) => setExtensionSettlementType(e.target.value)}
+                      style={{ fontWeight: 800 }}
+                    >
+                      <option value="folio">📋 Post to Room Folio (Pay at Checkout)</option>
+                      <option value="now">💳 Collect Payment Now (Instant MR)</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Payment Mode *</label>
-                  <select
-                    className="form-select"
-                    value={extensionPaymentMode}
-                    onChange={(e) => setExtensionPaymentMode(e.target.value)}
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem' }}>
+                      Payment Tender / Account *
+                    </label>
+                    <select
+                      className="form-select"
+                      value={extensionPaymentMode}
+                      onChange={(e) => setExtensionPaymentMode(e.target.value)}
+                    >
+                      <option value="UPI (PhonePe)">UPI (PhonePe / GPay)</option>
+                      <option value="Cash">Front Desk Cash</option>
+                      <option value="Card">POS Debit / Credit Card</option>
+                      <option value="Corporate Credit (BTC)">Bill to Company (BTC)</option>
+                      <option value="Net Banking">Bank Transfer / NEFT</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontWeight: 700, fontSize: '0.78rem' }}>
+                      Reason / Authorization Notes
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      placeholder="e.g. Guest requested +2 days for project review"
+                      value={extensionReason}
+                      onChange={(e) => setExtensionReason(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* MODAL ACTION BUTTONS */}
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setStayExtensionModalOpen(false)}
+                    className="btn-outline-gold"
+                    style={{ flex: 1, justifyContent: 'center' }}
                   >
-                    <option value="UPI (PhonePe)">UPI (PhonePe / GPay)</option>
-                    <option value="Cash">Front Desk Cash</option>
-                    <option value="Card">POS Debit / Credit Card</option>
-                    <option value="Corporate Credit (BTC)">Bill to Company (BTC)</option>
-                  </select>
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn-primary-gold"
+                    style={{
+                      flex: 2,
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, #d4af37, #f59e0b)',
+                      border: 'none',
+                      color: '#000000',
+                      fontWeight: 900,
+                      fontSize: '0.9rem',
+                      boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)'
+                    }}
+                  >
+                    Confirm &amp; Log Extension ({extensionMode === 'days' ? `+${extensionDays} Day(s)` : `+${extensionDurationHours}h`})
+                  </button>
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Reason / Remarks for Extension</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Connecting train delayed / Plant review extended"
-                  value={extensionReason}
-                  onChange={(e) => setExtensionReason(e.target.value)}
-                />
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem' }}>
-                <button type="button" onClick={() => setStayExtensionModalOpen(false)} className="btn-outline-gold" style={{ flex: 1, justifyContent: 'center' }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary-gold" style={{ flex: 2, justifyContent: 'center', background: '#eab308', borderColor: '#eab308', color: '#000', fontWeight: 800 }}>
-                  Confirm &amp; Log Extension (+{extensionDurationHours}h)
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* SCHEDULE STATION / PLANT TRANSFER MODAL (Inspired by Open-Hotel-PMS Logistics) */}
       {isTransferModalOpen && (
