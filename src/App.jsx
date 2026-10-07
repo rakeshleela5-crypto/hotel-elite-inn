@@ -823,14 +823,18 @@ export default function App() {
       channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
       channel.onmessage = (event) => {
         const { type, payload } = event.data || {};
-        if (type === 'ROOM_CLEANED' && payload?.roomNumber) {
+        if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
           handleUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
+        } else if (type === 'ROOM_INSPECTED' && payload?.roomNumber) {
+          handleUpdateRoomStatus(payload.roomNumber, 'Clean & Inspected', null, null);
         } else if (type === 'ROOM_STATUS_UPDATE' && payload?.roomNumber) {
-          if (payload.newStatus === 'Cleaning') {
+          if (payload.newStatus === 'Cleaning' || payload.newStatus === 'Under Cleaning') {
             handleUpdateRoomStatus(payload.roomNumber, 'Under Cleaning', null, null);
           }
         } else if ((type === 'ROOM_CHECKOUT' || type === 'ROOM_DIRTY') && payload?.roomNumber) {
           handleUpdateRoomStatus(payload.roomNumber, 'Vacant Dirty', null, null);
+        } else if (type === 'ROOM_MAINTENANCE' && payload?.roomNumber) {
+          handleUpdateRoomStatus(payload.roomNumber, 'Maintenance', 'MAINTENANCE BLOCKED', null);
         }
       };
     } catch (e) {

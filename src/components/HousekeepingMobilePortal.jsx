@@ -148,6 +148,18 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
           showToast(`\uD83D\uDEA8 Room ${payload.roomNumber} is now DIRTY - Checkout completed!`);
         }
 
+        if (type === 'ROOM_INSPECTED' && payload?.roomNumber) {
+          setRoomStatuses(prev => ({ ...prev, [payload.roomNumber]: 'Clean & Inspected' }));
+        }
+
+        if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
+          setRoomStatuses(prev => ({ ...prev, [payload.roomNumber]: 'Available' }));
+        }
+
+        if (type === 'ROOM_MAINTENANCE' && payload?.roomNumber) {
+          setRoomStatuses(prev => ({ ...prev, [payload.roomNumber]: 'Maintenance' }));
+        }
+
         if (type === 'ROOM_SERVICE_REQUEST') {
           // Guest scanned QR and requested room service
           const newReq = {
@@ -163,7 +175,7 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
           setServiceRequests(prev => [newReq, ...prev]);
           playHousekeepingChime();
           setNotificationCount(prev => prev + 1);
-          showToast(`\uD83D\uDD14 Room ${payload.roomNumber}: ${payload.serviceType || 'Service Request'}`);
+          showToast(`🔔 Room ${payload.roomNumber}: ${payload.serviceType || 'Service Request'}`);
         }
 
         if (type === 'ROOM_STATUS_SYNC') {

@@ -31,6 +31,38 @@ export default function InRoomGuestPortal({
   const [customServiceDesc, setCustomServiceDesc] = useState('');
   const [serviceSuccessMsg, setServiceSuccessMsg] = useState('');
 
+  // Do Not Disturb (DND) State synced to Housekeeping & Reception
+  const [isDnd, setIsDnd] = useState(() => {
+    try {
+      const stored = localStorage.getItem(`hei_dnd_${roomNumber}`);
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleDnd = () => {
+    const nextDnd = !isDnd;
+    setIsDnd(nextDnd);
+    try {
+      localStorage.setItem(`hei_dnd_${roomNumber}`, String(nextDnd));
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
+        hkChannel.postMessage({
+          type: 'ROOM_DND_TOGGLE',
+          payload: { roomNumber, isDnd: nextDnd }
+        });
+        hkChannel.close();
+      }
+    } catch {}
+    if (nextDnd) {
+      setServiceSuccessMsg(`⛔ Do Not Disturb activated for Room ${roomNumber}. Housekeeping will not knock.`);
+    } else {
+      setServiceSuccessMsg(`✓ Do Not Disturb turned off. Room service & cleaning available.`);
+    }
+    setTimeout(() => setServiceSuccessMsg(''), 5000);
+  };
+
   // Wi-Fi QR
   const [wifiQrUrl, setWifiQrUrl] = useState('');
   const [copiedWifi, setCopiedWifi] = useState(false);
@@ -277,6 +309,28 @@ export default function InRoomGuestPortal({
           </div>
 
           <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+            {/* Do Not Disturb (DND) Toggle */}
+            <button
+              type="button"
+              onClick={handleToggleDnd}
+              style={{
+                background: isDnd ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                border: isDnd ? '1.5px solid #ef4444' : '1px solid rgba(255, 255, 255, 0.15)',
+                color: isDnd ? '#f87171' : '#cbd5e1',
+                padding: '0.45rem 0.65rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+              title="Toggle Do Not Disturb (Alerts Housekeeping)"
+            >
+              <span>{isDnd ? '⛔ DND ON' : '🔔 DND'}</span>
+            </button>
+
             <button
               type="button"
               onClick={() => sendInRoomConciergeWhatsApp({

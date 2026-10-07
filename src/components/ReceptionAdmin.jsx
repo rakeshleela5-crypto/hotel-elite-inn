@@ -1372,16 +1372,26 @@ export default function ReceptionAdmin({
       channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
       channel.onmessage = (event) => {
         const { type, payload } = event.data || {};
-        if (type === 'ROOM_CLEANED' && payload?.roomNumber) {
+        if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
           if (onUpdateRoomStatus) {
             onUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
           }
-          showToast(`✨ ROOM ${payload.roomNumber} CLEANED & INSPECTED by ${payload.cleanedBy || 'Housekeeping Staff'}! Room is now Available (Green).`);
+          showToast(`✨ ROOM ${payload.roomNumber} IS AVAILABLE (GREEN)! Released to Front Desk.`);
+        } else if (type === 'ROOM_INSPECTED' && payload?.roomNumber) {
+          if (onUpdateRoomStatus) {
+            onUpdateRoomStatus(payload.roomNumber, 'Clean & Inspected', null, null);
+          }
+          showToast(`🔍 Room ${payload.roomNumber} inspected by Supervisor ${payload.inspectedBy || 'Staff'}`);
         } else if (type === 'ROOM_STATUS_UPDATE' && payload?.roomNumber) {
-          if (payload.newStatus === 'Cleaning' && onUpdateRoomStatus) {
+          if ((payload.newStatus === 'Cleaning' || payload.newStatus === 'Under Cleaning') && onUpdateRoomStatus) {
             onUpdateRoomStatus(payload.roomNumber, 'Under Cleaning', null, null);
             showToast(`🧹 Room ${payload.roomNumber} is now Under Cleaning by ${payload.updatedBy || 'Staff'}`);
           }
+        } else if (type === 'ROOM_MAINTENANCE' && payload?.roomNumber) {
+          if (onUpdateRoomStatus) {
+            onUpdateRoomStatus(payload.roomNumber, 'Maintenance', 'MAINTENANCE BLOCKED', null);
+          }
+          showToast(`⚠️ Room ${payload.roomNumber} placed under Maintenance (${payload.category || 'Defect'})`);
         }
       };
     }
