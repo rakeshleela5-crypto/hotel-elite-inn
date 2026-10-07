@@ -30,51 +30,109 @@
   --ring: 43 74% 49%;
   --radius: 0.5rem;
 
-  /* Color Palette - Midnight Sapphire & Regal Gold */
+  /* ==========================================================================
+     COLOR PALETTE: MIDNIGHT SAPPHIRE, VELVET CANVAS & REGAL 24K GOLD
+     ========================================================================== */
+  --bg-void: #03070f;
   --bg-deep: #060e1a;
   --bg-surface: #0c182b;
   --bg-surface-elevated: #13223d;
-  --bg-card: rgba(12, 24, 43, 0.75);
-  --bg-card-hover: rgba(19, 34, 61, 0.85);
+  --bg-surface-hover: #172a4c;
+  --bg-card: rgba(12, 24, 43, 0.78);
+  --bg-card-hover: rgba(19, 34, 61, 0.88);
+  --bg-glass: rgba(12, 24, 43, 0.75);
+  --bg-glass-subtle: rgba(12, 24, 43, 0.5);
+  --bg-glass-elevated: rgba(19, 34, 61, 0.88);
 
+  /* Gold & Metallic Accents */
   --gold-champagne: #d4af37;
   --gold-glow: #f3c64c;
+  --gold-bright: #ffd700;
   --gold-muted: #997e26;
   --gold-subtle: rgba(212, 175, 55, 0.12);
+  --gold-subtle-15: rgba(212, 175, 55, 0.15);
   --gold-border: rgba(212, 175, 55, 0.35);
+  --gold-border-subtle: rgba(212, 175, 55, 0.18);
+  --gold-border-glow: rgba(243, 198, 76, 0.55);
   --gold-gradient: linear-gradient(135deg, #fceec5 0%, #d4af37 50%, #aa831b 100%);
+  --gold-gradient-shine: linear-gradient(115deg, #c49b2c 0%, #fef08a 25%, #d4af37 50%, #f59e0b 75%, #c49b2c 100%);
 
+  /* Royal Sapphire & Ocean Accents */
   --sapphire-light: #38bdf8;
   --sapphire-primary: #1d4ed8;
   --sapphire-glow: rgba(56, 189, 248, 0.25);
   --sapphire-border: rgba(56, 189, 248, 0.25);
+  --sapphire-subtle: rgba(29, 78, 216, 0.15);
 
-  /* Status Colors */
+  /* Operational Status Colors */
   --status-available: #10b981;
   --status-available-bg: rgba(16, 185, 129, 0.15);
+  --status-available-border: rgba(16, 185, 129, 0.35);
   --status-occupied: #ef4444;
   --status-occupied-bg: rgba(239, 68, 68, 0.15);
+  --status-occupied-border: rgba(239, 68, 68, 0.35);
   --status-cleaning: #f59e0b;
   --status-cleaning-bg: rgba(245, 158, 11, 0.15);
+  --status-cleaning-border: rgba(245, 158, 11, 0.35);
   --status-maintenance: #6b7280;
   --status-maintenance-bg: rgba(107, 114, 128, 0.15);
+  --status-maintenance-border: rgba(107, 114, 128, 0.35);
   --status-vip: #8b5cf6;
   --status-vip-bg: rgba(139, 92, 246, 0.18);
+  --status-vip-border: rgba(139, 92, 246, 0.4);
 
-  /* Typography */
+  /* ==========================================================================
+     TYPOGRAPHY SCALE & FONT SYSTEM
+     ========================================================================== */
   --font-serif: 'Cinzel', serif, Georgia;
-  --font-sans: 'Outfit', 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* Standard 7-Tier Font Size Scale */
+  --font-size-micro: 0.6875rem; /* 11px - Micro Tags, GSTIN, Timestamps */
+  --font-size-dense: 0.75rem;   /* 12px - Audit Rows, Modifiers, Small Badges */
+  --font-size-sm: 0.8125rem;    /* 13px - Secondary Labels, Table Headers */
+  --font-size-base: 0.875rem;   /* 14px - Default Body Text, Form Inputs */
+  --font-size-md: 0.9375rem;    /* 15px - Prominent Inputs, Nav Links */
+  --font-size-lg: 1.0625rem;    /* 17px - Card Headings, Guest Names */
+  --font-size-xl: 1.25rem;      /* 20px - Sub-section Titles */
+  --font-size-2xl: 1.5rem;      /* 24px - Modal & Panel Headers */
+  --font-size-kpi: 2rem;        /* 32px - Executive Figures, Daily Revenue */
+  --font-size-hero: 2.75rem;    /* 44px - Grand Welcome Display */
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Letter Spacing / Tracking */
+  --tracking-tighter: -0.03em;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* Line Heights */
+  --line-height-dense: 1.2;
+  --line-height-compact: 1.35;
+  --line-height-base: 1.55;
+  --line-height-relaxed: 1.7;
+
+  /* Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-gold: #f3c64c;
+  --text-gold-light: #fef08a;
 
   /* Elevation & Glassmorphism */
   --glass-blur: blur(16px);
   --glass-border: 1px solid rgba(212, 175, 55, 0.22);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
   --glass-card: rgba(12, 24, 43, 0.72);
-
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-gold: #f3c64c;
 
   --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -255,6 +313,132 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
+}
+
+/* ==========================================================================
+   STANDARDIZED TYPOGRAPHY & LUXURY LAYOUT UTILITY CLASSES
+   ========================================================================== */
+
+/* 1. Micro Tag (11px, Uppercase, Tracking) */
+.text-micro-tag {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-micro);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  line-height: var(--line-height-dense);
+}
+
+/* 2. Dense Financial & Table Data (12px, Tabular Nums) */
+.text-dense-data {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-dense);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+  line-height: var(--line-height-compact);
+}
+
+/* 3. Form Input & Secondary UI Labels (13px) */
+.text-ui-label {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-secondary);
+}
+
+/* 4. Standard Body Text (14px) */
+.text-body-standard {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  color: var(--text-primary);
+}
+
+/* 5. Luxury Card Title (17px) */
+.text-card-title {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: #ffffff;
+}
+
+/* 6. Section & Modal Header Title (24px Serif) */
+.text-section-title {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-wide);
+  color: #ffffff;
+}
+
+/* 7. Executive KPI Metric Display (32px Gold Tabular) */
+.text-kpi-metric {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-kpi);
+  font-weight: var(--font-weight-extrabold);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+  letter-spacing: var(--tracking-tight);
+  color: var(--gold-glow);
+  line-height: var(--line-height-dense);
+}
+
+/* 8. Grand Hero Title (44px Regal Display) */
+.text-hero-display {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: var(--tracking-wide);
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+/* Tabular Numbers Utility */
+.tabular-num, .tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+/* Font Family Shortcuts */
+.font-brand-serif {
+  font-family: var(--font-serif) !important;
+}
+
+.font-ui-sans {
+  font-family: var(--font-sans) !important;
+}
+
+/* Standardized Luxury Containers */
+.luxury-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--gold-border-subtle);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  transition: var(--transition-smooth);
+}
+
+.luxury-card:hover {
+  border-color: var(--gold-border);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 16px rgba(212, 175, 55, 0.12);
+}
+
+.luxury-card-elevated {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(212, 175, 55, 0.15);
+}
+
+.luxury-card-active {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--gold-glow);
+  box-shadow: 0 0 20px rgba(243, 198, 76, 0.35);
 }
 
 /* Liquid Flowing Gold Heading Gradient */
