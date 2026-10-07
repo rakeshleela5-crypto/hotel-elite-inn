@@ -17,6 +17,7 @@ export default function NightAuditModal({
   rooms = [],
   bookings = [],
   transactions = [],
+  foodOrders = [],
   onExecuteNightAudit,
   onOpenAuditedSalesRegister
 }) {
@@ -24,41 +25,101 @@ export default function NightAuditModal({
   const [auditorName, setAuditorName] = useState('Sudhakar Reddy (Front Office Lead)');
   const [managerPin, setManagerPin] = useState('');
   const [physicalDrawerCash, setPhysicalDrawerCash] = useState('33500');
-  const [auditNotes, setAuditNotes] = useState('All 18 property rooms verified. Night room charges posted.');
+  const [auditNotes, setAuditNotes] = useState('All 27 property rooms verified. Night room charges posted.');
   const [auditCompleted, setAuditCompleted] = useState(false);
   const [isSealing, setIsSealing] = useState(false);
   const [sealProgress, setSealProgress] = useState(0);
 
   // Active business date & Audit Date Range Selector
-  const [businessDate, setBusinessDate] = useState('2026-09-21');
-  const [auditFromDate, setAuditFromDate] = useState('2026-09-21');
-  const [auditToDate, setAuditToDate] = useState('2026-09-21');
+  const [businessDate, setBusinessDate] = useState(() => {
+    return localStorage.getItem('hotel_elite_inn_business_date') || '2026-10-07';
+  });
+  const [auditFromDate, setAuditFromDate] = useState(() => {
+    return localStorage.getItem('hotel_elite_inn_business_date') || '2026-10-07';
+  });
+  const [auditToDate, setAuditToDate] = useState(() => {
+    return localStorage.getItem('hotel_elite_inn_business_date') || '2026-10-07';
+  });
   const [isAuditDateFilterActive, setIsAuditDateFilterActive] = useState(true);
-  const nextBusinessDate = '2026-09-22';
 
-  // Operational Inventory Metrics (22 Active Physical Inventory Keys)
-  const totalRooms = (rooms && rooms.length > 0) ? rooms.length : 22;
+  // Dynamic Next Business Date Calculation
+  const nextBusinessDate = React.useMemo(() => {
+    const d = new Date(businessDate);
+    if (isNaN(d.getTime())) return '2026-10-08';
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }, [businessDate]);
+
+  // Operational Inventory Metrics (27 Active Physical Inventory Keys)
+  const totalRooms = (rooms && rooms.length > 0) ? rooms.length : 27;
   const occupiedRooms = (rooms && rooms.length > 0) 
-    ? rooms.filter(r => r.status === 'Occupied' || r.status === 'Occupied Clean').length 
+    ? rooms.filter(r => (r.status || '').toLowerCase().includes('occupied')).length 
     : 12;
-  const occupancyPct = totalRooms > 0 ? ((occupiedRooms / totalRooms) * 100).toFixed(1) : '54.5';
+  const occupancyPct = totalRooms > 0 ? ((occupiedRooms / totalRooms) * 100).toFixed(1) : '44.4';
 
-  // Revenue figures (Screenshot 16 exact values)
-  const roomRevenue = 46280.00;
-  const fnbRevenue = 11967.07;
+  // Dynamic Room Revenue: Real-time sum of in-house room tariffs
+  const dynamicRoomRevenue = React.useMemo(() => {
+    if (rooms && rooms.length > 0) {
+      const occList = rooms.filter(r => (r.status || '').toLowerCase().includes('occupied'));
+      if (occList.length > 0) {
+        const sum = occList.reduce((acc, r) => acc + Number(r.tariff || r.basePrice || 1800), 0);
+        if (sum > 0) return sum;
+      }
+    }
+    return 46280.00; // Historic baseline fallback
+  }, [rooms]);
+
+  // Dynamic F&B Revenue: Real-time sum of today's live food orders
+  const dynamicFnbRevenue = React.useMemo(() => {
+    if (foodOrders && foodOrders.length > 0) {
+      const activeOrds = foodOrders.filter(o => o.status !== 'Cancelled' && o.status !== 'Void');
+      if (activeOrds.length > 0) {
+        const sum = activeOrds.reduce((acc, o) => acc + Number(o.totalAmount || 0), 0);
+        if (sum > 0) return Math.round(sum * 100) / 100;
+      }
+    }
+    return 11967.07; // Historic baseline fallback
+  }, [foodOrders]);
+
+  const roomRevenue = dynamicRoomRevenue;
+  const fnbRevenue = dynamicFnbRevenue;
   const otherRevenue = 0.00;
-  const grossRevenue = roomRevenue + fnbRevenue + otherRevenue; // 58,247.07
+  const grossRevenue = roomRevenue + fnbRevenue + otherRevenue;
 
   const adr = occupiedRooms > 0 ? (roomRevenue / occupiedRooms).toFixed(2) : '2618.00';
   const revpar = totalRooms > 0 ? (roomRevenue / totalRooms).toFixed(2) : '1248.00';
 
+  // Dynamic Collections from Live Transactions Ledger
+  const dynamicCollections = React.useMemo(() => {
+    let cash = 0, upi = 0, card = 0, btc = 0;
+    if (transactions && transactions.length > 0) {
+      transactions.forEach(t => {
+        const amt = Number(t.creditAmount || 0);
+        if (amt > 0) {
+          const desc = (t.description || '').toLowerCase();
+          const mode = (t.itemCode || t.paymentMode || '').toLowerCase();
+          if (desc.includes('cash') || mode.includes('cash')) cash += amt;
+          else if (desc.includes('upi') || desc.includes('phonepe') || desc.includes('gpay') || mode.includes('upi')) upi += amt;
+          else if (desc.includes('card') || desc.includes('pos') || mode.includes('card')) card += amt;
+          else if (desc.includes('btc') || desc.includes('company') || desc.includes('corporate') || mode.includes('btc')) btc += amt;
+        }
+      });
+    }
+    return {
+      cash: cash > 0 ? cash : 24500.00,
+      upi: upi > 0 ? upi : 18747.07,
+      card: card > 0 ? card : 15000.00,
+      btc: btc > 0 ? btc : 2912.35
+    };
+  }, [transactions]);
+
   // Collections
-  const cashCollected = 24500.00;
-  const upiCollected = 18747.07;
-  const cardCollected = 15000.00;
-  const companyCredit = 2912.35;
+  const cashCollected = dynamicCollections.cash;
+  const upiCollected = dynamicCollections.upi;
+  const cardCollected = dynamicCollections.card;
+  const companyCredit = dynamicCollections.btc;
   const openingFloat = 5000.00;
-  const expectedDrawerCash = openingFloat + cashCollected; // 29,500.00
+  const expectedDrawerCash = openingFloat + cashCollected; // Expected drawer cash
   const physicalCashNum = parseFloat(physicalDrawerCash) || 0;
   const cashVariance = physicalCashNum - expectedDrawerCash;
 
@@ -163,6 +224,16 @@ export default function NightAuditModal({
       notes: auditNotes
     };
 
+    // Local Storage Audit Trail Persistence & Day Rollover
+    try {
+      const existingHistory = JSON.parse(localStorage.getItem('hotel_elite_inn_pms_audit_history') || '[]');
+      const updatedHistory = [auditPayload, ...existingHistory.filter(h => h.businessDate !== businessDate)];
+      localStorage.setItem('hotel_elite_inn_pms_audit_history', JSON.stringify(updatedHistory));
+      localStorage.setItem('hotel_elite_inn_business_date', nextBusinessDate);
+    } catch (e) {
+      console.warn('Local audit persistence error:', e);
+    }
+
     // Edge D1 Sync
     const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
     fetch('/api/sync', {
@@ -190,7 +261,7 @@ export default function NightAuditModal({
       setSealProgress(100);
       setTimeout(() => {
         if (onExecuteNightAudit) {
-          onExecuteNightAudit(auditPayload);
+          onExecuteNightAudit({ ...auditPayload, nextBusinessDate });
         }
         setIsSealing(false);
         setAuditCompleted(true);

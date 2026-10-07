@@ -1030,13 +1030,16 @@ Thank you for dining at Cannon Kitchen! 🙏`;
       })
     }).catch(err => console.debug('Settlement log:', err));
 
-    // Broadcast table settlement to Steward Order Pad & Kitchen KDS
+    // Broadcast table settlement to Steward Order Pad, Kitchen KDS & Front Desk Cashier Drawer
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const ch = new BroadcastChannel('hotel_elite_inn_live_kds');
         ch.postMessage({
           type: 'TABLE_SETTLED',
-          settledTable: tableToSettle
+          settledTable: tableToSettle,
+          paymentMode: settlementPaymentMode,
+          totalAmount: totalPayable,
+          receipt
         });
         ch.close();
       }

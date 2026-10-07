@@ -43,31 +43,86 @@ export default function FolioActionsModal({
   const [ledgerSearchTerm, setLedgerSearchTerm] = useState('');
   const [ledgerCategoryFilter, setLedgerCategoryFilter] = useState('ALL');
 
-  // Room Switcher Handler
-  const handleSwitchRoom = (targetRoom) => {
-    setActiveRoomState(targetRoom);
-    setRoomSearchDropdownOpen(false);
-    setRoomSearchTerm('');
-
-    const matched = (transactions || []).filter(t => t.roomNumber === targetRoom.roomNumber);
+  // Dynamic Room Transactions Builder (Eliminates static mock orders)
+  const buildDynamicRoomTxs = (targetRoom, txList = []) => {
+    const matched = (txList || []).filter(t => String(t.roomNumber) === String(targetRoom.roomNumber));
     if (matched.length > 0) {
-      setFolioTransactions(matched.map(t => ({
+      return matched.map(t => ({
         id: t.transactionId || t.id,
-        date: t.createdAt ? t.createdAt.slice(0, 10) : '22/09/2026',
+        date: t.createdAt ? t.createdAt.slice(0, 10) : new Date().toISOString().slice(0, 10),
         type: t.transactionType === 'Food & Beverage' ? 'DINING' : t.transactionType === 'Payment' ? 'ADVANCE' : 'TARIFF',
         desc: t.description || `${t.outlet || 'PMS'} - ${t.itemCode || ''}`,
         sac: t.sacCode || (t.transactionType === 'Food & Beverage' ? '996331' : '996311'),
         debit: Number(t.debitAmount) || 0,
         credit: Number(t.creditAmount) || 0,
         operator: t.createdBy || 'Front Desk'
-      })));
-    } else {
-      setFolioTransactions([
-        { id: `TX-${targetRoom.roomNumber}-1`, date: '22/09/2026', type: 'TARIFF', desc: `Room Tariff - ${targetRoom.tier || 'Executive AC'} (Day 1)`, sac: '996311', debit: Number(targetRoom.tariff || 2199), credit: 0, operator: 'Front Desk' },
-        { id: `TX-${targetRoom.roomNumber}-2`, date: '22/09/2026', type: 'DINING', desc: 'Fenugreek Restaurant - KOT #18412 (Executive Thali)', sac: '996331', debit: 350.00, credit: 0, operator: 'Sadananda' },
-        { id: `TX-${targetRoom.roomNumber}-3`, date: '22/09/2026', type: 'ADVANCE', desc: 'Check-In Advance (UPI PhonePe)', sac: '-', debit: 0, credit: 1500.00, operator: 'Front Desk' }
-      ]);
+      }));
     }
+
+    const initialList = [];
+    const tariff = Number(targetRoom.tariff || targetRoom.basePrice || 2199);
+    const dateStr = targetRoom.checkInDate || new Date().toISOString().slice(0, 10);
+    
+    // Day 1 Room Tariff
+    initialList.push({
+      id: `TX-TARIFF-${targetRoom.roomNumber}`,
+      date: dateStr,
+      type: 'TARIFF',
+      desc: `Room Tariff - ${targetRoom.tier || 'Executive AC'} (Day 1 Check-In)`,
+      sac: '996311',
+      debit: tariff,
+      credit: 0,
+      operator: 'Front Desk'
+    });
+
+    // Check-In Advance if recorded
+    const advance = Number(targetRoom.advancePaid || targetRoom.advanceDeposit || 0);
+    if (advance > 0) {
+      initialList.push({
+        id: `TX-ADV-${targetRoom.roomNumber}`,
+        date: dateStr,
+        type: 'ADVANCE',
+        desc: `Check-In Advance (${targetRoom.paymentMode || 'UPI'})`,
+        sac: '-',
+        debit: 0,
+        credit: advance,
+        operator: 'Front Desk'
+      });
+    }
+
+    // Auto-detect real live in-room dining KOTs for this room from localStorage
+    try {
+      const savedKots = JSON.parse(localStorage.getItem('hotel_elite_inn_live_kots') || '[]');
+      const roomKots = savedKots.filter(k => 
+        (String(k.tableNumber) === String(targetRoom.roomNumber) || String(k.roomNumber) === String(targetRoom.roomNumber)) &&
+        k.orderType === 'room' &&
+        k.status !== 'Cancelled' && k.status !== 'Void'
+      );
+      roomKots.forEach((kot, idx) => {
+        initialList.push({
+          id: `TX-DINING-${kot.kotId || kot.id || idx}`,
+          date: kot.timestamp ? kot.timestamp.slice(0, 10) : dateStr,
+          type: 'DINING',
+          desc: `In-Room Dining: ${kot.items?.map(i => `${i.name} x${i.quantity}`).join(', ') || kot.id || 'Food Order'}`,
+          sac: '996331',
+          debit: Number(kot.totalAmount || 0),
+          credit: 0,
+          operator: kot.captain || kot.steward || 'In-Room Service'
+        });
+      });
+    } catch (e) {}
+
+    return initialList;
+  };
+
+  // Room Switcher Handler
+  const handleSwitchRoom = (targetRoom) => {
+    setActiveRoomState(targetRoom);
+    setRoomSearchDropdownOpen(false);
+    setRoomSearchTerm('');
+
+    const dynamicTxs = buildDynamicRoomTxs(targetRoom, transactions);
+    setFolioTransactions(dynamicTxs);
     showFeedback(`✓ Switched to Room ${targetRoom.roomNumber} • ${targetRoom.currentGuestName || 'Guest'}`);
   };
 
@@ -97,34 +152,12 @@ export default function FolioActionsModal({
   }, [room?.roomNumber]);
 
   // Selected Action Tab (Enhanced with Reversals, Multi-Tender Split Settlement, and Late Checkout)
-  const [selectedAction, setSelectedAction] = useState('ledger'); // 'ledger', 'charges', 'advance', 'split-settle', 'late-checkout', 'change-room', 'pax-change', 'link-room', 'swap-room', 'paid-out', 'allowance', 'edit-guest', 'split-folio'
+  const [selectedAction, setSelectedAction] = useState('ledger');
   const [actionSuccess, setActionSuccess] = useState('');
 
-  // Map central live transactions or fallback
+  // Map central live transactions or dynamic room initial state
   const getInitialTxs = () => {
-    const matched = (transactions || []).filter(t => t.roomNumber === room.roomNumber);
-    if (matched.length > 0) {
-      return matched.map(t => ({
-        id: t.transactionId || t.id,
-        date: t.createdAt ? t.createdAt.slice(0, 10) : '22/09/2026',
-        type: t.transactionType === 'Food & Beverage' ? 'DINING' : t.transactionType === 'Payment' ? 'ADVANCE' : 'TARIFF',
-        desc: t.description || `${t.outlet || 'PMS'} - ${t.itemCode || ''}`,
-        sac: t.sacCode || (t.transactionType === 'Food & Beverage' ? '996331' : '996311'),
-        debit: Number(t.debitAmount) || 0,
-        credit: Number(t.creditAmount) || 0,
-        operator: t.createdBy || 'Front Desk'
-      }));
-    }
-    return [
-      { id: 'TX-101', date: '17/09/2026', type: 'TARIFF', desc: `Room Tariff - ${room.tier || 'Executive Room'} (Day 1)`, sac: '996311', debit: Number(room.tariff || 2999), credit: 0, operator: 'Sudhakar Reddy' },
-      { id: 'TX-102', date: '18/09/2026', type: 'TARIFF', desc: `Room Tariff - ${room.tier || 'Executive Room'} (Day 2)`, sac: '996311', debit: Number(room.tariff || 2999), credit: 0, operator: 'Sudhakar Reddy' },
-      { id: 'TX-103', date: '18/09/2026', type: 'DINING', desc: 'Fenugreek Restaurant - KOT #18346 (Veg Fried Rice)', sac: '996331', debit: 294.00, credit: 0, operator: 'Sadananda' },
-      { id: 'TX-104', date: '19/09/2026', type: 'TARIFF', desc: `Room Tariff - ${room.tier || 'Executive Room'} (Day 3)`, sac: '996311', debit: Number(room.tariff || 2999), credit: 0, operator: 'Sudhakar Reddy' },
-      { id: 'TX-105', date: '19/09/2026', type: 'DINING', desc: 'Fenugreek Restaurant - KOT #18372 (Paneer Tikka + Water)', sac: '996331', debit: 325.50, credit: 0, operator: 'Koti' },
-      { id: 'TX-106', date: '20/09/2026', type: 'TARIFF', desc: `Room Tariff - ${room.tier || 'Executive Room'} (Day 4)`, sac: '996311', debit: Number(room.tariff || 2999), credit: 0, operator: 'Sudhakar Reddy' },
-      { id: 'TX-107', date: '20/09/2026', type: 'DINING', desc: 'Fenugreek Restaurant - KOT #18401 (Dal Makhani + Naan)', sac: '996331', debit: 325.50, credit: 0, operator: 'Deepak' },
-      { id: 'TX-108', date: '17/09/2026', type: 'ADVANCE', desc: 'Check-In Advance (UPI SBI Merchant QR)', sac: '-', debit: 0, credit: 3000.00, operator: 'Front Desk' }
-    ];
+    return buildDynamicRoomTxs(room, transactions);
   };
 
   // Live Folio Transactions with Double-Entry Balancing & Reversals
@@ -431,8 +464,34 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
       operator: 'Duty Manager'
     };
 
-    setFolioTransactions([newTx, ...folioTransactions]);
+    const updatedTxs = [newTx, ...folioTransactions];
+    setFolioTransactions(updatedTxs);
     syncFolioTransactionToEdge(newTx);
+
+    if (onAddTransaction) {
+      onAddTransaction({
+        transactionId: newTx.id,
+        folioId: `FOLIO-${room.roomNumber}`,
+        roomNumber: room.roomNumber,
+        transactionType: cat?.name || 'Extra Charge',
+        outlet: 'Front Desk PMS',
+        itemCode: chargeCategory,
+        description: newTx.desc,
+        debitAmount: amount,
+        creditAmount: 0,
+        taxableBase: amount,
+        gstRate: 12,
+        cgst: Math.round(amount * 0.06 * 100) / 100,
+        sgst: Math.round(amount * 0.06 * 100) / 100,
+        sacCode: cat?.sac || '996311',
+        createdBy: 'Duty Manager'
+      });
+    }
+
+    if (onUpdateFolio) {
+      onUpdateFolio(room.roomNumber, { transactions: updatedTxs, deltaBalance: amount });
+    }
+
     showFeedback(`✓ Posted ₹${amount.toFixed(2)} [${cat?.name || chargeCategory}] to Room ${room.roomNumber} folio!`);
     setChargeAmount('');
     setChargeRemarks('');
@@ -463,9 +522,26 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
 
     setFolioTransactions(updatedTxs);
     syncFolioTransactionToEdge(balancingCreditMemo);
-    if (onUpdateFolio) {
-      onUpdateFolio(room.roomNumber, { transactions: updatedTxs });
+
+    if (onAddTransaction) {
+      onAddTransaction({
+        transactionId: balancingCreditMemo.id,
+        folioId: `FOLIO-${room.roomNumber}`,
+        roomNumber: room.roomNumber,
+        transactionType: 'Credit Note',
+        outlet: 'Front Desk PMS',
+        itemCode: 'REVERSAL',
+        description: balancingCreditMemo.desc,
+        debitAmount: 0,
+        creditAmount: reversingTx.debit,
+        createdBy: 'Authorized Auditor (S. Patnaik)'
+      });
     }
+
+    if (onUpdateFolio) {
+      onUpdateFolio(room.roomNumber, { transactions: updatedTxs, deltaBalance: -reversingTx.debit });
+    }
+
     showFeedback(`✓ Reversed Transaction ${reversingTx.id}! Balancing credit memo of ₹${reversingTx.debit.toFixed(2)} posted.`);
     setReversingTx(null);
   };
@@ -632,8 +708,9 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
     const txToMove = folioTransactions.find(t => t.id === selectedTxToTransfer);
     if (!txToMove) return;
 
+    // 1. Credit Memo on Source Room (Transfer Out)
     const transferOutMemo = {
-      id: `XFER-${Date.now().toString().slice(-4)}`,
+      id: `XFER-OUT-${Date.now().toString().slice(-4)}`,
       date: new Date().toLocaleDateString('en-IN'),
       type: 'TRANSFER_OUT',
       desc: `➡️ TRANSFER FOLIO: Shifted [${txToMove.id}] ${txToMove.desc} to Room ${transferTargetRoom} [Reason: ${transferReason}]`,
@@ -644,15 +721,62 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
       timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
     };
 
+    // 2. Matching Debit Memo on Target Room (Transfer In) - Full Double-Entry Balancing
+    const transferInMemo = {
+      id: `XFER-IN-${Date.now().toString().slice(-4)}`,
+      date: new Date().toLocaleDateString('en-IN'),
+      type: 'TRANSFER_IN',
+      roomNumber: transferTargetRoom,
+      desc: `⬅️ TRANSFER IN: Received [${txToMove.id}] ${txToMove.desc} from Room ${room.roomNumber} [Reason: ${transferReason}]`,
+      sac: txToMove.sac || '996331',
+      debit: txToMove.debit,
+      credit: 0,
+      operator: 'Front Desk Cashier',
+      timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+    };
+
     const updatedCurrentTxs = [
       transferOutMemo,
       ...folioTransactions.map(t => t.id === txToMove.id ? { ...t, isTransferred: true, transferredTo: transferTargetRoom } : t)
     ];
 
     setFolioTransactions(updatedCurrentTxs);
-    if (onUpdateFolio) {
-      onUpdateFolio(room.roomNumber, { transactions: updatedCurrentTxs });
+
+    // Synchronize to Parent Transactions Ledger
+    if (onAddTransaction) {
+      onAddTransaction({
+        transactionId: transferOutMemo.id,
+        folioId: `FOLIO-${room.roomNumber}`,
+        roomNumber: room.roomNumber,
+        transactionType: 'Credit Note',
+        outlet: 'Front Desk PMS',
+        itemCode: 'XFER-OUT',
+        description: transferOutMemo.desc,
+        debitAmount: 0,
+        creditAmount: txToMove.debit,
+        createdBy: 'Front Desk Cashier'
+      });
+      onAddTransaction({
+        transactionId: transferInMemo.id,
+        folioId: `FOLIO-${transferTargetRoom}`,
+        roomNumber: transferTargetRoom,
+        transactionType: 'Debit Note',
+        outlet: 'Front Desk PMS',
+        itemCode: 'XFER-IN',
+        description: transferInMemo.desc,
+        debitAmount: txToMove.debit,
+        creditAmount: 0,
+        createdBy: 'Front Desk Cashier'
+      });
     }
+
+    if (onUpdateFolio) {
+      onUpdateFolio(room.roomNumber, { transactions: updatedCurrentTxs, deltaBalance: -txToMove.debit });
+      onUpdateFolio(transferTargetRoom, { addDebit: transferInMemo, deltaBalance: txToMove.debit });
+    }
+
+    syncFolioTransactionToEdge(transferOutMemo);
+    syncFolioTransactionToEdge({ ...transferInMemo, roomNumber: transferTargetRoom });
 
     showFeedback(`✓ Transferred ₹${txToMove.debit.toFixed(2)} [${txToMove.desc}] from Room ${room.roomNumber} to Room ${transferTargetRoom} successfully!`);
     setSelectedTxToTransfer(null);

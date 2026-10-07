@@ -1358,6 +1358,21 @@ export default function ReceptionAdmin({
           const ord = event.data.order;
           playOrderAlert();
           showToast(`🔔 LIVE RESTAURANT ORDER: Steward ${ord.steward} punched KOT for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
+        } else if (event.data?.type === 'TABLE_SETTLED') {
+          const { settledTable, paymentMode, totalAmount, receipt } = event.data;
+          if (paymentMode === 'cash' && totalAmount > 0) {
+            setCashCollected(prev => prev + totalAmount);
+            setDenominations(prev => ({
+              ...prev,
+              500: (Number(prev[500]) || 0) + Math.floor(totalAmount / 500),
+              coins: (Number(prev.coins) || 0) + (totalAmount % 500)
+            }));
+            showToast(`💵 RESTAURANT CASH SETTLEMENT: Table ${settledTable} paid ₹${totalAmount} cash (Credited to Cashier Shift Drawer)!`);
+          } else if (paymentMode === 'split' && receipt?.splitDetails?.cash > 0) {
+            const splitCash = Number(receipt.splitDetails.cash);
+            setCashCollected(prev => prev + splitCash);
+            showToast(`💵 RESTAURANT SPLIT CASH: Table ${settledTable} paid ₹${splitCash} cash (Credited to Cashier Shift Drawer)!`);
+          }
         }
       };
     }
@@ -9011,11 +9026,34 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           onAddTransaction={onAddTransaction}
           onOpenMasterFolio={onOpenMasterFolio}
           onUpdateFolio={(roomNumber, updateData) => {
-            console.log(`Updated Folio for Room ${roomNumber}:`, updateData);
+            if (updateData && updateData.deltaBalance !== undefined) {
+              setRooms(prev => prev.map(r => {
+                if (String(r.roomNumber) === String(roomNumber)) {
+                  const currentBal = Number(r.outstandingBalance !== undefined ? r.outstandingBalance : (r.tariff || 2199));
+                  const newBal = Math.max(0, Math.round((currentBal + updateData.deltaBalance) * 100) / 100);
+                  return { ...r, outstandingBalance: newBal };
+                }
+                return r;
+              }));
+            }
           }}
           onShiftRoom={(fromRoom, toRoom, reason) => {
             onUpdateRoomStatus(fromRoom, 'Available', null, null);
-            onUpdateRoomStatus(toRoom, 'Occupied', selectedFolioRoom.currentGuestName, null);
+            onUpdateRoomStatus(toRoom, 'Occupied', selectedFolioRoom?.currentGuestName, null);
+            if (onAddTransaction) {
+              onAddTransaction({
+                transactionId: `TXN-SHIFT-${Date.now().toString().slice(-4)}`,
+                folioId: `FOLIO-${toRoom}`,
+                roomNumber: toRoom,
+                transactionType: 'Room Shift',
+                outlet: 'Front Desk PMS',
+                itemCode: 'ROOM-SHIFT',
+                description: `Room Shift from #${fromRoom} to #${toRoom} [Reason: ${reason || 'Guest Relocation'}]`,
+                debitAmount: 0,
+                creditAmount: 0,
+                createdBy: 'Front Desk'
+              });
+            }
             setSelectedFolioRoom(null);
           }}
           onCheckoutRoom={(roomNumber, checkoutData) => {

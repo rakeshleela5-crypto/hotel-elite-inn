@@ -687,6 +687,32 @@ export default function App() {
       .catch(err => {
         console.debug("Edge sync offline, initialized with 27-inventory state:", err);
       });
+
+    // Periodic Background Polling for Cross-Device Synchronization (e.g., Steward mobile, Housekeeping phone)
+    const pollInterval = setInterval(() => {
+      fetch('/api/sync?action=get_all_state', {
+        headers: { 'X-Admin-Key': adminPin }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.data) {
+            if (data.data.foodOrders && data.data.foodOrders.length > 0) {
+              setFoodOrders(prev => {
+                const map = new Map();
+                data.data.foodOrders.forEach(o => map.set(o.id || o.orderId, o));
+                prev.forEach(o => { if (!map.has(o.id || o.orderId)) map.set(o.id || o.orderId, o); });
+                return Array.from(map.values());
+              });
+            }
+            if (data.data.roomServiceRequests && data.data.roomServiceRequests.length > 0) {
+              setRoomServices(data.data.roomServiceRequests);
+            }
+          }
+        })
+        .catch(() => {});
+    }, 12000);
+
+    return () => clearInterval(pollInterval);
   }, [currentView, adminPinVerified]);
 
   const handleOpenBooking = (tier, roomNumber = null) => {
@@ -993,6 +1019,21 @@ export default function App() {
   const handleExecuteNightAudit = (auditPayload) => {
     setTransactions(prev => prev.map(t => ({ ...t, isLocked: 1 })));
 
+    if (auditPayload?.nextBusinessDate) {
+      try {
+        localStorage.setItem('hotel_elite_inn_business_date', auditPayload.nextBusinessDate);
+      } catch (e) {}
+    }
+
+    // Broadcast across all system windows & devices
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const kdsCh = new BroadcastChannel('hotel_elite_inn_live_kds');
+        kdsCh.postMessage({ type: 'NIGHT_AUDIT_COMPLETED', payload: auditPayload });
+        kdsCh.close();
+      }
+    } catch (e) {}
+
     // Dispatch to Cloudflare Edge D1
     const adminPin = getVerifiedAdminPin();
     if (!adminPin) return;
@@ -1015,7 +1056,7 @@ export default function App() {
       })
       .catch(err => console.warn('Offline night audit sync:', err));
 
-    alert(`✓ Night Audit for ${auditPayload.businessDate} executed & synced to Cloudflare D1! All transactions locked (is_locked = 1). Business date rolled.`);
+    alert(`✓ Night Audit for ${auditPayload.businessDate} executed & synced to Cloudflare D1! All transactions locked (is_locked = 1). Business date rolled to ${auditPayload.nextBusinessDate || 'next day'}.`);
   };
 
   // Dedicated In-Room Guest Portal View (When QR Code is scanned in a guest room)
@@ -1349,6 +1390,7 @@ export default function App() {
             rooms={rooms}
             bookings={bookings}
             transactions={transactions}
+            foodOrders={foodOrders}
             onExecuteNightAudit={handleExecuteNightAudit}
             onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
           />

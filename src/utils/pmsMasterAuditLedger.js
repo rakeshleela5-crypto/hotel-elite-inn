@@ -1061,7 +1061,13 @@ export function getOctober2026SalesRecords(rooms = [], bookings = [], foodOrders
     const guest = rm.guestName || rm.currentGuestName || `Guest in Rm ${rm.roomNumber}`;
     const cgst = Math.round(tariff * 0.025 * 100) / 100;
     const sgst = Math.round(tariff * 0.025 * 100) / 100;
-    const net = tariff + cgst + sgst;
+    
+    // Dynamic F&B Room Service orders from live KOTs
+    const roomFoodTotal = (foodOrders || [])
+      .filter(o => (String(o.tableNumber) === String(rm.roomNumber) || String(o.roomNumber) === String(rm.roomNumber)) && o.status !== 'Cancelled' && o.status !== 'Void')
+      .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
+
+    const net = tariff + cgst + sgst + roomFoodTotal;
 
     records.push({
       sNo,
@@ -1074,19 +1080,19 @@ export function getOctober2026SalesRecords(rooms = [], bookings = [], foodOrders
       misc: 0.0,
       laundry: 0.0,
       minibar: 0.0,
-      roomService: 0.0,
-      netAmount: net,
+      roomService: Math.round(roomFoodTotal * 100) / 100,
+      netAmount: Math.round(net * 100) / 100,
       advance: 0.0,
       discount: 0.0,
       complimentary: rm.roomNumber === '204' ? tariff : 0.0,
       voidAmt: 0.0,
       allowances: 0.0,
       paidOut: 0.0,
-      cash: (idx % 2 === 0) ? net : 0.0,
+      cash: (idx % 2 === 0) ? Math.round(net * 100) / 100 : 0.0,
       btc: 0.0,
       cc: 0.0,
-      online: (idx % 2 !== 0) ? net : 0.0,
-      remark: 'Live Stay Folio',
+      online: (idx % 2 !== 0) ? Math.round(net * 100) / 100 : 0.0,
+      remark: roomFoodTotal > 0 ? `Live Stay Folio (+₹${roomFoodTotal} F&B)` : 'Live Stay Folio',
       guestName: guest,
       company: rm.company || 'FIT',
       gstin: rm.gstin || '',
