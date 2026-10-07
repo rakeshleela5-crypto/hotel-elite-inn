@@ -289,15 +289,103 @@ export default function BookingReceiptModal({
   const roomCgst = Number((roomGstVal / 2).toFixed(2));
   const roomTotal = Number((roomTariffBase + roomGstVal).toFixed(2));
 
+  // Dynamic Room Ledger Rows (Dynamic Room 308, Om Srihari, Nights)
+  const dynamicRoomRows = (() => {
+    if (roomItems.length > 0) {
+      return roomItems.map((item) => {
+        const taxVal = Number(item.qty || 1) * Number(item.rate || 0);
+        const gstVal = Number(((taxVal * 5) / 100).toFixed(2));
+        const tot = Number((taxVal + gstVal).toFixed(2));
+        return {
+          date: editHeader.checkInDate || booking?.checkInDate || 'Today',
+          desc: item.desc || `Accommodation Stay - Room ${editHeader.roomNumber || booking?.roomNumber || '308'}`,
+          sac: item.sac || '996311',
+          taxVal,
+          gstPct: 5,
+          gstVal,
+          tot
+        };
+      });
+    }
+    const nightsCount = Math.max(1, Number(booking?.nights || 1));
+    const ratePerNight = Number(booking?.tariffPerNight || (Number(booking?.tariff || 1699) / nightsCount) || 1699);
+    const rows = [];
+    const checkInRaw = editHeader.checkInDate || booking?.checkInDate;
+    const baseD = checkInRaw && !isNaN(new Date(checkInRaw).getTime()) ? new Date(checkInRaw) : new Date();
+    for (let i = 0; i < nightsCount; i++) {
+      const curD = new Date(baseD);
+      curD.setDate(curD.getDate() + i);
+      const dateFormatted = curD.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+      const taxVal = Number(ratePerNight.toFixed(2));
+      const gstVal = Number(((taxVal * 5) / 100).toFixed(2));
+      const tot = Number((taxVal + gstVal).toFixed(2));
+      rows.push({
+        date: dateFormatted,
+        desc: `Room Tariff (Night ${i + 1}/${nightsCount}) - Room ${editHeader.roomNumber || booking?.roomNumber || '308'}`,
+        sac: '996311',
+        taxVal,
+        gstPct: 5,
+        gstVal,
+        tot
+      });
+    }
+    return rows;
+  })();
+
   // Food Split calculations (Page 2 of hotel_documents.pdf - Cannon Kitchen)
   const foodItems = lineItems.filter(item => item.sac === '996331' || item.desc?.toLowerCase().includes('dining') || item.desc?.toLowerCase().includes('restaurant') || item.desc?.toLowerCase().includes('food'));
   const foodBase = foodItems.length > 0
     ? foodItems.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0)
-    : 0.00;
+    : Number(booking?.foodAmount || booking?.fnbTotal || booking?.restaurantCharges || 0) > 0
+      ? Number((Number(booking?.foodAmount || booking?.fnbTotal || booking?.restaurantCharges || 0) / 1.05).toFixed(2))
+      : 0.00;
   const foodGstVal = Number(((foodBase * 5) / 100).toFixed(2));
   const foodSgst = Number((foodGstVal / 2).toFixed(2));
   const foodCgst = Number((foodGstVal / 2).toFixed(2));
   const foodTotal = Number((foodBase + foodGstVal).toFixed(2));
+
+  // Dynamic Food Ledger Rows
+  const dynamicFoodRows = (() => {
+    if (foodItems.length > 0) {
+      return foodItems.map((item) => {
+        const taxVal = Number(item.qty || 1) * Number(item.rate || 0);
+        const gstVal = Number(((taxVal * 5) / 100).toFixed(2));
+        const tot = Number((taxVal + gstVal).toFixed(2));
+        return {
+          date: editHeader.billDate ? editHeader.billDate.split(' ')[0] : (editHeader.checkInDate || booking?.checkInDate || 'Today'),
+          desc: item.desc || `Cannon Kitchen Restaurant Dining - Room ${editHeader.roomNumber || booking?.roomNumber || '308'}`,
+          sac: '996331',
+          taxVal,
+          gstPct: 5,
+          gstVal,
+          tot
+        };
+      });
+    }
+    const fnbAmount = Number(booking?.foodAmount || booking?.fnbTotal || booking?.restaurantCharges || 0);
+    if (fnbAmount > 0) {
+      const taxVal = Number((fnbAmount / 1.05).toFixed(2));
+      const gstVal = Number((fnbAmount - taxVal).toFixed(2));
+      return [{
+        date: editHeader.billDate ? editHeader.billDate.split(' ')[0] : (editHeader.checkInDate || booking?.checkInDate || 'Today'),
+        desc: `Cannon Kitchen Dining & Room Service - Room ${editHeader.roomNumber || booking?.roomNumber || '308'}`,
+        sac: '996331',
+        taxVal,
+        gstPct: 5,
+        gstVal,
+        tot: fnbAmount
+      }];
+    }
+    return [{
+      date: editHeader.billDate ? editHeader.billDate.split(' ')[0] : (editHeader.checkInDate || booking?.checkInDate || 'Today'),
+      desc: `Cannon Kitchen Dining - Room ${editHeader.roomNumber || booking?.roomNumber || '308'} (No dining billed)`,
+      sac: '996331',
+      taxVal: 0.00,
+      gstPct: 5,
+      gstVal: 0.00,
+      tot: 0.00
+    }];
+  })();
 
   const effectiveBillNo = isNonGstBill 
     ? `NGST2627-${String(editHeader.roomNumber || '1499').padStart(5, '0')}`
@@ -543,7 +631,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                   overflow: 'hidden',
                   textOverflow: 'ellipsis'
                 }}>
-                  Room {booking.roomNumber || '301'} • {booking.guestName || 'MR. P ASHOK'} • 
+                  Room {editHeader.roomNumber || booking?.roomNumber || '308'} • {editHeader.guestName || booking?.guestName || 'GUEST IN-HOUSE'} • 
                   {invoiceType === 'grc' ? 'Official GRC Registration Form' :
                    invoiceType === 'room-split' ? 'Room Stay Tariff (Page 3)' :
                    invoiceType === 'food-split' ? 'Cannon Kitchen Dining (Page 2)' :
@@ -1741,22 +1829,26 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 <div className="field-row">
                   <span className="field-label">Bill No.</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>FMBIL2627-01499</strong></span>
+                  <span className="field-value">
+                    <strong>{editHeader.billNo ? `${editHeader.billNo}-RM` : `FMBIL2627-${String(editHeader.roomNumber || booking?.roomNumber || '1499').padStart(5, '0')}-RM`}</strong>
+                  </span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Bill Date</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value">21-Sep-2026 14:15:47</span>
+                  <span className="field-value">{editHeader.billDate || formatDateTime(new Date())}</span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Room Number</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>Room 402</strong> (Executive Room)</span>
+                  <span className="field-value">
+                    <strong>Room {editHeader.roomNumber || booking?.roomNumber || '308'}</strong> ({editHeader.tier || booking?.tier || 'Deluxe Room'})
+                  </span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Plan Code</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>CP</strong></span>
+                  <span className="field-value"><strong>{editHeader.planCode || booking?.mealPlan || 'EP'}</strong></span>
                 </div>
               </div>
 
@@ -1764,22 +1856,24 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 <div className="field-row">
                   <span className="field-label">Guest Name</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>MR. P ASHOK</strong></span>
+                  <span className="field-value"><strong>{(editHeader.guestName || booking?.guestName || 'GUEST IN-HOUSE').toUpperCase()}</strong></span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Company Name</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>LINDE INDIA LTD</strong></span>
+                  <span className="field-value"><strong>{editHeader.company || booking?.company || 'INDIVIDUAL / DIRECT GUEST'}</strong></span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">GSTIN No.</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value text-bold-gstin">21AAACB2528H1ZA</span>
+                  <span className="field-value text-bold-gstin">{editHeader.corporateGstin || booking?.corporateGstin || '—'}</span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Check In / Out</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value">17-Sep-2026 to 21-Sep-2026 (4 Nights)</span>
+                  <span className="field-value">
+                    {editHeader.checkInDate || booking?.checkInDate || 'Today'} to {editHeader.checkOutDate || booking?.checkOutDate || 'Tomorrow'} ({Math.max(1, Number(booking?.nights || 1))} Night{Math.max(1, Number(booking?.nights || 1)) > 1 ? 's' : ''})
+                  </span>
                 </div>
               </div>
             </div>
@@ -1797,12 +1891,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { date: '17-Sep-2026', desc: 'Tariff', taxVal: 2999.00, gstPct: 5, gstVal: 149.96, tot: 3148.96 },
-                  { date: '18-Sep-2026', desc: 'Tariff', taxVal: 2999.00, gstPct: 5, gstVal: 149.96, tot: 3148.96 },
-                  { date: '19-Sep-2026', desc: 'Tariff', taxVal: 2999.00, gstPct: 5, gstVal: 149.96, tot: 3148.96 },
-                  { date: '20-Sep-2026', desc: 'Tariff', taxVal: 2999.00, gstPct: 5, gstVal: 149.96, tot: 3148.96 }
-                ].map((row, idx) => (
+                {dynamicRoomRows.map((row, idx) => (
                   <tr key={idx}>
                     <td>{row.date}</td>
                     <td><strong>{row.desc}</strong></td>
@@ -1837,7 +1926,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             <div className="in-words-row">
               <span className="in-words-label">Amount in Words:</span>
               <span className="in-words-value">
-                INR Twelve thousand five hundred ninety-six only
+                {convertNumberToIndianWords(roomTotal)}
               </span>
             </div>
 
@@ -1874,17 +1963,21 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 <div className="field-row">
                   <span className="field-label">Bill No.</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>FMBIL2627-01500</strong></span>
+                  <span className="field-value">
+                    <strong>{editHeader.billNo ? `${editHeader.billNo}-FB` : `FMBIL2627-${String(editHeader.roomNumber || booking?.roomNumber || '1500').padStart(5, '0')}-FB`}</strong>
+                  </span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Bill Date</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value">21-Sep-2026 14:15:47</span>
+                  <span className="field-value">{editHeader.billDate || formatDateTime(new Date())}</span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Room Number</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>Room 402</strong></span>
+                  <span className="field-value">
+                    <strong>Room {editHeader.roomNumber || booking?.roomNumber || '308'}</strong>
+                  </span>
                 </div>
               </div>
 
@@ -1892,17 +1985,17 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 <div className="field-row">
                   <span className="field-label">Guest Name</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>MR. P ASHOK</strong></span>
+                  <span className="field-value"><strong>{(editHeader.guestName || booking?.guestName || 'GUEST IN-HOUSE').toUpperCase()}</strong></span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Company Name</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value"><strong>LINDE INDIA LTD</strong></span>
+                  <span className="field-value"><strong>{editHeader.company || booking?.company || 'INDIVIDUAL / DIRECT GUEST'}</strong></span>
                 </div>
                 <div className="field-row">
                   <span className="field-label">Corporate GSTIN</span>
                   <span className="field-colon">:</span>
-                  <span className="field-value text-bold-gstin">21AAACB2528H1ZA</span>
+                  <span className="field-value text-bold-gstin">{editHeader.corporateGstin || booking?.corporateGstin || '—'}</span>
                 </div>
               </div>
             </div>
@@ -1920,11 +2013,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { date: '18-Sep-2026', desc: 'CANNON KITCHEN RESTAURANT', taxVal: 280.00, gstPct: 5, gstVal: 14.00, tot: 294.00 },
-                  { date: '19-Sep-2026', desc: 'CANNON KITCHEN RESTAURANT', taxVal: 310.00, gstPct: 5, gstVal: 15.50, tot: 325.50 },
-                  { date: '20-Sep-2026', desc: 'CANNON KITCHEN RESTAURANT', taxVal: 310.00, gstPct: 5, gstVal: 15.50, tot: 325.50 }
-                ].map((row, idx) => (
+                {dynamicFoodRows.map((row, idx) => (
                   <tr key={idx}>
                     <td>{row.date}</td>
                     <td><strong>{row.desc}</strong></td>
@@ -1959,7 +2048,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             <div className="in-words-row">
               <span className="in-words-label">Amount in Words:</span>
               <span className="in-words-value">
-                INR Nine hundred sixty-two only
+                {convertNumberToIndianWords(foodTotal)}
               </span>
             </div>
 
