@@ -225,6 +225,7 @@ export default function CheckoutSplitModal({
   const [checkoutMode, setCheckoutMode] = useState('tenders'); // 'tenders' | 'split-invoices'
   const [openReceiptAfter, setOpenReceiptAfter] = useState(true);
   const [isNonGstBill, setIsNonGstBill] = useState(false);
+  const [autoSendWhatsApp, setAutoSendWhatsApp] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   // Auto-allocate net balance whenever active room or netPayable changes
@@ -374,8 +375,8 @@ export default function CheckoutSplitModal({
       targetReceiptType: receiptTarget === 'editor' ? 'a4' : (receiptTarget || 'a4')
     };
 
-    // Auto-dispatch WhatsApp digital receipt if phone is available
-    if (settlementPayload.guestPhone) {
+    // Dispatch WhatsApp digital receipt ONLY if staff explicitly opted in via toggle
+    if (autoSendWhatsApp && settlementPayload.guestPhone) {
       try {
         sendCheckoutSplitWhatsApp({
           billType: isNonGstBill ? 'Non-GST Tax Receipt' : 'Official Tax Invoice',
@@ -1265,14 +1266,42 @@ export default function CheckoutSplitModal({
           flexWrap: 'wrap',
           gap: '0.75rem'
         }}>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-outline-gold"
-            style={{ padding: '0.55rem 1.1rem', fontSize: '0.82rem' }}
-          >
-            Cancel
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-outline-gold"
+              style={{ padding: '0.55rem 1.1rem', fontSize: '0.82rem' }}
+            >
+              Cancel
+            </button>
+            <label 
+              style={{ 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.45rem', 
+                fontSize: '0.78rem', 
+                color: '#cbd5e1', 
+                cursor: 'pointer',
+                userSelect: 'none',
+                background: 'rgba(37, 211, 102, 0.1)',
+                border: '1px solid rgba(37, 211, 102, 0.25)',
+                padding: '0.4rem 0.75rem',
+                borderRadius: '6px'
+              }} 
+              title="Optional: dispatch checkout summary to guest WhatsApp"
+            >
+              <input
+                type="checkbox"
+                checked={autoSendWhatsApp}
+                onChange={(e) => setAutoSendWhatsApp(e.target.checked)}
+                style={{ accentColor: '#25D366', cursor: 'pointer' }}
+              />
+              <span style={{ fontWeight: 600, color: autoSendWhatsApp ? '#4ade80' : '#94a3b8' }}>
+                📲 Dispatch copy to WhatsApp
+              </span>
+            </label>
+          </div>
 
           <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Money Receipt Voucher Button */}

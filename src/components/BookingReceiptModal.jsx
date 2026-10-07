@@ -46,7 +46,7 @@ export default function BookingReceiptModal({
   // View modes: 'a4' (Consolidated), 'room-split' (Page 3), 'food-split' (Page 2), 'grc' (Page 1), 'money-receipt' (Page 5), 'pos' (Thermal), 'keycard' (3D RFID)
   const [invoiceType, setInvoiceType] = useState(initialType || 'a4');
   const [isNonGstBill, setIsNonGstBill] = useState(Boolean(booking?.isNonGstBill));
-  const isLiveEditMode = true; // Always-on inline editing
+  const [isLiveEditMode, setIsLiveEditMode] = useState(true); // Always-on inline editing
   const [includeLetterhead, setIncludeLetterhead] = useState(true);
   const [rule48Copy, setRule48Copy] = useState('ORIGINAL FOR RECIPIENT');
   const [saveSuccess, setSaveSuccess] = useState(false);

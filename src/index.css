@@ -1779,7 +1779,7 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
 }
 
 @media print {
-  /* Force exact color, border, and background graphics across all browsers */
+  /* Force exact color, border, and background graphics across all modern browsers */
   *,
   *::before,
   *::after {
@@ -1789,25 +1789,10 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
     text-shadow: none !important;
   }
 
-  /* Hide screen chrome, navigation bars, buttons, and action panels */
-  nav,
-  aside,
-  header.no-print,
-  footer.no-print,
-  .no-print,
-  .invoice-action-bar,
-  .modal-close-btn,
-  .hsi-inline-banner,
-  .doc-switcher-tab,
-  button:not(.print-keep),
-  .btn-primary-gold,
-  .btn-outline-gold,
-  .btn-outline,
-  .chat-widget,
-  .floating-action-btn,
-  .room-quick-actions {
+  /* Hide decorative pseudo-elements and dark atmospheric gradients */
+  body::before,
+  body::after {
     display: none !important;
-    visibility: hidden !important;
   }
 
   /* Base Document Reset */
@@ -1818,16 +1803,47 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
     padding: 0 !important;
     width: 100% !important;
     height: auto !important;
+    min-height: 0 !important;
     overflow: visible !important;
-    font-size: 11pt;
+    font-size: 10pt;
+  }
+
+  /* Hide screen chrome, action buttons, close buttons, navigation, and floating widgets */
+  nav,
+  aside,
+  header.no-print,
+  footer.no-print,
+  .no-print,
+  .invoice-action-bar,
+  .modal-close-btn,
+  .hsi-inline-banner,
+  .doc-switcher-tab,
+  .invoice-tabs-scroll-rail,
+  .mobile-swipe-guide,
+  .sheets-toolbar-legend,
+  .sheets-cell-handle,
+  .sheets-cell-pencil,
+  button:not(.print-keep),
+  .btn-primary-gold,
+  .btn-outline-gold,
+  .btn-outline,
+  .chat-widget,
+  .floating-action-btn,
+  .room-quick-actions,
+  .hsi-currently-editing,
+  .sheets-editable-cell::after {
+    display: none !important;
   }
 
   /* When printing any modal, promote it out of fixed positioning */
   .official-invoice-overlay,
   .pos-print-overlay,
   .modal-overlay,
+  .modal-backdrop,
+  .modal-backdrop-dark,
   div[style*="position: fixed"] {
     position: static !important;
+    display: block !important;
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1836,27 +1852,108 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
     overflow: visible !important;
     width: 100% !important;
     max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    z-index: auto !important;
+  }
+
+  /* Inner modal boxes & panels promoted to full static printable height */
+  .official-invoice-modal-content,
+  .modal-content,
+  .modal-content-luxury,
+  .glass-panel {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Scroll wrappers expanded for natural page flow */
+  .invoice-sheet-scroll-wrapper,
+  .enterprise-data-table-container,
+  div[style*="overflow-y: auto"],
+  div[style*="overflowY: auto"],
+  div[style*="overflow-y:auto"],
+  div[style*="overflowY:auto"],
+  div[style*="overflow-y: scroll"],
+  div[style*="overflow: auto"],
+  div[style*="overflow: hidden"] {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
     box-shadow: none !important;
   }
 
-  /* Universal Visibility Elevation for Printable Target Containers */
-  body:has(.tax-invoice-sheet, .printable-receipt, .printable-audit-pack, .printable-sheet, .printable-ledger, .printable-pos-slip) * {
-    visibility: hidden;
-  }
-
+  /* Text & inputs inside printable areas print in crisp, dark ink */
   .tax-invoice-sheet,
   .tax-invoice-sheet *,
-  .printable-receipt,
-  .printable-receipt *,
-  .printable-audit-pack,
-  .printable-audit-pack *,
   .printable-sheet,
   .printable-sheet *,
+  .printable-audit-pack,
+  .printable-audit-pack *,
   .printable-ledger,
   .printable-ledger *,
-  .printable-pos-slip,
-  .printable-pos-slip * {
-    visibility: visible !important;
+  .official-invoice-modal-content,
+  .modal-content,
+  .modal-content-luxury {
+    color: #0f172a !important;
+  }
+
+  .tax-invoice-sheet input,
+  .tax-invoice-sheet textarea,
+  .tax-invoice-sheet select,
+  .tax-invoice-sheet [contenteditable="true"] {
+    background: transparent !important;
+    color: #0f172a !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+  }
+
+  /* Table Gridlines & Data cells print cleanly with high legibility */
+  table, tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border-color: #94a3b8 !important;
+  }
+
+  .enterprise-data-table,
+  .sheets-grid-table {
+    color: #0f172a !important;
+    background: #ffffff !important;
+    border-color: #94a3b8 !important;
+  }
+
+  .enterprise-data-table thead tr,
+  .sheets-grid-table thead tr,
+  .enterprise-data-table th,
+  .sheets-grid-table th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+  }
+
+  .enterprise-data-table td,
+  .sheets-grid-table td {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
   }
 
   /* -------------------------------------------------------------
@@ -1872,7 +1969,7 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
     width: 100% !important;
     max-width: 210mm !important;
     margin: 0 auto !important;
-    padding: 6mm 10mm !important;
+    padding: 4mm 8mm !important;
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
@@ -1885,12 +1982,6 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
   /* Pre-printed stationery clearance: 48mm top clearance when header is toggled OFF */
   .tax-invoice-sheet.preprinted-pad-mode {
     padding-top: 48mm !important;
-  }
-
-  /* Prevent awkward page-breaks inside table rows, totals, and signatures */
-  table, tr, td, th {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
   .signature-block,
@@ -1911,7 +2002,9 @@ button:focus-visible, .btn:focus-visible, a:focus-visible, input:focus-visible, 
     display: block !important;
     width: 76mm !important;
     max-width: 80mm !important;
-    margin: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin: 0 auto !important;
     padding: 2mm 3mm !important;
     background: #ffffff !important;
     color: #000000 !important;
