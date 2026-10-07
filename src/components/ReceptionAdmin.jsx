@@ -866,17 +866,51 @@ export default function ReceptionAdmin({
 
   const handleBillToRoomFromLiveOrders = (payload) => {
     const kotId = payload.orderId || payload.kotId;
+    const totalAmt = Number(payload.totalAmount) || 0;
+    const taxable = Math.round((totalAmt / 1.05) * 100) / 100;
+    const gstHalf = Math.round(((totalAmt - taxable) / 2) * 100) / 100;
+
     if (onAddTransaction) {
       onAddTransaction({
-        id: `TXN-${Date.now()}`,
+        transactionId: `TXN-${payload.roomNumber}-${Date.now().toString().slice(-4)}`,
+        folioId: `FOLIO-${payload.roomNumber}`,
+        bookingId: `BOOK-${payload.roomNumber}`,
         roomNumber: payload.roomNumber,
-        category: 'Food & Beverage',
+        transactionType: 'Food & Beverage',
+        outlet: payload.outlet || 'Fenugreek Restaurant',
+        itemCode: kotId,
         description: `KOT #${kotId} - Fenugreek In-Room Dining`,
-        amount: payload.totalAmount,
-        type: 'Charge',
-        date: new Date().toISOString()
+        debitAmount: totalAmt,
+        creditAmount: 0,
+        taxableBase: taxable,
+        gstRate: 5,
+        cgst: gstHalf,
+        sgst: gstHalf,
+        sacCode: '996331',
+        invoiceCategory: 'Food',
+        isLocked: 0,
+        createdBy: 'Steward Order Pad',
+        createdAt: new Date().toISOString()
       });
     }
+
+    // Immediately update room outstanding balance on front desk matrix & Tape Chart
+    setRooms(prev => prev.map(r => {
+      if (String(r.roomNumber) === String(payload.roomNumber)) {
+        const curBal = Number(r.outstandingBalance !== undefined ? r.outstandingBalance : (r.tariff || 2199));
+        return { ...r, outstandingBalance: Math.round((curBal + totalAmt) * 100) / 100 };
+      }
+      return r;
+    }));
+
+    // Immediately update active booking balance due
+    setBookings(prev => prev.map(b => {
+      if (String(b.roomNumber) === String(payload.roomNumber) && b.status !== 'Checked Out') {
+        const curBal = Number(b.balanceDue !== undefined ? b.balanceDue : (b.totalAmount || 0));
+        return { ...b, balanceDue: Math.round((curBal + totalAmt) * 100) / 100 };
+      }
+      return b;
+    }));
 
     setInternalFoodOrdersList(prev => {
       const updated = prev.map(o => {
@@ -914,7 +948,7 @@ export default function ReceptionAdmin({
       })
     }).catch(err => console.debug('Offline room bill sync:', err));
 
-    setFeedbackToast(`KOT ${kotId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio!`);
+    setFeedbackToast(`KOT ${kotId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio! Tape Chart updated.`);
   };
 
   const handleAddRoomServiceRequest = (newReq) => {

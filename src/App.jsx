@@ -688,8 +688,8 @@ export default function App() {
         console.debug("Edge sync offline, initialized with 27-inventory state:", err);
       });
 
-    // Periodic Background Polling for Cross-Device Synchronization (e.g., Steward mobile, Housekeeping phone)
-    const pollInterval = setInterval(() => {
+    // Periodic Background Polling & Focus Sync for Cross-Device Operations (e.g. Steward mobile pad, Housekeeping phone)
+    const syncRemoteState = () => {
       fetch('/api/sync?action=get_all_state', {
         headers: { 'X-Admin-Key': adminPin }
       })
@@ -710,9 +710,20 @@ export default function App() {
           }
         })
         .catch(() => {});
-    }, 12000);
+    };
 
-    return () => clearInterval(pollInterval);
+    const pollInterval = setInterval(syncRemoteState, 8000);
+    window.addEventListener('focus', syncRemoteState);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') syncRemoteState();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(pollInterval);
+      window.removeEventListener('focus', syncRemoteState);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [currentView, adminPinVerified]);
 
   const handleOpenBooking = (tier, roomNumber = null) => {
