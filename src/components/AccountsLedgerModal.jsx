@@ -337,7 +337,7 @@ export default function AccountsLedgerModal({
     if (accountsQuickFilter === 'DUE' && item.cumulativeOutstanding <= 0) return false;
     if (accountsQuickFilter === 'B2B' && !item.guestName.toLowerCase().includes('ashok') && !item.guestName.toLowerCase().includes('ltd') && !item.guestName.toLowerCase().includes('paper') && !item.guestName.toLowerCase().includes('imfa')) return false;
     if (!accountsSearchQuery.trim()) return true;
-    const q = accountsSearchQuery.toLowerCase();
+    const q = accountsSearchQuery.replace(/^#/, '').trim().toLowerCase();
     return (
       item.roomNumber?.toString().toLowerCase().includes(q) ||
       item.guestName?.toLowerCase().includes(q) ||
@@ -350,7 +350,7 @@ export default function AccountsLedgerModal({
   const filteredCorporatePartners = corporatePartners.filter(corp => {
     if (accountsQuickFilter === 'DUE' && Number(corp.openingBalance || 0) <= 0) return false;
     if (!accountsSearchQuery.trim()) return true;
-    const q = accountsSearchQuery.toLowerCase();
+    const q = accountsSearchQuery.replace(/^#/, '').trim().toLowerCase();
     return (
       corp.name?.toLowerCase().includes(q) ||
       corp.contactPerson?.toLowerCase().includes(q) ||
@@ -515,7 +515,7 @@ export default function AccountsLedgerModal({
       }
     }
 
-    const searchTarget = (accountsSearchQuery || gstFomSearch).trim().toLowerCase();
+    const searchTarget = (accountsSearchQuery || gstFomSearch).replace(/^#/, '').trim().toLowerCase();
     if (searchTarget) {
       return (
         r.billNo.toLowerCase().includes(searchTarget) ||
@@ -2302,7 +2302,7 @@ export default function AccountsLedgerModal({
                 <Search size={15} color="#94a3b8" style={{ position: 'absolute', left: '0.7rem', top: '50%', transform: 'translateY(-50%)' }} />
                 <input
                   type="text"
-                  placeholder="Search Bill #, Guest, Room, Company, GSTIN..."
+                  placeholder="Search Bill No., Guest, Room No., Company, GSTIN..."
                   value={gstFomSearch}
                   onChange={(e) => setGstFomSearch(e.target.value)}
                   style={{
@@ -2786,7 +2786,7 @@ export default function AccountsLedgerModal({
               <table className="enterprise-data-table sheets-grid-table">
                 <thead>
                   <tr>
-                    <th style={{ padding: '0.75rem 1rem' }}>Bill # / Room</th>
+                    <th style={{ padding: '0.75rem 1rem' }}>Bill No. / Room</th>
                     <th style={{ padding: '0.75rem 1rem' }}>Guest & Company</th>
                     <th style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>Plan</th>
                     <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Room Tariff (₹)</th>
@@ -5646,10 +5646,10 @@ export default function AccountsLedgerModal({
                         <table className="enterprise-data-table sheets-grid-table" style={{ fontSize: '0.82rem' }}>
                           <thead>
                             <tr>
-                              <th style={{ padding: '0.75rem 1rem' }}>Folio / Invoice #</th>
+                              <th style={{ padding: '0.75rem 1rem' }}>Folio / Invoice No.</th>
                               <th style={{ padding: '0.75rem 1rem' }}>Stay Date</th>
                               <th style={{ padding: '0.75rem 1rem' }}>Guest / Delegation</th>
-                              <th style={{ padding: '0.75rem 1rem' }}>Room #</th>
+                              <th style={{ padding: '0.75rem 1rem' }}>Room No.</th>
                               <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Room (0% Non-GST)</th>
                               <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Dining (5% Taxable)</th>
                               <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Food GST (5%)</th>

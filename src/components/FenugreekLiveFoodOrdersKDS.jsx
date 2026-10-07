@@ -77,7 +77,7 @@ export default function FenugreekLiveFoodOrdersKDS({
       if (!seenOrderIds.current.has(idKey)) {
         seenOrderIds.current.add(idKey);
         const dest = normalized.orderType === 'room' ? `Room ${normalized.roomNumber}` : `Table ${normalized.tableNumber || 'Dining'}`;
-        setNewOrderNotice(`🔔 NEW KOT #${normalized.kotNumber} from Steward for ${dest}!`);
+        setNewOrderNotice(`🔔 NEW KOT ${normalized.kotNumber} from Steward for ${dest}!`);
         setTimeout(() => setNewOrderNotice(null), 7000);
 
         if (!isAudioMuted) {
@@ -154,7 +154,7 @@ export default function FenugreekLiveFoodOrdersKDS({
       playOrderAlert();
     }
 
-    setFeedbackToast(`KOT #${orderId} marked as ${newStatus}!`);
+    setFeedbackToast(`KOT ${orderId} marked as ${newStatus}!`);
     setTimeout(() => setFeedbackToast(null), 3500);
   };
 
@@ -178,7 +178,7 @@ export default function FenugreekLiveFoodOrdersKDS({
         subtotal: Math.round((order.totalAmount / 1.05) * 100) / 100,
         gst: Math.round((order.totalAmount - (order.totalAmount / 1.05)) * 100) / 100,
         items: order.items,
-        description: `Fenugreek In-Room Dining KOT #${orderId} (${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')})`,
+        description: `Fenugreek In-Room Dining KOT ${orderId} (${order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')})`,
         outlet: order.outlet || 'Fenugreek Restaurant',
         captainName: order.captain || order.steward || 'KOTI'
       });
@@ -201,7 +201,7 @@ export default function FenugreekLiveFoodOrdersKDS({
     setOrders(updated);
 
     playSuccessChime();
-    setFeedbackToast(`✓ KOT #${orderId} of ₹${order.totalAmount} successfully debited to Room ${roomNum} Master Folio!`);
+    setFeedbackToast(`✓ KOT ${orderId} of ₹${order.totalAmount} successfully debited to Room ${roomNum} Master Folio!`);
     setTimeout(() => setFeedbackToast(null), 4000);
   };
 
@@ -1097,7 +1097,7 @@ export default function FenugreekLiveFoodOrdersKDS({
             <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: '0.5rem', marginBottom: '0.5rem' }}>
               <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 900 }}>HOTEL ELITE INN</h3>
               <div style={{ fontSize: '0.8rem', fontWeight: 800 }}>FENUGREEK RESTAURANT KOT</div>
-              <div style={{ fontSize: '0.75rem' }}>KOT #{kotToPrint.id || kotToPrint.orderId}</div>
+              <div style={{ fontSize: '0.75rem' }}>KOT {kotToPrint.id || kotToPrint.orderId}</div>
               <div style={{ fontSize: '0.75rem' }}>{new Date(kotToPrint.timestamp || Date.now()).toLocaleString('en-IN')}</div>
             </div>
 

@@ -35,6 +35,7 @@ import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 import { playOrderAlert } from '../utils/soundAlert';
 import { sendGuestCheckout2HourReminderWhatsApp } from '../utils/whatsappDispatch';
 import FenugreekLiveFoodOrdersKDS from './FenugreekLiveFoodOrdersKDS';
+import UnifiedRoomSearchBar, { normalizeRoomQuery } from './UnifiedRoomSearchBar';
 import { 
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, updateKotStatusUnified, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
@@ -90,6 +91,7 @@ export default function ReceptionAdmin({
   const [tapeChartViewMode, setTapeChartViewMode] = useState('table'); // 'table' (Master Tabular Ledger), 'mysoft' (Tabular Matrix), or 'modern' (Cards)
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFloor, setSelectedFloor] = useState('all'); // 'all', 1, 2, or 3
 
   // Live 1-second ticking clock for 2-hour pre-checkout digital countdown
   const [liveClock, setLiveClock] = useState(() => Date.now());
@@ -854,7 +856,7 @@ export default function ReceptionAdmin({
       })
     }).catch(err => console.warn('Order status sync fallback:', err));
 
-    setFeedbackToast(`Order #${orderId} marked as ${newStatus}`);
+    setFeedbackToast(`Order ${orderId} marked as ${newStatus}`);
   };
 
   const handleBillToRoomFromLiveOrders = (payload) => {
@@ -907,7 +909,7 @@ export default function ReceptionAdmin({
       })
     }).catch(err => console.debug('Offline room bill sync:', err));
 
-    setFeedbackToast(`KOT #${kotId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio!`);
+    setFeedbackToast(`KOT ${kotId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio!`);
   };
 
   const handleAddRoomServiceRequest = (newReq) => {
@@ -950,7 +952,7 @@ export default function ReceptionAdmin({
       })
     }).catch(err => console.warn('Service status sync fallback:', err));
 
-    setFeedbackToast(`Service ticket #${requestId} marked as ${newStatus}`);
+    setFeedbackToast(`Service ticket ${requestId} marked as ${newStatus}`);
   };
 
   const handleCheckoutConfirm = (payload) => {
@@ -2253,26 +2255,44 @@ export default function ReceptionAdmin({
   const occupiedDirtyCount = projectedRooms.filter(r => r.effectiveStatus === 'Occupied').length;
   const oooCount = projectedRooms.filter(r => r.effectiveStatus === 'Maintenance' || r.effectiveStatus === 'VIP Hold').length;
 
-  // Filtered rooms for Tape Chart / Master Tabular Room Ledger
-  const filteredRooms = projectedRooms.filter(r => {
-    let matchesFilter = true;
-    if (statusFilter === 'all') matchesFilter = true;
-    else if (statusFilter === 'Available') matchesFilter = r.effectiveStatus === 'Available';
-    else if (statusFilter === 'Vacant Dirty') matchesFilter = r.effectiveStatus === 'Vacant Dirty' || r.effectiveStatus === 'Cleaning';
-    else if (statusFilter === 'Occupied') matchesFilter = r.effectiveStatus === 'Occupied' || r.effectiveStatus === 'Occupied Clean';
-    else if (statusFilter === 'Occupied Clean') matchesFilter = r.effectiveStatus === 'Occupied Clean';
-    else if (statusFilter === 'Maintenance') matchesFilter = r.effectiveStatus === 'Maintenance' || r.effectiveStatus === 'VIP Hold';
-    else matchesFilter = r.effectiveStatus === statusFilter;
+  // Filtered rooms for Tape Chart / Master Tabular Room Ledger / Tabular Matrix / Modern Cards
+  const filteredRooms = useMemo(() => {
+    return projectedRooms.filter(r => {
+      // 1. Floor Filter
+      if (selectedFloor !== 'all' && Number(r.floor) !== Number(selectedFloor)) {
+        return false;
+      }
 
-    if (filterExpiringOnly) {
-      if (!r.isExpiringSoon && !r.isOverdue) return false;
-    }
+      // 2. Status Filter
+      let matchesFilter = true;
+      if (statusFilter === 'all') matchesFilter = true;
+      else if (statusFilter === 'Available') matchesFilter = r.effectiveStatus === 'Available';
+      else if (statusFilter === 'Vacant Dirty') matchesFilter = r.effectiveStatus === 'Vacant Dirty' || r.effectiveStatus === 'Cleaning';
+      else if (statusFilter === 'Occupied') matchesFilter = r.effectiveStatus === 'Occupied' || r.effectiveStatus === 'Occupied Clean';
+      else if (statusFilter === 'Occupied Clean') matchesFilter = r.effectiveStatus === 'Occupied Clean';
+      else if (statusFilter === 'Maintenance') matchesFilter = r.effectiveStatus === 'Maintenance' || r.effectiveStatus === 'VIP Hold';
+      else matchesFilter = r.effectiveStatus === statusFilter;
 
-    const matchesSearch = r.roomNumber.includes(searchTerm) || 
-      (r.effectiveGuestName && r.effectiveGuestName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (r.effectiveCompany && r.effectiveCompany.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesFilter && matchesSearch;
-  });
+      if (!matchesFilter) return false;
+
+      if (filterExpiringOnly) {
+        if (!r.isExpiringSoon && !r.isOverdue) return false;
+      }
+
+      // 3. Search Term (normalized to eliminate hashtag ambiguity)
+      const cleanSearch = normalizeRoomQuery(searchTerm);
+      if (!cleanSearch) return true;
+
+      const roomNumMatch = String(r.roomNumber || '').toLowerCase().includes(cleanSearch);
+      const guestMatch = r.effectiveGuestName && r.effectiveGuestName.toLowerCase().includes(cleanSearch);
+      const companyMatch = r.effectiveCompany && r.effectiveCompany.toLowerCase().includes(cleanSearch);
+      const tierMatch = r.tier && r.tier.toLowerCase().includes(cleanSearch);
+      const phoneMatch = r.effectivePhone && r.effectivePhone.toLowerCase().includes(cleanSearch);
+      const statusMatch = r.effectiveStatus && r.effectiveStatus.toLowerCase().includes(cleanSearch);
+
+      return roomNumMatch || guestMatch || companyMatch || tierMatch || phoneMatch || statusMatch;
+    });
+  }, [projectedRooms, selectedFloor, statusFilter, filterExpiringOnly, searchTerm]);
 
   // Expiring Rooms (within 2-Hour Window or Overdue)
   const expiringRooms = useMemo(() => {
@@ -2366,6 +2386,60 @@ export default function ReceptionAdmin({
     setBlockRoomOpen(false);
     setBlockSelectedRoom('');
     setBlockNotes('');
+  };
+
+  // Dedicated Action Handlers for UnifiedRoomSearchBar
+  const handleOpenGrcFromSearch = (room) => {
+    setReceiptModalType('a4');
+    const matchedBooking = room.matchedBooking || bookings.find(b => b.roomNumber === room.roomNumber || b.room_number === room.roomNumber) || {
+      bookingId: `FMBIL2627-${room.roomNumber}`,
+      billNo: `FMBIL2627-${room.roomNumber}`,
+      roomNumber: room.roomNumber,
+      guestName: room.effectiveGuestName || room.currentGuestName || 'In-House Guest',
+      guestPhone: room.effectivePhone || '+91 94370 22555',
+      company: room.effectiveCompany || 'Direct Guest',
+      corporateGstin: '21AAACB2528H1ZA',
+      tier: room.tier,
+      tariff: room.effectiveTariff || room.tariff || 2199,
+      totalAmount: room.effectiveBalanceDue || room.tariff || 2199,
+      nights: 1,
+      grcNo: `GRC-${room.roomNumber}`,
+      checkInDate: '22/09/2026',
+      checkInTime: '11:00 AM',
+      checkOutDate: '23/09/2026 (12:00 PM)'
+    };
+    setSelectedReceiptBooking(matchedBooking);
+    setIsReceiptModalOpen(true);
+  };
+
+  const handleExpressWalkInFromSearch = (roomNumber) => {
+    const targetRoom = rooms.find(r => r.roomNumber === roomNumber);
+    setWalkInRoom(roomNumber);
+    setWalkInRate(targetRoom?.tariff || 2199);
+    setWalkInDeposit(targetRoom?.tariff || 2199);
+    setWalkInOpen(true);
+  };
+
+  const handleMarkCleanFromSearch = (roomNumber) => {
+    onUpdateRoomStatus(roomNumber, 'Available', null, null);
+    setFeedbackToast(`✓ Room ${roomNumber} marked Vacant Clean & Ready for Check-In!`);
+  };
+
+  const handleWorkOrderFromSearch = (roomNumber) => {
+    setWorkOrderForm({
+      roomNumber,
+      issue: '',
+      category: 'HVAC / AC',
+      priority: 'High',
+      technician: 'Bikram Patra (AC Specialist)',
+      notes: ''
+    });
+    setIsWorkOrderModalOpen(true);
+  };
+
+  const handleOpenQrFromSearch = (roomNumber) => {
+    setSelectedRoomForQr(roomNumber);
+    setRoomQrOpen(true);
   };
 
   // WhatsApp Digital Keycard & Welcome Pass Dispatch
@@ -4279,7 +4353,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Universal Search: Room #, Guest Name, Phone, GSTIN, Train, Plate, Staff (Press '/' to focus)..."
+            placeholder="Universal Search: Room Number, Guest Name, Phone, GSTIN, Train, Plate, Staff (Press '/' to focus)..."
             style={{
               flex: 1,
               background: 'rgba(0, 0, 0, 0.5)',
@@ -5028,70 +5102,48 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             </div>
           )}
 
-          {/* Search & Filter Bar with 5-Stage Lifecycle Tabs */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            marginBottom: '1.25rem'
-          }}>
-            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-              {[
-                { id: 'all', label: `All (${totalCount})` },
-                { id: 'Available', label: `Vacant Clean (${vacantCleanCount})` },
-                { id: 'Vacant Dirty', label: `Vacant Dirty (${vacantDirtyCount})` },
-                { id: 'Occupied', label: `Occupied In-House (${occupiedDirtyCount + occupiedCleanCount})` },
-                { id: 'Occupied Clean', label: `Occupied Serviced (${occupiedCleanCount})` },
-                { id: 'Maintenance', label: `OOO / Maint (${oooCount})` }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setStatusFilter(tab.id)}
-                  className={`enterprise-tab-pill ${statusFilter === tab.id ? 'active' : ''}`}
-                  style={{
-                    padding: '0.35rem 0.8rem',
-                    fontSize: '0.76rem'
-                  }}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+          {/* Universal 27-Room Selection, Ledger Matrix & Floor Filter Bar */}
+          <UnifiedRoomSearchBar
+            rooms={projectedRooms}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            selectedFloor={selectedFloor}
+            onFloorChange={setSelectedFloor}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            tapeChartViewMode={tapeChartViewMode}
+            onViewModeChange={setTapeChartViewMode}
+            onOpenFolio={(room) => setSelectedFolioRoom(room)}
+            onOpenGrc={handleOpenGrcFromSearch}
+            onExpressWalkIn={handleExpressWalkInFromSearch}
+            onMarkClean={handleMarkCleanFromSearch}
+            onOpenWorkOrder={handleWorkOrderFromSearch}
+            onOpenQr={handleOpenQrFromSearch}
+            expiringRoomsCount={expiringRoomsCount}
+            filterExpiringOnly={filterExpiringOnly}
+            onToggleFilterExpiringOnly={() => setFilterExpiringOnly(prev => !prev)}
+          />
 
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <button
-                onClick={() => {
-                  setWorkOrderForm({
-                    roomNumber: '201',
-                    issue: '',
-                    category: 'HVAC / AC',
-                    priority: 'High',
-                    technician: 'Bikram Patra (AC Specialist)',
-                    notes: ''
-                  });
-                  setIsWorkOrderModalOpen(true);
-                }}
-                className="btn-outline-gold"
-                style={{ padding: '0.45rem 0.85rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-              >
-                <Wrench size={14} color="var(--gold-glow)" /> + Log Work Order
-              </button>
-              <div style={{ position: 'relative', width: 220 }}>
-              <Search size={16} style={{ position: 'absolute', left: 10, top: 11, color: 'var(--text-muted)' }} />
-              <input 
-                type="text" 
-                placeholder="Search Room or Guest..." 
-                className="form-input" 
-                style={{ width: '100%', paddingLeft: '2rem', paddingRight: '0.75rem', height: 38, fontSize: '0.85rem' }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+          {/* Quick Work Order Action Strip */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.85rem' }}>
+            <button
+              onClick={() => {
+                setWorkOrderForm({
+                  roomNumber: '201',
+                  issue: '',
+                  category: 'HVAC / AC',
+                  priority: 'High',
+                  technician: 'Bikram Patra (AC Specialist)',
+                  notes: ''
+                });
+                setIsWorkOrderModalOpen(true);
+              }}
+              className="btn-outline-gold"
+              style={{ padding: '0.45rem 0.85rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+            >
+              <Wrench size={14} color="var(--gold-glow)" /> + Log Work Order
+            </button>
           </div>
-        </div>
 
           {/* VIEW 0: ENTERPRISE MASTER TABULAR ROOM LEDGER (Spreadsheet Format) */}
           {tapeChartViewMode === 'table' ? (
@@ -5156,7 +5208,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               <table className="enterprise-data-table sheets-grid-table">
                 <thead>
                   <tr>
-                    <SheetsColumnHeader title="Room #" badge="locked" align="center" style={{ width: '80px' }} />
+                    <SheetsColumnHeader title="Room No." badge="locked" align="center" style={{ width: '85px' }} />
                     <SheetsColumnHeader title="Floor" badge="locked" align="center" style={{ width: '65px' }} />
                     <SheetsColumnHeader title="Category / Tier" badge="locked" style={{ width: '135px' }} />
                     <SheetsColumnHeader title="Current Status" badge="editable" align="center" style={{ width: '120px' }} />
@@ -5173,8 +5225,22 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                 <tbody>
                   {filteredRooms.length === 0 ? (
                     <tr>
-                      <td colSpan={12} style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>
-                        No rooms match the selected filter or search term.
+                      <td colSpan={12} style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#94a3b8' }}>
+                        <Building size={32} color="var(--gold-glow)" style={{ margin: '0 auto 0.75rem', opacity: 0.8 }} />
+                        <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.35rem' }}>
+                          No rooms match your filter or search criteria
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: '1rem' }}>
+                          {searchTerm ? `No matches for "${searchTerm}".` : 'Try clearing floor or status filters.'}
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-outline-gold"
+                          onClick={() => { setSearchTerm(''); setStatusFilter('all'); setSelectedFloor('all'); }}
+                          style={{ padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
+                        >
+                          Reset All Filters
+                        </button>
                       </td>
                     </tr>
                   ) : (
@@ -5203,8 +5269,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                       };
 
                       return (
-                        <tr key={room.roomNumber}>
-                          {/* Room # */}
+                        <tr key={room.roomNumber} data-room-id={room.roomNumber}>
+                          {/* Room No. */}
                           <td style={{ textAlign: 'center', fontWeight: 800, fontSize: '0.92rem', color: 'var(--gold-glow)' }}>
                             {room.roomNumber}
                           </td>
@@ -5401,15 +5467,40 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             </div>
           ) : tapeChartViewMode === 'mysoft' ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {[1, 2, 3].map(floorNum => {
-                const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
-                if (floorRooms.length === 0) return null;
+              {filteredRooms.length === 0 ? (
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px dashed rgba(212, 175, 55, 0.4)',
+                  borderRadius: '10px',
+                  padding: '3rem 2rem',
+                  textAlign: 'center',
+                  color: '#94a3b8'
+                }}>
+                  <Building size={36} color="var(--gold-glow)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
+                  <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '0.5rem' }}>No Rooms Match Your Search or Filter</h4>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                    {searchTerm ? `No rooms match "${searchTerm}".` : 'No rooms match the selected floor or status.'}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn-gold"
+                    onClick={() => { setSearchTerm(''); setStatusFilter('all'); setSelectedFloor('all'); }}
+                    style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', color: '#000' }}
+                  >
+                    Reset Room Search & Filters
+                  </button>
+                </div>
+              ) : (
+                [1, 2, 3].map(floorNum => {
+                  if (selectedFloor !== 'all' && Number(selectedFloor) !== floorNum) return null;
+                  const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
+                  if (floorRooms.length === 0) return null;
 
-                const floorLabel = floorNum === 1
-                  ? '1ST FLOOR (Rooms 101 - 109)'
-                  : floorNum === 2 
-                    ? '2ND FLOOR (Rooms 201 - 209)' 
-                    : '3RD FLOOR (Rooms 301 - 309)';
+                  const floorLabel = floorNum === 1
+                    ? '1ST FLOOR (Rooms 101 - 109)'
+                    : floorNum === 2 
+                      ? '2ND FLOOR (Rooms 201 - 209)' 
+                      : '3RD FLOOR (Rooms 301 - 309)';
 
                 return (
                   <div key={floorNum} style={{
@@ -5715,55 +5806,81 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                     </div>
                   </div>
                 );
-              })}
+              }))}
             </div>
           ) : (
             /* VIEW 2: MODERN CARD LAYOUT */
             <div className="tape-chart-container">
-              {[1, 2, 3].map(floorNum => {
-                const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
-                if (floorRooms.length === 0) return null;
+              {filteredRooms.length === 0 ? (
+                <div style={{
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px dashed rgba(212, 175, 55, 0.4)',
+                  borderRadius: '10px',
+                  padding: '3rem 2rem',
+                  textAlign: 'center',
+                  color: '#94a3b8'
+                }}>
+                  <Building size={36} color="var(--gold-glow)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
+                  <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: '0.5rem' }}>No Rooms Match Your Search or Filter</h4>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                    {searchTerm ? `No rooms match "${searchTerm}".` : 'No rooms match the selected floor or status.'}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn-gold"
+                    onClick={() => { setSearchTerm(''); setStatusFilter('all'); setSelectedFloor('all'); }}
+                    style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem', color: '#000' }}
+                  >
+                    Reset Room Search & Filters
+                  </button>
+                </div>
+              ) : (
+                [1, 2, 3].map(floorNum => {
+                  if (selectedFloor !== 'all' && Number(selectedFloor) !== floorNum) return null;
+                  const floorRooms = filteredRooms.filter(r => r.floor === floorNum);
+                  if (floorRooms.length === 0) return null;
 
-                const floorLabel = floorNum === 1 
-                  ? 'FLOOR 1 • 9 Keys (101 - 109)' 
-                  : floorNum === 2 
-                    ? 'FLOOR 2 • 9 Keys (201 - 209)' 
-                    : 'FLOOR 3 • 9 Keys (301 - 309)';
+                  const floorLabel = floorNum === 1 
+                    ? 'FLOOR 1 • 9 Keys (101 - 109)' 
+                    : floorNum === 2 
+                      ? 'FLOOR 2 • 9 Keys (201 - 209)' 
+                      : 'FLOOR 3 • 9 Keys (301 - 309)';
 
-                return (
-                  <div key={floorNum} className="tape-floor-group">
-                    <div className="tape-floor-header">
-                      <span>{floorLabel}</span>
-                      <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                        {floorRooms.filter(r => r.status === 'Available').length} / {floorRooms.length} Available
-                      </span>
-                    </div>
+                  return (
+                    <div key={floorNum} className="tape-floor-group">
+                      <div className="tape-floor-header">
+                        <span>{floorLabel}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                          {floorRooms.filter(r => r.status === 'Available').length} / {floorRooms.length} Available
+                        </span>
+                      </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem', padding: '1rem' }}>
-                      {floorRooms.map(room => {
-                        const isOccupied = room.effectiveStatus === 'Occupied' || room.effectiveStatus === 'Occupied Clean' || room.status === 'Occupied';
-                        const isOverdue = room.isOverdue;
-                        const isExpiringSoon = room.isExpiringSoon;
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem', padding: '1rem' }}>
+                        {floorRooms.map(room => {
+                          const isOccupied = room.effectiveStatus === 'Occupied' || room.effectiveStatus === 'Occupied Clean' || room.status === 'Occupied';
+                          const isOverdue = room.isOverdue;
+                          const isExpiringSoon = room.isExpiringSoon;
 
-                        const cardBorder = isOverdue 
-                          ? '1.5px solid #ef4444' 
-                          : isExpiringSoon 
-                            ? '1.5px solid #f59e0b' 
-                            : '1px solid rgba(255, 255, 255, 0.08)';
-                        const cardShadow = isOverdue
-                          ? '0 0 16px rgba(239, 68, 68, 0.25)'
-                          : isExpiringSoon
-                            ? '0 0 16px rgba(245, 158, 11, 0.25)'
-                            : 'none';
-                        const cardBg = isOverdue
-                          ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.12), rgba(6, 14, 26, 0.85))'
-                          : isExpiringSoon
-                            ? 'linear-gradient(180deg, rgba(245, 158, 11, 0.12), rgba(6, 14, 26, 0.85))'
-                            : 'rgba(6, 14, 26, 0.65)';
+                          const cardBorder = isOverdue 
+                            ? '1.5px solid #ef4444' 
+                            : isExpiringSoon 
+                              ? '1.5px solid #f59e0b' 
+                              : '1px solid rgba(255, 255, 255, 0.08)';
+                          const cardShadow = isOverdue
+                            ? '0 0 16px rgba(239, 68, 68, 0.25)'
+                            : isExpiringSoon
+                              ? '0 0 16px rgba(245, 158, 11, 0.25)'
+                              : 'none';
+                          const cardBg = isOverdue
+                            ? 'linear-gradient(180deg, rgba(239, 68, 68, 0.12), rgba(6, 14, 26, 0.85))'
+                            : isExpiringSoon
+                              ? 'linear-gradient(180deg, rgba(245, 158, 11, 0.12), rgba(6, 14, 26, 0.85))'
+                              : 'rgba(6, 14, 26, 0.65)';
 
-                        return (
-                          <div 
-                            key={room.roomNumber}
+                          return (
+                            <div 
+                              key={room.roomNumber}
+                              data-room-id={room.roomNumber}
                             style={{
                               background: cardBg,
                               border: cardBorder,
@@ -5935,7 +6052,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                     </div>
                   </div>
                 );
-              })}
+              }))}
             </div>
           )}
         </div>
@@ -7229,7 +7346,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             <table className="enterprise-data-table sheets-grid-table">
               <thead>
                 <tr>
-                  <SheetsColumnHeader title="Room #" badge="locked" align="center" style={{ width: '100px' }} />
+                  <SheetsColumnHeader title="Room No." badge="locked" align="center" style={{ width: '100px' }} />
                   <SheetsColumnHeader title="Guest Name" badge="editable" />
                   <SheetsColumnHeader title="Contact Phone" badge="editable" style={{ width: '130px' }} />
                   <SheetsColumnHeader title="Govt ID Proof" badge="editable" style={{ width: '150px' }} />
@@ -10255,7 +10372,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             <form onSubmit={handleLfSubmit} className="modal-body">
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
                 <div className="form-group">
-                  <label className="form-label">Recovered Room # *</label>
+                  <label className="form-label">Recovered Room No. *</label>
                   <input
                     type="text"
                     required

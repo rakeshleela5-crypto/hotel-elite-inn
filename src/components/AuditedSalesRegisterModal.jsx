@@ -109,7 +109,7 @@ export default function AuditedSalesRegisterModal({
       if (!item) return false;
       // Search
       if (searchTerm.trim()) {
-        const q = searchTerm.toLowerCase();
+        const q = searchTerm.replace(/^#/, '').trim().toLowerCase();
         const matchSearch = 
           String(item.guestName || '').toLowerCase().includes(q) ||
           String(item.billNo || '').toLowerCase().includes(q) ||
@@ -2280,7 +2280,7 @@ GRAND RECONCILIATION:
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search Guest, Bill #, Room, Corporate, GSTIN, Remark..."
+                placeholder="Search Guest, Bill No., Room, Corporate, GSTIN, Remark..."
                 style={{
                   width: '100%',
                   background: '#090d1a',
@@ -2603,7 +2603,7 @@ GRAND RECONCILIATION:
                             alignItems: 'center',
                             gap: '0.25rem'
                           }}
-                          title={`Send Bill #${r.billNo} to Guest / Owner WhatsApp`}
+                          title={`Send Bill No. ${r.billNo} to Guest / Owner WhatsApp`}
                         >
                           <MessageCircle size={10} /> WhatsApp
                         </button>

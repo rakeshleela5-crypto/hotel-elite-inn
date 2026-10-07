@@ -1174,7 +1174,7 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
                       type="text"
                       value={ledgerSearchTerm}
                       onChange={(e) => setLedgerSearchTerm(e.target.value)}
-                      placeholder="Search description, KOT #, SAC, operator, date..."
+                      placeholder="Search description, KOT No., SAC, operator, date..."
                       style={{
                         width: '100%',
                         padding: '0.4rem 2rem 0.4rem 2rem',
@@ -2513,11 +2513,11 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.35rem' }}>
-                      <span>Invoice A (Bill #01499): Room Tariff (SAC 996311)</span>
+                      <span>Invoice A (Bill No. 01499): Room Tariff (SAC 996311)</span>
                       <strong style={{ color: '#fff' }}>₹12,596.00</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.35rem' }}>
-                      <span>Invoice B (Bill #01500): Fenugreek Restaurant Dining (SAC 996331)</span>
+                      <span>Invoice B (Bill No. 01500): Fenugreek Restaurant Dining (SAC 996331)</span>
                       <strong style={{ color: '#34d399' }}>₹962.00</strong>
                     </div>
                   </div>

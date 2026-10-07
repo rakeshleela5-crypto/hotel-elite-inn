@@ -330,7 +330,7 @@ export default function CannonKitchenPOS({
         if (event.data?.type === 'NEW_KOT_ORDER' && event.data.order) {
           const ord = event.data.order;
           playOrderAlert();
-          showPosToast(`🔔 STEWARD PUNCH: ${ord.steward} sent KOT #${ord.kotNumber} for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
+          showPosToast(`🔔 STEWARD PUNCH: ${ord.steward} sent KOT ${ord.kotNumber} for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
           if (event.data.tableSessions) {
             setRunningTableSessions(event.data.tableSessions);
           }
@@ -793,7 +793,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
           voidId: `VOID-${Date.now().toString().slice(-6)}`,
           roomOrTable: voidKotOrder.roomNumber ? `Room ${voidKotOrder.roomNumber}` : `Table ${voidKotOrder.tableNumber || 'Unknown'}`,
           itemCode: 'KOT-ALL',
-          itemName: `KOT #${orderId} (${voidKotOrder.items?.map(i => i.name).join(', ') || 'Dishes'})`,
+          itemName: `KOT ${orderId} (${voidKotOrder.items?.map(i => i.name).join(', ') || 'Dishes'})`,
           quantity: voidKotOrder.items?.reduce((s, i) => s + (i.quantity || 1), 0) || 1,
           amount: voidKotOrder.totalAmount || 0,
           reason: voidKotReason,
@@ -803,7 +803,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
       })
     }).catch(err => console.warn('Offline void sync:', err));
 
-    showPosToast(`❌ KOT #${orderId} marked VOID (${voidKotReason})`);
+    showPosToast(`❌ KOT ${orderId} marked VOID (${voidKotReason})`);
     setVoidKotOrder(null);
     setVoidKotCustomNote('');
   };
@@ -917,8 +917,8 @@ Thank you for dining at Cannon Kitchen! 🙏`;
     setPrintKotModalOrder(newKotOrder);
     setCart([]);
     showPosToast(isRunningAddition 
-      ? `✓ KOT #${nextKotNumber} (${kotId}) merged into Table ${tableNumber} running bill! Sent to Kitchen.`
-      : `✓ KOT #1 (${kotId}) started for Table ${tableNumber}! Sent to Kitchen.`);
+      ? `✓ KOT ${nextKotNumber} (${kotId}) merged into Table ${tableNumber} running bill! Sent to Kitchen.`
+      : `✓ KOT 1 (${kotId}) started for Table ${tableNumber}! Sent to Kitchen.`);
   };
 
   // Direct Table Bill Settlement (Cash, Dynamic UPI QR, Card, Split) with Cumulative Multi-KOT Invoicing
@@ -1137,7 +1137,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
     setLastOrderDetails(payload);
     setKotSentSuccess(true);
     setCart([]);
-    showPosToast(`✓ In-Room KOT #${kotId} debited to Room ${targetRoom} & routed to Live KDS!`);
+    showPosToast(`✓ In-Room KOT ${kotId} debited to Room ${targetRoom} & routed to Live KDS!`);
   };
 
   // Filtered menu list for visual clicking (Supports Category & Diet Filters across all 204 items)
@@ -1842,7 +1842,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                       }}
                     >
                       {runningTableSessions[tableNumber]?.status === 'OCCUPIED' 
-                        ? `➕ Add Running KOT #${(runningTableSessions[tableNumber].kots?.length || 1) + 1}`
+                        ? `➕ Add Running KOT ${(runningTableSessions[tableNumber].kots?.length || 1) + 1}`
                         : '🍽️ Start New Order'}
                     </button>
 

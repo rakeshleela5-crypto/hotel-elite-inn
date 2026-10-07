@@ -971,8 +971,8 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
 
             {[
               { id: 'a4', label: 'Consolidated Tax Invoice' },
-              { id: 'room-split', label: 'Room Bill #01499 (Page 3)' },
-              { id: 'food-split', label: 'Cannon Kitchen Food Bill #01500 (Page 2)' },
+              { id: 'room-split', label: 'Room Bill No. 01499 (Page 3)' },
+              { id: 'food-split', label: 'Cannon Kitchen Food Bill No. 01500 (Page 2)' },
               { id: 'grc', label: 'Official GRC Form (Page 1)' },
               { id: 'money-receipt', label: 'Money Receipt Voucher (Page 5)' },
               { id: 'pos', label: '80mm Slip' },
