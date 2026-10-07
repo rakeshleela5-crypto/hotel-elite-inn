@@ -297,36 +297,26 @@ export default function CheckoutSplitModal({
     }
 
     // Auto-allocate remaining balance if variance exists
-    let effectiveNumCash = numCash;
-    let effectiveNumUpi = numUpi;
-    let effectiveNumCard = numCard;
-    let effectiveNumBtc = numBtc;
-    let effectiveUpiRef = upiRef;
-    let effectiveUpiProvider = upiProvider;
+    let effectiveNumCash = Number(cashAmount) || 0;
+    let effectiveNumUpi = Number(upiAmount) || 0;
+    let effectiveNumCard = Number(cardAmount) || 0;
+    let effectiveNumBtc = Number(btcAmount) || 0;
+    let effectiveUpiRef = upiRef || `UPI-${Date.now().toString().slice(-6)}`;
+    let effectiveUpiProvider = upiProvider || 'PhonePe';
 
-    if (!isRefundDue && Math.abs(variance) >= 0.01) {
+    const currentAllocated = effectiveNumCash + effectiveNumUpi + effectiveNumCard + effectiveNumBtc;
+    const currentVariance = Math.round((netPayable - currentAllocated) * 100) / 100;
+
+    if (!isRefundDue && Math.abs(currentVariance) >= 0.01) {
       if (effectiveNumCash > 0 && effectiveNumUpi === 0) {
-        effectiveNumCash = Math.round((effectiveNumCash + variance) * 100) / 100;
+        effectiveNumCash = Math.round((effectiveNumCash + currentVariance) * 100) / 100;
         setCashAmount(effectiveNumCash.toFixed(2));
       } else if (effectiveNumBtc > 0 && effectiveNumUpi === 0 && effectiveNumCash === 0) {
-        effectiveNumBtc = Math.round((effectiveNumBtc + variance) * 100) / 100;
+        effectiveNumBtc = Math.round((effectiveNumBtc + currentVariance) * 100) / 100;
         setBtcAmount(effectiveNumBtc.toFixed(2));
       } else {
-        effectiveNumUpi = Math.round((effectiveNumUpi + variance) * 100) / 100;
+        effectiveNumUpi = Math.round((effectiveNumUpi + currentVariance) * 100) / 100;
         setUpiAmount(effectiveNumUpi.toFixed(2));
-      }
-    }
-
-    if (!isRoomOccupied && !hasGuestAssigned) {
-      const confirmProceed = window.confirm(
-        `Notice: Room ${activeRoom.roomNumber} is currently marked as '${roomStatus}'. Do you want to proceed with checking out and printing the folio for this room?`
-      );
-      if (!confirmProceed) return;
-    }
-
-    if (!keyReturned) {
-      if (!window.confirm(`Warning: Physical key for Room ${activeRoom.roomNumber} is NOT marked as returned. Do you want to proceed anyway?`)) {
-        return;
       }
     }
 
@@ -336,28 +326,28 @@ export default function CheckoutSplitModal({
     } else {
       if (effectiveNumCash > 0) tendersSummary.push(`Cash: ₹${effectiveNumCash.toLocaleString('en-IN')}`);
       if (effectiveNumUpi > 0) tendersSummary.push(`${effectiveUpiProvider} (UPI): ₹${effectiveNumUpi.toLocaleString('en-IN')} [Ref: ${effectiveUpiRef}]`);
-      if (effectiveNumCard > 0) tendersSummary.push(`Card: ₹${effectiveNumCard.toLocaleString('en-IN')} [Auth: ${cardAuth}]`);
-      if (effectiveNumBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany}): ₹${effectiveNumBtc.toLocaleString('en-IN')}`);
+      if (effectiveNumCard > 0) tendersSummary.push(`Card: ₹${effectiveNumCard.toLocaleString('en-IN')} [Auth: ${cardAuth || 'AUTH-OK'}]`);
+      if (effectiveNumBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany || 'Company'}): ₹${effectiveNumBtc.toLocaleString('en-IN')}`);
     }
 
     const settlementPayload = {
-      roomNumber: activeRoom.roomNumber,
-      guestName: activeRoom.effectiveGuestName || activeRoom.currentGuestName || matchedBooking.guestName,
-      guestPhone: matchedBooking.guestPhone || activeRoom.phone || '+91 94370 22555',
-      company: matchedBooking.company || activeRoom.company || 'Direct Guest',
-      corporateGstin: matchedBooking.corporateGstin || '',
-      tier: activeRoom.tier,
+      roomNumber: String(activeRoom.roomNumber),
+      guestName: activeRoom.effectiveGuestName || activeRoom.currentGuestName || matchedBooking?.guestName || 'Valued Guest',
+      guestPhone: matchedBooking?.guestPhone || activeRoom.phone || '+91 94370 22555',
+      company: matchedBooking?.company || activeRoom.company || 'Direct Guest',
+      corporateGstin: matchedBooking?.corporateGstin || '',
+      tier: activeRoom.tier || 'Deluxe Room',
       totalAmount: grossBillTotal,
       billTotal: grossBillTotal,
       netDue: netPayable,
       advancePaid: advancePaidTotal,
       roomAmount: roomTariffTotal,
       foodAmount: foodChargesTotal,
-      foodItems: foodSummary.itemsList,
-      nights: stayDuration.nights,
+      foodItems: foodSummary.itemsList || [],
+      nights: stayDuration.nights || 1,
       checkInDate: stayDuration.checkInStr,
       checkOutDate: new Date().toISOString().split('T')[0],
-      billNo: matchedBooking.billNo || `FMBIL2627-${activeRoom.roomNumber}`,
+      billNo: matchedBooking?.billNo || `FMBIL2627-${activeRoom.roomNumber}`,
       settlementTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       settlementDate: new Date().toLocaleDateString('en-IN'),
       isRefund: isRefundDue,
@@ -365,23 +355,23 @@ export default function CheckoutSplitModal({
       refundMode: isRefundDue ? refundMode : null,
       refundRef: isRefundDue ? refundRef : null,
       lateCheckoutSurcharge: lateCheckoutAmount,
-      keyReturned,
-      roomInspected,
+      keyReturned: Boolean(keyReturned),
+      roomInspected: Boolean(roomInspected),
       tenders: {
         cash: isRefundDue ? 0 : effectiveNumCash,
         upi: isRefundDue ? 0 : effectiveNumUpi,
         upiRef: effectiveUpiRef,
         upiProvider: effectiveUpiProvider,
         card: effectiveNumCard,
-        cardAuth,
+        cardAuth: cardAuth || 'AUTH-OK',
         btc: effectiveNumBtc,
-        btcCompany
+        btcCompany: btcCompany || matchedBooking?.company || 'Corporate Credit'
       },
       tendersSummary,
-      openReceiptAfter,
-      isNonGstBill,
+      openReceiptAfter: true,
+      isNonGstBill: Boolean(isNonGstBill),
       openEditor: receiptTarget === 'editor',
-      targetReceiptType: receiptTarget === 'editor' ? 'a4' : receiptTarget
+      targetReceiptType: receiptTarget === 'editor' ? 'a4' : (receiptTarget || 'a4')
     };
 
     // Auto-dispatch WhatsApp digital receipt if phone is available
@@ -404,7 +394,9 @@ export default function CheckoutSplitModal({
       }
     }
 
-    onConfirmCheckout(settlementPayload);
+    if (typeof onConfirmCheckout === 'function') {
+      onConfirmCheckout(settlementPayload);
+    }
   };
 
   return (

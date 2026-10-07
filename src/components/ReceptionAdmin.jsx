@@ -1001,8 +1001,12 @@ export default function ReceptionAdmin({
   };
 
   const handleCheckoutConfirm = (payload) => {
+    if (!payload || !payload.roomNumber) return;
+
     // 1. Release room to Vacant Dirty (Owner requirement: "automatic ga Dirty ani padatadi")
-    onUpdateRoomStatus(payload.roomNumber, 'Vacant Dirty', null, null);
+    if (typeof onUpdateRoomStatus === 'function') {
+      onUpdateRoomStatus(payload.roomNumber, 'Vacant Dirty', null, null);
+    }
 
     // 1a. Broadcast to Housekeeping Mobile Portal (Turns room Dirty & alerts Manager/Supervisor)
     try {
@@ -1024,7 +1028,9 @@ export default function ReceptionAdmin({
 
     // 1b. The Wild Oasis Protocol: Automated Housekeeping Turnover Task Dispatch
     const floorNum = Math.floor(Number(payload.roomNumber) / 100) || 2;
-    const attendant = floorAttendants[floorNum]?.name || 'Floor Attendant';
+    const attendant = (typeof floorAttendants !== 'undefined' && floorAttendants?.[floorNum]?.name) 
+      ? floorAttendants[floorNum].name 
+      : 'Floor Attendant';
     const newHkTicket = {
       requestId: `HK-TURNOVER-${payload.roomNumber}-${Date.now().toString().slice(-4)}`,
       roomNumber: payload.roomNumber,
@@ -1039,57 +1045,65 @@ export default function ReceptionAdmin({
     setRoomServicesList(prev => [newHkTicket, ...prev]);
 
     // 2. Add cash to cashier drawer if cash tender was used (or deduct if cash refund)
-    if (payload.tenders && payload.tenders.cash > 0) {
-      setCashCollected(prev => prev + payload.tenders.cash);
+    const tendersCash = Number(payload?.tenders?.cash) || 0;
+    if (tendersCash > 0) {
+      setCashCollected(prev => prev + tendersCash);
       setDenominations(prev => ({
         ...prev,
-        500: (Number(prev[500]) || 0) + Math.floor(payload.tenders.cash / 500),
-        coins: (Number(prev.coins) || 0) + (payload.tenders.cash % 500)
+        500: (Number(prev[500]) || 0) + Math.floor(tendersCash / 500),
+        coins: (Number(prev.coins) || 0) + (tendersCash % 500)
       }));
     } else if (payload.isRefund && payload.refundAmount > 0 && payload.refundMode === 'Cash') {
-      setCashCollected(prev => Math.max(0, prev - payload.refundAmount));
+      setCashCollected(prev => Math.max(0, prev - Number(payload.refundAmount || 0)));
     }
 
     // 2b. Dispatch Multi-Tender Split Payment to Cloudflare D1
     const tenderRows = [];
-    if (payload.tenders.cash > 0) {
-      tenderRows.push({ mode: 'Cash', amount: payload.tenders.cash, ref: 'Front Desk Cash Drawer' });
+    if (tendersCash > 0) {
+      tenderRows.push({ mode: 'Cash', amount: tendersCash, ref: 'Front Desk Cash Drawer' });
     }
-    if (payload.tenders.upi > 0) {
-      tenderRows.push({ mode: 'UPI', amount: payload.tenders.upi, ref: `${payload.tenders.upiProvider || 'UPI'} Ref: ${payload.tenders.upiRef || 'DIRECT'}` });
+    const tendersUpi = Number(payload?.tenders?.upi) || 0;
+    if (tendersUpi > 0) {
+      tenderRows.push({ mode: 'UPI', amount: tendersUpi, ref: `${payload?.tenders?.upiProvider || 'UPI'} Ref: ${payload?.tenders?.upiRef || 'DIRECT'}` });
     }
-    if (payload.tenders.card > 0) {
-      tenderRows.push({ mode: 'Card', amount: payload.tenders.card, ref: `POS Auth: ${payload.tenders.cardAuth || 'AUTH'}` });
+    const tendersCard = Number(payload?.tenders?.card) || 0;
+    if (tendersCard > 0) {
+      tenderRows.push({ mode: 'Card', amount: tendersCard, ref: `POS Auth: ${payload?.tenders?.cardAuth || 'AUTH'}` });
     }
-    if (payload.tenders.btc > 0) {
-      tenderRows.push({ mode: 'Corporate Credit', amount: payload.tenders.btc, ref: `BTC: ${payload.tenders.btcCompany || 'Company Credit'}` });
+    const tendersBtc = Number(payload?.tenders?.btc) || 0;
+    if (tendersBtc > 0) {
+      tenderRows.push({ mode: 'Corporate Credit', amount: tendersBtc, ref: `BTC: ${payload?.tenders?.btcCompany || 'Company Credit'}` });
     }
 
     const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'settle_split_payment',
-        payload: {
-          folioId: `FOLIO-${payload.roomNumber}`,
-          roomNumber: payload.roomNumber,
-          invoiceId: payload.billNo || `INV-${payload.roomNumber}`,
-          tenderRows,
-          housekeepingTicket: newHkTicket
-        }
+    try {
+      fetch('/api/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': adminPin
+        },
+        body: JSON.stringify({
+          action: 'settle_split_payment',
+          payload: {
+            folioId: `FOLIO-${payload.roomNumber}`,
+            roomNumber: payload.roomNumber,
+            invoiceId: payload.billNo || `INV-${payload.roomNumber}`,
+            tenderRows,
+            housekeepingTicket: newHkTicket
+          }
+        })
       })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.success) {
-          console.log(`✓ Split payment & housekeeping turnover task synced to D1 for room ${payload.roomNumber}`);
-        }
-      })
-      .catch(err => console.warn('Offline split payment fallback:', err));
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success) {
+            console.log(`✓ Split payment & housekeeping turnover task synced to D1 for room ${payload.roomNumber}`);
+          }
+        })
+        .catch(err => console.warn('Offline split payment fallback:', err));
+    } catch(err) {
+      console.warn('Split payment sync fetch error:', err);
+    }
 
     // 3. Add to recent settlements log
     setRecentSettlements(prev => [payload, ...prev]);
@@ -1100,24 +1114,24 @@ export default function ReceptionAdmin({
     // 5. Notify front desk with toast
     setFeedbackToast(`✓ Room ${payload.roomNumber} checked out! Automated Housekeeping Turnover ticket dispatched to ${attendant} (45-min SLA active).`);
 
-    // 6. If requested, automatically open the requested document (Money Receipt Voucher or Tax Invoice)
+    // 6. If requested, automatically open the requested document (Money Receipt Voucher, 80mm Slip, or Tax Invoice)
     if (payload.openReceiptAfter) {
       const receiptBooking = {
-        bookingId: payload.billNo,
-        billNo: payload.billNo,
+        bookingId: payload.billNo || `INV-${payload.roomNumber}`,
+        billNo: payload.billNo || `INV-${payload.roomNumber}`,
         roomNumber: payload.roomNumber,
-        guestName: payload.guestName,
-        guestPhone: payload.guestPhone,
+        guestName: payload.guestName || 'Valued Guest',
+        guestPhone: payload.guestPhone || '+91 94370 22555',
         company: payload.company || '',
         corporateGstin: payload.corporateGstin || '',
-        tier: payload.tier,
-        totalAmount: payload.billTotal || payload.totalAmount,
+        tier: payload.tier || 'Deluxe Room',
+        totalAmount: payload.billTotal || payload.totalAmount || 0,
         advancePaid: payload.advancePaid || 0,
         advanceDeposit: payload.advancePaid || 0,
-        paymentMode: payload.isRefund ? `Refund (${payload.refundMode})` : 'Split Tender',
+        paymentMode: payload.isRefund ? `Refund (${payload.refundMode || 'Cash'})` : 'Split Tender',
         paymentStatus: payload.isRefund ? 'Refunded & Checked Out' : 'Fully Settled & Checked Out',
-        tenders: payload.tenders,
-        tendersSummary: payload.tendersSummary,
+        tenders: payload.tenders || { cash: tendersCash, upi: tendersUpi, card: tendersCard, btc: tendersBtc },
+        tendersSummary: payload.tendersSummary || [],
         foodAmount: payload.foodAmount || 0,
         roomAmount: payload.roomAmount || 0,
         foodItems: payload.foodItems || [],
@@ -1125,10 +1139,12 @@ export default function ReceptionAdmin({
         checkInDate: payload.checkInDate || new Date().toISOString().split('T')[0],
         checkOutDate: payload.checkOutDate || new Date().toISOString().split('T')[0],
         grcNo: '684',
-        isNonGstBill: payload.isNonGstBill || false,
-        isLiveEditMode: payload.openEditor || false
+        isNonGstBill: Boolean(payload.isNonGstBill),
+        isCheckInMoneyReceipt: false,
+        isLiveEditMode: Boolean(payload.openEditor)
       };
-      setReceiptModalType(payload.targetReceiptType || 'a4');
+      const requestedDocType = payload.targetReceiptType || 'a4';
+      setReceiptModalType(requestedDocType);
       setSelectedReceiptBooking(receiptBooking);
       setIsReceiptModalOpen(true);
     }
