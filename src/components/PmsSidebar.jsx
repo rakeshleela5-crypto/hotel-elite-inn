@@ -53,6 +53,7 @@ export default function PmsSidebar({
       color: '#38bdf8',
       desc: '27-Room Matrix & Tape Chart',
       badge: null,
+      hotkey: 'F1',
       onClick: () => onSelectDepartment('reception')
     },
     {
@@ -64,6 +65,7 @@ export default function PmsSidebar({
       desc: 'In-Room Dining & Live KOTs',
       badge: liveKotCount > 0 ? `${liveKotCount} KOT` : null,
       badgeColor: '#ef4444',
+      hotkey: 'F2',
       onClick: () => {
         onSelectDepartment('restaurant');
         if (onOpenRestaurantPOS) onOpenRestaurantPOS();
@@ -78,6 +80,7 @@ export default function PmsSidebar({
       desc: 'Turnover & Room Sanitation',
       badge: pendingHkCount > 0 ? `${pendingHkCount} Dirty` : null,
       badgeColor: '#f59e0b',
+      hotkey: 'F3',
       onClick: () => onSelectDepartment('housekeeping')
     },
     {
@@ -88,6 +91,7 @@ export default function PmsSidebar({
       color: '#34d399',
       desc: '26-Col Register & Day Book',
       badge: null,
+      hotkey: 'F4',
       onClick: () => {
         onSelectDepartment('accounts');
         if (onOpenAccountsLedger) onOpenAccountsLedger('tally-erp');
@@ -101,6 +105,7 @@ export default function PmsSidebar({
       color: '#a78bfa',
       desc: 'Stock Requisition & Items',
       badge: null,
+      hotkey: 'F5',
       onClick: () => {
         onSelectDepartment('store');
         if (onOpenStoreInventory) onOpenStoreInventory();
@@ -115,6 +120,7 @@ export default function PmsSidebar({
       desc: 'Midnight Roll & D1 Sync',
       badge: 'D1 Live',
       badgeColor: 'rgba(192, 132, 252, 0.25)',
+      hotkey: 'F6',
       onClick: () => {
         onSelectDepartment('night-audit');
         if (onOpenNightAuditModal) onOpenNightAuditModal();
@@ -128,6 +134,7 @@ export default function PmsSidebar({
       color: '#f59e0b',
       desc: 'Dynamic Tier Micro-Rates',
       badge: null,
+      hotkey: 'F7',
       onClick: () => {
         if (onOpenRevenueManagement) onOpenRevenueManagement();
       }
@@ -141,6 +148,7 @@ export default function PmsSidebar({
       desc: 'Rule 46 & 10 Tax Reports',
       badge: '#36',
       badgeColor: 'rgba(251, 191, 36, 0.2)',
+      hotkey: 'F8',
       onClick: () => {
         if (onOpenCaFilingStation) onOpenCaFilingStation();
       }
@@ -153,6 +161,7 @@ export default function PmsSidebar({
       color: '#10b981',
       desc: 'Steward Mobile & Room QR',
       badge: null,
+      hotkey: 'F9',
       onClick: () => {
         if (onOpenQrHub) onOpenQrHub();
       }
@@ -412,7 +421,22 @@ export default function PmsSidebar({
                     alignItems: 'center',
                     justifyContent: 'space-between'
                   }}>
-                    <span>{item.shortLabel}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <span>{item.shortLabel}</span>
+                      {item.hotkey && (
+                        <kbd style={{
+                          background: 'rgba(0,0,0,0.4)',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          borderRadius: '3px',
+                          padding: '0px 3px',
+                          fontSize: '0.55rem',
+                          color: 'var(--gold-glow)',
+                          fontFamily: 'monospace'
+                        }}>
+                          {item.hotkey}
+                        </kbd>
+                      )}
+                    </div>
                     {item.badge && (
                       <span style={{
                         fontSize: '0.6rem',

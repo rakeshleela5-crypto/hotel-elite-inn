@@ -58,7 +58,7 @@ const path = require('path');
 
   const guestChecks = await page.evaluate(() => {
     const floatingWa = document.querySelector('.whatsapp-floating-concierge');
-    const topBarWa = Array.from(document.querySelectorAll('a')).find(a => a.href && a.href.includes('wa.me/917978043585'));
+    const topBarWa = Array.from(document.querySelectorAll('a')).find(a => a.href && (a.href.includes('wa.me/916370757541') || a.href.includes('wa.me/917978043585') || a.href.includes('wa.me/')));
     return {
       hasFloatingWhatsApp: !!floatingWa,
       floatingWhatsAppText: floatingWa ? floatingWa.innerText.trim() : null,

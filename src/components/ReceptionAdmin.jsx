@@ -93,8 +93,60 @@ export default function ReceptionAdmin({
   useEffect(() => {
     if (initialTab) {
       setActiveTab(initialTab);
+      if (['cashier-audit', 'audited-sales-register'].includes(initialTab)) {
+        setActiveDepartment('accounts');
+      } else if (['housekeeping', 'linen-assets', 'staff-payroll'].includes(initialTab)) {
+        setActiveDepartment('housekeeping');
+      } else if (['live-food-orders'].includes(initialTab)) {
+        setActiveDepartment('restaurant');
+      } else if (['operations-settings'].includes(initialTab)) {
+        setActiveDepartment('store');
+      }
     }
   }, [initialTab]);
+
+  // Department-Scoped Sub-Tabs to eliminate duplicate departmental options on central page
+  const currentDepartmentTabs = useMemo(() => {
+    switch (activeDepartment) {
+      case 'restaurant':
+        return [
+          { id: 'live-food-orders', label: '🍳 Fenugreek Live Food Orders & KDS', isKds: true }
+        ];
+      case 'housekeeping':
+        return [
+          { id: 'housekeeping', label: '🧹 Room Turnovers & Hygiene Inspection' },
+          { id: 'linen-assets', label: '🧺 Linen Room & Asset Stock' },
+          { id: 'staff-payroll', label: '👥 Floor Attendant Allocation' }
+        ];
+      case 'accounts':
+        return [
+          { id: 'cashier-audit', label: '💰 Cashier Shift Handover & Night Audit' },
+          { id: 'audited-sales-register', label: '📊 26-Column Audited Sales Register', isAudited: true }
+        ];
+      case 'store':
+        return [
+          { id: 'operations-settings', label: '⚙️ Mandi Store Inventory & Operations' }
+        ];
+      case 'night-audit':
+        return [
+          { id: 'cashier-audit', label: '💰 Midnight Audit & Cashier Handover' }
+        ];
+      case 'reception':
+      default:
+        return [
+          { id: 'tape-chart', label: '📊 27-Room Tape Chart Matrix' },
+          { id: 'shift-logbook', label: '📋 Shift Handover & Logbook' },
+          { id: 'police-register', label: '🚨 Sarai Act Police Register' },
+          { id: 'transit-dayuse', label: '🚆 Transit & Station Transfer' },
+          { id: 'visualize-bookings', label: '📅 Booking Visualizer' },
+          { id: 'occupancy-report', label: '📈 Occupancy Report' },
+          { id: 'maintenance-ooo', label: '🔧 Maintenance & OOO' },
+          { id: 'lost-and-found', label: '🧳 Lost & Found' },
+          { id: 'dpdp', label: '🛡️ DPDP Act 2023' },
+          { id: 'd1-database-explorer', label: '🗄️ D1 Live DB Explorer', isHub: true }
+        ];
+    }
+  }, [activeDepartment]);
   const [tapeChartViewMode, setTapeChartViewMode] = useState('14day-calendar'); // '14day-calendar', 'table', 'mysoft', or 'modern'
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -3794,178 +3846,72 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           className="reception-admin-root hsi-live-edit-active" 
           style={{ padding: '1rem 1.25rem 4rem 1.25rem', maxWidth: 1680, width: '100%', margin: '0 auto', position: 'relative' }}
         >
-          {/* Streamlined Workspace Context Banner & Quick Operations Bar */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            marginBottom: '1rem',
-            padding: '0.65rem 1rem',
-            background: 'linear-gradient(135deg, rgba(12, 24, 43, 0.95), rgba(6, 14, 26, 0.98))',
-            border: '1px solid rgba(212, 175, 55, 0.3)',
-            borderRadius: '10px',
-            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.35)'
-          }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'wrap' }}>
-                <span className="badge" style={{ background: 'rgba(212, 175, 55, 0.2)', color: 'var(--gold-glow)', border: '1px solid rgba(212, 175, 55, 0.4)', fontWeight: 800 }}>
-                  {HOTEL_CONFIG.legalName.toUpperCase()}
-                </span>
-                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                  27-Room Luxury Boutique PMS • GSTIN: <strong style={{ color: '#fbbf24' }}>{HOTEL_CONFIG.gstin}</strong> • Rule 46 Compliant
-                </span>
-              </div>
+          {/* Automated Statutory F&B Reconciliation Strip: Contextual to Accounts & Restaurant */}
+          {(activeDepartment === 'accounts' || activeDepartment === 'restaurant') && (
+            <AutomatedFnbReconciliationStrip
+              liveOrders={foodOrdersList}
+              onOpenFullRegister={onOpenAuditedRestaurantRegister}
+              onOpenCaStation={onOpenCaFilingStation}
+            />
+          )}
+
+          {/* Department-Scoped Contextual Sub-Tabs (Removes duplicate departmental navigation) */}
+          {currentDepartmentTabs.length > 1 && (
+            <div style={{
+              display: 'flex',
+              gap: '0.45rem',
+              flexWrap: 'wrap',
+              marginBottom: '1.25rem',
+              background: 'rgba(6, 14, 26, 0.7)',
+              padding: '0.35rem 0.5rem',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}>
+              {currentDepartmentTabs.map(tab => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    if (tab.id === 'audited-sales-register') {
+                      if (onOpenAuditedSalesRegister) onOpenAuditedSalesRegister();
+                    } else {
+                      setActiveTab(tab.id);
+                    }
+                  }}
+                  className={`enterprise-tab-pill ${activeTab === tab.id ? 'active' : ''}`}
+                  style={tab.isKds ? {
+                    background: activeTab === tab.id 
+                      ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.35))' 
+                      : 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12))',
+                    border: activeTab === tab.id 
+                      ? '1.5px solid #fbbf24' 
+                      : '1px solid rgba(251, 191, 36, 0.6)',
+                    color: activeTab === tab.id ? '#ffffff' : '#fbbf24',
+                    fontWeight: 800,
+                    boxShadow: activeTab === tab.id ? '0 0 16px rgba(251, 191, 36, 0.45)' : 'none'
+                  } : tab.isHub ? {
+                    background: activeTab === tab.id 
+                      ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(14, 165, 233, 0.3))' 
+                      : 'linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(14, 165, 233, 0.1))',
+                    border: activeTab === tab.id 
+                      ? '1.5px solid #38bdf8' 
+                      : '1px solid rgba(56, 189, 248, 0.5)',
+                    color: activeTab === tab.id ? '#ffffff' : '#38bdf8',
+                    fontWeight: 800,
+                    boxShadow: activeTab === tab.id ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none'
+                  } : tab.isAudited ? {
+                    background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 95, 70, 0.4))',
+                    border: '1.5px solid #10b981',
+                    color: '#34d399',
+                    fontWeight: 800,
+                    boxShadow: '0 0 14px rgba(16, 185, 129, 0.3)'
+                  } : undefined}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
-
-            <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              <button 
-                type="button"
-                onClick={() => setBlockRoomOpen(true)}
-                className="btn-outline-gold"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                title="Block room for Maintenance or Executive Hold"
-              >
-                <Ban size={13} color="#f87171" /> Block Room
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsRoomRackPrintOpen(true)}
-                className="btn-outline-gold"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                title="Print 27-Room Daily Tape Chart Rack & Arrivals Manifest"
-              >
-                <Printer size={13} color="var(--gold-glow)" /> Room Rack
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsPolicePrintOpen(true)}
-                className="btn-outline-gold"
-                style={{ 
-                  padding: '0.35rem 0.75rem', 
-                  fontSize: '0.74rem', 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: '0.35rem',
-                  borderColor: '#ef4444',
-                  color: '#fca5a5'
-                }}
-                title="Muniguda Police Station Daily Guest Manifest (Form C)"
-              >
-                <ShieldCheck size={13} color="#ef4444" /> Form C
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsLuggageModalOpen(true)}
-                className="btn-outline-gold"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                title="Bell Desk Luggage Custody Tags"
-              >
-                <Briefcase size={13} color="#38bdf8" /> Luggage
-              </button>
-              <button 
-                type="button"
-                onClick={() => setIsWakeUpModalOpen(true)}
-                className="btn-outline-gold"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                title="Pilgrim & Train Wake-Up Call Scheduler"
-              >
-                <Bell size={13} color="#facc15" /> Wake-Up
-              </button>
-              <button 
-                type="button"
-                onClick={() => setBackupOpen(true)}
-                className="btn-outline-gold"
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.74rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                title="Cloudflare D1 & Local JSON Full Backup"
-              >
-                <Database size={13} color="#38bdf8" /> Backup
-              </button>
-            </div>
-          </div>
-
-      {/* Automated Statutory F&B Reconciliation Strip (Rows 1325-1326 Automatic Engine) */}
-      <AutomatedFnbReconciliationStrip
-        liveOrders={foodOrdersList}
-        onOpenFullRegister={onOpenAuditedRestaurantRegister}
-        onOpenCaStation={onOpenCaFilingStation}
-      />
-
-      {/* Navigation Sub-Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: '0.45rem',
-        flexWrap: 'wrap',
-        marginBottom: '1.75rem',
-        background: 'rgba(6, 14, 26, 0.7)',
-        padding: '0.4rem',
-        borderRadius: '10px',
-        border: '1px solid rgba(255, 255, 255, 0.08)'
-      }}>
-        {[
-          { id: 'tape-chart', label: '📊 27-Room Tape Chart Matrix' },
-          { id: 'live-food-orders', label: '🍳 Fenugreek Live Food Orders & KDS', isKds: true },
-          { id: 'd1-database-explorer', label: '🗄️ D1 Live DB Explorer (Master Hub - All 68 Tables)', isHub: true },
-          { id: 'operations-settings', label: '⚙️ Operations & Policy Settings' },
-          { id: 'transit-dayuse', label: '🚆 Transit & Station Transfer' },
-          { id: 'shift-logbook', label: '📋 Shift Handover & Logbook' },
-          { id: 'channel-manager', label: '🌐 OTA Channel & Parity' },
-          { id: 'lost-and-found', label: '🧳 Lost & Found Custody Locker' },
-          { id: 'maintenance-ooo', label: '🔧 Maintenance & OOO Blocker' },
-          { id: 'visualize-bookings', label: '📅 Booking Visualizer & Calendar' },
-          { id: 'occupancy-report', label: '📈 Occupancy Report (Day/Mo/Yr)' },
-          { id: 'cashier-audit', label: '💰 Cashier Shift Handover & Night Audit' },
-          { id: 'audited-sales-register', label: '📊 26-Column Audited Sales & Night Audit Register', isAudited: true },
-          { id: 'housekeeping', label: '🧹 Housekeeping & Linen Tracker' },
-          { id: 'linen-assets', label: '🧺 Linen & Room Assets (Part 3)' },
-          { id: 'staff-payroll', label: '👥 Staff Attendance & Payroll (Part 1)' },
-          { id: 'police-register', label: '🚨 Sarai Act Police Register' },
-          { id: 'dpdp', label: '🛡️ DPDP Act 2023 Compliance' }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => {
-              if (tab.id === 'audited-sales-register') {
-                if (onOpenAuditedSalesRegister) onOpenAuditedSalesRegister();
-              } else {
-                setActiveTab(tab.id);
-              }
-            }}
-            className={`enterprise-tab-pill ${activeTab === tab.id ? 'active' : ''}`}
-            style={tab.isKds ? {
-              background: activeTab === tab.id 
-                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.35))' 
-                : 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12))',
-              border: activeTab === tab.id 
-                ? '1.5px solid #fbbf24' 
-                : '1px solid rgba(251, 191, 36, 0.6)',
-              color: activeTab === tab.id ? '#ffffff' : '#fbbf24',
-              fontWeight: 800,
-              boxShadow: activeTab === tab.id ? '0 0 16px rgba(251, 191, 36, 0.45)' : 'none'
-            } : tab.isHub ? {
-              background: activeTab === tab.id 
-                ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(14, 165, 233, 0.3))' 
-                : 'linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(14, 165, 233, 0.1))',
-              border: activeTab === tab.id 
-                ? '1.5px solid #38bdf8' 
-                : '1px solid rgba(56, 189, 248, 0.5)',
-              color: activeTab === tab.id ? '#ffffff' : '#38bdf8',
-              fontWeight: 800,
-              boxShadow: activeTab === tab.id ? '0 0 16px rgba(56, 189, 248, 0.4)' : 'none'
-            } : tab.isAudited ? {
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 95, 70, 0.4))',
-              border: '1.5px solid #10b981',
-              color: '#34d399',
-              fontWeight: 800,
-              boxShadow: '0 0 14px rgba(16, 185, 129, 0.3)'
-            } : undefined}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+          )}
 
       {/* Universal Two-Way Item Update Handler for Pop-Up Modal */}
       {(() => {

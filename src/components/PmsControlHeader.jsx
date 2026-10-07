@@ -176,55 +176,6 @@ export default function PmsControlHeader({
           </button>
         )}
 
-        {/* System #36: CA Filing Station */}
-        {onOpenCaFilingStation && (
-          <button
-            type="button"
-            onClick={onOpenCaFilingStation}
-            style={{
-              background: 'rgba(212, 175, 55, 0.12)',
-              border: '1px solid rgba(212, 175, 55, 0.35)',
-              color: 'var(--gold-glow)',
-              borderRadius: '6px',
-              padding: '3px 8px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-            title="Open System #36: CA Filing Station & Financial Intelligence"
-          >
-            <Scale size={13} color="var(--gold-glow)" />
-            <span>CA Station</span>
-          </button>
-        )}
-
-        {/* 26-Col Audited Register */}
-        {onOpenAuditedSalesRegister && (
-          <button
-            type="button"
-            onClick={onOpenAuditedSalesRegister}
-            style={{
-              background: 'rgba(52, 211, 153, 0.12)',
-              border: '1px solid rgba(52, 211, 153, 0.35)',
-              color: '#34d399',
-              borderRadius: '6px',
-              padding: '3px 8px',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-            title="Open 26-Column Audited Sales Register (F9)"
-          >
-            <FileSpreadsheet size={13} color="#34d399" />
-            <span>26-Col</span>
-          </button>
-        )}
 
         {/* Shift Cash Drawer Pill */}
         <div style={{
