@@ -123,22 +123,15 @@ export default function BookingReceiptModal({
       const tariff = Number(booking.tariffPerNight || booking.tariff || 1699);
       const foodAmt = Number(booking.foodAmount || 0);
 
+      const tracking = resolveAllTrackingNumbers(booking, { roomNumber: booking.roomNumber });
       setEditHeader({
         guestName: booking.guestName || 'Valued Guest',
-        guestPhone: booking.guestPhone || '',
-        company: booking.company || (booking.billingType === 'BTC' ? (booking.companyName || 'Corporate BTC') : 'Individual'),
+        guestPhone: booking.guestPhone || '+91 94370 22555',
+        company: booking.company || (booking.billingType === 'BTC' ? (booking.companyName || 'Corporate BTC Account') : 'Direct Individual Guest'),
         corporateGstin: booking.corporateGstin || '',
         billingAddress: booking.billingAddress || (booking.origin ? `${booking.origin} Visitor` : 'Rayagada - 765001'),
         stateCode: booking.corporateGstin?.slice(0, 2) || (booking.isInterstate ? '28' : '21'),
-        const tracking = resolveAllTrackingNumbers(booking, { roomNumber: booking.roomNumber });
-        setEditHeader({
-          guestName: booking.guestName || 'Valued Guest',
-          guestPhone: booking.guestPhone || '+91 94370 22555',
-          company: booking.company || (booking.billingType === 'BTC' ? 'Corporate BTC Account' : 'Direct Individual Guest'),
-          corporateGstin: booking.corporateGstin || '',
-          billingAddress: booking.billingAddress || (booking.origin ? `${booking.origin} Visitor` : 'Rayagada - 765001'),
-          stateCode: booking.corporateGstin?.slice(0, 2) || (booking.isInterstate ? '28' : '21'),
-          stateName: booking.corporateGstin?.slice(0, 2) === '21' || !booking.isInterstate ? 'Odisha' : 'Other State',
+        stateName: booking.corporateGstin?.slice(0, 2) === '21' || !booking.isInterstate ? 'Odisha' : 'Other State',
           roomNumber: String(booking.roomNumber || '101'),
           tier: booking.tier || 'Deluxe Room',
           planCode: booking.mealPlan || booking.plan || 'EP',
