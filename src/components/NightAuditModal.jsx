@@ -9,6 +9,7 @@ import { HOTEL_CONFIG, INITIAL_NIGHT_AUDITS } from '../data/hotelData';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { sendNightAuditFlashWhatsApp, sendOwnerMorningFlashWhatsApp } from '../utils/whatsappDispatch';
 import { AUTHENTIC_OWNER_AUDIT_REPORTS, formatOwnerRawFlashText, formatUpgradedExecutiveFlashText } from '../data/dailyFlashReports';
+import { sealDailyFnbStatutoryRecord, computeDailyStatutoryRecord } from '../utils/fnbStatutoryLedger';
 
 
 export default function NightAuditModal({
@@ -81,8 +82,12 @@ export default function NightAuditModal({
     return 11967.07; // Historic baseline fallback
   }, [foodOrders]);
 
+  const liveFnbStatutory = React.useMemo(() => {
+    return computeDailyStatutoryRecord(foodOrders, businessDate);
+  }, [foodOrders, businessDate]);
+
   const roomRevenue = dynamicRoomRevenue;
-  const fnbRevenue = dynamicFnbRevenue;
+  const fnbRevenue = liveFnbStatutory?.totalAmount || dynamicFnbRevenue;
   const otherRevenue = 0.00;
   const grossRevenue = roomRevenue + fnbRevenue + otherRevenue;
 
@@ -198,6 +203,9 @@ export default function NightAuditModal({
     setIsSealing(true);
     setSealProgress(20);
 
+    // Seal that day's F&B statutory tax ledger (freeze tax liability & save to continuous ledger)
+    const fnbStatutory = sealDailyFnbStatutoryRecord(businessDate, foodOrders);
+
     const auditPayload = {
       auditId: `NA-${businessDate}`,
       businessDate,
@@ -208,9 +216,10 @@ export default function NightAuditModal({
       adr: parseFloat(adr),
       revpar: parseFloat(revpar),
       roomRevenue,
-      fnbRevenue,
+      fnbRevenue: fnbStatutory?.totalAmount || fnbRevenue,
       otherRevenue,
-      grossRevenue,
+      grossRevenue: roomRevenue + (fnbStatutory?.totalAmount || fnbRevenue) + otherRevenue,
+      fnbStatutory,
       cashCollected,
       upiCollected,
       cardCollected,
@@ -1196,10 +1205,10 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                         <span style={{ color: '#34d399', fontSize: '0.68rem' }}>MGM Auto-Separated</span>
                       </div>
                       <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                        Gross F&amp;B: ₹{fnbRevenue.toFixed(2)} | Less MGM: -₹1,420.00 (0% Tax)<br/>
-                        Net Taxable Base: <strong>₹{Math.max(0, (fnbRevenue - 1420.00) / 1.05).toFixed(2)}</strong><br/>
-                        CGST (2.5%) + SGST (2.5%): <strong>₹{(Math.max(0, fnbRevenue - 1420.00) - Math.max(0, (fnbRevenue - 1420.00) / 1.05)).toFixed(2)}</strong><br/>
-                        <span style={{ color: '#fda4af', fontWeight: 600 }}>💰 ₹71.00 GST Saved by Auto-MGM Isolation</span>
+                        Gross F&amp;B: ₹{(liveFnbStatutory?.grossAmount || 0).toFixed(2)} | Less MGM: -₹{(liveFnbStatutory?.mgmAmount || 0).toFixed(2)} (0% Tax)<br/>
+                        Net Taxable Base: <strong>₹{(liveFnbStatutory?.taxableBase || 0).toFixed(2)}</strong><br/>
+                        CGST (2.5%) + SGST (2.5%): <strong>₹{(liveFnbStatutory?.totalGst || 0).toFixed(2)}</strong> (Total Supply: ₹{(liveFnbStatutory?.totalAmount || 0).toFixed(2)})<br/>
+                        <span style={{ color: '#fda4af', fontWeight: 600 }}>💰 ₹{(liveFnbStatutory?.taxSaved || 0).toFixed(2)} GST Legally Saved by MGM Table 444/555 Exemption</span>
                       </div>
                     </div>
 

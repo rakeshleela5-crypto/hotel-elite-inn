@@ -202,7 +202,8 @@ export async function onRequestGet({ request, env }) {
       tableSettlementsRes,
       corporateQuotationsRes,
       invoicePrintLogsRes,
-      inlineOverridesRes
+      inlineOverridesRes,
+      fnbDailyStatutoryLedgerRes
     ] = await Promise.all([
       db.prepare("SELECT * FROM rooms ORDER BY floor ASC, room_number ASC").all(),
       db.prepare("SELECT * FROM bookings ORDER BY created_at DESC LIMIT 100").all(),
@@ -246,7 +247,8 @@ export async function onRequestGet({ request, env }) {
       db.prepare("SELECT * FROM restaurant_table_settlements ORDER BY settled_at DESC LIMIT 50").all().catch(() => ({ results: [] })),
       db.prepare("SELECT * FROM corporate_quotations ORDER BY created_at DESC LIMIT 50").all().catch(() => ({ results: [] })),
       db.prepare("SELECT * FROM invoice_print_audit_logs ORDER BY printed_at DESC LIMIT 50").all().catch(() => ({ results: [] })),
-      db.prepare("SELECT * FROM universal_inline_overrides ORDER BY updated_at DESC LIMIT 200").all().catch(() => ({ results: [] }))
+      db.prepare("SELECT * FROM universal_inline_overrides ORDER BY updated_at DESC LIMIT 200").all().catch(() => ({ results: [] })),
+      db.prepare("SELECT * FROM fnb_daily_statutory_ledger ORDER BY date DESC LIMIT 60").all().catch(() => ({ results: [] }))
     ]);
 
     // Parse food order items JSON
@@ -388,7 +390,8 @@ export async function onRequestGet({ request, env }) {
         restaurantTableSettlements: tableSettlementsRes?.results || [],
         corporateQuotations: corporateQuotationsRes?.results || [],
         invoicePrintAuditLogs: invoicePrintLogsRes?.results || [],
-        universalInlineOverrides: inlineOverridesRes?.results || []
+        universalInlineOverrides: inlineOverridesRes?.results || [],
+        fnbDailyStatutoryLedger: fnbDailyStatutoryLedgerRes?.results || []
       }
     });
   } catch (error) {
@@ -1179,7 +1182,93 @@ export async function onRequestPost({ request, env }) {
         UPDATE folio_transactions SET is_locked = 1 WHERE is_locked = 0
       `).run();
 
+      // 3. HARD LOCK & SEAL F&B Statutory Ledger if provided in payload
+      if (audit.fnbStatutory) {
+        const fnb = audit.fnbStatutory;
+        try {
+          await db.prepare(`
+            INSERT INTO fnb_daily_statutory_ledger (
+              date, day_number, bills_count, food_amount, bev_amount, gross_amount,
+              discount, mgm_amount, taxable_base, cgst, sgst, total_gst, total_amount,
+              tax_saved, settlement_json, status, sealed_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Audited & Locked', datetime('now'), datetime('now'))
+            ON CONFLICT(date) DO UPDATE SET
+              bills_count = excluded.bills_count,
+              food_amount = excluded.food_amount,
+              bev_amount = excluded.bev_amount,
+              gross_amount = excluded.gross_amount,
+              discount = excluded.discount,
+              mgm_amount = excluded.mgm_amount,
+              taxable_base = excluded.taxable_base,
+              cgst = excluded.cgst,
+              sgst = excluded.sgst,
+              total_gst = excluded.total_gst,
+              total_amount = excluded.total_amount,
+              tax_saved = excluded.tax_saved,
+              settlement_json = excluded.settlement_json,
+              status = 'Audited & Locked',
+              sealed_at = datetime('now'),
+              updated_at = datetime('now')
+          `).bind(
+            fnb.date || audit.businessDate,
+            fnb.dayNumber || parseInt(audit.businessDate.slice(-2), 10),
+            fnb.billsCount || 0,
+            fnb.foodAmount || 0,
+            fnb.bevAmount || 0,
+            fnb.grossAmount || 0,
+            fnb.discount || 0,
+            fnb.mgmAmount || 0,
+            fnb.taxableBase || 0,
+            fnb.cgst || 0,
+            fnb.sgst || 0,
+            fnb.totalGst || 0,
+            fnb.totalAmount || 0,
+            fnb.taxSaved || 0,
+            JSON.stringify(fnb.settlement || {})
+          ).run();
+        } catch (e) {
+          console.warn('FNB statutory lock in night audit warning:', e);
+        }
+      }
+
       return jsonResponse({ success: true, auditId, locked: true });
+    }
+
+    // 14b. F&B STATUTORY: Seal Single Day F&B Tax Ledger
+    if (action === 'seal_fnb_daily_statutory') {
+      const rec = payload;
+      await db.prepare(`
+        INSERT INTO fnb_daily_statutory_ledger (
+          date, day_number, bills_count, food_amount, bev_amount, gross_amount,
+          discount, mgm_amount, taxable_base, cgst, sgst, total_gst, total_amount,
+          tax_saved, settlement_json, status, sealed_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(date) DO UPDATE SET
+          bills_count = excluded.bills_count,
+          food_amount = excluded.food_amount,
+          bev_amount = excluded.bev_amount,
+          gross_amount = excluded.gross_amount,
+          discount = excluded.discount,
+          mgm_amount = excluded.mgm_amount,
+          taxable_base = excluded.taxable_base,
+          cgst = excluded.cgst,
+          sgst = excluded.sgst,
+          total_gst = excluded.total_gst,
+          total_amount = excluded.total_amount,
+          tax_saved = excluded.tax_saved,
+          settlement_json = excluded.settlement_json,
+          status = excluded.status,
+          sealed_at = excluded.sealed_at,
+          updated_at = datetime('now')
+      `).bind(
+        rec.date, rec.dayNumber || parseInt(rec.date.slice(-2), 10), rec.billsCount || 0,
+        rec.foodAmount || 0, rec.bevAmount || 0, rec.grossAmount || 0,
+        rec.discount || 0, rec.mgmAmount || 0, rec.taxableBase || 0,
+        rec.cgst || 0, rec.sgst || 0, rec.totalGst || 0, rec.totalAmount || 0,
+        rec.taxSaved || 0, JSON.stringify(rec.settlement || {}), rec.status || 'Audited & Locked',
+        rec.sealedAt || new Date().toISOString()
+      ).run();
+      return jsonResponse({ success: true, date: rec.date });
     }
 
     // 15. ERP STORE: Record Mandi Raw Material Purchase

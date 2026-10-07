@@ -35,16 +35,49 @@ export default function AutomatedFnbReconciliationStrip({
   const [dataMode, setDataMode] = useState('live');
   const [showDailyLedgerTable, setShowDailyLedgerTable] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
+  const [lastUpdatePing, setLastUpdatePing] = useState(0);
+
+  // Synchronized Event Listeners for Live Operations & Midnight Day Seals
+  React.useEffect(() => {
+    let bc;
+    try {
+      bc = new BroadcastChannel('hotel_elite_inn_live_kds');
+      bc.onmessage = (event) => {
+        if (event && event.data) {
+          const type = event.data.type;
+          if (type === 'NEW_KOT_ORDER' || type === 'FNB_STATUTORY_SEALED' || type === 'TABLE_SETTLED' || type === 'NIGHT_AUDIT_COMPLETED') {
+            setLastUpdatePing(p => p + 1);
+          }
+        }
+      };
+    } catch (e) {}
+
+    const handleCustomUpdate = () => setLastUpdatePing(p => p + 1);
+    const handleStorage = (e) => {
+      if (e.key === 'hotel_elite_inn_live_kots' || e.key === 'hotel_elite_inn_fnb_daily_statutory_ledger' || e.key === 'hotel_elite_inn_business_date') {
+        setLastUpdatePing(p => p + 1);
+      }
+    };
+
+    window.addEventListener('fnb_statutory_updated', handleCustomUpdate);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (bc) bc.close();
+      window.removeEventListener('fnb_statutory_updated', handleCustomUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
 
   // 1. Current Live Today Record
   const todayRecord = useMemo(() => {
     return computeTodayStatutoryRecord(liveOrders);
-  }, [liveOrders]);
+  }, [liveOrders, lastUpdatePing]);
 
   // 2. Full Month-to-Date Ledger (Days 1 to 31 for Current Month)
   const currentMonthDailyRecords = useMemo(() => {
     return getCurrentMonthDayToDateLedger(liveOrders);
-  }, [liveOrders]);
+  }, [liveOrders, lastUpdatePing]);
 
   // 3. June 2026 Historical Daily Records (30 Days from 1,320 Bills)
   const juneDailyRecords = useMemo(() => {
@@ -711,13 +744,16 @@ export default function AutomatedFnbReconciliationStrip({
                         borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
                       }}
                     >
-                      <td style={{ textAlign: 'center', padding: '0.4rem', fontWeight: 800, color: isToday ? '#10b981' : '#94a3b8' }}>
-                        {r.dayNumber} {isToday && '⚡'}
+                      <td style={{ textAlign: 'center', padding: '0.4rem', fontWeight: 800, color: isToday ? '#10b981' : r.status === 'Audited & Locked' ? 'var(--gold-glow)' : '#94a3b8' }}>
+                        {r.dayNumber} {isToday ? '⚡' : r.status === 'Audited & Locked' ? '🔒' : ''}
                       </td>
                       <td style={{ textAlign: 'center', padding: '0.4rem', fontFamily: 'monospace', color: '#e2e8f0' }}>
                         {r.date}
                       </td>
-                      <td style={{ textAlign: 'center', padding: '0.4rem', color: '#cbd5e1' }}>
+                      <td 
+                        style={{ textAlign: 'center', padding: '0.4rem', color: '#cbd5e1', cursor: r.settlement ? 'help' : 'default' }}
+                        title={r.settlement ? `Cash: ₹${(r.settlement.cash || 0).toLocaleString('en-IN')} | UPI: ₹${(r.settlement.upi || 0).toLocaleString('en-IN')} | Card: ₹${(r.settlement.card || 0).toLocaleString('en-IN')} | Room: ₹${(r.settlement.roomFolio || 0).toLocaleString('en-IN')}` : undefined}
+                      >
                         {r.billsCount || '-'}
                       </td>
                       <td style={{ textAlign: 'right', padding: '0.4rem', color: '#34d399', fontFamily: 'monospace' }}>
