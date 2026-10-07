@@ -9,6 +9,14 @@ import {
 import { HOTEL_CONFIG } from '../data/hotelData';
 import { DigitalKeycard } from '@/components/ui/digital-keycard';
 import { SheetsEditableCell, useUniversalInlineEdit, InlineEditorBanner, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
+import { 
+  resolveAllTrackingNumbers, 
+  formatInvoiceNumber, 
+  formatFolioNumber, 
+  formatMoneyReceiptNumber, 
+  formatKotNumber, 
+  formatTransactionBillId 
+} from '../utils/trackingNumbers';
 
 // Indian Numbering System Converter for Statutory Tax Invoices
 function convertNumberToIndianWords(num) {
@@ -122,15 +130,28 @@ export default function BookingReceiptModal({
         corporateGstin: booking.corporateGstin || '',
         billingAddress: booking.billingAddress || (booking.origin ? `${booking.origin} Visitor` : 'Rayagada - 765001'),
         stateCode: booking.corporateGstin?.slice(0, 2) || (booking.isInterstate ? '28' : '21'),
-        stateName: booking.corporateGstin?.slice(0, 2) === '21' || !booking.isInterstate ? 'Odisha' : 'Other State',
-        roomNumber: String(booking.roomNumber || '101'),
-        tier: booking.tier || 'Deluxe Room',
-        planCode: booking.mealPlan || booking.plan || 'EP',
-        grcNo: booking.grcNo || `GRC-${booking.roomNumber || '101'}`,
-        checkInDate: booking.checkInDate || new Date().toISOString().split('T')[0],
-        checkOutDate: booking.checkOutDate || new Date(Date.now() + nights * 86400000).toISOString().split('T')[0],
-        billNo: booking.billNo || (booking.receiptNo || `HSI/MR/26-27/${booking.roomNumber || '101'}-${Date.now().toString().slice(-4)}`)
-      });
+        const tracking = resolveAllTrackingNumbers(booking, { roomNumber: booking.roomNumber });
+        setEditHeader({
+          guestName: booking.guestName || 'Valued Guest',
+          guestPhone: booking.guestPhone || '+91 94370 22555',
+          company: booking.company || (booking.billingType === 'BTC' ? 'Corporate BTC Account' : 'Direct Individual Guest'),
+          corporateGstin: booking.corporateGstin || '',
+          billingAddress: booking.billingAddress || (booking.origin ? `${booking.origin} Visitor` : 'Rayagada - 765001'),
+          stateCode: booking.corporateGstin?.slice(0, 2) || (booking.isInterstate ? '28' : '21'),
+          stateName: booking.corporateGstin?.slice(0, 2) === '21' || !booking.isInterstate ? 'Odisha' : 'Other State',
+          roomNumber: String(booking.roomNumber || '101'),
+          tier: booking.tier || 'Deluxe Room',
+          planCode: booking.mealPlan || booking.plan || 'EP',
+          grcNo: booking.grcNo || `GRC-${booking.roomNumber || '101'}`,
+          checkInDate: booking.checkInDate || new Date().toISOString().split('T')[0],
+          checkOutDate: booking.checkOutDate || new Date(Date.now() + nights * 86400000).toISOString().split('T')[0],
+          billNo: booking.billNo || booking.invoiceNo || tracking.invoiceNumber,
+          invoiceNo: booking.invoiceNo || booking.billNo || tracking.invoiceNumber,
+          folioNo: booking.folioNo || tracking.folioNumber,
+          moneyReceiptNo: booking.receiptNo || booking.moneyReceiptNo || tracking.moneyReceiptNumber,
+          kotNumbers: tracking.kotNumbers,
+          transactionBillId: booking.txnId || booking.transactionBillId || tracking.transactionBillId
+        });
 
       // Initial line items - ONLY add food if guest has actually ordered food
       const initialItems = [
@@ -535,7 +556,9 @@ export default function BookingReceiptModal({
     
     let msg = '';
     if (invoiceType === 'money-receipt') {
-      const receiptNum = booking?.receiptNo || editHeader.billNo || `HSI/MR/26-27/${editHeader.roomNumber || '101'}`;
+      const receiptNum = editHeader.moneyReceiptNo || booking?.receiptNo || formatMoneyReceiptNumber(null, editHeader.roomNumber);
+      const folioNum = editHeader.folioNo || formatFolioNumber(editHeader.roomNumber);
+      const txnId = editHeader.transactionBillId || formatTransactionBillId('MR', editHeader.roomNumber);
       msg = 
 `*HOTEL ELITE INN - CHECK-IN MONEY RECEIPT & WELCOME PASS*
 🏛️ *Opposite Railway Station Main Road, Muniguda, Rayagada - 765020*
@@ -545,7 +568,9 @@ Namaste *${editHeader.guestName || booking?.guestName || 'Valued Guest'}* ji! �
 
 Welcome to Hotel Elite Inn! Your check-in is complete and physical room key has been handed over.
 
-🧾 *Receipt No:* ${receiptNum}
+💰 *Money Receipt No:* ${receiptNum}
+🏨 *Master Folio No:* ${folioNum}
+💳 *Transaction Bill ID:* ${txnId}
 🚪 *Allocated Room:* Room ${editHeader.roomNumber || booking?.roomNumber} (${editHeader.tier || booking?.tier || 'Deluxe Room'})
 📅 *Check-In Date:* ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
 💵 *Advance Deposit Received:* ₹${advancePaid.toLocaleString('en-IN')} via ${booking?.paymentMode || 'Cash/UPI'}
@@ -557,6 +582,10 @@ Welcome to Hotel Elite Inn! Your check-in is complete and physical room key has 
 
 We wish you a pleasant and peaceful stay! Jay Jagannath! 🙏`;
     } else {
+      const invNum = editHeader.invoiceNo || editHeader.billNo || billNo;
+      const folioNum = editHeader.folioNo || formatFolioNumber(editHeader.roomNumber);
+      const receiptRef = editHeader.moneyReceiptNo || formatMoneyReceiptNumber(null, editHeader.roomNumber);
+      const txnId = editHeader.transactionBillId || formatTransactionBillId('CHK', editHeader.roomNumber);
       msg = 
 `*HOTEL ELITE INN - OFFICIAL GST TAX INVOICE*
 🏛️ *Opposite Railway Station Main Road, Muniguda, Odisha - 765020*
@@ -566,7 +595,10 @@ Dear *${editHeader.guestName || booking?.guestName || 'Valued Guest'}*,
 
 Thank you for choosing Hotel Elite Inn! Here is your official GST tax folio summary:
 
-📄 *Bill / Invoice No:* ${billNo}
+📄 *Tax Invoice No:* ${invNum}
+🏨 *Master Folio No:* ${folioNum}
+💰 *Linked Money Receipt:* ${receiptRef}
+💳 *Transaction Bill ID:* ${txnId}
 🚪 *Room Number:* ${editHeader.roomNumber || booking?.roomNumber} (${editHeader.tier || booking?.tier || 'Deluxe Room'})
 📅 *Stay Duration:* ${editHeader.checkInDate || booking?.checkInDate} to ${editHeader.checkOutDate || booking?.checkOutDate}
 🏷️ *Tax Category:* ${isNonGstBill ? 'Exempt / Non-GST' : `${gstSlab}% GST (${taxType === 'intra' ? 'CGST+SGST' : 'IGST'})`}
@@ -578,7 +610,7 @@ Thank you for choosing Hotel Elite Inn! Here is your official GST tax folio summ
 ${balanceDue > 0 ? `⚠️ *Balance Payable at Desk:* ₹${balanceDue.toLocaleString('en-IN')}` : '✨ *Settlement Status:* Fully Settled & Cleared'}
 
 🔗 *View Digital Folio & RFID Keycard:*
-${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || booking?.roomNumber}
+${window.location.origin}/?bill=${invNum}&room=${editHeader.roomNumber || booking?.roomNumber}
 
 🙏 *We wish you a pleasant journey! Jay Jagannath!*`;
     }
@@ -1194,19 +1226,33 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             <div className="particulars-grid">
               <div className="particulars-col">
                 <div className="field-row">
-                  <span className="field-label">Bill / Invoice No.</span>
+                  <span className="field-label">Tax Invoice No.</span>
                   <span className="field-colon">:</span>
                   <span className="field-value">
                     {isLiveEditMode ? (
                       <input 
                         type="text" 
-                        value={editHeader.billNo} 
-                        onChange={(e) => setEditHeader(prev => ({ ...prev, billNo: e.target.value }))}
-                        style={{ border: '1px dashed #cbd5e1', padding: '1px 4px', fontSize: '10px', fontWeight: 'bold', width: '150px' }}
+                        value={editHeader.invoiceNo || editHeader.billNo} 
+                        onChange={(e) => setEditHeader(prev => ({ ...prev, billNo: e.target.value, invoiceNo: e.target.value }))}
+                        style={{ border: '1px dashed #cbd5e1', padding: '1px 4px', fontSize: '10px', fontWeight: 'bold', width: '160px' }}
                       />
                     ) : (
-                      <strong style={{ color: '#0f172a' }}>{billNo}</strong>
+                      <strong style={{ color: '#0f172a' }}>{editHeader.invoiceNo || editHeader.billNo || billNo}</strong>
                     )}
+                  </span>
+                </div>
+                <div className="field-row">
+                  <span className="field-label">Master Folio No.</span>
+                  <span className="field-colon">:</span>
+                  <span className="field-value">
+                    <strong style={{ color: '#0369a1' }}>{editHeader.folioNo || formatFolioNumber(editHeader.roomNumber)}</strong>
+                  </span>
+                </div>
+                <div className="field-row">
+                  <span className="field-label">Money Receipt Ref</span>
+                  <span className="field-colon">:</span>
+                  <span className="field-value">
+                    <strong style={{ color: '#059669' }}>{editHeader.moneyReceiptNo || formatMoneyReceiptNumber(null, editHeader.roomNumber)}</strong>
                   </span>
                 </div>
                 <div className="field-row">
@@ -2183,9 +2229,15 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                   MONEY RECEIPT
                 </div>
                 <div style={{ fontSize: '11px', color: '#0f172a', marginTop: '2px' }}>
-                  Receipt No: <strong>{booking?.receiptNo || editHeader.billNo || `HSI/MR/26-27/${editHeader.roomNumber || '101'}`}</strong>
+                  Receipt No: <strong>{editHeader.moneyReceiptNo || booking?.receiptNo || formatMoneyReceiptNumber(null, editHeader.roomNumber)}</strong>
                 </div>
-                <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
+                <div style={{ fontSize: '10px', color: '#0369a1', marginTop: '1px' }}>
+                  Master Folio No: <strong>{editHeader.folioNo || formatFolioNumber(editHeader.roomNumber)}</strong>
+                </div>
+                <div style={{ fontSize: '10px', color: '#475569', marginTop: '1px' }}>
+                  Tax Invoice Ref: <strong>{editHeader.invoiceNo || editHeader.billNo || billNo}</strong>
+                </div>
+                <div style={{ fontSize: '10px', color: '#64748b', marginTop: '1px' }}>
                   Date: <strong>{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</strong> ({new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })})
                 </div>
               </div>
@@ -2251,6 +2303,16 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                 </span>
                 <span style={{ color: '#475569', fontSize: '11px' }}>
                   Rate: <strong>₹{Number(booking?.tariffPerNight || booking?.tariff || 1699).toLocaleString('en-IN')}/Night</strong>
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>Transaction Bill ID :</span>
+                <span style={{ flex: 1, color: '#0f172a', fontFamily: 'monospace', fontWeight: 700 }}>
+                  {editHeader.transactionBillId || formatTransactionBillId('MR', editHeader.roomNumber)}
+                </span>
+                <span style={{ color: '#64748b', fontSize: '11px' }}>
+                  Linked KOT(s): <strong>{editHeader.kotNumbers?.join(', ') || 'N/A (Room Stay)'}</strong>
                 </span>
               </div>
             </div>
@@ -2391,8 +2453,11 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             </div>
 
             <div style={{ fontSize: '0.78rem', lineHeight: 1.5, borderBottom: '1px solid #cbd5e1', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-              <div><strong>BILL NO:</strong> {billNo}</div>
-              <div><strong>DATE:</strong> {new Date().toLocaleDateString('en-IN')}</div>
+              <div><strong>TRANSACTION BILL ID:</strong> <span style={{ color: '#0369a1' }}>{editHeader.transactionBillId || formatTransactionBillId('POS', editHeader.roomNumber)}</span></div>
+              <div><strong>ROOM FOLIO NO:</strong> <span>{editHeader.folioNo || formatFolioNumber(editHeader.roomNumber)}</span></div>
+              <div><strong>TAX INVOICE NO:</strong> <span>{editHeader.invoiceNo || editHeader.billNo || billNo}</span></div>
+              <div><strong>KOT PRODUCTION NO:</strong> <span>{editHeader.kotNumbers?.[0] || 'CK-KOT-01'}</span></div>
+              <div><strong>DATE:</strong> {new Date().toLocaleDateString('en-IN')} {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</div>
               <div><strong>GUEST:</strong> {editHeader.guestName || booking?.guestName || 'Valued Guest'}</div>
               <div><strong>COMPANY:</strong> {editHeader.company || booking?.company || 'Direct Guest'}</div>
               <div><strong>ROOM:</strong> {editHeader.roomNumber || booking?.roomNumber} ({editHeader.tier || booking?.tier})</div>

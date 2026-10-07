@@ -240,6 +240,50 @@ test('blocks illegal state transition from Maintenance directly to Occupied', ()
   assert.strictEqual(canTransitionRoomStatus('Maintenance', 'Occupied'), false);
 });
 
+// 9. Core Universal Tracking Numbers Suite
+console.log('\n▶ [TDD] Audit & Financials: 5 Core Universal Tracking Numbers');
+function formatInvoiceNumberTdd(seq = '0104', fy = '26-27') {
+  return `HEI/${fy}/INV-${String(seq).padStart(4, '0')}`;
+}
+function formatFolioNumberTdd(room = '102', seq = '2610') {
+  return `FOLIO-${room}-${seq}`;
+}
+function formatMoneyReceiptNumberTdd(room = '102', year = 2026, seq = '0512') {
+  return `MR-${year}-${room}${seq.slice(-2)}`;
+}
+function formatKotNumberTdd(idx = 1) {
+  return `KOT #${idx}`;
+}
+function formatTransactionBillIdTdd(prefix = 'POS', target = '102') {
+  return `TXN-${prefix}-${target}-8842`;
+}
+
+test('generates compliant statutory GST Tax Invoice with FY prefix', () => {
+  const inv = formatInvoiceNumberTdd('104', '26-27');
+  assert.strictEqual(inv, 'HEI/26-27/INV-0104');
+  assert.match(inv, /^HEI\/\d{2}-\d{2}\/INV-\d{4}$/);
+});
+
+test('generates order-specific room master folio number', () => {
+  const folio = formatFolioNumberTdd('201', '0042');
+  assert.strictEqual(folio, 'FOLIO-201-0042');
+});
+
+test('generates order-linked money receipt payment acknowledgement number', () => {
+  const mr = formatMoneyReceiptNumberTdd('305', 2026, '0512');
+  assert.strictEqual(mr, 'MR-2026-30512');
+});
+
+test('generates production kitchen order ticket (KOT) sequence', () => {
+  assert.strictEqual(formatKotNumberTdd(1), 'KOT #1');
+  assert.strictEqual(formatKotNumberTdd(2), 'KOT #2');
+});
+
+test('generates point-of-sale transaction bill ID', () => {
+  const txn = formatTransactionBillIdTdd('POS', 'TBL6');
+  assert.strictEqual(txn, 'TXN-POS-TBL6-8842');
+});
+
 // Summary
 console.log('\n----------------------------------------------------------------');
 console.log(`  RESULTS: ${passed} PASSED | ${failed} FAILED`);

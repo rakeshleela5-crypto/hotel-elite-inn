@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
 import { sendCheckoutSplitWhatsApp } from '../utils/whatsappDispatch';
+import { resolveAllTrackingNumbers } from '../utils/trackingNumbers';
 
 export default function CheckoutSplitModal({
   isOpen,
@@ -331,6 +332,8 @@ export default function CheckoutSplitModal({
       if (effectiveNumBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany || 'Company'}): ₹${effectiveNumBtc.toLocaleString('en-IN')}`);
     }
 
+    const tracking = resolveAllTrackingNumbers(matchedBooking || {}, { roomNumber: activeRoom.roomNumber });
+
     const settlementPayload = {
       roomNumber: String(activeRoom.roomNumber),
       guestName: activeRoom.effectiveGuestName || activeRoom.currentGuestName || matchedBooking?.guestName || 'Valued Guest',
@@ -348,7 +351,12 @@ export default function CheckoutSplitModal({
       nights: stayDuration.nights || 1,
       checkInDate: stayDuration.checkInStr,
       checkOutDate: new Date().toISOString().split('T')[0],
-      billNo: matchedBooking?.billNo || `FMBIL2627-${activeRoom.roomNumber}`,
+      billNo: matchedBooking?.billNo || tracking.invoiceNumber,
+      invoiceNo: matchedBooking?.invoiceNo || matchedBooking?.billNo || tracking.invoiceNumber,
+      folioNo: matchedBooking?.folioNo || tracking.folioNumber,
+      moneyReceiptNo: matchedBooking?.receiptNo || tracking.moneyReceiptNumber,
+      kotNumbers: tracking.kotNumbers,
+      transactionBillId: tracking.transactionBillId,
       settlementTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       settlementDate: new Date().toLocaleDateString('en-IN'),
       isRefund: isRefundDue,
