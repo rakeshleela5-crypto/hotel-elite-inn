@@ -10,6 +10,7 @@ import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { sendNightAuditFlashWhatsApp, sendOwnerMorningFlashWhatsApp } from '../utils/whatsappDispatch';
 import { AUTHENTIC_OWNER_AUDIT_REPORTS, formatOwnerRawFlashText, formatUpgradedExecutiveFlashText } from '../data/dailyFlashReports';
 import { sealDailyFnbStatutoryRecord, computeDailyStatutoryRecord } from '../utils/fnbStatutoryLedger';
+import { sealDailyPmsAuditRecord } from '../utils/pmsMasterAuditLedger';
 
 
 export default function NightAuditModal({
@@ -206,6 +207,9 @@ export default function NightAuditModal({
     // Seal that day's F&B statutory tax ledger (freeze tax liability & save to continuous ledger)
     const fnbStatutory = sealDailyFnbStatutoryRecord(businessDate, foodOrders);
 
+    // Seal that day's 26-column PMS master audit ledger (freeze all 26 columns in D1 and local storage)
+    const pmsAudit = sealDailyPmsAuditRecord(businessDate, rooms, bookings, transactions, foodOrders);
+
     const auditPayload = {
       auditId: `NA-${businessDate}`,
       businessDate,
@@ -220,6 +224,7 @@ export default function NightAuditModal({
       otherRevenue,
       grossRevenue: roomRevenue + (fnbStatutory?.totalAmount || fnbRevenue) + otherRevenue,
       fnbStatutory,
+      pmsAudit,
       cashCollected,
       upiCollected,
       cardCollected,

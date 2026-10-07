@@ -45,19 +45,55 @@ export default function AuditedSalesRegisterModal({
       : getOctober2026SalesRecords(rooms, bookings, foodOrders);
   });
 
-  // Synchronize records when month changes
+  const [lastUpdatePing, setLastUpdatePing] = useState(0);
+
+  // Synchronized Event Listeners for Live Operations & Midnight Day Seals
+  useEffect(() => {
+    let bc;
+    try {
+      bc = new BroadcastChannel('hotel_elite_inn_live_kds');
+      bc.onmessage = (event) => {
+        if (event && event.data) {
+          const type = event.data.type;
+          if (type === 'PMS_AUDIT_SEALED' || type === 'FNB_STATUTORY_SEALED' || type === 'NEW_KOT_ORDER' || type === 'TABLE_SETTLED' || type === 'NIGHT_AUDIT_COMPLETED') {
+            setLastUpdatePing(p => p + 1);
+          }
+        }
+      };
+    } catch (e) {}
+
+    const handleCustomUpdate = () => setLastUpdatePing(p => p + 1);
+    const handleStorage = (e) => {
+      if (e.key?.includes('pms_daily_master_audit_ledger') || e.key === 'hotel_elite_inn_business_date' || e.key === 'hotel_elite_inn_live_kots') {
+        setLastUpdatePing(p => p + 1);
+      }
+    };
+
+    window.addEventListener('pms_audit_updated', handleCustomUpdate);
+    window.addEventListener('fnb_statutory_updated', handleCustomUpdate);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      if (bc) bc.close();
+      window.removeEventListener('pms_audit_updated', handleCustomUpdate);
+      window.removeEventListener('fnb_statutory_updated', handleCustomUpdate);
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
+
+  // Synchronize records when month changes or live update arrives
   useEffect(() => {
     if (selectedMonth === '2026-06') {
       setRecords(JUNE_2026_SALES_RECORDS);
     } else if (selectedMonth === '2026-10') {
       setRecords(getOctober2026SalesRecords(rooms, bookings, foodOrders));
     }
-  }, [selectedMonth, rooms, bookings, foodOrders]);
+  }, [selectedMonth, rooms, bookings, foodOrders, lastUpdatePing]);
 
   // Compute 30/31 Day-to-Date master audited ledger
   const pmsDailyRecords = useMemo(() => {
-    return getCurrentMonthPmsDayToDateLedger(selectedMonth, rooms, bookings, foodOrders);
-  }, [selectedMonth, rooms, bookings, foodOrders]);
+    return getCurrentMonthPmsDayToDateLedger(selectedMonth, rooms, bookings, foodOrders, null, transactions);
+  }, [selectedMonth, rooms, bookings, foodOrders, transactions, lastUpdatePing]);
 
   // Compute Month-to-Date Grand Totals
   const pmsMonthTotals = useMemo(() => {
@@ -1955,17 +1991,17 @@ GRAND RECONCILIATION:
                             }}>
                               ⚡ LIVE TODAY
                             </span>
-                          ) : d.status === 'Audited' ? (
+                          ) : (d.status === 'Audited' || d.status === 'Audited & Locked') ? (
                             <span style={{
-                              background: 'rgba(56, 189, 248, 0.15)',
-                              color: '#38bdf8',
-                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              background: 'rgba(212, 175, 55, 0.15)',
+                              color: 'var(--gold-glow)',
+                              border: '1px solid rgba(212, 175, 55, 0.35)',
                               padding: '0.15rem 0.4rem',
                               borderRadius: '4px',
                               fontSize: '0.62rem',
                               fontWeight: 700
                             }}>
-                              ✓ AUDITED
+                              🔒 AUDITED &amp; LOCKED
                             </span>
                           ) : (
                             <span style={{ color: '#64748b', fontSize: '0.62rem' }}>PENDING</span>

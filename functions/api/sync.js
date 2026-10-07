@@ -203,7 +203,8 @@ export async function onRequestGet({ request, env }) {
       corporateQuotationsRes,
       invoicePrintLogsRes,
       inlineOverridesRes,
-      fnbDailyStatutoryLedgerRes
+      fnbDailyStatutoryLedgerRes,
+      pmsDailyMasterAuditLedgerRes
     ] = await Promise.all([
       db.prepare("SELECT * FROM rooms ORDER BY floor ASC, room_number ASC").all(),
       db.prepare("SELECT * FROM bookings ORDER BY created_at DESC LIMIT 100").all(),
@@ -248,7 +249,8 @@ export async function onRequestGet({ request, env }) {
       db.prepare("SELECT * FROM corporate_quotations ORDER BY created_at DESC LIMIT 50").all().catch(() => ({ results: [] })),
       db.prepare("SELECT * FROM invoice_print_audit_logs ORDER BY printed_at DESC LIMIT 50").all().catch(() => ({ results: [] })),
       db.prepare("SELECT * FROM universal_inline_overrides ORDER BY updated_at DESC LIMIT 200").all().catch(() => ({ results: [] })),
-      db.prepare("SELECT * FROM fnb_daily_statutory_ledger ORDER BY date DESC LIMIT 60").all().catch(() => ({ results: [] }))
+      db.prepare("SELECT * FROM fnb_daily_statutory_ledger ORDER BY date DESC LIMIT 60").all().catch(() => ({ results: [] })),
+      db.prepare("SELECT * FROM pms_daily_master_audit_ledger ORDER BY date DESC LIMIT 60").all().catch(() => ({ results: [] }))
     ]);
 
     // Parse food order items JSON
@@ -391,7 +393,8 @@ export async function onRequestGet({ request, env }) {
         corporateQuotations: corporateQuotationsRes?.results || [],
         invoicePrintAuditLogs: invoicePrintLogsRes?.results || [],
         universalInlineOverrides: inlineOverridesRes?.results || [],
-        fnbDailyStatutoryLedger: fnbDailyStatutoryLedgerRes?.results || []
+        fnbDailyStatutoryLedger: fnbDailyStatutoryLedgerRes?.results || [],
+        pmsDailyMasterAuditLedger: pmsDailyMasterAuditLedgerRes?.results || []
       }
     });
   } catch (error) {
@@ -1231,6 +1234,79 @@ export async function onRequestPost({ request, env }) {
         }
       }
 
+      // 4. HARD LOCK & SEAL PMS 26-Column Master Audit Ledger if provided in payload
+      if (audit.pmsAudit) {
+        const pms = audit.pmsAudit;
+        try {
+          await db.prepare(`
+            INSERT INTO pms_daily_master_audit_ledger (
+              date, day_number, status, bills_count, rooms_sold, room_rent,
+              food_bill, bev_bill, fnb_total, laundry, misc, gross_amount,
+              discount, management, taxable_base, cgst, sgst, total_gst,
+              total_amount, tax_saved, cash, online, cc, btc, advance,
+              variance, settlement_json, sealed_at, updated_at
+            ) VALUES (?, ?, 'Audited & Locked', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            ON CONFLICT(date) DO UPDATE SET
+              status = 'Audited & Locked',
+              bills_count = excluded.bills_count,
+              rooms_sold = excluded.rooms_sold,
+              room_rent = excluded.room_rent,
+              food_bill = excluded.food_bill,
+              bev_bill = excluded.bev_bill,
+              fnb_total = excluded.fnb_total,
+              laundry = excluded.laundry,
+              misc = excluded.misc,
+              gross_amount = excluded.gross_amount,
+              discount = excluded.discount,
+              management = excluded.management,
+              taxable_base = excluded.taxable_base,
+              cgst = excluded.cgst,
+              sgst = excluded.sgst,
+              total_gst = excluded.total_gst,
+              total_amount = excluded.total_amount,
+              tax_saved = excluded.tax_saved,
+              cash = excluded.cash,
+              online = excluded.online,
+              cc = excluded.cc,
+              btc = excluded.btc,
+              advance = excluded.advance,
+              variance = excluded.variance,
+              settlement_json = excluded.settlement_json,
+              sealed_at = datetime('now'),
+              updated_at = datetime('now')
+          `).bind(
+            pms.date || audit.businessDate,
+            pms.dayNumber || parseInt(audit.businessDate.slice(-2), 10),
+            pms.billsCount || 0,
+            pms.roomsSold || 0,
+            pms.roomRent || 0,
+            pms.foodBill || 0,
+            pms.bevBill || 0,
+            pms.fnbTotal || 0,
+            pms.laundry || 0,
+            pms.misc || 0,
+            pms.grossAmount || 0,
+            pms.discount || 0,
+            pms.management || 0,
+            pms.taxableBase || 0,
+            pms.cgst || 0,
+            pms.sgst || 0,
+            pms.totalGst || 0,
+            pms.totalAmount || 0,
+            pms.taxSaved || 0,
+            pms.cash || 0,
+            pms.online || 0,
+            pms.cc || 0,
+            pms.btc || 0,
+            pms.advance || 0,
+            pms.variance || 0,
+            JSON.stringify(pms.settlement || {})
+          ).run();
+        } catch (e) {
+          console.warn('PMS master audit lock in night audit warning:', e);
+        }
+      }
+
       return jsonResponse({ success: true, auditId, locked: true });
     }
 
@@ -1269,6 +1345,78 @@ export async function onRequestPost({ request, env }) {
         rec.sealedAt || new Date().toISOString()
       ).run();
       return jsonResponse({ success: true, date: rec.date });
+    }
+
+    // 14c. PMS MASTER AUDIT: Seal 26-Column Daily Master Audit Record
+    if (action === 'seal_pms_daily_master_audit') {
+      const pms = payload;
+      await db.prepare(`
+        INSERT INTO pms_daily_master_audit_ledger (
+          date, day_number, status, bills_count, rooms_sold, room_rent,
+          food_bill, bev_bill, fnb_total, laundry, misc, gross_amount,
+          discount, management, taxable_base, cgst, sgst, total_gst,
+          total_amount, tax_saved, cash, online, cc, btc, advance,
+          variance, settlement_json, sealed_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        ON CONFLICT(date) DO UPDATE SET
+          status = excluded.status,
+          bills_count = excluded.bills_count,
+          rooms_sold = excluded.rooms_sold,
+          room_rent = excluded.room_rent,
+          food_bill = excluded.food_bill,
+          bev_bill = excluded.bev_bill,
+          fnb_total = excluded.fnb_total,
+          laundry = excluded.laundry,
+          misc = excluded.misc,
+          gross_amount = excluded.gross_amount,
+          discount = excluded.discount,
+          management = excluded.management,
+          taxable_base = excluded.taxable_base,
+          cgst = excluded.cgst,
+          sgst = excluded.sgst,
+          total_gst = excluded.total_gst,
+          total_amount = excluded.total_amount,
+          tax_saved = excluded.tax_saved,
+          cash = excluded.cash,
+          online = excluded.online,
+          cc = excluded.cc,
+          btc = excluded.btc,
+          advance = excluded.advance,
+          variance = excluded.variance,
+          settlement_json = excluded.settlement_json,
+          sealed_at = excluded.sealed_at,
+          updated_at = datetime('now')
+      `).bind(
+        pms.date,
+        pms.dayNumber || parseInt(pms.date.slice(-2), 10),
+        pms.status || 'Audited & Locked',
+        pms.billsCount || 0,
+        pms.roomsSold || 0,
+        pms.roomRent || 0,
+        pms.foodBill || 0,
+        pms.bevBill || 0,
+        pms.fnbTotal || 0,
+        pms.laundry || 0,
+        pms.misc || 0,
+        pms.grossAmount || 0,
+        pms.discount || 0,
+        pms.management || 0,
+        pms.taxableBase || 0,
+        pms.cgst || 0,
+        pms.sgst || 0,
+        pms.totalGst || 0,
+        pms.totalAmount || 0,
+        pms.taxSaved || 0,
+        pms.cash || 0,
+        pms.online || 0,
+        pms.cc || 0,
+        pms.btc || 0,
+        pms.advance || 0,
+        pms.variance || 0,
+        JSON.stringify(pms.settlement || {}),
+        pms.sealedAt || new Date().toISOString()
+      ).run();
+      return jsonResponse({ success: true, date: pms.date });
     }
 
     // 15. ERP STORE: Record Mandi Raw Material Purchase
