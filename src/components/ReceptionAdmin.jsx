@@ -32,9 +32,13 @@ import UniversalDateFilterBar from './UniversalDateFilterBar';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
 import { useUniversalInlineEdit, InlineEditorBanner, InlineText, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
-import StewardQrManagerModal from './StewardQrManagerModal';
 import { playOrderAlert } from '../utils/soundAlert';
 import { sendGuestCheckout2HourReminderWhatsApp } from '../utils/whatsappDispatch';
+import FenugreekLiveFoodOrdersKDS from './FenugreekLiveFoodOrdersKDS';
+import { 
+  getLiveKots, saveLiveKots, broadcastKotChannel, 
+  normalizeKotOrder, updateKotStatusUnified, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
+} from '../utils/kotDataSync';
 
 // Frequent VIP & Corporate Guests for instant Walk-in auto-fill
 const FREQUENT_VIP_GUESTS = [
@@ -735,41 +739,53 @@ export default function ReceptionAdmin({
     costEst: 250
   });
 
-  // Live Food Orders & Room Services Data State (2 New, 4 Pending defaults matching live reference)
-  const [internalFoodOrdersList, setInternalFoodOrdersList] = useState([
-    {
-      orderId: 'KOT-8491',
-      roomNumber: '204',
-      guestName: 'BIJAY PASWAN',
-      outlet: 'Cannon Kitchen',
-      status: 'Received',
-      items: [
-        { name: 'Paneer Butter Masala', quantity: 1, price: 240 },
-        { name: 'Butter Tandoori Roti', quantity: 4, price: 30 },
-        { name: 'Jeera Rice', quantity: 1, price: 160 }
-      ],
-      totalAmount: 520,
-      is_jain_satvik: 0,
-      created_at: new Date(Date.now() - 6 * 60000).toISOString()
-    },
-    {
-      orderId: 'KOT-8492',
-      roomNumber: '102',
-      guestName: 'UTKARSH SRIVASTAVA',
-      outlet: 'Cannon Kitchen',
-      status: 'Received',
-      items: [
-        { name: 'Dal Tadka (Satvik Pure Veg)', quantity: 1, price: 180 },
-        { name: 'Steamed Basmati Rice', quantity: 2, price: 90 },
-        { name: 'Curd & Salad Platter', quantity: 1, price: 80 }
-      ],
-      totalAmount: 440,
-      is_jain_satvik: 1,
-      created_at: new Date(Date.now() - 2 * 60000).toISOString()
-    }
-  ]);
+  // Live Food Orders & Room Services Data State - Connected live to Steward Mobiles & Kitchen KDS
+  const [internalFoodOrdersList, setInternalFoodOrdersList] = useState(() => getLiveKots());
+  const foodOrdersList = (propFoodOrders && propFoodOrders.length > 0) ? propFoodOrders : internalFoodOrdersList;
 
-  const foodOrdersList = propFoodOrders || internalFoodOrdersList;
+  // Real-time bidirectional KDS synchronization for Reception PMS
+  useEffect(() => {
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel(KDS_CHANNEL_NAME);
+      channel.onmessage = (event) => {
+        const { type, order, orderId, status } = event.data || {};
+        if (type === 'NEW_KOT_ORDER' && order) {
+          const normalized = normalizeKotOrder(order);
+          setInternalFoodOrdersList(prev => {
+            const exists = prev.some(o => (o.id || o.orderId) === (normalized.id || normalized.orderId));
+            if (exists) return prev.map(o => (o.id || o.orderId) === (normalized.id || normalized.orderId) ? normalized : o);
+            return [normalized, ...prev];
+          });
+          playOrderAlert();
+        } else if (type === 'KOT_STATUS_UPDATED' && orderId) {
+          setInternalFoodOrdersList(prev => prev.map(o => {
+            if ((o.id || o.orderId) === orderId) {
+              return { ...o, status };
+            }
+            return o;
+          }));
+        }
+      };
+    }
+
+    const handleStorage = (e) => {
+      if (e.key === KOT_STORAGE_KEY && e.newValue) {
+        try {
+          const fresh = JSON.parse(e.newValue);
+          if (Array.isArray(fresh)) {
+            setInternalFoodOrdersList(fresh.map(normalizeKotOrder).filter(Boolean));
+          }
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
 
   const [roomServicesList, setRoomServicesList] = useState([
     {
@@ -842,29 +858,56 @@ export default function ReceptionAdmin({
   };
 
   const handleBillToRoomFromLiveOrders = (payload) => {
+    const kotId = payload.orderId || payload.kotId;
     if (onAddTransaction) {
       onAddTransaction({
         id: `TXN-${Date.now()}`,
         roomNumber: payload.roomNumber,
         category: 'Food & Beverage',
-        description: `KOT #${payload.orderId} - Cannon Kitchen In-Room Dining`,
+        description: `KOT #${kotId} - Fenugreek In-Room Dining`,
         amount: payload.totalAmount,
         type: 'Charge',
         date: new Date().toISOString()
       });
     }
 
-    setInternalFoodOrdersList(prev => prev.map(o => {
-      if ((o.order_id || o.orderId) === payload.orderId) {
-        return { ...o, payment_status: 'Billed to Room', status: 'Delivered' };
-      }
-      return o;
-    }));
+    setInternalFoodOrdersList(prev => {
+      const updated = prev.map(o => {
+        if ((o.order_id || o.orderId || o.id) === kotId) {
+          return { ...o, payment_status: 'Billed to Room', status: 'Delivered' };
+        }
+        return o;
+      });
+      saveLiveKots(updated);
+      return updated;
+    });
+
+    broadcastKotChannel({
+      type: 'KOT_STATUS_UPDATED',
+      orderId: kotId,
+      status: 'Delivered'
+    });
+
     if (propUpdateOrderStatus) {
-      propUpdateOrderStatus(payload.orderId, 'Delivered');
+      propUpdateOrderStatus(kotId, 'Delivered');
     }
 
-    setFeedbackToast(`KOT #${payload.orderId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio!`);
+    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+    fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+      body: JSON.stringify({
+        action: 'bill_kot_to_room',
+        payload: {
+          roomNumber: payload.roomNumber,
+          kotId: kotId,
+          totalAmount: payload.totalAmount,
+          outlet: payload.outlet || 'Fenugreek Restaurant'
+        }
+      })
+    }).catch(err => console.debug('Offline room bill sync:', err));
+
+    setFeedbackToast(`KOT #${kotId} (₹${payload.totalAmount}) billed to Room ${payload.roomNumber} folio!`);
   };
 
   const handleAddRoomServiceRequest = (newReq) => {
@@ -3653,12 +3696,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               label: '2. Fenugreek Restaurant', 
               icon: Utensils, 
               color: '#fbbf24', 
-              desc: 'KOT Billing, In-Room Dining & POS',
-              badge: foodOrdersList.filter(o => o.status === 'Received').length > 0 ? `${foodOrdersList.filter(o => o.status === 'Received').length} New` : null,
+              desc: 'Live KOTs, In-Room Dining & POS',
+              badge: foodOrdersList.filter(o => o.status === 'Received' || o.status === 'Preparing').length > 0 ? `${foodOrdersList.filter(o => o.status === 'Received' || o.status === 'Preparing').length} Live` : null,
               badgeColor: '#ef4444',
               onClick: () => {
                 setActiveDepartment('restaurant');
-                if (onOpenRestaurantPOS) onOpenRestaurantPOS();
+                setActiveTab('live-food-orders');
               }
             },
             { 
@@ -3985,6 +4028,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
       }}>
         {[
           { id: 'tape-chart', label: '📊 27-Room Tape Chart Matrix' },
+          { id: 'live-food-orders', label: '🍳 Fenugreek Live Food Orders & KDS', isKds: true },
           { id: 'd1-database-explorer', label: '🗄️ D1 Live DB Explorer (Master Hub - All 68 Tables)', isHub: true },
           { id: 'operations-settings', label: '⚙️ Operations & Policy Settings' },
           { id: 'transit-dayuse', label: '🚆 Transit & Station Transfer' },
@@ -4013,7 +4057,17 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               }
             }}
             className={`enterprise-tab-pill ${activeTab === tab.id ? 'active' : ''}`}
-            style={tab.isHub ? {
+            style={tab.isKds ? {
+              background: activeTab === tab.id 
+                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.45), rgba(217, 119, 6, 0.35))' 
+                : 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.12))',
+              border: activeTab === tab.id 
+                ? '1.5px solid #fbbf24' 
+                : '1px solid rgba(251, 191, 36, 0.6)',
+              color: activeTab === tab.id ? '#ffffff' : '#fbbf24',
+              fontWeight: 800,
+              boxShadow: activeTab === tab.id ? '0 0 16px rgba(251, 191, 36, 0.45)' : 'none'
+            } : tab.isHub ? {
               background: activeTab === tab.id 
                 ? 'linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(14, 165, 233, 0.3))' 
                 : 'linear-gradient(135deg, rgba(6, 182, 212, 0.18), rgba(14, 165, 233, 0.1))',
@@ -4771,6 +4825,16 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             showToast('✓ Central PMS operational settings updated & synced!');
           }}
         />
+      )}
+
+      {/* TAB: FENUGREEK RESTAURANT LIVE FOOD ORDERS & KITCHEN KDS */}
+      {activeTab === 'live-food-orders' && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <FenugreekLiveFoodOrdersKDS
+            onBillToRoom={handleBillToRoomFromLiveOrders}
+            onOpenPOS={onOpenRestaurantPOS}
+          />
+        </div>
       )}
 
       {/* TAB 1: 39-ROOM TAPE CHART MATRIX */}

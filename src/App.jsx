@@ -58,6 +58,10 @@ const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDispla
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
 const RoomQuickSearchModal = lazyWithRetry(() => import('./components/RoomQuickSearchModal'));
+import { 
+  getLiveKots, saveLiveKots, broadcastKotChannel, 
+  normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
+} from './utils/kotDataSync';
 const RoomQrModal = lazyWithRetry(() => import('./components/RoomQrModal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
@@ -395,80 +399,69 @@ export default function App() {
   }, []);
   const [dynamicRates, setDynamicRates] = useState(() => calculateAllTierMicroRates({ occupancyRate: 68, daysToArrival: 3, pickupVelocity48h: 4 }));
 
-  // Live Food Orders & KDS State shared across Front Desk & Cannon Kitchen POS
-  const [foodOrders, setFoodOrders] = useState([
-    {
-      orderId: 'KOT-8491',
-      roomNumber: '204',
-      guestName: 'BIJAY PASWAN',
-      outlet: 'Cannon Kitchen',
-      status: 'Received',
-      items: [
-        { name: 'Paneer Butter Masala', quantity: 1, price: 240, notes: 'Stone-ground mustard gravy, mild' },
-        { name: 'Butter Tandoori Roti', quantity: 4, price: 30, notes: 'Freshly baked and crisp' },
-        { name: 'Jeera Rice', quantity: 1, price: 160, notes: 'Fragrant cumin tadka' }
-      ],
-      totalAmount: 520,
-      is_jain_satvik: 0,
-      captain: 'KOTI',
-      created_at: new Date(Date.now() - 6 * 60000).toISOString()
-    },
-    {
-      orderId: 'KOT-8492',
-      roomNumber: '206',
-      guestName: 'UTKARSH SRIVASTAVA',
-      outlet: 'Cannon Kitchen',
-      status: 'Received',
-      items: [
-        { name: 'Dal Tadka (Satvik Pure Veg)', quantity: 1, price: 180, notes: 'No Onion, No Garlic, Desi Ghee' },
-        { name: 'Steamed Basmati Rice', quantity: 2, price: 90, notes: 'Hot steamed fresh' },
-        { name: 'Curd & Salad Platter', quantity: 1, price: 80, notes: 'Chilled cucumber & lemon' }
-      ],
-      totalAmount: 440,
-      is_jain_satvik: 1,
-      captain: 'SADANANDA',
-      created_at: new Date(Date.now() - 2 * 60000).toISOString()
-    },
-    {
-      orderId: 'KOT-7514',
-      tableNumber: '6',
-      guestName: 'P. K. Mohapatra',
-      outlet: 'Cannon Kitchen',
-      status: 'Preparing',
-      items: [
-        { name: 'Mutton Kassa (Odisha Style)', quantity: 2, price: 420, notes: 'Spicy mustard & whole spices' },
-        { name: 'Butter Tandoori Roti', quantity: 6, price: 25, notes: 'Extra butter' },
-        { name: 'Fresh Lime Soda (Sweet/Salt)', quantity: 2, price: 70, notes: 'Chilled with ice' }
-      ],
-      totalAmount: 1190,
-      is_jain_satvik: 0,
-      captain: 'KOTI',
-      created_at: new Date(Date.now() - 14 * 60000).toISOString()
-    },
-    {
-      orderId: 'KOT-7515',
-      tableNumber: 'B',
-      guestName: 'Dr. Tripathy',
-      outlet: 'Drop In Bar',
-      status: 'Preparing',
-      items: [
-        { name: 'Chicken Dum Biryani (Chef Special)', quantity: 2, price: 260, notes: 'Dum cooked, with raita' },
-        { name: 'Chilli Chicken Dry', quantity: 1, price: 240, notes: 'Crispy starter' }
-      ],
-      totalAmount: 760,
-      is_jain_satvik: 0,
-      captain: 'SADANANDA',
-      created_at: new Date(Date.now() - 18 * 60000).toISOString()
+  // Live Food Orders & KDS State shared across Front Desk, Steward Mobiles & Cannon Kitchen POS
+  const [foodOrders, setFoodOrders] = useState(() => getLiveKots());
+
+  // Real-time bidirectional synchronization with Kitchen KDS, Steward Order Pad & Cloudflare D1
+  useEffect(() => {
+    let channel = null;
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      channel = new BroadcastChannel(KDS_CHANNEL_NAME);
+      channel.onmessage = (event) => {
+        const { type, order, orderId, status } = event.data || {};
+        if (type === 'NEW_KOT_ORDER' && order) {
+          const normalized = normalizeKotOrder(order);
+          setFoodOrders(prev => {
+            const exists = prev.some(o => (o.id || o.orderId) === (normalized.id || normalized.orderId));
+            if (exists) return prev.map(o => (o.id || o.orderId) === (normalized.id || normalized.orderId) ? normalized : o);
+            return [normalized, ...prev];
+          });
+        } else if (type === 'KOT_STATUS_UPDATED' && orderId) {
+          setFoodOrders(prev => prev.map(o => {
+            if ((o.id || o.orderId) === orderId) {
+              return { ...o, status };
+            }
+            return o;
+          }));
+        }
+      };
     }
-  ]);
+
+    const handleStorage = (e) => {
+      if (e.key === KOT_STORAGE_KEY && e.newValue) {
+        try {
+          const fresh = JSON.parse(e.newValue);
+          if (Array.isArray(fresh)) {
+            setFoodOrders(fresh.map(normalizeKotOrder).filter(Boolean));
+          }
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      if (channel) channel.close();
+      window.removeEventListener('storage', handleStorage);
+    };
+  }, []);
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
-    setFoodOrders(prev => prev.map(o => {
-      if ((o.orderId || o.order_id) === orderId) {
-        return { ...o, status: newStatus };
-      }
-      return o;
-    }));
+    setFoodOrders(prev => {
+      const updated = prev.map(o => {
+        if ((o.orderId || o.order_id || o.id) === orderId) {
+          return { ...o, status: newStatus };
+        }
+        return o;
+      });
+      saveLiveKots(updated);
+      return updated;
+    });
+
+    broadcastKotChannel({
+      type: 'KOT_STATUS_UPDATED',
+      orderId,
+      status: newStatus
+    });
 
     const adminPin = adminPinVerified ? getVerifiedAdminPin() : '';
     if (!adminPin) return;
@@ -486,7 +479,16 @@ export default function App() {
   };
 
   const handleAddFoodOrder = (newOrder) => {
-    setFoodOrders(prev => [newOrder, ...prev]);
+    const normalized = normalizeKotOrder(newOrder);
+    setFoodOrders(prev => {
+      const updated = [normalized, ...prev.filter(o => (o.id || o.orderId) !== (normalized.id || normalized.orderId))];
+      saveLiveKots(updated);
+      return updated;
+    });
+    broadcastKotChannel({
+      type: 'NEW_KOT_ORDER',
+      order: normalized
+    });
   };
 
   // Dedicated In-Room Guest Portal Handlers
