@@ -17,7 +17,7 @@ import BookingReceiptModal from './BookingReceiptModal';
 import CheckoutSplitModal from './CheckoutSplitModal';
 import PmsSidebar from './PmsSidebar';
 import PmsControlHeader from './PmsControlHeader';
-import InteractiveCalendar from '@/components/ui/visualize-booking';
+
 import RoomQrModal from './RoomQrModal';
 import StewardQrManagerModal from './StewardQrManagerModal';
 import BackupRestoreModal from './BackupRestoreModal';
@@ -138,7 +138,6 @@ export default function ReceptionAdmin({
           { id: 'shift-logbook', label: '📋 Shift Handover & Logbook' },
           { id: 'police-register', label: '🚨 Sarai Act Police Register' },
           { id: 'transit-dayuse', label: '🚆 Transit & Station Transfer' },
-          { id: 'visualize-bookings', label: '📅 Booking Visualizer' },
           { id: 'occupancy-report', label: '📈 Occupancy Report' },
           { id: 'maintenance-ooo', label: '🔧 Maintenance & OOO' },
           { id: 'lost-and-found', label: '🧳 Lost & Found' },
@@ -3932,7 +3931,6 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             activeTab === 'transit-dayuse' ? 'transit' :
             activeTab === 'shift-logbook' ? 'shift-logbook' :
             activeTab === 'housekeeping' ? 'housekeeping' :
-            activeTab === 'visualize-bookings' ? 'bookings' :
             activeTab === 'occupancy-report' ? 'occupancy' :
             activeTab === 'dpdp' ? 'dpdp' :
             'rooms'
@@ -3958,7 +3956,6 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               inspectionStatus: (r.effectiveStatus || r.status) === 'Available' ? 'Inspected' : 'Pending',
               linenStatus: 'Par Replaced'
             })) :
-            activeTab === 'visualize-bookings' ? filteredBookings :
             activeTab === 'occupancy-report' ? (filteredRooms.length > 0 ? filteredRooms : projectedRooms) :
             activeTab === 'dpdp' ? filteredBookings.map(b => ({
               id: b.id || b.bookingId,
@@ -3980,7 +3977,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               }
             }
             // 2. Bookings updates
-            if (activeTab === 'police-register' || activeTab === 'visualize-bookings' || activeTab === 'dpdp') {
+            if (activeTab === 'police-register' || activeTab === 'dpdp') {
               if (onUpdateBooking && (item.id || item.bookingId)) {
                 onUpdateBooking({ ...item, [field]: newVal });
               }
@@ -4045,7 +4042,6 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             activeTab === 'transit-dayuse' ? filteredTransitStays.length :
             activeTab === 'shift-logbook' ? 3 :
             activeTab === 'housekeeping' ? rooms.length :
-            activeTab === 'visualize-bookings' ? filteredBookings.length :
             filteredRooms.length
           }
           totalAmount={
@@ -4239,36 +4235,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         </div>
       </div>
 
-      {/* TAB: INTERACTIVE BOOKING VISUALIZER (visualize-booking.tsx) */}
-      {activeTab === 'visualize-bookings' && (
-        <div className="w-full mb-8">
-          <InteractiveCalendar 
-            rooms={rooms}
-            bookings={bookings}
-            onSelectBooking={(evt) => {
-              const roomMatch = evt.venue?.match(/Room\s*(\d+)/i);
-              const roomNum = roomMatch ? roomMatch[1] : null;
-              const foundRoom = roomNum ? rooms.find(r => r.roomNumber === roomNum) : null;
-              if (foundRoom) {
-                setSelectedFolioRoom(foundRoom);
-              } else {
-                const foundBooking = bookings.find(b => 
-                  (evt.contactPerson && b.guestName?.toLowerCase().includes(evt.contactPerson.toLowerCase())) || 
-                  b.id === evt.id ||
-                  (b.roomNumber && evt.venue?.includes(b.roomNumber))
-                );
-                if (foundBooking) {
-                  setSelectedReceiptBooking(foundBooking);
-                  setIsReceiptModalOpen(true);
-                } else {
-                  const fallbackRoom = rooms.find(r => r.status === 'Occupied') || rooms[0];
-                  if (fallbackRoom) setSelectedFolioRoom(fallbackRoom);
-                }
-              }
-            }}
-          />
-        </div>
-      )}
+
 
       {/* TAB: OCCUPANCY REPORT (Day / Month / Year with CSV Export - Sheet 2 Requirement) */}
       {activeTab === 'occupancy-report' && (
