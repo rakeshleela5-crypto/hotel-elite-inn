@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   UtensilsCrossed, Plus, Minus, Trash2, Printer, CheckCircle2, 
   Search, Hash, DollarSign, Smartphone, Bed, ShieldCheck, X, 
@@ -6,7 +6,7 @@ import {
   FileSpreadsheet, Download, ChefHat, Bell, Volume2, VolumeX, Truck, Flame, RefreshCw, Eye, AlertTriangle, Filter,
   CreditCard, QrCode, Share2
 } from 'lucide-react';
-import { RESTAURANT_MENU, HOTEL_CONFIG, MYPOS_CANNON_KITCHEN_LAYOUT } from '../data/hotelData';
+import { RESTAURANT_MENU, HOTEL_CONFIG, MYPOS_CANNON_KITCHEN_LAYOUT, INITIAL_ROOMS_INVENTORY } from '../data/hotelData';
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
@@ -227,9 +227,34 @@ export default function CannonKitchenPOS({
   // Outlet selection: 'Cannon Kitchen (Dine-In)', 'Bar Outlet', 'Room Service', 'Swiggy / Zomato'
   const [selectedOutlet, setSelectedOutlet] = useState('Cannon Kitchen');
   
+  // Master 27 Physical Inventory Rooms of Hotel Elite Inn (Floors 1, 2, 3)
+  const all27RoomsList = useMemo(() => {
+    return (INITIAL_ROOMS_INVENTORY || []).map(baseRoom => {
+      const live = (rooms || []).find(r => String(r.roomNumber || r.number) === String(baseRoom.roomNumber));
+      const booking = (bookings || []).find(b => String(b.roomNumber) === String(baseRoom.roomNumber) && (b.status === 'Checked-In' || b.status === 'Occupied'));
+      
+      const isOccupied = live ? (live.status === 'Occupied' || Boolean(live.currentGuestName)) : Boolean(booking);
+      const guestName = live?.currentGuestName || booking?.guestName || null;
+      const balance = live?.balanceDue ?? live?.outstandingBalance ?? booking?.balanceDue ?? 0;
+      
+      return {
+        roomNumber: String(baseRoom.roomNumber),
+        floor: baseRoom.floor,
+        tier: baseRoom.tier,
+        status: isOccupied ? 'Occupied' : (live?.status || baseRoom.status || 'Available'),
+        isOccupied,
+        guestName,
+        balance
+      };
+    });
+  }, [rooms, bookings]);
+
   // Table or Room or Take-Away selector
   const [orderType, setOrderType] = useState('room'); // 'room', 'table', 'takeaway'
-  const [targetRoom, setTargetRoom] = useState('402');
+  const [targetRoom, setTargetRoom] = useState(() => {
+    const firstOcc = (rooms || []).find(r => r.status === 'Occupied');
+    return String(firstOcc?.roomNumber || firstOcc?.number || '101');
+  });
   const [tableNumber, setTableNumber] = useState('6');
   const [captainName, setCaptainName] = useState('Pradeep Jena');
   const [packagingFee, setPackagingFee] = useState(15);
@@ -1109,7 +1134,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
       orderId: kotId,
       roomNumber: targetRoom,
       tableNumber: null,
-      guestName: rooms.find(r => r.number === targetRoom)?.guestName || `Room ${targetRoom} Guest`,
+      guestName: all27RoomsList.find(r => String(r.roomNumber) === String(targetRoom))?.guestName || `Room ${targetRoom} Guest`,
       outlet: selectedOutlet,
       orderType: 'room',
       status: 'Received',
@@ -2074,35 +2099,61 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   </div>
                 </div>
 
-                {/* Section 4: Direct Room Service Transfer Buttons */}
+                {/* Section 4: Direct Room Service Transfer Buttons (All 27 Rooms of Hotel Elite Inn) */}
                 <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: '0.5rem' }}>
-                    🛎️ Direct Room Service Transfer Keys (Bill to Folio)
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fbbf24', marginBottom: '0.55rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>🛎️ Direct Room Service Transfer Keys (Bill to Folio - All 27 Rooms)</span>
+                    <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                      Selected: <strong style={{ color: '#38bdf8' }}>Room {targetRoom}</strong>
+                    </span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(95px, 1fr))', gap: '0.65rem' }}>
-                    {['201', '202', '206', '207', '208', '301', '304', '305', '308', '402', '408', '409', '410', '411', '412', '413', '415', '416'].map(rNum => {
-                      const isSelected = targetRoom === rNum && orderType === 'room';
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(105px, 1fr))', gap: '0.65rem' }}>
+                    {all27RoomsList.map(r => {
+                      const isSelected = String(targetRoom) === String(r.roomNumber) && orderType === 'room';
                       return (
                         <button
-                          key={rNum}
+                          key={`room-key-${r.roomNumber}`}
                           onClick={() => {
-                            setTargetRoom(rNum);
+                            setTargetRoom(r.roomNumber);
                             setOrderType('room');
                             setSelectedOutlet('Room Service');
+                            showPosToast(`✓ Selected Room ${r.roomNumber} (${r.guestName || r.status}) for Bill to Folio`);
                           }}
                           style={{
-                            background: isSelected ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255, 255, 255, 0.04)',
-                            border: isSelected ? '2px solid var(--gold-glow)' : '1px solid rgba(255, 255, 255, 0.15)',
+                            background: isSelected 
+                              ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.25))' 
+                              : r.isOccupied 
+                              ? 'rgba(16, 185, 129, 0.12)' 
+                              : 'rgba(255, 255, 255, 0.04)',
+                            border: isSelected 
+                              ? '2px solid #f59e0b' 
+                              : r.isOccupied 
+                              ? '1px solid rgba(16, 185, 129, 0.4)' 
+                              : '1px solid rgba(255, 255, 255, 0.12)',
                             borderRadius: '8px',
-                            padding: '0.55rem',
+                            padding: '0.55rem 0.4rem',
                             textAlign: 'center',
                             cursor: 'pointer',
-                            color: isSelected ? 'var(--gold-glow)' : '#f8fafc',
+                            color: isSelected ? '#fbbf24' : '#f8fafc',
                             fontWeight: 800,
-                            fontSize: '0.85rem'
+                            fontSize: '0.82rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '2px',
+                            transition: 'all 0.15s ease'
                           }}
+                          title={`Room ${r.roomNumber} - ${r.guestName || r.status}`}
                         >
-                          R-{rNum}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>R-{r.roomNumber}</span>
+                            {r.isOccupied && (
+                              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                            )}
+                          </div>
+                          <span style={{ fontSize: '0.62rem', fontWeight: 600, color: r.isOccupied ? '#34d399' : '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '95px' }}>
+                            {r.guestName ? r.guestName.split(' ')[0] : `Flr ${r.floor}`}
+                          </span>
                         </button>
                       );
                     })}
@@ -2481,57 +2532,77 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                 <>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     <div style={{ flex: 1 }}>
-                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Target Room Folio</label>
+                      <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.72rem', color: '#fbbf24', fontWeight: 700, marginBottom: '0.25rem' }}>
+                        <span>🛎️ Bill to Room Folio (Select Any of 27 Rooms)</span>
+                        <span style={{ fontSize: '0.68rem', color: '#38bdf8', fontWeight: 600 }}>
+                          Selected: Room {targetRoom}
+                        </span>
+                      </label>
                       <select
                         value={targetRoom}
                         onChange={(e) => setTargetRoom(e.target.value)}
                         style={{
                           width: '100%',
-                          padding: '0.45rem',
+                          padding: '0.5rem 0.6rem',
                           background: '#0d111d',
                           color: '#fff',
-                          border: '1px solid rgba(56, 189, 248, 0.4)',
-                          borderRadius: '6px',
+                          border: '1px solid rgba(245, 158, 11, 0.5)',
+                          borderRadius: '7px',
                           fontSize: '0.85rem',
-                          fontWeight: 600
+                          fontWeight: 700,
+                          outline: 'none'
                         }}
                       >
-                        {rooms.filter(r => r.status === 'Occupied').length > 0 ? (
-                          rooms.filter(r => r.status === 'Occupied').map(r => (
-                            <option key={r.roomNumber} value={r.roomNumber}>
-                              Room {r.roomNumber} - {r.currentGuestName || 'Guest'} (₹{(r.balanceDue || 0).toLocaleString()})
-                            </option>
-                          ))
-                        ) : (
-                          <>
-                            <option value="402">Room 402 - P ASHOK (Linde India Ltd • CP Plan)</option>
-                            <option value="201">Room 201 - LAVAKANTA OJHA (Akchem • CP Plan)</option>
-                            <option value="202">Room 202 - SATYARANJAN SAHOO (CP Plan)</option>
-                            <option value="410">Room 410 - BIJAY PASWAN (PRADAN)</option>
-                            <option value="206">Room 206 - S S HAMEED</option>
-                            <option value="207">Room 207 - SAHANAWAZ HUSSAIN</option>
-                            <option value="301">Room 301 - UTKARSH SRIVASTAVA</option>
-                            <option value="304">Room 304 - SUPHAL CHANDRA MAHATO</option>
-                            <option value="305">Room 305 - K RAJESH KUMAR</option>
-                            <option value="408">Room 408 - SARATH CHANDRA MADIREDDY</option>
-                            <option value="416">Room 416 - SUMER KUMA</option>
-                          </>
+                        {/* 1. In-House Occupied Rooms Section */}
+                        {all27RoomsList.filter(r => r.isOccupied).length > 0 && (
+                          <optgroup label="🟢 Active In-House Guest Folios (Occupied Rooms)">
+                            {all27RoomsList.filter(r => r.isOccupied).map(r => (
+                              <option key={`occ-${r.roomNumber}`} value={r.roomNumber}>
+                                Room {r.roomNumber} - {r.guestName || 'In-House Guest'} (Occupied • Folio: ₹{(r.balance || 0).toLocaleString()})
+                              </option>
+                            ))}
+                          </optgroup>
                         )}
+
+                        {/* 2. All 27 Rooms Grouped by Floor */}
+                        <optgroup label="🏢 First Floor (Rooms 101 - 109)">
+                          {all27RoomsList.filter(r => r.floor === 1).map(r => (
+                            <option key={`f1-${r.roomNumber}`} value={r.roomNumber}>
+                              Room {r.roomNumber} - {r.guestName ? `${r.guestName} (${r.status})` : `${r.tier} (${r.status})`}
+                            </option>
+                          ))}
+                        </optgroup>
+
+                        <optgroup label="🏢 Second Floor (Rooms 201 - 209)">
+                          {all27RoomsList.filter(r => r.floor === 2).map(r => (
+                            <option key={`f2-${r.roomNumber}`} value={r.roomNumber}>
+                              Room {r.roomNumber} - {r.guestName ? `${r.guestName} (${r.status})` : `${r.tier} (${r.status})`}
+                            </option>
+                          ))}
+                        </optgroup>
+
+                        <optgroup label="🏢 Third Floor (Rooms 301 - 309)">
+                          {all27RoomsList.filter(r => r.floor === 3).map(r => (
+                            <option key={`f3-${r.roomNumber}`} value={r.roomNumber}>
+                              Room {r.roomNumber} - {r.guestName ? `${r.guestName} (${r.status})` : `${r.tier} (${r.status})`}
+                            </option>
+                          ))}
+                        </optgroup>
                       </select>
                     </div>
-                    <div style={{ width: 130 }}>
-                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Captain / Waiter</label>
+                    <div style={{ width: 140 }}>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Captain / Waiter</label>
                       <input
                         type="text"
                         value={captainName}
                         onChange={(e) => setCaptainName(e.target.value)}
                         style={{
                           width: '100%',
-                          padding: '0.45rem',
+                          padding: '0.5rem',
                           background: '#0d111d',
                           color: '#fff',
                           border: '1px solid rgba(255,255,255,0.2)',
-                          borderRadius: '6px',
+                          borderRadius: '7px',
                           fontSize: '0.85rem'
                         }}
                       />
@@ -2541,7 +2612,7 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                   {/* CP Complimentary Breakfast Alert Banner */}
                   {(() => {
                     const matchedBooking = (bookings || []).find(b => String(b.roomNumber) === String(targetRoom));
-                    const isCp = matchedBooking?.mealPlan === 'CP' || matchedBooking?.plan === 'CP' || targetRoom === '402' || targetRoom === '201' || targetRoom === '202';
+                    const isCp = matchedBooking?.mealPlan === 'CP' || matchedBooking?.plan === 'CP' || targetRoom === '201' || targetRoom === '202';
                     if (isCp) {
                       return (
                         <div style={{
@@ -3087,20 +3158,23 @@ Thank you for dining at Cannon Kitchen! 🙏`;
                     className="btn-primary"
                     style={{
                       flex: 1.5,
-                      padding: '0.7rem',
-                      fontSize: '0.85rem',
-                      fontWeight: 700,
-                      background: '#f59e0b',
+                      padding: '0.75rem 1rem',
+                      fontSize: '0.88rem',
+                      fontWeight: 800,
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                       color: '#000',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.5rem',
+                      gap: '0.55rem',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)',
                       opacity: cart.length === 0 ? 0.5 : 1,
                       cursor: cart.length === 0 ? 'not-allowed' : 'pointer'
                     }}
+                    title={`Debit ₹${netTotal.toFixed(2)} to Room ${targetRoom} Master Folio`}
                   >
-                    <Bed size={16} /> Bill to Room {targetRoom} Folio
+                    <Bed size={17} /> Bill to Room {targetRoom} Folio {netTotal > 0 ? `(₹${netTotal.toFixed(2)})` : ''}
                   </button>
                 ) : orderType === 'takeaway' ? (
                   <button
