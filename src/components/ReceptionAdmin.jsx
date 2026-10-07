@@ -7,7 +7,7 @@ import {
   Calculator, ClipboardList, Utensils, ShoppingBag, Receipt, Sparkle,
   ArrowRightLeft, Edit3, MessageCircle, TrendingUp, QrCode, Database,
   BellRing, Car, Globe, Radio, Bell, Sliders, LogOut, Coffee, Briefcase, PlusCircle,
-  ShieldAlert, FileSpreadsheet, UtensilsCrossed
+  ShieldAlert, FileSpreadsheet, UtensilsCrossed, Building
 } from 'lucide-react';
 import { HOTEL_CONFIG, ROOM_TIERS, GST_FOM_RECORDS_2026_09_25 } from '../data/hotelData';
 import { maskAadhaar } from '../utils/security';
@@ -17,6 +17,7 @@ import BookingReceiptModal from './BookingReceiptModal';
 import CheckoutSplitModal from './CheckoutSplitModal';
 import InteractiveCalendar from '@/components/ui/visualize-booking';
 import RoomQrModal from './RoomQrModal';
+import StewardQrManagerModal from './StewardQrManagerModal';
 import BackupRestoreModal from './BackupRestoreModal';
 import LiveOrdersDrawerModal from './LiveOrdersDrawerModal';
 import RoomServicesCareModal from './RoomServicesCareModal';
