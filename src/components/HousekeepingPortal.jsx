@@ -1424,12 +1424,12 @@ export default function HousekeepingPortal({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1rem' }}>
               {[
-                { key: 'linenChanged', label: '1. Fresh sanitised bed sheets & duvet covers replaced' },
-                { key: 'washroomSanitized', label: '2. Washroom descaled, bleached & ozone sanitized' },
-                { key: 'terryTowelsPlaced', label: '3. 4x fresh plush terry bath towels & mat placed' },
-                { key: 'ayurvedicToiletriesRestocked', label: '4. Herbal Ayurvedic shampoo, soap & dental kit' },
-                { key: 'beverageTrayRestocked', label: '5. 2x mineral water bottles & Taj Mahal tea tray' },
-                { key: 'acLightsChecked', label: '6. AC cooling, remote, TV & lights verified' },
+                { key: 'linenChanged', label: '1. Fresh bed linen & duvet aligned' },
+                { key: 'washroomSanitized', label: '2. Bathroom descaled & ozone sanitized' },
+                { key: 'terryTowelsPlaced', label: '3. 4x fresh terry towels & bath mat' },
+                { key: 'ayurvedicToiletriesRestocked', label: '4. Ayurvedic toiletries & dental kit replenished' },
+                { key: 'beverageTrayRestocked', label: '5. 2x mineral water & electric kettle tea tray restocked' },
+                { key: 'acLightsChecked', label: '6. AC remote & TV tested (working condition)' },
                 { key: 'wardrobeHangersPlaced', label: '7. Wardrobe hangers & laundry bag placed' }
               ].map(chk => (
                 <label key={chk.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
