@@ -300,6 +300,7 @@ export default function App() {
 
   const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const [currentReceiptBooking, setCurrentReceiptBooking] = useState(null);
+  const [receiptInitialType, setReceiptInitialType] = useState('money-receipt');
 
   const [floorExplorerOpen, setFloorExplorerOpen] = useState(false);
   const [virtualTourOpen, setVirtualTourOpen] = useState(false);
@@ -779,6 +780,7 @@ export default function App() {
     }
 
     setCurrentReceiptBooking(newBooking);
+    setReceiptInitialType(newBooking?.isCheckInMoneyReceipt !== false ? 'money-receipt' : 'a4');
     setReceiptModalOpen(true);
   };
 
@@ -1244,6 +1246,7 @@ export default function App() {
           isOpen={receiptModalOpen}
           onClose={() => setReceiptModalOpen(false)}
           booking={currentReceiptBooking}
+          initialType={receiptInitialType}
           onUpdateBooking={(updated) => {
             if (updated && (updated.bookingId || updated.id)) {
               const bId = updated.bookingId || updated.id;

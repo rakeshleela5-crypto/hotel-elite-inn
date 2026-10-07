@@ -103,55 +103,59 @@ export default function BookingReceiptModal({
   // Synchronize state when modal opens or booking changes
   useEffect(() => {
     if (booking && isOpen) {
-      setInvoiceType(initialType || 'a4');
+      const defaultMode = booking.isCheckInMoneyReceipt ? 'money-receipt' : (initialType || 'money-receipt');
+      setInvoiceType(defaultMode);
       if (booking.isNonGstBill !== undefined) {
         setIsNonGstBill(Boolean(booking.isNonGstBill));
       }
       if (booking.isLiveEditMode !== undefined) {
         setIsLiveEditMode(Boolean(booking.isLiveEditMode));
       }
-      const nights = Number(booking.nights || 4);
-      const tariff = Number(booking.tariffPerNight || booking.tariff || 2999);
-      const foodAmt = Number(booking.foodAmount || 900);
+      const nights = Math.max(1, Number(booking.nights || 1));
+      const tariff = Number(booking.tariffPerNight || booking.tariff || 1699);
+      const foodAmt = Number(booking.foodAmount || 0);
 
       setEditHeader({
-        guestName: booking.guestName || 'MR. P ASHOK',
-        guestPhone: booking.guestPhone || '+91 6305202068',
-        company: booking.company || 'LINDE INDIA LTD',
-        corporateGstin: booking.corporateGstin || '21AAACB2528H1ZA',
-        billingAddress: booking.billingAddress || 'Rayagada Field Project Office, Rayagada - 765001',
-        stateCode: booking.corporateGstin?.slice(0, 2) || '21',
-        stateName: booking.corporateGstin?.slice(0, 2) === '21' ? 'Odisha' : 'Other State',
-        roomNumber: String(booking.roomNumber || '301'),
-        tier: booking.tier || 'Executive AC',
-        planCode: booking.mealPlan || booking.plan || 'CP',
-        grcNo: booking.grcNo || '684',
-        checkInDate: booking.checkInDate || '17-Sep-2026 20:44',
-        checkOutDate: booking.checkOutDate || '21-Sep-2026 14:15',
-        billNo: booking.billNo || `FMBIL2627-${String(booking.roomNumber || '1499').padStart(5, '0')}`
+        guestName: booking.guestName || 'Valued Guest',
+        guestPhone: booking.guestPhone || '',
+        company: booking.company || (booking.billingType === 'BTC' ? (booking.companyName || 'Corporate BTC') : 'Individual'),
+        corporateGstin: booking.corporateGstin || '',
+        billingAddress: booking.billingAddress || (booking.origin ? `${booking.origin} Visitor` : 'Rayagada - 765001'),
+        stateCode: booking.corporateGstin?.slice(0, 2) || (booking.isInterstate ? '28' : '21'),
+        stateName: booking.corporateGstin?.slice(0, 2) === '21' || !booking.isInterstate ? 'Odisha' : 'Other State',
+        roomNumber: String(booking.roomNumber || '101'),
+        tier: booking.tier || 'Deluxe Room',
+        planCode: booking.mealPlan || booking.plan || 'EP',
+        grcNo: booking.grcNo || `GRC-${booking.roomNumber || '101'}`,
+        checkInDate: booking.checkInDate || new Date().toISOString().split('T')[0],
+        checkOutDate: booking.checkOutDate || new Date(Date.now() + nights * 86400000).toISOString().split('T')[0],
+        billNo: booking.billNo || (booking.receiptNo || `HSI/MR/26-27/${booking.roomNumber || '101'}-${Date.now().toString().slice(-4)}`)
       });
 
-      // Initial line items
+      // Initial line items - ONLY add food if guest has actually ordered food
       const initialItems = [
         {
           id: 'item-1',
-          desc: `Accommodation Stay - ${booking.tier || 'Executive AC'} (Room ${booking.roomNumber || '301'})`,
-          subDesc: `Plan: ${booking.mealPlan || 'CP'} • ${nights} Nights Stay`,
+          desc: `Accommodation Stay - ${booking.tier || 'Deluxe Room'} (Room ${booking.roomNumber || '101'})`,
+          subDesc: `Plan: ${booking.mealPlan || 'EP'} • ${nights} Night${nights > 1 ? 's' : ''} Stay`,
           sac: '996311',
           qty: nights,
           rate: tariff,
           isExempt: false
-        },
-        {
+        }
+      ];
+
+      if (foodAmt > 0) {
+        initialItems.push({
           id: 'item-2',
           desc: 'Cannon Kitchen Restaurant - Food & Dining',
-          subDesc: 'Satvik Dining & Thali Service (KOT F2627-18346)',
+          subDesc: 'Satvik Dining & Room Service (KOT Billed)',
           sac: '996331',
           qty: 1,
           rate: foodAmt,
           isExempt: false
-        }
-      ];
+        });
+      }
 
       if (Array.isArray(booking.selectedAddOns)) {
         booking.selectedAddOns.forEach((addon, idx) => {
@@ -170,7 +174,7 @@ export default function BookingReceiptModal({
       setLineItems(initialItems);
 
       // Auto-detect interstate if corporate GSTIN is outside Odisha (21)
-      const gstinState = booking.corporateGstin ? booking.corporateGstin.slice(0, 2) : '21';
+      const gstinState = booking.corporateGstin ? booking.corporateGstin.slice(0, 2) : (booking.isInterstate ? '28' : '21');
       if (gstinState && gstinState !== '21') {
         setTaxType('inter');
       } else {
@@ -179,16 +183,18 @@ export default function BookingReceiptModal({
 
       // Initialize tenders
       const bTenders = booking.tenders || {};
-      const adv = Number(booking.advanceDeposit || booking.advancePaid || 5000);
+      const adv = Number(booking.advanceDeposit !== undefined ? booking.advanceDeposit : (booking.advancePaid || 0));
+      const payMode = (booking.paymentMode || 'Cash').toLowerCase();
+
       setTenders({
-        cash: bTenders.cash !== undefined ? bTenders.cash : 500,
-        upi: bTenders.upi !== undefined ? bTenders.upi : (adv >= 1000 ? 1000 : adv),
-        upiProvider: bTenders.upiProvider || 'PhonePe',
-        upiRef: bTenders.upiRef || 'UPI-849102',
-        card: bTenders.card !== undefined ? bTenders.card : 0,
+        cash: bTenders.cash !== undefined ? bTenders.cash : (payMode.includes('cash') ? adv : 0),
+        upi: bTenders.upi !== undefined ? bTenders.upi : (payMode.includes('upi') || payMode.includes('qr') ? adv : 0),
+        upiProvider: bTenders.upiProvider || 'SBI Merchant QR / UPI',
+        upiRef: bTenders.upiRef || (booking.bookingId ? `REF-${booking.bookingId}` : 'UPI-SETTLED'),
+        card: bTenders.card !== undefined ? bTenders.card : (payMode.includes('card') ? adv : 0),
         cardAuth: bTenders.cardAuth || '',
-        btc: bTenders.btc !== undefined ? bTenders.btc : (booking.isB2b ? Math.max(0, (booking.totalAmount || 13538) - adv) : 0),
-        btcCompany: booking.company || 'Linde India Ltd'
+        btc: bTenders.btc !== undefined ? bTenders.btc : (booking.isB2b || payMode.includes('btc') ? Math.max(0, (booking.totalAmount || (tariff * nights)) - adv) : 0),
+        btcCompany: booking.company || booking.companyName || 'Corporate Ledger'
       });
     }
   }, [isOpen, booking, initialType]);
@@ -256,14 +262,16 @@ export default function BookingReceiptModal({
   const effectiveRoundOff = customRoundOff !== 0 ? customRoundOff : autoRoundOff;
   const grandTotal = Math.round(unroundedTotal + effectiveRoundOff);
 
-  const advancePaid = Number(booking.advanceDeposit || booking.advancePaid || 5000);
+  const advancePaid = booking?.advanceDeposit !== undefined
+    ? Number(booking.advanceDeposit)
+    : Number(booking?.advancePaid || 0);
   const balanceDue = Math.max(0, grandTotal - advancePaid);
 
   // Room Split calculations (Page 3 of hotel_documents.pdf)
   const roomItems = lineItems.filter(item => item.sac === '996311' || item.desc?.toLowerCase().includes('accommodation') || item.desc?.toLowerCase().includes('tariff') || item.desc?.toLowerCase().includes('room'));
   const roomTariffBase = roomItems.length > 0
     ? roomItems.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0)
-    : 11996.00;
+    : Number(booking?.tariffPerNight || booking?.tariff || 1699) * Math.max(1, Number(booking?.nights || 1));
   const roomGstVal = Number(((roomTariffBase * 5) / 100).toFixed(2));
   const roomSgst = Number((roomGstVal / 2).toFixed(2));
   const roomCgst = Number((roomGstVal / 2).toFixed(2));
@@ -273,7 +281,7 @@ export default function BookingReceiptModal({
   const foodItems = lineItems.filter(item => item.sac === '996331' || item.desc?.toLowerCase().includes('dining') || item.desc?.toLowerCase().includes('restaurant') || item.desc?.toLowerCase().includes('food'));
   const foodBase = foodItems.length > 0
     ? foodItems.reduce((sum, item) => sum + (Number(item.qty || 1) * Number(item.rate || 0)), 0)
-    : 900.00;
+    : 0.00;
   const foodGstVal = Number(((foodBase * 5) / 100).toFixed(2));
   const foodSgst = Number((foodGstVal / 2).toFixed(2));
   const foodCgst = Number((foodGstVal / 2).toFixed(2));
@@ -420,23 +428,47 @@ export default function BookingReceiptModal({
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
-  // WhatsApp GST Tax Folio Dispatch
+  // WhatsApp GST Tax Folio or Check-In Money Receipt Dispatch
   const handleSendWhatsAppInvoice = () => {
-    const rawPhone = (editHeader.guestPhone || booking.guestPhone || '').replace(/\D/g, '');
-    const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : (rawPhone.length > 10 ? rawPhone : '916305202068');
+    const rawPhone = (editHeader.guestPhone || booking?.guestPhone || '').replace(/\D/g, '');
+    const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : (rawPhone.length > 10 ? rawPhone : '916370757541');
     
-    const msg = 
+    let msg = '';
+    if (invoiceType === 'money-receipt') {
+      const receiptNum = booking?.receiptNo || editHeader.billNo || `HSI/MR/26-27/${editHeader.roomNumber || '101'}`;
+      msg = 
+`*HOTEL ELITE INN - CHECK-IN MONEY RECEIPT & WELCOME PASS*
+🏛️ *Opposite Railway Station Main Road, Muniguda, Rayagada - 765020*
+📞 Front Desk: +91-6370757541 | GSTIN: 21AEWFS9433F1ZN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Namaste *${editHeader.guestName || booking?.guestName || 'Valued Guest'}* ji! 🙏
+
+Welcome to Hotel Elite Inn! Your check-in is complete and physical room key has been handed over.
+
+🧾 *Receipt No:* ${receiptNum}
+🚪 *Allocated Room:* Room ${editHeader.roomNumber || booking?.roomNumber} (${editHeader.tier || booking?.tier || 'Deluxe Room'})
+📅 *Check-In Date:* ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+💵 *Advance Deposit Received:* ₹${advancePaid.toLocaleString('en-IN')} via ${booking?.paymentMode || 'Cash/UPI'}
+💰 *Agreed Room Tariff:* ₹${Number(booking?.tariffPerNight || booking?.tariff || 1699).toLocaleString('en-IN')} / night
+⚠️ *Est. Balance at Checkout:* ₹${balanceDue.toLocaleString('en-IN')}
+
+📶 *Guest Wi-Fi:* SSID \`EliteInn_Guest\` | Password \`elite7651\`
+🍽️ *Satvik Dining & Room Service:* Dial 9 or 100 from room telephone
+
+We wish you a pleasant and peaceful stay! Jay Jagannath! 🙏`;
+    } else {
+      msg = 
 `*HOTEL ELITE INN - OFFICIAL GST TAX INVOICE*
 🏛️ *Opposite Railway Station Main Road, Muniguda, Odisha - 765020*
 📞 Front Desk: +91-6370757541 | GSTIN: 21AEWFS9433F1ZN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Dear *${editHeader.guestName || booking.guestName || 'Valued Guest'}*,
+Dear *${editHeader.guestName || booking?.guestName || 'Valued Guest'}*,
 
 Thank you for choosing Hotel Elite Inn! Here is your official GST tax folio summary:
 
 📄 *Bill / Invoice No:* ${billNo}
-🚪 *Room Number:* ${editHeader.roomNumber || booking.roomNumber} (${editHeader.tier || booking.tier || 'Executive AC'})
-📅 *Stay Duration:* ${editHeader.checkInDate || booking.checkInDate} to ${editHeader.checkOutDate || booking.checkOutDate}
+🚪 *Room Number:* ${editHeader.roomNumber || booking?.roomNumber} (${editHeader.tier || booking?.tier || 'Deluxe Room'})
+📅 *Stay Duration:* ${editHeader.checkInDate || booking?.checkInDate} to ${editHeader.checkOutDate || booking?.checkOutDate}
 🏷️ *Tax Category:* ${isNonGstBill ? 'Exempt / Non-GST' : `${gstSlab}% GST (${taxType === 'intra' ? 'CGST+SGST' : 'IGST'})`}
 
 💰 *Taxable Base:* ₹${netTaxable.toLocaleString('en-IN')}
@@ -446,9 +478,10 @@ Thank you for choosing Hotel Elite Inn! Here is your official GST tax folio summ
 ${balanceDue > 0 ? `⚠️ *Balance Payable at Desk:* ₹${balanceDue.toLocaleString('en-IN')}` : '✨ *Settlement Status:* Fully Settled & Cleared'}
 
 🔗 *View Digital Folio & RFID Keycard:*
-${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || booking.roomNumber}
+${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || booking?.roomNumber}
 
 🙏 *We wish you a pleasant journey! Jay Jagannath!*`;
+    }
 
     const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, '_blank', 'noopener,noreferrer');
@@ -2006,7 +2039,7 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
           </div>
         )}
 
-        {/* VIEW 4B: OFFICIAL CASH / UPI MONEY RECEIPT VOUCHER (Page 5 & Owner Video Demo) */}
+        {/* VIEW 4B: OFFICIAL CASH / UPI MONEY RECEIPT & ADVANCE VOUCHER (Page 5) */}
         {invoiceType === 'money-receipt' && (
           <div className={`tax-invoice-sheet ${!includeLetterhead ? 'preprinted-pad-mode' : ''}`} style={{ 
             background: '#ffffff', 
@@ -2016,7 +2049,8 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             maxWidth: '820px',
             margin: '0 auto',
             boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-            position: 'relative'
+            position: 'relative',
+            borderRadius: '4px'
           }}>
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #b91c1c', paddingBottom: '12px' }}>
@@ -2026,115 +2060,205 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
                   color: '#fff', 
                   fontSize: '9px', 
                   fontWeight: 900, 
-                  padding: '2px 6px', 
+                  padding: '2px 8px', 
                   borderRadius: '3px',
                   letterSpacing: '0.05em' 
                 }}>
-                  OFFICIAL PAYMENT VOUCHER • GUEST ORIGINAL
+                  OFFICIAL CHECK-IN PAYMENT VOUCHER • GUEST ORIGINAL
                 </span>
                 <h1 style={{ margin: '6px 0 2px 0', fontSize: '1.45rem', fontWeight: 900, color: '#0f172a', letterSpacing: '0.5px' }}>
-                  HOTEL ELITE INN
+                  {HOTEL_CONFIG.name.toUpperCase()}
                 </h1>
                 <div style={{ fontSize: '11px', color: '#334155' }}>
-                  Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada - 765020. Odisha
+                  {HOTEL_CONFIG.address}
                 </div>
                 <div style={{ fontSize: '10px', color: '#475569' }}>
-                  GSTIN: <strong>21AEWFS9433F1ZN</strong> | PAN: <strong>AEWFS9433F</strong> | State: 21 (Odisha)
+                  GSTIN: <strong>{HOTEL_CONFIG.gstin}</strong> | State: 21 (Odisha) | Ph: {HOTEL_CONFIG.phone}
                 </div>
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#b91c1c' }}>
+                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#b91c1c' }}>
                   MONEY RECEIPT
                 </div>
                 <div style={{ fontSize: '11px', color: '#0f172a', marginTop: '2px' }}>
-                  Receipt No: <strong>HSI/MR/26-27/{booking.roomNumber || '301'}</strong>
+                  Receipt No: <strong>{booking?.receiptNo || editHeader.billNo || `HSI/MR/26-27/${editHeader.roomNumber || '101'}`}</strong>
                 </div>
                 <div style={{ fontSize: '10px', color: '#64748b', marginTop: '2px' }}>
-                  Date: <strong>{new Date().toLocaleDateString('en-IN')}</strong> ({new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })})
+                  Date: <strong>{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</strong> ({new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })})
                 </div>
               </div>
             </div>
 
             {/* Body */}
-            <div style={{ padding: '20px 0', fontSize: '12px', lineHeight: 2.2 }}>
+            <div style={{ padding: '16px 0', fontSize: '12px', lineHeight: 2.2 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
-                <span style={{ minWidth: '180px', color: '#475569', fontWeight: 600 }}>Received with thanks from :</span>
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>Received with thanks from :</span>
                 <strong style={{ fontSize: '13px', color: '#0f172a', textTransform: 'uppercase', flex: 1 }}>
-                  {booking.guestName || 'MR. P ASHOK'}
+                  {editHeader.guestName || booking?.guestName || 'Valued Guest'}
                 </strong>
-                <span style={{ color: '#64748b' }}>Room No: <strong>{booking.roomNumber || '301'}</strong> ({booking.tier || 'Executive AC'})</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
-                <span style={{ minWidth: '180px', color: '#475569', fontWeight: 600 }}>Company Name / Account :</span>
-                <span style={{ flex: 1, color: '#0f172a', fontWeight: 600 }}>
-                  {booking.company || 'LINDE INDIA LTD (Direct Guest Settlement)'}
+                <span style={{ color: '#0369a1', fontWeight: 700 }}>
+                  Room No: <strong style={{ fontSize: '14px' }}>{editHeader.roomNumber || booking?.roomNumber || '101'}</strong> ({editHeader.tier || booking?.tier || 'Deluxe Room'})
                 </span>
-                <span style={{ color: '#64748b' }}>Folio / Bill: <strong>{billNo}</strong></span>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
-                <span style={{ minWidth: '180px', color: '#475569', fontWeight: 600 }}>The Sum of Rupees :</span>
-                <strong style={{ color: '#059669', flex: 1, fontSize: '13px' }}>
-                  INR Nine hundred sixty-two only (₹{foodTotal.toFixed(2)})
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>Mobile / Contact No :</span>
+                <span style={{ flex: 1, color: '#0f172a', fontWeight: 600 }}>
+                  {editHeader.guestPhone || booking?.guestPhone || 'Direct Front Desk Walk-In'}
+                </span>
+                <span style={{ color: '#64748b' }}>Booking ID: <strong>{booking?.bookingId || 'WALK-IN'}</strong></span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>Company / Account :</span>
+                <span style={{ flex: 1, color: '#0f172a', fontWeight: 600 }}>
+                  {editHeader.company || booking?.company || (booking?.billingType === 'BTC' ? 'Corporate BTC Ledger' : 'Direct Individual Guest')}
+                </span>
+                <span style={{ color: '#64748b' }}>Meal Plan: <strong>{editHeader.planCode || booking?.mealPlan || 'EP'}</strong></span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8', background: 'rgba(5, 150, 105, 0.05)', padding: '2px 6px' }}>
+                <span style={{ minWidth: '184px', color: '#047857', fontWeight: 700 }}>The Sum of Rupees :</span>
+                <strong style={{ color: '#047857', flex: 1, fontSize: '13px' }}>
+                  {advancePaid > 0 ? (
+                    `₹${advancePaid.toLocaleString('en-IN')}.00 (${convertNumberToIndianWords(advancePaid)})`
+                  ) : (
+                    '₹0.00 (Zero Advance Deposit - Balance Payable at Checkout)'
+                  )}
                 </strong>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
-                <span style={{ minWidth: '180px', color: '#475569', fontWeight: 600 }}>By Tender / Mode of Payment :</span>
-                <div style={{ flex: 1, display: 'flex', gap: '15px', alignItems: 'center' }}>
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>By Tender / Payment Mode :</span>
+                <div style={{ flex: 1, display: 'flex', gap: '12px', alignItems: 'center' }}>
                   <span style={{ background: '#eff6ff', color: '#1d4ed8', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, border: '1px solid #bfdbfe' }}>
-                    ✓ PhonePe (UPI) • Ref: UPI-849102 / SBI Merchant QR
+                    ✓ {booking?.paymentMode || 'Cash / UPI Settlement'}
                   </span>
                   <span style={{ color: '#64748b', fontSize: '11px' }}>
-                    Status: <strong style={{ color: '#059669' }}>SETTLED &amp; CLEARED</strong>
+                    Status: <strong style={{ color: advancePaid > 0 ? '#059669' : '#d97706' }}>
+                      {advancePaid > 0 ? 'SETTLED & RECEIVED AT COUNTER' : 'PAYABLE AT CHECKOUT'}
+                    </strong>
                   </span>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'baseline', borderBottom: '1px dotted #94a3b8' }}>
-                <span style={{ minWidth: '180px', color: '#475569', fontWeight: 600 }}>Towards Settlement Of :</span>
+                <span style={{ minWidth: '190px', color: '#475569', fontWeight: 600 }}>Towards Settlement Of :</span>
                 <span style={{ flex: 1, color: '#0f172a' }}>
-                  Cannon Kitchen Restaurant Dining &amp; Room Service Meals (SAC 996331)
+                  Advance Room Reservation Deposit • {Number(booking?.nights || 1)} Night Stay (SAC 996311)
                 </span>
-                <span style={{ color: '#b45309', fontWeight: 600, fontSize: '11px' }}>
-                  * Room Tariff (₹{roomTotal.toFixed(2)}) transferred to Corporate BTC Credit
+                <span style={{ color: '#475569', fontSize: '11px' }}>
+                  Rate: <strong>₹{Number(booking?.tariffPerNight || booking?.tariff || 1699).toLocaleString('en-IN')}/Night</strong>
                 </span>
               </div>
             </div>
 
+            {/* Check-In Tariff & Stay Summary Table */}
+            <div style={{
+              background: '#f8fafc',
+              border: '1px solid #cbd5e1',
+              borderRadius: '6px',
+              padding: '12px 16px',
+              margin: '10px 0 16px',
+              fontSize: '11px'
+            }}>
+              <div style={{ fontWeight: 800, color: '#0f172a', marginBottom: '8px', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em' }}>
+                Stay Estimate &amp; Account Balance Summary
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', textAlign: 'center' }}>
+                <div style={{ background: '#ffffff', padding: '8px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ color: '#64748b', fontSize: '10px' }}>Agreed Room Tariff</div>
+                  <div style={{ fontWeight: 800, fontSize: '13px', color: '#0f172a' }}>
+                    ₹{Number(booking?.tariffPerNight || booking?.tariff || 1699).toLocaleString('en-IN')} <span style={{ fontSize: '9px', fontWeight: 'normal' }}>/nt</span>
+                  </div>
+                </div>
+
+                <div style={{ background: '#ffffff', padding: '8px', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ color: '#64748b', fontSize: '10px' }}>Estimated Stay Total</div>
+                  <div style={{ fontWeight: 800, fontSize: '13px', color: '#0f172a' }}>
+                    ₹{Number(booking?.totalAmount || ((booking?.tariffPerNight || 1699) * (booking?.nights || 1))).toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '9px', color: '#94a3b8' }}>({booking?.nights || 1} Night Stay)</div>
+                </div>
+
+                <div style={{ background: '#ecfdf5', padding: '8px', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
+                  <div style={{ color: '#047857', fontSize: '10px', fontWeight: 600 }}>Advance Paid Now</div>
+                  <div style={{ fontWeight: 900, fontSize: '13px', color: '#059669' }}>
+                    ₹{advancePaid.toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '9px', color: '#047857' }}>via {booking?.paymentMode || 'Cash/UPI'}</div>
+                </div>
+
+                <div style={{ background: '#fffbeb', padding: '8px', borderRadius: '4px', border: '1px solid #fde68a' }}>
+                  <div style={{ color: '#b45309', fontSize: '10px', fontWeight: 600 }}>Balance at Checkout</div>
+                  <div style={{ fontWeight: 900, fontSize: '13px', color: '#d97706' }}>
+                    ₹{Math.max(0, Number(booking?.totalAmount || ((booking?.tariffPerNight || 1699) * (booking?.nights || 1))) - advancePaid).toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '9px', color: '#92400e' }}>Payable at room release</div>
+                </div>
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '10px', color: '#64748b', textAlign: 'center' }}>
+                ℹ️ F&amp;B charges: <strong>₹0.00</strong> (No dining ordered at check-in). Room service orders will be billed separately via Cannon Kitchen KOT.
+              </div>
+            </div>
+
+            {/* Key Handover & Wi-Fi Pass Badge */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(15, 23, 42, 0.04))',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              borderRadius: '6px',
+              padding: '8px 14px',
+              margin: '8px 0 16px',
+              fontSize: '11px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🔑</span>
+                <span><strong>Physical Room Key #{editHeader.roomNumber || booking?.roomNumber || '101'}</strong> handed over to guest at reception.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0369a1' }}>
+                <span style={{ fontSize: '16px' }}>📶</span>
+                <span>Wi-Fi: <strong>EliteInn_Guest</strong> | Key: <strong>elite7651</strong></span>
+              </div>
+            </div>
+
             {/* Bottom Signatures and Stamp */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '20px', paddingTop: '10px' }}>
               <div style={{ 
                 border: '1px dashed #cbd5e1', 
-                padding: '10px 14px', 
+                padding: '8px 12px', 
                 borderRadius: '6px', 
-                background: '#f8fafc',
-                fontSize: '10px',
+                background: '#f8fafc', 
+                fontSize: '9.5px', 
                 color: '#64748b',
-                maxWidth: '300px'
+                maxWidth: '320px',
+                lineHeight: 1.4
               }}>
-                <div>• Valid subject to realization of UPI/Bank transfer</div>
-                <div>• Computer generated cash/tender voucher</div>
-                <div>• All disputes subject to Rayagada, Odisha jurisdiction</div>
+                <div>• Valid subject to realization of UPI/Cash receipt.</div>
+                <div>• Official Front Desk advance voucher under Sarai Act 1867.</div>
+                <div>• All disputes subject to Rayagada, Odisha jurisdiction.</div>
               </div>
 
               <div style={{ display: 'flex', gap: '40px', textAlign: 'center', fontSize: '11px' }}>
                 <div>
-                  <div style={{ height: '40px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                    <span style={{ fontFamily: 'cursive', fontSize: '13px', color: '#334155' }}>{booking.guestName ? booking.guestName.split(' ')[0] : 'Guest'}</span>
+                  <div style={{ height: '36px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: 'cursive', fontSize: '13px', color: '#334155' }}>
+                      {editHeader.guestName ? editHeader.guestName.split(' ')[0] : 'Guest'}
+                    </span>
                   </div>
                   <div style={{ borderBottom: '1px solid #0f172a', width: '130px', marginBottom: '4px' }}></div>
                   <span style={{ color: '#475569', fontWeight: 600 }}>Guest Signature</span>
                 </div>
 
                 <div>
-                  <div style={{ height: '40px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                    <span style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '12px' }}>K. Simhachalam</span>
+                  <div style={{ height: '36px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <span style={{ fontWeight: 800, color: '#1e3a8a', fontSize: '11px' }}>Duty Receptionist</span>
                   </div>
                   <div style={{ borderBottom: '1px solid #0f172a', width: '150px', marginBottom: '4px' }}></div>
-                  <span style={{ color: '#475569', fontWeight: 700 }}>Authorized Cashier / MD</span>
+                  <span style={{ color: '#475569', fontWeight: 700 }}>Authorized Front Desk Cashier</span>
                 </div>
               </div>
             </div>
@@ -2168,46 +2292,48 @@ ${window.location.origin}/?bill=${billNo}&room=${editHeader.roomNumber || bookin
             <div style={{ fontSize: '0.78rem', lineHeight: 1.5, borderBottom: '1px solid #cbd5e1', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
               <div><strong>BILL NO:</strong> {billNo}</div>
               <div><strong>DATE:</strong> {new Date().toLocaleDateString('en-IN')}</div>
-              <div><strong>GUEST:</strong> {booking.guestName}</div>
-              <div><strong>COMPANY:</strong> {booking.company || 'LINDE INDIA LTD'}</div>
-              <div><strong>ROOM:</strong> {booking.roomNumber} ({booking.tier})</div>
-              <div><strong>CHECK-IN:</strong> 17-Sep-2026 (20:44)</div>
-              <div><strong>CHECK-OUT:</strong> 21-Sep-2026 (14:15)</div>
+              <div><strong>GUEST:</strong> {editHeader.guestName || booking?.guestName || 'Valued Guest'}</div>
+              <div><strong>COMPANY:</strong> {editHeader.company || booking?.company || 'Direct Guest'}</div>
+              <div><strong>ROOM:</strong> {editHeader.roomNumber || booking?.roomNumber} ({editHeader.tier || booking?.tier})</div>
+              <div><strong>CHECK-IN:</strong> {editHeader.checkInDate || booking?.checkInDate}</div>
+              <div><strong>CHECK-OUT:</strong> {editHeader.checkOutDate || booking?.checkOutDate}</div>
             </div>
 
             <table style={{ width: '100%', fontSize: '0.78rem', borderCollapse: 'collapse', marginBottom: '0.85rem' }}>
               <tbody>
                 <tr>
-                  <td>Room Tariff (4 Nts)</td>
-                  <td style={{ textAlign: 'right' }}>₹11,996.00</td>
+                  <td>Room Tariff ({booking?.nights || 1} Nt{Number(booking?.nights || 1) > 1 ? 's' : ''})</td>
+                  <td style={{ textAlign: 'right' }}>₹{roomTariffBase.toFixed(2)}</td>
                 </tr>
-                <tr>
-                  <td>Cannon Kitchen Dining</td>
-                  <td style={{ textAlign: 'right' }}>₹900.00</td>
-                </tr>
-                <tr>
-                  <td>CGST (2.5%)</td>
-                  <td style={{ textAlign: 'right' }}>₹320.92</td>
-                </tr>
-                <tr>
-                  <td>SGST (2.5%)</td>
-                  <td style={{ textAlign: 'right' }}>₹320.92</td>
-                </tr>
+                {foodBase > 0 && (
+                  <tr>
+                    <td>Cannon Kitchen Dining</td>
+                    <td style={{ textAlign: 'right' }}>₹{foodBase.toFixed(2)}</td>
+                  </tr>
+                )}
+                {!isNonGstBill && cgstAmount > 0 && (
+                  <tr>
+                    <td>CGST ({cgstRate}%)</td>
+                    <td style={{ textAlign: 'right' }}>₹{cgstAmount.toFixed(2)}</td>
+                  </tr>
+                )}
+                {!isNonGstBill && sgstAmount > 0 && (
+                  <tr>
+                    <td>SGST ({sgstRate}%)</td>
+                    <td style={{ textAlign: 'right' }}>₹{sgstAmount.toFixed(2)}</td>
+                  </tr>
+                )}
                 <tr style={{ borderTop: '2px dashed #0f172a', fontWeight: 'bold', fontSize: '0.88rem' }}>
                   <td style={{ paddingTop: '0.4rem' }}>NET TOTAL</td>
-                  <td style={{ textAlign: 'right', paddingTop: '0.4rem' }}>₹13,537.84</td>
+                  <td style={{ textAlign: 'right', paddingTop: '0.4rem' }}>₹{grandTotal.toFixed(2)}</td>
                 </tr>
                 <tr style={{ fontSize: '0.72rem', color: '#475569' }}>
-                  <td style={{ paddingTop: '0.3rem' }}>UPI (SBI Merchant QR):</td>
-                  <td style={{ textAlign: 'right', paddingTop: '0.3rem' }}>₹5,000.00</td>
+                  <td style={{ paddingTop: '0.3rem' }}>Advance Paid ({booking?.paymentMode || 'Cash/UPI'}):</td>
+                  <td style={{ textAlign: 'right', paddingTop: '0.3rem' }}>₹{advancePaid.toFixed(2)}</td>
                 </tr>
-                <tr style={{ fontSize: '0.72rem', color: '#475569' }}>
-                  <td>BTC (Linde India Ltd):</td>
-                  <td style={{ textAlign: 'right' }}>₹8,537.84</td>
-                </tr>
-                <tr style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 'bold' }}>
+                <tr style={{ fontSize: '0.72rem', color: balanceDue > 0 ? '#b91c1c' : '#059669', fontWeight: 'bold' }}>
                   <td>Balance Due:</td>
-                  <td style={{ textAlign: 'right' }}>₹0.00 (PAID)</td>
+                  <td style={{ textAlign: 'right' }}>₹{balanceDue.toFixed(2)} {balanceDue <= 0 ? '(PAID)' : ''}</td>
                 </tr>
               </tbody>
             </table>

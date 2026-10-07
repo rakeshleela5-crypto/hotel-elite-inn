@@ -2291,11 +2291,14 @@ export default function ReceptionAdmin({
       totalAmount: totalStayAmount,
       advanceDeposit: advanceDepositNum,
       balanceDue: balanceDueCalculated,
-      paymentMode: walkInPaymentMode,
+      paymentMode: walkInPaymentMode || 'UPI',
       paymentStatus: advanceDepositNum >= totalStayAmount ? 'Paid at Check-In' : (advanceDepositNum > 0 ? 'Partially Paid' : 'Pending Payment'),
       bookingStatus: 'Checked In',
+      foodAmount: 0,
       isB2b: walkInBillingType === 'BTC',
-      consentDpdp: 1
+      consentDpdp: 1,
+      isCheckInMoneyReceipt: true,
+      receiptNo: `HSI/MR/26-27/${walkInRoom}-${Date.now().toString().slice(-4)}`
     };
 
     // Save directly to Cloudflare D1 database
@@ -8623,6 +8626,60 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
                     onChange={(e) => setWalkInDeposit(Number(e.target.value))}
                     required 
                   />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="form-group">
+                  <label className="form-label">Stay Duration (Nights)</label>
+                  <input 
+                    type="number" 
+                    min="1"
+                    max="30"
+                    className="form-input" 
+                    value={walkInNights}
+                    onChange={(e) => setWalkInNights(Math.max(1, Number(e.target.value) || 1))}
+                    required 
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Advance Payment Mode</label>
+                  <select 
+                    className="form-select"
+                    value={walkInPaymentMode}
+                    onChange={(e) => setWalkInPaymentMode(e.target.value)}
+                  >
+                    <option value="UPI">UPI / QR (PhonePe, GPay, Paytm)</option>
+                    <option value="Cash">Cash at Counter</option>
+                    <option value="Card">Debit / Credit Card (POS Terminal)</option>
+                    <option value="BTC">BTC (Bill to Company / Corporate)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Live Stay & Payment Breakdown Summary */}
+              <div style={{
+                background: 'rgba(15, 23, 42, 0.85)',
+                border: '1px solid rgba(212, 175, 55, 0.35)',
+                borderRadius: '8px',
+                padding: '0.75rem 1rem',
+                margin: '0.85rem 0 0.5rem',
+                fontSize: '0.82rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: '#cbd5e1' }}>
+                  <span>Estimated Total Stay ({walkInNights} Nts × ₹{walkInRate}):</span>
+                  <strong style={{ color: '#fff' }}>₹{(walkInRate * walkInNights).toLocaleString('en-IN')}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: '#34d399' }}>
+                  <span>Advance Deposit Paid ({walkInPaymentMode}):</span>
+                  <strong>- ₹{Number(walkInDeposit || 0).toLocaleString('en-IN')}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed rgba(255,255,255,0.15)', paddingTop: '4px', color: '#fbbf24', fontWeight: 800 }}>
+                  <span>Estimated Balance Due at Checkout:</span>
+                  <span>₹{Math.max(0, (walkInRate * walkInNights) - Number(walkInDeposit || 0)).toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '5px' }}>
+                  🧾 Generates official Check-In Money Receipt. F&amp;B dining is ₹0.00 until food is ordered.
                 </div>
               </div>
 
