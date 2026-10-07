@@ -224,347 +224,7 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* IDS Next Enterprise Operational Quick Bar (For Owner & Consultant Audit) */}
-      <div className="navbar-erp-quickbar" style={{
-        background: 'linear-gradient(90deg, rgba(8,12,24,0.98), rgba(18,24,44,0.98))',
-        borderBottom: '1px solid rgba(212, 175, 55, 0.3)',
-        padding: '0.4rem 1rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'nowrap',
-        overflowX: 'auto',
-        WebkitOverflowScrolling: 'touch',
-        maxWidth: '100vw',
-        width: '100%',
-        boxSizing: 'border-box',
-        gap: '0.5rem',
-        fontSize: '0.8rem'
-      }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0, flexWrap: 'nowrap' }}>
-          <span style={{
-            fontSize: '0.7rem',
-            background: 'rgba(212, 175, 55, 0.25)',
-            color: 'var(--gold-glow)',
-            padding: '0.15rem 0.5rem',
-            borderRadius: '4px',
-            fontWeight: 800,
-            border: '1px solid var(--gold-primary)'
-          }}>
-            IDS NEXT ERP
-          </span>
 
-          {/* 27-Room Quick Search Trigger */}
-          <button
-            onClick={onOpenRoomSearch}
-            style={{
-              padding: '0.3rem 0.75rem',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(15, 23, 42, 0.95))',
-              border: '1.5px solid rgba(212, 175, 55, 0.6)',
-              color: '#fff',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.45rem',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-              whiteSpace: 'nowrap'
-            }}
-            title="Search all 27 rooms (Ctrl+K)"
-          >
-            <Search size={13} color="#fbbf24" />
-            <span>🔍 Search 27 Rooms</span>
-            <kbd style={{
-              background: 'rgba(0,0,0,0.6)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '4px',
-              padding: '1px 5px',
-              fontSize: '0.62rem',
-              color: '#fbbf24',
-              fontFamily: 'monospace'
-            }}>Ctrl+K</kbd>
-          </button>
-
-          <button
-            onClick={onOpenMasterFolio}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(96, 165, 250, 0.18)',
-              border: '1px solid rgba(96, 165, 250, 0.4)',
-              color: '#60a5fa',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            📄 Primary Folio (1-17 Actions)
-          </button>
-
-          <button
-            onClick={onOpenCannonKitchenPOS}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(245, 158, 11, 0.18)',
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              color: '#fbbf24',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            🍳 Fenugreek Restaurant POS (Code 214)
-          </button>
-
-          <button
-            onClick={onOpenAccountsLedger}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(52, 211, 153, 0.18)',
-              border: '1px solid rgba(52, 211, 153, 0.4)',
-              color: '#34d399',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            📊 Accounts Day Book & B2B GST
-          </button>
-
-          <button
-            onClick={onOpenCaFilingStation}
-            style={{
-              padding: '0.3rem 0.75rem',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(245, 158, 11, 0.18))',
-              border: '1.5px solid var(--gold-primary)',
-              color: 'var(--gold-glow)',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              boxShadow: '0 0 12px rgba(212, 175, 55, 0.25)'
-            }}
-            title="Open System #36: CA Filing Station & Financial Intelligence Engine (10 Modules)"
-          >
-            <Scale size={13} color="var(--gold-glow)" /> 🏛️ System #36: CA Filing Station
-          </button>
-
-          <button
-            id="nav-audited-sales-btn"
-            onClick={onOpenAuditedSalesRegister}
-            style={{
-              padding: '0.35rem 0.85rem',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 95, 70, 0.45))',
-              border: '1.5px solid #10b981',
-              color: '#34d399',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.8rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              boxShadow: '0 0 14px rgba(16, 185, 129, 0.3)',
-              whiteSpace: 'nowrap',
-              flexShrink: 0
-            }}
-            title="Open 26-Column Audited Sales Register, Reconciler & Excel Importer"
-          >
-            <FileSpreadsheet size={14} color="#34d399" /> 📊 26-Column Audited Sales Register
-          </button>
-
-          <button
-            id="nav-audited-restaurant-btn"
-            onClick={onOpenAuditedRestaurantRegister}
-            style={{
-              padding: '0.3rem 0.75rem',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.28), rgba(180, 83, 9, 0.35))',
-              border: '1.5px solid #d97706',
-              color: '#fbbf24',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              boxShadow: '0 0 12px rgba(217, 119, 6, 0.25)'
-            }}
-            title="Open 1,320 Bills Restaurant Sales Register, POS Channels & Statutory Reconciliation (F10)"
-          >
-            <UtensilsCrossed size={13} color="#fbbf24" /> 🍽️ Rest. Sales Reg (F10)
-          </button>
-
-          <button
-            onClick={onOpenD1Database}
-            style={{
-              padding: '0.3rem 0.7rem',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.28), rgba(14, 165, 233, 0.18))',
-              border: '1.5px solid rgba(56, 189, 248, 0.7)',
-              color: '#38bdf8',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              boxShadow: '0 0 12px rgba(56, 189, 248, 0.3)'
-            }}
-            title="Open Cloudflare D1 Master Database Console (All 68 Tables)"
-          >
-            <Database size={13} color="#38bdf8" /> 🗄️ D1 Database Hub (68 Tables)
-          </button>
-
-          <button
-            onClick={onOpenNightAudit}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(192, 132, 252, 0.18)',
-              border: '1px solid rgba(192, 132, 252, 0.4)',
-              color: '#c084fc',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            🌙 12 AM Night Audit Lock
-          </button>
-
-          <button
-            onClick={onOpenHousekeeping}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(16, 185, 129, 0.2)',
-              border: '1px solid #10b981',
-              color: '#34d399',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-            title="Open Mobile Housekeeping & Room Turnaround Console"
-          >
-            🧹 Housekeeping Attendant
-          </button>
-
-          <button
-            onClick={onOpenDirectorPortal}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(212, 175, 55, 0.18)',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              color: 'var(--gold-glow)',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            📱 Remote Director Portal
-          </button>
-
-          <button
-            onClick={onOpenStoreInventory}
-            style={{
-              padding: '0.3rem 0.65rem',
-              borderRadius: '6px',
-              background: 'rgba(16, 185, 129, 0.15)',
-              border: '1px solid rgba(16, 185, 129, 0.35)',
-              color: '#6ee7b7',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.3rem'
-            }}
-          >
-            🥬 Mandi Store
-          </button>
-
-          <button
-            onClick={onOpenRevenueManagement}
-            style={{
-              padding: '0.3rem 0.75rem',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(245, 158, 11, 0.22))',
-              border: '1px solid var(--gold-primary)',
-              color: 'var(--gold-glow)',
-              cursor: 'pointer',
-              fontWeight: 800,
-              fontSize: '0.78rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              boxShadow: '0 0 12px rgba(212, 175, 55, 0.2)'
-            }}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }}></span>
-            ⚡ IDeaS G3 RMS Console
-          </button>
-
-
-        </div>
-
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-          <button
-            onClick={handleAdminAccess}
-            style={{
-              fontSize: '0.75rem',
-              color: '#fff',
-              background: currentView === 'pms' ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' : 'rgba(255,255,255,0.04)',
-              border: currentView === 'pms' ? '1px solid #f87171' : '1px solid rgba(56, 189, 248, 0.3)',
-              padding: '0.35rem 0.75rem',
-              borderRadius: '6px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              transition: 'all 0.15s ease',
-              boxShadow: currentView === 'pms' ? '0 0 12px rgba(220, 38, 38, 0.45)' : 'none'
-            }}
-            title={currentView === 'pms' ? 'Exit PMS and return to Public Website (Esc)' : 'Open Front Desk PMS Console'}
-          >
-            {currentView === 'pms' ? (
-              <>
-                <LogOut size={13} color="#ffffff" /> Exit PMS to Website (Esc)
-              </>
-            ) : (
-              <>
-                <Lock size={13} color="#38bdf8" /> Front Desk Enterprise PMS
-              </>
-            )}
-          </button>
-        </div>
-      </div>
 
       {/* Main Glassmorphic Navigation Bar */}
       <nav style={{
@@ -724,7 +384,7 @@ export default function Navbar({
             </button>
 
             <button 
-              onClick={onOpenCannonKitchenPOS}
+              onClick={onOpenDining}
               style={{
                 color: 'var(--text-primary)',
                 fontSize: '0.9rem',
@@ -732,43 +392,23 @@ export default function Navbar({
                 alignItems: 'center',
                 gap: '0.35rem'
               }}
+              title="Explore Satvik Dining & Restaurant Menu"
             >
-              <Utensils size={15} color="#34d399" /> Fenugreek Restaurant POS
+              <Utensils size={15} color="#34d399" /> Satvik Dining
             </button>
 
             <button 
-              onClick={onOpenAccountsLedger}
+              onClick={onOpenDarshan}
               style={{
-                color: 'var(--text-primary)',
+                color: 'var(--gold-glow)',
                 fontSize: '0.9rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.35rem'
               }}
+              title="Maa Majhighariani Temple Darshan Guide & Timings"
             >
-              <Scale size={15} color="var(--gold-glow)" /> Audit Reconciler
-            </button>
-
-            <button 
-              id="main-nav-audited-sales-btn"
-              onClick={onOpenAuditedSalesRegister}
-              style={{
-                color: '#34d399',
-                fontSize: '0.88rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                background: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
-                padding: '0.35rem 0.75rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontWeight: 700,
-                boxShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
-              }}
-              title="Open 26-Column Audited Sales & Night Audit Register"
-            >
-              <FileSpreadsheet size={15} color="#34d399" /> 📊 26-Col Sales Reg
+              <Sparkles size={15} color="var(--gold-glow)" /> Sacred Darshan
             </button>
 
             <button 
@@ -780,28 +420,9 @@ export default function Navbar({
                 alignItems: 'center',
                 gap: '0.35rem'
               }}
+              title="Corporate Bookings & Direct Billing"
             >
-              <Building2 size={15} color="#8b5cf6" /> Corporate Ledgers
-            </button>
-
-            <button 
-              onClick={onOpenD1Database}
-              style={{
-                color: '#38bdf8',
-                fontSize: '0.88rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontWeight: 700,
-                background: 'rgba(6, 182, 212, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
-                padding: '0.3rem 0.65rem',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-              title="Inspect All 68 Cloudflare D1 Database Tables Live"
-            >
-              <Database size={14} color="#38bdf8" /> 🗄️ 68-Table DB Hub
+              <Building2 size={15} color="#8b5cf6" /> Corporate Stays
             </button>
           </div>
 
@@ -818,7 +439,7 @@ export default function Navbar({
               <span className="hide-on-mobile">AI Concierge</span>
             </button>
 
-            {/* Back-Office PMS / Reception Toggle */}
+            {/* Staff / Front Desk PMS Access */}
             <button 
               onClick={handleAdminAccess}
               style={{
@@ -839,7 +460,7 @@ export default function Navbar({
                 boxShadow: currentView === 'pms' ? '0 0 15px rgba(220, 38, 38, 0.5)' : 'none',
                 cursor: 'pointer'
               }}
-              title={currentView === 'pms' ? 'Exit PMS and return to Public Website (Esc)' : 'Open Front Desk PMS Console'}
+              title={currentView === 'pms' ? 'Exit PMS and return to Public Website (Esc)' : 'Front Desk Staff Access'}
             >
               {currentView === 'pms' ? (
                 <>
@@ -847,7 +468,7 @@ export default function Navbar({
                 </>
               ) : (
                 <>
-                  <Lock size={15} color="var(--gold-champagne)" /> Front Desk PMS
+                  <Lock size={15} color="var(--gold-champagne)" /> Staff Login
                 </>
               )}
             </button>
@@ -875,8 +496,8 @@ export default function Navbar({
           }}>
             <button 
               onClick={() => { 
-                handleAdminAccess(); 
                 setMobileMenuOpen(false); 
+                handleAdminAccess(); 
               }} 
               style={{ 
                 textAlign: 'left', 
@@ -899,7 +520,7 @@ export default function Navbar({
                 </>
               ) : (
                 <>
-                  <Lock size={16} /> 🔒 Front Desk Enterprise PMS (Tape Chart & Billing)
+                  <Lock size={16} /> 🔒 Staff Login (Reception PMS)
                 </>
               )}
             </button>
@@ -915,25 +536,14 @@ export default function Navbar({
             <button onClick={() => { onOpenVirtualTour?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#f59e0b', padding: '0.4rem 0', fontWeight: 600 }}>
               🌐 360° Panoramic Virtual Tour
             </button>
-            <button onClick={() => { onOpenCannonKitchenPOS(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#34d399', padding: '0.4rem 0' }}>
-              🍳 Fenugreek Restaurant Multi-Outlet POS
+            <button onClick={() => { onOpenDining?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#34d399', padding: '0.4rem 0' }}>
+              🍳 Pure Satvik Dining & Restaurant
             </button>
-            <button onClick={() => { onOpenAccountsLedger(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: 'var(--gold-glow)', padding: '0.4rem 0' }}>
-              ⚖️ Accounts Day Book & GST Audit
+            <button onClick={() => { onOpenDarshan?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: 'var(--gold-glow)', padding: '0.4rem 0' }}>
+              🛕 Maa Majhighariani Sacred Darshan
             </button>
-            <button onClick={() => { onOpenAuditedSalesRegister?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#34d399', padding: '0.45rem 0', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <FileSpreadsheet size={15} /> 📊 26-Column Audited Sales Register
-            </button>
-            <button onClick={() => { onOpenCorporate(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#a78bfa', padding: '0.4rem 0' }}>
-              🏢 Corporate B2B (Ashok Leyland / JK Paper)
-            </button>
-
-            <button onClick={() => { onOpenD1Database?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#38bdf8', padding: '0.4rem 0', fontWeight: 800 }}>
-              🗄️ Cloudflare D1 Database Hub (68 Tables)
-            </button>
-
-            <button onClick={() => { onOpenRevenueManagement(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: 'var(--gold-glow)', padding: '0.4rem 0', fontWeight: 800 }}>
-              ⚡ IDeaS G3 RMS Console
+            <button onClick={() => { onOpenCorporate?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#a78bfa', padding: '0.4rem 0' }}>
+              🏢 Corporate B2B Stays
             </button>
           </div>
         )}
