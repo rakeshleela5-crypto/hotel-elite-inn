@@ -349,7 +349,7 @@ export default function FenugreekLiveFoodOrdersKDS({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.01em' }}>
-                Fenugreek Live Food Orders &amp; Kitchen KDS
+                Cannon Kitchen Live Food Orders &amp; Production KDS
               </h3>
               <span style={{
                 background: 'rgba(16, 185, 129, 0.15)',

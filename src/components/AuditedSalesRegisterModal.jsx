@@ -2762,13 +2762,19 @@ const stickyTd = {
   background: '#081124',
   padding: '0.5rem 0.5rem',
   borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-  borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+  fontFamily: 'var(--font-sans)',
+  fontVariantNumeric: 'tabular-nums',
+  fontFeatureSettings: "'tnum' 1, 'zero' 1"
 };
 
 const standardTd = {
   padding: '0.5rem 0.5rem',
   borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-  whiteSpace: 'nowrap'
+  whiteSpace: 'nowrap',
+  fontFamily: 'var(--font-sans)',
+  fontVariantNumeric: 'tabular-nums',
+  fontFeatureSettings: "'tnum' 1, 'zero' 1"
 };
 
 const thBtnStyle = {

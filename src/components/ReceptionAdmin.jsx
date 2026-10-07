@@ -28,7 +28,6 @@ import StaffPayrollSection from './StaffPayrollSection';
 
 import CheckInReviewModal from './CheckInReviewModal';
 import { sendHousekeepingOrderWhatsApp, sendMaintenanceTicketWhatsApp } from '../utils/whatsappDispatch';
-import StayDurationAnalytics from './StayDurationAnalytics';
 import OperationsSettingsTab from './OperationsSettingsTab';
 import TapeChartCalendar from './TapeChartCalendar';
 import D1LiveDatabaseExplorer from './D1LiveDatabaseExplorer';
@@ -110,7 +109,7 @@ export default function ReceptionAdmin({
     switch (activeDepartment) {
       case 'restaurant':
         return [
-          { id: 'live-food-orders', label: '🍳 Fenugreek Live Food Orders & KDS', isKds: true }
+          { id: 'live-food-orders', label: '🍳 Cannon Kitchen Live Orders & KDS', isKds: true }
         ];
       case 'housekeeping':
         return [
@@ -4601,9 +4600,6 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
               </table>
             </div>
           )}
-
-          {/* THE WILD OASIS: STAY DURATION DISTRIBUTION ANALYTICS */}
-          <StayDurationAnalytics bookings={bookings} />
         </div>
       )}
 

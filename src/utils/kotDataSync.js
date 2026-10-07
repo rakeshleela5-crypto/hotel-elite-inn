@@ -26,7 +26,7 @@ export function normalizeKotOrder(raw) {
   const totalAmount = Number(raw.totalAmount !== undefined ? raw.totalAmount : (raw.total_amount !== undefined ? raw.total_amount : (raw.amount || 0)));
   const guestName = raw.guestName || raw.guest_name || (roomNumber ? `Room ${roomNumber} Guest` : (tableNumber ? `Table ${tableNumber} Guest` : 'Walk-In Guest'));
   
-  const outlet = raw.outlet || (orderType === 'room' ? 'In-Room Dining (Fenugreek)' : (orderType === 'bar' ? 'Drop In Bar' : (orderType === 'terrace' ? 'Terrace Dining' : 'Fenugreek Restaurant')));
+  const outlet = raw.outlet || (orderType === 'room' ? 'In-Room Dining (Cannon Kitchen)' : (orderType === 'bar' ? 'Drop In Bar' : (orderType === 'terrace' ? 'Terrace Dining' : 'Cannon Kitchen')));
   const status = raw.status || 'Received';
   const createdAt = raw.timestamp || raw.created_at || raw.createdAt || new Date().toISOString();
   const captain = raw.steward || raw.captain || raw.captainName || 'KOTI';
@@ -97,7 +97,7 @@ export function getLiveKots() {
       steward: 'SADANANDA',
       captain: 'SADANANDA',
       guestName: 'Dr. Tripathy',
-      outlet: 'Fenugreek Restaurant',
+      outlet: 'Cannon Kitchen',
       timestamp: new Date(Date.now() - 5 * 60000).toISOString(),
       timeFormatted: '08:45 PM',
       status: 'Preparing',
@@ -118,7 +118,7 @@ export function getLiveKots() {
       steward: 'KOTI',
       captain: 'KOTI',
       guestName: 'P. K. Mohapatra',
-      outlet: 'Fenugreek Restaurant',
+      outlet: 'Cannon Kitchen',
       timestamp: new Date(Date.now() - 12 * 60000).toISOString(),
       timeFormatted: '08:38 PM',
       status: 'Ready',
@@ -138,7 +138,7 @@ export function getLiveKots() {
       steward: 'SADANANDA',
       captain: 'SADANANDA',
       guestName: 'BIJAY PASWAN',
-      outlet: 'In-Room Dining (Fenugreek)',
+      outlet: 'In-Room Dining (Cannon Kitchen)',
       timestamp: new Date(Date.now() - 8 * 60000).toISOString(),
       timeFormatted: '08:42 PM',
       status: 'Received',
