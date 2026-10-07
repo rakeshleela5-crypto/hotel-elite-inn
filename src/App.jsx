@@ -1161,36 +1161,38 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Navbar with 27-room counter & view switcher */}
-      <Navbar 
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-        onOpen3DExplorer={() => setFloorExplorerOpen(true)}
-        onOpenVirtualTour={() => handleOpenVirtualTour('entrance-gate')}
-        onOpenDining={() => setDiningModalOpen(true)}
-        onOpenDarshan={() => setDarshanModalOpen(true)}
-        onOpenAiConcierge={() => setAiConciergeOpen(true)}
-        onOpenBotFleet={() => setBotFleetOpen(true)}
-        onOpenCorporate={() => setCorporateModalOpen(true)}
-        onOpenMasterFolio={handleOpenMasterFolio}
-        onOpenCannonKitchenPOS={() => setPosModalOpen(true)}
-        onOpenAccountsLedger={() => setAccountsModalOpen(true)}
-        onOpenNightAudit={() => setNightAuditModalOpen(true)}
-        onOpenStoreInventory={() => setStoreInventoryModalOpen(true)}
-        onOpenDirectorPortal={() => setDirectorPortalOpen(true)}
-        onOpenRevenueManagement={() => setRevenueModalOpen(true)}
-        onOpenD1Database={handleOpenD1Database}
-        onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
-        onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
-        onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
-        onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
-        onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
-        rooms={rooms}
-        adminPinVerified={adminPinVerified}
-        setAdminPinVerified={setAdminPinVerified}
-        showPinPrompt={showPinPrompt}
-        setShowPinPrompt={setShowPinPrompt}
-      />
+      {/* Guest Public Navbar: Rendered ONLY on Public Website (Cleanly hidden in Staff Front Desk PMS) */}
+      {currentView === 'guest' && (
+        <Navbar 
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          onOpen3DExplorer={() => setFloorExplorerOpen(true)}
+          onOpenVirtualTour={() => handleOpenVirtualTour('entrance-gate')}
+          onOpenDining={() => setDiningModalOpen(true)}
+          onOpenDarshan={() => setDarshanModalOpen(true)}
+          onOpenAiConcierge={() => setAiConciergeOpen(true)}
+          onOpenBotFleet={() => setBotFleetOpen(true)}
+          onOpenCorporate={() => setCorporateModalOpen(true)}
+          onOpenMasterFolio={handleOpenMasterFolio}
+          onOpenCannonKitchenPOS={() => setPosModalOpen(true)}
+          onOpenAccountsLedger={() => setAccountsModalOpen(true)}
+          onOpenNightAudit={() => setNightAuditModalOpen(true)}
+          onOpenStoreInventory={() => setStoreInventoryModalOpen(true)}
+          onOpenDirectorPortal={() => setDirectorPortalOpen(true)}
+          onOpenRevenueManagement={() => setRevenueModalOpen(true)}
+          onOpenD1Database={handleOpenD1Database}
+          onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
+          onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
+          onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
+          onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
+          onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
+          rooms={rooms}
+          adminPinVerified={adminPinVerified}
+          setAdminPinVerified={setAdminPinVerified}
+          showPinPrompt={showPinPrompt}
+          setShowPinPrompt={setShowPinPrompt}
+        />
+      )}
 
       {/* Main View Router */}
       <main style={{ flex: 1 }}>
@@ -1276,8 +1278,6 @@ export default function App() {
                 onAddRoomService={handleRequestRoomServiceFromGuestPortal}
               />
             </ErrorBoundary>
-
-            <FinancialAnalytics bookings={bookings} />
           </Suspense>
         )}
       </main>
@@ -1571,99 +1571,104 @@ export default function App() {
         )}
       </Suspense>
 
-      <Footer 
-        onOpenDarshan={() => setDarshanModalOpen(true)}
-        onOpenDining={() => setDiningModalOpen(true)}
-        onOpenCorporate={() => setCorporateModalOpen(true)}
-        onOpenBotFleet={() => setBotFleetOpen(true)}
-        onOpenLegal={(tab) => {
-          setLegalModalTab(tab);
-          setLegalModalOpen(true);
-        }}
-        onOpenDataRights={() => setDataRightsModalOpen(true)}
-      />
+      {currentView === 'guest' && (
+        <>
+          <Footer 
+            onOpenDarshan={() => setDarshanModalOpen(true)}
+            onOpenDining={() => setDiningModalOpen(true)}
+            onOpenCorporate={() => setCorporateModalOpen(true)}
+            onOpenBotFleet={() => setBotFleetOpen(true)}
+            onOpenLegal={(tab) => {
+              setLegalModalTab(tab);
+              setLegalModalOpen(true);
+            }}
+            onOpenDataRights={() => setDataRightsModalOpen(true)}
+          />
 
-      <CookieConsentBanner 
-        onOpenPolicy={() => {
-          setLegalModalTab('cookies');
-          setLegalModalOpen(true);
-        }}
-      />
+          <CookieConsentBanner 
+            onOpenPolicy={() => {
+              setLegalModalTab('cookies');
+              setLegalModalOpen(true);
+            }}
+          />
+        </>
+      )}
 
-      {/* 21st.dev / Magic UI Floating Luxury Navigation Dock */}
-      <FloatingDock 
-        items={[
-          {
-            title: "Quick Search 27 Rooms (Ctrl+K)",
-            icon: <Search className="h-5 w-5 text-amber-300" />,
-            onClick: () => setRoomSearchModalOpen(true)
-          },
-          {
-            title: "Reserve Luxury Room",
-            icon: <Hotel className="h-5 w-5" />,
-            onClick: () => handleOpenBooking(ROOM_TIERS[0])
-          },
-          {
-            title: "3D Isometric Tour",
-            icon: <Layers className="h-5 w-5" />,
-            onClick: () => setFloorExplorerOpen(true)
-          },
-          {
-            title: "360° Virtual Tour",
-            icon: <Compass className="h-5 w-5 text-amber-400" />,
-            onClick: () => handleOpenVirtualTour('entrance-gate')
-          },
-          {
-            title: "Tally Prime ERP",
-            icon: <Terminal className="h-5 w-5 text-sky-400" />,
-            onClick: () => handleOpenAccountsWithTab('tally-erp')
-          },
-          {
-            title: "Accounts Day Book",
-            icon: <Scale className="h-5 w-5" />,
-            onClick: () => handleOpenAccountsWithTab('reconciliation-audit')
-          },
-          {
-            title: "26-Col Audited Sales Register",
-            icon: <FileSpreadsheet className="h-5 w-5 text-emerald-400" />,
-            onClick: () => setAuditedSalesRegisterOpen(true)
-          },
-          {
-            title: "System #36: CA Filing Station",
-            icon: <Scale className="h-5 w-5 text-amber-300" />,
-            onClick: () => setCaFilingModalOpen(true)
-          },
-          {
-            title: "Cannon Kitchen POS",
-            icon: <Utensils className="h-5 w-5" />,
-            onClick: () => setPosModalOpen(true)
-          },
-          {
-            title: "D1 Database (68 Tables)",
-            icon: <Database className="h-5 w-5 text-amber-400" />,
-            onClick: handleOpenD1Database
-          },
-
-          {
-            title: "24/7 WhatsApp Concierge",
-            icon: <MessageCircle className="h-5 w-5 text-emerald-400" />,
-            onClick: () => window.open(`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`, '_blank', 'noopener,noreferrer')
-          },
-          {
-            title: currentView === 'pms' ? "Exit PMS (Return to Website)" : "Reception PMS",
-            icon: <ShieldCheck className="h-5 w-5" />,
-            onClick: () => {
-              if (currentView === 'pms') {
-                setCurrentView('guest');
-              } else if (adminPinVerified) {
-                setCurrentView('pms');
-              } else {
-                setShowPinPrompt(true);
+      {/* 21st.dev / Magic UI Floating Luxury Navigation Dock (Guest Website Only) */}
+      {currentView === 'guest' && (
+        <FloatingDock 
+          items={[
+            {
+              title: "Quick Search 27 Rooms (Ctrl+K)",
+              icon: <Search className="h-5 w-5 text-amber-300" />,
+              onClick: () => setRoomSearchModalOpen(true)
+            },
+            {
+              title: "Reserve Luxury Room",
+              icon: <Hotel className="h-5 w-5" />,
+              onClick: () => handleOpenBooking(ROOM_TIERS[0])
+            },
+            {
+              title: "3D Isometric Tour",
+              icon: <Layers className="h-5 w-5" />,
+              onClick: () => setFloorExplorerOpen(true)
+            },
+            {
+              title: "360° Virtual Tour",
+              icon: <Compass className="h-5 w-5 text-amber-400" />,
+              onClick: () => handleOpenVirtualTour('entrance-gate')
+            },
+            {
+              title: "Tally Prime ERP",
+              icon: <Terminal className="h-5 w-5 text-sky-400" />,
+              onClick: () => handleOpenAccountsWithTab('tally-erp')
+            },
+            {
+              title: "Accounts Day Book",
+              icon: <Scale className="h-5 w-5" />,
+              onClick: () => handleOpenAccountsWithTab('reconciliation-audit')
+            },
+            {
+              title: "26-Col Audited Sales Register",
+              icon: <FileSpreadsheet className="h-5 w-5 text-emerald-400" />,
+              onClick: () => setAuditedSalesRegisterOpen(true)
+            },
+            {
+              title: "System #36: CA Filing Station",
+              icon: <Scale className="h-5 w-5 text-amber-300" />,
+              onClick: () => setCaFilingModalOpen(true)
+            },
+            {
+              title: "Cannon Kitchen POS",
+              icon: <Utensils className="h-5 w-5" />,
+              onClick: () => setPosModalOpen(true)
+            },
+            {
+              title: "D1 Database (68 Tables)",
+              icon: <Database className="h-5 w-5 text-amber-400" />,
+              onClick: handleOpenD1Database
+            },
+            {
+              title: "24/7 WhatsApp Concierge",
+              icon: <MessageCircle className="h-5 w-5 text-emerald-400" />,
+              onClick: () => window.open(`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`, '_blank', 'noopener,noreferrer')
+            },
+            {
+              title: currentView === 'pms' ? "Exit PMS (Return to Website)" : "Reception PMS",
+              icon: <ShieldCheck className="h-5 w-5" />,
+              onClick: () => {
+                if (currentView === 'pms') {
+                  setCurrentView('guest');
+                } else if (adminPinVerified) {
+                  setCurrentView('pms');
+                } else {
+                  setShowPinPrompt(true);
+                }
               }
             }
-          }
-        ]}
-      />
+          ]}
+        />
+      )}
 
       {/* 24/7 Floating WhatsApp Direct Concierge (Bottom Left) */}
       {currentView === 'guest' && (
