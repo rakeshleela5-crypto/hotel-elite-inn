@@ -46,6 +46,7 @@ export default function UnifiedRoomSearchBar({
   onMarkClean = () => {},
   onOpenWorkOrder = () => {},
   onOpenQr = () => {},
+  onOpenCheckout = () => {},
   expiringRoomsCount = 0,
   filterExpiringOnly = false,
   onToggleFilterExpiringOnly = () => {}
@@ -238,39 +239,65 @@ export default function UnifiedRoomSearchBar({
           )}
         </div>
 
-        {/* View Mode Switcher: Master Ledger / Tabular Matrix / Modern Cards */}
-        <div style={{
-          display: 'inline-flex',
-          background: 'rgba(6, 14, 26, 0.85)',
-          padding: '3px',
-          borderRadius: '8px',
-          border: '1px solid rgba(212, 175, 55, 0.3)',
-          gap: '4px'
-        }}>
-          <button
-            type="button"
-            className={`enterprise-tab-pill ${tapeChartViewMode === 'table' ? 'active' : ''}`}
-            onClick={() => onViewModeChange('table')}
-            style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
-          >
-            📋 Master Tabular Ledger
-          </button>
-          <button
-            type="button"
-            className={`enterprise-tab-pill ${tapeChartViewMode === 'mysoft' ? 'active' : ''}`}
-            onClick={() => onViewModeChange('mysoft')}
-            style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
-          >
-            📊 Tabular Matrix
-          </button>
-          <button
-            type="button"
-            className={`enterprise-tab-pill ${tapeChartViewMode === 'modern' ? 'active' : ''}`}
-            onClick={() => onViewModeChange('modern')}
-            style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
-          >
-            🏢 Modern Cards
-          </button>
+        {/* View Mode Switcher & Express Checkout */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'inline-flex',
+            background: 'rgba(6, 14, 26, 0.85)',
+            padding: '3px',
+            borderRadius: '8px',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            gap: '4px'
+          }}>
+            <button
+              type="button"
+              className={`enterprise-tab-pill ${tapeChartViewMode === 'table' ? 'active' : ''}`}
+              onClick={() => onViewModeChange('table')}
+              style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
+            >
+              📋 Master Tabular Ledger
+            </button>
+            <button
+              type="button"
+              className={`enterprise-tab-pill ${tapeChartViewMode === 'mysoft' ? 'active' : ''}`}
+              onClick={() => onViewModeChange('mysoft')}
+              style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
+            >
+              📊 Tabular Matrix
+            </button>
+            <button
+              type="button"
+              className={`enterprise-tab-pill ${tapeChartViewMode === 'modern' ? 'active' : ''}`}
+              onClick={() => onViewModeChange('modern')}
+              style={{ fontSize: '0.76rem', padding: '0.35rem 0.75rem' }}
+            >
+              🏢 Modern Cards
+            </button>
+          </div>
+
+          {onOpenCheckout && (
+            <button
+              type="button"
+              onClick={() => onOpenCheckout(null)}
+              style={{
+                background: 'linear-gradient(135deg, #d4af37, #f59e0b)',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '0.35rem 0.85rem',
+                fontSize: '0.76rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                boxShadow: '0 2px 10px rgba(212, 175, 55, 0.35)'
+              }}
+              title="Open Express Checkout Station by Room Number (Alt+C)"
+            >
+              ⚡ Express Checkout
+            </button>
+          )}
         </div>
       </div>
 
@@ -519,6 +546,33 @@ export default function UnifiedRoomSearchBar({
                         </span>
 
                         {/* Quick 1-Click Action Buttons */}
+                        {isOccupied && onOpenCheckout && (
+                          <button
+                            type="button"
+                            style={{
+                              padding: '0.25rem 0.55rem',
+                              fontSize: '0.72rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '3px',
+                              background: 'linear-gradient(135deg, #d4af37, #f59e0b)',
+                              color: '#000',
+                              border: 'none',
+                              borderRadius: '4px',
+                              fontWeight: 800,
+                              cursor: 'pointer'
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsDropdownOpen(false);
+                              onOpenCheckout(room);
+                            }}
+                            title={`Express Checkout for Room ${room.roomNumber}`}
+                          >
+                            ⚡ Checkout
+                          </button>
+                        )}
+
                         {isOccupied && (
                           <button
                             type="button"

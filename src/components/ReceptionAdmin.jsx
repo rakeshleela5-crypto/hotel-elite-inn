@@ -409,6 +409,9 @@ export default function ReceptionAdmin({
         else if (roomServicesCareOpen) setRoomServicesCareOpen(false);
         else if (isTransferModalOpen) setIsTransferModalOpen(false);
         else if (isWakeUpModalOpen) setIsWakeUpModalOpen(false);
+      } else if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+        e.preventDefault();
+        setCheckoutRoom({ roomNumber: '' });
       } else if (e.key === '/' && document.activeElement && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         e.preventDefault();
         if (searchInputRef.current) {
@@ -993,14 +996,16 @@ export default function ReceptionAdmin({
     };
     setRoomServicesList(prev => [newHkTicket, ...prev]);
 
-    // 2. Add cash to cashier drawer if cash tender was used
-    if (payload.tenders.cash > 0) {
+    // 2. Add cash to cashier drawer if cash tender was used (or deduct if cash refund)
+    if (payload.tenders && payload.tenders.cash > 0) {
       setCashCollected(prev => prev + payload.tenders.cash);
       setDenominations(prev => ({
         ...prev,
         500: (Number(prev[500]) || 0) + Math.floor(payload.tenders.cash / 500),
         coins: (Number(prev.coins) || 0) + (payload.tenders.cash % 500)
       }));
+    } else if (payload.isRefund && payload.refundAmount > 0 && payload.refundMode === 'Cash') {
+      setCashCollected(prev => Math.max(0, prev - payload.refundAmount));
     }
 
     // 2b. Dispatch Multi-Tender Split Payment to Cloudflare D1
@@ -1061,14 +1066,21 @@ export default function ReceptionAdmin({
         roomNumber: payload.roomNumber,
         guestName: payload.guestName,
         guestPhone: payload.guestPhone,
+        company: payload.company || '',
+        corporateGstin: payload.corporateGstin || '',
         tier: payload.tier,
-        totalAmount: payload.totalAmount,
+        totalAmount: payload.billTotal || payload.totalAmount,
         advancePaid: payload.advancePaid || 0,
-        paymentMode: 'Split Tender',
-        paymentStatus: 'Fully Settled & Checked Out',
+        paymentMode: payload.isRefund ? `Refund (${payload.refundMode})` : 'Split Tender',
+        paymentStatus: payload.isRefund ? 'Refunded & Checked Out' : 'Fully Settled & Checked Out',
         tenders: payload.tenders,
         tendersSummary: payload.tendersSummary,
-        foodAmount: payload.billTotal > 1500 ? 962 : payload.billTotal,
+        foodAmount: payload.foodAmount || 0,
+        roomAmount: payload.roomAmount || 0,
+        foodItems: payload.foodItems || [],
+        nights: payload.nights || 1,
+        checkInDate: payload.checkInDate || new Date().toISOString().split('T')[0],
+        checkOutDate: payload.checkOutDate || new Date().toISOString().split('T')[0],
         grcNo: '684',
         isNonGstBill: payload.isNonGstBill || false,
         isLiveEditMode: payload.openEditor || false
@@ -5119,6 +5131,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             onMarkClean={handleMarkCleanFromSearch}
             onOpenWorkOrder={handleWorkOrderFromSearch}
             onOpenQr={handleOpenQrFromSearch}
+            onOpenCheckout={(r) => setCheckoutRoom(r || { roomNumber: '' })}
             expiringRoomsCount={expiringRoomsCount}
             filterExpiringOnly={filterExpiringOnly}
             onToggleFilterExpiringOnly={() => setFilterExpiringOnly(prev => !prev)}
@@ -9049,7 +9062,8 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           isOpen={!!checkoutRoom}
           onClose={() => setCheckoutRoom(null)}
           room={checkoutRoom}
-          bookings={bookings}
+          rooms={projectedRooms}
+          bookings={allKnownBookings}
           onConfirmCheckout={handleCheckoutConfirm}
         />
       )}

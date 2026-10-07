@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   X, Check, DollarSign, CreditCard, Smartphone, Building2, 
   Receipt, AlertCircle, CheckCircle2, ArrowRight, Printer,
-  Sparkles, Clock, User, BedDouble, Utensils, ShieldCheck, MessageCircle
+  Sparkles, Clock, User, BedDouble, Utensils, ShieldCheck, MessageCircle,
+  Search, RefreshCw, Key, QrCode, AlertTriangle, ArrowDownLeft, ArrowUpRight,
+  ClipboardCheck, Building, Coffee, HelpCircle
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
 import { sendCheckoutSplitWhatsApp } from '../utils/whatsappDispatch';
@@ -11,54 +13,219 @@ export default function CheckoutSplitModal({
   isOpen,
   onClose,
   room,
+  rooms = [],
   bookings = [],
   onConfirmCheckout
 }) {
-  if (!isOpen || !room) return null;
+  if (!isOpen) return null;
 
-  // Find matching booking for this room if exists
-  const matchedBooking = bookings.find(b => b.roomNumber === room.roomNumber) || {
-    bookingId: `FMBIL2627-${room.roomNumber}`,
-    billNo: `FMBIL2627-${room.roomNumber}`,
-    roomNumber: room.roomNumber,
-    guestName: room.currentGuestName || 'MR. P ASHOK',
-    guestPhone: '+91 6305202068',
-    tier: room.tier || 'Executive AC',
-    totalAmount: room.balanceDue || 962.00,
-    foodAmount: 962.00,
-    roomAmount: 0.00,
-    advancePaid: 0.00
-  };
+  // 1. Room Selection & Typeahead State
+  // Can be initialized from clicked room, or empty for receptionist to type any room
+  const [selectedRoomNumber, setSelectedRoomNumber] = useState(room?.roomNumber || '');
+  const [roomSearchInput, setRoomSearchInput] = useState(room?.roomNumber || '');
+  const [isRoomDropdownOpen, setIsRoomDropdownOpen] = useState(false);
+  const roomInputRef = useRef(null);
 
-  // The default bill amount: owner specifically demoed ₹962 (e.g. Fenugreek Restaurant dining balance or stay balance)
-  const defaultTotal = Number(room.balanceDue || matchedBooking.totalAmount || 962.00);
+  // Synchronize when room prop changes
+  useEffect(() => {
+    if (room?.roomNumber) {
+      setSelectedRoomNumber(room.roomNumber);
+      setRoomSearchInput(room.roomNumber);
+    } else if (rooms.length > 0) {
+      // If no room specified, default to first Occupied room or room 101
+      const firstOccupied = rooms.find(r => (r.effectiveStatus || r.status || '').includes('Occupied'));
+      if (firstOccupied) {
+        setSelectedRoomNumber(firstOccupied.roomNumber);
+        setRoomSearchInput(firstOccupied.roomNumber);
+      }
+    }
+  }, [room, rooms]);
 
-  const [billTotal, setBillTotal] = useState(defaultTotal);
-  const [billBreakdown, setBillBreakdown] = useState({
-    roomTariff: defaultTotal > 1500 ? defaultTotal - 962 : 0,
-    foodCharges: defaultTotal > 1500 ? 962 : defaultTotal,
-    advancePaid: Number(matchedBooking.advancePaid || 0)
-  });
+  // Find the active room object
+  const activeRoom = useMemo(() => {
+    if (!selectedRoomNumber) return null;
+    const cleanNo = String(selectedRoomNumber).replace(/^#/, '').trim();
+    return rooms.find(r => String(r.roomNumber) === cleanNo) || null;
+  }, [selectedRoomNumber, rooms]);
 
-  // Multi-tender split states
-  // Default to owner's exact scenario if total is 962, otherwise auto-fill
-  const [upiAmount, setUpiAmount] = useState(defaultTotal === 962 ? '462' : '');
+  // Check room status
+  const roomStatus = activeRoom ? (activeRoom.effectiveStatus || activeRoom.status || 'Available') : '';
+  const isRoomOccupied = roomStatus.includes('Occupied');
+
+  // List of all currently occupied rooms for quick chips
+  const occupiedRooms = useMemo(() => {
+    return rooms.filter(r => (r.effectiveStatus || r.status || '').includes('Occupied'));
+  }, [rooms]);
+
+  // Filtered room matches for the typeahead input
+  const roomMatches = useMemo(() => {
+    const q = roomSearchInput.replace(/^#/, '').trim().toLowerCase();
+    if (!q) return rooms;
+    return rooms.filter(r => 
+      String(r.roomNumber).includes(q) ||
+      String(r.currentGuestName || '').toLowerCase().includes(q) ||
+      String(r.tier || '').toLowerCase().includes(q)
+    );
+  }, [roomSearchInput, rooms]);
+
+  // Find matching booking for this room
+  const matchedBooking = useMemo(() => {
+    if (!activeRoom) return null;
+    const rNo = String(activeRoom.roomNumber);
+    const found = bookings.find(b => String(b.roomNumber) === rNo && b.status !== 'Checked Out');
+    if (found) return found;
+
+    return {
+      bookingId: `FMBIL2627-${rNo}`,
+      billNo: `FMBIL2627-${rNo}`,
+      roomNumber: rNo,
+      guestName: activeRoom.effectiveGuestName || activeRoom.currentGuestName || 'In-House Guest',
+      guestPhone: activeRoom.effectivePhone || activeRoom.phone || '+91 94370 22555',
+      company: activeRoom.effectiveCompany || activeRoom.company || 'Direct Walk-In',
+      corporateGstin: activeRoom.corporateGstin || (activeRoom.company?.includes('Linde') ? '21AAACB2528H1ZA' : ''),
+      tier: activeRoom.tier || 'Executive AC',
+      tariff: Number(activeRoom.effectiveTariff || activeRoom.tariff || 2199),
+      advancePaid: Number(activeRoom.advancePaid || 0),
+      checkInDate: activeRoom.checkInDate || new Date().toISOString().split('T')[0],
+      checkInTime: activeRoom.checkInTime || '11:00 AM'
+    };
+  }, [activeRoom, bookings]);
+
+  // 2. Real-Time In-Stay Consumption: Fetch Real Food Orders from Live KOT Bus
+  const liveFoodOrders = useMemo(() => {
+    if (!activeRoom) return [];
+    try {
+      const stored = localStorage.getItem('hotel_elite_inn_live_kots');
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return [];
+      const rNo = String(activeRoom.roomNumber);
+      return parsed.filter(o => 
+        (String(o.roomNumber) === rNo || String(o.room_number) === rNo || (o.orderType === 'room' && String(o.roomNumber) === rNo)) &&
+        o.status !== 'Cancelled' && o.status !== 'Void'
+      );
+    } catch (e) {
+      console.warn('Error reading live KOTs:', e);
+      return [];
+    }
+  }, [activeRoom]);
+
+  // Aggregate real food amount and itemized dishes
+  const foodSummary = useMemo(() => {
+    let totalAmt = 0;
+    const itemsList = [];
+
+    liveFoodOrders.forEach(ord => {
+      totalAmt += Number(ord.totalAmount || 0);
+      if (Array.isArray(ord.items)) {
+        ord.items.forEach(i => {
+          itemsList.push({
+            kotId: ord.id || ord.orderId || ord.kotNumber,
+            name: i.name || 'Dish',
+            qty: Number(i.quantity || 1),
+            price: Number(i.price || 0),
+            total: Number(i.quantity || 1) * Number(i.price || 0)
+          });
+        });
+      }
+    });
+
+    // If active room has existing food balance in folio or booking
+    if (totalAmt === 0 && matchedBooking && Number(matchedBooking.foodAmount || 0) > 0) {
+      totalAmt = Number(matchedBooking.foodAmount);
+    }
+
+    return { totalAmt, itemsList };
+  }, [liveFoodOrders, matchedBooking]);
+
+  // 3. Dynamic Stay Duration & Room Tariff
+  const stayDuration = useMemo(() => {
+    if (!matchedBooking) return { nights: 1, checkInStr: 'Today', isLateCheckout: false, lateHours: 0 };
+    
+    const checkInStr = matchedBooking.checkInDate || activeRoom?.checkInDate || new Date().toISOString().split('T')[0];
+    const inDate = new Date(checkInStr);
+    const now = new Date();
+    const diffTime = Math.max(0, now - inDate);
+    const calculatedNights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    const nights = matchedBooking.nights ? Math.max(1, Number(matchedBooking.nights)) : calculatedNights;
+
+    // Late checkout calculation: standard checkout is 12:00 PM (noon)
+    const currentHour = now.getHours();
+    const currentMin = now.getMinutes();
+    const isLate = currentHour > 12 || (currentHour === 12 && currentMin > 15);
+    const lateHours = isLate ? Math.max(0, currentHour - 12 + (currentMin / 60)) : 0;
+
+    return {
+      nights,
+      checkInStr,
+      isLateCheckout: isLate,
+      lateHours: Math.round(lateHours * 10) / 10
+    };
+  }, [matchedBooking, activeRoom]);
+
+  // 4. Operational Financial States
+  const [lateCheckoutFeeType, setLateCheckoutFeeType] = useState('waived'); // 'waived' | 'half' | 'full'
+  const lateCheckoutAmount = useMemo(() => {
+    if (!stayDuration.isLateCheckout) return 0;
+    const baseTariff = Number(matchedBooking?.tariff || activeRoom?.tariff || 2199);
+    if (lateCheckoutFeeType === 'half') return Math.round(baseTariff / 2);
+    if (lateCheckoutFeeType === 'full') return baseTariff;
+    return 0; // 'waived'
+  }, [stayDuration.isLateCheckout, lateCheckoutFeeType, matchedBooking, activeRoom]);
+
+  const roomTariffTotal = Number(matchedBooking?.tariff || activeRoom?.tariff || 2199) * stayDuration.nights;
+  const foodChargesTotal = foodSummary.totalAmt;
+  const advancePaidTotal = Number(matchedBooking?.advancePaid || activeRoom?.advancePaid || 0);
+
+  const grossBillTotal = roomTariffTotal + foodChargesTotal + lateCheckoutAmount;
+  const netPayable = grossBillTotal - advancePaidTotal;
+  const isRefundDue = netPayable < -0.01;
+  const refundAmount = Math.abs(netPayable);
+
+  // 5. Checklist: Physical Key Return & Housekeeping Inspection
+  const [keyReturned, setKeyReturned] = useState(true);
+  const [roomInspected, setRoomInspected] = useState(true);
+
+  // 6. Multi-tender split states
+  const [upiAmount, setUpiAmount] = useState('');
   const [upiRef, setUpiRef] = useState(`UPI-${Date.now().toString().slice(-6)}`);
   const [upiProvider, setUpiProvider] = useState('PhonePe');
 
-  const [cashAmount, setCashAmount] = useState(defaultTotal === 962 ? '500' : '');
+  const [cashAmount, setCashAmount] = useState('');
   const [cashierName, setCashierName] = useState('Front Desk Cashier');
 
   const [cardAmount, setCardAmount] = useState('');
   const [cardAuth, setCardAuth] = useState('AUTH-9412');
 
   const [btcAmount, setBtcAmount] = useState('');
-  const [btcCompany, setBtcCompany] = useState('Linde India Ltd');
+  const [btcCompany, setBtcCompany] = useState(matchedBooking?.company || 'Linde India Ltd');
 
+  // Refund Mode State (If excess advance paid)
+  const [refundMode, setRefundMode] = useState('Cash'); // 'Cash' | 'UPI'
+  const [refundRef, setRefundRef] = useState(`REF-${Date.now().toString().slice(-6)}`);
+
+  // UI Modes
+  const [checkoutMode, setCheckoutMode] = useState('tenders'); // 'tenders' | 'split-invoices'
   const [openReceiptAfter, setOpenReceiptAfter] = useState(true);
   const [isNonGstBill, setIsNonGstBill] = useState(false);
-  const [checkoutMode, setCheckoutMode] = useState('tenders'); // 'tenders' | 'split-invoices'
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Auto-allocate net balance whenever active room or netPayable changes
+  useEffect(() => {
+    setErrorMsg('');
+    if (isRefundDue || netPayable <= 0) {
+      setUpiAmount('');
+      setCashAmount('');
+      setCardAmount('');
+      setBtcAmount('');
+    } else {
+      // Default to 100% UPI PhonePe
+      setUpiAmount(netPayable.toFixed(2));
+      setCashAmount('');
+      setCardAmount('');
+      setBtcAmount('');
+    }
+  }, [activeRoom?.roomNumber, netPayable, isRefundDue]);
 
   // Total allocated sum
   const numUpi = Number(upiAmount) || 0;
@@ -67,95 +234,107 @@ export default function CheckoutSplitModal({
   const numBtc = Number(btcAmount) || 0;
 
   const totalAllocated = numUpi + numCash + numCard + numBtc;
-  const netDue = Math.max(0, billTotal - billBreakdown.advancePaid);
-  const variance = Math.round((netDue - totalAllocated) * 100) / 100;
-  const isBalanced = Math.abs(variance) < 0.01;
+  const variance = Math.round((netPayable - totalAllocated) * 100) / 100;
+  const isBalanced = isRefundDue ? true : (Math.abs(variance) < 0.01);
 
-  // Percentage shares for visual bar
-  const upiPercent = netDue > 0 ? Math.min(100, (numUpi / netDue) * 100) : 0;
-  const cashPercent = netDue > 0 ? Math.min(100, (numCash / netDue) * 100) : 0;
-  const cardPercent = netDue > 0 ? Math.min(100, (numCard / netDue) * 100) : 0;
-  const btcPercent = netDue > 0 ? Math.min(100, (numBtc / netDue) * 100) : 0;
-
-  // Apply quick presets
+  // Quick Presets
   const applyPreset = (type) => {
     setErrorMsg('');
-    if (type === 'owner-split-btc') {
-      // The exact corporate lodging + dining split from the owner's video:
-      // ₹962 Fenugreek Restaurant Dining -> PhonePe (UPI)
-      // ₹12,596 Room Lodging Tariff -> Linde India Ltd (BTC Credit)
-      setBillTotal(13558);
-      setBillBreakdown({
-        roomTariff: 12596,
-        foodCharges: 962,
-        advancePaid: 0
-      });
-      setUpiAmount('962');
-      setUpiProvider('PhonePe');
-      setBtcAmount('12596');
-      setBtcCompany('Linde India Ltd');
-      setCashAmount('');
-      setCardAmount('');
-    } else if (type === 'owner-demo') {
-      // The cash + UPI split example from owner's demo: Total 962 -> 462 PhonePe + 500 Cash
-      setBillTotal(962);
-      setBillBreakdown({
-        roomTariff: 0,
-        foodCharges: 962,
-        advancePaid: 0
-      });
-      setUpiAmount('462');
-      setUpiProvider('PhonePe');
-      setCashAmount('500');
-      setCardAmount('');
-      setBtcAmount('');
-    } else if (type === '100-upi') {
-      setUpiAmount(netDue.toFixed(2));
+    if (netPayable <= 0) return;
+
+    if (type === '100-upi') {
+      setUpiAmount(netPayable.toFixed(2));
       setCashAmount('');
       setCardAmount('');
       setBtcAmount('');
     } else if (type === '100-cash') {
-      setCashAmount(netDue.toFixed(2));
+      setCashAmount(netPayable.toFixed(2));
       setUpiAmount('');
       setCardAmount('');
       setBtcAmount('');
     } else if (type === '50-50') {
-      const half = (netDue / 2).toFixed(2);
-      const remainingHalf = (netDue - Number(half)).toFixed(2);
+      const half = (netPayable / 2).toFixed(2);
+      const remainingHalf = (netPayable - Number(half)).toFixed(2);
       setUpiAmount(half);
       setCashAmount(remainingHalf);
       setCardAmount('');
       setBtcAmount('');
+    } else if (type === 'corporate-split') {
+      // Room tariff to Corporate BTC, Food charges to Guest UPI
+      const roomDue = Math.max(0, roomTariffTotal + lateCheckoutAmount - advancePaidTotal);
+      const foodDue = foodChargesTotal;
+      setBtcAmount(roomDue.toFixed(2));
+      setUpiAmount(foodDue.toFixed(2));
+      setCashAmount('');
+      setCardAmount('');
     }
   };
 
+  // Submit Checkout & Synchronize Across PMS
   const handleCheckoutSubmit = (e, receiptTarget = 'a4') => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!isBalanced) {
-      setErrorMsg(`Cannot settle: Variance of ₹${Math.abs(variance).toFixed(2)} remaining. Total allocated (₹${totalAllocated.toFixed(2)}) must equal Total Due (₹${netDue.toFixed(2)}).`);
+
+    if (!activeRoom) {
+      setErrorMsg('Please select a valid room to check out.');
       return;
     }
 
+    if (!isRoomOccupied) {
+      setErrorMsg(`Room ${activeRoom.roomNumber} is currently ${roomStatus}. Only Occupied rooms can be checked out.`);
+      return;
+    }
+
+    if (!isBalanced) {
+      setErrorMsg(`Cannot settle: Variance of ₹${Math.abs(variance).toFixed(2)} remaining. Total allocated (₹${totalAllocated.toFixed(2)}) must equal Net Payable (₹${netPayable.toFixed(2)}).`);
+      return;
+    }
+
+    if (!keyReturned) {
+      if (!window.confirm(`Warning: Physical key for Room ${activeRoom.roomNumber} is NOT marked as returned. Do you want to proceed anyway?`)) {
+        return;
+      }
+    }
+
     const tendersSummary = [];
-    if (numCash > 0) tendersSummary.push(`Cash: ₹${numCash.toLocaleString('en-IN')}`);
-    if (numUpi > 0) tendersSummary.push(`${upiProvider} (UPI): ₹${numUpi.toLocaleString('en-IN')} [Ref: ${upiRef}]`);
-    if (numCard > 0) tendersSummary.push(`Card: ₹${numCard.toLocaleString('en-IN')} [Auth: ${cardAuth}]`);
-    if (numBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany}): ₹${numBtc.toLocaleString('en-IN')}`);
+    if (isRefundDue) {
+      tendersSummary.push(`Refund Given: ₹${refundAmount.toLocaleString('en-IN')} via ${refundMode} (Ref: ${refundRef})`);
+    } else {
+      if (numCash > 0) tendersSummary.push(`Cash: ₹${numCash.toLocaleString('en-IN')}`);
+      if (numUpi > 0) tendersSummary.push(`${upiProvider} (UPI): ₹${numUpi.toLocaleString('en-IN')} [Ref: ${upiRef}]`);
+      if (numCard > 0) tendersSummary.push(`Card: ₹${numCard.toLocaleString('en-IN')} [Auth: ${cardAuth}]`);
+      if (numBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany}): ₹${numBtc.toLocaleString('en-IN')}`);
+    }
 
     const settlementPayload = {
-      roomNumber: room.roomNumber,
-      guestName: room.currentGuestName || matchedBooking.guestName,
-      guestPhone: matchedBooking.guestPhone || '+91 6305202068',
-      tier: room.tier,
-      totalAmount: netDue,
-      billTotal: billTotal,
-      advancePaid: billBreakdown.advancePaid,
-      billNo: matchedBooking.billNo || `FMBIL2627-${room.roomNumber}`,
+      roomNumber: activeRoom.roomNumber,
+      guestName: activeRoom.effectiveGuestName || activeRoom.currentGuestName || matchedBooking.guestName,
+      guestPhone: matchedBooking.guestPhone || activeRoom.phone || '+91 94370 22555',
+      company: matchedBooking.company || activeRoom.company || 'Direct Guest',
+      corporateGstin: matchedBooking.corporateGstin || '',
+      tier: activeRoom.tier,
+      totalAmount: grossBillTotal,
+      billTotal: grossBillTotal,
+      netDue: netPayable,
+      advancePaid: advancePaidTotal,
+      roomAmount: roomTariffTotal,
+      foodAmount: foodChargesTotal,
+      foodItems: foodSummary.itemsList,
+      nights: stayDuration.nights,
+      checkInDate: stayDuration.checkInStr,
+      checkOutDate: new Date().toISOString().split('T')[0],
+      billNo: matchedBooking.billNo || `FMBIL2627-${activeRoom.roomNumber}`,
       settlementTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
       settlementDate: new Date().toLocaleDateString('en-IN'),
+      isRefund: isRefundDue,
+      refundAmount: isRefundDue ? refundAmount : 0,
+      refundMode: isRefundDue ? refundMode : null,
+      refundRef: isRefundDue ? refundRef : null,
+      lateCheckoutSurcharge: lateCheckoutAmount,
+      keyReturned,
+      roomInspected,
       tenders: {
-        cash: numCash,
-        upi: numUpi,
+        cash: isRefundDue ? 0 : numCash,
+        upi: isRefundDue ? 0 : numUpi,
         upiRef,
         upiProvider,
         card: numCard,
@@ -169,6 +348,26 @@ export default function CheckoutSplitModal({
       openEditor: receiptTarget === 'editor',
       targetReceiptType: receiptTarget === 'editor' ? 'a4' : receiptTarget
     };
+
+    // Auto-dispatch WhatsApp digital receipt if phone is available
+    if (settlementPayload.guestPhone) {
+      try {
+        sendCheckoutSplitWhatsApp({
+          billType: isNonGstBill ? 'Non-GST Tax Receipt' : 'Official Tax Invoice',
+          billNo: settlementPayload.billNo,
+          companyOrGuest: settlementPayload.company && settlementPayload.company !== 'Direct Guest' 
+            ? `${settlementPayload.guestName} (${settlementPayload.company})` 
+            : settlementPayload.guestName,
+          gstin: settlementPayload.corporateGstin,
+          roomNumber: activeRoom.roomNumber,
+          period: `${stayDuration.checkInStr} to Today (${stayDuration.nights} Nights)`,
+          amount: grossBillTotal,
+          recipientPhone: settlementPayload.guestPhone
+        });
+      } catch (err) {
+        console.warn('WhatsApp checkout dispatch error:', err);
+      }
+    }
 
     onConfirmCheckout(settlementPayload);
   };
@@ -188,902 +387,526 @@ export default function CheckoutSplitModal({
     }}>
       <div style={{
         background: 'linear-gradient(180deg, #0c182b 0%, #060e1a 100%)',
-        border: '1px solid rgba(212, 175, 55, 0.35)',
+        border: '1.5px solid rgba(212, 175, 55, 0.45)',
         borderRadius: '16px',
         width: '100%',
-        maxWidth: '780px',
+        maxWidth: '860px',
+        maxHeight: '94vh',
         boxShadow: '0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.15)',
         color: '#fff',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* MODAL HEADER */}
         <div style={{
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.5rem',
           borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
-          background: 'linear-gradient(90deg, rgba(19, 34, 61, 0.9), rgba(12, 24, 43, 0.9))',
+          background: 'linear-gradient(90deg, rgba(19, 34, 61, 0.95), rgba(12, 24, 43, 0.95))',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
               <span style={{
-                background: 'rgba(212, 175, 55, 0.2)',
-                color: 'var(--gold-glow)',
-                border: '1px solid rgba(212, 175, 55, 0.4)',
+                background: 'linear-gradient(135deg, #d4af37, #f59e0b)',
+                color: '#000',
                 padding: '2px 8px',
                 borderRadius: '4px',
                 fontSize: '0.72rem',
-                fontWeight: 700,
-                textTransform: 'uppercase'
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
               }}>
-                {HOTEL_CONFIG.name} • Front Desk
+                <Sparkles size={12} /> EXPRESS CHECKOUT STATION
               </span>
-              <span style={{
-                background: 'rgba(56, 189, 248, 0.15)',
-                color: '#38bdf8',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                fontSize: '0.72rem',
-                fontWeight: 700
-              }}>
-                Room {room.roomNumber} ({room.tier})
+              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                Stage 4: Folio Settlement &amp; Turnover
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.2rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 700, color: '#fff' }}>
-                Guest Checkout &amp; <span className="gold-gradient-text">Settlement Suite</span>
-              </h2>
-              <div style={{ display: 'flex', gap: '0.35rem', background: 'rgba(0,0,0,0.5)', padding: '0.25rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <button
-                  type="button"
-                  onClick={() => setCheckoutMode('tenders')}
-                  style={{
-                    padding: '0.35rem 0.75rem',
-                    borderRadius: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: checkoutMode === 'tenders' ? 'var(--gold-primary)' : 'transparent',
-                    color: checkoutMode === 'tenders' ? '#000' : 'var(--text-muted)'
-                  }}
-                >
-                  💳 Multi-Tender Payment
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCheckoutMode('split-invoices')}
-                  style={{
-                    padding: '0.35rem 0.75rem',
-                    borderRadius: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    border: 'none',
-                    background: checkoutMode === 'split-invoices' ? '#38bdf8' : 'transparent',
-                    color: checkoutMode === 'split-invoices' ? '#000' : 'var(--text-muted)'
-                  }}
-                >
-                  📑 Split Tax Invoices (Room vs Food)
-                </button>
-              </div>
-            </div>
-            <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-              Guest: <strong style={{ color: '#fff' }}>{room.currentGuestName || matchedBooking.guestName}</strong> • Official Bill #{matchedBooking.billNo}
-            </p>
+
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Checkout &amp; Settlement: Room {selectedRoomNumber || '—'}
+              {activeRoom && (
+                <span style={{
+                  fontSize: '0.75rem',
+                  padding: '2px 8px',
+                  borderRadius: '999px',
+                  background: isRoomOccupied ? 'rgba(234, 88, 12, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+                  color: isRoomOccupied ? '#fb923c' : '#34d399',
+                  border: `1px solid ${isRoomOccupied ? '#fb923c' : '#34d399'}60`
+                }}>
+                  {roomStatus}
+                </span>
+              )}
+            </h3>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              borderRadius: '8px',
-              color: '#94a3b8',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {checkoutMode === 'split-invoices' ? (
-          <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto' }}>
-            {/* Corporate Split Notice */}
+          {/* Mode Switcher & Close */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <div style={{
-              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(212, 175, 55, 0.12))',
-              border: '1px solid rgba(56, 189, 248, 0.3)',
-              borderRadius: '10px',
-              padding: '1rem 1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem'
+              display: 'inline-flex',
+              background: 'rgba(0,0,0,0.4)',
+              padding: '2px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <ShieldCheck size={24} color="#38bdf8" />
-              <div>
-                <strong style={{ color: '#fff', fontSize: '0.9rem' }}>
-                  Corporate Tax Invoicing Compliance (JK Paper, GAIL, Ashok Leyland Standard)
-                </strong>
-                <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-                  Generating two legally isolated tax invoices for Room {room.roomNumber}: 
-                  <strong> Bill A (Room Lodging)</strong> under company GSTIN for travel claims &amp; 
-                  <strong> Bill B (Fenugreek Restaurant Food)</strong> under guest name for F&amp;B meal allowances.
-                </p>
-              </div>
-            </div>
-
-            {/* Split Invoices Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-              {/* BILL A: ROOM LODGING */}
-              <div style={{
-                background: 'rgba(12, 24, 43, 0.85)',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
-                borderRadius: '12px',
-                padding: '1.25rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <span className="badge" style={{ background: '#38bdf8', color: '#060e1a', fontWeight: 800, fontSize: '0.7rem' }}>
-                        BILL A: ROOM TARIFF INVOICE
-                      </span>
-                      <h4 style={{ margin: '0.4rem 0 0', color: '#fff', fontSize: '1.05rem' }}>
-                        #{matchedBooking.billNo || 'FMBIL2627'}-R
-                      </h4>
-                    </div>
-                    <div style={{ textAlign: 'right', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      <div>SAC Code: <strong style={{ color: '#38bdf8' }}>996311</strong></div>
-                      <div>GST Rate: <strong>12% (6%+6%)</strong></div>
-                    </div>
-                  </div>
-
-                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-                    <div><strong>Billed To:</strong> {btcCompany || 'Ashok Leyland Limited'}</div>
-                    <div><strong>GSTIN:</strong> 33AAACA0779M1ZT (Corporate B2B)</div>
-                    <div><strong>Guest:</strong> {room.currentGuestName || matchedBooking.guestName} (Room {room.roomNumber})</div>
-                    <div><strong>Period:</strong> 18/09/2026 to 21/09/2026 (3 Nights)</div>
-                  </div>
-
-                  <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.8rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Room Base Tariff:</span>
-                      <span style={{ color: '#fff', fontWeight: 600 }}>₹{((billTotal > 1500 ? billTotal - 962 : billTotal) / 1.12).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>CGST (6%):</span>
-                      <span style={{ color: '#fbbf24' }}>₹{(((billTotal > 1500 ? billTotal - 962 : billTotal) / 1.12) * 0.06).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>SGST (6%):</span>
-                      <span style={{ color: '#fbbf24' }}>₹{(((billTotal > 1500 ? billTotal - 962 : billTotal) / 1.12) * 0.06).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.4rem', fontWeight: 800 }}>
-                      <span style={{ color: '#38bdf8' }}>Total Room Bill:</span>
-                      <span style={{ color: '#38bdf8', fontSize: '1.05rem' }}>₹{(billTotal > 1500 ? billTotal - 962 : billTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => alert(`Printing Bill A: Official Room Tax Invoice #${matchedBooking.billNo}-R for ${btcCompany || 'Corporate'}`)}
-                    className="btn-outline"
-                    style={{ flex: 1, padding: '0.5rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', borderColor: '#38bdf8', color: '#38bdf8' }}
-                  >
-                    <Printer size={15} /> Print Room Bill A
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => sendCheckoutSplitWhatsApp({
-                      billType: 'Corporate Lodging Bill A',
-                      billNo: `${matchedBooking.billNo || 'FMBIL2627'}-R`,
-                      companyOrGuest: btcCompany || 'Corporate Client',
-                      gstin: '33AAACA0779M1ZT',
-                      roomNumber: room.roomNumber,
-                      period: '3 Nights Stay',
-                      amount: (billTotal > 1500 ? billTotal - 962 : billTotal)
-                    })}
-                    style={{ flex: 1.1, padding: '0.5rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', background: 'rgba(56, 189, 248, 0.15)', borderColor: '#38bdf8', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
-                    title="Send official room lodging tax invoice to Corporate Accounts on WhatsApp"
-                  >
-                    <MessageCircle size={14} /> WhatsApp Bill A
-                  </button>
-                </div>
-              </div>
-
-              {/* BILL B: FENUGREEK RESTAURANT FOOD */}
-              <div style={{
-                background: 'rgba(12, 24, 43, 0.85)',
-                border: '1px solid rgba(52, 211, 153, 0.4)',
-                borderRadius: '12px',
-                padding: '1.25rem',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <span className="badge" style={{ background: '#34d399', color: '#060e1a', fontWeight: 800, fontSize: '0.7rem' }}>
-                        BILL B: FENUGREEK RESTAURANT FOOD INVOICE
-                      </span>
-                      <h4 style={{ margin: '0.4rem 0 0', color: '#fff', fontSize: '1.05rem' }}>
-                        #{matchedBooking.billNo || 'FMBIL2627'}-F
-                      </h4>
-                    </div>
-                    <div style={{ textAlign: 'right', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      <div>SAC Code: <strong style={{ color: '#34d399' }}>996331</strong></div>
-                      <div>GST Rate: <strong>5% (2.5%+2.5%)</strong></div>
-                    </div>
-                  </div>
-
-                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-                    <div><strong>Billed To:</strong> {room.currentGuestName || matchedBooking.guestName} (Personal)</div>
-                    <div><strong>Outlet:</strong> Fenugreek Restaurant &amp; Room Dining</div>
-                    <div><strong>KOT Numbers:</strong> F2627-7514, F2627-7515</div>
-                    <div><strong>Payment Mode:</strong> PhonePe UPI / Cash (Personal Settlement)</div>
-                  </div>
-
-                  <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.8rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>Food Base Value:</span>
-                      <span style={{ color: '#fff', fontWeight: 600 }}>₹{(962.00 / 1.05).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>CGST (2.5%):</span>
-                      <span style={{ color: '#fbbf24' }}>₹{((962.00 / 1.05) * 0.025).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>SGST (2.5%):</span>
-                      <span style={{ color: '#fbbf24' }}>₹{((962.00 / 1.05) * 0.025).toFixed(2)}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.4rem', fontWeight: 800 }}>
-                      <span style={{ color: '#34d399' }}>Total Food Bill:</span>
-                      <span style={{ color: '#34d399', fontSize: '1.05rem' }}>₹962.00</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.5rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => alert(`Printing Bill B: Cannon Kitchen Food Invoice #${matchedBooking.billNo}-F for ${room.currentGuestName || matchedBooking.guestName}`)}
-                    className="btn-outline"
-                    style={{ flex: 1, padding: '0.5rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', borderColor: '#34d399', color: '#34d399' }}
-                  >
-                    <Printer size={15} /> Print Food Bill B
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => sendCheckoutSplitWhatsApp({
-                      billType: 'Fenugreek Restaurant Food Bill B',
-                      billNo: `${matchedBooking.billNo || 'FMBIL2627'}-F`,
-                      companyOrGuest: room.currentGuestName || matchedBooking.guestName,
-                      gstin: '',
-                      roomNumber: room.roomNumber,
-                      period: 'Dining Settlement',
-                      amount: 962.00,
-                      recipientPhone: matchedBooking.guestPhone || room.guestPhone
-                    })}
-                    style={{ flex: 1.1, padding: '0.5rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', background: 'rgba(52, 211, 153, 0.15)', borderColor: '#34d399', color: '#34d399', border: '1px solid #34d399', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
-                    title="Send personal restaurant & room dining bill to Guest mobile on WhatsApp"
-                  >
-                    <MessageCircle size={14} /> WhatsApp Bill B
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Back to Tenders or Proceed */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <button
                 type="button"
                 onClick={() => setCheckoutMode('tenders')}
-                className="btn-outline"
-                style={{ padding: '0.55rem 1.25rem', fontSize: '0.85rem' }}
+                style={{
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '6px',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: checkoutMode === 'tenders' ? 'var(--gold-glow)' : 'transparent',
+                  color: checkoutMode === 'tenders' ? '#000' : '#94a3b8'
+                }}
               >
-                ← Back to Multi-Tender Payment
+                💳 Multi-Tender
               </button>
+              <button
+                type="button"
+                onClick={() => setCheckoutMode('split-invoices')}
+                style={{
+                  padding: '0.35rem 0.65rem',
+                  borderRadius: '6px',
+                  fontSize: '0.74rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: checkoutMode === 'split-invoices' ? '#38bdf8' : 'transparent',
+                  color: checkoutMode === 'split-invoices' ? '#000' : '#94a3b8'
+                }}
+              >
+                📑 Corporate Split (Room/Food)
+              </button>
+            </div>
 
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: '0.45rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* MODAL BODY (Scrollable) */}
+        <div style={{ overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.2rem', flex: 1 }}>
+
+          {/* 1. UNIVERSAL ROOM NUMBER INPUT & QUICK OCCUPIED ROOM CHIPS */}
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.75)',
+            border: '1px solid rgba(212, 175, 55, 0.3)',
+            borderRadius: '12px',
+            padding: '0.9rem 1.15rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--gold-glow)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Search size={14} /> TYPE ROOM NUMBER TO JUMP &amp; SETTLE:
+              </label>
+              <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                {occupiedRooms.length} Occupied Room{occupiedRooms.length === 1 ? '' : 's'} Active In-House
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <input
+                  ref={roomInputRef}
+                  type="text"
+                  value={roomSearchInput}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setRoomSearchInput(val);
+                    const clean = val.replace(/^#/, '').trim();
+                    if (clean && rooms.some(r => String(r.roomNumber) === clean)) {
+                      setSelectedRoomNumber(clean);
+                    }
+                    setIsRoomDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsRoomDropdownOpen(true)}
+                  placeholder="Type Room No. (e.g. 101, 204, 301)..."
+                  style={{
+                    width: '100%',
+                    background: '#070b14',
+                    border: '1.5px solid rgba(212, 175, 55, 0.5)',
+                    borderRadius: '8px',
+                    padding: '0.55rem 0.85rem',
+                    color: '#fff',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    outline: 'none',
+                    letterSpacing: '0.5px'
+                  }}
+                />
+
+                {/* Dropdown suggestions */}
+                {isRoomDropdownOpen && roomSearchInput && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '46px',
+                    left: 0,
+                    right: 0,
+                    background: '#091322',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    borderRadius: '8px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    zIndex: 2600,
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.8)'
+                  }}>
+                    {roomMatches.length === 0 ? (
+                      <div style={{ padding: '0.65rem', color: '#94a3b8', fontSize: '0.75rem' }}>No room found matching "{roomSearchInput}"</div>
+                    ) : (
+                      roomMatches.map(r => {
+                        const isOcc = (r.effectiveStatus || r.status || '').includes('Occupied');
+                        return (
+                          <div
+                            key={r.roomNumber}
+                            onClick={() => {
+                              setSelectedRoomNumber(r.roomNumber);
+                              setRoomSearchInput(r.roomNumber);
+                              setIsRoomDropdownOpen(false);
+                            }}
+                            style={{
+                              padding: '0.45rem 0.75rem',
+                              borderBottom: '1px solid rgba(255,255,255,0.05)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              background: r.roomNumber === selectedRoomNumber ? 'rgba(212, 175, 55, 0.15)' : 'transparent'
+                            }}
+                          >
+                            <div>
+                              <strong style={{ color: 'var(--gold-glow)' }}>Room {r.roomNumber}</strong>
+                              <span style={{ fontSize: '0.75rem', color: '#cbd5e1', marginLeft: '0.5rem' }}>
+                                {r.effectiveGuestName || r.currentGuestName || 'Vacant'}
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '0.68rem',
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              background: isOcc ? 'rgba(234, 88, 12, 0.25)' : 'rgba(16, 185, 129, 0.25)',
+                              color: isOcc ? '#fb923c' : '#34d399'
+                            }}>
+                              {r.effectiveStatus || r.status}
+                            </span>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Clear / Reset button */}
               <button
                 type="button"
                 onClick={() => {
-                  alert('Both Bill A (Room) and Bill B (Cannon Kitchen Food) generated and logged in statutory sales summary.');
-                  setCheckoutMode('tenders');
+                  setRoomSearchInput('');
+                  setIsRoomDropdownOpen(true);
                 }}
-                className="btn-primary-gold"
-                style={{ padding: '0.55rem 1.5rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                className="btn-outline-gold"
+                style={{ padding: '0.5rem 0.85rem', fontSize: '0.78rem' }}
               >
-                <CheckCircle2 size={16} /> Confirm Split Invoices &amp; Proceed to Settlement
+                Clear
               </button>
             </div>
-          </div>
-        ) : (
-        <form onSubmit={handleCheckoutSubmit} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          
-          {/* NET DUE & BALANCING SUMMARY CARD */}
-          <div style={{
-            background: 'rgba(12, 24, 43, 0.75)',
-            border: `1px solid ${isBalanced ? 'rgba(52, 211, 153, 0.4)' : 'rgba(248, 113, 113, 0.4)'}`,
-            borderRadius: '12px',
-            padding: '1.25rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            boxShadow: isBalanced ? '0 0 20px rgba(52, 211, 153, 0.1)' : '0 0 20px rgba(248, 113, 113, 0.1)'
-          }}>
-            <div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--gold-glow)', textTransform: 'uppercase', fontWeight: 600 }}>
-                Total Bill to Settle
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
-                <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff' }}>
-                  ₹{netDue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  (incl. CGST &amp; SGST)
-                </span>
-              </div>
-            </div>
 
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'flex-end' }}>
-                {isBalanced ? (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(16, 185, 129, 0.2)',
-                    color: '#34d399',
-                    border: '1px solid #10b981',
-                    fontSize: '0.78rem',
-                    fontWeight: 700
-                  }}>
-                    <CheckCircle2 size={14} /> 100% BALANCED (₹0.00 DUE)
-                  </span>
-                ) : (
-                  <span style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    background: 'rgba(239, 68, 68, 0.2)',
-                    color: '#f87171',
-                    border: '1px solid #ef4444',
-                    fontSize: '0.78rem',
-                    fontWeight: 700
-                  }}>
-                    <AlertCircle size={14} /> VARIANCE: ₹{variance.toFixed(2)}
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-                Allocated: <strong style={{ color: '#fff' }}>₹{totalAllocated.toFixed(2)}</strong> of ₹{netDue.toFixed(2)}
-              </div>
-            </div>
-
-            {/* Split Percentage Visual Bar */}
-            <div style={{ width: '100%', marginTop: '0.25rem' }}>
-              <div style={{
-                width: '100%',
-                height: '8px',
-                background: 'rgba(255, 255, 255, 0.08)',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                display: 'flex'
-              }}>
-                <div style={{ width: `${upiPercent}%`, background: '#38bdf8', transition: 'width 0.3s ease' }} title={`PhonePe/UPI: ${upiPercent.toFixed(0)}%`} />
-                <div style={{ width: `${cashPercent}%`, background: '#34d399', transition: 'width 0.3s ease' }} title={`Cash: ${cashPercent.toFixed(0)}%`} />
-                <div style={{ width: `${cardPercent}%`, background: '#c084fc', transition: 'width 0.3s ease' }} title={`Card: ${cardPercent.toFixed(0)}%`} />
-                <div style={{ width: `${btcPercent}%`, background: '#fbbf24', transition: 'width 0.3s ease' }} title={`BTC: ${btcPercent.toFixed(0)}%`} />
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.4rem', fontSize: '0.72rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#38bdf8' }} /> PhonePe / UPI: ₹{numUpi.toFixed(2)}
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399' }} /> Cash: ₹{numCash.toFixed(2)}
-                </span>
-                {numCard > 0 && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#c084fc' }} /> Card: ₹{numCard.toFixed(2)}
-                  </span>
-                )}
-                {numBtc > 0 && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#fbbf24' }} /> Corporate BTC: ₹{numBtc.toFixed(2)}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* QUICK PRESET BUTTONS (Featuring the Owner's exact scenario) */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--gold-glow)', textTransform: 'uppercase', fontWeight: 600 }}>
-                ⚡ Quick Split Presets
-              </span>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                Click to instantly populate payment tenders
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {/* OWNER'S EXACT VIDEO SPLIT: PhonePe Food + Linde BTC Lodging */}
-              <button
-                type="button"
-                onClick={() => applyPreset('owner-split-btc')}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(52, 211, 153, 0.2))',
-                  color: '#38bdf8',
-                  border: '1px solid #38bdf8',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 10px rgba(56, 189, 248, 0.2)'
-                }}
-              >
-                <Sparkles size={14} color="#34d399" /> 🏢 Corporate Dual-Tender (₹962 Guest UPI + ₹12,596 Company BTC)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => applyPreset('owner-demo')}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(212, 175, 55, 0.1))',
-                  color: 'var(--gold-glow)',
-                  border: '1px solid var(--gold-glow)',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 10px rgba(212, 175, 55, 0.2)'
-                }}
-              >
-                <Sparkles size={14} /> Quick Split (₹462 UPI + ₹500 Cash)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => applyPreset('100-upi')}
-                style={{
-                  background: 'rgba(56, 189, 248, 0.12)',
-                  color: '#38bdf8',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                100% PhonePe / UPI (₹{netDue.toFixed(2)})
-              </button>
-
-              <button
-                type="button"
-                onClick={() => applyPreset('100-cash')}
-                style={{
-                  background: 'rgba(52, 211, 153, 0.12)',
-                  color: '#34d399',
-                  border: '1px solid rgba(52, 211, 153, 0.3)',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                100% Cash Drawer (₹{netDue.toFixed(2)})
-              </button>
-
-              <button
-                type="button"
-                onClick={() => applyPreset('50-50')}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#e2e8f0',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                50 / 50 Equal Split
-              </button>
-            </div>
-          </div>
-
-          {/* SPLIT TENDER INPUT CARDS */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
-            
-            {/* TENDER 1: PHONEPE / UPI */}
-            <div style={{
-              background: 'rgba(19, 34, 61, 0.45)',
-              border: '1px solid rgba(56, 189, 248, 0.35)',
-              borderRadius: '10px',
-              padding: '1rem',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontWeight: 700, fontSize: '0.85rem' }}>
-                  <Smartphone size={16} /> 1. PhonePe / UPI (Digital Payment)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const diff = Math.max(0, netDue - numCash - numCard - numBtc);
-                    setUpiAmount(diff.toFixed(2));
-                  }}
-                  style={{
-                    background: 'rgba(56, 189, 248, 0.2)',
-                    color: '#38bdf8',
-                    border: 'none',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Max Balance
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Amount (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 462.00"
-                    value={upiAmount}
-                    onChange={(e) => setUpiAmount(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(56, 189, 248, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.95rem',
-                      fontWeight: 700
+            {/* Quick Chips of In-House Occupied Rooms */}
+            {occupiedRooms.length > 0 && (
+              <div style={{ marginTop: '0.65rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Occupied Rooms:</span>
+                {occupiedRooms.map(occ => (
+                  <button
+                    key={occ.roomNumber}
+                    type="button"
+                    onClick={() => {
+                      setSelectedRoomNumber(occ.roomNumber);
+                      setRoomSearchInput(occ.roomNumber);
+                      setIsRoomDropdownOpen(false);
                     }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>UPI App / Mode</label>
-                  <select
-                    value={upiProvider}
-                    onChange={(e) => setUpiProvider(e.target.value)}
                     style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      background: occ.roomNumber === selectedRoomNumber ? 'linear-gradient(135deg, #d4af37, #f59e0b)' : 'rgba(234, 88, 12, 0.15)',
+                      color: occ.roomNumber === selectedRoomNumber ? '#000' : '#fb923c',
+                      border: occ.roomNumber === selectedRoomNumber ? '1px solid #d4af37' : '1px solid rgba(234, 88, 12, 0.4)',
+                      padding: '2px 7px',
                       borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.85rem'
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      cursor: 'pointer'
                     }}
                   >
-                    <option value="PhonePe">PhonePe QR</option>
-                    <option value="GooglePay">Google Pay (GPay)</option>
-                    <option value="Paytm">Paytm Merchant</option>
-                    <option value="SBI UPI">SBI Yono / BHIM</option>
-                  </select>
-                </div>
+                    Room {occ.roomNumber} ({occ.effectiveGuestName?.split(' ')[0] || 'Guest'})
+                  </button>
+                ))}
               </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Bank / UTR Ref Number</label>
-                <input
-                  type="text"
-                  placeholder="e.g. UPI-9281048201"
-                  value={upiRef}
-                  onChange={(e) => setUpiRef(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#060e1a',
-                    color: '#94a3b8',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '6px',
-                    padding: '0.4rem 0.5rem',
-                    fontSize: '0.75rem',
-                    fontFamily: 'monospace'
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* TENDER 2: CASH DRAWER */}
-            <div style={{
-              background: 'rgba(19, 34, 61, 0.45)',
-              border: '1px solid rgba(52, 211, 153, 0.35)',
-              borderRadius: '10px',
-              padding: '1rem',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#34d399', fontWeight: 700, fontSize: '0.85rem' }}>
-                  <DollarSign size={16} /> 2. Physical Cash (Front Desk Drawer)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const diff = Math.max(0, netDue - numUpi - numCard - numBtc);
-                    setCashAmount(diff.toFixed(2));
-                  }}
-                  style={{
-                    background: 'rgba(52, 211, 153, 0.2)',
-                    color: '#34d399',
-                    border: 'none',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Max Balance
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Amount (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="e.g. 500.00"
-                    value={cashAmount}
-                    onChange={(e) => setCashAmount(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(52, 211, 153, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.95rem',
-                      fontWeight: 700
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Cashier Handling</label>
-                  <input
-                    type="text"
-                    value={cashierName}
-                    onChange={(e) => setCashierName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(52, 211, 153, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.85rem'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                  Drawer Sync: Automatically logged into Cashier Audit Physical Note Denomination Counter.
-                </span>
-              </div>
-            </div>
-
-            {/* TENDER 3: CARD SWIPE / POS */}
-            <div style={{
-              background: 'rgba(19, 34, 61, 0.45)',
-              border: '1px solid rgba(192, 132, 252, 0.25)',
-              borderRadius: '10px',
-              padding: '1rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#c084fc', fontWeight: 700, fontSize: '0.85rem' }}>
-                  <CreditCard size={16} /> 3. Card Swipe / POS (Optional)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const diff = Math.max(0, netDue - numUpi - numCash - numBtc);
-                    setCardAmount(diff.toFixed(2));
-                  }}
-                  style={{
-                    background: 'rgba(192, 132, 252, 0.2)',
-                    color: '#c084fc',
-                    border: 'none',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Max Balance
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Amount (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    value={cardAmount}
-                    onChange={(e) => setCardAmount(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(192, 132, 252, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.95rem',
-                      fontWeight: 700
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>EDC Machine Auth Code</label>
-                  <input
-                    type="text"
-                    value={cardAuth}
-                    onChange={(e) => setCardAuth(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(192, 132, 252, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.85rem'
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* TENDER 4: CORPORATE BTC */}
-            <div style={{
-              background: 'rgba(19, 34, 61, 0.45)',
-              border: '1px solid rgba(251, 191, 36, 0.25)',
-              borderRadius: '10px',
-              padding: '1rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#fbbf24', fontWeight: 700, fontSize: '0.85rem' }}>
-                  <Building2 size={16} /> 4. Corporate Credit / BTC (Optional)
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const diff = Math.max(0, netDue - numUpi - numCash - numCard);
-                    setBtcAmount(diff.toFixed(2));
-                  }}
-                  style={{
-                    background: 'rgba(251, 191, 36, 0.2)',
-                    color: '#fbbf24',
-                    border: 'none',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.68rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Max Balance
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Amount (₹)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    value={btcAmount}
-                    onChange={(e) => setBtcAmount(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(251, 191, 36, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.95rem',
-                      fontWeight: 700
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Corporate Account</label>
-                  <select
-                    value={btcCompany}
-                    onChange={(e) => setBtcCompany(e.target.value)}
-                    style={{
-                      width: '100%',
-                      background: '#060e1a',
-                      color: '#fff',
-                      border: '1px solid rgba(251, 191, 36, 0.3)',
-                      borderRadius: '6px',
-                      padding: '0.5rem',
-                      fontSize: '0.85rem'
-                    }}
-                  >
-                    <option value="Linde India Ltd">Linde India Ltd</option>
-                    <option value="JK Paper Mills">JK Paper Mills (Jaykaypur)</option>
-                    <option value="IMFA Therubali">IMFA Therubali</option>
-                    <option value="Vedanta Alumina">Vedanta Alumina</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
+            )}
           </div>
 
-          {/* ERROR ALERT */}
-          {errorMsg && (
+          {/* WARNING IF ROOM IS NOT OCCUPIED */}
+          {!isRoomOccupied && activeRoom && (
             <div style={{
               background: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid #ef4444',
-              color: '#fca5a5',
-              padding: '0.75rem 1rem',
-              borderRadius: '8px',
-              fontSize: '0.82rem',
+              border: '1.5px solid #ef4444',
+              borderRadius: '10px',
+              padding: '0.85rem 1rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.75rem',
+              color: '#fca5a5'
             }}>
-              <AlertCircle size={16} />
-              <span>{errorMsg}</span>
+              <AlertTriangle size={22} color="#ef4444" />
+              <div>
+                <strong style={{ color: '#fff', fontSize: '0.88rem' }}>
+                  Room {activeRoom.roomNumber} is currently "{roomStatus}"
+                </strong>
+                <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem' }}>
+                  Checkout is only applicable to occupied rooms. Please choose an occupied room from the list above, or return to front desk.
+                </p>
+              </div>
             </div>
           )}
 
-          {/* DOCUMENT ENGINE FORMAT & BILLING SERIES SELECTOR */}
+          {/* 2. SYNCHRONIZED GUEST PROFILE & STAY DETAILS */}
+          {activeRoom && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1rem',
+              background: 'rgba(10, 18, 33, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '12px',
+              padding: '1rem 1.25rem'
+            }}>
+              {/* Guest Profile */}
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                  In-House Guest Profile
+                </div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', marginTop: '0.2rem' }}>
+                  {activeRoom.effectiveGuestName || activeRoom.currentGuestName || matchedBooking?.guestName}
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                  📞 {matchedBooking?.guestPhone || activeRoom.phone || 'Phone on file'}
+                </div>
+                {matchedBooking?.company && matchedBooking.company !== 'Direct Guest' && (
+                  <div style={{ fontSize: '0.74rem', color: '#38bdf8', marginTop: '0.25rem' }}>
+                    🏢 {matchedBooking.company} {matchedBooking.corporateGstin ? `• GSTIN: ${matchedBooking.corporateGstin}` : ''}
+                  </div>
+                )}
+              </div>
+
+              {/* Stay & Room Info */}
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Room Tier &amp; Stay Duration
+                </div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginTop: '0.2rem' }}>
+                  {activeRoom.tier} (Room {activeRoom.roomNumber})
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                  📅 Check-In: {stayDuration.checkInStr} • {stayDuration.nights} Night{stayDuration.nights > 1 ? 's' : ''} Stay
+                </div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--gold-glow)', marginTop: '0.25rem' }}>
+                  Tariff: ₹{Number(matchedBooking?.tariff || activeRoom.tariff || 2199).toLocaleString('en-IN')}/night (SAC 996311)
+                </div>
+              </div>
+
+              {/* Late Checkout Grace Engine */}
+              <div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
+                  Departure Policy
+                </div>
+                {stayDuration.isLateCheckout ? (
+                  <div style={{ marginTop: '0.25rem' }}>
+                    <span style={{
+                      background: 'rgba(234, 88, 12, 0.25)',
+                      border: '1px solid #ea580c',
+                      color: '#fb923c',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontSize: '0.7rem',
+                      fontWeight: 800
+                    }}>
+                      ⏰ LATE CHECKOUT (+{stayDuration.lateHours}h)
+                    </span>
+                    <div style={{ marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.72rem' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="lateCheck"
+                          checked={lateCheckoutFeeType === 'waived'}
+                          onChange={() => setLateCheckoutFeeType('waived')}
+                        />
+                        <span>Courtesy Manager Waiver (₹0.00)</span>
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="lateCheck"
+                          checked={lateCheckoutFeeType === 'half'}
+                          onChange={() => setLateCheckoutFeeType('half')}
+                        />
+                        <span>Half-Day Surcharge (+₹{Math.round(Number(activeRoom.tariff || 2199) / 2)})</span>
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                        <input
+                          type="radio"
+                          name="lateCheck"
+                          checked={lateCheckoutFeeType === 'full'}
+                          onChange={() => setLateCheckoutFeeType('full')}
+                        />
+                        <span>Full-Day Extension (+₹{Number(activeRoom.tariff || 2199)})</span>
+                      </label>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.8rem', color: '#34d399', marginTop: '0.3rem' }}>
+                    ✓ Standard 12:00 PM On-Time Departure
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 3. SYNCHRONIZED FINANCIAL BREAKDOWN: ROOM + FOOD + ADVANCE */}
           <div style={{
-            background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02))',
-            border: '1px solid rgba(212, 175, 55, 0.25)',
+            background: 'rgba(7, 14, 27, 0.95)',
+            border: '1px solid rgba(212, 175, 55, 0.35)',
+            borderRadius: '12px',
+            padding: '1.15rem 1.25rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.5rem' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--gold-glow)' }}>
+                SYNCHRONIZED MASTER FOLIO CHARGES
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                Bill No: <strong style={{ color: '#fff' }}>{matchedBooking?.billNo || `FMBIL2627-${selectedRoomNumber}`}</strong>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
+              {/* Room Tariff Line */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>1. Room Accommodation</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', marginTop: '0.2rem' }}>
+                  ₹{roomTariffTotal.toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                  {stayDuration.nights} Ngt @ ₹{Number(activeRoom?.tariff || 2199)}
+                </div>
+              </div>
+
+              {/* F&B Dining Line (Real Live KOTs) */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>2. Fenugreek Restaurant</span>
+                  <span style={{ color: '#38bdf8' }}>{foodSummary.itemsList.length} KOT item{foodSummary.itemsList.length === 1 ? '' : 's'}</span>
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#34d399', marginTop: '0.2rem' }}>
+                  ₹{foodChargesTotal.toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                  {foodChargesTotal > 0 ? 'Live KDS Billed (SAC 996331)' : 'No Food Ordered (₹0.00)'}
+                </div>
+              </div>
+
+              {/* Late Checkout Line */}
+              {lateCheckoutAmount > 0 && (
+                <div style={{ background: 'rgba(234, 88, 12, 0.1)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(234, 88, 12, 0.3)' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#fb923c' }}>3. Late Checkout</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fb923c', marginTop: '0.2rem' }}>
+                    ₹{lateCheckoutAmount.toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#94a3b8' }}>
+                    +{stayDuration.lateHours}h Surcharge
+                  </div>
+                </div>
+              )}
+
+              {/* Advance Paid Deposit */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>Less: Advance Deposit</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8', marginTop: '0.2rem' }}>
+                  ₹{advancePaidTotal.toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                  Check-in / Pre-auth deposit
+                </div>
+              </div>
+
+              {/* Net Balance Due / Refund Due */}
+              <div style={{
+                background: isRefundDue 
+                  ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2))' 
+                  : 'linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(245, 158, 11, 0.18))',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: isRefundDue ? '1.5px solid #10b981' : '1.5px solid rgba(212, 175, 55, 0.5)'
+              }}>
+                <div style={{ fontSize: '0.7rem', color: isRefundDue ? '#34d399' : 'var(--gold-glow)', fontWeight: 800 }}>
+                  {isRefundDue ? 'REFUND DUE TO GUEST' : 'NET PAYABLE AT CHECKOUT'}
+                </div>
+                <div style={{ fontSize: '1.3rem', fontWeight: 900, color: isRefundDue ? '#34d399' : '#fff', marginTop: '0.15rem' }}>
+                  ₹{(isRefundDue ? refundAmount : Math.max(0, netPayable)).toLocaleString('en-IN')}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#cbd5e1' }}>
+                  {isRefundDue ? 'Excess deposit return' : 'Final settlement due'}
+                </div>
+              </div>
+            </div>
+
+            {/* Itemized Food Dishes List (If food was ordered) */}
+            {foodSummary.itemsList.length > 0 && (
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.65rem', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '0.35rem' }}>
+                  🍴 In-Room Dining KOT Line Items:
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {foodSummary.itemsList.map((item, idx) => (
+                    <span key={idx} style={{
+                      background: 'rgba(56, 189, 248, 0.12)',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      color: '#e2e8f0',
+                      padding: '2px 7px',
+                      borderRadius: '4px',
+                      fontSize: '0.72rem'
+                    }}>
+                      {item.qty}x {item.name} (₹{item.total})
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 4. STATUTORY KEY RETURN & HOUSEKEEPING INSPECTION CHECKLIST */}
+          <div style={{
+            background: 'rgba(10, 20, 35, 0.7)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
             borderRadius: '10px',
             padding: '0.75rem 1rem',
             display: 'flex',
@@ -1092,191 +915,413 @@ export default function CheckoutSplitModal({
             flexWrap: 'wrap',
             gap: '0.75rem'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.8rem', color: '#f3c64c', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                <Receipt size={15} /> Document Series:
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ClipboardCheck size={18} color="#38bdf8" />
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fff' }}>
+                Statutory Room Turnover Handover Checklist:
               </span>
-              <div style={{ display: 'inline-flex', background: 'rgba(0,0,0,0.6)', padding: '2px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsNonGstBill(false)}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '4px',
-                    fontSize: '0.74rem',
-                    fontWeight: !isNonGstBill ? 800 : 500,
-                    background: !isNonGstBill ? 'linear-gradient(135deg, #d4af37, #f3c64c)' : 'transparent',
-                    color: !isNonGstBill ? '#060e1a' : '#cbd5e1',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  🏛️ Rule 46 GST Bill (FMBIL)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsNonGstBill(true)}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: '4px',
-                    fontSize: '0.74rem',
-                    fontWeight: isNonGstBill ? 800 : 500,
-                    background: isNonGstBill ? 'linear-gradient(135deg, #38bdf8, #0284c7)' : 'transparent',
-                    color: isNonGstBill ? '#ffffff' : '#cbd5e1',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  📜 Non-GST Cash Memo (NGST)
-                </button>
-              </div>
             </div>
 
-            <label htmlFor="openReceiptAfter" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', color: '#94a3b8', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                id="openReceiptAfter"
-                checked={openReceiptAfter}
-                onChange={(e) => setOpenReceiptAfter(e.target.checked)}
-                style={{ cursor: 'pointer', width: 15, height: 15, accentColor: 'var(--gold-glow)' }}
-              />
-              <span>Auto-open Document Suite on Settle</span>
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.78rem' }}>
+                <input
+                  type="checkbox"
+                  checked={keyReturned}
+                  onChange={(e) => setKeyReturned(e.target.checked)}
+                />
+                <span style={{ color: keyReturned ? '#34d399' : '#f87171', fontWeight: 600 }}>
+                  🔑 Physical Key Received &amp; Revoked
+                </span>
+              </label>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.78rem' }}>
+                <input
+                  type="checkbox"
+                  checked={roomInspected}
+                  onChange={(e) => setRoomInspected(e.target.checked)}
+                />
+                <span style={{ color: roomInspected ? '#34d399' : '#f59e0b', fontWeight: 600 }}>
+                  🧹 Room Linen &amp; Amenities Cleared
+                </span>
+              </label>
+            </div>
           </div>
 
-          {/* MODAL FOOTER BUTTONS */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-            paddingTop: '0.75rem',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-          }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{
-                padding: '0.6rem 1.25rem',
-                borderRadius: '8px',
-                background: 'transparent',
-                color: '#94a3b8',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
+          {/* 5. MULTI-TENDER PAYMENT SETTLEMENT OR REFUND ENGINE */}
+          {checkoutMode === 'tenders' ? (
+            <div style={{
+              background: 'rgba(12, 22, 38, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '12px',
+              padding: '1.15rem 1.25rem'
+            }}>
+              {/* If Refund Due */}
+              {isRefundDue ? (
+                <div>
+                  <div style={{
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1.5px solid #10b981',
+                    borderRadius: '10px',
+                    padding: '1rem',
+                    marginBottom: '1rem'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#34d399' }}>
+                      <ArrowDownLeft size={22} />
+                      <div>
+                        <strong style={{ fontSize: '0.95rem' }}>Excess Advance Return: ₹{refundAmount.toFixed(2)}</strong>
+                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#cbd5e1' }}>
+                          Guest deposited ₹{advancePaidTotal.toFixed(2)}, but total charges were ₹{grossBillTotal.toFixed(2)}. Issue refund below to balance folio to ₹0.00.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-            {/* Post-Checkout 1-Click WhatsApp Google Review Link */}
-            <button
-              type="button"
-              onClick={() => {
-                const guestName = room.currentGuestName || matchedBooking.guestName || 'Valued Guest';
-                const rawPhone = (room.guestPhone || matchedBooking.guestPhone || '').replace(/\D/g, '');
-                const cleanPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
-                const msg = encodeURIComponent(`Namaste ${guestName} ji! 🙏\n\nThank you for choosing Hotel Elite Inn, Muniguda! It was our pleasure hosting you in Room ${room.roomNumber}.\n\nIf you enjoyed your stay, please take 15 seconds to share a 5-star review on Google Maps:\n⭐ https://maps.app.goo.gl/HotelEliteInnMuniguda\n\nWishing you safe travels and looking forward to your next visit!\nWarm regards,\nHotel Elite Inn Management, Muniguda\n📞 +91 94370 00000 | 🌐 https://hotel-elite-inn.pages.dev`);
-                window.open(`https://wa.me/${cleanPhone || '919437000000'}?text=${msg}`, '_blank');
-              }}
-              title="Send personalized Thank-You message & 5-Star Google Maps Review Link to guest WhatsApp"
-              style={{
-                padding: '0.6rem 1rem',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.35))',
-                color: '#fde047',
-                border: '1px solid #facc15',
-                fontSize: '0.82rem',
-                fontWeight: 800,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                boxShadow: '0 2px 10px rgba(234, 179, 8, 0.2)'
-              }}
-            >
-              ⭐ WhatsApp Review Link
-            </button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="form-group">
+                      <label className="form-label">Refund Payment Mode</label>
+                      <select
+                        className="form-select"
+                        value={refundMode}
+                        onChange={(e) => setRefundMode(e.target.value)}
+                      >
+                        <option value="Cash">Cash (Front Desk Drawer Outflow)</option>
+                        <option value="UPI">PhonePe / UPI Return Transfer</option>
+                        <option value="Original Payment Method">Original Payment Reversal</option>
+                      </select>
+                    </div>
 
-            {/* Instant Money Receipt Button (Owner Video Demonstration) */}
+                    <div className="form-group">
+                      <label className="form-label">Refund Reference / Voucher ID</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        value={refundRef}
+                        onChange={(e) => setRefundRef(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : netPayable > 0 ? (
+                /* Multi-Tender Payment Allocation */
+                <div>
+                  {/* Preset Buttons */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--gold-glow)' }}>
+                      TENDER ALLOCATION (Net Due: ₹{netPayable.toFixed(2)})
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      <button type="button" onClick={() => applyPreset('100-upi')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}>
+                        100% PhonePe UPI
+                      </button>
+                      <button type="button" onClick={() => applyPreset('100-cash')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}>
+                        100% Cash
+                      </button>
+                      <button type="button" onClick={() => applyPreset('50-50')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}>
+                        50-50 Split
+                      </button>
+                      {matchedBooking?.company && (
+                        <button type="button" onClick={() => applyPreset('corporate-split')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem', color: '#38bdf8', borderColor: '#38bdf8' }}>
+                          🏢 Room BTC + Food UPI
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 4 Multi-Tender Inputs */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem' }}>
+                    {/* PhonePe UPI */}
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: numUpi > 0 ? '1.5px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)' }}>
+                      <label style={{ fontSize: '0.74rem', color: '#38bdf8', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Smartphone size={13} /> PhonePe / UPI (₹)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={upiAmount}
+                        onChange={(e) => setUpiAmount(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginTop: '0.35rem' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="UPI Ref ID"
+                        value={upiRef}
+                        onChange={(e) => setUpiRef(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #1e293b', borderRadius: '4px', padding: '0.25rem 0.5rem', color: '#94a3b8', fontSize: '0.7rem', marginTop: '0.35rem' }}
+                      />
+                    </div>
+
+                    {/* Cash */}
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: numCash > 0 ? '1.5px solid #10b981' : '1px solid rgba(255,255,255,0.08)' }}>
+                      <label style={{ fontSize: '0.74rem', color: '#34d399', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <DollarSign size={13} /> Cash Drawer (₹)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={cashAmount}
+                        onChange={(e) => setCashAmount(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginTop: '0.35rem' }}
+                      />
+                      <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginTop: '0.35rem' }}>
+                        Auto-increments Shift Drawer
+                      </span>
+                    </div>
+
+                    {/* Card */}
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: numCard > 0 ? '1.5px solid #a855f7' : '1px solid rgba(255,255,255,0.08)' }}>
+                      <label style={{ fontSize: '0.74rem', color: '#c084fc', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <CreditCard size={13} /> POS Card (₹)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={cardAmount}
+                        onChange={(e) => setCardAmount(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginTop: '0.35rem' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Card Auth Code"
+                        value={cardAuth}
+                        onChange={(e) => setCardAuth(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #1e293b', borderRadius: '4px', padding: '0.25rem 0.5rem', color: '#94a3b8', fontSize: '0.7rem', marginTop: '0.35rem' }}
+                      />
+                    </div>
+
+                    {/* Corporate BTC Credit */}
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: numBtc > 0 ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)' }}>
+                      <label style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Building2 size={13} /> Bill to Company (BTC ₹)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={btcAmount}
+                        onChange={(e) => setBtcAmount(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginTop: '0.35rem' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Company Name"
+                        value={btcCompany}
+                        onChange={(e) => setBtcCompany(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #1e293b', borderRadius: '4px', padding: '0.25rem 0.5rem', color: '#94a3b8', fontSize: '0.7rem', marginTop: '0.35rem' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Variance / Balance Bar */}
+                  <div style={{
+                    marginTop: '0.85rem',
+                    padding: '0.5rem 0.85rem',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: isBalanced ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                    border: isBalanced ? '1px solid #10b981' : '1px solid #ef4444'
+                  }}>
+                    <span style={{ fontSize: '0.78rem', color: isBalanced ? '#34d399' : '#f87171', fontWeight: 700 }}>
+                      {isBalanced 
+                        ? '✓ Total Allocated Equals Net Payable (Folio Balanced to ₹0.00)' 
+                        : `⚠️ Variance: ₹${Math.abs(variance).toFixed(2)} ${variance > 0 ? 'Remaining to Allocate' : 'Over-allocated'}`}
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                      Allocated: <strong>₹{totalAllocated.toFixed(2)}</strong> / ₹{netPayable.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ padding: '0.85rem', textAlign: 'center', color: '#34d399', fontSize: '0.9rem', fontWeight: 700 }}>
+                  ✓ Zero Balance Outstanding. Folio is fully settled.
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Corporate Split Invoices View (Room vs Food) */
+            <div style={{
+              background: 'rgba(12, 22, 38, 0.85)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '12px',
+              padding: '1.15rem 1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <ShieldCheck size={20} color="#38bdf8" />
+                <div>
+                  <strong style={{ fontSize: '0.88rem', color: '#fff' }}>Corporate Two-Tier Invoicing Protocol</strong>
+                  <p style={{ margin: '0.1rem 0 0', fontSize: '0.74rem', color: '#94a3b8' }}>
+                    Separates Room Lodging for company claim and Personal Dining for guest reimbursement.
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                {/* INVOICE A: ROOM LODGING */}
+                <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                  <span style={{ fontSize: '0.7rem', background: '#38bdf8', color: '#000', fontWeight: 900, padding: '2px 6px', borderRadius: '4px' }}>
+                    BILL A: ROOM TARIFF
+                  </span>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#fff', marginTop: '0.5rem' }}>
+                    ₹{roomTariffTotal.toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                    SAC 996311 • Billed To: {matchedBooking?.company || 'Linde India Ltd'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => handleCheckoutSubmit(e, 'room-split')}
+                    disabled={!isBalanced}
+                    className="btn-outline-gold"
+                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem' }}
+                  >
+                    📄 Print Room Bill No. 01499
+                  </button>
+                </div>
+
+                {/* INVOICE B: RESTAURANT FOOD */}
+                <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                  <span style={{ fontSize: '0.7rem', background: '#34d399', color: '#000', fontWeight: 900, padding: '2px 6px', borderRadius: '4px' }}>
+                    BILL B: FENUGREEK FOOD
+                  </span>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#34d399', marginTop: '0.5rem' }}>
+                    ₹{foodChargesTotal.toLocaleString('en-IN')}
+                  </div>
+                  <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                    SAC 996331 • Billed To: {activeRoom?.effectiveGuestName || 'Guest'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => handleCheckoutSubmit(e, 'food-split')}
+                    disabled={!isBalanced}
+                    className="btn-outline-gold"
+                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem', borderColor: '#34d399', color: '#34d399' }}
+                  >
+                    🍽️ Print Food Bill No. 01500
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {errorMsg && (
+            <div style={{
+              background: 'rgba(239, 68, 68, 0.2)',
+              border: '1px solid #ef4444',
+              borderRadius: '8px',
+              padding: '0.65rem 0.85rem',
+              color: '#fca5a5',
+              fontSize: '0.8rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <AlertCircle size={16} />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+        </div>
+
+        {/* MODAL FOOTER ACTIONS */}
+        <div style={{
+          padding: '1rem 1.5rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          background: 'rgba(6, 12, 22, 0.98)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-outline-gold"
+            style={{ padding: '0.55rem 1.1rem', fontSize: '0.82rem' }}
+          >
+            Cancel
+          </button>
+
+          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Money Receipt Voucher Button */}
             <button
               type="button"
               onClick={(e) => handleCheckoutSubmit(e, 'money-receipt')}
-              disabled={!isBalanced}
-              title="Settle folio & instantly generate Official Money Receipt Voucher (Page 5)"
+              disabled={!isBalanced || !isRoomOccupied}
               style={{
-                padding: '0.6rem 1.25rem',
+                padding: '0.55rem 1rem',
                 borderRadius: '8px',
-                background: isBalanced ? 'linear-gradient(135deg, #e11d48, #be123c)' : 'rgba(255, 255, 255, 0.08)',
-                color: isBalanced ? '#ffffff' : '#64748b',
-                border: 'none',
-                fontSize: '0.85rem',
+                background: 'rgba(56, 189, 248, 0.2)',
+                color: '#38bdf8',
+                border: '1px solid #38bdf8',
+                fontSize: '0.8rem',
                 fontWeight: 700,
-                cursor: isBalanced ? 'pointer' : 'not-allowed',
+                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.45rem',
-                boxShadow: isBalanced ? '0 4px 15px rgba(225, 29, 72, 0.35)' : 'none',
-                transition: 'all 0.2s ease'
+                gap: '0.4rem',
+                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
               }}
             >
-              <Receipt size={16} /> 🧾 Settle &amp; Print Money Receipt
+              <Receipt size={15} /> 🧾 Money Receipt Voucher (Page 5)
             </button>
 
-            {/* Settle & Open in Universal Document Editor */}
+            {/* 80mm POS Slip */}
             <button
               type="button"
-              onClick={(e) => handleCheckoutSubmit(e, 'editor')}
-              disabled={!isBalanced}
-              title="Settle folio & open live Document Editor to customize remarks, GRC, or line items before printing"
+              onClick={(e) => handleCheckoutSubmit(e, 'pos')}
+              disabled={!isBalanced || !isRoomOccupied}
               style={{
-                padding: '0.6rem 1.25rem',
+                padding: '0.55rem 1rem',
                 borderRadius: '8px',
-                background: isBalanced ? 'linear-gradient(135deg, #7c3aed, #6d28d9)' : 'rgba(255, 255, 255, 0.08)',
-                color: isBalanced ? '#ffffff' : '#64748b',
-                border: 'none',
-                fontSize: '0.85rem',
+                background: 'rgba(255, 255, 255, 0.1)',
+                color: '#cbd5e1',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                fontSize: '0.8rem',
                 fontWeight: 700,
-                cursor: isBalanced ? 'pointer' : 'not-allowed',
+                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.45rem',
-                boxShadow: isBalanced ? '0 4px 15px rgba(124, 58, 237, 0.35)' : 'none',
-                transition: 'all 0.2s ease'
+                gap: '0.4rem',
+                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
               }}
             >
-              <Receipt size={16} /> ✏️ Settle &amp; Open Document Editor
+              <Printer size={15} /> 🖨️ 80mm Slip
             </button>
 
-            {/* Consolidated Tax Invoice Button */}
+            {/* Settle & Consolidated Tax Invoice (Default Master Action) */}
             <button
               type="button"
               onClick={(e) => handleCheckoutSubmit(e, 'a4')}
-              disabled={!isBalanced}
+              disabled={!isBalanced || !isRoomOccupied}
               style={{
                 padding: '0.6rem 1.4rem',
                 borderRadius: '8px',
-                background: isBalanced ? 'linear-gradient(135deg, #d4af37, #f3c64c)' : 'rgba(255, 255, 255, 0.1)',
-                color: isBalanced ? '#060e1a' : '#64748b',
+                background: (isBalanced && isRoomOccupied) ? 'linear-gradient(135deg, #d4af37, #f59e0b)' : 'rgba(255, 255, 255, 0.1)',
+                color: (isBalanced && isRoomOccupied) ? '#000' : '#64748b',
                 border: 'none',
-                fontSize: '0.88rem',
-                fontWeight: 800,
-                cursor: isBalanced ? 'pointer' : 'not-allowed',
+                fontSize: '0.85rem',
+                fontWeight: 900,
+                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: isBalanced ? '0 4px 15px rgba(212, 175, 55, 0.35)' : 'none',
-                transition: 'all 0.2s ease'
+                boxShadow: (isBalanced && isRoomOccupied) ? '0 4px 15px rgba(212, 175, 55, 0.35)' : 'none',
+                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
               }}
             >
-              <Check size={18} /> 📄 Settle &amp; Print Tax Invoice
+              <Check size={18} /> ⚡ Complete Checkout &amp; Print Tax Invoice
             </button>
           </div>
+        </div>
 
-        </form>
-        )}
       </div>
     </div>
   );

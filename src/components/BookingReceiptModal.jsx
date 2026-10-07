@@ -145,7 +145,19 @@ export default function BookingReceiptModal({
         }
       ];
 
-      if (foodAmt > 0) {
+      if (Array.isArray(booking.foodItems) && booking.foodItems.length > 0) {
+        booking.foodItems.forEach((fItem, fIdx) => {
+          initialItems.push({
+            id: `food-item-${fIdx}`,
+            desc: `Fenugreek Dining - ${fItem.name}`,
+            subDesc: `KOT ${fItem.kotId || ''} • SAC 996331 (5% Taxable Dining)`,
+            sac: '996331',
+            qty: Number(fItem.qty || 1),
+            rate: Number(fItem.price || fItem.total || 0),
+            isExempt: false
+          });
+        });
+      } else if (foodAmt > 0) {
         initialItems.push({
           id: 'item-2',
           desc: 'Cannon Kitchen Restaurant - Food & Dining',
