@@ -717,27 +717,71 @@ export async function onRequestPost({ request, env }) {
     }
 
     // 3. PUBLIC GUEST ACTION: Place Food Order
-    // 3. PUBLIC GUEST ACTION: Place Food Order & Live KOT
+    // 3. PUBLIC GUEST & STEWARD ACTION: Place Food Order & Live KOT
     if (action === 'place_food_order' || action === 'create_live_kot') {
       const order = payload || {};
       const orderId = order.id || order.kotId || order.orderId || `FOOD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
+      const roomOrTable = order.roomNumber ? `Room ${order.roomNumber}` : (order.tableNumber ? `Table ${order.tableNumber}` : 'Dining');
+      const guestName = order.guestName || (order.roomNumber ? `Room ${order.roomNumber} Guest` : (order.tableNumber ? `Table ${order.tableNumber} Guest` : 'Walk-In Guest'));
+      const subtotal = Number(order.subtotal || Math.round(((order.totalAmount || 0) / 1.05) * 100) / 100);
+      const gst = Number(order.gst || Math.round(((order.totalAmount || 0) - subtotal) * 100) / 100);
+      const totalAmount = Number(order.totalAmount || 0);
+      const isJain = (order.isJain || order.is_jain_satvik || order.dietaryTag === 'jain') ? 1 : 0;
+      const status = order.status || 'Received';
+      const captain = order.steward || order.captain || 'Steward';
+      const outlet = order.outlet || 'Cannon Kitchen';
+      const createdAt = order.timestamp || order.created_at || new Date().toISOString();
+
       await db.prepare(`
-        INSERT INTO food_orders (
-          order_id, room_number, guest_name, items_json,
-          subtotal, gst, total_amount, is_jain_satvik, status, payment_status, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Received', 'Pending', datetime('now'))
+        INSERT OR REPLACE INTO food_orders (
+          order_id, room_number, guest_name, outlet, items_json,
+          subtotal, gst, total_amount, is_jain_satvik, status, payment_status, captain_name, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', ?, ?)
       `).bind(
-        orderId, 
-        order.roomNumber || (order.tableNumber ? `Table ${order.tableNumber}` : 'Dining'), 
-        order.guestName || (order.roomNumber ? `Room ${order.roomNumber}` : 'Direct Guest'),
-        JSON.stringify(order.items || []), 
-        order.subtotal || Math.round(((order.totalAmount || 0) / 1.05) * 100) / 100, 
-        order.gst || Math.round(((order.totalAmount || 0) - ((order.totalAmount || 0) / 1.05)) * 100) / 100,
-        order.totalAmount || 0, 
-        (order.isJain || order.is_jain_satvik) ? 1 : 0
+        orderId, roomOrTable, guestName, outlet,
+        JSON.stringify(order.items || []),
+        subtotal, gst, totalAmount, isJain, status, captain, createdAt
       ).run();
 
       return jsonResponse({ success: true, orderId });
+    }
+
+    // 3B. REAL-TIME MULTI-DEVICE KDS SYNC: Fetch Live KOT Orders Feed
+    if (action === 'get_live_kots' || action === 'get_live_orders') {
+      const res = await db.prepare("SELECT * FROM food_orders ORDER BY created_at DESC LIMIT 50").all();
+      const kots = (res.results || []).map(o => {
+        let items = [];
+        try { items = JSON.parse(o.items_json || "[]"); } catch { items = []; }
+        const rStr = String(o.room_number || '');
+        const isTable = rStr.toLowerCase().includes('table');
+        const isRoom = rStr.toLowerCase().includes('room');
+        const cleanTable = isTable ? rStr.replace(/table\s*/i, '').trim() : null;
+        const cleanRoom = isRoom ? rStr.replace(/room\s*/i, '').trim() : (!isTable ? rStr : null);
+        return {
+          id: o.order_id,
+          orderId: o.order_id,
+          kotId: o.order_id,
+          kotNumber: o.order_id.replace(/\D/g, '').slice(-3) || '1',
+          tableNumber: cleanTable,
+          roomNumber: cleanRoom,
+          orderType: cleanRoom ? 'room' : 'dining',
+          guestName: o.guest_name,
+          outlet: o.outlet || 'Cannon Kitchen',
+          status: o.status || 'Received',
+          payment_status: o.payment_status || 'Pending',
+          timestamp: o.created_at,
+          created_at: o.created_at,
+          timeFormatted: new Date(o.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+          totalAmount: o.total_amount,
+          subtotal: o.subtotal,
+          gst: o.gst,
+          is_jain_satvik: o.is_jain_satvik,
+          items,
+          steward: o.captain_name || 'Steward',
+          captain: o.captain_name || 'Steward'
+        };
+      });
+      return jsonResponse({ success: true, kots });
     }
 
     // 4. PUBLIC GUEST ACTION: Room Service Request & Housekeeping Ticket

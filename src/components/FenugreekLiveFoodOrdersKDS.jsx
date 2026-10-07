@@ -30,6 +30,8 @@ export default function FenugreekLiveFoodOrdersKDS({
   const [newOrderNotice, setNewOrderNotice] = useState(null);
   const [kotToPrint, setKotToPrint] = useState(null);
   const [feedbackToast, setFeedbackToast] = useState(null);
+  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
+  const fetchCloudOrdersRef = useRef(null);
 
   // Bumped (strike-through) items tracker for line chefs
   const [bumpedItems, setBumpedItems] = useState(() => {
@@ -148,10 +150,36 @@ export default function FenugreekLiveFoodOrdersKDS({
 
     window.addEventListener('storage', handleStorage);
 
+    // 3. Real-Time Cloud Network Sync: Bridges orders from Mobile Stewards & Room QRs across internet
+    const fetchCloudOrders = async () => {
+      try {
+        const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
+        const res = await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+          body: JSON.stringify({ action: 'get_live_kots' })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.kots && Array.isArray(data.kots)) {
+          data.kots.forEach(order => {
+            handleIncomingOrder(order);
+          });
+        }
+      } catch (err) {
+        // silent fallback on network glitch
+      }
+    };
+
+    fetchCloudOrdersRef.current = fetchCloudOrders;
+    fetchCloudOrders();
+    const cloudPollInterval = setInterval(fetchCloudOrders, 2500);
+
     return () => {
       if (channel) channel.close();
       if (channelKot) channelKot.close();
       window.removeEventListener('storage', handleStorage);
+      clearInterval(cloudPollInterval);
     };
   }, [isAudioMuted]);
 
@@ -397,8 +425,40 @@ export default function FenugreekLiveFoodOrdersKDS({
           </div>
         </div>
 
-        {/* Right Action Tools: Chime Test, POS Button, Audio Toggle */}
+        {/* Right Action Tools: Cloud Sync, Chime Test, POS Button, Audio Toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => {
+              setIsSyncingCloud(true);
+              if (fetchCloudOrdersRef.current) {
+                fetchCloudOrdersRef.current().finally(() => {
+                  setTimeout(() => setIsSyncingCloud(false), 600);
+                });
+              } else {
+                setIsSyncingCloud(false);
+              }
+              setFeedbackToast('⚡ Synced with Cloud D1: Checked live orders from Mobile Stewards & Room QRs!');
+            }}
+            title="Force immediate check for new orders from Mobile Stewards & Room QRs"
+            style={{
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(14, 165, 233, 0.12))',
+              border: '1px solid #38bdf8',
+              color: '#38bdf8',
+              padding: '0.42rem 0.85rem',
+              borderRadius: '7px',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              boxShadow: '0 2px 8px rgba(56, 189, 248, 0.2)'
+            }}
+          >
+            <RefreshCw size={13} style={{ animation: isSyncingCloud ? 'spin 1s linear infinite' : 'none' }} />
+            <span>{isSyncingCloud ? 'Syncing...' : 'Sync Cloud Orders'}</span>
+          </button>
+
           <button
             onClick={() => {
               playOrderAlert();
