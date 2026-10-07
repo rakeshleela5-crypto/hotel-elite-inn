@@ -1165,26 +1165,37 @@ Thank you for dining at Cannon Kitchen! 🙏`;
       aria-labelledby="pos-main-title"
       style={{
         position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(5, 7, 15, 0.92)',
-        backdropFilter: 'blur(10px)',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        backgroundColor: '#070b14',
         zIndex: 2000,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem'
+        flexDirection: 'column',
+        padding: 0,
+        margin: 0,
+        overflow: 'hidden'
       }}
     >
-      <div className="glass-panel emil-modal-enter" style={{
-        width: '100%',
-        maxWidth: 1340,
-        height: '92vh',
+      <div style={{
+        width: '100vw',
+        height: '100vh',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '16px',
-        border: '1px solid rgba(245, 158, 11, 0.35)',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.85)',
-        overflow: 'hidden'
+        borderRadius: 0,
+        border: 'none',
+        background: '#070b14',
+        boxShadow: 'none',
+        overflow: 'hidden',
+        padding: 0,
+        margin: 0
       }}>
         {/* Header Bar */}
         <div style={{
