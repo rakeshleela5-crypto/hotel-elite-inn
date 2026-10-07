@@ -103,7 +103,7 @@ export default function BookingReceiptModal({
   // Synchronize state when modal opens or booking changes
   useEffect(() => {
     if (booking && isOpen) {
-      const defaultMode = booking.isCheckInMoneyReceipt ? 'money-receipt' : (initialType || 'money-receipt');
+      const defaultMode = booking.isCheckInMoneyReceipt ? 'money-receipt' : (initialType || 'a4');
       setInvoiceType(defaultMode);
       if (booking.isNonGstBill !== undefined) {
         setIsNonGstBill(Boolean(booking.isNonGstBill));

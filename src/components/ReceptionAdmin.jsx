@@ -1107,6 +1107,7 @@ export default function ReceptionAdmin({
         tier: payload.tier,
         totalAmount: payload.billTotal || payload.totalAmount,
         advancePaid: payload.advancePaid || 0,
+        advanceDeposit: payload.advancePaid || 0,
         paymentMode: payload.isRefund ? `Refund (${payload.refundMode})` : 'Split Tender',
         paymentStatus: payload.isRefund ? 'Refunded & Checked Out' : 'Fully Settled & Checked Out',
         tenders: payload.tenders,

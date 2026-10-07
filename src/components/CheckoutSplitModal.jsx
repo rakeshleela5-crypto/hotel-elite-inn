@@ -48,13 +48,30 @@ export default function CheckoutSplitModal({
     return rooms.find(r => String(r.roomNumber) === cleanNo) || null;
   }, [selectedRoomNumber, rooms]);
 
-  // Check room status
+  // Check room status & active occupancy
   const roomStatus = activeRoom ? (activeRoom.effectiveStatus || activeRoom.status || 'Available') : '';
-  const isRoomOccupied = roomStatus.includes('Occupied');
+  const statusLower = String(roomStatus).toLowerCase();
+  const hasGuestAssigned = Boolean(
+    (activeRoom?.currentGuestName && activeRoom.currentGuestName !== '—' && activeRoom.currentGuestName !== 'Available' && String(activeRoom.currentGuestName).trim() !== '') ||
+    (activeRoom?.effectiveGuestName && activeRoom.effectiveGuestName !== '—' && activeRoom.effectiveGuestName !== 'Available' && String(activeRoom.effectiveGuestName).trim() !== '')
+  );
+  const isRoomOccupied = statusLower.includes('occupied') ||
+    statusLower.includes('stay') ||
+    statusLower.includes('in-house') ||
+    statusLower.includes('due out') ||
+    statusLower.includes('checked in') ||
+    hasGuestAssigned;
 
   // List of all currently occupied rooms for quick chips
   const occupiedRooms = useMemo(() => {
-    return rooms.filter(r => (r.effectiveStatus || r.status || '').includes('Occupied'));
+    return rooms.filter(r => {
+      const st = String(r.effectiveStatus || r.status || '').toLowerCase();
+      const hasGuest = Boolean(
+        (r.currentGuestName && r.currentGuestName !== '—' && r.currentGuestName !== 'Available' && String(r.currentGuestName).trim() !== '') ||
+        (r.effectiveGuestName && r.effectiveGuestName !== '—' && r.effectiveGuestName !== 'Available' && String(r.effectiveGuestName).trim() !== '')
+      );
+      return st.includes('occupied') || st.includes('stay') || st.includes('in-house') || st.includes('due out') || st.includes('checked in') || hasGuest;
+    });
   }, [rooms]);
 
   // Filtered room matches for the typeahead input
@@ -275,18 +292,36 @@ export default function CheckoutSplitModal({
     if (e && e.preventDefault) e.preventDefault();
 
     if (!activeRoom) {
-      setErrorMsg('Please select a valid room to check out.');
+      setErrorMsg('Please select a valid room number to check out.');
       return;
     }
 
-    if (!isRoomOccupied) {
-      setErrorMsg(`Room ${activeRoom.roomNumber} is currently ${roomStatus}. Only Occupied rooms can be checked out.`);
-      return;
+    // Auto-allocate remaining balance if variance exists
+    let effectiveNumCash = numCash;
+    let effectiveNumUpi = numUpi;
+    let effectiveNumCard = numCard;
+    let effectiveNumBtc = numBtc;
+    let effectiveUpiRef = upiRef;
+    let effectiveUpiProvider = upiProvider;
+
+    if (!isRefundDue && Math.abs(variance) >= 0.01) {
+      if (effectiveNumCash > 0 && effectiveNumUpi === 0) {
+        effectiveNumCash = Math.round((effectiveNumCash + variance) * 100) / 100;
+        setCashAmount(effectiveNumCash.toFixed(2));
+      } else if (effectiveNumBtc > 0 && effectiveNumUpi === 0 && effectiveNumCash === 0) {
+        effectiveNumBtc = Math.round((effectiveNumBtc + variance) * 100) / 100;
+        setBtcAmount(effectiveNumBtc.toFixed(2));
+      } else {
+        effectiveNumUpi = Math.round((effectiveNumUpi + variance) * 100) / 100;
+        setUpiAmount(effectiveNumUpi.toFixed(2));
+      }
     }
 
-    if (!isBalanced) {
-      setErrorMsg(`Cannot settle: Variance of ₹${Math.abs(variance).toFixed(2)} remaining. Total allocated (₹${totalAllocated.toFixed(2)}) must equal Net Payable (₹${netPayable.toFixed(2)}).`);
-      return;
+    if (!isRoomOccupied && !hasGuestAssigned) {
+      const confirmProceed = window.confirm(
+        `Notice: Room ${activeRoom.roomNumber} is currently marked as '${roomStatus}'. Do you want to proceed with checking out and printing the folio for this room?`
+      );
+      if (!confirmProceed) return;
     }
 
     if (!keyReturned) {
@@ -299,10 +334,10 @@ export default function CheckoutSplitModal({
     if (isRefundDue) {
       tendersSummary.push(`Refund Given: ₹${refundAmount.toLocaleString('en-IN')} via ${refundMode} (Ref: ${refundRef})`);
     } else {
-      if (numCash > 0) tendersSummary.push(`Cash: ₹${numCash.toLocaleString('en-IN')}`);
-      if (numUpi > 0) tendersSummary.push(`${upiProvider} (UPI): ₹${numUpi.toLocaleString('en-IN')} [Ref: ${upiRef}]`);
-      if (numCard > 0) tendersSummary.push(`Card: ₹${numCard.toLocaleString('en-IN')} [Auth: ${cardAuth}]`);
-      if (numBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany}): ₹${numBtc.toLocaleString('en-IN')}`);
+      if (effectiveNumCash > 0) tendersSummary.push(`Cash: ₹${effectiveNumCash.toLocaleString('en-IN')}`);
+      if (effectiveNumUpi > 0) tendersSummary.push(`${effectiveUpiProvider} (UPI): ₹${effectiveNumUpi.toLocaleString('en-IN')} [Ref: ${effectiveUpiRef}]`);
+      if (effectiveNumCard > 0) tendersSummary.push(`Card: ₹${effectiveNumCard.toLocaleString('en-IN')} [Auth: ${cardAuth}]`);
+      if (effectiveNumBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany}): ₹${effectiveNumBtc.toLocaleString('en-IN')}`);
     }
 
     const settlementPayload = {
@@ -333,13 +368,13 @@ export default function CheckoutSplitModal({
       keyReturned,
       roomInspected,
       tenders: {
-        cash: isRefundDue ? 0 : numCash,
-        upi: isRefundDue ? 0 : numUpi,
-        upiRef,
-        upiProvider,
-        card: numCard,
+        cash: isRefundDue ? 0 : effectiveNumCash,
+        upi: isRefundDue ? 0 : effectiveNumUpi,
+        upiRef: effectiveUpiRef,
+        upiProvider: effectiveUpiProvider,
+        card: effectiveNumCard,
         cardAuth,
-        btc: numBtc,
+        btc: effectiveNumBtc,
         btcCompany
       },
       tendersSummary,
@@ -1177,9 +1212,8 @@ export default function CheckoutSplitModal({
                   <button
                     type="button"
                     onClick={(e) => handleCheckoutSubmit(e, 'room-split')}
-                    disabled={!isBalanced}
                     className="btn-outline-gold"
-                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem' }}
+                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem', cursor: 'pointer' }}
                   >
                     📄 Print Room Bill No. 01499
                   </button>
@@ -1199,9 +1233,8 @@ export default function CheckoutSplitModal({
                   <button
                     type="button"
                     onClick={(e) => handleCheckoutSubmit(e, 'food-split')}
-                    disabled={!isBalanced}
                     className="btn-outline-gold"
-                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem', borderColor: '#34d399', color: '#34d399' }}
+                    style={{ width: '100%', marginTop: '0.75rem', fontSize: '0.75rem', padding: '0.4rem', borderColor: '#34d399', color: '#34d399', cursor: 'pointer' }}
                   >
                     🍽️ Print Food Bill No. 01500
                   </button>
@@ -1254,68 +1287,70 @@ export default function CheckoutSplitModal({
             <button
               type="button"
               onClick={(e) => handleCheckoutSubmit(e, 'money-receipt')}
-              disabled={!isBalanced || !isRoomOccupied}
               style={{
-                padding: '0.55rem 1rem',
+                padding: '0.6rem 1.1rem',
                 borderRadius: '8px',
-                background: 'rgba(56, 189, 248, 0.2)',
+                background: 'rgba(56, 189, 248, 0.22)',
                 color: '#38bdf8',
-                border: '1px solid #38bdf8',
-                fontSize: '0.8rem',
+                border: '1.5px solid #38bdf8',
+                fontSize: '0.82rem',
                 fontWeight: 700,
-                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
+                cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
+                gap: '0.45rem',
+                boxShadow: '0 2px 8px rgba(56, 189, 248, 0.25)',
+                transition: 'all 0.15s ease'
               }}
+              title="Settle folio & print Money Receipt Voucher (Page 5)"
             >
-              <Receipt size={15} /> 🧾 Money Receipt Voucher (Page 5)
+              <Receipt size={16} /> 🧾 Money Receipt Voucher (Page 5)
             </button>
 
             {/* 80mm POS Slip */}
             <button
               type="button"
               onClick={(e) => handleCheckoutSubmit(e, 'pos')}
-              disabled={!isBalanced || !isRoomOccupied}
               style={{
-                padding: '0.55rem 1rem',
+                padding: '0.6rem 1.1rem',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#cbd5e1',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                fontSize: '0.8rem',
+                background: 'rgba(255, 255, 255, 0.12)',
+                color: '#f1f5f9',
+                border: '1.5px solid rgba(255, 255, 255, 0.28)',
+                fontSize: '0.82rem',
                 fontWeight: 700,
-                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
+                cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
+                gap: '0.45rem',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                transition: 'all 0.15s ease'
               }}
+              title="Settle folio & print 80mm Thermal Receipt Slip"
             >
-              <Printer size={15} /> 🖨️ 80mm Slip
+              <Printer size={16} /> 🖨️ 80mm Slip
             </button>
 
             {/* Settle & Consolidated Tax Invoice (Default Master Action) */}
             <button
               type="button"
               onClick={(e) => handleCheckoutSubmit(e, 'a4')}
-              disabled={!isBalanced || !isRoomOccupied}
               style={{
-                padding: '0.6rem 1.4rem',
+                padding: '0.65rem 1.45rem',
                 borderRadius: '8px',
-                background: (isBalanced && isRoomOccupied) ? 'linear-gradient(135deg, #d4af37, #f59e0b)' : 'rgba(255, 255, 255, 0.1)',
-                color: (isBalanced && isRoomOccupied) ? '#000' : '#64748b',
+                background: 'linear-gradient(135deg, #d4af37, #f59e0b)',
+                color: '#000',
                 border: 'none',
                 fontSize: '0.85rem',
                 fontWeight: 900,
-                cursor: (isBalanced && isRoomOccupied) ? 'pointer' : 'not-allowed',
+                cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: (isBalanced && isRoomOccupied) ? '0 4px 15px rgba(212, 175, 55, 0.35)' : 'none',
-                opacity: (isBalanced && isRoomOccupied) ? 1 : 0.5
+                boxShadow: '0 4px 15px rgba(212, 175, 55, 0.45)',
+                transition: 'all 0.15s ease'
               }}
+              title="Settle folio & print Consolidated Tax Invoice"
             >
               <Check size={18} /> ⚡ Complete Checkout &amp; Print Tax Invoice
             </button>
