@@ -581,8 +581,25 @@ ${cGstin ? `Corporate GSTIN: ${cGstin}\n` : ''}Date: ${new Date().toLocaleDateSt
 
     const finalTxs = [settlementTx, ...folioTransactions];
     setFolioTransactions(finalTxs);
+    syncFolioTransactionToEdge(settlementTx);
+
+    if (onAddTransaction) {
+      onAddTransaction({
+        transactionId: settlementTx.id,
+        folioId: `FOLIO-${room.roomNumber}`,
+        roomNumber: room.roomNumber,
+        transactionType: 'Settlement',
+        outlet: 'Front Desk PMS',
+        itemCode: 'SPLIT-SETTLE',
+        description: settlementTx.desc,
+        debitAmount: 0,
+        creditAmount: allocatedTenders,
+        createdBy: 'Front Desk Lead (K. Simhachalam)'
+      });
+    }
+
     if (onUpdateFolio) {
-      onUpdateFolio(room.roomNumber, { transactions: finalTxs, isSettled: true });
+      onUpdateFolio(room.roomNumber, { transactions: finalTxs, isSettled: true, deltaBalance: -allocatedTenders });
     }
     showFeedback(`✓ Succeeded! Room ${room.roomNumber} folio settled across ${tendersSummary.length} payment tenders. Room released to Cleaning.`);
 

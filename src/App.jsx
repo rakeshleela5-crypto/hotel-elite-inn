@@ -1226,6 +1226,9 @@ export default function App() {
                 initialTab={pmsInitialTab}
                 onAddTransaction={handleAddTransaction}
                 onUpdateRoomStatus={handleUpdateRoomStatus}
+                onShiftRoomTransactions={(fromRoom, toRoom) => {
+                  setTransactions(prev => prev.map(t => String(t.roomNumber) === String(fromRoom) ? { ...t, roomNumber: toRoom, folioId: `FOLIO-${toRoom}`, description: `${t.description} (Shifted from Rm ${fromRoom})` } : t));
+                }}
                 onNewBooking={handleBookingSuccess}
                 onUpdateBooking={(updated) => {
                   if (updated && (updated.bookingId || updated.id)) {

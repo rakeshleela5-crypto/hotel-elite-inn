@@ -77,6 +77,7 @@ export default function ReceptionAdmin({
   onOpenRoomSearch,
   foodOrders: propFoodOrders,
   onUpdateOrderStatus: propUpdateOrderStatus,
+  onShiftRoomTransactions,
   initialTab
 }) {
   // The 3 Authorized Roles & 5 Department Console (Owner Video 2 Requirement)
@@ -9040,6 +9041,9 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           onShiftRoom={(fromRoom, toRoom, reason) => {
             onUpdateRoomStatus(fromRoom, 'Available', null, null);
             onUpdateRoomStatus(toRoom, 'Occupied', selectedFolioRoom?.currentGuestName, null);
+            if (onShiftRoomTransactions) {
+              onShiftRoomTransactions(fromRoom, toRoom);
+            }
             if (onAddTransaction) {
               onAddTransaction({
                 transactionId: `TXN-SHIFT-${Date.now().toString().slice(-4)}`,
