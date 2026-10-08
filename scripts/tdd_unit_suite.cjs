@@ -284,6 +284,45 @@ test('generates point-of-sale transaction bill ID', () => {
   assert.strictEqual(txn, 'TXN-POS-TBL6-8842');
 });
 
+// 10. Razorpay Payment Gateway & Multi-Tender Reconciliation
+console.log('\n▶ [TDD] Payment Gateway: Razorpay Amount Precision & Multi-Tender Balancing');
+function convertToRazorpayPaise(rupees) {
+  if (!rupees || isNaN(rupees) || rupees <= 0) return 0;
+  return Math.round(Number(rupees) * 100);
+}
+
+function reconcileTendersWithRazorpay(netPayable, tenders = {}) {
+  const sum = (Number(tenders.cash) || 0) + 
+              (Number(tenders.upi) || 0) + 
+              (Number(tenders.card) || 0) + 
+              (Number(tenders.btc) || 0) + 
+              (Number(tenders.razorpay) || 0);
+  const variance = Math.round((netPayable - sum) * 100) / 100;
+  return {
+    isBalanced: Math.abs(variance) < 0.01,
+    allocated: sum,
+    variance
+  };
+}
+
+test('converts Indian Rupee amounts accurately to Razorpay integer paise', () => {
+  assert.strictEqual(convertToRazorpayPaise(1699), 169900);
+  assert.strictEqual(convertToRazorpayPaise(500.50), 50050);
+  assert.strictEqual(convertToRazorpayPaise(2418.96), 241896);
+});
+
+test('balances 100% full settlement via Razorpay Online Gateway', () => {
+  const rec = reconcileTendersWithRazorpay(3500, { razorpay: 3500 });
+  assert.strictEqual(rec.isBalanced, true);
+  assert.strictEqual(rec.variance, 0);
+});
+
+test('balances hybrid split: 50% Cash + 50% Razorpay Online Gateway', () => {
+  const rec = reconcileTendersWithRazorpay(2000, { cash: 1000, razorpay: 1000 });
+  assert.strictEqual(rec.isBalanced, true);
+  assert.strictEqual(rec.allocated, 2000);
+});
+
 // Summary
 console.log('\n----------------------------------------------------------------');
 console.log(`  RESULTS: ${passed} PASSED | ${failed} FAILED`);

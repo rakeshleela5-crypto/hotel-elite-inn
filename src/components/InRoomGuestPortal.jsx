@@ -3,11 +3,13 @@ import QRCode from 'qrcode';
 import { 
   Utensils, Bell, Wifi, Phone, Clock, CheckCircle2, 
   Sparkles, Coffee, Droplets, Bed, Wrench, ShieldCheck, 
-  Plus, Minus, ShoppingBag, X, Send, Search, Check, AlertCircle, MessageCircle
+  Plus, Minus, ShoppingBag, X, Send, Search, Check, AlertCircle, MessageCircle,
+  CreditCard
 } from 'lucide-react';
 import { RESTAURANT_MENU, HOTEL_CONFIG } from '../data/hotelData';
 import { sendInRoomConciergeWhatsApp } from '../utils/whatsappDispatch';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
+import { launchRazorpayPayment } from '../utils/razorpayGateway';
 
 export default function InRoomGuestPortal({
   roomNumber = '204',
@@ -122,8 +124,7 @@ export default function InRoomGuestPortal({
   const cartTotal = cart.reduce((sum, c) => sum + (getDishPrice(c.dish) * c.quantity), 0);
   const cartItemCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
-  // Submit in-room food order & broadcast to Cannon Kitchen Live Orders & Production KDS
-  const handlePlaceOrder = () => {
+  const submitInRoomOrder = (paymentStatus = 'Pending (Folio)', paymentId = null) => {
     if (cart.length === 0) return;
 
     const orderId = `KOT-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -140,6 +141,8 @@ export default function InRoomGuestPortal({
       outlet: 'Cannon Kitchen (In-Room Dining)',
       orderType: 'room',
       status: 'Received',
+      payment_status: paymentStatus,
+      paymentId: paymentId || undefined,
       steward: 'In-Room QR Order',
       captain: 'In-Room QR Order',
       timestamp: new Date().toISOString(),
@@ -174,7 +177,6 @@ export default function InRoomGuestPortal({
     // 2. Dual BroadcastChannel dispatch to Kitchen KDS & Cannon Kitchen Live Food Orders
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        // Broadcast to KDS channel (KitchenDisplayKDS + FenugreekLiveFoodOrdersKDS)
         const kdsChannel = new BroadcastChannel('hotel_elite_inn_live_kds');
         kdsChannel.postMessage({
           type: 'NEW_KOT_ORDER',
@@ -183,7 +185,6 @@ export default function InRoomGuestPortal({
         });
         kdsChannel.close();
 
-        // Broadcast to Reception Admin Live Orders channel
         const kotChannel = new BroadcastChannel('hotel_elite_inn_kot');
         kotChannel.postMessage({
           type: 'NEW_KOT_ORDER',
@@ -201,6 +202,7 @@ export default function InRoomGuestPortal({
       const existingTxns = JSON.parse(localStorage.getItem('hotel_elite_inn_pms_transactions') || '[]');
       const taxable = Math.round((cartTotal / 1.05) * 100) / 100;
       const gstHalf = Math.round(((cartTotal - taxable) / 2) * 100) / 100;
+      const isPaidNow = paymentStatus.includes('Paid');
       const newTxn = {
         transactionId: `TXN-${roomNumber}-${Date.now().toString().slice(-4)}`,
         folioId: `FOLIO-${roomNumber}`,
@@ -209,9 +211,9 @@ export default function InRoomGuestPortal({
         transactionType: 'Food & Beverage',
         outlet: 'Cannon Kitchen (In-Room Dining)',
         itemCode: orderId,
-        description: `KOT #${orderId} - Cannon Kitchen In-Room Dining`,
-        debitAmount: cartTotal,
-        creditAmount: 0,
+        description: `KOT #${orderId} - Cannon Kitchen In-Room Dining${isPaidNow ? ' [Paid Online]' : ''}`,
+        debitAmount: isPaidNow ? 0 : cartTotal,
+        creditAmount: isPaidNow ? cartTotal : 0,
         taxableBase: taxable,
         gstRate: 5,
         cgst: gstHalf,
@@ -243,10 +245,41 @@ export default function InRoomGuestPortal({
     }
 
     playSuccessChime();
-    setOrderSuccessMsg(`✓ Order #${orderId} placed & billed to Room ${roomNumber}! Cannon Kitchen KDS alerted.`);
+    setOrderSuccessMsg(paymentStatus.includes('Paid')
+      ? `✓ Order #${orderId} Paid & Placed via Razorpay! Cannon Kitchen alerted.`
+      : `✓ Order #${orderId} placed & billed to Room ${roomNumber}! Cannon Kitchen alerted.`);
     setCart([]);
     setCookingNotes('');
     setTimeout(() => setOrderSuccessMsg(''), 7000);
+  };
+
+  const handlePlaceOrder = (mode = 'folio') => {
+    if (cart.length === 0) return;
+
+    if (mode === 'razorpay') {
+      launchRazorpayPayment({
+        amount: cartTotal,
+        description: `Room ${roomNumber} Satvik Dining Order`,
+        orderType: 'food',
+        prefill: {
+          name: `Room ${roomNumber} Guest`,
+          contact: ''
+        },
+        notes: {
+          roomNumber,
+          outlet: 'In-Room Dining'
+        },
+        onSuccess: (payRes) => {
+          submitInRoomOrder('Paid (Razorpay Gateway)', payRes.paymentId);
+        },
+        onError: (err) => {
+          alert(`Razorpay Payment could not proceed: ${err.message || err}`);
+        }
+      });
+      return;
+    }
+
+    submitInRoomOrder('Pending (Folio)', null);
   };
 
   // Quick Room Service Request Presets
@@ -1326,26 +1359,50 @@ export default function InRoomGuestPortal({
             }}
           />
 
-          <button
-            onClick={handlePlaceOrder}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-              color: '#000',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              fontWeight: 900,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.45rem'
-            }}
-          >
-            <Send size={16} /> Place Order &amp; Bill to Room {roomNumber}
-          </button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+            <button
+              onClick={() => handlePlaceOrder('folio')}
+              style={{
+                padding: '0.75rem 0.5rem',
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#fff',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Send size={14} /> Bill Room {roomNumber}
+            </button>
+
+            <button
+              onClick={() => handlePlaceOrder('razorpay')}
+              style={{
+                padding: '0.75rem 0.5rem',
+                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 900,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.35)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <CreditCard size={15} /> Pay via Razorpay
+            </button>
+          </div>
         </div>
       )}
 

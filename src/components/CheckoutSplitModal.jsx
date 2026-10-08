@@ -9,6 +9,7 @@ import {
 import { HOTEL_CONFIG } from '../data/hotelData';
 import { sendCheckoutSplitWhatsApp } from '../utils/whatsappDispatch';
 import { resolveAllTrackingNumbers } from '../utils/trackingNumbers';
+import { launchRazorpayPayment } from '../utils/razorpayGateway';
 
 export default function CheckoutSplitModal({
   isOpen,
@@ -218,6 +219,10 @@ export default function CheckoutSplitModal({
   const [btcAmount, setBtcAmount] = useState('');
   const [btcCompany, setBtcCompany] = useState(matchedBooking?.company || 'Linde India Ltd');
 
+  const [razorpayAmount, setRazorpayAmount] = useState('');
+  const [razorpayPaymentId, setRazorpayPaymentId] = useState('');
+  const [isProcessingRazorpay, setIsProcessingRazorpay] = useState(false);
+
   // Refund Mode State (If excess advance paid)
   const [refundMode, setRefundMode] = useState('Cash'); // 'Cash' | 'UPI'
   const [refundRef, setRefundRef] = useState(`REF-${Date.now().toString().slice(-6)}`);
@@ -237,12 +242,14 @@ export default function CheckoutSplitModal({
       setCashAmount('');
       setCardAmount('');
       setBtcAmount('');
+      setRazorpayAmount('');
     } else {
       // Default to 100% UPI PhonePe
       setUpiAmount(netPayable.toFixed(2));
       setCashAmount('');
       setCardAmount('');
       setBtcAmount('');
+      setRazorpayAmount('');
     }
   }, [activeRoom?.roomNumber, netPayable, isRefundDue]);
 
@@ -251,17 +258,66 @@ export default function CheckoutSplitModal({
   const numCash = Number(cashAmount) || 0;
   const numCard = Number(cardAmount) || 0;
   const numBtc = Number(btcAmount) || 0;
+  const numRazorpay = Number(razorpayAmount) || 0;
 
-  const totalAllocated = numUpi + numCash + numCard + numBtc;
+  const totalAllocated = numUpi + numCash + numCard + numBtc + numRazorpay;
   const variance = Math.round((netPayable - totalAllocated) * 100) / 100;
   const isBalanced = isRefundDue ? true : (Math.abs(variance) < 0.01);
+
+  // Collect balance online via Razorpay Gateway
+  const handleCollectViaRazorpay = async () => {
+    const targetAmount = Number(razorpayAmount) > 0 ? Number(razorpayAmount) : (netPayable > 0 ? netPayable : 0);
+    if (targetAmount <= 0) {
+      setErrorMsg('No balance due to collect via Razorpay.');
+      return;
+    }
+
+    setIsProcessingRazorpay(true);
+    await launchRazorpayPayment({
+      amount: targetAmount,
+      description: `Room ${activeRoom?.roomNumber || ''} Checkout Settlement`,
+      orderType: 'checkout',
+      prefill: {
+        name: activeRoom?.effectiveGuestName || activeRoom?.currentGuestName || matchedBooking?.guestName || 'Valued Guest',
+        contact: matchedBooking?.guestPhone || activeRoom?.phone || ''
+      },
+      notes: {
+        roomNumber: String(activeRoom?.roomNumber),
+        billNo: matchedBooking?.billNo || ''
+      },
+      onSuccess: (payRes) => {
+        setIsProcessingRazorpay(false);
+        setRazorpayAmount(targetAmount.toFixed(2));
+        setRazorpayPaymentId(payRes.paymentId);
+        if (targetAmount >= netPayable) {
+          setUpiAmount('');
+          setCashAmount('');
+          setCardAmount('');
+          setBtcAmount('');
+        }
+      },
+      onDismiss: () => {
+        setIsProcessingRazorpay(false);
+      },
+      onError: (err) => {
+        setIsProcessingRazorpay(false);
+        setErrorMsg(`Razorpay transaction was not completed: ${err.message || err}`);
+      }
+    });
+  };
 
   // Quick Presets
   const applyPreset = (type) => {
     setErrorMsg('');
     if (netPayable <= 0) return;
 
-    if (type === '100-upi') {
+    if (type === '100-razorpay') {
+      setRazorpayAmount(netPayable.toFixed(2));
+      setUpiAmount('');
+      setCashAmount('');
+      setCardAmount('');
+      setBtcAmount('');
+    } else if (type === '100-upi') {
       setUpiAmount(netPayable.toFixed(2));
       setCashAmount('');
       setCardAmount('');
@@ -306,16 +362,19 @@ export default function CheckoutSplitModal({
     let effectiveUpiRef = upiRef || `UPI-${Date.now().toString().slice(-6)}`;
     let effectiveUpiProvider = upiProvider || 'PhonePe';
 
-    const currentAllocated = effectiveNumCash + effectiveNumUpi + effectiveNumCard + effectiveNumBtc;
+    const effectiveNumRazorpay = numRazorpay;
+    const currentAllocated = effectiveNumCash + effectiveNumUpi + effectiveNumCard + effectiveNumBtc + effectiveNumRazorpay;
     const currentVariance = Math.round((netPayable - currentAllocated) * 100) / 100;
 
     if (!isRefundDue && Math.abs(currentVariance) >= 0.01) {
-      if (effectiveNumCash > 0 && effectiveNumUpi === 0) {
+      if (effectiveNumCash > 0 && effectiveNumUpi === 0 && effectiveNumRazorpay === 0) {
         effectiveNumCash = Math.round((effectiveNumCash + currentVariance) * 100) / 100;
         setCashAmount(effectiveNumCash.toFixed(2));
-      } else if (effectiveNumBtc > 0 && effectiveNumUpi === 0 && effectiveNumCash === 0) {
+      } else if (effectiveNumBtc > 0 && effectiveNumUpi === 0 && effectiveNumCash === 0 && effectiveNumRazorpay === 0) {
         effectiveNumBtc = Math.round((effectiveNumBtc + currentVariance) * 100) / 100;
         setBtcAmount(effectiveNumBtc.toFixed(2));
+      } else if (effectiveNumRazorpay > 0 && effectiveNumUpi === 0) {
+        // keep razorpay exact as paid
       } else {
         effectiveNumUpi = Math.round((effectiveNumUpi + currentVariance) * 100) / 100;
         setUpiAmount(effectiveNumUpi.toFixed(2));
@@ -330,6 +389,7 @@ export default function CheckoutSplitModal({
       if (effectiveNumUpi > 0) tendersSummary.push(`${effectiveUpiProvider} (UPI): ₹${effectiveNumUpi.toLocaleString('en-IN')} [Ref: ${effectiveUpiRef}]`);
       if (effectiveNumCard > 0) tendersSummary.push(`Card: ₹${effectiveNumCard.toLocaleString('en-IN')} [Auth: ${cardAuth || 'AUTH-OK'}]`);
       if (effectiveNumBtc > 0) tendersSummary.push(`Corporate BTC (${btcCompany || 'Company'}): ₹${effectiveNumBtc.toLocaleString('en-IN')}`);
+      if (effectiveNumRazorpay > 0) tendersSummary.push(`Razorpay Online: ₹${effectiveNumRazorpay.toLocaleString('en-IN')} [Ref: ${razorpayPaymentId || 'Verified'}]`);
     }
 
     const tracking = resolveAllTrackingNumbers(matchedBooking || {}, { roomNumber: activeRoom.roomNumber });
@@ -374,7 +434,9 @@ export default function CheckoutSplitModal({
         card: effectiveNumCard,
         cardAuth: cardAuth || 'AUTH-OK',
         btc: effectiveNumBtc,
-        btcCompany: btcCompany || matchedBooking?.company || 'Corporate Credit'
+        btcCompany: btcCompany || matchedBooking?.company || 'Corporate Credit',
+        razorpay: effectiveNumRazorpay,
+        razorpayPaymentId: razorpayPaymentId || null
       },
       tendersSummary,
       openReceiptAfter: true,
@@ -1046,6 +1108,9 @@ export default function CheckoutSplitModal({
                       TENDER ALLOCATION (Net Due: ₹{netPayable.toFixed(2)})
                     </div>
                     <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      <button type="button" onClick={() => applyPreset('100-razorpay')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem', color: '#f3c64c', borderColor: '#d4af37' }}>
+                        ⚡ 100% Razorpay
+                      </button>
                       <button type="button" onClick={() => applyPreset('100-upi')} className="btn-outline-gold" style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}>
                         100% PhonePe UPI
                       </button>
@@ -1147,6 +1212,50 @@ export default function CheckoutSplitModal({
                         onChange={(e) => setBtcCompany(e.target.value)}
                         style={{ width: '100%', background: '#070b14', border: '1px solid #1e293b', borderRadius: '4px', padding: '0.25rem 0.5rem', color: '#94a3b8', fontSize: '0.7rem', marginTop: '0.35rem' }}
                       />
+                    </div>
+
+                    {/* Razorpay Online Payment Gateway */}
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '8px', border: numRazorpay > 0 ? '1.5px solid #d4af37' : '1px solid rgba(212,175,55,0.2)' }}>
+                      <label style={{ fontSize: '0.74rem', color: '#f3c64c', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <CreditCard size={13} /> Razorpay Gateway (₹)
+                        </span>
+                        {razorpayPaymentId && (
+                          <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 800 }}>✓ VERIFIED</span>
+                        )}
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        value={razorpayAmount}
+                        onChange={(e) => setRazorpayAmount(e.target.value)}
+                        style={{ width: '100%', background: '#070b14', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', color: '#fff', fontSize: '0.95rem', fontWeight: 800, marginTop: '0.35rem' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleCollectViaRazorpay}
+                        disabled={isProcessingRazorpay || netPayable <= 0}
+                        style={{
+                          width: '100%',
+                          marginTop: '0.35rem',
+                          background: razorpayPaymentId ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(135deg, #d4af37, #b8860b)',
+                          color: razorpayPaymentId ? '#34d399' : '#000',
+                          border: razorpayPaymentId ? '1px solid #10b981' : 'none',
+                          borderRadius: '4px',
+                          padding: '0.35rem 0.5rem',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <Sparkles size={12} />
+                        {isProcessingRazorpay ? 'Opening Gateway...' : (razorpayPaymentId ? `Paid (${razorpayPaymentId.slice(-6)})` : '⚡ Collect via Razorpay')}
+                      </button>
                     </div>
                   </div>
 

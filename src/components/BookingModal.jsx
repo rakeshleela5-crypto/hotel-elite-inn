@@ -12,6 +12,7 @@ import { maskAadhaar, hasDateCollision } from '../utils/security';
 import BookingCalendar from '@/components/ui/v-calendar-15';
 import { AnimatedStepper } from '@/components/ui/animated-stepper';
 import { sendBookingConfirmationWhatsApp } from '../utils/whatsappDispatch';
+import { launchRazorpayPayment } from '../utils/razorpayGateway';
 
 export const AVAILABLE_ADDONS = [
   {
@@ -307,40 +308,38 @@ export default function BookingModal({
       setSubmitting(false);
     };
 
-    if (paymentMode === 'Razorpay' && typeof window !== 'undefined' && window.Razorpay) {
-      const rzpOptions = {
-        key: 'rzp_test_54a1e1d5_hotel',
-        amount: Math.round(advanceDepositPayable * 100),
-        currency: 'INR',
-        name: HOTEL_CONFIG.name,
-        description: `Booking for ${selectedTier.name} (Room ${selectedRoomNumber})`,
-        image: '/favicon.svg',
-        handler: async function (response) {
-          bookingPayload.paymentStatus = depositOption === 'deposit'
-            ? 'Partial Deposit Paid (₹500 Gateway Verified)'
-            : 'Paid (Razorpay Gateway)';
-          bookingPayload.advanceDeposit = advanceDepositPayable;
-          bookingPayload.balanceDue = balanceDueCalculated;
-          await submitBookingDirect(bookingPayload);
-        },
-        prefill: {
-          name: guestName,
-          email: guestEmail,
-          contact: guestPhone
-        },
-        theme: {
-          color: '#d4af37'
-        },
-        modal: {
-          ondismiss: function() {
-            setSubmitting(false);
-          }
-        }
-      };
-
+    if (paymentMode === 'Razorpay') {
       try {
-        const rzp = new window.Razorpay(rzpOptions);
-        rzp.open();
+        await launchRazorpayPayment({
+          amount: advanceDepositPayable,
+          description: `Booking for ${selectedTier.name} (Room ${selectedRoomNumber})`,
+          orderType: 'booking',
+          prefill: {
+            name: guestName,
+            email: guestEmail,
+            contact: guestPhone
+          },
+          notes: {
+            roomNumber: selectedRoomNumber,
+            tier: selectedTier.name
+          },
+          onSuccess: async (payRes) => {
+            bookingPayload.paymentStatus = depositOption === 'deposit'
+              ? 'Partial Deposit Paid (₹500 Gateway Verified)'
+              : 'Paid (Razorpay Gateway)';
+            bookingPayload.advanceDeposit = advanceDepositPayable;
+            bookingPayload.balanceDue = balanceDueCalculated;
+            bookingPayload.paymentId = payRes.paymentId;
+            await submitBookingDirect(bookingPayload);
+          },
+          onDismiss: () => {
+            setSubmitting(false);
+          },
+          onError: (err) => {
+            console.warn("Razorpay launcher fallback:", err);
+            submitBookingDirect(bookingPayload);
+          }
+        });
         return;
       } catch (err) {
         console.warn("Razorpay launcher fallback:", err);

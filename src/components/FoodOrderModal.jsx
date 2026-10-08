@@ -3,6 +3,7 @@ import { X, ShoppingBag, Plus, Minus, Trash2, CheckCircle2, Utensils, AlertCircl
 import { RESTAURANT_MENU, HOTEL_CONFIG } from '../data/hotelData';
 import { playSuccessChime } from '../utils/soundAlert';
 import { sendRoomServiceOrderWhatsApp } from '../utils/whatsappDispatch';
+import { launchRazorpayPayment } from '../utils/razorpayGateway';
 
 export default function FoodOrderModal({ isOpen, onClose, initialItem = null, rooms = [], onBillToRoom }) {
   const [cart, setCart] = useState(initialItem ? [{ ...initialItem, qty: 1 }] : []);
@@ -49,6 +50,62 @@ export default function FoodOrderModal({ isOpen, onClose, initialItem = null, ro
   const gst = Math.round(subtotal * 0.05 * 100) / 100; // 5% Restaurant GST
   const total = subtotal + gst;
 
+  const dispatchFinalOrder = async (finalPayload, itemsDesc) => {
+    try {
+      // Connect to central Front Desk & Accountant Folio Pipeline
+      if (finalPayload.billingMode === 'Bill to Room Folio' && onBillToRoom) {
+        onBillToRoom({
+          kotId: finalPayload.kotId,
+          roomNumber,
+          outlet: 'In-Room Dining (Satvik Tray)',
+          items: cart,
+          grossSubtotal: subtotal,
+          discount: 0,
+          discountReason: 'None',
+          subtotal,
+          gst,
+          totalAmount: total,
+          isNonCommercial: false,
+          description: `In-Room Dining (${itemsDesc})`,
+          captainName: 'In-Room Service Captain',
+          createdAt: new Date().toISOString()
+        });
+      } else {
+        await fetch('/api/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'place_food_order', payload: finalPayload })
+        }).catch(() => {});
+      }
+      const orderSummary = {
+        orderId: finalPayload.kotId,
+        roomNumber,
+        guestName,
+        items: cart,
+        totalAmount: total,
+        notes: `Billing: ${finalPayload.billingMode}. ${finalPayload.paymentStatus ? `[${finalPayload.paymentStatus}]` : 'Satvik kitchen preparation.'}`
+      };
+      setLastPlacedOrder(orderSummary);
+      playSuccessChime();
+      setOrderSubmitted(true);
+    } catch (err) {
+      console.warn("Order sync note:", err);
+      const fallbackOrder = {
+        orderId: finalPayload.kotId,
+        roomNumber,
+        guestName,
+        items: cart,
+        totalAmount: total,
+        notes: `Billing: ${finalPayload.billingMode}. Satvik pure vegetarian preparation.`
+      };
+      setLastPlacedOrder(fallbackOrder);
+      playSuccessChime();
+      setOrderSubmitted(true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!roomNumber) return;
@@ -69,59 +126,42 @@ export default function FoodOrderModal({ isOpen, onClose, initialItem = null, ro
       billingMode
     };
 
-    try {
-      // Connect to central Front Desk & Accountant Folio Pipeline
-      if (billingMode === 'Bill to Room Folio' && onBillToRoom) {
-        onBillToRoom({
-          kotId,
-          roomNumber,
-          outlet: 'In-Room Dining (Satvik Tray)',
-          items: cart,
-          grossSubtotal: subtotal,
-          discount: 0,
-          discountReason: 'None',
-          subtotal,
-          gst,
-          totalAmount: total,
-          isNonCommercial: false,
-          description: `In-Room Dining (${itemsDescription})`,
-          captainName: 'In-Room Service Captain',
-          createdAt: new Date().toISOString()
+    if (billingMode === 'Online Razorpay') {
+      try {
+        await launchRazorpayPayment({
+          amount: total,
+          description: `In-Room Dining KOT for Room ${roomNumber}`,
+          orderType: 'food',
+          prefill: {
+            name: guestName || `Room ${roomNumber} Guest`,
+            contact: ''
+          },
+          notes: {
+            roomNumber,
+            kotId
+          },
+          onSuccess: async (payRes) => {
+            payload.paymentStatus = 'Paid (Razorpay Gateway)';
+            payload.paymentId = payRes.paymentId;
+            payload.notes = `Razorpay Paid: ${payRes.paymentId}`;
+            await dispatchFinalOrder(payload, itemsDescription);
+          },
+          onDismiss: () => {
+            setSubmitting(false);
+          },
+          onError: (err) => {
+            alert(`Razorpay Payment could not proceed: ${err.message || err}`);
+            setSubmitting(false);
+          }
         });
-      } else {
-        await fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'place_food_order', payload })
-        }).catch(() => {});
+        return;
+      } catch (err) {
+        setSubmitting(false);
+        return;
       }
-      const orderSummary = {
-        orderId: kotId,
-        roomNumber,
-        guestName,
-        items: cart,
-        totalAmount: total,
-        notes: `Billing: ${billingMode}. Satvik pure vegetarian kitchen preparation.`
-      };
-      setLastPlacedOrder(orderSummary);
-      playSuccessChime();
-      setOrderSubmitted(true);
-    } catch (err) {
-      console.warn("Order sync note:", err);
-      const fallbackOrder = {
-        orderId: kotId,
-        roomNumber,
-        guestName,
-        items: cart,
-        totalAmount: total,
-        notes: `Billing: ${billingMode}. Satvik pure vegetarian preparation.`
-      };
-      setLastPlacedOrder(fallbackOrder);
-      playSuccessChime();
-      setOrderSubmitted(true);
-    } finally {
-      setSubmitting(false);
     }
+
+    await dispatchFinalOrder(payload, itemsDescription);
   };
 
   return (
@@ -367,7 +407,7 @@ export default function FoodOrderModal({ isOpen, onClose, initialItem = null, ro
               <div className="form-group">
                 <label className="form-label">Payment Settlement Mode</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  {['Bill to Room Folio', 'UPI on Delivery', 'Cash on Delivery'].map(mode => (
+                  {['Bill to Room Folio', 'Online Razorpay', 'UPI on Delivery', 'Cash on Delivery'].map(mode => (
                     <button
                       key={mode}
                       type="button"
