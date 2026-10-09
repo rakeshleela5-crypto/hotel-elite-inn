@@ -38,6 +38,7 @@ import IdsAmendStayModal from './IdsAmendStayModal';
 import IdsRoomTransferModal from './IdsRoomTransferModal';
 import IdsPostDepositModal from './IdsPostDepositModal';
 import IdsCheckoutBillModal from './IdsCheckoutBillModal';
+import IdsWalkInModal from './IdsWalkInModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -243,19 +244,27 @@ export default function IdsDesktopShell({
   const [checkoutInitialMode, setCheckoutInitialMode] = useState('checkout'); // 'checkout' | 'settlement'
   const [checkedOutRooms, setCheckedOutRooms] = useState([]);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062 & Video 16 Frame 085 sync)
+  // Video 17: Walk-in Process for Direct Guest States (Frames 010–110)
+  const [walkInModalOpen, setWalkInModalOpen] = useState(false);
+  const [walkInInitialRoom, setWalkInInitialRoom] = useState('203');
+  const [walkInCompletedList, setWalkInCompletedList] = useState([]);
+
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085 & Video 17 Frame 110 sync)
   const stats = useMemo(() => {
+    const totalWalkInRooms = walkInCompletedList.length;
+    const totalWalkInPax = walkInCompletedList.reduce((sum, w) => sum + (w.pax || 2), 0);
+
     // Video 16 Frame 085: When Sharma Group (10 rooms) is bulk checked out
     const hasBulkCheckedOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
     if (hasBulkCheckedOut) {
       return {
         expectedArrivals: 0,
         expectedDepartures: 0,
-        checkInRooms: 0,
-        walkInRooms: 0,
-        roomsToSell: 57,
+        checkInRooms: totalWalkInRooms,
+        walkInRooms: totalWalkInRooms,
+        roomsToSell: Math.max(0, 57 - totalWalkInRooms),
         registeredComplaints: 0,
-        inhouseRoomsGuests: '23/39',
+        inhouseRoomsGuests: `${23 + totalWalkInRooms}/${39 + totalWalkInPax}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
         guestBlocks: 0
@@ -267,11 +276,11 @@ export default function IdsDesktopShell({
       return {
         expectedArrivals: 0,
         expectedDepartures: 16,
-        checkInRooms: 0,
-        walkInRooms: 0,
-        roomsToSell: 40,
+        checkInRooms: totalWalkInRooms,
+        walkInRooms: totalWalkInRooms,
+        roomsToSell: Math.max(0, 40 - totalWalkInRooms),
         registeredComplaints: 0,
-        inhouseRoomsGuests: '33/59',
+        inhouseRoomsGuests: `${33 + totalWalkInRooms}/${59 + totalWalkInPax}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
         guestBlocks: 0
@@ -434,7 +443,14 @@ export default function IdsDesktopShell({
           setScanBookingModalOpen(true);
         } 
       },
-      { label: 'Walk-ins', videoId: '17', action: () => openTutorial('17') },
+      { 
+        label: 'Walk-ins', 
+        videoId: '17', 
+        action: () => {
+          setWalkInInitialRoom('203');
+          setWalkInModalOpen(true);
+        } 
+      },
       { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
       { label: 'Room Floor Plan Display', videoId: '33', action: () => openTutorial('33') },
       { label: 'Guest Management', videoId: '10', action: () => setGuestManagementOpen(true) },
@@ -1483,6 +1499,11 @@ export default function IdsDesktopShell({
           setCheckoutInitialMode('checkout');
           setCheckoutBillModalOpen(true);
         }}
+        onOpenWalkIn={(roomNo) => {
+          setWalkInInitialRoom(roomNo || '203');
+          setWalkInModalOpen(true);
+        }}
+        walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
         transferredRooms={transferredRooms}
       />
@@ -1752,13 +1773,44 @@ export default function IdsDesktopShell({
         }}
       />
 
+      {/* Video 17: Walk-in Process for Direct Guest in IDS 6.5 & 7.0 (Frames 010–110) */}
+      <IdsWalkInModal 
+        isOpen={walkInModalOpen}
+        onClose={() => setWalkInModalOpen(false)}
+        initialRoomNo={walkInInitialRoom}
+        onCompleteWalkIn={(walkInData) => {
+          setWalkInCompletedList(prev => [...prev, walkInData]);
+          // Sync with inhouse guest database: add walked-in guest
+          setInhouseGuestsList(prev => [
+            {
+              roomNo: walkInData.roomNo,
+              regNo: walkInData.regNo,
+              roomType: walkInData.roomType,
+              title: 'Mr',
+              guestName: walkInData.guestName,
+              companyName: walkInData.company,
+              arrival: walkInData.arrival,
+              departure: walkInData.departure,
+              folioNo: `${walkInData.roomNo} / 1`,
+              rate: walkInData.rate,
+              payMode: walkInData.payMode,
+              planCode: walkInData.planCode
+            },
+            ...prev
+          ]);
+        }}
+      />
+
       {/* Built-In 44-Video Tutorial Player Modal */}
       <IdsTutorialPlayerModal 
         isOpen={tutorialPlayerOpen}
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '16') {
+          if (videoId === '17') {
+            setWalkInInitialRoom('203');
+            setWalkInModalOpen(true);
+          } else if (videoId === '16') {
             setSelectedRoomForCheckout('406');
             setCheckoutInitialMode('bulk');
             setCheckoutBillModalOpen(true);

@@ -745,6 +745,8 @@ export function IdsRoomRackConsoleModal({
   onOpenRoomTransfer,
   onOpenPostDeposit,
   onOpenCheckout,
+  onOpenWalkIn,
+  walkInRooms = [],
   checkedOutRooms = [],
   transferredRooms = {}
 }) {
@@ -787,7 +789,13 @@ export function IdsRoomRackConsoleModal({
   // 44 Rooms matching Frame 034, Frame 060 & Video 08 Frame 062 grid
   const roomsMatrix = [
     { no: '201', type: isRoomCleared('201') ? 'V/EXE' : 'D/EXE', status: isRoomCleared('201') ? 'vacant' : 'dirty', category: 'EXE' },
-    { no: '203', type: isRoomCleared('203') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('203') ? 'vacant' : 'dirty', category: 'DLX' },
+    { 
+      no: '203', 
+      type: walkInRooms.some(w => w.roomNo === '203') ? 'O/DLX' : (isRoomCleared('203') ? 'V/DLX' : 'D/DLX'), 
+      guest: walkInRooms.find(w => w.roomNo === '203') ? 'Rajesh / Sharma' : undefined,
+      status: walkInRooms.some(w => w.roomNo === '203') ? 'occupied' : (isRoomCleared('203') ? 'vacant' : 'dirty'), 
+      category: 'DLX' 
+    },
     { no: '204', type: isRoomCleared('204') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('204') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '205', type: isRoomCleared('205') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('205') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '206', type: isRoomCleared('206') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('206') ? 'vacant' : 'dirty', category: 'DLX' },
@@ -1342,7 +1350,11 @@ export function IdsRoomRackConsoleModal({
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
                     onClick={() => {
-                      alert(`Walk-in for Room ${contextMenu.roomNo}`);
+                      if (onOpenWalkIn) {
+                        onOpenWalkIn(contextMenu.roomNo);
+                      } else {
+                        alert(`Walk-in for Room ${contextMenu.roomNo}`);
+                      }
                       setContextMenu(null);
                     }}
                   >
