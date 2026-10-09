@@ -43,6 +43,7 @@ import IdsPaxCheckoutModal from './IdsPaxCheckoutModal';
 import IdsNightAuditModal from './IdsNightAuditModal';
 import IdsAdditionalRoomRateModal from './IdsAdditionalRoomRateModal';
 import IdsPostChargesModal from './IdsPostChargesModal';
+import IdsCheckInSecondPaxModal from './IdsCheckInSecondPaxModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -274,11 +275,17 @@ export default function IdsDesktopShell({
   const [selectedRoomForPostCharges, setSelectedRoomForPostCharges] = useState('312');
   const [selectedRevenueCodeForPostCharges, setSelectedRevenueCodeForPostCharges] = useState('TRV');
 
+  // Video 22: How to Check-in 2nd Pax Later (Frames 015–090)
+  const [secondPaxModalOpen, setSecondPaxModalOpen] = useState(false);
+  const [selectedRoomForSecondPax, setSelectedRoomForSecondPax] = useState('312');
+  const [secondPaxCheckedInRooms, setSecondPaxCheckedInRooms] = useState([]);
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
     const totalWalkInRooms = walkInCompletedList.length;
     const totalWalkInPax = walkInCompletedList.reduce((sum, w) => sum + (w.pax || 2), 0);
     const paxDeduction = paxCheckedOutRooms.length;
+    const secondPaxAddition = secondPaxCheckedInRooms.length;
 
     // Video 16 Frame 085: When Sharma Group (10 rooms) is bulk checked out
     const hasBulkCheckedOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
@@ -475,6 +482,14 @@ export default function IdsDesktopShell({
         action: () => {
           setWalkInInitialRoom('203');
           setWalkInModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Check-in 2nd Pax later into Room', 
+        videoId: '22', 
+        action: () => {
+          setSelectedRoomForSecondPax('312');
+          setSecondPaxModalOpen(true);
         } 
       },
       { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
@@ -1654,6 +1669,10 @@ export default function IdsDesktopShell({
           setSelectedRoomForPostCharges(roomNo || '312');
           setPostChargesModalOpen(true);
         }}
+        onOpenSecondPaxCheckIn={(roomNo) => {
+          setSelectedRoomForSecondPax(roomNo || '312');
+          setSecondPaxModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1802,6 +1821,7 @@ export default function IdsDesktopShell({
         guests={inhouseGuestsList}
         initialRoomNo={selectedRoomForGuestInfo}
         paxCheckedOutRooms={paxCheckedOutRooms}
+        secondPaxCheckedInRooms={secondPaxCheckedInRooms}
       />
 
       {/* Video 12: Amend Stay V6.5.002.1 Modal (Frames 018–045) */}
@@ -1961,7 +1981,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '21') {
+          if (videoId === '22') {
+            setSelectedRoomForSecondPax('312');
+            setSecondPaxModalOpen(true);
+          } else if (videoId === '21') {
             setSelectedRoomForPostCharges('312');
             setSelectedRevenueCodeForPostCharges('TRV');
             setPostChargesModalOpen(true);
@@ -2064,6 +2087,27 @@ export default function IdsDesktopShell({
               return {
                 ...g,
                 balance: (g.balance || 13460) + (chargeData.total || 0)
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 22: Check-in 2nd Pax Later in IDS 6.5 & 7.0 (Frames 015–090) */}
+      <IdsCheckInSecondPaxModal 
+        isOpen={secondPaxModalOpen}
+        onClose={() => setSecondPaxModalOpen(false)}
+        initialRoomNo={selectedRoomForSecondPax}
+        accountingDate={accountingDate}
+        onCompleteSecondPaxCheckIn={(secondPaxRecord) => {
+          setSecondPaxCheckedInRooms(prev => Array.from(new Set([...prev, secondPaxRecord.roomNo])));
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === secondPaxRecord.roomNo) {
+              return {
+                ...g,
+                pax: 2,
+                paxList: [g.guestName || 'MS BASU ANIRUDH', secondPaxRecord.name]
               };
             }
             return g;

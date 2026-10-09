@@ -1224,7 +1224,8 @@ export function IdsGuestInformationModal({
   onClose, 
   guests = INITIAL_INHOUSE_GUESTS,
   initialRoomNo = '312',
-  paxCheckedOutRooms = []
+  paxCheckedOutRooms = [],
+  secondPaxCheckedInRooms = []
 }) {
   const [searchRoom, setSearchRoom] = useState(initialRoomNo || '312');
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -1244,12 +1245,17 @@ export function IdsGuestInformationModal({
 
   if (!isOpen) return null;
 
-  // Determine current pax list for room taking pax check-out into account
+  // Determine current pax list for room taking pax check-out and 2nd pax check-in into account
   const isPaxCheckedOut = paxCheckedOutRooms.includes(searchRoom);
+  const hasSecondPaxAdded = secondPaxCheckedInRooms.includes(searchRoom);
   const rawPaxList = selectedGuest?.paxList || [selectedGuest?.guestName || 'GUEST'];
   const activePaxList = isPaxCheckedOut 
     ? [rawPaxList[0]] // only primary guest remains
-    : (searchRoom === '312' ? ['MS BASU ANIRUDH', 'MR Anirudh'] : (searchRoom === '311' ? ['MR DEURI HEMCHANDRA', 'MRS DEURI KABITA'] : rawPaxList));
+    : (searchRoom === '312' 
+        ? (hasSecondPaxAdded 
+            ? ['MS BASU ANIRUDH', 'Mrs Basu Anamika'] 
+            : ['MS BASU ANIRUDH', 'Mrs Basu Anamika']) 
+        : (searchRoom === '311' ? ['MR DEURI HEMCHANDRA', 'MRS DEURI KABITA'] : rawPaxList));
 
   const totalPaxDisplay = isPaxCheckedOut || activePaxList.length === 1 ? '1 (1/0)' : '2 (2/0)';
 

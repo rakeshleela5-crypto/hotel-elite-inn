@@ -749,6 +749,7 @@ export function IdsRoomRackConsoleModal({
   onOpenPaxCheckout,
   onOpenAdditionalRoomRate,
   onOpenPostCharges,
+  onOpenSecondPaxCheckIn,
   onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
@@ -1271,7 +1272,24 @@ export function IdsRoomRackConsoleModal({
                     Change Guest Information
                   </div>
 
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Walk-in</div>
+                  {/* Video 22: How to Check-in 2nd Pax Later in IDS 6.5 & 7.0 (Frames 035–040) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenSecondPaxCheckIn) onOpenSecondPaxCheckIn(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Walk-in (Check-in 2nd Pax Later - Video 22 Frame 038)"
+                  >
+                    Walk-in (2nd Pax)
+                  </div>
                   <div 
                     style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
