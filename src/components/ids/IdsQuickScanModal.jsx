@@ -38,6 +38,9 @@ export default function IdsQuickScanModal({
     { id: 'checkout-settle', label: 'Checkout & Settle Front Office Bill', code: 'CO01' },
     { id: 'settlements', label: 'Settlements', code: 'ST01' },
     { id: 'split-bill', label: 'Split Bill Process', code: 'SB01' },
+    { id: 'transfer-folio', label: 'Transfer Folios', code: 'TF01' },
+    { id: 'pax-transfer', label: 'Pax Transfer', code: 'PT01' },
+    { id: 'purge-fo', label: 'Purge FO Transaction', code: 'PF01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 

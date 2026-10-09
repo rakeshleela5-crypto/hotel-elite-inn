@@ -752,6 +752,7 @@ export function IdsRoomRackConsoleModal({
   onOpenSecondPaxCheckIn,
   onOpenBillAllowanceDayWise,
   onOpenBillAllowanceOption,
+  onOpenTransferFolio,
   onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
@@ -1438,6 +1439,23 @@ export function IdsRoomRackConsoleModal({
                     title="Bill Allowance (Video 23 & Video 24 Frame 020)"
                   >
                     Bill Allowance
+                  </div>
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700, 
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenTransferFolio) onOpenTransferFolio(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Transfer Folio to Another Room (Video 25 Frame 125)"
+                  >
+                    Transfer Folio
                   </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Consolidated Allowance</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>De-Link Rooms</div>

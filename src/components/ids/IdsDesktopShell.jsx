@@ -46,6 +46,7 @@ import IdsPostChargesModal from './IdsPostChargesModal';
 import IdsCheckInSecondPaxModal from './IdsCheckInSecondPaxModal';
 import IdsBillAllowanceDayWiseModal from './IdsBillAllowanceDayWiseModal';
 import IdsBillAllowanceOptionModal from './IdsBillAllowanceOptionModal';
+import IdsTransferFolioModal from './IdsTransferFolioModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -289,6 +290,11 @@ export default function IdsDesktopShell({
   // Video 24: Bill Allowance Option (Multi-Day Batch Discount) (Frames 015–100)
   const [billAllowanceOptionModalOpen, setBillAllowanceOptionModalOpen] = useState(false);
   const [selectedRoomForBillAllowanceOption, setSelectedRoomForBillAllowanceOption] = useState('201');
+
+  // Video 25: Transfer Folio from one room to another (Frames 015–140)
+  const [transferFolioModalOpen, setTransferFolioModalOpen] = useState(false);
+  const [transferFolioFromRoom, setTransferFolioFromRoom] = useState('201');
+  const [transferFolioToRoom, setTransferFolioToRoom] = useState('205');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -608,7 +614,15 @@ export default function IdsDesktopShell({
           setBillAllowanceOptionModalOpen(true);
         } 
       },
-      { label: 'Transfer Folio to Another Room', videoId: '25', action: () => openTutorial('25') },
+      { 
+        label: 'Transfer Folio to Another Room', 
+        videoId: '25', 
+        action: () => {
+          setTransferFolioFromRoom('201');
+          setTransferFolioToRoom('205');
+          setTransferFolioModalOpen(true);
+        } 
+      },
       { label: 'Folio Reinstate Option', videoId: '26', action: () => openTutorial('26') },
       { label: 'Release Stop Posting Option', videoId: '27', action: () => openTutorial('27') },
       { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
@@ -1705,6 +1719,11 @@ export default function IdsDesktopShell({
           setSelectedRoomForBillAllowanceOption(roomNo || '201');
           setBillAllowanceOptionModalOpen(true);
         }}
+        onOpenTransferFolio={(roomNo) => {
+          setTransferFolioFromRoom(roomNo || '201');
+          setTransferFolioToRoom('205');
+          setTransferFolioModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1765,6 +1784,10 @@ export default function IdsDesktopShell({
             setCheckoutBillModalOpen(true);
           } else if (programId === 'room-booking') {
             setQuickReservationOpen(true);
+          } else if (programId === 'transfer-folio') {
+            setTransferFolioFromRoom('201');
+            setTransferFolioToRoom('205');
+            setTransferFolioModalOpen(true);
           }
         }}
       />
@@ -2013,7 +2036,11 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '24') {
+          if (videoId === '25') {
+            setTransferFolioFromRoom('201');
+            setTransferFolioToRoom('205');
+            setTransferFolioModalOpen(true);
+          } else if (videoId === '24') {
             setSelectedRoomForBillAllowanceOption('201');
             setBillAllowanceOptionModalOpen(true);
           } else if (videoId === '23') {
@@ -2184,6 +2211,32 @@ export default function IdsDesktopShell({
               return {
                 ...g,
                 balance: Math.max(0, (g.balance || 4250) - (allowanceData.grandTotalDiscount || 1428))
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 25: Transfer Folio from one room to another in IDS 6.5 & 7.0 (Frames 015–140) */}
+      <IdsTransferFolioModal 
+        isOpen={transferFolioModalOpen}
+        onClose={() => setTransferFolioModalOpen(false)}
+        initialFromRoom={transferFolioFromRoom}
+        initialToRoom={transferFolioToRoom}
+        accountingDate={accountingDate}
+        onCompleteTransfer={(transferData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === transferData.fromRoomNo) {
+              return {
+                ...g,
+                balance: Math.max(0, (g.balance || 5190) - (transferData.amount || 4600))
+              };
+            }
+            if (g.roomNo === transferData.toRoomNo) {
+              return {
+                ...g,
+                balance: (g.balance || 0) + (transferData.amount || 4600)
               };
             }
             return g;
