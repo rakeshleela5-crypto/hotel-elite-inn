@@ -111,6 +111,32 @@ export const INITIAL_INHOUSE_GUESTS = [
     nationality: 'IND'
   },
   {
+    roomNo: '311',
+    regNo: '566',
+    roomType: 'DLX',
+    title: 'MR',
+    lastName: 'DEURI',
+    firstName: 'HEMCHANDRA',
+    guestName: 'MR DEURI HEMCHANDRA',
+    companyName: 'DEURI TOURS',
+    resNo: '255',
+    arrival: '02-DEC-2021 12:47',
+    departure: '26-JAN-2022 12:00 WEDNESDAY',
+    folioNo: '311 / 1',
+    guestStatus: 'REG',
+    nationality: 'India',
+    paxList: ['MR DEURI HEMCHANDRA', 'MRS DEURI KABITA'],
+    rate: '3,200.00 - DISCOUNT',
+    planCode: 'CP',
+    balance: '8,400.00',
+    roomNights: 55,
+    group: 'DEURI',
+    billInst: 'Direct',
+    marketSegment: 'FIT',
+    businessSource: 'WKN',
+    checkInUser: 'MANAGER'
+  },
+  {
     roomNo: '312',
     regNo: '587',
     roomType: 'DLX',
@@ -120,11 +146,21 @@ export const INITIAL_INHOUSE_GUESTS = [
     guestName: 'MS BASU ANIRUDH',
     companyName: 'Indian Bank',
     resNo: '272',
-    arrival: '12-JAN-2022 16:00',
-    departure: '18-JAN-2022 12:00',
+    arrival: '16-JAN-2022 11:49 SUNDAY',
+    departure: '26-JAN-2022 12:00 WEDNESDAY',
     folioNo: '312 / 1',
-    guestStatus: 'CORP',
-    nationality: 'IND'
+    guestStatus: 'REG',
+    nationality: 'India',
+    paxList: ['MS BASU ANIRUDH', 'MR Anirudh'],
+    rate: '3,500.00 - DISCOUNT',
+    planCode: 'CP',
+    balance: '11,760.00',
+    roomNights: 10,
+    group: 'Anirudh',
+    billInst: 'Direct',
+    marketSegment: 'FIT',
+    businessSource: 'WKN',
+    checkInUser: 'MANAGER'
   },
   {
     roomNo: '314',
@@ -1181,98 +1217,264 @@ export function IdsOtherDetailsModal({ isOpen, onClose }) {
 }
 
 /* =========================================================================
-   6. GUEST INFORMATION V6.5002.2 ("GI" TOOLBAR POPUP, Frame 068)
+   6. GUEST INFORMATION V6.5002.2 (Video 18 Frames 070 & 102, Video 10 Frame 068)
    ========================================================================= */
-export function IdsGuestInformationModal({ isOpen, onClose, guests = INITIAL_INHOUSE_GUESTS }) {
-  const [searchRoom, setSearchRoom] = useState('301');
-  const [selectedGuest, setSelectedGuest] = useState(guests[0]);
+export function IdsGuestInformationModal({ 
+  isOpen, 
+  onClose, 
+  guests = INITIAL_INHOUSE_GUESTS,
+  initialRoomNo = '312',
+  paxCheckedOutRooms = []
+}) {
+  const [searchRoom, setSearchRoom] = useState(initialRoomNo || '312');
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [selectedPaxName, setSelectedPaxName] = useState('');
 
   useEffect(() => {
-    const found = guests.find(g => g.roomNo === searchRoom);
-    if (found) setSelectedGuest(found);
+    if (initialRoomNo) setSearchRoom(String(initialRoomNo));
+  }, [initialRoomNo]);
+
+  useEffect(() => {
+    const found = guests.find(g => String(g.roomNo) === String(searchRoom)) || guests[0];
+    setSelectedGuest(found);
+    if (found) {
+      setSelectedPaxName(found.guestName || `${found.title || ''} ${found.lastName || ''} ${found.firstName || ''}`);
+    }
   }, [searchRoom, guests]);
 
   if (!isOpen) return null;
+
+  // Determine current pax list for room taking pax check-out into account
+  const isPaxCheckedOut = paxCheckedOutRooms.includes(searchRoom);
+  const rawPaxList = selectedGuest?.paxList || [selectedGuest?.guestName || 'GUEST'];
+  const activePaxList = isPaxCheckedOut 
+    ? [rawPaxList[0]] // only primary guest remains
+    : (searchRoom === '312' ? ['MS BASU ANIRUDH', 'MR Anirudh'] : (searchRoom === '311' ? ['MR DEURI HEMCHANDRA', 'MRS DEURI KABITA'] : rawPaxList));
+
+  const totalPaxDisplay = isPaxCheckedOut || activePaxList.length === 1 ? '1 (1/0)' : '2 (2/0)';
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       <div 
         className="ids-dialog-window" 
-        style={{ width: '700px', maxWidth: '96vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8' }}
+        style={{ 
+          width: '780px', 
+          maxWidth: '96vw', 
+          boxShadow: '0 8px 30px rgba(0,0,0,0.5)', 
+          background: '#ECE9D8',
+          border: '2px solid #FFF',
+          borderRightColor: '#716F64',
+          borderBottomColor: '#716F64',
+          fontFamily: 'Tahoma, Arial, sans-serif'
+        }}
       >
-        {/* Title Bar matching Frame 068 */}
-        <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 700, fontSize: '11px' }}>Guest Information V6.5002.2</span>
-          <button className="ids-win-btn close" onClick={onClose}>✕</button>
+        {/* Title Bar matching Video 18 Frame 070 */}
+        <div 
+          className="ids-dialog-titlebar plain" 
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)',
+            color: '#FFF',
+            padding: '3px 6px'
+          }}
+        >
+          <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>Guest Information V6.5002.2</span>
+          <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
         </div>
 
-        <div style={{ padding: '8px 10px', fontSize: '11px' }}>
-          {/* Top Search Line matching Frame 068 */}
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontWeight: 600 }}>Name/Room#</span>
-            <input 
-              className="ids-input" 
-              value={searchRoom} 
-              onChange={(e) => setSearchRoom(e.target.value)} 
-              style={{ width: '80px', fontWeight: 700 }} 
-            />
-            <button className="ids-btn-classic" style={{ padding: '0 6px' }}>?</button>
+        <div style={{ padding: '8px 10px', fontSize: '11px', color: '#000' }}>
+          {/* Top Row: Name/Room#, Total Pax, and Multi-Pax Guest List (Frames 070 & 102) */}
+          <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr 130px', gap: '8px', marginBottom: '8px', alignItems: 'start' }}>
+            {/* Left Top Inputs */}
+            <div>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600, width: '90px' }}>Name/Room#</span>
+                <input 
+                  className="ids-input" 
+                  value={searchRoom} 
+                  onChange={(e) => setSearchRoom(e.target.value)} 
+                  style={{ width: '80px', fontWeight: 700, background: '#FFF' }} 
+                />
+                <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }}>?</button>
+              </div>
 
-            <span style={{ fontWeight: 600, marginLeft: '12px' }}>Total Pax (ADT/CHD)</span>
-            <input className="ids-input" value="1/0" readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600, width: '90px' }}>Total Pax (ADT/CHD)</span>
+                <input 
+                  className="ids-input" 
+                  value={totalPaxDisplay} 
+                  readOnly 
+                  style={{ width: '80px', background: isPaxCheckedOut ? '#E8F5E9' : '#FFF', fontWeight: 700, color: isPaxCheckedOut ? '#2E7D32' : '#000' }} 
+                />
+                {isPaxCheckedOut && (
+                  <span style={{ fontSize: '10px', color: '#C0392B', fontWeight: 700 }}>[ Pax Checked Out ]</span>
+                )}
+              </div>
 
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Rate Info</button>
-              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Pckg</button>
-              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Check</button>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontWeight: 600, width: '90px' }}>Guest Status</span>
+                <input className="ids-input" value={selectedGuest?.guestStatus || 'REG'} readOnly style={{ width: '80px', background: '#EBEBE4' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600, width: '90px' }}>Nationality</span>
+                <input className="ids-input" value={selectedGuest?.nationality || 'India'} readOnly style={{ width: '120px', background: '#EBEBE4' }} />
+              </div>
+            </div>
+
+            {/* Center: Guest Name List Box (Frames 070 & 102) */}
+            <div>
+              <div style={{ fontWeight: 600, marginBottom: '2px', fontSize: '10px' }}>Guest Name</div>
+              <div 
+                style={{ 
+                  border: '1px solid #7F9DB9', 
+                  background: '#FFF', 
+                  height: '84px', 
+                  overflowY: 'auto',
+                  padding: '1px'
+                }}
+              >
+                {activePaxList.map((paxName, idx) => {
+                  const isSelected = selectedPaxName === paxName || (idx === 0 && !selectedPaxName);
+                  return (
+                    <div 
+                      key={idx}
+                      onClick={() => setSelectedPaxName(paxName)}
+                      style={{ 
+                        padding: '2px 6px', 
+                        cursor: 'pointer',
+                        background: isSelected ? '#0A246A' : 'transparent',
+                        color: isSelected ? '#FFF' : '#000',
+                        fontWeight: 600,
+                        fontSize: '11px'
+                      }}
+                    >
+                      {paxName}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right Command Buttons (Frames 070 & 102) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px' }}>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>Rate Info</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>Pckg</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0', gridColumn: 'span 2' }}>Check</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>History</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>Trace</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>Extra Charges</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0' }}>Deposit Details</button>
+              <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '2px 0', gridColumn: 'span 2' }}>Fixed Charges</button>
             </div>
           </div>
 
-          {/* Guest Name Banner */}
-          <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '6px 10px', marginBottom: '8px' }}>
-            <span style={{ fontSize: '10px', color: '#666' }}>Guest Name:</span>
-            <div style={{ fontWeight: 700, fontSize: '13px', color: '#0A246A' }}>
-              {selectedGuest?.title} {selectedGuest?.lastName || selectedGuest?.guestName} {selectedGuest?.firstName}
-            </div>
+          {/* Company Row */}
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontWeight: 600, width: '90px' }}>Company</span>
+            <input className="ids-input" value={selectedGuest?.companyName || 'Indian Bank'} readOnly style={{ width: '240px', background: '#EBEBE4' }} />
+            <span style={{ fontWeight: 600, marginLeft: '12px', width: '90px' }}>Com. Remarks</span>
+            <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
           </div>
 
-          {/* Key Details Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '4px', alignItems: 'center' }}>
-              <span>Nationality</span>
-              <input className="ids-input" value={selectedGuest?.nationality || 'IND'} readOnly style={{ background: '#EBEBE4' }} />
-
+          {/* Main 2-Column Details Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px', border: '1px solid #CCC', padding: '6px 8px', background: '#F8F7F3', marginBottom: '8px' }}>
+            {/* Left Details */}
+            <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '4px', alignItems: 'center', fontSize: '10.5px' }}>
               <span>Arrival</span>
-              <input className="ids-input" value={selectedGuest?.arrival || '05-JAN-2022 20:28'} readOnly style={{ background: '#EBEBE4' }} />
+              <input className="ids-input" value={selectedGuest?.arrival || '16-JAN-2022 11:49 SUNDAY'} readOnly style={{ background: '#EBEBE4' }} />
 
               <span>Departure</span>
-              <input className="ids-input" value={selectedGuest?.departure || '15-JAN-2022 12:00'} readOnly style={{ background: '#EBEBE4' }} />
+              <input className="ids-input" value={selectedGuest?.departure || '26-JAN-2022 12:00 WEDNESDAY'} readOnly style={{ background: '#EBEBE4' }} />
 
-              <span>Room Type</span>
-              <input className="ids-input" value={selectedGuest?.roomType || 'EXE'} readOnly style={{ fontWeight: 700, background: '#EBEBE4' }} />
+              <span>Room Night(s)</span>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <input className="ids-input" value={selectedGuest?.roomNights || 10} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
+                <span style={{ fontWeight: 600 }}>Ref #</span>
+                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+              </div>
+
+              <span>Arrival From</span>
+              <input className="ids-input" value="Kolkata" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Proceeding To</span>
+              <input className="ids-input" value="Bihar" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Group</span>
+              <input className="ids-input" value={selectedGuest?.group || 'Anirudh'} readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Plan / Passport#</span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <input className="ids-input" value={selectedGuest?.planCode || 'CP'} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} placeholder="Passport #" />
+              </div>
+
+              <span>Bill Inst</span>
+              <input className="ids-input" value={selectedGuest?.billInst || 'Direct'} readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Mkt Segment</span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <input className="ids-input" value="FIT" readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+                <input className="ids-input" value="FIT" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+              </div>
+
+              <span>Bus Source</span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <input className="ids-input" value="WKN" readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+                <input className="ids-input" value="WALK IN" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+              </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '4px', alignItems: 'center' }}>
-              <span>Company</span>
-              <input className="ids-input" value={selectedGuest?.companyName || 'None'} readOnly style={{ background: '#EBEBE4' }} />
+            {/* Right Financials Box */}
+            <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '4px', alignItems: 'center', fontSize: '10.5px' }}>
+              <span>Rate</span>
+              <input className="ids-input" value={selectedGuest?.rate || '3,500.00 - DISCOUNT'} readOnly style={{ fontWeight: 700, background: '#EBEBE4' }} />
 
-              <span>Plan / Rate</span>
-              <input className="ids-input" value={`${selectedGuest?.planCode || 'CP'} / ${selectedGuest?.rate || 'Discount'}`} readOnly style={{ background: '#EBEBE4' }} />
+              <span>Plan</span>
+              <input className="ids-input" value="0.00" readOnly style={{ background: '#EBEBE4' }} />
 
-              <span>Mobile</span>
-              <input className="ids-input" value={selectedGuest?.mobile || '1234567890'} readOnly style={{ background: '#EBEBE4' }} />
+              <span>E.BED RATE</span>
+              <input className="ids-input" value="0" readOnly style={{ background: '#EBEBE4' }} />
 
-              <span>Email</span>
-              <input className="ids-input" value={selectedGuest?.email || 'tenzing@gmail.com'} readOnly style={{ background: '#EBEBE4' }} />
+              <span>E.B.PLAN</span>
+              <input className="ids-input" value="0" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span style={{ fontWeight: 700, color: '#0A246A' }}>Guest Balance</span>
+              <input className="ids-input" value={selectedGuest?.balance || '11,760.00'} readOnly style={{ fontWeight: 700, background: '#FFF', color: '#0A246A' }} />
+
+              <span>Credit Limit(No)</span>
+              <input className="ids-input" value="0.00" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Credit Card #</span>
+              <input className="ids-input" value="" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span>Expiry Date</span>
+              <input className="ids-input" value="" readOnly style={{ background: '#EBEBE4' }} />
+
+              <span style={{ fontWeight: 700 }}>Room Type</span>
+              <input className="ids-input" value={selectedGuest?.roomType === 'EXE' ? 'EXECUTIVE (EXE)' : (selectedGuest?.roomType === 'SUI' ? 'SUITE (SUI)' : 'DELUXE (DLX)')} readOnly style={{ fontWeight: 700, background: '#EBEBE4', color: '#7B241C' }} />
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Clear</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px', fontWeight: 700 }} onClick={onClose}>Exit</button>
+          {/* Bottom Footer Row (Frame 070) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #CCC', paddingTop: '6px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '10px' }}>
+              <span>Check in User: <strong>MANAGER</strong></span>
+              <span>VIP Guest: <strong>No</strong></span>
+            </div>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Room Ins</button>
+              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Display</button>
+              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Messages</button>
+              <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Clear</button>
+              <button className="ids-btn-classic" style={{ fontSize: '10px', fontWeight: 700 }} onClick={onClose}>Exit</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

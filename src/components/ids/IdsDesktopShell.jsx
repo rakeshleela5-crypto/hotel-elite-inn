@@ -39,6 +39,7 @@ import IdsRoomTransferModal from './IdsRoomTransferModal';
 import IdsPostDepositModal from './IdsPostDepositModal';
 import IdsCheckoutBillModal from './IdsCheckoutBillModal';
 import IdsWalkInModal from './IdsWalkInModal';
+import IdsPaxCheckoutModal from './IdsPaxCheckoutModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -249,10 +250,17 @@ export default function IdsDesktopShell({
   const [walkInInitialRoom, setWalkInInitialRoom] = useState('203');
   const [walkInCompletedList, setWalkInCompletedList] = useState([]);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085 & Video 17 Frame 110 sync)
+  // Video 18: Pax Check-Out States (Frames 020–095)
+  const [paxCheckoutModalOpen, setPaxCheckoutModalOpen] = useState(false);
+  const [selectedRoomForPaxCheckout, setSelectedRoomForPaxCheckout] = useState('312');
+  const [paxCheckedOutRooms, setPaxCheckedOutRooms] = useState([]);
+  const [selectedRoomForGuestInfo, setSelectedRoomForGuestInfo] = useState('312');
+
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
     const totalWalkInRooms = walkInCompletedList.length;
     const totalWalkInPax = walkInCompletedList.reduce((sum, w) => sum + (w.pax || 2), 0);
+    const paxDeduction = paxCheckedOutRooms.length;
 
     // Video 16 Frame 085: When Sharma Group (10 rooms) is bulk checked out
     const hasBulkCheckedOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
@@ -264,7 +272,7 @@ export default function IdsDesktopShell({
         walkInRooms: totalWalkInRooms,
         roomsToSell: Math.max(0, 57 - totalWalkInRooms),
         registeredComplaints: 0,
-        inhouseRoomsGuests: `${23 + totalWalkInRooms}/${39 + totalWalkInPax}`,
+        inhouseRoomsGuests: `${23 + totalWalkInRooms}/${Math.max(0, 39 + totalWalkInPax - paxDeduction)}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
         guestBlocks: 0
@@ -280,7 +288,7 @@ export default function IdsDesktopShell({
         walkInRooms: totalWalkInRooms,
         roomsToSell: Math.max(0, 40 - totalWalkInRooms),
         registeredComplaints: 0,
-        inhouseRoomsGuests: `${33 + totalWalkInRooms}/${59 + totalWalkInPax}`,
+        inhouseRoomsGuests: `${33 + totalWalkInRooms}/${Math.max(0, 59 + totalWalkInPax - paxDeduction)}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
         guestBlocks: 0
@@ -314,11 +322,11 @@ export default function IdsDesktopShell({
       return {
         expectedArrivals: 0,
         expectedDepartures: 17,
-        checkInRooms: 0,
-        walkInRooms: 0,
-        roomsToSell: 40,
+        checkInRooms: totalWalkInRooms,
+        walkInRooms: totalWalkInRooms,
+        roomsToSell: Math.max(0, 40 - totalWalkInRooms),
         registeredComplaints: 0,
-        inhouseRoomsGuests: '34/61',
+        inhouseRoomsGuests: `${34 + totalWalkInRooms}/${Math.max(0, 61 + totalWalkInPax - paxDeduction)}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
         guestBlocks: 0
@@ -507,7 +515,14 @@ export default function IdsDesktopShell({
           setCheckoutBillModalOpen(true);
         } 
       },
-      { label: 'Pax Check-Out', videoId: '18', action: () => openTutorial('18') },
+      { 
+        label: 'Pax Check-Out', 
+        videoId: '18', 
+        action: () => {
+          setSelectedRoomForPaxCheckout('312');
+          setPaxCheckoutModalOpen(true);
+        } 
+      },
       { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
       { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
       { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
@@ -1503,6 +1518,11 @@ export default function IdsDesktopShell({
           setWalkInInitialRoom(roomNo || '203');
           setWalkInModalOpen(true);
         }}
+        onOpenPaxCheckout={(roomNo) => {
+          setSelectedRoomForPaxCheckout(roomNo || '312');
+          setPaxCheckoutModalOpen(true);
+        }}
+        paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
         transferredRooms={transferredRooms}
@@ -1643,11 +1663,13 @@ export default function IdsDesktopShell({
         }}
       />
 
-      {/* Video 10: Guest Information Shortcut Modal ("GI" Frame 068) */}
+      {/* Video 10 & 18: Guest Information Shortcut Modal ("GI" Frame 068, Video 18 Frame 070 & 102) */}
       <IdsGuestInformationModal 
         isOpen={guestInformationModalOpen}
         onClose={() => setGuestInformationModalOpen(false)}
         guests={inhouseGuestsList}
+        initialRoomNo={selectedRoomForGuestInfo}
+        paxCheckedOutRooms={paxCheckedOutRooms}
       />
 
       {/* Video 12: Amend Stay V6.5.002.1 Modal (Frames 018–045) */}
@@ -1807,7 +1829,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '17') {
+          if (videoId === '18') {
+            setSelectedRoomForPaxCheckout('312');
+            setPaxCheckoutModalOpen(true);
+          } else if (videoId === '17') {
             setWalkInInitialRoom('203');
             setWalkInModalOpen(true);
           } else if (videoId === '16') {
@@ -1833,6 +1858,21 @@ export default function IdsDesktopShell({
           } else if (videoId === '09') {
             setRoomRackConsoleOpen(true);
           }
+        }}
+      />
+      {/* Video 18: Pax Check-Out V6.5.002.1 Modal (Frames 020–095) */}
+      <IdsPaxCheckoutModal 
+        isOpen={paxCheckoutModalOpen}
+        onClose={() => setPaxCheckoutModalOpen(false)}
+        initialRoomNo={selectedRoomForPaxCheckout}
+        paxCheckedOutRooms={paxCheckedOutRooms}
+        onOpenGuestInfo={(roomNo) => {
+          setSelectedRoomForGuestInfo(roomNo || '312');
+          setGuestInformationModalOpen(true);
+        }}
+        onOpenRoomRack={() => setRoomRackConsoleOpen(true)}
+        onPaxCheckedOut={({ roomNo }) => {
+          setPaxCheckedOutRooms(prev => Array.from(new Set([...prev, roomNo])));
         }}
       />
     </div>

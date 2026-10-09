@@ -746,8 +746,10 @@ export function IdsRoomRackConsoleModal({
   onOpenPostDeposit,
   onOpenCheckout,
   onOpenWalkIn,
+  onOpenPaxCheckout,
   walkInRooms = [],
   checkedOutRooms = [],
+  paxCheckedOutRooms = [],
   transferredRooms = {}
 }) {
   const [filterType, setFilterType] = useState('All');
@@ -819,8 +821,22 @@ export function IdsRoomRackConsoleModal({
     { no: '308', type: isRoomCleared('308') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('308') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '309', type: isRoomCleared('309') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('309') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '310', type: 'O/DLX', guest: 'WAHLANG', status: 'occupied' },
-    { no: '311', type: 'O/DLX', guest: 'DEURI', status: 'occupied' },
-    { no: '312', type: 'O/DLX', guest: 'BASU', status: 'occupied' },
+    { 
+      no: '311', 
+      type: 'O/DLX', 
+      guest: paxCheckedOutRooms.includes('311') ? 'DEURI' : 'DEURI / KABITA', 
+      status: 'occupied',
+      category: 'DLX',
+      tooltip: 'ROOM #311 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)'
+    },
+    { 
+      no: '312', 
+      type: 'O/DLX', 
+      guest: paxCheckedOutRooms.includes('312') ? 'BASU' : 'BASU / ANIRUDH', 
+      status: 'occupied',
+      category: 'DLX',
+      tooltip: 'ROOM #312 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)'
+    },
     { 
       no: '314', 
       type: checkedOutRooms.includes('314') ? (isRoomCleared('314') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
@@ -1284,7 +1300,24 @@ export function IdsRoomRackConsoleModal({
                   >
                     Check-Out
                   </div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Pax Check-Out</div>
+                  {/* Video 18: Pax Check-Out in IDS 6.5 & 7.0 (Frame 025) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenPaxCheckout) onOpenPaxCheckout(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Pax Check-Out (Video 18 Frame 025)"
+                  >
+                    Pax Check-Out
+                  </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Charges</div>
                   
                   {/* Video 14: Post Deposits (Frame 009) */}
