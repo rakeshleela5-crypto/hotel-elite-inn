@@ -37,6 +37,7 @@ import IdsChangeRateModal, { DEFAULT_ROOM_TARIFFS } from './IdsChangeRateModal';
 import IdsAmendStayModal from './IdsAmendStayModal';
 import IdsRoomTransferModal from './IdsRoomTransferModal';
 import IdsPostDepositModal from './IdsPostDepositModal';
+import IdsCheckoutBillModal from './IdsCheckoutBillModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -236,8 +237,30 @@ export default function IdsDesktopShell({
   const [selectedRoomForDeposit, setSelectedRoomForDeposit] = useState('201');
   const [postedDeposits, setPostedDeposits] = useState([]);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035 sync)
+  // Video 15: Checkout & Settle Front Office Bill States (Frames 010–060)
+  const [checkoutBillModalOpen, setCheckoutBillModalOpen] = useState(false);
+  const [selectedRoomForCheckout, setSelectedRoomForCheckout] = useState('314');
+  const [checkoutInitialMode, setCheckoutInitialMode] = useState('checkout'); // 'checkout' | 'settlement'
+  const [checkedOutRooms, setCheckedOutRooms] = useState([]);
+
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062 sync)
   const stats = useMemo(() => {
+    // Video 15 Frame 062: When Room 314 is checked out, Inhouse Rooms/Guests transitions to 33/59, Rooms to sell is 40, Expected Departures is 16
+    if (checkedOutRooms.includes('314') || checkedOutRooms.length > 0) {
+      return {
+        expectedArrivals: 0,
+        expectedDepartures: 16,
+        checkInRooms: 0,
+        walkInRooms: 0,
+        roomsToSell: 40,
+        registeredComplaints: 0,
+        inhouseRoomsGuests: '33/59',
+        extraAdultChild: '0/0',
+        inhouseForeigners: '0/0',
+        guestBlocks: 0
+      };
+    }
+
     const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
     const hasGroupCheckedIn = checkedInList.some(c => c.resNo === '276');
     const has401CheckedIn = checkedInList.some(c => c.roomNo === '401');
@@ -424,7 +447,24 @@ export default function IdsDesktopShell({
           setPostDepositModalOpen(true);
         } 
       },
-      { label: 'Checkout & Settle Front Office Bill (Split Bill)', videoId: '15', action: () => openTutorial('15') },
+      { 
+        label: 'Checkout & Settle Front Office Bill (Split Bill)', 
+        videoId: '15', 
+        action: () => {
+          setSelectedRoomForCheckout('314');
+          setCheckoutInitialMode('checkout');
+          setCheckoutBillModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Settlements V6.5.008.30 (FO Bill Settle)', 
+        videoId: '15', 
+        action: () => {
+          setSelectedRoomForCheckout('314');
+          setCheckoutInitialMode('settlement');
+          setCheckoutBillModalOpen(true);
+        } 
+      },
       { label: 'Bulk Check Out at Once (Group)', videoId: '16', action: () => openTutorial('16') },
       { label: 'Pax Check-Out', videoId: '18', action: () => openTutorial('18') },
       { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
@@ -1413,6 +1453,12 @@ export default function IdsDesktopShell({
           setSelectedRoomForDeposit(roomNo);
           setPostDepositModalOpen(true);
         }}
+        onOpenCheckout={(roomNo) => {
+          setSelectedRoomForCheckout(roomNo || '314');
+          setCheckoutInitialMode('checkout');
+          setCheckoutBillModalOpen(true);
+        }}
+        checkedOutRooms={checkedOutRooms}
         transferredRooms={transferredRooms}
       />
 
@@ -1459,6 +1505,14 @@ export default function IdsDesktopShell({
           } else if (programId === 'reservation-checkin') {
             setScanPurpose('checkin');
             setScanBookingModalOpen(true);
+          } else if (programId === 'checkout-settle' || programId === 'split-bill') {
+            setSelectedRoomForCheckout('314');
+            setCheckoutInitialMode('checkout');
+            setCheckoutBillModalOpen(true);
+          } else if (programId === 'settlements') {
+            setSelectedRoomForCheckout('314');
+            setCheckoutInitialMode('settlement');
+            setCheckoutBillModalOpen(true);
           } else if (programId === 'room-booking') {
             setQuickReservationOpen(true);
           }
@@ -1649,6 +1703,20 @@ export default function IdsDesktopShell({
           setExpressCheckInOpen(false);
           setScanPurpose('checkin');
           setScanBookingModalOpen(true);
+        }}
+      />
+
+      {/* Video 15: Checkout & Settle Front Office Bill with Split Bill Process (Frames 010–060) */}
+      <IdsCheckoutBillModal 
+        isOpen={checkoutBillModalOpen}
+        onClose={() => setCheckoutBillModalOpen(false)}
+        initialRoomNo={selectedRoomForCheckout}
+        initialMode={checkoutInitialMode}
+        checkedOutRooms={checkedOutRooms}
+        onCompleteCheckout={(roomNo, settlementData) => {
+          setCheckedOutRooms(prev => [...new Set([...prev, roomNo])]);
+          // Sync with inhouse guest database: remove checked out room
+          setInhouseGuestsList(prev => prev.filter(g => g.roomNo !== roomNo));
         }}
       />
 

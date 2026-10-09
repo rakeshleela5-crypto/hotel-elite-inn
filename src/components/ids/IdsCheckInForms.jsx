@@ -744,6 +744,8 @@ export function IdsRoomRackConsoleModal({
   onOpenAmendStay,
   onOpenRoomTransfer,
   onOpenPostDeposit,
+  onOpenCheckout,
+  checkedOutRooms = [],
   transferredRooms = {}
 }) {
   const [filterType, setFilterType] = useState('All');
@@ -811,7 +813,13 @@ export function IdsRoomRackConsoleModal({
     { no: '310', type: 'O/DLX', guest: 'WAHLANG', status: 'occupied' },
     { no: '311', type: 'O/DLX', guest: 'DEURI', status: 'occupied' },
     { no: '312', type: 'O/DLX', guest: 'BASU', status: 'occupied' },
-    { no: '314', type: 'O/DLX', guest: 'Anirudh', status: 'occupied' },
+    { 
+      no: '314', 
+      type: checkedOutRooms.includes('314') ? (isRoomCleared('314') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('314') ? undefined : 'Anirudh', 
+      status: checkedOutRooms.includes('314') ? (isRoomCleared('314') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
     { no: '315', type: 'O/EXE', guest: 'Khan', status: 'occupied' },
     { 
       no: '316', 
@@ -1188,7 +1196,24 @@ export function IdsRoomRackConsoleModal({
                     Amend Stay
                   </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Guest Services</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Check-Out</div>
+                  {/* Video 15: Checkout & Settle Front Office Bill (Frame 006) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenCheckout) onOpenCheckout(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Checkout & Settle Front Office Bill (Video 15 Frame 006)"
+                  >
+                    Check-Out
+                  </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Pax Check-Out</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Charges</div>
                   

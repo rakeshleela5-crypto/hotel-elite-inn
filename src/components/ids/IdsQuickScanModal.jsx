@@ -35,7 +35,9 @@ export default function IdsQuickScanModal({
     { id: 'room-transfer', label: 'Room Transfer / Shift', code: 'RT01' },
     { id: 'post-deposit', label: 'Post Deposit / Advance to Room', code: 'PD01' },
     { id: 'express-checkin', label: 'Express Check-in', code: 'EX01' },
-    { id: 'reservation-checkin', label: 'Reservation Check-in', code: 'RC01' },
+    { id: 'checkout-settle', label: 'Checkout & Settle Front Office Bill', code: 'CO01' },
+    { id: 'settlements', label: 'Settlements', code: 'ST01' },
+    { id: 'split-bill', label: 'Split Bill Process', code: 'SB01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
