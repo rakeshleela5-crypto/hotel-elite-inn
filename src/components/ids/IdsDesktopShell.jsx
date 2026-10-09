@@ -93,6 +93,31 @@ export default function IdsDesktopShell({
       isCancelled: false 
     },
     { 
+      resNo: '276', 
+      title: 'Mr', 
+      guestName: 'Anil Kumar Group', 
+      contactPerson: 'Mr. Anil Kumar',
+      booker: 'Mr Sharma',
+      groupCode: '003',
+      groupName: 'Anil Kumar Group',
+      companyName: 'Varun Beverages Ltd', 
+      companyCode: 'COM0003', 
+      roomNo: '415, 501, 515', 
+      rooms: ['415', '501', '515'],
+      type: 'EXE', 
+      confirm: '0+5+0', 
+      provisional: '0+0+0', 
+      pax: '10+3+0', 
+      arrivalDate: '16-JAN-2022 14:00', 
+      departureDate: '18-JAN-2022 12:00', 
+      depositAmount: 0, 
+      rate: '4,250.00',
+      status: 'Confirmed Group', 
+      blocked: false,
+      isCancelled: false,
+      isGroup: true
+    },
+    { 
       resNo: '269', 
       title: 'Mr', 
       guestName: 'P Ashok', 
@@ -165,25 +190,52 @@ export default function IdsDesktopShell({
   const [roomRackConsoleOpen, setRoomRackConsoleOpen] = useState(false);
   const [expressCheckInOpen, setExpressCheckInOpen] = useState(false);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028 sync)
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060 sync)
   const stats = useMemo(() => {
+    const hasGroupCheckedIn = checkedInList.some(c => c.resNo === '276');
+    const has401CheckedIn = checkedInList.some(c => c.roomNo === '401');
     const checkedInCount = checkedInList.length;
-    const totalGuestsAdded = checkedInList.reduce((acc, c) => acc + (c.totalGuests || 2), 0);
-    const inhouseRooms = 15 + (checkedInCount > 1 ? checkedInCount - 1 : 0);
-    const inhouseGuests = 23 + (checkedInCount > 1 ? totalGuestsAdded - 2 : 0);
-    const blockedCount = Math.max(0, 1 - checkedInCount);
+
+    // Video 07 Frame 040 (Group Booked): Expected Arrivals jumps to 7 (2+5), Rooms to sell drops to 36 (41-5).
+    // Video 07 Frame 060 (Group Checked In): 3 rooms checked in (415, 501, 515), occupied increases.
+    let expectedArrivals = 7;
+    let roomsToSell = 36;
+    let checkInRooms = 1;
+    let inhouseRoomsGuests = '16/25';
+
+    if (hasGroupCheckedIn && has401CheckedIn) {
+      expectedArrivals = 3;
+      roomsToSell = 47;
+      checkInRooms = 5;
+      inhouseRoomsGuests = '20/33';
+    } else if (hasGroupCheckedIn) {
+      expectedArrivals = 4;
+      roomsToSell = 36;
+      checkInRooms = 4;
+      inhouseRoomsGuests = '19/31';
+    } else if (has401CheckedIn) {
+      expectedArrivals = 6;
+      roomsToSell = 51;
+      checkInRooms = 2;
+      inhouseRoomsGuests = '17/27';
+    } else if (checkedInCount === 0) {
+      expectedArrivals = 7;
+      roomsToSell = 36;
+      checkInRooms = 1;
+      inhouseRoomsGuests = '16/25';
+    }
 
     return {
-      expectedArrivals: Math.max(0, 6 - checkedInCount), // Video 06 shows: 6 -> 5
+      expectedArrivals,
       expectedDepartures: 2,
-      checkInRooms: checkedInCount > 0 ? checkedInCount : 1, // Video 06 shows 1 -> 2
+      checkInRooms,
       walkInRooms: 0,
-      roomsToSell: checkedInCount >= 2 ? 51 : 56, // Video 06 Frame 028 shows: 51
+      roomsToSell,
       registeredComplaints: 0,
-      inhouseRoomsGuests: checkedInCount >= 2 ? '17/27' : checkedInCount === 1 ? '15/23' : '16/25', // Frame 028: 17/27
+      inhouseRoomsGuests,
       extraAdultChild: '0/0',
       inhouseForeigners: '0/0',
-      guestBlocks: blockedCount // 1 -> 0
+      guestBlocks: has401CheckedIn ? 0 : 1
     };
   }, [reservations, checkedInList]);
 
@@ -205,6 +257,7 @@ export default function IdsDesktopShell({
   const subMenuMap = {
     'Reservations..': [
       { label: 'Room Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
+      { label: 'Group Room Booking', videoId: '07', action: () => setQuickReservationOpen(true) },
       { 
         label: 'Assign Guest Rooms', 
         videoId: '02', 
@@ -248,6 +301,7 @@ export default function IdsDesktopShell({
     ],
     'Registrations..': [
       { label: 'Express Check-in', videoId: '06', action: () => setExpressCheckInOpen(true) },
+      { label: 'Group Express Check-in', videoId: '07', action: () => setExpressCheckInOpen(true) },
       { 
         label: 'Reservation Check-in', 
         videoId: '05', 
@@ -515,6 +569,73 @@ export default function IdsDesktopShell({
           status: 'Checked In',
           blocked: false,
           roomNo: data.roomNo
+        };
+      }
+      return r;
+    }));
+  };
+
+  // Video 07: Group Express Check-In Workflow Handler
+  const handleCompleteGroupCheckin = (data) => {
+    const rooms = data.rooms || ['415', '501', '515'];
+    const newRecords = [
+      {
+        resNo: data.resNo || '276',
+        roomNo: '415',
+        regNo: '613',
+        type: data.type || 'EXE',
+        guestName: 'Kumar Anil',
+        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
+        rate: '4,250.00',
+        planAmt: '0.00',
+        arrivalDate: data.arrivalDate || '16-JAN-2022',
+        departureDate: data.departureDate || '18-JAN-2022',
+        nation: 'IND',
+        user: 'MANAGER',
+        totalGuests: 2
+      },
+      {
+        resNo: data.resNo || '276',
+        roomNo: '501',
+        regNo: '615',
+        type: data.type || 'EXE',
+        guestName: 'Anil Kumar Group',
+        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
+        rate: '4,250.00',
+        planAmt: '0.00',
+        arrivalDate: data.arrivalDate || '16-JAN-2022',
+        departureDate: data.departureDate || '18-JAN-2022',
+        nation: 'IND',
+        user: 'MANAGER',
+        totalGuests: 2
+      },
+      {
+        resNo: data.resNo || '276',
+        roomNo: '515',
+        regNo: '617',
+        type: data.type || 'EXE',
+        guestName: 'Anil Kumar Group',
+        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
+        rate: '4,250.00',
+        planAmt: '0.00',
+        arrivalDate: data.arrivalDate || '16-JAN-2022',
+        departureDate: data.departureDate || '18-JAN-2022',
+        nation: 'IND',
+        user: 'MANAGER',
+        totalGuests: 2
+      }
+    ];
+
+    setCheckedInList(prev => [...newRecords, ...prev]);
+
+    setReservations(prev => prev.map(r => {
+      if (r.resNo === (data.resNo || '276')) {
+        return {
+          ...r,
+          isCheckedIn: true,
+          status: 'Checked In',
+          blocked: false,
+          rooms: rooms
         };
       }
       return r;
@@ -837,29 +958,61 @@ export default function IdsDesktopShell({
           handleInitiateCancel(b);
         }}
         onSuccessBooking={(bookingData) => {
-          setReservations(prev => [
-            {
-              resNo: bookingData.reservationNo || `${272 + prev.length}`,
-              title: 'Mr',
-              guestName: bookingData.guestName,
-              companyName: bookingData.company || 'FIT',
-              companyCode: 'COM0001',
-              roomNo: '',
-              type: bookingData.roomType || 'DLX',
-              confirm: '1+0+0',
-              provisional: '0+0+0',
-              pax: `${bookingData.adults || 1}+0+0`,
-              arrivalDate: bookingData.arrivalDate || '14-JAN-2022',
-              departureDate: bookingData.departureDate || '16-JAN-2022',
-              depositAmount: parseFloat(bookingData.advancePaid) || 0,
-              status: 'Confirmed',
-              blocked: false,
-              isCancelled: false
-            },
-            ...prev
-          ]);
+          if (bookingData.isGroup) {
+            setReservations(prev => [
+              {
+                resNo: bookingData.reservationNo || '276',
+                title: 'Mr',
+                guestName: bookingData.guestName || 'Anil Kumar Group',
+                contactPerson: bookingData.contactPerson || 'Mr. Anil Kumar',
+                booker: bookingData.booker || 'Mr Sharma',
+                groupCode: bookingData.groupCode || '003',
+                groupName: bookingData.groupName || 'Anil Kumar Group',
+                companyName: bookingData.company || 'Varun Beverages Ltd',
+                companyCode: bookingData.companyCode || 'COM0003',
+                roomNo: '415, 501, 515',
+                rooms: ['415', '501', '515'],
+                type: 'EXE',
+                confirm: '0+5+0',
+                provisional: '0+0+0',
+                pax: '10+3+0',
+                arrivalDate: bookingData.arrivalDate || '16-JAN-2022 14:00',
+                departureDate: bookingData.departureDate || '18-JAN-2022 12:00',
+                depositAmount: 0,
+                rate: bookingData.rate || '4,250.00',
+                status: 'Confirmed Group',
+                blocked: false,
+                isCancelled: false,
+                isGroup: true
+              },
+              ...prev.filter(r => r.resNo !== (bookingData.reservationNo || '276'))
+            ]);
+            alert(`✅ Group Reservation #${bookingData.reservationNo || '276'} (Group: ${bookingData.groupName || 'Anil Kumar Group'}) confirmed with 5 Executive Rooms!`);
+          } else {
+            setReservations(prev => [
+              {
+                resNo: bookingData.reservationNo || `${272 + prev.length}`,
+                title: 'Mr',
+                guestName: bookingData.guestName,
+                companyName: bookingData.company || 'FIT',
+                companyCode: 'COM0001',
+                roomNo: '',
+                type: bookingData.roomType || 'DLX',
+                confirm: '1+0+0',
+                provisional: '0+0+0',
+                pax: `${bookingData.adults || 1}+0+0`,
+                arrivalDate: bookingData.arrivalDate || '14-JAN-2022',
+                departureDate: bookingData.departureDate || '16-JAN-2022',
+                depositAmount: parseFloat(bookingData.advancePaid) || 0,
+                status: 'Confirmed',
+                blocked: false,
+                isCancelled: false
+              },
+              ...prev
+            ]);
+            alert(`✅ Reservation #${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
+          }
           if (onNewBooking) onNewBooking(bookingData);
-          alert(`✅ Reservation #${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
         }}
       />
 
@@ -1054,11 +1207,12 @@ export default function IdsDesktopShell({
         guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
       />
 
-      {/* Video 06: Express Check-In Modal (Frames 012–026) */}
+      {/* Video 06 & 07: Express Check-In Modal (Frames 012–060) */}
       <IdsExpressCheckInModal 
         isOpen={expressCheckInOpen}
         onClose={() => setExpressCheckInOpen(false)}
         onCompleteExpressCheckin={handleCompleteExpressCheckin}
+        onCompleteGroupCheckin={handleCompleteGroupCheckin}
         onOpenStandardCheckin={() => {
           setExpressCheckInOpen(false);
           setScanPurpose('checkin');

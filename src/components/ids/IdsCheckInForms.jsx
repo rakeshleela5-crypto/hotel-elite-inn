@@ -744,8 +744,11 @@ export function IdsRoomRackConsoleModal({
 
   const is516Occupied = checkedInList.some(c => c.roomNo === '516') || occupiedRoom === '516';
   const is401Occupied = checkedInList.some(c => c.roomNo === '401');
+  const is415Occupied = checkedInList.some(c => c.roomNo === '415');
+  const is501Occupied = checkedInList.some(c => c.roomNo === '501');
+  const is515Occupied = checkedInList.some(c => c.roomNo === '515');
 
-  // 44 Rooms matching Frame 034 grid
+  // 44 Rooms matching Frame 034 & Frame 060 grid
   const roomsMatrix = [
     { no: '201', type: 'D/EXE', status: 'dirty' },
     { no: '203', type: 'D/DLX', status: 'dirty' },
@@ -796,9 +799,20 @@ export function IdsRoomRackConsoleModal({
     { no: '412', type: 'V/DLX', status: 'vacant' },
     { no: '414', type: 'V/DLX', status: 'vacant' },
 
-    { no: '415', type: 'V/EXE', status: 'vacant' },
+    { 
+      no: '415', 
+      type: is415Occupied ? 'O/EXE' : 'V/EXE', 
+      guest: is415Occupied ? 'Kumar' : undefined, 
+      status: is415Occupied ? 'occupied' : 'vacant' 
+    },
     { no: '416', type: 'V/SUI', status: 'vacant' },
-    { no: '501', type: 'V/EXE', status: 'vacant' },
+    { 
+      no: '501', 
+      type: is501Occupied ? 'O/EXE' : 'V/EXE', 
+      guest: is501Occupied ? 'Anil Kumar G' : undefined, 
+      status: is501Occupied ? 'occupied' : 'vacant',
+      tooltip: is501Occupied ? 'ROOM # 501 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)' : undefined
+    },
     { no: '503', type: 'O/DLX', guest: 'NATRAJ', status: 'occupied' },
     { no: '504', type: 'O/DLX', guest: 'MENAN', status: 'occupied' },
     { no: '505', type: 'O/DLX', guest: 'BEDI', status: 'occupied' },
@@ -811,7 +825,12 @@ export function IdsRoomRackConsoleModal({
     { no: '511', type: 'V/DLX', status: 'vacant' },
     { no: '512', type: 'V/DLX', status: 'vacant' },
     { no: '514', type: 'V/DLX', status: 'vacant' },
-    { no: '515', type: 'V/EXE', status: 'vacant' }, // Released in Video 04!
+    { 
+      no: '515', 
+      type: is515Occupied ? 'O/EXE' : 'V/EXE', 
+      guest: is515Occupied ? 'Anil Kumar G' : undefined, 
+      status: is515Occupied ? 'occupied' : 'vacant' 
+    },
     { 
       no: '516', 
       type: is516Occupied ? 'O/SUI' : 'V/SUI', 
@@ -821,8 +840,9 @@ export function IdsRoomRackConsoleModal({
     { no: '601', type: 'D/PNH', status: 'dirty' }
   ];
 
-  const occupiedCount = 14 + (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0);
-  const vacantCount = 25 - (is516Occupied ? 1 : 0) - (is401Occupied ? 1 : 0);
+  const addedOccupied = (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0) + (is415Occupied ? 1 : 0) + (is501Occupied ? 1 : 0) + (is515Occupied ? 1 : 0);
+  const occupiedCount = 14 + addedOccupied;
+  const vacantCount = Math.max(0, 25 - addedOccupied);
 
   const getCellBg = (status) => {
     switch (status) {

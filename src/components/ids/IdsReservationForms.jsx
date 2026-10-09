@@ -45,6 +45,53 @@ export function IdsQuickReservationModal({
   const [childCount, setChildCount] = useState('0');
   const [status, setStatus] = useState('Confirmed');
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
+  const [isGroupBooking, setIsGroupBooking] = useState(false);
+  const [groupCode, setGroupCode] = useState('003');
+  const [groupName, setGroupName] = useState('Anil Kumar Group');
+  const [contactPerson, setContactPerson] = useState('Mr. Anil Kumar');
+
+  const toggleGroupBookingMode = () => {
+    if (!isGroupBooking) {
+      setIsGroupBooking(true);
+      setGroupCode('003');
+      setGroupName('Anil Kumar Group');
+      setContactPerson('Mr. Anil Kumar');
+      setBookerName('Mr Sharma');
+      setCompanyCode('COM0003');
+      setCompanyName('Varun Beverages Ltd');
+      setRoomType('EXECUTIVE');
+      setRoomsCount('5');
+      setAdultCount('10');
+      setChildCount('3');
+      setTariffs({
+        currency: 'INR',
+        single: '4250.00',
+        double: '4250.00',
+        triple: '0.00',
+        qud: '0.00',
+        extAdult: '1000.00',
+        extChild: '0.00'
+      });
+      setGuests([
+        { title: 'Mr', lastName: 'Kumar', middleName: '', firstName: 'Anil', selected: true },
+        { title: 'Mr', lastName: 'Sharma', middleName: '', firstName: 'Booker', selected: false }
+      ]);
+    } else {
+      setIsGroupBooking(false);
+      setRoomsCount('1');
+      setAdultCount('2');
+      setChildCount('0');
+      setTariffs({
+        currency: 'INR',
+        single: isModify ? '5000.00' : '6500.00',
+        double: isModify ? '5000.00' : '6500.00',
+        triple: '0.00',
+        qud: '0.00',
+        extAdult: '1000.00',
+        extChild: '0.00'
+      });
+    }
+  };
 
   // Guest Grid
   const [guests, setGuests] = useState([
@@ -129,14 +176,36 @@ export function IdsQuickReservationModal({
       setReceiptsOpen(true);
     } else {
       if (onSuccessBooking) {
-        onSuccessBooking({
-          reservationNo: '271',
-          guestName: `${guests[0]?.title} ${guests[0]?.firstName} ${guests[0]?.lastName}`,
-          roomType,
-          arrivalDate,
-          departureDate,
-          company: companyName
-        });
+        if (isGroupBooking) {
+          onSuccessBooking({
+            reservationNo: '276',
+            isGroup: true,
+            guestName: 'Anil Kumar Group',
+            contactPerson,
+            booker: bookerName,
+            groupCode,
+            groupName,
+            company: companyName,
+            companyCode,
+            roomType,
+            roomsCount: parseInt(roomsCount) || 5,
+            adults: parseInt(adultCount) || 10,
+            children: parseInt(childCount) || 3,
+            rate: tariffs.single || '4,250.00',
+            advancePaid: '0.00',
+            arrivalDate,
+            departureDate
+          });
+        } else {
+          onSuccessBooking({
+            reservationNo: isModify ? resNumber : '271',
+            guestName: `${guests[0]?.title} ${guests[0]?.firstName} ${guests[0]?.lastName}`,
+            roomType,
+            arrivalDate,
+            departureDate,
+            company: companyName
+          });
+        }
       }
       onClose();
     }
@@ -145,15 +214,37 @@ export function IdsQuickReservationModal({
   const handleReceiptsSave = () => {
     setReceiptsOpen(false);
     if (onSuccessBooking) {
-      onSuccessBooking({
-        reservationNo: '271',
-        guestName: `${guests[0]?.title} ${guests[0]?.firstName} ${guests[0]?.lastName}`,
-        roomType,
-        arrivalDate,
-        departureDate,
-        company: companyName,
-        advancePaid: '5000.00'
-      });
+      if (isGroupBooking) {
+        onSuccessBooking({
+          reservationNo: '276',
+          isGroup: true,
+          guestName: 'Anil Kumar Group',
+          contactPerson,
+          booker: bookerName,
+          groupCode,
+          groupName,
+          company: companyName,
+          companyCode,
+          roomType,
+          roomsCount: parseInt(roomsCount) || 5,
+          adults: parseInt(adultCount) || 10,
+          children: parseInt(childCount) || 3,
+          rate: tariffs.single || '4,250.00',
+          advancePaid: '5000.00',
+          arrivalDate,
+          departureDate
+        });
+      } else {
+        onSuccessBooking({
+          reservationNo: isModify ? resNumber : '271',
+          guestName: `${guests[0]?.title} ${guests[0]?.firstName} ${guests[0]?.lastName}`,
+          roomType,
+          arrivalDate,
+          departureDate,
+          company: companyName,
+          advancePaid: '5000.00'
+        });
+      }
     }
     onClose();
   };
@@ -167,9 +258,11 @@ export function IdsQuickReservationModal({
         {/* Title Bar */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>
-            {detailedMode 
-              ? (isCancel ? `Detailed Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
-              : (isCancel ? `Quick Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
+            {isGroupBooking 
+              ? 'Quick Reservation / Group Make V6.5.002.20 [Group # 003: Anil Kumar Group]'
+              : detailedMode 
+                ? (isCancel ? `Detailed Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
+                : (isCancel ? `Quick Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
           </span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
@@ -241,7 +334,16 @@ export function IdsQuickReservationModal({
           >
             <Home size={18} color="#111" />
           </div>
-          <div className="ids-dialog-action-icon" title="Group Booking">
+          <div 
+            className="ids-dialog-action-icon" 
+            title="Group Booking (Click to toggle Group 003 mode)"
+            onClick={toggleGroupBookingMode}
+            style={{
+              background: isGroupBooking ? '#C2BDA7' : 'transparent',
+              border: isGroupBooking ? '1px inset #716F64' : '1px solid transparent',
+              cursor: 'pointer'
+            }}
+          >
             <Users size={18} color="#111" />
           </div>
           <div className="ids-dialog-action-icon" title="Check-In">
@@ -257,6 +359,20 @@ export function IdsQuickReservationModal({
           
           {/* Left Form: Quick Reservation Core */}
           <div>
+            {/* Video 07: Group Booking Indicator Banner (Frame 008-040) */}
+            {isGroupBooking && (
+              <div style={{ background: '#FFF9D7', border: '1px solid #D4B106', padding: '4px 8px', marginBottom: '8px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 'inset 0 1px 0 #FFF' }}>
+                <div>
+                  <span style={{ fontWeight: 700, color: '#0A246A' }}>GROUP BOOKING:</span> &nbsp;
+                  <strong>Code:</strong> 003 &nbsp;|&nbsp; 
+                  <strong>Name:</strong> Anil Kumar Group &nbsp;|&nbsp; 
+                  <strong>Contact:</strong> Mr. Anil Kumar
+                </div>
+                <div style={{ fontWeight: 700, color: '#B30000', fontSize: '10px' }}>
+                  5 Rooms / 13 Pax (Tariff 4,250.00)
+                </div>
+              </div>
+            )}
             {/* Arrival & Departure Block */}
             <div style={{ display: 'grid', gridTemplateColumns: '70px 100px 50px 70px 50px 45px', gap: '4px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Arrival</span>
