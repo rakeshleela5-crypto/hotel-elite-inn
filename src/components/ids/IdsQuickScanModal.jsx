@@ -68,6 +68,8 @@ export default function IdsQuickScanModal({
     { id: 'walkin-regular-guest', label: 'Regular Guest Walk-in', code: 'WG02' },
     { id: 'cancel-checkins', label: 'Cancel Check-Ins', code: 'CC01' },
     { id: 'remove-checkin', label: 'Remove or Cancel Check-In', code: 'CC02' },
+    { id: 'delete-deposit-before-cancel-checkin', label: 'Delete Deposit Before Cancel Check in', code: 'DD01' },
+    { id: 'delete-deposit', label: 'Delete Deposit', code: 'DD02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 
