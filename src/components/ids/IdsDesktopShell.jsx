@@ -2280,6 +2280,7 @@ export default function IdsDesktopShell({
         initialRoomNo={selectedRoomForDeposit}
         inhouseGuests={inhouseGuestsList}
         onOpenRoomHelpLookup={() => setRoomHelpLookupOpen(true)}
+        onOpenCrystalReport={openCrystalReport}
         onSaveDeposit={({ roomNo, guestName, folioNo, amount, paymentMode, particulars, receiptNo, date }) => {
           setPostedDeposits(prev => [
             ...prev,
@@ -2323,6 +2324,7 @@ export default function IdsDesktopShell({
         initialMode={checkoutInitialMode}
         initialGroup={checkoutInitialMode === 'bulk' ? 'Sharma Group' : ''}
         checkedOutRooms={checkedOutRooms}
+        onOpenCrystalReport={openCrystalReport}
         onCompleteCheckout={(roomNo, settlementData) => {
           setCheckedOutRooms(prev => [...new Set([...prev, roomNo])]);
           // Sync with inhouse guest database: remove checked out room
@@ -2655,6 +2657,7 @@ export default function IdsDesktopShell({
         isOpen={reprintVoucherModalOpen}
         onClose={() => setReprintVoucherModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
       />
 
       {/* Video 36: Reprint Front Office Bill (Rule 46 GST) in IDS 6.5 & 7.0 (Frames 010–040) */}
@@ -2662,6 +2665,7 @@ export default function IdsDesktopShell({
         isOpen={reprintBillModalOpen}
         onClose={() => setReprintBillModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
       />
 
       {/* Video 37: Walk In Regular Guest in IDS 6.5 & 7.0 (Frames 010–040) */}
@@ -2775,6 +2779,7 @@ export default function IdsDesktopShell({
         isOpen={foreignExchangeModalOpen}
         onClose={() => setForeignExchangeModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
       />
 
       {/* Video 43: Add Company Details & GSTN After Check-out in IDS 6.5 & 7.0 (Frames 010–074) */}
@@ -2782,6 +2787,7 @@ export default function IdsDesktopShell({
         isOpen={gstnChangeModalOpen}
         onClose={() => setGstnChangeModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
       />
 
       {/* Video 44: Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 (Frames 010–110) */}
@@ -2789,6 +2795,7 @@ export default function IdsDesktopShell({
         isOpen={paidOutModalOpen}
         onClose={() => setPaidOutModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
         onCheckOutComplete={(checkOutData) => {
           console.log('Paid-Out & Check-Out completed:', checkOutData);
           setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== checkOutData.roomNo));

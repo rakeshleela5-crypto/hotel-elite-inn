@@ -45,7 +45,8 @@ export default function IdsPaidOutModal({
   onClose,
   accountingDate = '26-MAR-2022',
   onCheckOutComplete,
-  onOpenRoomRack
+  onOpenRoomRack,
+  onOpenCrystalReport
 }) {
   // Navigation tabs: 'checkoutNegative' | 'paidOutForm' | 'checkoutZero' | 'completed'
   const [currentStep, setCurrentStep] = useState('checkoutNegative');
@@ -605,7 +606,28 @@ export default function IdsPaidOutModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '16px' }}>
-                  <button className="ids-btn-classic" onClick={() => window.print()}>Print Voucher</button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontWeight: 700, background: '#DCE6F1' }}
+                    onClick={() => {
+                      if (onOpenCrystalReport) {
+                        onOpenCrystalReport('paid-out', {
+                          voucherNo,
+                          guestName,
+                          roomNo,
+                          amount: paidOutAmount,
+                          reason: paidOutReason,
+                          particulars
+                        });
+                        setVoucherModalOpen(false);
+                      } else {
+                        window.print();
+                      }
+                    }}
+                  >
+                    Crystal Reports Print
+                  </button>
+                  <button className="ids-btn-classic" onClick={() => window.print()}>Quick Print</button>
                   <button className="ids-btn-classic" onClick={() => setVoucherModalOpen(false)}>Close</button>
                 </div>
               </div>

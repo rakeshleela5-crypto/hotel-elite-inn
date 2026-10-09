@@ -209,7 +209,8 @@ export const INITIAL_VOUCHERS_DATABASE = [
 export default function IdsReprintVoucherModal({
   isOpen,
   onClose,
-  accountingDate = '24-FEB-2022'
+  accountingDate = '24-FEB-2022',
+  onOpenCrystalReport
 }) {
   const [selectedType, setSelectedType] = useState('Deposit');
   const [filterDate, setFilterDate] = useState(accountingDate);
@@ -411,13 +412,48 @@ export default function IdsReprintVoucherModal({
                 style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1', display: 'flex', alignItems: 'center', gap: '4px' }}
                 onClick={() => {
                   if (selectedVoucher) {
+                    if (onOpenCrystalReport) {
+                      if (selectedVoucher.type === 'Paid Outs') {
+                        onOpenCrystalReport('paid-out', {
+                          voucherNo: selectedVoucher.voucherNo,
+                          guestName: selectedVoucher.guestName,
+                          roomNo: selectedVoucher.roomNo,
+                          amount: selectedVoucher.amount,
+                          reason: selectedVoucher.description,
+                          particulars: selectedVoucher.remarks
+                        });
+                      } else {
+                        onOpenCrystalReport('advance-receipt', {
+                          receiptNo: selectedVoucher.voucherNo,
+                          guestName: selectedVoucher.guestName,
+                          roomNo: selectedVoucher.roomNo,
+                          amount: selectedVoucher.amount,
+                          paymentMode: selectedVoucher.payMode,
+                          particulars: selectedVoucher.description
+                        });
+                      }
+                    } else {
+                      handlePrintVoucher(selectedVoucher);
+                    }
+                  } else {
+                    alert('Please select a voucher row first.');
+                  }
+                }}
+              >
+                <Printer size={12} /> Crystal Reports Print
+              </button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => {
+                  if (selectedVoucher) {
                     handlePrintVoucher(selectedVoucher);
                   } else {
                     alert('Please select a voucher row first.');
                   }
                 }}
               >
-                <Printer size={12} /> Print
+                Quick Preview
               </button>
               <button 
                 className="ids-btn-classic" 
@@ -467,9 +503,9 @@ export default function IdsReprintVoucherModal({
                 
                 {/* Hotel Header */}
                 <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '1px' }}>HOTEL ELITE INN & SUITES</div>
-                  <div style={{ fontSize: '11px' }}>FORTUNE NEXT PMS — FRONT OFFICE MODULE</div>
-                  <div style={{ fontSize: '10px', color: '#444' }}>GSTIN: 27AABCT3518Q1ZY | TEL: +91 22 2876 5432</div>
+                  <div style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '1px' }}>HOTEL ELITE INN</div>
+                  <div style={{ fontSize: '11px' }}>Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020</div>
+                  <div style={{ fontSize: '10px', color: '#444' }}>GSTIN: 21AEWFS9433F1ZN | State Code: 21 | Phone: +91-6370757541</div>
                   <div style={{ marginTop: '6px', display: 'inline-block', border: '1px solid #000', padding: '2px 10px', fontWeight: 700, fontSize: '12px' }}>
                     {selectedVoucher.type.toUpperCase()} VOUCHER (REPRINT)
                   </div>
@@ -565,11 +601,11 @@ export default function IdsReprintVoucherModal({
                   className="ids-btn-classic" 
                   style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => {
-                    alert(`PDF Voucher saved as: ${selectedVoucher.voucherNo}.pdf (Frame 030 / Frame 054)`);
+                    alert(`PDF Voucher exported successfully: ${selectedVoucher.voucherNo}.pdf`);
                     setPrintPreviewOpen(false);
                   }}
                 >
-                  <Download size={12} /> Save PDF (Frame 030)
+                  <Download size={12} /> Export PDF
                 </button>
                 <button className="ids-btn-classic" onClick={() => setPrintPreviewOpen(false)}>
                   Close

@@ -206,7 +206,7 @@ export default function IdsWalkInModal({
     setRackTitle('Mr');
     setRackLastName('Sarkar');
     setRackFirstName('Rajesh');
-    setStatusMessage('Loaded Video 17 presets: Room 203 for Mr. Rajesh Sarkar.');
+    setStatusMessage('Sample walk-in preset loaded: Room 203 for Mr. Rajesh Sarkar.');
   };
 
   // Move from Rack to Walk-in Registration
@@ -490,7 +490,7 @@ export default function IdsWalkInModal({
                 style={{ background: '#FFF7CC', fontWeight: 700, color: '#0A246A' }}
                 onClick={handleAutoFillVideo17}
               >
-                ⚡ Auto-Fill Video 17 Walk-in: Room 203 (Mr. Rajesh Sarkar)
+                ⚡ Auto-Fill Sample Walk-in: Room 203 (Mr. Rajesh Sarkar)
               </button>
               <div style={{ color: '#0A246A', fontWeight: 600 }}>{statusMessage}</div>
             </div>

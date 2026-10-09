@@ -100,7 +100,8 @@ export const INITIAL_ENCASHMENTS_DATABASE = [
 export default function IdsForeignExchangeModal({
   isOpen,
   onClose,
-  accountingDate = '17-MAR-2022'
+  accountingDate = '17-MAR-2022',
+  onOpenCrystalReport
 }) {
   const [encashmentsList, setEncashmentsList] = useState(INITIAL_ENCASHMENTS_DATABASE);
   const [selectedVoucher, setSelectedVoucher] = useState(INITIAL_ENCASHMENTS_DATABASE[0]);
@@ -476,8 +477,8 @@ export default function IdsForeignExchangeModal({
                 
                 <div style={{ textAlign: 'center', borderBottom: '2px double #000', paddingBottom: '8px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '14px', fontWeight: 900 }}>HOTEL ELITE INN</div>
-                  <div style={{ fontSize: '10px' }}>RBI AUTHORIZED FULL FLLEDGED MONEY CHANGER (FFMC)</div>
-                  <div style={{ fontSize: '10px' }}>RBI Licence No: RL/MUM/2022/4481 | GSTIN: 27AABCH1234F1Z9</div>
+                  <div style={{ fontSize: '10px' }}>Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020</div>
+                  <div style={{ fontSize: '10px' }}>RBI AUTHORIZED MONEY CHANGER (FFMC) • Licence No: RL/BBSR/2022/1084 | GSTIN: 21AEWFS9433F1ZN</div>
                   <div style={{ fontSize: '12px', fontWeight: 800, marginTop: '4px', textDecoration: 'underline' }}>
                     CERTIFICATE OF ENCASHMENT (FORM E.C.F.)
                   </div>
@@ -527,8 +528,35 @@ export default function IdsForeignExchangeModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '16px' }}>
-                  <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => window.print()}>
-                    Print Certificate
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontWeight: 700, background: '#DCE6F1' }} 
+                    onClick={() => {
+                      if (onOpenCrystalReport) {
+                        onOpenCrystalReport('forex', {
+                          certNo: encashmentNo,
+                          guestName,
+                          nationality,
+                          passportNo,
+                          roomNo,
+                          currency: currencyCode,
+                          foreignAmount: totalForeignAmount,
+                          exchangeRate,
+                          grossInr: grossInrValue,
+                          commissionPct: 0,
+                          commissionAmount: gstTaxAmount,
+                          netInrPaid: netPaidInr
+                        });
+                        setCertificateModalOpen(false);
+                      } else {
+                        window.print();
+                      }
+                    }}
+                  >
+                    Crystal Reports Print
+                  </button>
+                  <button className="ids-btn-classic" onClick={() => window.print()}>
+                    Quick Print
                   </button>
                   <button className="ids-btn-classic" onClick={() => setCertificateModalOpen(false)}>
                     Close

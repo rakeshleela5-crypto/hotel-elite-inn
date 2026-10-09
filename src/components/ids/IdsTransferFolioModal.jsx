@@ -284,7 +284,7 @@ export default function IdsTransferFolioModal({
           }}
         >
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, color: '#0A246A' }}>Video 25 Views:</span>
+            <span style={{ fontWeight: 700, color: '#0A246A' }}>Folio Views:</span>
             <button
               className="ids-btn-classic"
               style={{
@@ -295,7 +295,7 @@ export default function IdsTransferFolioModal({
               }}
               onClick={() => setCurrentView('transfer-folios')}
             >
-              1. Transfer Folios Dialog (Frames 065–085)
+              1. Transfer Folios Dialog
             </button>
             <button
               className="ids-btn-classic"
@@ -306,7 +306,7 @@ export default function IdsTransferFolioModal({
               }}
               onClick={() => setCurrentView('view-bill-source')}
             >
-              2. Source Room {fromRoomNo} Bill (Frame 110)
+              2. Source Room {fromRoomNo} Bill
             </button>
             <button
               className="ids-btn-classic"
@@ -318,7 +318,7 @@ export default function IdsTransferFolioModal({
               }}
               onClick={() => setCurrentView('view-bill-destination')}
             >
-              3. Destination Room {toRoomNo} Bill (Frame 135)
+              3. Destination Room {toRoomNo} Bill
             </button>
           </div>
 
@@ -897,7 +897,7 @@ export default function IdsTransferFolioModal({
             System Date: <strong>{accountingDate}</strong> | User: <strong>IT ADMIN</strong>
           </div>
           <div>
-            IDS Fortune NEXT V6.5.002.1 • Video 25 (Transfer Folio from one room to another)
+            IDS Fortune NEXT V6.5.002.1 • Transfer Folio Transaction
           </div>
         </div>
       </div>

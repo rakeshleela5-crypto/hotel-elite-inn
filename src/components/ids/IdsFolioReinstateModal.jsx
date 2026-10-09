@@ -251,7 +251,7 @@ export default function IdsFolioReinstateModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#D9534F', fontWeight: 700 }}>
             <AlertTriangle size={15} color="#D9534F" />
-            <span>Operational Rule (Video 26 Frame 035): Before doing Folio Reinstate make sure your room is clean.</span>
+            <span>Operational Rule: Before performing Folio Reinstate, make sure your room is clean.</span>
           </div>
 
           <div style={{ display: 'flex', gap: '6px' }}>

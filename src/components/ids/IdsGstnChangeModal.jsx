@@ -103,7 +103,8 @@ export const COMPANY_LOOKUP_DATABASE = [
 export default function IdsGstnChangeModal({
   isOpen,
   onClose,
-  accountingDate = '25-MAR-2022'
+  accountingDate = '25-MAR-2022',
+  onOpenCrystalReport
 }) {
   const [activeModuleTab, setActiveModuleTab] = useState('Front Office');
   const [billsList, setBillsList] = useState(INITIAL_CHECKED_OUT_BILLS);
@@ -630,8 +631,36 @@ export default function IdsGstnChangeModal({
                 </table>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '14px' }}>
-                  <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => window.print()}>
-                    Print Updated Tax Invoice
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontWeight: 700, background: '#DCE6F1' }} 
+                    onClick={() => {
+                      if (onOpenCrystalReport) {
+                        onOpenCrystalReport('rule46-bill', {
+                          billNo: selectedBill.billNo,
+                          billDate: selectedBill.billDate,
+                          roomNo: selectedBill.roomNo,
+                          guestName: selectedBill.guestName,
+                          companyName: selectedBill.newCompanyName || newCompanyName,
+                          gstin: selectedBill.newGstn || newGstn,
+                          roomType: selectedBill.roomType,
+                          ratePlan: 'EP',
+                          roomTariff: selectedBill.roomTariff,
+                          cgst: selectedBill.cgst,
+                          sgst: selectedBill.sgst,
+                          grandTotal: selectedBill.totalAmount,
+                          payMode: 'Cash'
+                        });
+                        setInvoicePreviewOpen(false);
+                      } else {
+                        window.print();
+                      }
+                    }}
+                  >
+                    Crystal Reports Print
+                  </button>
+                  <button className="ids-btn-classic" onClick={() => window.print()}>
+                    Quick Print
                   </button>
                   <button className="ids-btn-classic" onClick={() => setInvoicePreviewOpen(false)}>
                     Close

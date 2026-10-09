@@ -913,8 +913,8 @@ export default function IdsPostChargesModal({
               {/* Header */}
               <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '8px', marginBottom: '12px' }}>
                 <h2 style={{ margin: 0, fontSize: '16px', letterSpacing: '1px' }}>HOTEL ELITE INN</h2>
-                <div style={{ fontSize: '10px' }}>Old Market Road, Tawang, Arunachal Pradesh - 790104</div>
-                <div style={{ fontSize: '10px' }}>GSTIN: 12AAAAA0000A1Z5 | Phone: +91 3794 224488</div>
+                <div style={{ fontSize: '10px' }}>Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020</div>
+                <div style={{ fontSize: '10px' }}>GSTIN: 21AEWFS9433F1ZN | State Code: 21 | Phone: +91-6370757541</div>
                 <div style={{ fontWeight: 700, marginTop: '6px', fontSize: '13px', textDecoration: 'underline' }}>
                   FRONT OFFICE CHARGE VOUCHER
                 </div>

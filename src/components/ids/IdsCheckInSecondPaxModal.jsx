@@ -330,7 +330,7 @@ export default function IdsCheckInSecondPaxModal({
                   }}
                 >
                   <div style={{ fontSize: '10px', color: '#555', marginBottom: '4px', fontWeight: 600, display: 'flex', justifyContent: 'space-between' }}>
-                    <span>⭐ 2nd Pax Details Entry (Video 22 Frame 058):</span>
+                    <span>2nd Pax Registration Details:</span>
                     <span style={{ color: '#0A246A' }}>Room is currently occupied by 1 Pax (1/0)</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '60px 140px 110px 1fr', gap: '6px', alignItems: 'center' }}>

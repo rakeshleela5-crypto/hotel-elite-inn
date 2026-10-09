@@ -125,7 +125,8 @@ export const INITIAL_BILLS_DATABASE = [
 export default function IdsReprintBillModal({
   isOpen,
   onClose,
-  accountingDate = '24-FEB-2022'
+  accountingDate = '24-FEB-2022',
+  onOpenCrystalReport
 }) {
   const [stage, setStage] = useState('input'); // 'input' | 'details'
   const [monthYear, setMonthYear] = useState('FEB-2022');
@@ -353,9 +354,38 @@ export default function IdsReprintBillModal({
               <button 
                 className="ids-btn-classic" 
                 style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1', display: 'flex', alignItems: 'center', gap: '4px' }}
+                onClick={() => {
+                  if (onOpenCrystalReport) {
+                    onOpenCrystalReport('rule46-bill', {
+                      billNo: activeBill.billNo,
+                      billDate: activeBill.billDate,
+                      roomNo: activeBill.roomNo,
+                      guestName: activeBill.guestName,
+                      companyName: activeBill.companyName,
+                      gstin: activeBill.gstin,
+                      arrivalDate: activeBill.arrivalDate,
+                      departureDate: activeBill.departureDate,
+                      roomType: activeBill.roomType,
+                      ratePlan: activeBill.ratePlan,
+                      roomTariff: activeBill.baseAmount || 4500,
+                      cgst: activeBill.cgst || 270,
+                      sgst: activeBill.sgst || 270,
+                      grandTotal: activeBill.netAmount || 5040,
+                      payMode: activeBill.payMode
+                    });
+                  } else {
+                    setPrintPreviewOpen(true);
+                  }
+                }}
+              >
+                <Printer size={12} /> Crystal Reports Print
+              </button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
                 onClick={() => setPrintPreviewOpen(true)}
               >
-                <Printer size={12} /> Print
+                Quick Preview
               </button>
               <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
               <button 

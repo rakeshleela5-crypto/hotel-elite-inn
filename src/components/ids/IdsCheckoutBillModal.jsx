@@ -109,7 +109,8 @@ export default function IdsCheckoutBillModal({
   initialMode = 'checkout', // 'checkout' | 'bulk' | 'settlement'
   onCompleteCheckout,
   onCompleteBulkCheckout,
-  checkedOutRooms = []
+  checkedOutRooms = [],
+  onOpenCrystalReport
 }) {
   // Navigation View: 'selector' | 'bill-summary' | 'settlements'
   const [activeScreen, setActiveScreen] = useState(
@@ -1080,10 +1081,10 @@ export default function IdsCheckoutBillModal({
                         ForeignExchange: 0,
                         Complimentary: 0
                       });
-                      setStatusMessage('Applied Video 16: Credit Card VISA ₹33,320.00 (Frame 058)');
+                      setStatusMessage('Applied settlement: Credit Card VISA ₹33,320.00');
                     }}
                   >
-                    ★ Video 16 Credit Card VISA ₹33,320.00
+                    ★ Fast-Fill Card: VISA ₹33,320.00
                   </button>
                   <button 
                     className="ids-btn-classic" 
@@ -1121,10 +1122,10 @@ export default function IdsCheckoutBillModal({
                         ForeignExchange: 0,
                         Complimentary: 0
                       });
-                      setStatusMessage('Applied Video 15 Split: Cash ₹724.00 + Credit Card ₹4,000.00');
+                      setStatusMessage('Applied split settlement: Cash ₹724.00 + Credit Card ₹4,000.00');
                     }}
                   >
-                    Video 15 Split: Cash ₹724 + Card ₹4,000
+                    ★ Split Settle: Cash ₹724 + Card ₹4,000
                   </button>
                   <button 
                     className="ids-btn-classic" 
@@ -1551,11 +1552,30 @@ export default function IdsCheckoutBillModal({
                   style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
                   onClick={() => {
                     setCrystalPrintSuccess(true);
-                    setStatusMessage(`Bill # ${settlementBillNo} printed via Crystal Reports.`);
-                    setTimeout(() => {
+                    setStatusMessage(`Bill # ${settlementBillNo} rendered in Crystal Reports 8.5/9.0.`);
+                    if (onOpenCrystalReport) {
+                      onOpenCrystalReport('rule46-bill', {
+                        billNo: settlementBillNo,
+                        billDate: '25-JAN-2022',
+                        roomNo: isGroupMode ? '406 (Sharma Group)' : currentRoom,
+                        guestName: isGroupMode ? 'SHARMA GROUP (10 ROOMS)' : billData.guestName,
+                        companyName: isGroupMode ? 'M/S. ALKEM LABS. LTD.' : 'Corporate FIT',
+                        gstin: isGroupMode ? '27AABCA1234F1Z8' : '',
+                        roomType: isGroupMode ? 'EXE' : (billData.roomType || 'EXE'),
+                        ratePlan: 'CP',
+                        roomTariff: isGroupMode ? 29750.00 : (billData.rate || 3500.00),
+                        cgst: isGroupMode ? 1785.00 : 210.00,
+                        sgst: isGroupMode ? 1785.00 : 210.00,
+                        grandTotal: totalBillNet,
+                        payMode: Object.keys(settlementOptions).filter(k => settlementOptions[k] > 0).join(', ') || 'Cash'
+                      });
                       setPrintCrystalOpen(false);
-                      setCrystalPrintSuccess(false);
-                    }, 1200);
+                    } else {
+                      setTimeout(() => {
+                        setPrintCrystalOpen(false);
+                        setCrystalPrintSuccess(false);
+                      }, 1200);
+                    }
                   }}
                 >
                   Print

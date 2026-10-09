@@ -19,7 +19,8 @@ export default function IdsPostDepositModal({
   initialRoomNo = '201',
   inhouseGuests = [],
   onOpenRoomHelpLookup,
-  onSaveDeposit
+  onSaveDeposit,
+  onOpenCrystalReport
 }) {
   const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo);
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -109,7 +110,22 @@ export default function IdsPostDepositModal({
     }
 
     if (shouldPrint) {
-      setShowVoucherPreview(true);
+      if (onOpenCrystalReport) {
+        onOpenCrystalReport('advance-receipt', {
+          receiptNo,
+          date: '17-JAN-2022 19:13',
+          roomNo: selectedGuest?.roomNo || selectedRoomNo,
+          folioNo: selectedGuest?.folioNo || '1',
+          guestName: selectedGuest?.guestName || 'Mr Kumar Anil',
+          companyName: selectedGuest?.companyName || 'Varun Beverages Ltd',
+          amount: parsedAmount,
+          paymentMode,
+          particulars
+        });
+        onClose();
+      } else {
+        setShowVoucherPreview(true);
+      }
     } else {
       setSaveSuccessNotice(true);
       setTimeout(() => {
@@ -558,8 +574,8 @@ export default function IdsPostDepositModal({
                 {/* Voucher Header */}
                 <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '8px', marginBottom: '12px' }}>
                   <h2 style={{ margin: 0, fontSize: '16px', letterSpacing: '1px' }}>HOTEL ELITE INN</h2>
-                  <div style={{ fontSize: '10px' }}>Old Market Road, Tawang, Arunachal Pradesh - 790104</div>
-                  <div style={{ fontSize: '10px' }}>GSTIN: 12AAAAA0000A1Z5 | Phone: +91 3794 224488</div>
+                  <div style={{ fontSize: '10px' }}>Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020</div>
+                  <div style={{ fontSize: '10px' }}>GSTIN: 21AEWFS9433F1ZN | State Code: 21 | Phone: +91-6370757541</div>
                   <div style={{ fontWeight: 700, marginTop: '6px', fontSize: '13px', textDecoration: 'underline' }}>
                     FRONT OFFICE DEPOSIT RECEIPT VOUCHER
                   </div>
@@ -632,12 +648,37 @@ export default function IdsPostDepositModal({
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
                   <button 
                     className="ids-btn-classic" 
-                    style={{ fontWeight: 700, padding: '4px 14px' }}
+                    style={{ fontWeight: 700, padding: '4px 14px', background: '#DCE6F1' }}
+                    onClick={() => {
+                      if (onOpenCrystalReport) {
+                        onOpenCrystalReport('advance-receipt', {
+                          receiptNo,
+                          date: '17-JAN-2022 19:13',
+                          roomNo: selectedGuest?.roomNo || selectedRoomNo,
+                          folioNo: selectedGuest?.folioNo || '1',
+                          guestName: selectedGuest?.guestName || 'Mr Kumar Anil',
+                          companyName: selectedGuest?.companyName || 'Varun Beverages Ltd',
+                          amount: parseFloat(receivedAmount) || 2000,
+                          paymentMode,
+                          particulars
+                        });
+                        setShowVoucherPreview(false);
+                        onClose();
+                      } else {
+                        window.print();
+                      }
+                    }}
+                  >
+                    Crystal Reports Print
+                  </button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ padding: '4px 14px' }}
                     onClick={() => {
                       window.print();
                     }}
                   >
-                    🖨️ Print Voucher
+                    Quick Print
                   </button>
                   <button 
                     className="ids-btn-classic" 
