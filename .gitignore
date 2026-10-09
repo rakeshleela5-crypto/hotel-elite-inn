@@ -33,6 +33,10 @@ recordings/
 *.wav
 !.agents/rules/
 
-# Raw Screenshots Cache
+# Raw Screenshots & Video Cache
 screenshots/
 scratch/
+videos/**/*.mp4
+videos/*.mp4
+videos/frames/
+!videos/**/PLAYLIST_CATALOG.md

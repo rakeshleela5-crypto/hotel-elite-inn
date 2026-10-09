@@ -1,0 +1,489 @@
+/* IDS FORTUNE NEXT 6.5 & 7.0 AUTHENTIC DESKTOP GUI STYLES */
+
+.ids-desktop-container {
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  font-size: 11px;
+  color: #000000;
+  user-select: none;
+  background-color: #2F3935;
+  background-image: radial-gradient(circle at 50% 50%, #3B4B43 0%, #1A221E 100%);
+  min-height: 100vh;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: auto;
+}
+
+/* Master IDS Application Window */
+.ids-window {
+  width: 100%;
+  max-width: 1380px;
+  background-color: #ECE9D8;
+  border: 1px solid #716F64;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 3px 3px 0 0;
+}
+
+/* Window Title Bar */
+.ids-titlebar {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 60%, #D4D0C8 100%);
+  border-bottom: 1px solid #999488;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333333;
+}
+
+.ids-titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ids-logo-badge {
+  background: #A02020;
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+.ids-titlebar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.ids-win-btn {
+  width: 22px;
+  height: 20px;
+  background: #ECE9D8;
+  border: 1px solid #716F64;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  color: #333;
+}
+.ids-win-btn:hover {
+  background: #E0DEC8;
+}
+.ids-win-btn.close:hover {
+  background: #E81123;
+  color: #FFFFFF;
+}
+
+/* Menu Bar */
+.ids-menubar {
+  background: #ECE9D8;
+  border-bottom: 1px solid #D0CDC0;
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 16px;
+  font-size: 11px;
+}
+
+.ids-menu-item {
+  cursor: pointer;
+  padding: 2px 6px;
+  color: #222;
+}
+.ids-menu-item:hover {
+  background: #316AC5;
+  color: #FFF;
+}
+
+/* Sub-Info Bar */
+.ids-subbar {
+  background: #E2DFCE;
+  border-bottom: 1px solid #C4C0AE;
+  padding: 3px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Top Horizontal Icon Strip */
+.ids-icon-toolbar {
+  background: #8F9E78;
+  background: linear-gradient(180deg, #9CAD84 0%, #7F8E69 100%);
+  border-bottom: 2px solid #5A664A;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.ids-tool-btn {
+  width: 44px;
+  height: 42px;
+  background: #3A4232;
+  border: 1px solid #282E23;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #DDE5D0;
+  transition: all 0.1s ease;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.3);
+  padding: 0;
+}
+.ids-tool-btn:hover {
+  background: #4E5944;
+  color: #FFFFFF;
+}
+.ids-tool-btn.active {
+  background: #73A72E;
+  background: linear-gradient(180deg, #8BC239 0%, #689626 100%);
+  border-color: #4B6E18;
+  color: #FFFFFF;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Main Body Layout: Left Master, Middle Submenu, Right Statistics */
+.ids-main-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  min-height: 520px;
+  background: #ECE9D8;
+}
+
+.ids-column-header {
+  background: #DFDBC9;
+  border-bottom: 1px solid #B0AB9A;
+  padding: 6px 10px;
+  font-weight: 800;
+  font-size: 12px;
+  text-align: center;
+  color: #333333;
+  letter-spacing: 0.5px;
+}
+
+/* Left Master Menu Tree */
+.ids-master-menu {
+  border-right: 1px solid #B0AB9A;
+  background: #EDEAE0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ids-master-item {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111111;
+  cursor: pointer;
+  border-bottom: 1px solid #E2DFD3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ids-master-item:hover {
+  background: #DFDBC7;
+}
+.ids-master-item.selected {
+  background: #D5D1BD;
+  border: 1px dotted #444444;
+  border-left: 3px solid #73A72E;
+}
+
+/* Middle Submenu Panel */
+.ids-submenu-panel {
+  background: #FFFFFF;
+  border-right: 1px solid #B0AB9A;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ids-submenu-item {
+  padding: 7px 16px;
+  font-size: 12px;
+  color: #000000;
+  cursor: pointer;
+  border-bottom: 1px solid #F0F0F0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ids-submenu-item:hover {
+  background: #316AC5;
+  color: #FFFFFF;
+}
+.ids-submenu-item.active {
+  background: #316AC5;
+  color: #FFFFFF;
+}
+
+/* Right Statistics Counter Grid */
+.ids-statistics-panel {
+  background: #EDEAE0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ids-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #C4C0AE;
+}
+
+.ids-stat-card {
+  border-right: 1px solid #C4C0AE;
+  border-bottom: 1px solid #C4C0AE;
+  padding: 10px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+}
+.ids-stat-card:nth-child(2n) {
+  border-right: none;
+}
+
+.ids-stat-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: #BD5317;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.ids-stat-val.green {
+  color: #2E7D32;
+}
+.ids-stat-val.orange {
+  color: #D35400;
+}
+.ids-stat-lbl {
+  font-size: 10px;
+  color: #666655;
+  line-height: 1.2;
+}
+
+/* Bottom Command Strip */
+.ids-bottom-commands {
+  background: #DFDBC9;
+  border-top: 2px solid #B0AB9A;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.ids-btn-classic {
+  background: #ECE9D8;
+  border: 2px outset #FFFFFF;
+  border-right-color: #716F64;
+  border-bottom-color: #716F64;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #000000;
+  min-width: 65px;
+  text-align: center;
+  box-sizing: border-box;
+}
+.ids-btn-classic:active {
+  border: 2px inset #716F64;
+  border-right-color: #FFFFFF;
+  border-bottom-color: #FFFFFF;
+  padding: 4px 11px 2px 13px;
+}
+
+/* Modal Popup Window Frame */
+.ids-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 12px;
+}
+
+.ids-dialog-window {
+  background: #ECE9D8;
+  border: 2px outset #FFFFFF;
+  border-right-color: #555544;
+  border-bottom-color: #555544;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-height: 92vh;
+  overflow: hidden;
+}
+
+.ids-dialog-titlebar {
+  background: linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ids-dialog-titlebar.plain {
+  background: #ECE9D8;
+  color: #000000;
+  border-bottom: 1px solid #B0AB9A;
+}
+
+/* Inset inputs and tables */
+.ids-input {
+  border: 1px solid #7F9DB9;
+  background: #FFFFFF;
+  color: #000000;
+  font-size: 11px;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  padding: 2px 4px;
+  box-sizing: border-box;
+}
+.ids-input:focus {
+  outline: 1px solid #316AC5;
+}
+
+.ids-select {
+  border: 1px solid #7F9DB9;
+  background: #FFFFFF;
+  font-size: 11px;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  padding: 2px 2px;
+  box-sizing: border-box;
+}
+
+.ids-grid-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #FFFFFF;
+  border: 1px solid #7F9DB9;
+  font-size: 11px;
+}
+.ids-grid-table th {
+  background: #DFDBC9;
+  border: 1px solid #C4C0AE;
+  padding: 3px 6px;
+  font-weight: 700;
+  text-align: left;
+}
+.ids-grid-table td {
+  border: 1px solid #E0DEC8;
+  padding: 2px 6px;
+  color: #000000;
+}
+.ids-grid-table tr:hover td {
+  background: #E8F0FE;
+}
+.ids-grid-table tr.selected td {
+  background: #316AC5;
+  color: #FFFFFF;
+}
+
+/* Dialog Action Ribbon Buttons (+, Edit, Del, Help, Building, Group, Checkin, Search) */
+.ids-dialog-top-tools {
+  background: #ECE9D8;
+  border-bottom: 1px solid #B0AB9A;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ids-dialog-action-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.ids-dialog-action-icon:hover {
+  background: #DFDBC9;
+  border-color: #B0AB9A;
+}
+
+/* Floppy Disk Save & Big X Cancel Buttons */
+.ids-icon-save-btn {
+  background: #ECE9D8;
+  border: 2px outset #FFFFFF;
+  border-right-color: #716F64;
+  border-bottom-color: #716F64;
+  width: 44px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.ids-icon-save-btn:active {
+  border: 2px inset #716F64;
+}
+
+.ids-icon-cancel-btn {
+  background: #ECE9D8;
+  border: 2px outset #FFFFFF;
+  border-right-color: #716F64;
+  border-bottom-color: #716F64;
+  width: 44px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 900;
+  color: #333333;
+}
+.ids-icon-cancel-btn:active {
+  border: 2px inset #716F64;
+}
+
+.ids-icon-next-btn {
+  background: #ECE9D8;
+  border: 2px outset #FFFFFF;
+  border-right-color: #716F64;
+  border-bottom-color: #716F64;
+  width: 44px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 900;
+  color: #111111;
+}
+.ids-icon-next-btn:active {
+  border: 2px inset #716F64;
+}

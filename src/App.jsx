@@ -33,6 +33,7 @@ const VirtualTour360Modal = lazyWithRetry(() => import('./components/VirtualTour
 const BookingModal = lazyWithRetry(() => import('./components/BookingModal'));
 const BookingReceiptModal = lazyWithRetry(() => import('./components/BookingReceiptModal'));
 const ReceptionAdmin = lazyWithRetry(() => import('./components/ReceptionAdmin'));
+const IdsDesktopShell = lazyWithRetry(() => import('./components/ids/IdsDesktopShell'));
 const FinancialAnalytics = lazyWithRetry(() => import('./components/FinancialAnalytics'));
 const CaFilingStationModal = lazyWithRetry(() => import('./components/CaFilingStationModal'));
 const AutonomousBotFleetModal = lazyWithRetry(() => import('./components/AutonomousBotFleetModal'));
@@ -1236,46 +1237,11 @@ export default function App() {
         ) : (
           <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center', color: 'var(--gold-glow)' }}>Loading Front Desk PMS...</div>}>
             <ErrorBoundary onExit={() => setCurrentView('guest')}>
-              <ReceptionAdmin 
+              <IdsDesktopShell 
                 rooms={rooms}
                 bookings={bookings}
-                transactions={transactions}
-                initialTab={pmsInitialTab}
-                onAddTransaction={handleAddTransaction}
-                onUpdateRoomStatus={handleUpdateRoomStatus}
-                onShiftRoomTransactions={(fromRoom, toRoom) => {
-                  setTransactions(prev => prev.map(t => String(t.roomNumber) === String(fromRoom) ? { ...t, roomNumber: toRoom, folioId: `FOLIO-${toRoom}`, description: `${t.description} (Shifted from Rm ${fromRoom})` } : t));
-                }}
-                onNewBooking={handleBookingSuccess}
-                onUpdateBooking={(updated) => {
-                  if (updated && (updated.bookingId || updated.id)) {
-                    const bId = updated.bookingId || updated.id;
-                    setBookings(prev => prev.map(b => (b.bookingId === bId || b.id === bId || b.roomNumber === updated.roomNumber) ? { ...b, ...updated } : b));
-                  }
-                }}
-                onRunNightAudit={handleRunNightAudit}
                 onExitPMS={() => setCurrentView('guest')}
-                onOpenMasterFolio={handleOpenMasterFolio}
-                onOpenRestaurantPOS={() => setPosModalOpen(true)}
-                onOpenAccountsLedger={(tab) => handleOpenAccountsWithTab(tab || 'tally-erp')}
-                onOpenStoreInventory={() => setStoreInventoryModalOpen(true)}
-                onOpenNightAuditModal={() => setNightAuditModalOpen(true)}
-                onOpenDirectorPortal={() => setDirectorPortalOpen(true)}
-                onOpenRevenueManagement={() => setRevenueModalOpen(true)}
-                onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
-                onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
-                onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
-                onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
-                onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
-                onOpenBookingModal={(params) => {
-                  const targetTier = params?.tier ? ROOM_TIERS.find(t => t.name === params.tier || t.id === params.tier) || ROOM_TIERS[0] : ROOM_TIERS[0];
-                  handleOpenBooking(targetTier, params?.roomNumber, params?.checkInDate, params?.checkOutDate);
-                }}
-                nightAudits={nightAudits}
-                foodOrders={foodOrders}
-                onUpdateOrderStatus={handleUpdateOrderStatus}
-                roomServices={roomServices}
-                onAddRoomService={handleRequestRoomServiceFromGuestPortal}
+                onNewBooking={handleBookingSuccess}
               />
             </ErrorBoundary>
           </Suspense>
