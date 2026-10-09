@@ -26,6 +26,13 @@ import {
 import IdsExpressCheckInModal from './IdsExpressCheckInModal';
 import IdsClearRoomsModal from './IdsClearRoomsModal';
 import IdsQuickScanModal from './IdsQuickScanModal';
+import { 
+  IdsGuestManagementModal, 
+  IdsRoomHelpLookupModal, 
+  IdsChangeGuestInfoModal, 
+  IdsGuestInformationModal, 
+  INITIAL_INHOUSE_GUESTS 
+} from './IdsGuestManagementModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -197,6 +204,14 @@ export default function IdsDesktopShell({
   const [quickScanModalOpen, setQuickScanModalOpen] = useState(false);
   const [clearedDirtyRooms, setClearedDirtyRooms] = useState([]);
 
+  // Video 10: Guest Management & Change Guest Details States (Frames 008–072)
+  const [guestManagementOpen, setGuestManagementOpen] = useState(false);
+  const [roomHelpLookupOpen, setRoomHelpLookupOpen] = useState(false);
+  const [changeGuestInfoOpen, setChangeGuestInfoOpen] = useState(false);
+  const [guestInformationModalOpen, setGuestInformationModalOpen] = useState(false);
+  const [inhouseGuestsList, setInhouseGuestsList] = useState(INITIAL_INHOUSE_GUESTS);
+  const [selectedGuestForEdit, setSelectedGuestForEdit] = useState(INITIAL_INHOUSE_GUESTS[0]);
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058 sync)
   const stats = useMemo(() => {
     const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
@@ -330,10 +345,10 @@ export default function IdsDesktopShell({
       { label: 'Walk-ins', videoId: '17', action: () => openTutorial('17') },
       { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
       { label: 'Room Floor Plan Display', videoId: '33', action: () => openTutorial('33') },
-      { label: 'Guest Management', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Guest Management', videoId: '10', action: () => setGuestManagementOpen(true) },
       { label: 'Guest Services', videoId: '21', action: () => openTutorial('21') },
-      { label: 'Guest Photo (In-House)', videoId: '10', action: () => openTutorial('10') },
-      { label: 'Guest Photo Reg. Card', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Guest Photo (In-House)', videoId: '10', action: () => setRoomHelpLookupOpen(true) },
+      { label: 'Guest Photo Reg. Card', videoId: '10', action: () => setRoomHelpLookupOpen(true) },
       { label: 'Guest Reg Card (Crystal)', videoId: '35', action: () => openTutorial('35') },
       { label: 'Invoice by Arrival', videoId: '36', action: () => openTutorial('36') },
       { label: 'Mask Guests', videoId: '10', action: () => openTutorial('10') },
@@ -357,7 +372,14 @@ export default function IdsDesktopShell({
     'House Keeping..': [
       { label: 'House Keeping Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
       { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setClearRoomsModalOpen(true) },
-      { label: 'Change Guest Details In-House', videoId: '10', action: () => openTutorial('10') },
+      { 
+        label: 'Change Guest Details In-House', 
+        videoId: '10', 
+        action: () => {
+          setSelectedGuestForEdit(inhouseGuestsList.find(g => g.roomNo === '301') || inhouseGuestsList[0]);
+          setChangeGuestInfoOpen(true);
+        } 
+      },
       { label: 'Modify Guest Departure / Extension', videoId: '12', action: () => openTutorial('12') },
       { label: 'Room Transfer / Shift', videoId: '13', action: () => openTutorial('13') },
       { label: 'Add Room Numbers in Room Status', videoId: '33', action: () => openTutorial('33') },
@@ -989,7 +1011,13 @@ export default function IdsDesktopShell({
           <button className="ids-btn-classic">Events</button>
           <button className="ids-btn-classic">Last Updated</button>
           <button className="ids-btn-classic">To-Do</button>
-          <button className="ids-btn-classic">GI</button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => setGuestInformationModalOpen(true)}
+            title="Guest Information Lookup (Video 10 Frame 068)"
+          >
+            GI
+          </button>
           <button 
             className="ids-btn-classic" 
             onClick={() => setQuickScanModalOpen(true)}
@@ -1296,6 +1324,12 @@ export default function IdsDesktopShell({
             setRoomRackConsoleOpen(true);
           } else if (programId === 'clear-rooms') {
             setClearRoomsModalOpen(true);
+          } else if (programId === 'guest-management') {
+            setGuestManagementOpen(true);
+          } else if (programId === 'guest-information') {
+            setGuestInformationModalOpen(true);
+          } else if (programId === 'change-guest-info') {
+            setRoomHelpLookupOpen(true);
           } else if (programId === 'express-checkin') {
             setExpressCheckInOpen(true);
           } else if (programId === 'reservation-checkin') {
@@ -1305,6 +1339,52 @@ export default function IdsDesktopShell({
             setQuickReservationOpen(true);
           }
         }}
+      />
+
+      {/* Video 10: Guest Management Modal (Frame 012) */}
+      <IdsGuestManagementModal 
+        isOpen={guestManagementOpen}
+        onClose={() => setGuestManagementOpen(false)}
+        onOpenChangeGuestInfo={() => {
+          setGuestManagementOpen(false);
+          setRoomHelpLookupOpen(true);
+        }}
+        onOpenRoomTransfer={() => {
+          // Future Room Transfer
+        }}
+        onOpenAmendStay={() => {
+          // Future Amend Stay
+        }}
+      />
+
+      {/* Video 10: Room Help Lookup Modal (Frame 016) */}
+      <IdsRoomHelpLookupModal 
+        isOpen={roomHelpLookupOpen}
+        onClose={() => setRoomHelpLookupOpen(false)}
+        guests={inhouseGuestsList}
+        onSelectGuest={(guest) => {
+          setSelectedGuestForEdit(guest);
+          setRoomHelpLookupOpen(false);
+          setChangeGuestInfoOpen(true);
+        }}
+      />
+
+      {/* Video 10: Change Guest Information Modal (Frames 022–060) */}
+      <IdsChangeGuestInfoModal 
+        isOpen={changeGuestInfoOpen}
+        onClose={() => setChangeGuestInfoOpen(false)}
+        guest={selectedGuestForEdit}
+        onSaveGuest={(updated) => {
+          setInhouseGuestsList(prev => prev.map(g => g.roomNo === updated.roomNo ? updated : g));
+          setSelectedGuestForEdit(updated);
+        }}
+      />
+
+      {/* Video 10: Guest Information Shortcut Modal ("GI" Frame 068) */}
+      <IdsGuestInformationModal 
+        isOpen={guestInformationModalOpen}
+        onClose={() => setGuestInformationModalOpen(false)}
+        guests={inhouseGuestsList}
       />
 
       {/* Video 06, 07 & 08: Express Check-In Modal (Frames 012–060) */}

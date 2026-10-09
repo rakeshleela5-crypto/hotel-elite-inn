@@ -25,6 +25,9 @@ export default function IdsQuickScanModal({
     { id: 'housekeeping-room-status', label: 'House Keeping Room Status', code: 'HK01' },
     { id: 'room-status-reports', label: 'Room Status Reports', code: 'RSR01' },
     { id: 'room-sales', label: 'Room Sales', code: 'RS02' },
+    { id: 'guest-management', label: 'Guest Management', code: 'GM01' },
+    { id: 'guest-information', label: 'Guest Information', code: 'GI01' },
+    { id: 'change-guest-info', label: 'Change Guest Information', code: 'CG01' },
     { id: 'express-checkin', label: 'Express Check-in', code: 'EX01' },
     { id: 'reservation-checkin', label: 'Reservation Check-in', code: 'RC01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
