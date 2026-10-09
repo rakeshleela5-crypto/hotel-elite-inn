@@ -750,6 +750,7 @@ export function IdsRoomRackConsoleModal({
   onOpenAdditionalRoomRate,
   onOpenPostCharges,
   onOpenSecondPaxCheckIn,
+  onOpenBillAllowanceDayWise,
   onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
@@ -1415,7 +1416,24 @@ export function IdsRoomRackConsoleModal({
                     Change Tariff
                   </div>
 
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Bill Allowance</div>
+                  {/* Video 23: Bill Allowance Day Wise (Frames 015–022) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700, 
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenBillAllowanceDayWise) onOpenBillAllowanceDayWise(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Bill Allowance Day Wise (Video 23 Frame 020)"
+                  >
+                    Bill Allowance
+                  </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Consolidated Allowance</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>De-Link Rooms</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Link Fit Rooms to Groups</div>

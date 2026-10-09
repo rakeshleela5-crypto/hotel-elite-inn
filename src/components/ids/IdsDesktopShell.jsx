@@ -44,6 +44,7 @@ import IdsNightAuditModal from './IdsNightAuditModal';
 import IdsAdditionalRoomRateModal from './IdsAdditionalRoomRateModal';
 import IdsPostChargesModal from './IdsPostChargesModal';
 import IdsCheckInSecondPaxModal from './IdsCheckInSecondPaxModal';
+import IdsBillAllowanceDayWiseModal from './IdsBillAllowanceDayWiseModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -279,6 +280,10 @@ export default function IdsDesktopShell({
   const [secondPaxModalOpen, setSecondPaxModalOpen] = useState(false);
   const [selectedRoomForSecondPax, setSelectedRoomForSecondPax] = useState('312');
   const [secondPaxCheckedInRooms, setSecondPaxCheckedInRooms] = useState([]);
+
+  // Video 23: Bill Allowance Day Wise (Frames 015–115)
+  const [billAllowanceModalOpen, setBillAllowanceModalOpen] = useState(false);
+  const [selectedRoomForBillAllowance, setSelectedRoomForBillAllowance] = useState('311');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -582,7 +587,14 @@ export default function IdsDesktopShell({
           setPostChargesModalOpen(true);
         } 
       },
-      { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
+      { 
+        label: 'Bill Allowance Day Wise (Discount & GST Rebate)', 
+        videoId: '23', 
+        action: () => {
+          setSelectedRoomForBillAllowance('311');
+          setBillAllowanceModalOpen(true);
+        } 
+      },
       { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
       { label: 'Transfer Folio to Another Room', videoId: '25', action: () => openTutorial('25') },
       { label: 'Folio Reinstate Option', videoId: '26', action: () => openTutorial('26') },
@@ -1673,6 +1685,10 @@ export default function IdsDesktopShell({
           setSelectedRoomForSecondPax(roomNo || '312');
           setSecondPaxModalOpen(true);
         }}
+        onOpenBillAllowanceDayWise={(roomNo) => {
+          setSelectedRoomForBillAllowance(roomNo || '311');
+          setBillAllowanceModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1981,7 +1997,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '22') {
+          if (videoId === '23') {
+            setSelectedRoomForBillAllowance('311');
+            setBillAllowanceModalOpen(true);
+          } else if (videoId === '22') {
             setSelectedRoomForSecondPax('312');
             setSecondPaxModalOpen(true);
           } else if (videoId === '21') {
@@ -2108,6 +2127,25 @@ export default function IdsDesktopShell({
                 ...g,
                 pax: 2,
                 paxList: [g.guestName || 'MS BASU ANIRUDH', secondPaxRecord.name]
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 23: Bill Allowance Day Wise in IDS 6.5 & 7.0 (Frames 015–115) */}
+      <IdsBillAllowanceDayWiseModal 
+        isOpen={billAllowanceModalOpen}
+        onClose={() => setBillAllowanceModalOpen(false)}
+        initialRoomNo={selectedRoomForBillAllowance}
+        accountingDate={accountingDate}
+        onSaveAllowance={(allowanceData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === selectedRoomForBillAllowance) {
+              return {
+                ...g,
+                balance: Math.max(0, (g.balance || 3500) - (allowanceData.totalDisc || 500))
               };
             }
             return g;
