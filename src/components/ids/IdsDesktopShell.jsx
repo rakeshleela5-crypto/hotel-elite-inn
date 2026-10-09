@@ -16,6 +16,13 @@ import {
   IdsCancelVoucherPromptDialog, 
   IdsCancellationVoucherModal 
 } from './IdsCancelBookingModal';
+import { 
+  IdsReservationCheckinPromptModal, 
+  IdsCheckinGuestListModal, 
+  IdsCheckInRegistrationModal, 
+  IdsCheckedInPositionModal, 
+  IdsRoomRackConsoleModal 
+} from './IdsCheckInForms';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -129,25 +136,36 @@ export default function IdsDesktopShell({
   const [completedCancelRecord, setCompletedCancelRecord] = useState(null);
   const [cancellationContext, setCancellationContext] = useState({});
 
-  // Real-time statistics computed dynamically (Exact Frame 004 vs Frame 040 sync)
+  // Video 05: Check-In Workflow States
+  const [checkinPromptOpen, setCheckinPromptOpen] = useState(false);
+  const [selectedBookingForCheckin, setSelectedBookingForCheckin] = useState(null);
+  const [checkinGuestListOpen, setCheckinGuestListOpen] = useState(false);
+  const [checkInRegistrationOpen, setCheckInRegistrationOpen] = useState(false);
+  const [checkedInList, setCheckedInList] = useState([]);
+  const [detailedPositionOpen, setDetailedPositionOpen] = useState(false);
+  const [roomRackConsoleOpen, setRoomRackConsoleOpen] = useState(false);
+
+  // Real-time statistics computed dynamically (Frame 004 vs Frame 030 sync)
   const stats = useMemo(() => {
-    const activeArrivals = reservations.filter(r => !r.isCancelled && (r.status === 'Repeat Guest' || r.status === 'VIP' || r.status === 'Confirmed')).length;
-    const blockedCount = reservations.filter(r => !r.isCancelled && r.blocked).length;
-    const roomsToSellCount = 54 + (2 - blockedCount);
+    const activeArrivals = reservations.filter(r => !r.isCancelled && !r.isCheckedIn && (r.status === 'Repeat Guest' || r.status === 'VIP' || r.status === 'Confirmed')).length;
+    const blockedCount = reservations.filter(r => !r.isCancelled && !r.isCheckedIn && r.blocked).length;
+    const checkedInCount = checkedInList.length;
+    const inhouseRooms = 14 + checkedInCount;
+    const inhouseGuests = 21 + (checkedInCount * 2);
 
     return {
-      expectedArrivals: activeArrivals, // 2 -> 1 after Res 270 cancelled
+      expectedArrivals: activeArrivals, // 1 -> 0 after Check-in (or 2 -> 1 -> 0)
       expectedDepartures: 0,
-      checkInRooms: 0,
+      checkInRooms: checkedInCount,     // 0 -> 1 after Check-in
       walkInRooms: 0,
-      roomsToSell: roomsToSellCount, // 55 -> 56 after Res 270 cancelled
+      roomsToSell: 56,                  // 56
       registeredComplaints: 0,
-      inhouseRoomsGuests: '14/21',
+      inhouseRoomsGuests: `${inhouseRooms}/${inhouseGuests}`, // 14/21 -> 15/23
       extraAdultChild: '0/0',
       inhouseForeigners: '0/0',
-      guestBlocks: blockedCount // 2 -> 1 after Res 270 cancelled
+      guestBlocks: blockedCount         // 1 -> 0 after Check-in
     };
-  }, [reservations]);
+  }, [reservations, checkedInList]);
 
   // Master Menu Items (Frame 001 & 013)
   const masterMenuItems = [
@@ -195,10 +213,7 @@ export default function IdsDesktopShell({
       { 
         label: 'Room Rack Console', 
         videoId: '02', 
-        action: () => {
-          setScanPurpose('assign');
-          setScanBookingModalOpen(true);
-        } 
+        action: () => setRoomRackConsoleOpen(true) 
       },
       { label: 'Reserved Guest Messages', videoId: '01', action: () => openTutorial('01') },
       { 
@@ -213,7 +228,14 @@ export default function IdsDesktopShell({
     ],
     'Registrations..': [
       { label: 'Express Check-in', videoId: '06', action: () => openTutorial('06') },
-      { label: 'Reservation Check-in', videoId: '05', action: () => openTutorial('05') },
+      { 
+        label: 'Reservation Check-in', 
+        videoId: '05', 
+        action: () => {
+          setScanPurpose('checkin');
+          setScanBookingModalOpen(true);
+        } 
+      },
       { label: 'Walk-ins', videoId: '17', action: () => openTutorial('17') },
       { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
       { label: 'Room Floor Plan Display', videoId: '33', action: () => openTutorial('33') },
@@ -242,7 +264,7 @@ export default function IdsDesktopShell({
       { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
     ],
     'House Keeping..': [
-      { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => openTutorial('09') },
+      { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
       { label: 'Change Guest Details In-House', videoId: '10', action: () => openTutorial('10') },
       { label: 'Modify Guest Departure / Extension', videoId: '12', action: () => openTutorial('12') },
       { label: 'Room Transfer / Shift', videoId: '13', action: () => openTutorial('13') },
@@ -391,6 +413,56 @@ export default function IdsDesktopShell({
       setCancellationVoucherOpen(true);
     }
     setQuickReservationCancelOpen(false);
+  };
+
+  // Video 05: Check-In Workflow Handlers
+  const handleInitiateCheckin = (b) => {
+    setSelectedBookingForCheckin(b);
+    setCheckinPromptOpen(true);
+  };
+
+  const handleConfirmCheckinPrompt = () => {
+    setCheckinPromptOpen(false);
+    setCheckinGuestListOpen(true);
+  };
+
+  const handleSelectGuestForRegistration = (guest, idx) => {
+    setCheckinGuestListOpen(false);
+    setCheckInRegistrationOpen(true);
+  };
+
+  const handleCompleteCheckIn = (checkInData) => {
+    setCheckInRegistrationOpen(false);
+    const checkedInRecord = {
+      resNo: checkInData.resNo || '271',
+      roomNo: checkInData.roomNo || '516',
+      regNo: checkInData.regNo || '581',
+      type: selectedBookingForCheckin?.type || 'SUI',
+      guestName: `${checkInData.guest1?.title || 'Mr'} ${checkInData.guest1?.lastName || 'Biswakarma'} ${checkInData.guest1?.firstName || 'Santosh'}`,
+      companyName: selectedBookingForCheckin?.companyName || 'Mahindra & Mahindra Limited',
+      rate: checkInData.rate || '6,500.00',
+      planAmt: checkInData.planAmt || '700.00',
+      arrivalDate: checkInData.arrivalDate || '14-JAN-2022',
+      departureDate: checkInData.departureDate || '16-JAN-2022',
+      nation: 'IND',
+      user: 'MANAGER',
+      totalGuests: checkInData.totalGuests || 2
+    };
+
+    setCheckedInList(prev => [checkedInRecord, ...prev]);
+
+    // Update reservations state: mark as checked in, remove from pending arrivals, unblock
+    setReservations(prev => prev.map(r => {
+      if (r.resNo === checkInData.resNo) {
+        return {
+          ...r,
+          isCheckedIn: true,
+          status: 'Checked In',
+          blocked: false
+        };
+      }
+      return r;
+    }));
   };
 
   const currentSubList = subMenuMap[selectedMaster] || [];
@@ -615,8 +687,15 @@ export default function IdsDesktopShell({
               </div>
 
               {/* Row 2 */}
-              <div className="ids-stat-card">
-                <div className="ids-stat-val">{stats.checkInRooms}</div>
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Detailed Position - Already checked-in (Frame 032)"
+                onClick={() => setDetailedPositionOpen(true)}
+              >
+                <div className="ids-stat-val" style={{ color: stats.checkInRooms > 0 ? '#0066CC' : 'inherit' }}>
+                  {stats.checkInRooms}
+                </div>
                 <div className="ids-stat-lbl">Check-in Rooms</div>
               </div>
               <div className="ids-stat-card">
@@ -625,7 +704,12 @@ export default function IdsDesktopShell({
               </div>
 
               {/* Row 3 */}
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Room Status Rack Console (Frame 034)"
+                onClick={() => setRoomRackConsoleOpen(true)}
+              >
                 <div className="ids-stat-val green">{stats.roomsToSell}</div>
                 <div className="ids-stat-lbl">Rooms to sell</div>
               </div>
@@ -635,7 +719,12 @@ export default function IdsDesktopShell({
               </div>
 
               {/* Row 4 */}
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Room Status Rack Console (Frame 034)"
+                onClick={() => setRoomRackConsoleOpen(true)}
+              >
                 <div className="ids-stat-val orange">{stats.inhouseRoomsGuests}</div>
                 <div className="ids-stat-lbl">Inhouse<br />Rooms/Guests</div>
               </div>
@@ -730,6 +819,8 @@ export default function IdsDesktopShell({
             setAmendBookingModalOpen(true);
           } else if (scanPurpose === 'cancel') {
             handleInitiateCancel(b);
+          } else if (scanPurpose === 'checkin') {
+            handleInitiateCheckin(b);
           } else {
             setSelectedBookingForAssignment(b);
             setAssignRoomsModalOpen(true);
@@ -862,6 +953,49 @@ export default function IdsDesktopShell({
           }}
         />
       )}
+
+      {/* Video 05: Reservation Check-in Prompt Modal (Frame 008) */}
+      <IdsReservationCheckinPromptModal 
+        isOpen={checkinPromptOpen}
+        onClose={() => setCheckinPromptOpen(false)}
+        booking={selectedBookingForCheckin}
+        onContinue={handleConfirmCheckinPrompt}
+      />
+
+      {/* Video 05: Check-in Guest List Modal (Frame 010) */}
+      <IdsCheckinGuestListModal 
+        isOpen={checkinGuestListOpen}
+        onClose={() => setCheckinGuestListOpen(false)}
+        booking={selectedBookingForCheckin}
+        onSelectGuest={handleSelectGuestForRegistration}
+        onRelease={(b) => {
+          alert(`Room ${b?.roomNo || '516'} released from assignment.`);
+          setCheckinGuestListOpen(false);
+        }}
+      />
+
+      {/* Video 05: Check-In V6.5002.5 Main Registration Modal (Frames 012–028) */}
+      <IdsCheckInRegistrationModal 
+        isOpen={checkInRegistrationOpen}
+        onClose={() => setCheckInRegistrationOpen(false)}
+        booking={selectedBookingForCheckin}
+        onCompleteCheckIn={handleCompleteCheckIn}
+      />
+
+      {/* Video 05: Detailed Position - Already Checked-in Modal (Frame 032) */}
+      <IdsCheckedInPositionModal 
+        isOpen={detailedPositionOpen}
+        onClose={() => setDetailedPositionOpen(false)}
+        checkedInList={checkedInList}
+      />
+
+      {/* Video 05: Room Status V6.5.002.1 Rack Console Modal (Frame 034) */}
+      <IdsRoomRackConsoleModal 
+        isOpen={roomRackConsoleOpen}
+        onClose={() => setRoomRackConsoleOpen(false)}
+        occupiedRoom={checkedInList.length > 0 ? checkedInList[0].roomNo : '516'}
+        guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
+      />
 
       {/* Built-In 44-Video Tutorial Player Modal */}
       <IdsTutorialPlayerModal 
