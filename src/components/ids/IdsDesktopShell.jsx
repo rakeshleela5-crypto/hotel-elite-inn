@@ -61,6 +61,7 @@ import IdsRegularGuestWalkInModal from './IdsRegularGuestWalkInModal';
 import IdsCancelCheckInModal from './IdsCancelCheckInModal';
 import IdsDeleteDepositModal from './IdsDeleteDepositModal';
 import IdsPackageRatesModal from './IdsPackageRatesModal';
+import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -361,6 +362,10 @@ export default function IdsDesktopShell({
   // Video 40: Create / Sell Package Rates in IDS 6.5 & 7.0 (Frames 010–096)
   const [packageRatesModalOpen, setPackageRatesModalOpen] = useState(false);
   const [packageRatesInitialMode, setPackageRatesInitialMode] = useState('create');
+
+  // Video 41: Multi Rate Option (Weekday vs Weekend) in IDS 6.5 & 7.0 (Frames 010–045)
+  const [multiRateModalOpen, setMultiRateModalOpen] = useState(false);
+  const [selectedRoomForMultiRate, setSelectedRoomForMultiRate] = useState('201');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -878,7 +883,14 @@ export default function IdsDesktopShell({
           setPackageRatesModalOpen(true);
         } 
       },
-      { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
+      { 
+        label: 'Multi Rate Option (Weekday vs Weekend / Date-Wise)', 
+        videoId: '41', 
+        action: () => {
+          setSelectedRoomForMultiRate('201');
+          setMultiRateModalOpen(true);
+        } 
+      },
       { 
         label: 'Additional Room Rate Option (Plans / Extra Bed / Retention)', 
         videoId: '20', 
@@ -1998,6 +2010,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'package-rates' || programId === 'create-package-rates' || programId === 'sell-package-rates') {
             setPackageRatesInitialMode(programId.includes('sell') ? 'sell' : 'create');
             setPackageRatesModalOpen(true);
+          } else if (programId === 'multi-rate-option' || programId === 'multi-rate') {
+            setSelectedRoomForMultiRate('201');
+            setMultiRateModalOpen(true);
           }
         }}
       />
@@ -2246,7 +2261,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '40') {
+          if (videoId === '41') {
+            setSelectedRoomForMultiRate('201');
+            setMultiRateModalOpen(true);
+          } else if (videoId === '40') {
             setPackageRatesInitialMode('create');
             setPackageRatesModalOpen(true);
           } else if (videoId === '39') {
@@ -2710,6 +2728,32 @@ export default function IdsDesktopShell({
               rate: pkgBooking.rate,
               payMode: 'CAS',
               planCode: pkgBooking.planCode
+            },
+            ...prev
+          ]);
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
+        }}
+      />
+
+      {/* Video 41: Multi Rate Option (Weekday vs Weekend) in IDS 6.5 & 7.0 (Frames 010–045) */}
+      <IdsMultiRateModal 
+        isOpen={multiRateModalOpen}
+        onClose={() => setMultiRateModalOpen(false)}
+        initialRoomNo={selectedRoomForMultiRate}
+        accountingDate={accountingDate}
+        onMultiRateSaved={(multiRateData) => {
+          console.log('Multi-Rate Booking Saved:', multiRateData);
+          setWalkInCompletedList(prev => [
+            {
+              roomNo: multiRateData.roomNo,
+              guestName: multiRateData.guestName,
+              pax: 1,
+              folioNo: `${multiRateData.roomNo} / 1`,
+              rate: multiRateData.totalRate,
+              payMode: 'CAS',
+              planCode: multiRateData.planCode
             },
             ...prev
           ]);

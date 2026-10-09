@@ -73,6 +73,8 @@ export default function IdsQuickScanModal({
     { id: 'package-rates', label: 'Create / Sell Package Rates (Room Rate Master)', code: 'PR01' },
     { id: 'create-package-rates', label: 'Create Package Rates', code: 'PR02' },
     { id: 'sell-package-rates', label: 'Sell Package Rates (Room Booking / Walk-In)', code: 'PR03' },
+    { id: 'multi-rate-option', label: 'Multi Rate Option (Weekday vs Weekend)', code: 'MR01' },
+    { id: 'multi-rate', label: 'Multi Rate Option', code: 'MR02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 
