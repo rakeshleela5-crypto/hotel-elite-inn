@@ -3,7 +3,7 @@ import './idsFortuneNext.css';
 import { 
   Building2, Users, Calendar, DollarSign, Clock, RefreshCw, 
   Phone, Briefcase, Box, Utensils, Clipboard, Wrench, Settings,
-  LogOut, Play, Film, CheckCircle2, AlertCircle, Search, FileText
+  LogOut, Play, CheckCircle2, AlertCircle, Search, FileText
 } from 'lucide-react';
 import { IdsQuickReservationModal } from './IdsReservationForms';
 import { IdsScanBookingModal, IdsAssignGuestRoomsModal } from './IdsAssignRoomsModal';
@@ -1438,38 +1438,9 @@ export default function IdsDesktopShell({
                   }}
                 >
                   <span style={{ flex: 1 }}>{sub.label}</span>
-                  {sub.videoId && (
-                    <span 
-                      style={{ 
-                        fontSize: '9px', 
-                        background: '#ECE9D8', 
-                        color: '#333', 
-                        padding: '1px 6px', 
-                        borderRadius: '2px', 
-                        border: '1px solid #B0AB9A',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '3px'
-                      }}
-                      title={`Video ${sub.videoId} Screen Recording`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openTutorial(sub.videoId);
-                      }}
-                    >
-                      <Film size={10} color="#BD5317" />
-                      <span>Vid {sub.videoId}</span>
-                    </span>
-                  )}
                 </div>
               );
             })}
-
-            {/* Quick Helper Banner */}
-            <div style={{ marginTop: 'auto', padding: '12px', background: '#F5F3EB', borderTop: '1px solid #D5D1BD', fontSize: '11px', color: '#555' }}>
-              <div style={{ fontWeight: 700, color: '#333', marginBottom: '4px' }}>💡 Quick Action:</div>
-              <div>Click <strong>Room Booking</strong> to open the full Quick & Detailed Reservation modal with meal plans, rate information, and advance receipts!</div>
-            </div>
           </div>
 
           {/* Column 3: Right Statistics KPI Panel (Frame 001 & 013) */}
