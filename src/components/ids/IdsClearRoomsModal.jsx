@@ -16,6 +16,7 @@ export default function IdsClearRoomsModal({
   isOpen,
   onClose,
   clearedRooms = [],
+  checkedOutRooms = [],
   onClearAllDirtyRooms,
   onOpenRoomRack
 }) {
@@ -45,8 +46,24 @@ export default function IdsClearRoomsModal({
     { roomNo: '601', type: 'PNH', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'MANORANJAN' }
   ];
 
+  // Video 16 Frame 092: Include any checked-out rooms (e.g. Sharma Group 10 rooms) that are now Dirty
+  const checkedOutDirtyRooms = checkedOutRooms
+    .filter(r => !clearedRooms.includes(r) && !['201', '203'].includes(r) && !initialDirtyRooms.some(x => x.roomNo === r))
+    .map(r => ({
+      roomNo: r,
+      type: 'DLX',
+      occupied: '',
+      status: 'Dirty',
+      hskStaff: '',
+      authorizedBy: '',
+      blockedDateTime: '',
+      guestReason: '',
+      lastUpdated: 'MANAGER'
+    }));
+
   // Include 201 and 203 if they haven't been individually cleaned yet
   const fullInitialList = [
+    ...checkedOutDirtyRooms,
     ...(!clearedRooms.includes('201') ? [{ roomNo: '201', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' }] : []),
     ...(!clearedRooms.includes('203') ? [{ roomNo: '203', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' }] : []),
     ...initialDirtyRooms.filter(r => !clearedRooms.includes(r.roomNo))

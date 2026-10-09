@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
-import { Printer, Search, Scissors, DollarSign, X, Check, FileText } from 'lucide-react';
+import { Printer, Search, Scissors, DollarSign, X, Check, FileText, Users } from 'lucide-react';
 
 /* =========================================================================
-   VIDEO 15: CHECKOUT & SETTLE FRONT OFFICE BILL WITH SPLIT BILL PROCESS
+   VIDEO 15 & 16: CHECKOUT & SETTLE FRONT OFFICE BILL & BULK CHECK OUT
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT V6.5 & V7.0
    Replication of:
-   1. Check-out V6.5.002.6 Console (Frame 010 & Frame 031)
-   2. Bill Summary V6.5.002.6 Dialog (Frame 013 & Frame 014)
-   3. Bill Split Dialog (Frame 020 & Frame 025)
-   4. View Bill Line-Item Detail Dialog (Frame 022)
-   5. FO Bill Print Crystal Dialog & Invoice Preview (Frame 030)
-   6. Settlements V6.5.008.30 Dialog (Frame 035, 038, 048, 055, 058, 060)
-   7. Settlement Sub-popups: Cash, Credit Card, Company (Frames 048, 055, 058)
-   8. Bill # Lookup Dialog (Frame 036)
+   1. Check-out V6.5.002.6 Console (Video 15 Frame 010 & Video 16 Frame 018/022)
+   2. Bill Summary V6.5.002.6 Dialog (Video 15 Frame 013 & Video 16 Frame 024/038)
+   3. Bill Split Dialog (Video 15 Frame 020 & Video 16 Frame 032)
+   4. View Bill Line-Item Detail Dialog (Video 15 Frame 022)
+   5. FO Bill Print Crystal Dialog & Invoice Preview (Video 15 Frame 030 & Video 16 Frame 042)
+   6. Settlements V6.5.008.30 Dialog (Video 15 Frame 035/060 & Video 16 Frame 055)
+   7. Clear Room# Multi-Room Confirmation Popup (Video 16 Frame 070)
+   8. Bill # Lookup Dialog (Video 15 Frame 036)
    ========================================================================= */
 
-// All 16 Expected Departures matching Frame 010
+// All 16 Expected Departures matching Video 15 Frame 010
 export const DEFAULT_EXPECTED_DEPARTURES = [
   { roomNo: '305', time: '00:00', date: '17-JAN-2022', guest: 'KAKATI', type: 'DLX', company: 'ALL' },
   { roomNo: '403', time: '00:00', date: '17-JAN-2022', guest: 'DEKA', type: 'DLX', company: 'ALL' },
@@ -34,16 +34,31 @@ export const DEFAULT_EXPECTED_DEPARTURES = [
   { roomNo: '505', time: '12:00', date: '17-JAN-2022', guest: 'BEDI', type: 'DLX', company: 'ALL' },
   { roomNo: '516', time: '12:00', date: '17-JAN-2022', guest: 'Biswakarma', type: 'SUI', company: 'Mahindra & Mahindra' },
   { roomNo: '401', time: '23:00', date: '17-JAN-2022', guest: 'Khan', type: 'EXE', company: 'Corporate FIT' },
-  // Target Room 314 matching Frame 011 & 013
-  { roomNo: '314', time: '12:00', date: '18-JAN-2022', guest: 'Anirudh', type: 'DLX', company: 'COM0015 / Indian Bank', isGroup: true }
+  // Video 15 Target Room 314
+  { roomNo: '314', time: '12:00', date: '18-JAN-2022', guest: 'Anirudh', type: 'DLX', company: 'COM0015 / Indian Bank', isGroup: false }
 ];
 
-// Target Room 314 Bill Profile matching Video 15 Frame 013 & 020
+// Video 16: Sharma Group 10 Rooms matching Video 16 Frame 020, 024 & 070
+export const SHARMA_GROUP_ROOMS = [
+  { roomNo: '406', regNo: '593', guest: 'Mr. Sharma Rohir', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', isLeader: true, selected: true },
+  { roomNo: '407', regNo: '595', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '408', regNo: '597', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '410', regNo: '599', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '411', regNo: '601', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '412', regNo: '603', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '414', regNo: '605', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '506', regNo: '607', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '508', regNo: '609', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
+  { roomNo: '507', regNo: '611', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true }
+];
+
+// Target Single Room 314 Bill Profile (Video 15 Frame 013 & 020)
 export const TARGET_ROOM_314_BILL = {
   roomNo: '314',
   regNo: '589',
   resNo: '272',
   guestName: 'MR. Anirudh',
+  groupName: '',
   folioNo: '1',
   companyCode: 'COM0015',
   companyName: 'Indian Bank',
@@ -61,30 +76,70 @@ export const TARGET_ROOM_314_BILL = {
   billNo: '501'
 };
 
+// Target Sharma Group Consolidated Bill Profile (Video 16 Frame 024, 038 & 055)
+export const TARGET_SHARMA_GROUP_BILL = {
+  roomNo: '406',
+  regNo: '593',
+  resNo: '276',
+  guestName: 'Mr. Sharma Rohir',
+  groupName: 'Sharma Group',
+  folioNo: '1',
+  companyCode: 'COM0006',
+  companyName: 'M/S. ALKEM LABS. LTD.',
+  billing: '4 / Room to Company Extras Direct',
+  payMode: 'Cash',
+  specialIns: '',
+  arrival: '16-JAN-2022 11:56',
+  departure: '18-JAN-2022 12:00',
+  rate: 2975.00,
+  totalRate: 29750.00,
+  plan: 0.00,
+  charges: 0.00,
+  totalTaxes: 3570.00,
+  receipts: 0.00,
+  netAmount: 33320.00,
+  billNo: '502'
+};
+
 export default function IdsCheckoutBillModal({
   isOpen,
   onClose,
   initialRoomNo = '314',
-  initialMode = 'checkout', // 'checkout' | 'settlement'
+  initialGroup = '',
+  initialMode = 'checkout', // 'checkout' | 'bulk' | 'settlement'
   onCompleteCheckout,
+  onCompleteBulkCheckout,
   checkedOutRooms = []
 }) {
   // Navigation View: 'selector' | 'bill-summary' | 'settlements'
-  const [activeScreen, setActiveScreen] = useState(initialMode === 'settlement' ? 'settlements' : 'selector');
+  const [activeScreen, setActiveScreen] = useState(
+    initialMode === 'settlement' ? 'settlements' : 'selector'
+  );
   
-  // Selection Filters (Frame 010)
-  const [filterCompany, setFilterCompany] = useState('ALL');
-  const [filterGroup, setFilterGroup] = useState('ALL');
+  // Is this a group bulk checkout?
+  const [isGroupMode, setIsGroupMode] = useState(initialMode === 'bulk' || initialGroup === 'Sharma Group');
+  
+  // Selection Filters (Video 15 Frame 010 & Video 16 Frame 018/022)
+  const [filterCompany, setFilterCompany] = useState(initialMode === 'bulk' ? 'M/S ALKEM LABS. LTD.' : 'ALL');
+  const [filterGroup, setFilterGroup] = useState(initialGroup || (initialMode === 'bulk' ? 'Sharma Group' : 'ALL'));
   const [filterRoomType, setFilterRoomType] = useState('ALL');
   const [filterFloor, setFilterFloor] = useState('ALL');
   const [filterBlock, setFilterBlock] = useState('ALL');
-  const [searchRoomInput, setSearchRoomInput] = useState(initialRoomNo || '314');
+  const [searchRoomInput, setSearchRoomInput] = useState(initialMode === 'bulk' ? '' : (initialRoomNo || '314'));
 
   // Currently Selected Checkout Room & Bill Data
   const [currentRoom, setCurrentRoom] = useState(initialRoomNo || '314');
-  const [billData, setBillData] = useState(TARGET_ROOM_314_BILL);
+  const [billData, setBillData] = useState(
+    initialMode === 'bulk' || initialGroup === 'Sharma Group' 
+      ? TARGET_SHARMA_GROUP_BILL 
+      : TARGET_ROOM_314_BILL
+  );
 
-  // Split Bill State (Frames 020 & 025)
+  // Group Multi-room selection table (Video 16 Frame 024)
+  const [groupRoomsTable, setGroupRoomsTable] = useState(SHARMA_GROUP_ROOMS);
+  const [isConsolidatedMasterLine, setIsConsolidatedMasterLine] = useState(false);
+
+  // Split Bill State (Video 15 Frame 020 & Video 16 Frame 032)
   const [splitBillOpen, setSplitBillOpen] = useState(false);
   const [isBillSplitted, setIsBillSplitted] = useState(false);
   const [splitItems, setSplitItems] = useState({
@@ -110,8 +165,12 @@ export default function IdsCheckoutBillModal({
   const [crystalPrinter, setCrystalPrinter] = useState('Microsoft Print to PDF');
   const [billLookupOpen, setBillLookupOpen] = useState(false);
   
-  // Settlements V6.5.008.30 State (Frames 035, 038, 060)
-  const [settlementBillNo, setSettlementBillNo] = useState('501');
+  // Video 16 Frame 070: Clear Room# Multi-Room Confirmation Popup
+  const [clearRoomModalOpen, setClearRoomModalOpen] = useState(false);
+  const [bulkClearedStatus, setBulkClearedStatus] = useState({});
+
+  // Settlements V6.5.008.30 State (Video 15 Frame 035 & Video 16 Frame 055)
+  const [settlementBillNo, setSettlementBillNo] = useState(initialMode === 'bulk' ? '502' : '501');
   const [settlementLoaded, setSettlementLoaded] = useState(false);
   const [settlementOptions, setSettlementOptions] = useState({
     Cash: 0,
@@ -134,13 +193,13 @@ export default function IdsCheckoutBillModal({
   const [cardType, setCardType] = useState('VISA / HDFC');
   const [cardNumber, setCardNumber] = useState('4582 9901 2284 3140');
   const [cardAuth, setCardAuth] = useState('AUTH-782104');
-  const [cardAmountInput, setCardAmountInput] = useState('4000.00');
+  const [cardAmountInput, setCardAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4000.00');
   const [cardTipInput, setCardTipInput] = useState('0.00');
   const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal #1');
 
-  const [companyCodeInput, setCompanyCodeInput] = useState('COM0015');
-  const [companyNameInput, setCompanyNameInput] = useState('Indian Bank');
-  const [companyAmountInput, setCompanyAmountInput] = useState('4724.00');
+  const [companyCodeInput, setCompanyCodeInput] = useState(initialMode === 'bulk' ? 'COM0006' : 'COM0015');
+  const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'Indian Bank');
+  const [companyAmountInput, setCompanyAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4724.00');
 
   const [statusMessage, setStatusMessage] = useState('');
   const [isSavingCheckout, setIsSavingCheckout] = useState(false);
@@ -148,23 +207,39 @@ export default function IdsCheckoutBillModal({
   // Sync props when opening
   useEffect(() => {
     if (isOpen) {
-      if (initialMode === 'settlement') {
+      if (initialMode === 'bulk' || initialGroup === 'Sharma Group') {
+        setIsGroupMode(true);
+        setFilterGroup('Sharma Group');
+        setFilterCompany('M/S ALKEM LABS. LTD.');
+        setBillData(TARGET_SHARMA_GROUP_BILL);
+        setSettlementBillNo('502');
+        setCurrentRoom('406');
+        setCardAmountInput('33320.00');
+        setCompanyAmountInput('33320.00');
+        setActiveScreen('selector');
+      } else if (initialMode === 'settlement') {
         setActiveScreen('settlements');
         setSettlementBillNo('501');
+        setBillData(TARGET_ROOM_314_BILL);
         setSettlementLoaded(true);
       } else {
+        setIsGroupMode(false);
         setActiveScreen(initialRoomNo ? 'bill-summary' : 'selector');
         setSearchRoomInput(initialRoomNo || '314');
         setCurrentRoom(initialRoomNo || '314');
+        setBillData(TARGET_ROOM_314_BILL);
       }
       setStatusMessage('');
       setIsSavingCheckout(false);
+      setClearRoomModalOpen(false);
     }
-  }, [isOpen, initialMode, initialRoomNo]);
+  }, [isOpen, initialMode, initialGroup, initialRoomNo]);
 
   if (!isOpen) return null;
 
-  // Filter Departures
+  // Active rooms in selector view
+  const isSharmaGroupSelected = filterGroup === 'Sharma Group' || filterCompany.includes('ALKEM');
+
   const departuresList = DEFAULT_EXPECTED_DEPARTURES.filter(item => {
     if (checkedOutRooms.includes(item.roomNo)) return false;
     if (searchRoomInput && searchRoomInput.trim() !== '') {
@@ -183,9 +258,32 @@ export default function IdsCheckoutBillModal({
   // Select a room from console
   const handleSelectRoom = (roomNo) => {
     setCurrentRoom(roomNo);
-    if (roomNo === '314') {
+    const isSharmaRoom = SHARMA_GROUP_ROOMS.some(r => r.roomNo === roomNo);
+
+    if (isSharmaRoom || filterGroup === 'Sharma Group') {
+      setIsGroupMode(true);
+      setBillData(TARGET_SHARMA_GROUP_BILL);
+      setSettlementBillNo('502');
+      setCardAmountInput('33320.00');
+      setCompanyAmountInput('33320.00');
+      // Setup Group split items matching Video 16 Frame 032
+      setSplitItems({
+        bill1: SHARMA_GROUP_ROOMS.flatMap((r, idx) => [
+          { id: `${idx}-1`, date: '16/01/22', roomNo: r.roomNo, refNo: '', desc: `Tariff ${r.roomNo}`, amount: 2975.00, checked: false },
+          { id: `${idx}-2`, date: '16/01/22', roomNo: r.roomNo, refNo: '', desc: 'Central GST', amount: 178.50, checked: false },
+          { id: `${idx}-3`, date: '16/01/22', roomNo: r.roomNo, refNo: '', desc: 'State GST', amount: 178.50, checked: false }
+        ]),
+        bill2: [],
+        bill3: []
+      });
+    } else if (roomNo === '314') {
+      setIsGroupMode(false);
       setBillData(TARGET_ROOM_314_BILL);
+      setSettlementBillNo('501');
+      setCardAmountInput('4000.00');
+      setCompanyAmountInput('4724.00');
     } else {
+      setIsGroupMode(false);
       const found = DEFAULT_EXPECTED_DEPARTURES.find(d => d.roomNo === roomNo);
       setBillData({
         ...TARGET_ROOM_314_BILL,
@@ -195,15 +293,16 @@ export default function IdsCheckoutBillModal({
         charges: 0,
         taxes: 420.00,
         receipts: 0.00,
-        netAmount: found?.type === 'SUI' ? 7280 : found?.type === 'EXE' ? 5040 : 3920
+        netAmount: found?.type === 'SUI' ? 7280 : found?.type === 'EXE' ? 5040 : 3920,
+        billNo: '503'
       });
+      setSettlementBillNo('503');
     }
     setActiveScreen('bill-summary');
   };
 
   // Merge split bills
   const handleMergeSplitBills = () => {
-    // Merges Bill 3 (Food taxes) into Bill 2 (RMS/GN / FOOD) matching Frame 025
     if (splitItems.bill3.length > 0) {
       setSplitItems(prev => ({
         ...prev,
@@ -222,18 +321,42 @@ export default function IdsCheckoutBillModal({
     setStatusMessage('Bill split confirmed into multiple sub-bills.');
   };
 
-  // Execute checkout & settlement
+  // Toggle selection of group rooms in bill summary
+  const handleToggleRoomSelected = (roomNo) => {
+    setGroupRoomsTable(prev => prev.map(r => r.roomNo === roomNo ? { ...r, selected: !r.selected } : r));
+  };
+
+  // Initiate Settlement Save
   const handleSaveSettlement = () => {
     if (currentBalance > 0.01) {
       alert(`Balance ₹${currentBalance.toFixed(2)} is remaining. Please settle the full amount of ₹${totalBillNet.toFixed(2)}.`);
       return;
     }
 
+    if (isGroupMode) {
+      // Video 16 Frame 070: Open Clear Room# dialog before executing bulk checkout!
+      setClearRoomModalOpen(true);
+    } else {
+      executeCheckoutExecution([currentRoom]);
+    }
+  };
+
+  // Execute checkout & update room master
+  const executeCheckoutExecution = (roomNosToCheckout) => {
     setIsSavingCheckout(true);
     setStatusMessage('UPDATING ROOM MASTER...');
 
     setTimeout(() => {
-      if (onCompleteCheckout) {
+      if (isGroupMode && onCompleteBulkCheckout) {
+        onCompleteBulkCheckout(roomNosToCheckout, {
+          billNo: settlementBillNo,
+          groupName: 'Sharma Group',
+          company: 'M/S. ALKEM LABS. LTD.',
+          netAmount: totalBillNet,
+          settlementOptions,
+          checkoutTime: new Date().toLocaleTimeString()
+        });
+      } else if (onCompleteCheckout) {
         onCompleteCheckout(currentRoom, {
           billNo: settlementBillNo,
           netAmount: totalBillNet,
@@ -243,6 +366,7 @@ export default function IdsCheckoutBillModal({
         });
       }
       setIsSavingCheckout(false);
+      setClearRoomModalOpen(false);
       onClose();
     }, 800);
   };
@@ -250,7 +374,7 @@ export default function IdsCheckoutBillModal({
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       {/* =========================================================================
-          SCREEN 1: CHECK-OUT V6.5.002.6 SELECTION CONSOLE (Frame 010 & Frame 031)
+          SCREEN 1: CHECK-OUT V6.5.002.6 SELECTION CONSOLE (Video 15 & 16 Frame 010 & 022)
           ========================================================================= */}
       {activeScreen === 'selector' && (
         <div className="ids-dialog-window" style={{ width: '920px', maxWidth: '98vw' }}>
@@ -260,22 +384,50 @@ export default function IdsCheckoutBillModal({
           </div>
 
           <div style={{ padding: '8px 12px' }}>
-            {/* Header Filters Strip matching Frame 010 */}
+            {/* Header Filters Strip matching Frame 010 & Video 16 Frame 022 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', background: '#ECE9D8', padding: '4px', borderBottom: '1px solid #CCC', fontSize: '11px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ color: '#000' }}>Company</span>
-                <select className="ids-select" style={{ width: '120px', background: '#316AC5', color: '#FFF', fontWeight: 700 }} value={filterCompany} onChange={(e) => setFilterCompany(e.target.value)}>
+                <select 
+                  className="ids-select" 
+                  style={{ width: '130px', background: '#316AC5', color: '#FFF', fontWeight: 700 }} 
+                  value={filterCompany} 
+                  onChange={(e) => {
+                    setFilterCompany(e.target.value);
+                    if (e.target.value.includes('ALKEM')) {
+                      setFilterGroup('Sharma Group');
+                      setIsGroupMode(true);
+                    }
+                  }}
+                >
                   <option value="ALL">ALL</option>
                   <option value="Indian Bank">COM0015 / Indian Bank</option>
+                  <option value="M/S ALKEM LABS. LTD.">COM0006 / M/S ALKEM LABS. LTD.</option>
                   <option value="Corporate FIT">COM0005 / Corporate FIT</option>
                   <option value="Mahindra">COM0007 / Mahindra</option>
                 </select>
               </div>
 
+              {/* Group filter: Video 16 Frame 020: Sharma Group */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                 <span style={{ color: '#000' }}>Group</span>
-                <select className="ids-select" style={{ width: '80px', background: '#316AC5', color: '#FFF' }} value={filterGroup} onChange={(e) => setFilterGroup(e.target.value)}>
+                <select 
+                  className="ids-select" 
+                  style={{ width: '105px', background: '#316AC5', color: '#FFF', fontWeight: 700 }} 
+                  value={filterGroup} 
+                  onChange={(e) => {
+                    setFilterGroup(e.target.value);
+                    if (e.target.value === 'Sharma Group') {
+                      setIsGroupMode(true);
+                      setSearchRoomInput('');
+                    } else {
+                      setIsGroupMode(false);
+                    }
+                  }}
+                >
                   <option value="ALL">ALL</option>
+                  <option value="Sharma Group">Sharma Group</option>
+                  <option value="Anil Kumar Group">Anil Kumar Group</option>
                 </select>
               </div>
 
@@ -320,7 +472,7 @@ export default function IdsCheckoutBillModal({
                   style={{ width: '65px', fontWeight: 700, textAlign: 'center' }}
                   value={searchRoomInput}
                   onChange={(e) => setSearchRoomInput(e.target.value)}
-                  placeholder="314"
+                  placeholder="406"
                 />
                 <button 
                   className="ids-btn-classic" 
@@ -333,12 +485,12 @@ export default function IdsCheckoutBillModal({
               </div>
             </div>
 
-            {/* Title Centered above tile matrix */}
+            {/* Title Centered above tile matrix matching Video 16 Frame 022: "Group Rooms" */}
             <div style={{ textAlign: 'center', fontWeight: 700, color: '#333', margin: '8px 0 4px 0', fontSize: '11px' }}>
-              {searchRoomInput.trim() ? 'All Rooms' : 'Expected Departures'}
+              {isSharmaGroupSelected ? 'Group Rooms' : searchRoomInput.trim() ? 'All Rooms' : 'Expected Departures'}
             </div>
 
-            {/* Expected Departures Green Tile Matrix matching Frame 010 & 031 */}
+            {/* Expected Departures Matrix */}
             <div 
               style={{ 
                 minHeight: '380px', 
@@ -353,54 +505,109 @@ export default function IdsCheckoutBillModal({
                 alignContent: 'flex-start'
               }}
             >
-              {departuresList.map((card) => (
-                <div
-                  key={card.roomNo}
-                  onClick={() => handleSelectRoom(card.roomNo)}
-                  title={`Click to open Bill Summary for Room ${card.roomNo} (${card.guest})`}
-                  style={{
-                    background: '#84B02A',
-                    border: '1px solid #557715',
-                    color: '#000',
-                    padding: '4px',
-                    fontSize: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '1px',
-                    boxShadow: '1px 1px 2px rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '52px',
-                    transition: 'transform 0.1s, box-shadow 0.1s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                    <span style={{ fontSize: '11px' }}>{card.roomNo}</span>
-                    {card.isGroup && <span title="Group Booking">👥</span>}
+              {/* If Sharma Group is selected (Video 16 Frame 022): render all 10 orange group tiles */}
+              {isSharmaGroupSelected ? (
+                SHARMA_GROUP_ROOMS.filter(r => !checkedOutRooms.includes(r.roomNo)).map((card) => (
+                  <div
+                    key={card.roomNo}
+                    onClick={() => handleSelectRoom(card.roomNo)}
+                    title={`Click to open Bulk Check-out Bill Summary for Sharma Group (${card.roomNo})`}
+                    style={{
+                      background: '#F15A24',
+                      border: '1px solid #C43B08',
+                      color: '#000',
+                      padding: '4px',
+                      fontSize: '10px',
+                      cursor: 'pointer',
+                      borderRadius: '1px',
+                      boxShadow: '1px 1px 2px rgba(0,0,0,0.15)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '52px',
+                      transition: 'transform 0.1s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                      <span style={{ fontSize: '11px' }}>{card.roomNo}</span>
+                      <span title="Sharma Group Booking">👥</span>
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#111' }}>{card.time}</div>
+                    <div style={{ fontSize: '9px', color: '#111' }}>{card.date}</div>
+                    <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {card.isLeader ? 'Sharma' : 'Sharma Group'}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '9px', color: '#111' }}>{card.time}</div>
-                  <div style={{ fontSize: '9px', color: '#111' }}>{card.date}</div>
-                  <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {card.guest}
+                ))
+              ) : (
+                departuresList.map((card) => (
+                  <div
+                    key={card.roomNo}
+                    onClick={() => handleSelectRoom(card.roomNo)}
+                    title={`Click to open Bill Summary for Room ${card.roomNo} (${card.guest})`}
+                    style={{
+                      background: '#84B02A',
+                      border: '1px solid #557715',
+                      color: '#000',
+                      padding: '4px',
+                      fontSize: '10px',
+                      cursor: 'pointer',
+                      borderRadius: '1px',
+                      boxShadow: '1px 1px 2px rgba(0,0,0,0.15)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '52px',
+                      transition: 'transform 0.1s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                      <span style={{ fontSize: '11px' }}>{card.roomNo}</span>
+                      {card.isGroup && <span title="Group Booking">👥</span>}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#111' }}>{card.time}</div>
+                    <div style={{ fontSize: '9px', color: '#111' }}>{card.date}</div>
+                    <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {card.guest}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Bottom buttons */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '85px' }}>Cut Off Date</button>
-              <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => setSearchRoomInput('')}>Refresh</button>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ background: '#FFF7CC', fontWeight: 700, color: '#0A246A', fontSize: '11px' }}
+                  onClick={() => {
+                    setFilterGroup('Sharma Group');
+                    setFilterCompany('M/S ALKEM LABS. LTD.');
+                    setIsGroupMode(true);
+                    setSearchRoomInput('');
+                  }}
+                >
+                  👥 Filter Video 16 Sharma Group (10 Rooms)
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button className="ids-btn-classic" style={{ minWidth: '85px' }}>Cut Off Date</button>
+                <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => { setSearchRoomInput(''); setFilterGroup('ALL'); setFilterCompany('ALL'); setIsGroupMode(false); }}>Refresh</button>
+                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* =========================================================================
-          SCREEN 2: BILL SUMMARY DIALOG (Video 15 Frame 013 & Frame 014)
+          SCREEN 2: BILL SUMMARY DIALOG (Video 15 Frame 013 & Video 16 Frame 024/038)
           ========================================================================= */}
       {activeScreen === 'bill-summary' && (
         <div className="ids-dialog-window" style={{ width: '940px', maxWidth: '98vw' }}>
@@ -410,7 +617,7 @@ export default function IdsCheckoutBillModal({
           </div>
 
           <div style={{ padding: '8px 12px' }}>
-            {/* Header Form matching Frame 013 */}
+            {/* Header Form matching Frame 013 & Video 16 Frame 024 */}
             <div style={{ border: '1px solid #7F9DB9', padding: '6px 10px', background: '#FFF', fontSize: '11px', marginBottom: '8px' }}>
               {/* Row 1 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 80px 50px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
@@ -431,7 +638,7 @@ export default function IdsCheckoutBillModal({
               </div>
 
               {/* Row 3 */}
-              <div style={{ display: 'grid', gridTemplateColumns: '70px 180px 24px 70px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '70px 220px 24px 70px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Billing</span>
                 <input className="ids-input" readOnly value={billData.billing} style={{ background: '#F5F5F5' }} />
                 <button className="ids-btn-classic" style={{ padding: '0', height: '20px', width: '20px', fontWeight: 700 }}>?</button>
@@ -458,7 +665,7 @@ export default function IdsCheckoutBillModal({
               </div>
             </div>
 
-            {/* Folio Grid matching Frame 013 & Frame 024 */}
+            {/* Folio Grid matching Video 15 Frame 013 OR Video 16 Frame 024 (10 Rooms) */}
             <div style={{ border: '1px solid #7F9DB9', background: '#FFF', height: '170px', overflowY: 'auto' }}>
               <table className="ids-table" style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
                 <thead>
@@ -477,8 +684,48 @@ export default function IdsCheckoutBillModal({
                   </tr>
                 </thead>
                 <tbody>
-                  {!isBillSplitted ? (
-                    // Single Unsplit Bill (Frame 013)
+                  {isGroupMode ? (
+                    isConsolidatedMasterLine ? (
+                      // Video 16 Frame 038: Consolidated Master Line
+                      <tr style={{ background: '#E6EFF9', cursor: 'pointer' }} onDoubleClick={() => setViewBillOpen(true)}>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>Yes</td>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>1</td>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC', fontWeight: 700 }}>406</td>
+                        <td style={{ borderRight: '1px solid #CCC' }}>Mr. Sharma Rohir</td>
+                        <td style={{ borderRight: '1px solid #CCC' }}></td>
+                        <td style={{ borderRight: '1px solid #CCC' }}>DIRECT</td>
+                        <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>29,750.00</td>
+                        <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>0.00</td>
+                        <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>3,570.00</td>
+                        <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>0.00</td>
+                        <td style={{ textAlign: 'right', fontWeight: 700, color: '#0A246A' }}>33,320.00</td>
+                      </tr>
+                    ) : (
+                      // Video 16 Frame 024: 10 Individual Room lines
+                      groupRoomsTable.map((row, idx) => (
+                        <tr 
+                          key={row.roomNo} 
+                          style={{ background: row.selected ? '#E6EFF9' : '#FFF', cursor: 'pointer' }}
+                          onClick={() => handleToggleRoomSelected(row.roomNo)}
+                        >
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>
+                            <input type="checkbox" checked={row.selected} onChange={() => handleToggleRoomSelected(row.roomNo)} />
+                          </td>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>{idx + 1}</td>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #CCC', fontWeight: 700 }}>{row.roomNo}</td>
+                          <td style={{ borderRight: '1px solid #CCC' }}>{row.guest}</td>
+                          <td style={{ borderRight: '1px solid #CCC' }}></td>
+                          <td style={{ borderRight: '1px solid #CCC' }}>{row.billTo}</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>{row.rate.toFixed(2)}</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>{row.charges.toFixed(2)}</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>{row.taxes.toFixed(2)}</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #CCC' }}>0.00</td>
+                          <td style={{ textAlign: 'right', fontWeight: 700, color: '#0A246A' }}>{row.netAmount.toFixed(2)}</td>
+                        </tr>
+                      ))
+                    )
+                  ) : !isBillSplitted ? (
+                    // Video 15 Single Unsplit Bill (Frame 013)
                     <tr style={{ background: '#E6EFF9', cursor: 'pointer' }} onDoubleClick={() => setViewBillOpen(true)}>
                       <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>Yes</td>
                       <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>1</td>
@@ -499,7 +746,7 @@ export default function IdsCheckoutBillModal({
                       </td>
                     </tr>
                   ) : (
-                    // Splitted Bill (Frame 024: 2 Sub-bills)
+                    // Video 15 Splitted Bill (Frame 024: 2 Sub-bills)
                     <>
                       <tr style={{ background: '#E6EFF9', cursor: 'pointer' }} onDoubleClick={() => setViewBillOpen(true)}>
                         <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>Yes</td>
@@ -530,7 +777,7 @@ export default function IdsCheckoutBillModal({
                     </>
                   )}
                   {/* Blank filler rows */}
-                  {[...Array(isBillSplitted ? 3 : 4)].map((_, idx) => (
+                  {!isGroupMode && [...Array(isBillSplitted ? 3 : 4)].map((_, idx) => (
                     <tr key={`fill-${idx}`} style={{ height: '22px' }}>
                       <td style={{ borderRight: '1px solid #EEE' }}></td>
                       <td style={{ borderRight: '1px solid #EEE' }}></td>
@@ -549,11 +796,22 @@ export default function IdsCheckoutBillModal({
               </table>
             </div>
 
-            {/* Total Strip & Red Helper Text matching Frame 013 */}
+            {/* Total Strip & Red Helper Text matching Frame 013 & Video 16 Frame 024 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '6px 0 4px 0', fontSize: '11px' }}>
-              <span style={{ color: '#D00', fontStyle: 'italic', fontSize: '10px' }}>
-                Click Net Amount Column to View Bill Details.
-              </span>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <span style={{ color: '#D00', fontStyle: 'italic', fontSize: '10px' }}>
+                  Click Net Amount Column to View Bill Details.
+                </span>
+                {isGroupMode && (
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', padding: '1px 6px', background: '#E6EFF9', fontWeight: 600 }}
+                    onClick={() => setIsConsolidatedMasterLine(!isConsolidatedMasterLine)}
+                  >
+                    {isConsolidatedMasterLine ? 'Show 10 Room-Wise Lines' : 'Consolidate into 1 Master Line (Frame 038)'}
+                  </button>
+                )}
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontWeight: 700 }}>Grand Total</span>
                 <input 
@@ -565,11 +823,11 @@ export default function IdsCheckoutBillModal({
               </div>
             </div>
 
-            {/* Status Strip matching Frame 029 */}
+            {/* Status Strip matching Frame 029 & Video 16 Frame 038 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginBottom: '8px' }}>
               <span style={{ color: '#555' }}>Status</span>
               <div style={{ flex: 1, border: '1px solid #7F9DB9', background: '#FFF', padding: '2px 6px', height: '20px', fontSize: '10px', color: '#0A246A', fontWeight: 600 }}>
-                {statusMessage || 'Ready for settlement or split...'}
+                {statusMessage || (isGroupMode ? 'Sharma Group (10 Rooms) ready for consolidated settlement...' : 'Ready for settlement or split...')}
               </div>
             </div>
 
@@ -583,9 +841,11 @@ export default function IdsCheckoutBillModal({
                   className="ids-btn-classic" 
                   style={{ minWidth: '75px', fontWeight: 700 }}
                   onClick={() => {
-                    setStatusMessage('Updating OTT Table 589');
+                    const ottTable = isGroupMode ? '595' : '589';
+                    const targetBill = isGroupMode ? '502' : '501';
+                    setStatusMessage(`Updating OTT Table ${ottTable}`);
                     setTimeout(() => {
-                      setStatusMessage('Printing Bill # 501');
+                      setStatusMessage(`Printing Bill # ${targetBill}`);
                       setPrintCrystalOpen(true);
                     }, 400);
                   }}
@@ -597,7 +857,7 @@ export default function IdsCheckoutBillModal({
                   className="ids-btn-classic" 
                   style={{ minWidth: '75px', fontWeight: 700, background: '#FFF7CC', color: '#0A246A' }}
                   onClick={() => setSplitBillOpen(true)}
-                  title="Bill Split (Video 15 Frame 020)"
+                  title="Bill Split (Video 15 & 16)"
                 >
                   ✂️ Split Bill...
                 </button>
@@ -605,11 +865,11 @@ export default function IdsCheckoutBillModal({
                   className="ids-btn-classic" 
                   style={{ minWidth: '75px', fontWeight: 700, background: '#C8E6C9', color: '#004D40' }}
                   onClick={() => {
-                    setSettlementBillNo('501');
+                    setSettlementBillNo(isGroupMode ? '502' : '501');
                     setSettlementLoaded(true);
                     setActiveScreen('settlements');
                   }}
-                  title="Open Settlement V6.5.008.30 (Video 15 Frame 035)"
+                  title="Open Settlement V6.5.008.30 (Video 15 Frame 035 & Video 16 Frame 055)"
                 >
                   💳 Bill Settle
                 </button>
@@ -622,7 +882,7 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SCREEN 3: SETTLEMENTS V6.5.008.30 DIALOG (Video 15 Frames 035, 038, 060)
+          SCREEN 3: SETTLEMENTS V6.5.008.30 DIALOG (Video 15 & Video 16 Frame 055)
           ========================================================================= */}
       {activeScreen === 'settlements' && (
         <div className="ids-dialog-window" style={{ width: '820px', maxWidth: '98vw' }}>
@@ -632,7 +892,7 @@ export default function IdsCheckoutBillModal({
           </div>
 
           <div style={{ padding: '8px 12px' }}>
-            {/* Top Form Section matching Frame 035 & Frame 038 */}
+            {/* Top Form Section matching Frame 035 & Video 16 Frame 055 */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '11px', marginBottom: '8px' }}>
               {/* Left Column */}
               <div>
@@ -667,7 +927,7 @@ export default function IdsCheckoutBillModal({
                     onClick={() => {
                       setSettlementOptions({
                         ...settlementOptions,
-                        Cash: currentBalance > 0 ? currentBalance : 4724.00
+                        Cash: currentBalance > 0 ? currentBalance : totalBillNet
                       });
                     }}
                   >
@@ -736,7 +996,7 @@ export default function IdsCheckoutBillModal({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Group</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? 'Anirudh' : ''} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input className="ids-input" readOnly value={settlementLoaded ? (billData.groupName || 'Direct') : ''} style={{ flex: 1, background: '#F5F5F5' }} />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -746,7 +1006,7 @@ export default function IdsCheckoutBillModal({
               </div>
             </div>
 
-            {/* Fieldset: Settlement Options (Frame 035 & Frame 060) */}
+            {/* Fieldset: Settlement Options (Video 15 & Video 16 Frame 055) */}
             <fieldset style={{ border: '1px solid #7F9DB9', padding: '6px 8px', margin: '4px 0 8px 0', background: '#FFF' }}>
               <legend style={{ fontSize: '11px', fontWeight: 700, color: '#000', padding: '0 4px' }}>Settlement Options</legend>
               <div style={{ height: '170px', overflowY: 'auto' }}>
@@ -760,7 +1020,6 @@ export default function IdsCheckoutBillModal({
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Rows matching Frame 035: Cash, Credit Card, Companies, Staff, Cheque, Bills On Hold, Foreign Exchange, Complimentary */}
                     {[
                       { key: 'Cash', label: 'Cash', hasModal: true },
                       { key: 'CreditCard', label: 'Credit Card', hasModal: true },
@@ -802,66 +1061,92 @@ export default function IdsCheckoutBillModal({
               </div>
             </fieldset>
 
-            {/* Quick Presets matching Video 15 Frame 060 (Split Cash ₹724 + Card ₹4,000) */}
+            {/* Quick Presets matching Video 15 Frame 060 & Video 16 Frame 058 */}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px', fontSize: '11px', background: '#FFF7CC', padding: '4px 8px', border: '1px solid #DDD' }}>
-              <span style={{ fontWeight: 700, color: '#856404' }}>Video 15 Exact Walkthrough:</span>
-              <button 
-                className="ids-btn-classic" 
-                style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700 }}
-                onClick={() => {
-                  setSettlementOptions({
-                    Cash: 724.00,
-                    CreditCard: 4000.00,
-                    Companies: 0,
-                    Staff: 0,
-                    Cheque: 0,
-                    BillsOnHold: 0,
-                    ForeignExchange: 0,
-                    Complimentary: 0
-                  });
-                  setStatusMessage('Applied: Cash ₹724.00 + Credit Card ₹4,000.00 (Frame 060)');
-                }}
-              >
-                Apply Video 15 Split: Cash ₹724 + Card ₹4,000
-              </button>
-              <button 
-                className="ids-btn-classic" 
-                style={{ fontSize: '10px', padding: '2px 8px' }}
-                onClick={() => {
-                  setSettlementOptions({
-                    Cash: 4724.00,
-                    CreditCard: 0,
-                    Companies: 0,
-                    Staff: 0,
-                    Cheque: 0,
-                    BillsOnHold: 0,
-                    ForeignExchange: 0,
-                    Complimentary: 0
-                  });
-                  setStatusMessage('Applied: Full Cash ₹4,724.00');
-                }}
-              >
-                Full Cash ₹4,724.00
-              </button>
-              <button 
-                className="ids-btn-classic" 
-                style={{ fontSize: '10px', padding: '2px 8px' }}
-                onClick={() => {
-                  setSettlementOptions({
-                    Cash: 0,
-                    CreditCard: 0,
-                    Companies: 4724.00,
-                    Staff: 0,
-                    Cheque: 0,
-                    BillsOnHold: 0,
-                    ForeignExchange: 0,
-                    Complimentary: 0
-                  });
-                  setStatusMessage('Applied: Direct Company BTC ₹4,724.00 (Indian Bank)');
-                }}
-              >
-                Company BTC ₹4,724.00
-              </button>
+              <span style={{ fontWeight: 700, color: '#856404' }}>Quick Settlement Presets:</span>
+              {isGroupMode ? (
+                <>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700, background: '#D1E7DD', color: '#0F5132' }}
+                    onClick={() => {
+                      setSettlementOptions({
+                        Cash: 0,
+                        CreditCard: 33320.00,
+                        Companies: 0,
+                        Staff: 0,
+                        Cheque: 0,
+                        BillsOnHold: 0,
+                        ForeignExchange: 0,
+                        Complimentary: 0
+                      });
+                      setStatusMessage('Applied Video 16: Credit Card VISA ₹33,320.00 (Frame 058)');
+                    }}
+                  >
+                    ★ Video 16 Credit Card VISA ₹33,320.00
+                  </button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', padding: '2px 8px' }}
+                    onClick={() => {
+                      setSettlementOptions({
+                        Cash: 0,
+                        CreditCard: 0,
+                        Companies: 33320.00,
+                        Staff: 0,
+                        Cheque: 0,
+                        BillsOnHold: 0,
+                        ForeignExchange: 0,
+                        Complimentary: 0
+                      });
+                      setStatusMessage('Applied: Direct Company BTC ₹33,320.00 (M/S. ALKEM LABS. LTD.)');
+                    }}
+                  >
+                    Company BTC ₹33,320.00
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700 }}
+                    onClick={() => {
+                      setSettlementOptions({
+                        Cash: 724.00,
+                        CreditCard: 4000.00,
+                        Companies: 0,
+                        Staff: 0,
+                        Cheque: 0,
+                        BillsOnHold: 0,
+                        ForeignExchange: 0,
+                        Complimentary: 0
+                      });
+                      setStatusMessage('Applied Video 15 Split: Cash ₹724.00 + Credit Card ₹4,000.00');
+                    }}
+                  >
+                    Video 15 Split: Cash ₹724 + Card ₹4,000
+                  </button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', padding: '2px 8px' }}
+                    onClick={() => {
+                      setSettlementOptions({
+                        Cash: 4724.00,
+                        CreditCard: 0,
+                        Companies: 0,
+                        Staff: 0,
+                        Cheque: 0,
+                        BillsOnHold: 0,
+                        ForeignExchange: 0,
+                        Complimentary: 0
+                      });
+                      setStatusMessage('Applied: Full Cash ₹4,724.00');
+                    }}
+                  >
+                    Full Cash ₹4,724.00
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Bottom Status strip */}
@@ -869,7 +1154,7 @@ export default function IdsCheckoutBillModal({
               {statusMessage || (isSavingCheckout ? 'UPDATING ROOM MASTER...' : 'Select receipt type to enter settlement')}
             </div>
 
-            {/* Bottom Action buttons matching Frame 035 & 060 */}
+            {/* Bottom Action buttons */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
               <button 
                 className="ids-btn-classic" 
@@ -907,11 +1192,71 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SUB-POPUP 1: BILL SPLIT DIALOG (Video 15 Frame 020 & Frame 025)
+          POPUP: CLEAR ROOM# MULTI-ROOM CONFIRMATION POPUP (Video 16 Frame 070)
+          ========================================================================= */}
+      {clearRoomModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div className="ids-dialog-window" style={{ width: '480px', maxWidth: '95vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.6)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Clear Room#</span>
+              <button className="ids-win-btn close" onClick={() => setClearRoomModalOpen(false)}>✕</button>
+            </div>
+
+            <div style={{ padding: '8px 10px', fontSize: '11px' }}>
+              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', maxHeight: '230px', overflowY: 'auto' }}>
+                <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#ECE9D8', color: '#000' }}>
+                      <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Room#</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio #</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. #</th>
+                      <th style={{ borderRight: '1px solid #BBB' }}>Guest Name</th>
+                      <th style={{ width: '45px', textAlign: 'center' }}>Clear</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Rows matching Video 16 Frame 070 */}
+                    {SHARMA_GROUP_ROOMS.map((r) => (
+                      <tr key={r.roomNo} style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC', fontWeight: 700 }}>{r.roomNo}</td>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>1</td>
+                        <td style={{ textAlign: 'center', borderRight: '1px solid #CCC' }}>{r.regNo}</td>
+                        <td style={{ borderRight: '1px solid #CCC' }}>{r.guest}</td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span style={{ fontWeight: 700, color: '#2E7D32' }}>Yes</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Action Button: [ Ok ] matching Frame 070 */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
+                  onClick={() => {
+                    executeCheckoutExecution(SHARMA_GROUP_ROOMS.map(r => r.roomNo));
+                  }}
+                >
+                  <u>O</u>k
+                </button>
+                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setClearRoomModalOpen(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          SUB-POPUP 1: BILL SPLIT DIALOG (Video 15 Frame 020 & Video 16 Frame 032)
           ========================================================================= */}
       {splitBillOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1300 }}>
-          <div className="ids-dialog-window" style={{ width: '560px', maxWidth: '95vw', background: '#ECE9D8' }}>
+          <div className="ids-dialog-window" style={{ width: '580px', maxWidth: '95vw', background: '#ECE9D8' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>Bill Split</span>
               <button className="ids-win-btn close" onClick={() => setSplitBillOpen(false)}>✕</button>
@@ -921,88 +1266,12 @@ export default function IdsCheckoutBillModal({
               {/* Bill 1 Box */}
               <div style={{ border: '1px solid #7F9DB9', background: '#FFF', marginBottom: '8px' }}>
                 <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 8px', display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '11px' }}>
-                  <span>Bill —&gt; 1 ({billData.roomNo})</span>
+                  <span>Bill —&gt; 1 {isGroupMode ? '(Sharma Group)' : `(${billData.roomNo})`}</span>
                   <span>
                     {splitItems.bill1.reduce((sum, item) => sum + item.amount, 0).toFixed(2)}
                   </span>
                 </div>
-                <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#F5F5F5' }}>
-                      <th style={{ width: '25px' }}>#</th>
-                      <th style={{ width: '60px' }}>Date</th>
-                      <th style={{ width: '50px' }}>Room #</th>
-                      <th style={{ width: '45px' }}>Ref #</th>
-                      <th>Description</th>
-                      <th style={{ width: '25px', textAlign: 'center' }}>✂️</th>
-                      <th style={{ width: '70px', textAlign: 'right' }}>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {splitItems.bill1.map((item, idx) => (
-                      <tr key={item.id} style={{ borderBottom: '1px solid #EEE' }}>
-                        <td style={{ textAlign: 'center' }}>{idx + 1}</td>
-                        <td>{item.date}</td>
-                        <td>{item.roomNo}</td>
-                        <td>{item.refNo}</td>
-                        <td>{item.desc}</td>
-                        <td style={{ textAlign: 'center' }}>
-                          <input type="checkbox" checked={item.checked} onChange={() => {}} />
-                        </td>
-                        <td style={{ textAlign: 'right' }}>{item.amount.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Bill 2 Box */}
-              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', marginBottom: '8px' }}>
-                <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 8px', display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '11px' }}>
-                  <span>Bill —&gt; 2 ({billData.roomNo})</span>
-                  <span>
-                    {splitItems.bill2.reduce((sum, item) => sum + item.amount, 0).toFixed(2)}
-                  </span>
-                </div>
-                <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#F5F5F5' }}>
-                      <th style={{ width: '25px' }}>#</th>
-                      <th style={{ width: '60px' }}>Date</th>
-                      <th style={{ width: '50px' }}>Room #</th>
-                      <th style={{ width: '45px' }}>Ref #</th>
-                      <th>Description</th>
-                      <th style={{ width: '25px', textAlign: 'center' }}>✂️</th>
-                      <th style={{ width: '70px', textAlign: 'right' }}>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {splitItems.bill2.map((item, idx) => (
-                      <tr key={item.id} style={{ borderBottom: '1px solid #EEE' }}>
-                        <td style={{ textAlign: 'center' }}>{idx + 1}</td>
-                        <td>{item.date}</td>
-                        <td>{item.roomNo}</td>
-                        <td>{item.refNo}</td>
-                        <td>{item.desc}</td>
-                        <td style={{ textAlign: 'center' }}>
-                          <input type="checkbox" checked={item.checked} onChange={() => {}} />
-                        </td>
-                        <td style={{ textAlign: 'right' }}>{item.amount.toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Bill 3 Box (if any items) */}
-              {splitItems.bill3.length > 0 && (
-                <div style={{ border: '1px solid #7F9DB9', background: '#FFF', marginBottom: '8px' }}>
-                  <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 8px', display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '11px' }}>
-                    <span>Bill —&gt; 3 ({billData.roomNo})</span>
-                    <span>
-                      {splitItems.bill3.reduce((sum, item) => sum + item.amount, 0).toFixed(2)}
-                    </span>
-                  </div>
+                <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
                   <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: '#F5F5F5' }}>
@@ -1016,11 +1285,11 @@ export default function IdsCheckoutBillModal({
                       </tr>
                     </thead>
                     <tbody>
-                      {splitItems.bill3.map((item, idx) => (
+                      {splitItems.bill1.map((item, idx) => (
                         <tr key={item.id} style={{ borderBottom: '1px solid #EEE' }}>
                           <td style={{ textAlign: 'center' }}>{idx + 1}</td>
                           <td>{item.date}</td>
-                          <td>{item.roomNo}</td>
+                          <td style={{ textAlign: 'center', fontWeight: 600 }}>{item.roomNo}</td>
                           <td>{item.refNo}</td>
                           <td>{item.desc}</td>
                           <td style={{ textAlign: 'center' }}>
@@ -1032,15 +1301,14 @@ export default function IdsCheckoutBillModal({
                     </tbody>
                   </table>
                 </div>
-              )}
+              </div>
 
-              {/* Action Buttons matching Frame 020 & 025 */}
+              {/* Action Buttons matching Frame 020 & Video 16 Frame 032 */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '10px' }}>
                 <button 
                   className="ids-btn-classic" 
                   style={{ minWidth: '70px', fontWeight: 700, background: '#FFF7CC' }}
                   onClick={handleMergeSplitBills}
-                  title="Merge Taxes into F&B Bill (Video 15 Frame 025)"
                 >
                   Merge
                 </button>
@@ -1095,84 +1363,126 @@ export default function IdsCheckoutBillModal({
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Rows matching Video 15 Frame 022 */}
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>1</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>TRF</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* Tariff 314</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>3,500.00</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>2</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* Central GST</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>3</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* State GST</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>4</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>POS</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>1</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* RMS/GN / FOOD</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>765.66</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>5</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>1</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* Central GST (F&amp;B)</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
-                    <tr style={{ background: '#FFF' }}>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>6</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>589</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>1</td>
-                      <td style={{ borderRight: '1px solid #EEE' }}>* State GST (F&amp;B)</td>
-                      <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
-                      <td style={{ textAlign: 'right' }}>0.00</td>
-                    </tr>
+                    {isGroupMode ? (
+                      SHARMA_GROUP_ROOMS.flatMap((r, i) => [
+                        <tr key={`t-${r.roomNo}`} style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 1}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>276</td>
+                          <td style={{ borderRight: '1px solid #EEE', fontWeight: 600 }}>{r.roomNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>TRF</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Tariff {r.roomNo}</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>2,975.00</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>,
+                        <tr key={`cg-${r.roomNo}`} style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 2}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>276</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{r.roomNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Central GST</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>178.50</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>,
+                        <tr key={`sg-${r.roomNo}`} style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 3}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>276</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{r.roomNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* State GST</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>178.50</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                      ])
+                    ) : (
+                      <>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>1</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>TRF</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Tariff 314</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>3,500.00</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>2</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Central GST</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>3</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}></td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* State GST</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>4</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>POS</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>1</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* RMS/GN / FOOD</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>765.66</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>5</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>1</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Central GST (F&amp;B)</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                        <tr style={{ background: '#FFF' }}>
+                          <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>6</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>1</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* State GST (F&amp;B)</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
+                          <td style={{ textAlign: 'right' }}>0.00</td>
+                        </tr>
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>
 
-              {/* Note matching Frame 022 */}
+              {/* Note */}
               <div style={{ textAlign: 'center', fontSize: '10px', color: '#555', margin: '8px 0', border: '1px solid #CCC', padding: '4px', background: '#FFF' }}>
                 Note : Double click on POS Outlet Bill Details, to View Details for F&amp;B transactions..<br />
                 Press F2 to Rename Revenue Description
@@ -1190,7 +1500,7 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SUB-POPUP 3: FO BILL PRINT CRYSTAL DIALOG & PREVIEW (Video 15 Frame 030)
+          SUB-POPUP 3: FO BILL PRINT CRYSTAL DIALOG & PREVIEW (Video 15 & 16 Frame 042)
           ========================================================================= */}
       {printCrystalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
@@ -1231,7 +1541,7 @@ export default function IdsCheckoutBillModal({
 
               {crystalPrintSuccess && (
                 <div style={{ background: '#E8F5E9', border: '1px solid #81C784', padding: '8px', marginBottom: '12px', fontSize: '11px', color: '#2E7D32', borderRadius: '2px' }}>
-                  ✓ <b>Bill # 501</b> sent to {crystalPrinter}. Crystal Report Detailed Bill rendered successfully.
+                  ✓ <b>Bill # {settlementBillNo}</b> sent to {crystalPrinter}. Crystal Report Detailed Bill rendered successfully.
                 </div>
               )}
 
@@ -1241,7 +1551,7 @@ export default function IdsCheckoutBillModal({
                   style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
                   onClick={() => {
                     setCrystalPrintSuccess(true);
-                    setStatusMessage('Bill # 501 printed via Crystal Reports.');
+                    setStatusMessage(`Bill # ${settlementBillNo} printed via Crystal Reports.`);
                     setTimeout(() => {
                       setPrintCrystalOpen(false);
                       setCrystalPrintSuccess(false);
@@ -1260,7 +1570,7 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SUB-POPUP 4: BILL # LOOKUP DIALOG (Video 15 Frame 036 & 037)
+          SUB-POPUP 4: BILL # LOOKUP DIALOG (Video 15 Frame 036 & Video 16 Frame 055)
           ========================================================================= */}
       {billLookupOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
@@ -1285,10 +1595,36 @@ export default function IdsCheckoutBillModal({
                     </tr>
                   </thead>
                   <tbody>
+                    {/* Bill 502 (Sharma Group) */}
                     <tr 
-                      style={{ background: '#316AC5', color: '#FFF', cursor: 'pointer', fontWeight: 700 }}
-                      onDoubleClick={() => {
+                      style={{ background: settlementBillNo === '502' ? '#316AC5' : '#FFF', color: settlementBillNo === '502' ? '#FFF' : '#000', cursor: 'pointer', fontWeight: 700 }}
+                      onClick={() => {
+                        setSettlementBillNo('502');
+                        setIsGroupMode(true);
+                        setBillData(TARGET_SHARMA_GROUP_BILL);
+                        setCardAmountInput('33320.00');
+                        setCompanyAmountInput('33320.00');
+                        setSettlementLoaded(true);
+                        setBillLookupOpen(false);
+                      }}
+                    >
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>502</td>
+                      <td style={{ borderRight: '1px solid #4477DD' }}>18-JAN-2022</td>
+                      <td style={{ borderRight: '1px solid #4477DD' }}>PENDING</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>406</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>1</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>593</td>
+                      <td style={{ textAlign: 'right' }}>33,320.00</td>
+                    </tr>
+                    {/* Bill 501 (Room 314) */}
+                    <tr 
+                      style={{ background: settlementBillNo === '501' ? '#316AC5' : '#FFF', color: settlementBillNo === '501' ? '#FFF' : '#000', cursor: 'pointer', fontWeight: 700 }}
+                      onClick={() => {
                         setSettlementBillNo('501');
+                        setIsGroupMode(false);
+                        setBillData(TARGET_ROOM_314_BILL);
+                        setCardAmountInput('4000.00');
+                        setCompanyAmountInput('4724.00');
                         setSettlementLoaded(true);
                         setBillLookupOpen(false);
                       }}
@@ -1301,17 +1637,6 @@ export default function IdsCheckoutBillModal({
                       <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>589</td>
                       <td style={{ textAlign: 'right' }}>4,724.00</td>
                     </tr>
-                    {[...Array(4)].map((_, i) => (
-                      <tr key={`blank-${i}`} style={{ height: '20px' }}>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td style={{ borderRight: '1px solid #EEE' }}></td>
-                        <td></td>
-                      </tr>
-                    ))}
                   </tbody>
                 </table>
               </div>
@@ -1321,7 +1646,6 @@ export default function IdsCheckoutBillModal({
                   className="ids-btn-classic" 
                   style={{ minWidth: '70px', fontWeight: 700 }}
                   onClick={() => {
-                    setSettlementBillNo('501');
                     setSettlementLoaded(true);
                     setBillLookupOpen(false);
                   }}
@@ -1408,7 +1732,7 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SUB-POPUP 6: CREDIT CARD SETTLEMENT DIALOG (Video 15 Frame 055)
+          SUB-POPUP 6: CREDIT CARD SETTLEMENT DIALOG (Video 15 & 16 Frame 058)
           ========================================================================= */}
       {activePaymentModal === 'CreditCard' && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>

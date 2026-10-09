@@ -838,14 +838,56 @@ export function IdsRoomRackConsoleModal({
 
     { no: '404', type: 'O/DLX', guest: 'DAS', status: 'occupied' },
     { no: '405', type: 'O/DLX', guest: 'Anirudh', status: 'occupied' },
-    { no: '406', type: 'O/DLX', guest: 'Sharma', status: 'occupied' },
-    { no: '407', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '408', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { 
+      no: '406', 
+      type: checkedOutRooms.includes('406') ? (isRoomCleared('406') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('406') ? undefined : 'Sharma', 
+      status: checkedOutRooms.includes('406') ? (isRoomCleared('406') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '407', 
+      type: checkedOutRooms.includes('407') ? (isRoomCleared('407') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('407') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('407') ? (isRoomCleared('407') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '408', 
+      type: checkedOutRooms.includes('408') ? (isRoomCleared('408') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('408') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('408') ? (isRoomCleared('408') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
     { no: '409', type: 'O/DLX', guest: 'BHATTASALI', status: 'occupied' },
-    { no: '410', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '411', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '412', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '414', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { 
+      no: '410', 
+      type: checkedOutRooms.includes('410') ? (isRoomCleared('410') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('410') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('410') ? (isRoomCleared('410') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '411', 
+      type: checkedOutRooms.includes('411') ? (isRoomCleared('411') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('411') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('411') ? (isRoomCleared('411') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '412', 
+      type: checkedOutRooms.includes('412') ? (isRoomCleared('412') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('412') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('412') ? (isRoomCleared('412') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '414', 
+      type: checkedOutRooms.includes('414') ? (isRoomCleared('414') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('414') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('414') ? (isRoomCleared('414') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
 
     { 
       no: '415', 
@@ -864,9 +906,27 @@ export function IdsRoomRackConsoleModal({
     { no: '503', type: 'O/DLX', guest: 'NATRAJ', status: 'occupied' },
     { no: '504', type: 'O/DLX', guest: 'MENAN', status: 'occupied' },
     { no: '505', type: 'O/DLX', guest: 'BEDI', status: 'occupied' },
-    { no: '506', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '507', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
-    { no: '508', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { 
+      no: '506', 
+      type: checkedOutRooms.includes('506') ? (isRoomCleared('506') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('506') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('506') ? (isRoomCleared('506') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '507', 
+      type: checkedOutRooms.includes('507') ? (isRoomCleared('507') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('507') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('507') ? (isRoomCleared('507') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
+    { 
+      no: '508', 
+      type: checkedOutRooms.includes('508') ? (isRoomCleared('508') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
+      guest: checkedOutRooms.includes('508') ? undefined : 'Sharma Group', 
+      status: checkedOutRooms.includes('508') ? (isRoomCleared('508') ? 'vacant' : 'dirty') : 'occupied',
+      category: 'DLX'
+    },
     { no: '509', type: 'V/DLX', status: 'vacant' },
 
     { no: '510', type: 'V/DLX', status: 'vacant' },
@@ -888,14 +948,16 @@ export function IdsRoomRackConsoleModal({
     { no: '601', type: isRoomCleared('601') ? 'V/PNH' : 'D/PNH', status: isRoomCleared('601') ? 'vacant' : 'dirty', category: 'PNH' }
   ];
 
-  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060 & Video 13 Frame 018:
+  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060, Video 13 Frame 018 & Video 16 Frame 085:
   // Base dirty count is 17. Each cleared room decrements dirty and increments vacant!
   // Room transfers increment dirty and decrement vacant.
+  const isBulkOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
   const transferCount = Object.keys(transferredRooms).length;
-  const clearedCount = allCleared.filter(no => dirtyCategories[no]).length;
-  const dirtyCount = Math.max(0, 17 - clearedCount) + transferCount;
+  const clearedCount = allCleared.filter(no => dirtyCategories[no] || checkedOutRooms.includes(no)).length;
+  const baseDirty = isBulkOut ? 27 : (checkedOutRooms.includes('314') ? 18 : 17);
+  const dirtyCount = Math.max(0, baseDirty - clearedCount) + transferCount;
   const vacantCount = Math.max(0, 6 + clearedCount - transferCount);
-  const occupiedCount = is316Occupied ? 32 : 14;
+  const occupiedCount = isBulkOut ? 22 : (is316Occupied ? 32 : 14);
 
   const getCellBg = (status, roomNo) => {
     // Rooms 401 & 516 display in blue/purple for Expected Departure

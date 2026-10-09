@@ -243,8 +243,25 @@ export default function IdsDesktopShell({
   const [checkoutInitialMode, setCheckoutInitialMode] = useState('checkout'); // 'checkout' | 'settlement'
   const [checkedOutRooms, setCheckedOutRooms] = useState([]);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062 sync)
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062 & Video 16 Frame 085 sync)
   const stats = useMemo(() => {
+    // Video 16 Frame 085: When Sharma Group (10 rooms) is bulk checked out
+    const hasBulkCheckedOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
+    if (hasBulkCheckedOut) {
+      return {
+        expectedArrivals: 0,
+        expectedDepartures: 0,
+        checkInRooms: 0,
+        walkInRooms: 0,
+        roomsToSell: 57,
+        registeredComplaints: 0,
+        inhouseRoomsGuests: '23/39',
+        extraAdultChild: '0/0',
+        inhouseForeigners: '0/0',
+        guestBlocks: 0
+      };
+    }
+
     // Video 15 Frame 062: When Room 314 is checked out, Inhouse Rooms/Guests transitions to 33/59, Rooms to sell is 40, Expected Departures is 16
     if (checkedOutRooms.includes('314') || checkedOutRooms.length > 0) {
       return {
@@ -465,7 +482,15 @@ export default function IdsDesktopShell({
           setCheckoutBillModalOpen(true);
         } 
       },
-      { label: 'Bulk Check Out at Once (Group)', videoId: '16', action: () => openTutorial('16') },
+      { 
+        label: 'Bulk Check Out at Once (Group)', 
+        videoId: '16', 
+        action: () => {
+          setSelectedRoomForCheckout('406');
+          setCheckoutInitialMode('bulk');
+          setCheckoutBillModalOpen(true);
+        } 
+      },
       { label: 'Pax Check-Out', videoId: '18', action: () => openTutorial('18') },
       { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
       { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
@@ -1462,11 +1487,12 @@ export default function IdsDesktopShell({
         transferredRooms={transferredRooms}
       />
 
-      {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) */}
+      {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) & Video 16 Frame 092 */}
       <IdsClearRoomsModal 
         isOpen={clearRoomsModalOpen}
         onClose={() => setClearRoomsModalOpen(false)}
         clearedRooms={clearedDirtyRooms}
+        checkedOutRooms={checkedOutRooms}
         onClearAllDirtyRooms={(allRoomNos) => {
           setClearedDirtyRooms(prev => Array.from(new Set([...prev, ...allRoomNos])));
         }}
@@ -1706,17 +1732,23 @@ export default function IdsDesktopShell({
         }}
       />
 
-      {/* Video 15: Checkout & Settle Front Office Bill with Split Bill Process (Frames 010–060) */}
+      {/* Video 15 & 16: Checkout & Settle Front Office Bill & Bulk Check Out (Frames 010–070) */}
       <IdsCheckoutBillModal 
         isOpen={checkoutBillModalOpen}
         onClose={() => setCheckoutBillModalOpen(false)}
         initialRoomNo={selectedRoomForCheckout}
         initialMode={checkoutInitialMode}
+        initialGroup={checkoutInitialMode === 'bulk' ? 'Sharma Group' : ''}
         checkedOutRooms={checkedOutRooms}
         onCompleteCheckout={(roomNo, settlementData) => {
           setCheckedOutRooms(prev => [...new Set([...prev, roomNo])]);
           // Sync with inhouse guest database: remove checked out room
           setInhouseGuestsList(prev => prev.filter(g => g.roomNo !== roomNo));
+        }}
+        onCompleteBulkCheckout={(roomNos, groupData) => {
+          setCheckedOutRooms(prev => [...new Set([...prev, ...roomNos])]);
+          // Sync with inhouse guest database: remove all checked out rooms
+          setInhouseGuestsList(prev => prev.filter(g => !roomNos.includes(g.roomNo)));
         }}
       />
 
@@ -1725,6 +1757,31 @@ export default function IdsDesktopShell({
         isOpen={tutorialPlayerOpen}
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
+        onLaunchInteractive={(videoId) => {
+          if (videoId === '16') {
+            setSelectedRoomForCheckout('406');
+            setCheckoutInitialMode('bulk');
+            setCheckoutBillModalOpen(true);
+          } else if (videoId === '15') {
+            setSelectedRoomForCheckout('314');
+            setCheckoutInitialMode('checkout');
+            setCheckoutBillModalOpen(true);
+          } else if (videoId === '14') {
+            setSelectedRoomForDeposit('201');
+            setPostDepositModalOpen(true);
+          } else if (videoId === '13') {
+            setSelectedRoomForTransfer('415');
+            setRoomTransferModalOpen(true);
+          } else if (videoId === '12') {
+            setSelectedRoomForAmendStay('301');
+            setAmendStayModalOpen(true);
+          } else if (videoId === '11') {
+            setSelectedRoomForRate('312');
+            setChangeRateModalOpen(true);
+          } else if (videoId === '09') {
+            setRoomRackConsoleOpen(true);
+          }
+        }}
       />
     </div>
   );

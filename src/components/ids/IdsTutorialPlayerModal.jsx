@@ -48,7 +48,7 @@ export const TUTORIAL_PLAYLIST_DATA = [
   { id: '44', title: '44 - How to Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 Software', file: '44 - How to Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 Software.mp4', duration: '03:41', module: 'Cashiering' }
 ];
 
-export default function IdsTutorialPlayerModal({ isOpen, onClose, initialVideoId = '01' }) {
+export default function IdsTutorialPlayerModal({ isOpen, onClose, initialVideoId = '01', onLaunchInteractive }) {
   const [selectedVideo, setSelectedVideo] = useState(() => {
     return TUTORIAL_PLAYLIST_DATA.find(v => v.id === initialVideoId) || TUTORIAL_PLAYLIST_DATA[0];
   });
@@ -152,7 +152,21 @@ export default function IdsTutorialPlayerModal({ isOpen, onClose, initialVideoId
               <span style={{ fontSize: '11px' }}>
                 📁 Local path: <code style={{ background: '#FFFFFF', padding: '1px 4px', border: '1px solid #B0AB9A' }}>videos/ids_fortune_next_playlist/{selectedVideo.file}</code>
               </span>
-              <button className="ids-btn-classic" onClick={onClose}>Close Player</button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {onLaunchInteractive && (
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ background: '#FFF7CC', fontWeight: 700, color: '#0A246A' }}
+                    onClick={() => {
+                      onClose();
+                      onLaunchInteractive(selectedVideo.id);
+                    }}
+                  >
+                    🚀 Launch Interactive Feature Clone
+                  </button>
+                )}
+                <button className="ids-btn-classic" onClick={onClose}>Close Player</button>
+              </div>
             </div>
           </div>
         </div>
