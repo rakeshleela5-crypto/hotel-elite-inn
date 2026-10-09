@@ -56,6 +56,7 @@ import IdsCompanyContractRatesModal from './IdsCompanyContractRatesModal';
 import IdsLinkRatesToCompanyModal from './IdsLinkRatesToCompanyModal';
 import IdsRoomMasterModal from './IdsRoomMasterModal';
 import IdsReprintVoucherModal from './IdsReprintVoucherModal';
+import IdsReprintBillModal from './IdsReprintBillModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -339,6 +340,9 @@ export default function IdsDesktopShell({
 
   // Video 35: Reprint Front Office Module Voucher in IDS 6.5 & 7.0 (Frames 010–060)
   const [reprintVoucherModalOpen, setReprintVoucherModalOpen] = useState(false);
+
+  // Video 36: Reprint Front Office Bill (Rule 46 GST) in IDS 6.5 & 7.0 (Frames 010–040)
+  const [reprintBillModalOpen, setReprintBillModalOpen] = useState(false);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -786,7 +790,7 @@ export default function IdsDesktopShell({
     ],
     'Reports..': [
       { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
-      { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => openTutorial('36') },
+      { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => setReprintBillModalOpen(true) },
       { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => openTutorial('42') }
     ],
     'Setup..': [
@@ -1939,6 +1943,8 @@ export default function IdsDesktopShell({
             setRoomMasterModalOpen(true);
           } else if (programId === 'reprint-voucher' || programId === 'reprint-front-office-voucher' || programId === 'print-voucher') {
             setReprintVoucherModalOpen(true);
+          } else if (programId === 'reprint-fo-bill' || programId === 'reprint-front-office-bill' || programId === 'reprint-bill') {
+            setReprintBillModalOpen(true);
           }
         }}
       />
@@ -2187,7 +2193,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '35') {
+          if (videoId === '36') {
+            setReprintBillModalOpen(true);
+          } else if (videoId === '35') {
             setReprintVoucherModalOpen(true);
           } else if (videoId === '34' || videoId === '33') {
             setSelectedRoomForMaster('202');
@@ -2558,6 +2566,13 @@ export default function IdsDesktopShell({
       <IdsReprintVoucherModal 
         isOpen={reprintVoucherModalOpen}
         onClose={() => setReprintVoucherModalOpen(false)}
+        accountingDate={accountingDate}
+      />
+
+      {/* Video 36: Reprint Front Office Bill (Rule 46 GST) in IDS 6.5 & 7.0 (Frames 010–040) */}
+      <IdsReprintBillModal 
+        isOpen={reprintBillModalOpen}
+        onClose={() => setReprintBillModalOpen(false)}
         accountingDate={accountingDate}
       />
     </div>

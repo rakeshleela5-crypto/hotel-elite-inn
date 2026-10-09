@@ -62,7 +62,9 @@ export default function IdsQuickScanModal({
     { id: 'reprint-voucher', label: 'Reprint Voucher', code: 'RV01' },
     { id: 'reprint-front-office-voucher', label: 'Reprint Front Office Module Voucher', code: 'RV02' },
     { id: 'print-voucher', label: 'Print Voucher', code: 'PV01' },
-    { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
+    { id: 'reprint-fo-bill', label: 'Reprint FO Bill', code: 'RB01' },
+    { id: 'reprint-front-office-bill', label: 'Reprint Front Office Bill (Rule 46 GST)', code: 'RB02' },
+    { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 
   const filtered = programs.filter(p => 
