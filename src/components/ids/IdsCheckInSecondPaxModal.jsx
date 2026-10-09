@@ -234,68 +234,7 @@ export default function IdsCheckInSecondPaxModal({
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
-      {/* Top Tutorial Guidance Banner */}
-      <div 
-        style={{
-          width: '840px',
-          maxWidth: '96vw',
-          margin: '0 auto 6px auto',
-          background: 'linear-gradient(180deg, #1A365D 0%, #0F2942 100%)',
-          color: '#FFF',
-          padding: '6px 12px',
-          borderRadius: '4px',
-          fontSize: '11px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          border: '1px solid #3182CE',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.45)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ background: '#3182CE', color: '#FFF', padding: '2px 7px', borderRadius: '3px', fontWeight: 800 }}>
-            VIDEO 22
-          </span>
-          <span style={{ fontWeight: 700, color: '#EBF8FF' }}>
-            Check-in 2nd Pax Later into Occupied Room in IDS 6.5 & 7.0 PMS
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-          <span style={{ color: '#A0AEC0', fontSize: '10px' }}>Presets:</span>
-          {OCCUPIED_ROOMS_DEMO.map(demo => (
-            <button
-              key={demo.roomNo}
-              onClick={() => applyPreset(demo.roomNo)}
-              style={{
-                background: selectedRoomNo === demo.roomNo ? '#F6E05E' : '#2D3748',
-                color: selectedRoomNo === demo.roomNo ? '#000' : '#FFF',
-                border: '1px solid #4A5568',
-                padding: '2px 6px',
-                fontSize: '10px',
-                borderRadius: '2px',
-                fontWeight: selectedRoomNo === demo.roomNo ? 700 : 500,
-                cursor: 'pointer'
-              }}
-            >
-              Room {demo.roomNo} ({demo.defaultSecondPax.firstName})
-            </button>
-          ))}
-          <button 
-            onClick={onClose}
-            style={{
-              background: '#E53E3E',
-              color: '#FFF',
-              border: 'none',
-              padding: '2px 8px',
-              borderRadius: '2px',
-              fontWeight: 700,
-              cursor: 'pointer'
-            }}
-          >
-            ✕
-          </button>
-        </div>
-      </div>
+
 
       {/* =========================================================================
           VIEW 1: ROOM RACK V6.5.002.2 (Video 22 Frames 042–060)

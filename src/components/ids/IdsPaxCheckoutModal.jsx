@@ -415,77 +415,7 @@ export default function IdsPaxCheckoutModal({
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
-      {/* Tutorial Walkthrough Ribbon (Top) */}
-      <div 
-        style={{
-          width: '680px',
-          maxWidth: '96vw',
-          margin: '0 auto 6px auto',
-          background: 'linear-gradient(180deg, #1A365D 0%, #0F2942 100%)',
-          color: '#FFF',
-          padding: '6px 12px',
-          borderRadius: '4px',
-          border: '1px solid #4A90E2',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-          fontSize: '11px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
-            <span style={{ background: '#FF9800', color: '#000', padding: '1px 5px', borderRadius: '2px', fontSize: '10px' }}>
-              VIDEO 18
-            </span>
-            <span>Pax Check-Out Workflow (Room 312: Mr Anirudh & Room 311: Mrs Deuri Kabita)</span>
-          </div>
-          <span style={{ fontSize: '10px', color: '#BEE3F8' }}>IDS Fortune NEXT V6.5 / V7.0</span>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', paddingTop: '2px' }}>
-          <span style={{ color: '#E2E8F0', fontSize: '10px' }}>Quick Actions:</span>
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ fontSize: '10px', padding: '1px 7px', background: formRoomNo === '312' ? '#C2E0C6' : '#ECE9D8', fontWeight: 700 }}
-            onClick={() => {
-              const p = fullPaxList.find(x => x.roomNo === '312');
-              if (p) loadPax(p);
-            }}
-          >
-            🎯 Room 312 (Mr Anirudh)
-          </button>
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ fontSize: '10px', padding: '1px 7px', background: formRoomNo === '311' ? '#C2E0C6' : '#ECE9D8', fontWeight: 700 }}
-            onClick={() => {
-              const p = fullPaxList.find(x => x.roomNo === '311');
-              if (p) loadPax(p);
-            }}
-          >
-            🎯 Room 311 (Mrs Deuri)
-          </button>
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ fontSize: '10px', padding: '1px 7px' }}
-            onClick={handleOpenLookup}
-          >
-            📋 Open Pax Lookup Table
-          </button>
-          {formRoomNo && (
-            <button 
-              type="button"
-              className="ids-btn-classic" 
-              style={{ fontSize: '10px', padding: '1px 7px', background: '#316AC5', color: '#FFF', fontWeight: 700 }}
-              onClick={handleStartCheckout}
-            >
-              ⚡ Fast Checkout
-            </button>
-          )}
-        </div>
-      </div>
+
 
       {/* Main Modal: Pax Check-out V6.5.002.1 */}
       <div 

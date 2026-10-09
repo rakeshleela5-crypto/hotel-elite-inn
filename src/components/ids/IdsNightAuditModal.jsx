@@ -204,112 +204,7 @@ export default function IdsNightAuditModal({
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
-      {/* Top Tutorial Walkthrough Banner */}
-      <div 
-        style={{
-          width: '740px',
-          maxWidth: '96vw',
-          margin: '0 auto 6px auto',
-          background: 'linear-gradient(180deg, #1A365D 0%, #0F2942 100%)',
-          color: '#FFF',
-          padding: '6px 12px',
-          borderRadius: '4px',
-          border: '1px solid #4A90E2',
-          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-          fontSize: '11px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
-            <span style={{ background: '#FF9800', color: '#000', padding: '1px 5px', borderRadius: '2px', fontSize: '10px' }}>
-              VIDEO 19
-            </span>
-            <span>Night Audit Process in IDS 6.5 & 7.0 Software (Full 4-Step Rollover)</span>
-          </div>
-          <span style={{ fontSize: '10px', color: '#BEE3F8' }}>Current A/c Date: {step4Done ? nextDate : acDate}</span>
-        </div>
 
-        {/* Stepper Navigation */}
-        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', paddingTop: '2px' }}>
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ 
-              fontSize: '10px', 
-              padding: '2px 8px', 
-              background: activeStep === 1 ? '#C2E0C6' : '#ECE9D8', 
-              fontWeight: activeStep === 1 ? 700 : 400 
-            }}
-            onClick={() => setActiveStep(1)}
-          >
-            {step1Done ? '✓ ' : '1. '}Post Room Rate
-          </button>
-          <span style={{ color: '#A0AEC0' }}>→</span>
-
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ 
-              fontSize: '10px', 
-              padding: '2px 8px', 
-              background: activeStep === 2 ? '#C2E0C6' : '#ECE9D8', 
-              fontWeight: activeStep === 2 ? 700 : 400 
-            }}
-            onClick={() => setActiveStep(2)}
-          >
-            {step2Done ? '✓ ' : '2. '}Create Guest Balance
-          </button>
-          <span style={{ color: '#A0AEC0' }}>→</span>
-
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ 
-              fontSize: '10px', 
-              padding: '2px 8px', 
-              background: activeStep === 3 ? '#C2E0C6' : '#ECE9D8', 
-              fontWeight: activeStep === 3 ? 700 : 400 
-            }}
-            onClick={() => setActiveStep(3)}
-          >
-            {step3Done ? '✓ ' : '3. '}Create Night Balance
-          </button>
-          <span style={{ color: '#A0AEC0' }}>→</span>
-
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ 
-              fontSize: '10px', 
-              padding: '2px 8px', 
-              background: activeStep === 4 ? '#C2E0C6' : '#ECE9D8', 
-              fontWeight: activeStep === 4 ? 700 : 400 
-            }}
-            onClick={() => setActiveStep(4)}
-          >
-            {step4Done ? '✓ ' : '4. '}Open New Date
-          </button>
-
-          <button 
-            type="button"
-            className="ids-btn-classic" 
-            style={{ 
-              fontSize: '10px', 
-              padding: '2px 8px', 
-              marginLeft: 'auto',
-              background: '#316AC5',
-              color: '#FFF',
-              fontWeight: 700
-            }}
-            onClick={() => setShowInfoModal(true)}
-          >
-            ℹ Verify in Info.. (Frame 090)
-          </button>
-        </div>
-      </div>
 
       {/* =========================================================================
           STEP 1: POST ROOM RATE V6.5.002.1 (Frames 020–040)
@@ -350,10 +245,7 @@ export default function IdsNightAuditModal({
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
-            {/* Step Explanation Banner */}
-            <div style={{ background: '#FFFBE6', border: '1px solid #FFE58F', padding: '6px 10px', marginBottom: '12px', fontSize: '10.5px' }}>
-              <span style={{ fontWeight: 700, color: '#D4380D' }}>1st Step: Post Room Rate</span> — Debits daily tariff, GST/luxury taxes, and meal package charges to all active in-house guest folios before end-of-day ledger closure.
-            </div>
+
 
             {/* Selection Radios & Date */}
             <div style={{ border: '1px solid #7F9DB9', padding: '12px 16px', background: '#F8F7F3', marginBottom: '12px' }}>
@@ -492,10 +384,7 @@ export default function IdsNightAuditModal({
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
-            {/* Step Explanation Banner */}
-            <div style={{ background: '#FFFBE6', border: '1px solid #FFE58F', padding: '6px 10px', marginBottom: '10px', fontSize: '10.5px' }}>
-              <span style={{ fontWeight: 700, color: '#D4380D' }}>2nd Step: Create Guest Balance</span> — Consolidates guest ledgers, checks advance deposits against posted transactions, and derives closing balances.
-            </div>
+
 
             {/* Instruction Box matching Frame 045 */}
             <div 
@@ -621,10 +510,7 @@ export default function IdsNightAuditModal({
           </div>
 
           <div style={{ padding: '10px 12px', fontSize: '11px', color: '#000' }}>
-            {/* Step Explanation Banner */}
-            <div style={{ background: '#FFFBE6', border: '1px solid #FFE58F', padding: '6px 10px', marginBottom: '8px', fontSize: '10.5px' }}>
-              <span style={{ fontWeight: 700, color: '#D4380D' }}>3rd Step: Create Night Balance</span> — System checks for unbilled POS/restaurant kitchen order tickets (KOTs) to verify outlet revenues prior to closing.
-            </div>
+
 
             {/* Pending KOTs Grid matching Frame 060 */}
             <div 
@@ -726,10 +612,7 @@ export default function IdsNightAuditModal({
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
-            {/* Step Explanation Banner */}
-            <div style={{ background: '#FFFBE6', border: '1px solid #FFE58F', padding: '6px 10px', marginBottom: '10px', fontSize: '10.5px' }}>
-              <span style={{ fontWeight: 700, color: '#D4380D' }}>4th Step: Open New Date</span> — Finalizes day closure, locks transactions for the previous date, purges work tables (FOMPURG), and increments PMS Accounting Date to 26-JAN-2022.
-            </div>
+
 
             {/* Instruction Warning Box matching Frame 070 */}
             <div 
