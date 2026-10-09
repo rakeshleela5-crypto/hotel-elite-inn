@@ -737,7 +737,10 @@ export function IdsRoomRackConsoleModal({
   guestName = 'Biswakarma',
   clearedRooms = [],
   onClearSingleRoom,
-  onOpenClearRoomsModal
+  onOpenClearRoomsModal,
+  onOpenChangeRate,
+  onOpenGuestInfo,
+  onOpenChangeGuestInfo
 }) {
   const [filterType, setFilterType] = useState('All');
   const [filterBlock, setFilterBlock] = useState('All');
@@ -892,15 +895,17 @@ export function IdsRoomRackConsoleModal({
   };
 
   const handleRoomClick = (e, r) => {
-    // If dirty room, show context menu matching Frame 018
-    if (r.status === 'dirty' || dirtyCategories[r.no]) {
+    // If dirty room or occupied room, show context menu (Video 09 Frame 018 & Video 11 Frames 035-040)
+    if (r.status === 'dirty' || dirtyCategories[r.no] || r.status === 'occupied') {
       e.preventDefault();
       const rect = e.currentTarget.getBoundingClientRect();
       setContextMenu({
         roomNo: r.no,
+        status: r.status,
         category: r.category || 'DLX',
-        x: rect.left,
-        y: rect.bottom + 2
+        guest: r.guest,
+        x: Math.min(window.innerWidth - 180, rect.left),
+        y: Math.min(window.innerHeight - 380, rect.bottom + 2)
       });
     }
   };
@@ -999,7 +1004,13 @@ export function IdsRoomRackConsoleModal({
                   key={r.no}
                   onClick={(e) => handleRoomClick(e, r)}
                   onContextMenu={(e) => handleRoomClick(e, r)}
-                  title={isDirty ? `Room #${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` : undefined}
+                  title={
+                    isDirty 
+                      ? `Room #${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
+                      : r.status === 'occupied'
+                        ? `Room #${r.no} is Occupied (${r.guest || ''}). Right-click or click for Actions / Change Tariff (Video 11)`
+                        : undefined
+                  }
                   style={{
                     background: getCellBg(r.status, r.no),
                     border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
@@ -1010,7 +1021,7 @@ export function IdsRoomRackConsoleModal({
                     justifyContent: 'space-between',
                     color: '#000',
                     fontSize: '10px',
-                    cursor: isDirty ? 'context-menu' : 'default',
+                    cursor: (isDirty || r.status === 'occupied') ? 'context-menu' : 'default',
                     userSelect: 'none'
                   }}
                 >
@@ -1078,46 +1089,131 @@ export function IdsRoomRackConsoleModal({
         </div>
 
         {/* =========================================================================
-            VIDEO 09: ROOM CONTEXT MENU (Frame 018 & 028)
+            VIDEO 09 & 11: ROOM CONTEXT MENU (Video 09 Frame 018 & Video 11 Frames 035–040)
             ========================================================================= */}
         {contextMenu && (
-          <div 
-            style={{ 
-              position: 'fixed', 
-              top: contextMenu.y, 
-              left: contextMenu.x, 
-              background: '#ECE9D8', 
-              border: '2px outset #ECE9D8',
-              boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
-              zIndex: 1350,
-              minWidth: '105px',
-              fontSize: '11px'
-            }}
-          >
-            {/* Header: Room #201 */}
-            <div style={{ padding: '2px 6px', background: '#316AC5', color: '#FFF', fontWeight: 700, fontSize: '10px' }}>
-              Room #{contextMenu.roomNo}
-            </div>
+          <>
             <div 
-              style={{ padding: '4px 8px', cursor: 'pointer', borderBottom: '1px solid #CCC', fontWeight: 600 }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
-              onClick={() => handleOpenClearDialog(contextMenu.roomNo)}
-            >
-              Clear Room
-            </div>
+              style={{ position: 'fixed', inset: 0, zIndex: 1340 }} 
+              onClick={() => setContextMenu(null)} 
+            />
             <div 
-              style={{ padding: '4px 8px', cursor: 'pointer' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
-              onClick={() => {
-                alert(`Walk-in for Room ${contextMenu.roomNo}`);
-                setContextMenu(null);
+              style={{ 
+                position: 'fixed', 
+                top: contextMenu.y, 
+                left: contextMenu.x, 
+                background: '#ECE9D8', 
+                border: '2px outset #ECE9D8',
+                boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
+                zIndex: 1350,
+                minWidth: contextMenu.status === 'occupied' ? '165px' : '105px',
+                maxHeight: contextMenu.status === 'occupied' ? '360px' : 'auto',
+                overflowY: contextMenu.status === 'occupied' ? 'auto' : 'visible',
+                fontSize: '11px'
               }}
             >
-              Walk-in
+              {/* Header: Room #312 */}
+              <div style={{ padding: '3px 8px', background: '#316AC5', color: '#FFF', fontWeight: 700, fontSize: '10px' }}>
+                Room #{contextMenu.roomNo} {contextMenu.guest ? `(${contextMenu.guest})` : ''}
+              </div>
+
+              {contextMenu.status === 'occupied' ? (
+                <>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Audit</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Instructions</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Clear Room</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Transfer</div>
+                  
+                  <div 
+                    style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      if (onOpenGuestInfo) onOpenGuestInfo(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                  >
+                    Guest Information
+                  </div>
+
+                  <div 
+                    style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      if (onOpenChangeGuestInfo) onOpenChangeGuestInfo(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                  >
+                    Change Guest Information
+                  </div>
+
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Walk-in</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Amend Stay</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Guest Services</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Check-Out</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Pax Check-Out</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Charges</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Deposits</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Paidouts</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Rate</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Additional Room Rate</div>
+
+                  {/* Video 11: Change Tariff (Frames 035 & 040) */}
+                  <div 
+                    style={{ 
+                      padding: '4px 8px', 
+                      cursor: 'pointer', 
+                      background: '#FFF7CC', 
+                      fontWeight: 700, 
+                      color: '#0A246A',
+                      borderTop: '1px solid #CCC',
+                      borderBottom: '1px solid #CCC'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#FFF7CC'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenChangeRate) onOpenChangeRate(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Change Room Rate / Tariff (Video 11)"
+                  >
+                    ⭐ Change Tariff
+                  </div>
+
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Bill Allowance</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Consolidated Allowance</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>De-Link Rooms</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Link Fit Rooms to Groups</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Guest Details</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Photo Reg. Card</div>
+                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Quick Balances</div>
+                </>
+              ) : (
+                <>
+                  <div 
+                    style={{ padding: '4px 8px', cursor: 'pointer', borderBottom: '1px solid #CCC', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => handleOpenClearDialog(contextMenu.roomNo)}
+                  >
+                    Clear Room
+                  </div>
+                  <div 
+                    style={{ padding: '4px 8px', cursor: 'pointer' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      alert(`Walk-in for Room ${contextMenu.roomNo}`);
+                      setContextMenu(null);
+                    }}
+                  >
+                    Walk-in
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          </>
         )}
 
         {/* =========================================================================

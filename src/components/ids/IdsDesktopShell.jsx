@@ -33,6 +33,7 @@ import {
   IdsGuestInformationModal, 
   INITIAL_INHOUSE_GUESTS 
 } from './IdsGuestManagementModal';
+import IdsChangeRateModal, { DEFAULT_ROOM_TARIFFS } from './IdsChangeRateModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -211,6 +212,11 @@ export default function IdsDesktopShell({
   const [guestInformationModalOpen, setGuestInformationModalOpen] = useState(false);
   const [inhouseGuestsList, setInhouseGuestsList] = useState(INITIAL_INHOUSE_GUESTS);
   const [selectedGuestForEdit, setSelectedGuestForEdit] = useState(INITIAL_INHOUSE_GUESTS[0]);
+  
+  // Video 11: Change Room Rate / Change Tariff States (Frames 024–048)
+  const [changeRateModalOpen, setChangeRateModalOpen] = useState(false);
+  const [selectedRoomForRate, setSelectedRoomForRate] = useState('312');
+  const [roomTariffs, setRoomTariffs] = useState(DEFAULT_ROOM_TARIFFS);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058 sync)
   const stats = useMemo(() => {
@@ -354,7 +360,14 @@ export default function IdsDesktopShell({
       { label: 'Mask Guests', videoId: '10', action: () => openTutorial('10') },
       { label: 'Turn Away / Walkout Guest', videoId: '04', action: () => openTutorial('04') },
       { label: 'Room Instructions', videoId: '10', action: () => openTutorial('10') },
-      { label: 'Change Rate', videoId: '11', action: () => openTutorial('11') }
+      { 
+        label: 'Change Rate', 
+        videoId: '11', 
+        action: () => {
+          setSelectedRoomForRate('312');
+          setChangeRateModalOpen(true);
+        } 
+      }
     ],
     'Cashiering..': [
       { label: 'Post Deposit / Advance to Room', videoId: '14', action: () => openTutorial('14') },
@@ -407,7 +420,14 @@ export default function IdsDesktopShell({
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
       { label: 'Additional Room Rate Option (Half-Day)', videoId: '20', action: () => openTutorial('20') },
-      { label: 'Change Room Rate / Tariff Override', videoId: '11', action: () => openTutorial('11') }
+      { 
+        label: 'Change Room Rate / Tariff Override', 
+        videoId: '11', 
+        action: () => {
+          setSelectedRoomForRate('312');
+          setChangeRateModalOpen(true);
+        } 
+      }
     ],
     'Lookups..': [
       { label: 'Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
@@ -1302,6 +1322,18 @@ export default function IdsDesktopShell({
           setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
         }}
         onOpenClearRoomsModal={() => setClearRoomsModalOpen(true)}
+        onOpenChangeRate={(roomNo) => {
+          setSelectedRoomForRate(roomNo);
+          setChangeRateModalOpen(true);
+        }}
+        onOpenGuestInfo={(roomNo) => {
+          setGuestInformationModalOpen(true);
+        }}
+        onOpenChangeGuestInfo={(roomNo) => {
+          const g = inhouseGuestsList.find(x => x.roomNo === roomNo) || inhouseGuestsList[0];
+          setSelectedGuestForEdit(g);
+          setChangeGuestInfoOpen(true);
+        }}
       />
 
       {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) */}
@@ -1330,6 +1362,9 @@ export default function IdsDesktopShell({
             setGuestInformationModalOpen(true);
           } else if (programId === 'change-guest-info') {
             setRoomHelpLookupOpen(true);
+          } else if (programId === 'change-rate') {
+            setSelectedRoomForRate('312');
+            setChangeRateModalOpen(true);
           } else if (programId === 'express-checkin') {
             setExpressCheckInOpen(true);
           } else if (programId === 'reservation-checkin') {
@@ -1338,6 +1373,40 @@ export default function IdsDesktopShell({
           } else if (programId === 'room-booking') {
             setQuickReservationOpen(true);
           }
+        }}
+      />
+
+      {/* Video 11: Change Rate V6.5002.2 Modal (Frames 024–048) */}
+      <IdsChangeRateModal 
+        isOpen={changeRateModalOpen}
+        onClose={() => setChangeRateModalOpen(false)}
+        initialRoomNo={selectedRoomForRate}
+        roomTariffs={roomTariffs}
+        onOpenRoomHelpLookup={() => setRoomHelpLookupOpen(true)}
+        onSaveTariffChange={(updatedTariff) => {
+          setRoomTariffs(prev => ({
+            ...prev,
+            [updatedTariff.roomNo]: {
+              ...(prev[updatedTariff.roomNo] || {}),
+              currentRate: updatedTariff.newRate,
+              extraAdult: updatedTariff.extraAdult,
+              extraChild: updatedTariff.extraChild,
+              remarks: updatedTariff.remarks,
+              reason: updatedTariff.reason,
+              authorizedBy: updatedTariff.authorizedBy
+            }
+          }));
+
+          // Also sync into inhouseGuestsList so Guest Information reflects new rate
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === updatedTariff.roomNo) {
+              return {
+                ...g,
+                rate: `Discount (₹${updatedTariff.newRate.toFixed(2)})`
+              };
+            }
+            return g;
+          }));
         }}
       />
 

@@ -28,6 +28,8 @@ export default function IdsQuickScanModal({
     { id: 'guest-management', label: 'Guest Management', code: 'GM01' },
     { id: 'guest-information', label: 'Guest Information', code: 'GI01' },
     { id: 'change-guest-info', label: 'Change Guest Information', code: 'CG01' },
+    { id: 'change-rate', label: 'Change Rate', code: 'CR02' },
+    { id: 'hurdle-rate', label: 'Hurdle Rate', code: 'HR01' },
     { id: 'express-checkin', label: 'Express Check-in', code: 'EX01' },
     { id: 'reservation-checkin', label: 'Reservation Check-in', code: 'RC01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
