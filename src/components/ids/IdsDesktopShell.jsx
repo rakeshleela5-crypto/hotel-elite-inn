@@ -65,7 +65,6 @@ import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsForeignExchangeModal from './IdsForeignExchangeModal';
 import IdsGstnChangeModal from './IdsGstnChangeModal';
 import IdsPaidOutModal from './IdsPaidOutModal';
-import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
 export default function IdsDesktopShell({ 
@@ -205,8 +204,6 @@ export default function IdsDesktopShell({
   const [selectedBookingForAssignment, setSelectedBookingForAssignment] = useState(null);
   const [amendBookingModalOpen, setAmendBookingModalOpen] = useState(false);
   const [selectedBookingForAmend, setSelectedBookingForAmend] = useState(null);
-  const [tutorialPlayerOpen, setTutorialPlayerOpen] = useState(false);
-  const [selectedTutorialVideoId, setSelectedTutorialVideoId] = useState('01');
   const [activeTool, setActiveTool] = useState('front-office');
 
   // Video 04: Cancel Workflow States
@@ -552,16 +549,15 @@ export default function IdsDesktopShell({
         videoId: '02', 
         action: () => setRoomRackConsoleOpen(true) 
       },
-      { label: 'Reserved Guest Messages', videoId: '01', action: () => openTutorial('01') },
+      { label: 'Reserved Guest Messages', action: () => setQuickReservationOpen(true) },
       { 
         label: 'Retentions-Cancel/No Show', 
-        videoId: '04', 
         action: () => {
           setScanPurpose('cancel');
           setScanBookingModalOpen(true);
         } 
       },
-      { label: 'Close Room Inventory', videoId: '01', action: () => openTutorial('01') }
+      { label: 'Close Room Inventory', action: () => setRoomRackConsoleOpen(true) }
     ],
     'Registrations..': [
       { label: 'Express Check-in', videoId: '06', action: () => setExpressCheckInOpen(true) },
@@ -609,17 +605,30 @@ export default function IdsDesktopShell({
           setSecondPaxModalOpen(true);
         } 
       },
-      { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
-      { label: 'Room Floor Plan Display', videoId: '33', action: () => openTutorial('33') },
-      { label: 'Guest Management', videoId: '10', action: () => setGuestManagementOpen(true) },
-      { label: 'Guest Services', videoId: '21', action: () => openTutorial('21') },
-      { label: 'Guest Photo (In-House)', videoId: '10', action: () => setRoomHelpLookupOpen(true) },
-      { label: 'Guest Photo Reg. Card', videoId: '10', action: () => setRoomHelpLookupOpen(true) },
-      { label: 'Guest Reg Card (Crystal)', videoId: '35', action: () => openTutorial('35') },
-      { label: 'Invoice by Arrival', videoId: '36', action: () => openTutorial('36') },
-      { label: 'Mask Guests', videoId: '10', action: () => openTutorial('10') },
-      { label: 'Turn Away / Walkout Guest', videoId: '04', action: () => openTutorial('04') },
-      { label: 'Room Instructions', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Special Rooms Checkin', action: () => setExpressCheckInOpen(true) },
+      { label: 'Room Floor Plan Display', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'Guest Management', action: () => setGuestManagementOpen(true) },
+      { 
+        label: 'Guest Services', 
+        action: () => {
+          setSelectedRoomForPostCharges('312');
+          setSelectedRevenueCodeForPostCharges('TRV');
+          setPostChargesModalOpen(true);
+        } 
+      },
+      { label: 'Guest Photo (In-House)', action: () => setRoomHelpLookupOpen(true) },
+      { label: 'Guest Photo Reg. Card', action: () => setRoomHelpLookupOpen(true) },
+      { label: 'Guest Reg Card (Crystal)', action: () => setReprintVoucherModalOpen(true) },
+      { label: 'Invoice by Arrival', action: () => setReprintBillModalOpen(true) },
+      { label: 'Mask Guests', action: () => setGuestManagementOpen(true) },
+      { 
+        label: 'Turn Away / Walkout Guest', 
+        action: () => {
+          setScanPurpose('cancel');
+          setScanBookingModalOpen(true);
+        } 
+      },
+      { label: 'Room Instructions', action: () => setGuestManagementOpen(true) },
       { 
         label: 'Change Rate', 
         videoId: '11', 
@@ -773,8 +782,20 @@ export default function IdsDesktopShell({
           setRoomTransferModalOpen(true);
         } 
       },
-      { label: 'Add Room Numbers in Room Status', videoId: '33', action: () => openTutorial('33') },
-      { label: 'Modify Room Master', videoId: '34', action: () => openTutorial('34') }
+      { 
+        label: 'Add Room Numbers in Room Status', 
+        action: () => {
+          setSelectedRoomForMaster('202');
+          setRoomMasterModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Modify Room Master', 
+        action: () => {
+          setSelectedRoomForMaster('202');
+          setRoomMasterModalOpen(true);
+        } 
+      }
     ],
     'Day End process..': [
       { 
@@ -943,17 +964,24 @@ export default function IdsDesktopShell({
       },
       { label: 'Clear Rooms Program', videoId: '09', action: () => setClearRoomsModalOpen(true) },
       { label: 'Room Status Matrix Lookup', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
-      { label: 'Company Lookup Directory', videoId: '28', action: () => openTutorial('28') }
+      { 
+        label: 'Company Lookup Directory', 
+        action: () => {
+          setSelectedCompanyCode('COM0001');
+          setCompanyProfileModalOpen(true);
+        } 
+      }
     ],
     'SMS Setup..': [
-      { label: 'Guest Check-In SMS Gateway', videoId: '10', action: () => openTutorial('10') },
-      { label: 'Bill Settlement SMS Template', videoId: '15', action: () => openTutorial('15') }
+      { 
+        label: 'Guest Check-In SMS Gateway', 
+        action: () => setGuestManagementOpen(true) 
+      },
+      { 
+        label: 'Bill Settlement SMS Template', 
+        action: () => setReprintBillModalOpen(true) 
+      }
     ]
-  };
-
-  const openTutorial = (videoId) => {
-    setSelectedTutorialVideoId(videoId);
-    setTutorialPlayerOpen(true);
   };
 
   // Video 04: Cancel Workflow Handlers
@@ -2245,114 +2273,7 @@ export default function IdsDesktopShell({
         }}
       />
 
-      {/* Built-In 44-Video Tutorial Player Modal */}
-      <IdsTutorialPlayerModal 
-        isOpen={tutorialPlayerOpen}
-        onClose={() => setTutorialPlayerOpen(false)}
-        initialVideoId={selectedTutorialVideoId}
-        onLaunchInteractive={(videoId) => {
-          if (videoId === '44') {
-            setPaidOutModalOpen(true);
-          } else if (videoId === '43') {
-            setGstnChangeModalOpen(true);
-          } else if (videoId === '42') {
-            setForeignExchangeModalOpen(true);
-          } else if (videoId === '41') {
-            setSelectedRoomForMultiRate('201');
-            setMultiRateModalOpen(true);
-          } else if (videoId === '40') {
-            setPackageRatesInitialMode('create');
-            setPackageRatesModalOpen(true);
-          } else if (videoId === '39') {
-            setDeleteDepositModalOpen(true);
-          } else if (videoId === '38') {
-            setCancelCheckInModalOpen(true);
-          } else if (videoId === '37') {
-            setSelectedRoomForRegularWalkIn('202');
-            setRegularGuestWalkInModalOpen(true);
-          } else if (videoId === '36') {
-            setReprintBillModalOpen(true);
-          } else if (videoId === '35') {
-            setReprintVoucherModalOpen(true);
-          } else if (videoId === '34' || videoId === '33') {
-            setSelectedRoomForMaster('202');
-            setRoomMasterModalOpen(true);
-          } else if (videoId === '32') {
-            setSelectedCompanyForRateLink('COM0002');
-            setLinkRatesModalOpen(true);
-          } else if (videoId === '31') {
-            setSelectedRateTableNo('100');
-            setCompanyContractRatesModalOpen(true);
-          } else if (videoId === '30') {
-            setSelectedMarketSegmentCode('CVG');
-            setMarketSegmentModalOpen(true);
-          } else if (videoId === '29') {
-            setSelectedBusinessSourceCode('OTA');
-            setBusinessSourceModalOpen(true);
-          } else if (videoId === '28') {
-            setSelectedCompanyCode('COM0001');
-            setCompanyProfileModalOpen(true);
-          } else if (videoId === '27') {
-            setReleaseStopPostingRoomNo('201');
-            setReleaseStopPostingModalOpen(true);
-          } else if (videoId === '26') {
-            setFolioReinstateRoomNo('201');
-            setFolioReinstateModalOpen(true);
-          } else if (videoId === '25') {
-            setTransferFolioFromRoom('201');
-            setTransferFolioToRoom('205');
-            setTransferFolioModalOpen(true);
-          } else if (videoId === '24') {
-            setSelectedRoomForBillAllowanceOption('201');
-            setBillAllowanceOptionModalOpen(true);
-          } else if (videoId === '23') {
-            setSelectedRoomForBillAllowance('311');
-            setBillAllowanceModalOpen(true);
-          } else if (videoId === '22') {
-            setSelectedRoomForSecondPax('312');
-            setSecondPaxModalOpen(true);
-          } else if (videoId === '21') {
-            setSelectedRoomForPostCharges('312');
-            setSelectedRevenueCodeForPostCharges('TRV');
-            setPostChargesModalOpen(true);
-          } else if (videoId === '20') {
-            setSelectedRoomForAdditionalRate('312');
-            setAdditionalRoomRateInitialMode('additional-rate');
-            setAdditionalRoomRateModalOpen(true);
-          } else if (videoId === '19') {
-            setNightAuditInitialStep('full-wizard');
-            setNightAuditModalOpen(true);
-          } else if (videoId === '18') {
-            setSelectedRoomForPaxCheckout('312');
-            setPaxCheckoutModalOpen(true);
-          } else if (videoId === '17') {
-            setWalkInInitialRoom('203');
-            setWalkInModalOpen(true);
-          } else if (videoId === '16') {
-            setSelectedRoomForCheckout('406');
-            setCheckoutInitialMode('bulk');
-            setCheckoutBillModalOpen(true);
-          } else if (videoId === '15') {
-            setSelectedRoomForCheckout('314');
-            setCheckoutInitialMode('checkout');
-            setCheckoutBillModalOpen(true);
-          } else if (videoId === '14') {
-            setSelectedRoomForDeposit('201');
-            setPostDepositModalOpen(true);
-          } else if (videoId === '13') {
-            setSelectedRoomForTransfer('415');
-            setRoomTransferModalOpen(true);
-          } else if (videoId === '12') {
-            setSelectedRoomForAmendStay('301');
-            setAmendStayModalOpen(true);
-          } else if (videoId === '11') {
-            setSelectedRoomForRate('312');
-            setChangeRateModalOpen(true);
-          } else if (videoId === '09') {
-            setRoomRackConsoleOpen(true);
-          }
-        }}
-      />
+
       {/* Video 18: Pax Check-Out V6.5.002.1 Modal (Frames 020–095) */}
       <IdsPaxCheckoutModal 
         isOpen={paxCheckoutModalOpen}
