@@ -51,6 +51,9 @@ export default function IdsQuickScanModal({
     { id: 'add-business-source', label: 'Add Business Source', code: 'BS02' },
     { id: 'market-segments', label: 'Market Segments', code: 'MS01' },
     { id: 'add-market-segment', label: 'Add Market Segment', code: 'MS02' },
+    { id: 'company-contract-rates', label: 'Create Company Contract Rates', code: 'CR01' },
+    { id: 'create-contract-rates', label: 'Company Contract Rates', code: 'CR02' },
+    { id: 'room-rate-master', label: 'Room Rate Master', code: 'RRM01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
