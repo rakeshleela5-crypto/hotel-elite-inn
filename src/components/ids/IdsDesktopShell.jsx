@@ -55,6 +55,7 @@ import IdsMarketSegmentModal from './IdsMarketSegmentModal';
 import IdsCompanyContractRatesModal from './IdsCompanyContractRatesModal';
 import IdsLinkRatesToCompanyModal from './IdsLinkRatesToCompanyModal';
 import IdsRoomMasterModal from './IdsRoomMasterModal';
+import IdsReprintVoucherModal from './IdsReprintVoucherModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -335,6 +336,9 @@ export default function IdsDesktopShell({
   // Video 33: Add Room Numbers in Room Status / Room Master in IDS 6.5 & 7.0 (Frames 010–030)
   const [roomMasterModalOpen, setRoomMasterModalOpen] = useState(false);
   const [selectedRoomForMaster, setSelectedRoomForMaster] = useState('202');
+
+  // Video 35: Reprint Front Office Module Voucher in IDS 6.5 & 7.0 (Frames 010–060)
+  const [reprintVoucherModalOpen, setReprintVoucherModalOpen] = useState(false);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -781,7 +785,7 @@ export default function IdsDesktopShell({
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => openTutorial('43') }
     ],
     'Reports..': [
-      { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => openTutorial('35') },
+      { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
       { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => openTutorial('36') },
       { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => openTutorial('42') }
     ],
@@ -1933,6 +1937,8 @@ export default function IdsDesktopShell({
           } else if (programId === 'room-master' || programId === 'add-room-number' || programId === 'modify-room-master') {
             setSelectedRoomForMaster('202');
             setRoomMasterModalOpen(true);
+          } else if (programId === 'reprint-voucher' || programId === 'reprint-front-office-voucher' || programId === 'print-voucher') {
+            setReprintVoucherModalOpen(true);
           }
         }}
       />
@@ -2181,7 +2187,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '34' || videoId === '33') {
+          if (videoId === '35') {
+            setReprintVoucherModalOpen(true);
+          } else if (videoId === '34' || videoId === '33') {
             setSelectedRoomForMaster('202');
             setRoomMasterModalOpen(true);
           } else if (videoId === '32') {
@@ -2544,6 +2552,13 @@ export default function IdsDesktopShell({
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
         }}
+      />
+
+      {/* Video 35: Reprint Front Office Module Voucher in IDS 6.5 & 7.0 (Frames 010–060) */}
+      <IdsReprintVoucherModal 
+        isOpen={reprintVoucherModalOpen}
+        onClose={() => setReprintVoucherModalOpen(false)}
+        accountingDate={accountingDate}
       />
     </div>
   );

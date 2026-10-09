@@ -59,6 +59,9 @@ export default function IdsQuickScanModal({
     { id: 'room-master', label: 'Room Master', code: 'RM01' },
     { id: 'add-room-number', label: 'Add Room Numbers in Room Status', code: 'RM02' },
     { id: 'modify-room-master', label: 'Modify Room Master', code: 'RM03' },
+    { id: 'reprint-voucher', label: 'Reprint Voucher', code: 'RV01' },
+    { id: 'reprint-front-office-voucher', label: 'Reprint Front Office Module Voucher', code: 'RV02' },
+    { id: 'print-voucher', label: 'Print Voucher', code: 'PV01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
