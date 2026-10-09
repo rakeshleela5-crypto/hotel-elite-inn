@@ -78,6 +78,9 @@ export default function IdsQuickScanModal({
     { id: 'foreign-exchange-entry', label: 'Foreign Exchange Entry (RBI Encashment)', code: 'FX01' },
     { id: 'foreign-exchange', label: 'Foreign Exchange Entry', code: 'FX02' },
     { id: 'forex-entry', label: 'Forex Currency Encashment (Form ECF)', code: 'FX03' },
+    { id: 'gstn-number-change', label: 'GSTN Number Change (Add Company After Check-Out)', code: 'GC01' },
+    { id: 'gstn-change', label: 'GSTN / VAT Number Change **', code: 'GC02' },
+    { id: 'add-company-details-after-checkout', label: 'Add Company Details & GSTN After Check-out', code: 'GC03' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 

@@ -63,6 +63,7 @@ import IdsDeleteDepositModal from './IdsDeleteDepositModal';
 import IdsPackageRatesModal from './IdsPackageRatesModal';
 import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsForeignExchangeModal from './IdsForeignExchangeModal';
+import IdsGstnChangeModal from './IdsGstnChangeModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -370,6 +371,9 @@ export default function IdsDesktopShell({
 
   // Video 42: Foreign Exchange Entry in IDS 6.5 & 7.0 (Frames 010–074)
   const [foreignExchangeModalOpen, setForeignExchangeModalOpen] = useState(false);
+
+  // Video 43: Add Company Details & GSTN After Check-out in IDS 6.5 & 7.0 (Frames 010–074)
+  const [gstnChangeModalOpen, setGstnChangeModalOpen] = useState(false);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -831,7 +835,7 @@ export default function IdsDesktopShell({
           setLinkRatesModalOpen(true);
         } 
       },
-      { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => openTutorial('43') }
+      { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => setGstnChangeModalOpen(true) }
     ],
     'Reports..': [
       { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
@@ -911,6 +915,11 @@ export default function IdsDesktopShell({
           setSelectedRoomForRate('312');
           setChangeRateModalOpen(true);
         } 
+      },
+      { 
+        label: 'Add Company Details & GSTN After Check-out (GSTN Change)', 
+        videoId: '43', 
+        action: () => setGstnChangeModalOpen(true) 
       }
     ],
     'Lookups..': [
@@ -2019,6 +2028,8 @@ export default function IdsDesktopShell({
             setMultiRateModalOpen(true);
           } else if (programId === 'foreign-exchange-entry' || programId === 'foreign-exchange' || programId === 'forex-entry') {
             setForeignExchangeModalOpen(true);
+          } else if (programId === 'gstn-number-change' || programId === 'gstn-change' || programId === 'add-company-details-after-checkout') {
+            setGstnChangeModalOpen(true);
           }
         }}
       />
@@ -2267,7 +2278,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '42') {
+          if (videoId === '43') {
+            setGstnChangeModalOpen(true);
+          } else if (videoId === '42') {
             setForeignExchangeModalOpen(true);
           } else if (videoId === '41') {
             setSelectedRoomForMultiRate('201');
@@ -2775,6 +2788,13 @@ export default function IdsDesktopShell({
       <IdsForeignExchangeModal 
         isOpen={foreignExchangeModalOpen}
         onClose={() => setForeignExchangeModalOpen(false)}
+        accountingDate={accountingDate}
+      />
+
+      {/* Video 43: Add Company Details & GSTN After Check-out in IDS 6.5 & 7.0 (Frames 010–074) */}
+      <IdsGstnChangeModal 
+        isOpen={gstnChangeModalOpen}
+        onClose={() => setGstnChangeModalOpen(false)}
         accountingDate={accountingDate}
       />
     </div>
