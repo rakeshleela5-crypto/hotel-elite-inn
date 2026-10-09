@@ -39,4 +39,5 @@ scratch/
 videos/**/*.mp4
 videos/*.mp4
 videos/frames/
+videos/frames*/
 !videos/**/PLAYLIST_CATALOG.md

@@ -12,17 +12,18 @@ export function IdsScanBookingModal({
   const [arrivalDate, setArrivalDate] = useState('14/01/2022');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sample or live reservation records matching video
-  const defaultBookings = useMemo(() => {
+  // Sample or live reservation records matching video Frame 014
+  const activeBookings = useMemo(() => {
+    if (bookings && bookings.length > 0) return bookings;
     return [
-      { resNo: '270', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Fit', roomNo: '', type: 'EXE', confirm: 'Y', provisional: 'N', pax: '1', arrivalDate: '14/01/2022', departureDate: '17/01/2022', status: 'Repeat Guest' },
-      { resNo: '271', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Mahindra & Mahindra Limited', roomNo: '', type: 'SUI', confirm: 'Y', provisional: 'N', pax: '2', arrivalDate: '14/01/2022', departureDate: '16/01/2022', status: 'VIP' },
-      { resNo: '269', title: 'Mr', guestName: 'P Ashok', companyName: 'Linde India Ltd', roomNo: '201', type: 'DLX', confirm: 'Y', provisional: 'N', pax: '1', arrivalDate: '14/01/2022', departureDate: '15/01/2022', status: 'Checked In' },
-      { resNo: '268', title: 'Mrs', guestName: 'Anjali Sharma', companyName: 'Direct', roomNo: '', type: 'DLX', confirm: 'N', provisional: 'Y', pax: '2', arrivalDate: '15/01/2022', departureDate: '18/01/2022', status: 'Waitlist' }
+      { resNo: '270', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Quality Pharma Products Pvt Ltd.', companyCode: 'COM0009', roomNo: '515', type: 'EXE', confirm: '1+0+0', provisional: '0+0+0', pax: '1+0+0', arrivalDate: '14-JAN-2022 20:07', departureDate: '17-JAN-2022 12:00', depositAmount: 2000, status: 'Repeat Guest', blocked: true },
+      { resNo: '271', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Mahindra & Mahindra Limited', companyCode: 'COM0007', roomNo: '516', type: 'SUI', confirm: '0+1+0', provisional: '0+0+0', pax: '2+0+0', arrivalDate: '14-JAN-2022 19:56', departureDate: '16-JAN-2022 12:00', depositAmount: 0, status: 'VIP', blocked: true },
+      { resNo: '269', title: 'Mr', guestName: 'P Ashok', companyName: 'Linde India Ltd', companyCode: 'COM0004', roomNo: '201', type: 'DLX', confirm: '1+0+0', provisional: '0+0+0', pax: '1+0+0', arrivalDate: '14-JAN-2022 14:00', departureDate: '15-JAN-2022 12:00', depositAmount: 1500, status: 'Checked In', blocked: false },
+      { resNo: '268', title: 'Mrs', guestName: 'Anjali Sharma', companyName: 'Direct FIT', companyCode: '', roomNo: '', type: 'DLX', confirm: '0+0+0', provisional: '1+0+0', pax: '2+0+0', arrivalDate: '15-JAN-2022 12:00', departureDate: '18-JAN-2022 12:00', depositAmount: 0, status: 'Waitlist', blocked: false }
     ];
-  }, []);
+  }, [bookings]);
 
-  const [selectedRow, setSelectedRow] = useState(defaultBookings[0]);
+  const [selectedRow, setSelectedRow] = useState(() => activeBookings[0]);
 
   if (!isOpen) return null;
 
@@ -119,7 +120,7 @@ export function IdsScanBookingModal({
                 </tr>
               </thead>
               <tbody>
-                {defaultBookings.map((b) => {
+                {activeBookings.map((b) => {
                   const isSelected = selectedRow?.resNo === b.resNo;
                   return (
                     <tr 

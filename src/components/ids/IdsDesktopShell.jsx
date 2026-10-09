@@ -7,6 +7,15 @@ import {
 } from 'lucide-react';
 import { IdsQuickReservationModal } from './IdsReservationForms';
 import { IdsScanBookingModal, IdsAssignGuestRoomsModal } from './IdsAssignRoomsModal';
+import { 
+  IdsCancelBookingDialog, 
+  IdsDepositWarningDialog, 
+  IdsDepositRefundModal, 
+  IdsCancelReasonModal, 
+  IdsBlockedRoomWarningDialog, 
+  IdsCancelVoucherPromptDialog, 
+  IdsCancellationVoucherModal 
+} from './IdsCancelBookingModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -19,10 +28,87 @@ export default function IdsDesktopShell({
   const [selectedMaster, setSelectedMaster] = useState('Reservations..');
   const [activeSubItem, setActiveSubItem] = useState('Room Booking');
   
-  // Modals
+  // Dynamic Live Reservations List matching Videos 01, 02, 03 & 04
+  const [reservations, setReservations] = useState([
+    { 
+      resNo: '270', 
+      title: 'Mr', 
+      guestName: 'Biswakarma Santosh', 
+      companyName: 'Quality Pharma Products Pvt Ltd.', 
+      companyCode: 'COM0009', 
+      roomNo: '515', 
+      type: 'EXE', 
+      confirm: '1+0+0', 
+      provisional: '0+0+0', 
+      pax: '1+0+0', 
+      arrivalDate: '14-JAN-2022 20:07', 
+      departureDate: '17-JAN-2022 12:00', 
+      depositAmount: 2000, 
+      status: 'Repeat Guest', 
+      blocked: true,
+      isCancelled: false 
+    },
+    { 
+      resNo: '271', 
+      title: 'Mr', 
+      guestName: 'Biswakarma Santosh', 
+      companyName: 'Mahindra & Mahindra Limited', 
+      companyCode: 'COM0007', 
+      roomNo: '516', 
+      type: 'SUI', 
+      confirm: '0+1+0', 
+      provisional: '0+0+0', 
+      pax: '2+0+0', 
+      arrivalDate: '14-JAN-2022 19:56', 
+      departureDate: '16-JAN-2022 12:00', 
+      depositAmount: 0, 
+      status: 'VIP', 
+      blocked: true,
+      isCancelled: false 
+    },
+    { 
+      resNo: '269', 
+      title: 'Mr', 
+      guestName: 'P Ashok', 
+      companyName: 'Linde India Ltd', 
+      companyCode: 'COM0004', 
+      roomNo: '201', 
+      type: 'DLX', 
+      confirm: '1+0+0', 
+      provisional: '0+0+0', 
+      pax: '1+0+0', 
+      arrivalDate: '14-JAN-2022 14:00', 
+      departureDate: '15-JAN-2022 12:00', 
+      depositAmount: 1500, 
+      status: 'Checked In', 
+      blocked: false,
+      isCancelled: false 
+    },
+    { 
+      resNo: '268', 
+      title: 'Mrs', 
+      guestName: 'Anjali Sharma', 
+      companyName: 'Direct FIT', 
+      companyCode: '', 
+      roomNo: '', 
+      type: 'DLX', 
+      confirm: '0+0+0', 
+      provisional: '1+0+0', 
+      pax: '2+0+0', 
+      arrivalDate: '15-JAN-2022 12:00', 
+      departureDate: '18-JAN-2022 12:00', 
+      depositAmount: 0, 
+      status: 'Waitlist', 
+      blocked: false,
+      isCancelled: false 
+    }
+  ]);
+
+  // Modals & Navigation
   const [quickReservationOpen, setQuickReservationOpen] = useState(false);
+  const [quickReservationCancelOpen, setQuickReservationCancelOpen] = useState(false);
   const [scanBookingModalOpen, setScanBookingModalOpen] = useState(false);
-  const [scanPurpose, setScanPurpose] = useState('assign'); // 'assign' or 'amend'
+  const [scanPurpose, setScanPurpose] = useState('assign'); // 'assign' | 'amend' | 'cancel'
   const [assignRoomsModalOpen, setAssignRoomsModalOpen] = useState(false);
   const [selectedBookingForAssignment, setSelectedBookingForAssignment] = useState(null);
   const [amendBookingModalOpen, setAmendBookingModalOpen] = useState(false);
@@ -31,27 +117,37 @@ export default function IdsDesktopShell({
   const [selectedTutorialVideoId, setSelectedTutorialVideoId] = useState('01');
   const [activeTool, setActiveTool] = useState('front-office');
 
-  // Real-time statistics computed from room & booking inventory
+  // Video 04: Cancel Workflow States
+  const [cancelBookingModalOpen, setCancelBookingModalOpen] = useState(false);
+  const [selectedBookingForCancel, setSelectedBookingForCancel] = useState(null);
+  const [depositWarningOpen, setDepositWarningOpen] = useState(false);
+  const [depositRefundOpen, setDepositRefundOpen] = useState(false);
+  const [cancelReasonOpen, setCancelReasonOpen] = useState(false);
+  const [blockedRoomWarningOpen, setBlockedRoomWarningOpen] = useState(false);
+  const [cancelVoucherPromptOpen, setCancelVoucherPromptOpen] = useState(false);
+  const [cancellationVoucherOpen, setCancellationVoucherOpen] = useState(false);
+  const [completedCancelRecord, setCompletedCancelRecord] = useState(null);
+  const [cancellationContext, setCancellationContext] = useState({});
+
+  // Real-time statistics computed dynamically (Exact Frame 004 vs Frame 040 sync)
   const stats = useMemo(() => {
-    const totalRooms = rooms.length || 27;
-    const occupiedRooms = rooms.filter(r => r.status === 'occupied').length;
-    const dirtyRooms = rooms.filter(r => r.status === 'dirty' || r.status === 'cleaning').length;
-    const availableRooms = totalRooms - occupiedRooms;
-    const inhouseGuests = occupiedRooms * 2; // average 2 pax per occupied room
+    const activeArrivals = reservations.filter(r => !r.isCancelled && (r.status === 'Repeat Guest' || r.status === 'VIP' || r.status === 'Confirmed')).length;
+    const blockedCount = reservations.filter(r => !r.isCancelled && r.blocked).length;
+    const roomsToSellCount = 54 + (2 - blockedCount);
 
     return {
-      expectedArrivals: 2,
-      expectedDepartures: 1,
-      checkInRooms: occupiedRooms > 0 ? occupiedRooms : 0,
+      expectedArrivals: activeArrivals, // 2 -> 1 after Res 270 cancelled
+      expectedDepartures: 0,
+      checkInRooms: 0,
       walkInRooms: 0,
-      roomsToSell: availableRooms > 0 ? availableRooms : 56,
+      roomsToSell: roomsToSellCount, // 55 -> 56 after Res 270 cancelled
       registeredComplaints: 0,
-      inhouseRoomsGuests: `${occupiedRooms || 14}/${inhouseGuests || 21}`,
+      inhouseRoomsGuests: '14/21',
       extraAdultChild: '0/0',
       inhouseForeigners: '0/0',
-      guestBlocks: 2
+      guestBlocks: blockedCount // 2 -> 1 after Res 270 cancelled
     };
-  }, [rooms]);
+  }, [reservations]);
 
   // Master Menu Items (Frame 001 & 013)
   const masterMenuItems = [
@@ -87,7 +183,14 @@ export default function IdsDesktopShell({
           setScanBookingModalOpen(true);
         } 
       },
-      { label: 'Cancel Booking', videoId: '04', action: () => openTutorial('04') },
+      { 
+        label: 'Cancel Booking', 
+        videoId: '04', 
+        action: () => {
+          setScanPurpose('cancel');
+          setScanBookingModalOpen(true);
+        } 
+      },
       { label: 'Room Type Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
       { 
         label: 'Room Rack Console', 
@@ -98,7 +201,14 @@ export default function IdsDesktopShell({
         } 
       },
       { label: 'Reserved Guest Messages', videoId: '01', action: () => openTutorial('01') },
-      { label: 'Retentions-Cancel/No Show', videoId: '04', action: () => openTutorial('04') },
+      { 
+        label: 'Retentions-Cancel/No Show', 
+        videoId: '04', 
+        action: () => {
+          setScanPurpose('cancel');
+          setScanBookingModalOpen(true);
+        } 
+      },
       { label: 'Close Room Inventory', videoId: '01', action: () => openTutorial('01') }
     ],
     'Registrations..': [
@@ -176,6 +286,111 @@ export default function IdsDesktopShell({
   const openTutorial = (videoId) => {
     setSelectedTutorialVideoId(videoId);
     setTutorialPlayerOpen(true);
+  };
+
+  // Video 04: Cancel Workflow Handlers
+  const handleInitiateCancel = (b) => {
+    setSelectedBookingForCancel(b);
+    setCancellationContext({
+      booking: b,
+      depositAmount: b.depositAmount || 0,
+      refundMode: 'Refund Amount',
+      payMode: 'Cash',
+      refundAmount: b.depositAmount || 0,
+      retentionCharges: 0,
+      reason: 'Cancelled by Customer',
+      authorizedBy: 'Manager',
+      callerDetails: `${b.title || 'Mr'} ${b.guestName}`,
+      mobileNumber: '1234567890'
+    });
+    setQuickReservationCancelOpen(true);
+    setCancelBookingModalOpen(true);
+  };
+
+  const handleCancelProceed = ({ cancelYes }) => {
+    if (cancelYes === 'No') {
+      setCancelBookingModalOpen(false);
+      setQuickReservationCancelOpen(false);
+      return;
+    }
+    setCancelBookingModalOpen(false);
+    if ((selectedBookingForCancel?.depositAmount || 0) > 0) {
+      setDepositWarningOpen(true);
+    } else {
+      setCancelReasonOpen(true);
+    }
+  };
+
+  const handleRefundConfirm = (refundData) => {
+    setCancellationContext(prev => ({
+      ...prev,
+      refundMode: refundData.refundMode,
+      payMode: refundData.payMode,
+      refundAmount: refundData.refundMode === 'Refund Amount' ? refundData.amount : 0,
+      retentionCharges: refundData.refundMode === 'Retention Charges' ? refundData.amount : 0,
+      refundReason: refundData.reason
+    }));
+    setDepositRefundOpen(false);
+    setCancelReasonOpen(true);
+  };
+
+  const handleReasonConfirm = (reasonData) => {
+    setCancellationContext(prev => ({
+      ...prev,
+      reason: reasonData.reason,
+      authorizedBy: reasonData.authorizedBy,
+      callerDetails: reasonData.callerDetails,
+      mobileNumber: reasonData.mobileNumber
+    }));
+    setCancelReasonOpen(false);
+    if (selectedBookingForCancel?.roomNo || selectedBookingForCancel?.blocked) {
+      setBlockedRoomWarningOpen(true);
+    } else {
+      setCancelVoucherPromptOpen(true);
+    }
+  };
+
+  const handleExecuteCancellation = (shouldPrintVoucher) => {
+    const finalRecord = {
+      cancellationNo: `CAN-2022-0${selectedBookingForCancel?.resNo || '270'}`,
+      resNo: selectedBookingForCancel?.resNo || '270',
+      title: selectedBookingForCancel?.title || 'Mr',
+      guestName: selectedBookingForCancel?.guestName || 'Biswakarma Santosh',
+      companyName: selectedBookingForCancel?.companyName || 'Quality Pharma Products Pvt Ltd.',
+      type: selectedBookingForCancel?.type || 'EXE',
+      roomNo: selectedBookingForCancel?.roomNo || '515',
+      arrivalDate: selectedBookingForCancel?.arrivalDate || '14-JAN-2022',
+      departureDate: selectedBookingForCancel?.departureDate || '17-JAN-2022',
+      depositAmount: selectedBookingForCancel?.depositAmount || 2000,
+      refundAmount: cancellationContext.refundAmount ?? 2000,
+      retentionCharges: cancellationContext.retentionCharges ?? 0,
+      payMode: cancellationContext.payMode || 'CASH',
+      reason: cancellationContext.reason || 'Cancelled by Customer',
+      authorizedBy: cancellationContext.authorizedBy || 'Manager',
+      callerDetails: cancellationContext.callerDetails || 'Mr Biswakarma Santosh',
+      mobileNumber: cancellationContext.mobileNumber || '1234567890'
+    };
+
+    setCompletedCancelRecord(finalRecord);
+
+    // Update reservations state (release room & mark cancelled)
+    setReservations(prev => prev.map(r => {
+      if (r.resNo === selectedBookingForCancel?.resNo) {
+        return {
+          ...r,
+          isCancelled: true,
+          status: 'Cancelled',
+          blocked: false,
+          roomNo: ''
+        };
+      }
+      return r;
+    }));
+
+    if (shouldPrintVoucher) {
+      setCancellationVoucherOpen(true);
+    }
+    setQuickReservationCancelOpen(false);
   };
 
   const currentSubList = subMenuMap[selectedMaster] || [];
@@ -467,21 +682,54 @@ export default function IdsDesktopShell({
         isOpen={quickReservationOpen}
         onClose={() => setQuickReservationOpen(false)}
         rooms={rooms}
+        mode="make"
+        onOpenScanBooking={(purpose) => {
+          setScanPurpose(purpose);
+          setScanBookingModalOpen(true);
+        }}
+        onOpenCancelBooking={(b) => {
+          setQuickReservationOpen(false);
+          handleInitiateCancel(b);
+        }}
         onSuccessBooking={(bookingData) => {
+          setReservations(prev => [
+            {
+              resNo: bookingData.reservationNo || `${272 + prev.length}`,
+              title: 'Mr',
+              guestName: bookingData.guestName,
+              companyName: bookingData.company || 'FIT',
+              companyCode: 'COM0001',
+              roomNo: '',
+              type: bookingData.roomType || 'DLX',
+              confirm: '1+0+0',
+              provisional: '0+0+0',
+              pax: `${bookingData.adults || 1}+0+0`,
+              arrivalDate: bookingData.arrivalDate || '14-JAN-2022',
+              departureDate: bookingData.departureDate || '16-JAN-2022',
+              depositAmount: parseFloat(bookingData.advancePaid) || 0,
+              status: 'Confirmed',
+              blocked: false,
+              isCancelled: false
+            },
+            ...prev
+          ]);
           if (onNewBooking) onNewBooking(bookingData);
           alert(`✅ Reservation #${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
         }}
       />
 
-      {/* Video 02 & 03: Scan Booking Modal (Frame 004) */}
+      {/* Video 02, 03 & 04: Scan Booking Modal (Frame 004 & Frame 014) */}
       <IdsScanBookingModal 
         isOpen={scanBookingModalOpen}
         onClose={() => setScanBookingModalOpen(false)}
+        bookings={reservations.filter(r => !r.isCancelled)}
         onSelectBooking={(b) => {
           setScanBookingModalOpen(false);
           if (scanPurpose === 'amend') {
             setSelectedBookingForAmend(b);
             setAmendBookingModalOpen(true);
+          } else if (scanPurpose === 'cancel') {
+            handleInitiateCancel(b);
           } else {
             setSelectedBookingForAssignment(b);
             setAssignRoomsModalOpen(true);
@@ -497,12 +745,111 @@ export default function IdsDesktopShell({
           mode="modify"
           initialBooking={selectedBookingForAmend}
           rooms={rooms}
+          onOpenScanBooking={(purpose) => {
+            setScanPurpose(purpose);
+            setScanBookingModalOpen(true);
+          }}
+          onOpenCancelBooking={(b) => {
+            setAmendBookingModalOpen(false);
+            handleInitiateCancel(b);
+          }}
           onSuccessBooking={(updated) => {
             setAmendBookingModalOpen(false);
+            setReservations(prev => prev.map(r => r.resNo === updated.reservationNo ? { ...r, ...updated } : r));
             alert(`✅ Reservation #${updated.reservationNo || '270'} successfully amended & updated!`);
           }}
         />
       )}
+
+      {/* Video 04: Quick Reservation in Cancel Mode (Frame 016) */}
+      {quickReservationCancelOpen && (
+        <IdsQuickReservationModal 
+          isOpen={quickReservationCancelOpen}
+          onClose={() => setQuickReservationCancelOpen(false)}
+          mode="cancel"
+          initialBooking={selectedBookingForCancel}
+          rooms={rooms}
+          onOpenScanBooking={(purpose) => {
+            setScanPurpose(purpose);
+            setScanBookingModalOpen(true);
+          }}
+          onOpenCancelBooking={(b) => {
+            handleInitiateCancel(b);
+          }}
+        />
+      )}
+
+      {/* Video 04: Cancel Booking Dialog (Frame 018) */}
+      <IdsCancelBookingDialog 
+        isOpen={cancelBookingModalOpen}
+        onClose={() => {
+          setCancelBookingModalOpen(false);
+          setQuickReservationCancelOpen(false);
+        }}
+        booking={selectedBookingForCancel}
+        onProceed={handleCancelProceed}
+      />
+
+      {/* Video 04: Deposit Warning Dialog (Frame 020) */}
+      <IdsDepositWarningDialog 
+        isOpen={depositWarningOpen}
+        onClose={() => {
+          setDepositWarningOpen(false);
+          setQuickReservationCancelOpen(false);
+        }}
+        onRefund={() => {
+          setDepositWarningOpen(false);
+          setDepositRefundOpen(true);
+        }}
+        onProceedWithoutRefund={() => {
+          setDepositWarningOpen(false);
+          setCancelReasonOpen(true);
+        }}
+      />
+
+      {/* Video 04: Deposit Refund Modal (Frame 022, 024, 026) */}
+      <IdsDepositRefundModal 
+        isOpen={depositRefundOpen}
+        onClose={() => {
+          setDepositRefundOpen(false);
+          setCancelReasonOpen(true);
+        }}
+        booking={selectedBookingForCancel}
+        onCompleteRefund={handleRefundConfirm}
+      />
+
+      {/* Video 04: Reason Entry Modal (Frame 030, 032, 034) */}
+      <IdsCancelReasonModal 
+        isOpen={cancelReasonOpen}
+        onClose={() => {
+          setCancelReasonOpen(false);
+          setQuickReservationCancelOpen(false);
+        }}
+        onConfirm={handleReasonConfirm}
+      />
+
+      {/* Video 04: Blocked Room Release Warning Dialog (Detail 05) */}
+      <IdsBlockedRoomWarningDialog 
+        isOpen={blockedRoomWarningOpen}
+        onOk={() => {
+          setBlockedRoomWarningOpen(false);
+          setCancelVoucherPromptOpen(true);
+        }}
+      />
+
+      {/* Video 04: Print Voucher Prompt Dialog (Detail 06) */}
+      <IdsCancelVoucherPromptDialog 
+        isOpen={cancelVoucherPromptOpen}
+        onYes={() => handleExecuteCancellation(true)}
+        onNo={() => handleExecuteCancellation(false)}
+      />
+
+      {/* Video 04: Printable Cancellation Voucher Preview Modal */}
+      <IdsCancellationVoucherModal 
+        isOpen={cancellationVoucherOpen}
+        onClose={() => setCancellationVoucherOpen(false)}
+        cancelRecord={completedCancelRecord}
+      />
 
       {/* Video 02: Assign Guest Rooms Modal (Frame 006) */}
       {selectedBookingForAssignment && (

@@ -18,9 +18,12 @@ export function IdsQuickReservationModal({
   onSuccessBooking, 
   rooms = [],
   mode = 'make',
-  initialBooking = null
+  initialBooking = null,
+  onOpenCancelBooking = null,
+  onOpenScanBooking = null
 }) {
-  const isModify = mode === 'modify' || !!initialBooking;
+  const isCancel = mode === 'cancel';
+  const isModify = mode === 'modify' || (!!initialBooking && !isCancel);
   const resNumber = initialBooking?.resNo || '270';
 
   const [arrivalDate, setArrivalDate] = useState(() => initialBooking?.arrivalDate || '14-JAN-2022');
@@ -165,21 +168,66 @@ export function IdsQuickReservationModal({
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>
             {detailedMode 
-              ? (isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
-              : (isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
+              ? (isCancel ? `Detailed Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
+              : (isCancel ? `Quick Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
           </span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
 
         {/* Top Action Ribbon (+, Edit, Del, Help, Building, Group, Checkin, Search) */}
         <div className="ids-dialog-top-tools">
-          <div className="ids-dialog-action-icon" title="New Reservation">
+          <div 
+            className="ids-dialog-action-icon" 
+            title="New Reservation"
+            style={{
+              background: mode === 'make' && !initialBooking ? '#C2BDA7' : 'transparent',
+              border: mode === 'make' && !initialBooking ? '1px inset #716F64' : '1px solid transparent'
+            }}
+          >
             <Plus size={20} strokeWidth={2.5} color="#111" />
           </div>
-          <div className="ids-dialog-action-icon" title="Amend Reservation">
+          <div 
+            className="ids-dialog-action-icon" 
+            title="Amend Reservation"
+            onClick={() => {
+              if (onOpenScanBooking) onOpenScanBooking('amend');
+            }}
+            style={{
+              background: isModify ? '#C2BDA7' : 'transparent',
+              border: isModify ? '1px inset #716F64' : '1px solid transparent',
+              cursor: 'pointer'
+            }}
+          >
             <Edit2 size={18} color="#111" />
           </div>
-          <div className="ids-dialog-action-icon" title="Cancel Reservation">
+          <div 
+            className="ids-dialog-action-icon" 
+            title="Cancel Reservation"
+            onClick={() => {
+              if (onOpenCancelBooking) {
+                onOpenCancelBooking(initialBooking || {
+                  resNo: '270',
+                  title: 'Mr',
+                  guestName: 'Biswakarma Santosh',
+                  companyName: 'Quality Pharma Products Pvt Ltd.',
+                  companyCode: 'COM0009',
+                  roomNo: '515',
+                  type: 'EXE',
+                  arrivalDate: '14-JAN-2022',
+                  departureDate: '17-JAN-2022',
+                  pax: '1',
+                  depositAmount: 2000
+                });
+              } else if (onOpenScanBooking) {
+                onOpenScanBooking('cancel');
+              }
+            }}
+            style={{
+              background: isCancel ? '#C2BDA7' : 'transparent',
+              border: isCancel ? '1px inset #716F64' : '1px solid transparent',
+              cursor: 'pointer'
+            }}
+          >
             <Trash2 size={18} color="#111" />
           </div>
           <div className="ids-dialog-action-icon" title="Help / Info">
