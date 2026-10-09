@@ -10,31 +10,38 @@ import {
   IdsPostSaveDialog, 
   IdsPostReceiptsModal 
 } from './IdsRateModals';
+import IdsCompanyProfileModal from './IdsCompanyProfileModal';
 
 export function IdsQuickReservationModal({ 
   isOpen, 
   onClose, 
   onSuccessBooking, 
-  rooms = [] 
+  rooms = [],
+  mode = 'make',
+  initialBooking = null
 }) {
-  const [arrivalDate, setArrivalDate] = useState('14-JAN-2022');
-  const [arrivalTime, setArrivalTime] = useState('19:53');
+  const isModify = mode === 'modify' || !!initialBooking;
+  const resNumber = initialBooking?.resNo || '270';
+
+  const [arrivalDate, setArrivalDate] = useState(() => initialBooking?.arrivalDate || '14-JAN-2022');
+  const [arrivalTime, setArrivalTime] = useState('20:06');
   const [arrivalDay, setArrivalDay] = useState('FRIDAY');
-  const [nights, setNights] = useState('2');
-  const [departureDate, setDepartureDate] = useState('16-JAN-2022 12:00');
-  const [departureDay, setDepartureDay] = useState('SUNDAY');
+  const [nights, setNights] = useState(() => isModify ? '3' : '2');
+  const [departureDate, setDepartureDate] = useState(() => isModify ? '17-JAN-2022 12:00' : '16-JAN-2022 12:00');
+  const [departureDay, setDepartureDay] = useState(() => isModify ? 'MONDAY' : 'SUNDAY');
 
   const [property, setProperty] = useState('DEMO');
-  const [companyCode, setCompanyCode] = useState('COM0007');
-  const [companyName, setCompanyName] = useState('Mahindra & Mahindra Limited');
-  const [bookerName, setBookerName] = useState('Ajay Yadav');
+  const [companyCode, setCompanyCode] = useState(() => isModify ? 'COM0009' : 'COM0007');
+  const [companyName, setCompanyName] = useState(() => isModify ? 'QUALITY PHARMA PRODUCTS' : 'Mahindra & Mahindra Limited');
+  const [bookerName, setBookerName] = useState(() => isModify ? 'Mr Ajay' : 'Ajay Yadav');
   const [bookerCode, setBookerCode] = useState('');
-  const [roomType, setRoomType] = useState('DELUXE');
-  const [mode, setMode] = useState('Phone');
+  const [roomType, setRoomType] = useState(() => initialBooking?.type || (isModify ? 'EXECUTIVE' : 'DELUXE'));
+  const [contactMode, setContactMode] = useState('Phone');
   const [roomsCount, setRoomsCount] = useState('1');
-  const [adultCount, setAdultCount] = useState('2');
+  const [adultCount, setAdultCount] = useState(() => isModify ? '1' : '2');
   const [childCount, setChildCount] = useState('0');
   const [status, setStatus] = useState('Confirmed');
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
 
   // Guest Grid
   const [guests, setGuests] = useState([
@@ -45,13 +52,35 @@ export function IdsQuickReservationModal({
   // Pricing
   const [tariffs, setTariffs] = useState({
     currency: 'INR',
-    single: '6500.00',
-    double: '6500.00',
+    single: isModify ? '5000.00' : '6500.00',
+    double: isModify ? '5000.00' : '6500.00',
     triple: '0.00',
     qud: '0.00',
     extAdult: '1000.00',
     extChild: '0.00'
   });
+
+  const [passportDetails, setPassportDetails] = useState({
+    passportNo: '',
+    stayDays: '3',
+    issueDate: '',
+    dob: '',
+    issuePlace: '',
+    workPermit: '',
+    expiryDate: '',
+    guardianName: '',
+    arrivalDate: '14-JAN-2022',
+    guardianPassport: '',
+    visaNo: '',
+    visaIssueDate: '',
+    visaIssuePlace: '',
+    visaExpiryDate: '',
+    idType: 'Aadhaar Card',
+    idNumber: ''
+  });
+
+  const [likes, setLikes] = useState(['High Floor', 'Quiet Room', 'King Bed', '', '']);
+  const [dislikes, setDislikes] = useState(['Near Elevator', 'Smoking', '', '', '']);
 
   // Sub-Dialog States
   const [rateModalOpen, setRateModalOpen] = useState(false);
@@ -135,7 +164,9 @@ export function IdsQuickReservationModal({
         {/* Title Bar */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>
-            {detailedMode ? 'Detailed Reservation / Make V6.5.002.20' : 'Quick Reservation / Make V6.5.002.20'}
+            {detailedMode 
+              ? (isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
+              : (isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
           </span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
@@ -204,7 +235,7 @@ export function IdsQuickReservationModal({
               <span style={{ fontWeight: 600 }}>Company</span>
               <div style={{ display: 'flex', gap: '2px' }}>
                 <input className="ids-input" style={{ width: '65px' }} value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} />
-                <button className="ids-btn-classic" style={{ minWidth: '18px', padding: '1px 4px' }}>?</button>
+                <button className="ids-btn-classic" style={{ minWidth: '18px', padding: '1px 4px' }} onClick={() => setCompanyModalOpen(true)}>?</button>
               </div>
               <span style={{ fontWeight: 600, fontSize: '11px', color: '#0A246A' }}>{companyName}</span>
             </div>
@@ -438,6 +469,118 @@ export function IdsQuickReservationModal({
                 </div>
               )}
 
+              {/* Passport & Visa Tab Content (Video 3 Frame 010) */}
+              {activeGuestTab === 'Passport & Visa' && (
+                <div style={{ background: '#F8F7F0', border: '1px solid #B0AB9A', padding: '10px', borderRadius: '2px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '11px', color: '#0A246A', marginBottom: '4px', borderBottom: '1px solid #C4C0AE', paddingBottom: '2px' }}>
+                    Passport Details
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '75px 1fr 75px 1fr', rowGap: '5px', columnGap: '8px', alignItems: 'center' }}>
+                    <span>Passport #</span>
+                    <input className="ids-input" value={passportDetails.passportNo} onChange={(e) => setPassportDetails({ ...passportDetails, passportNo: e.target.value })} />
+                    <span>Stay Days</span>
+                    <input className="ids-input" value={passportDetails.stayDays} onChange={(e) => setPassportDetails({ ...passportDetails, stayDays: e.target.value })} />
+
+                    <span>Issue Date</span>
+                    <input className="ids-input" value={passportDetails.issueDate} onChange={(e) => setPassportDetails({ ...passportDetails, issueDate: e.target.value })} />
+                    <span>Date of Birth</span>
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                      <input className="ids-input" value={passportDetails.dob} onChange={(e) => setPassportDetails({ ...passportDetails, dob: e.target.value })} />
+                      <button className="ids-btn-classic" style={{ minWidth: '18px', padding: '0 4px' }}>?</button>
+                    </div>
+
+                    <span>Issue Place</span>
+                    <input className="ids-input" value={passportDetails.issuePlace} onChange={(e) => setPassportDetails({ ...passportDetails, issuePlace: e.target.value })} />
+                    <span>Work Permit</span>
+                    <input className="ids-input" value={passportDetails.workPermit} onChange={(e) => setPassportDetails({ ...passportDetails, workPermit: e.target.value })} />
+
+                    <span>Expiry Date</span>
+                    <input className="ids-input" value={passportDetails.expiryDate} onChange={(e) => setPassportDetails({ ...passportDetails, expiryDate: e.target.value })} />
+                    <span>Guardian Name</span>
+                    <input className="ids-input" value={passportDetails.guardianName} onChange={(e) => setPassportDetails({ ...passportDetails, guardianName: e.target.value })} />
+
+                    <span>Arrival Date</span>
+                    <input className="ids-input" value={passportDetails.arrivalDate} onChange={(e) => setPassportDetails({ ...passportDetails, arrivalDate: e.target.value })} />
+                    <span>Guardian Pass.</span>
+                    <input className="ids-input" value={passportDetails.guardianPassport} onChange={(e) => setPassportDetails({ ...passportDetails, guardianPassport: e.target.value })} />
+                  </div>
+
+                  <div style={{ fontWeight: 700, fontSize: '11px', color: '#0A246A', margin: '8px 0 4px', borderBottom: '1px solid #C4C0AE', paddingBottom: '2px' }}>
+                    Visa Details
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '75px 1fr 75px 1fr', rowGap: '5px', columnGap: '8px', alignItems: 'center' }}>
+                    <span>Number</span>
+                    <input className="ids-input" value={passportDetails.visaNo} onChange={(e) => setPassportDetails({ ...passportDetails, visaNo: e.target.value })} />
+                    <span>Issue Date</span>
+                    <input className="ids-input" value={passportDetails.visaIssueDate} onChange={(e) => setPassportDetails({ ...passportDetails, visaIssueDate: e.target.value })} />
+
+                    <span>Issue Place</span>
+                    <input className="ids-input" value={passportDetails.visaIssuePlace} onChange={(e) => setPassportDetails({ ...passportDetails, visaIssuePlace: e.target.value })} />
+                    <span>Expiry Date</span>
+                    <input className="ids-input" value={passportDetails.visaExpiryDate} onChange={(e) => setPassportDetails({ ...passportDetails, visaExpiryDate: e.target.value })} />
+                  </div>
+
+                  <div style={{ fontWeight: 700, fontSize: '11px', color: '#0A246A', margin: '8px 0 4px', borderBottom: '1px solid #C4C0AE', paddingBottom: '2px' }}>
+                    ID Proof Details
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 65px', rowGap: '5px', columnGap: '8px', alignItems: 'center' }}>
+                    <span>Identification Type</span>
+                    <select className="ids-select" value={passportDetails.idType} onChange={(e) => setPassportDetails({ ...passportDetails, idType: e.target.value })}>
+                      <option value="Aadhaar Card">Aadhaar Card (UIDAI)</option>
+                      <option value="Passport">Passport</option>
+                      <option value="Voter ID">Voter Identity Card</option>
+                      <option value="Driving License">Driving License</option>
+                      <option value="PAN Card">PAN Card</option>
+                    </select>
+                    <button className="ids-btn-classic">Browse</button>
+
+                    <span>Identification#</span>
+                    <input className="ids-input" style={{ gridColumn: 'span 2' }} value={passportDetails.idNumber} onChange={(e) => setPassportDetails({ ...passportDetails, idNumber: e.target.value })} placeholder="Enter ID Proof Number" />
+                  </div>
+                </div>
+              )}
+
+              {/* Likes / Dislikes Tab Content (Video 3 Frame 012) */}
+              {activeGuestTab === 'Likes / Dislikes' && (
+                <div style={{ background: '#F8F7F0', border: '1px solid #B0AB9A', padding: '10px', borderRadius: '2px' }}>
+                  <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '11px', marginBottom: '6px' }}>Likes / Dislikes</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, textAlign: 'center', marginBottom: '4px' }}>Likes</div>
+                      {likes.map((like, i) => (
+                        <input 
+                          key={i} 
+                          className="ids-input" 
+                          style={{ width: '100%', marginBottom: '4px' }} 
+                          value={like} 
+                          onChange={(e) => {
+                            const newL = [...likes];
+                            newL[i] = e.target.value;
+                            setLikes(newL);
+                          }} 
+                        />
+                      ))}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 600, textAlign: 'center', marginBottom: '4px' }}>Dislikes</div>
+                      {dislikes.map((dis, i) => (
+                        <input 
+                          key={i} 
+                          className="ids-input" 
+                          style={{ width: '100%', marginBottom: '4px' }} 
+                          value={dis} 
+                          onChange={(e) => {
+                            const newD = [...dislikes];
+                            newD[i] = e.target.value;
+                            setDislikes(newD);
+                          }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Bottom Room Category & Rates Matrix (Frame 008) */}
               <div style={{ marginTop: '10px' }}>
                 <div style={{ fontSize: '10px', fontWeight: 700, marginBottom: '3px' }}>Tier Tariffs & Taxes Matrix</div>
@@ -522,6 +665,16 @@ export function IdsQuickReservationModal({
         reservationNo="271"
         guestName={`${guests[0]?.title} ${guests[0]?.lastName} ${guests[0]?.firstName}`}
         roomNo={guestDetail.roomNo || '101'}
+      />
+
+      {/* Video 03: Company Profile Lookup Modal (Frame 006) */}
+      <IdsCompanyProfileModal 
+        isOpen={companyModalOpen}
+        onClose={() => setCompanyModalOpen(false)}
+        onSelectCompany={(c) => {
+          setCompanyCode(c.code);
+          setCompanyName(c.name);
+        }}
       />
     </div>
   );

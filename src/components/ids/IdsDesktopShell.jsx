@@ -22,8 +22,11 @@ export default function IdsDesktopShell({
   // Modals
   const [quickReservationOpen, setQuickReservationOpen] = useState(false);
   const [scanBookingModalOpen, setScanBookingModalOpen] = useState(false);
+  const [scanPurpose, setScanPurpose] = useState('assign'); // 'assign' or 'amend'
   const [assignRoomsModalOpen, setAssignRoomsModalOpen] = useState(false);
   const [selectedBookingForAssignment, setSelectedBookingForAssignment] = useState(null);
+  const [amendBookingModalOpen, setAmendBookingModalOpen] = useState(false);
+  const [selectedBookingForAmend, setSelectedBookingForAmend] = useState(null);
   const [tutorialPlayerOpen, setTutorialPlayerOpen] = useState(false);
   const [selectedTutorialVideoId, setSelectedTutorialVideoId] = useState('01');
   const [activeTool, setActiveTool] = useState('front-office');
@@ -68,11 +71,32 @@ export default function IdsDesktopShell({
   const subMenuMap = {
     'Reservations..': [
       { label: 'Room Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
-      { label: 'Assign Guest Rooms', videoId: '02', action: () => setScanBookingModalOpen(true) },
-      { label: 'Amend Booking', videoId: '03', action: () => openTutorial('03') },
+      { 
+        label: 'Assign Guest Rooms', 
+        videoId: '02', 
+        action: () => {
+          setScanPurpose('assign');
+          setScanBookingModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Amend Booking', 
+        videoId: '03', 
+        action: () => {
+          setScanPurpose('amend');
+          setScanBookingModalOpen(true);
+        } 
+      },
       { label: 'Cancel Booking', videoId: '04', action: () => openTutorial('04') },
       { label: 'Room Type Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
-      { label: 'Room Rack Console', videoId: '02', action: () => setScanBookingModalOpen(true) },
+      { 
+        label: 'Room Rack Console', 
+        videoId: '02', 
+        action: () => {
+          setScanPurpose('assign');
+          setScanBookingModalOpen(true);
+        } 
+      },
       { label: 'Reserved Guest Messages', videoId: '01', action: () => openTutorial('01') },
       { label: 'Retentions-Cancel/No Show', videoId: '04', action: () => openTutorial('04') },
       { label: 'Close Room Inventory', videoId: '01', action: () => openTutorial('01') }
@@ -449,16 +473,36 @@ export default function IdsDesktopShell({
         }}
       />
 
-      {/* Video 02: Scan Booking Modal (Frame 004) */}
+      {/* Video 02 & 03: Scan Booking Modal (Frame 004) */}
       <IdsScanBookingModal 
         isOpen={scanBookingModalOpen}
         onClose={() => setScanBookingModalOpen(false)}
         onSelectBooking={(b) => {
-          setSelectedBookingForAssignment(b);
           setScanBookingModalOpen(false);
-          setAssignRoomsModalOpen(true);
+          if (scanPurpose === 'amend') {
+            setSelectedBookingForAmend(b);
+            setAmendBookingModalOpen(true);
+          } else {
+            setSelectedBookingForAssignment(b);
+            setAssignRoomsModalOpen(true);
+          }
         }}
       />
+
+      {/* Video 03: Quick Reservation in Modify Mode (Frame 006 & Frame 008) */}
+      {amendBookingModalOpen && (
+        <IdsQuickReservationModal 
+          isOpen={amendBookingModalOpen}
+          onClose={() => setAmendBookingModalOpen(false)}
+          mode="modify"
+          initialBooking={selectedBookingForAmend}
+          rooms={rooms}
+          onSuccessBooking={(updated) => {
+            setAmendBookingModalOpen(false);
+            alert(`✅ Reservation #${updated.reservationNo || '270'} successfully amended & updated!`);
+          }}
+        />
+      )}
 
       {/* Video 02: Assign Guest Rooms Modal (Frame 006) */}
       {selectedBookingForAssignment && (
