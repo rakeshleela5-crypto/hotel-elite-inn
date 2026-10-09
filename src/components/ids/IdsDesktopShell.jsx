@@ -54,6 +54,7 @@ import IdsBusinessSourceModal from './IdsBusinessSourceModal';
 import IdsMarketSegmentModal from './IdsMarketSegmentModal';
 import IdsCompanyContractRatesModal from './IdsCompanyContractRatesModal';
 import IdsLinkRatesToCompanyModal from './IdsLinkRatesToCompanyModal';
+import IdsRoomMasterModal from './IdsRoomMasterModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -330,6 +331,10 @@ export default function IdsDesktopShell({
   // Video 32: Link Company Rates in IDS 6.5 & 7.0 (Frames 010–060)
   const [linkRatesModalOpen, setLinkRatesModalOpen] = useState(false);
   const [selectedCompanyForRateLink, setSelectedCompanyForRateLink] = useState('COM0002');
+
+  // Video 33: Add Room Numbers in Room Status / Room Master in IDS 6.5 & 7.0 (Frames 010–030)
+  const [roomMasterModalOpen, setRoomMasterModalOpen] = useState(false);
+  const [selectedRoomForMaster, setSelectedRoomForMaster] = useState('202');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -803,6 +808,14 @@ export default function IdsDesktopShell({
         action: () => {
           setSelectedMarketSegmentCode('CVG');
           setMarketSegmentModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Add Room Numbers in Room Status (Room Master)', 
+        videoId: '33', 
+        action: () => {
+          setSelectedRoomForMaster('202');
+          setRoomMasterModalOpen(true);
         } 
       },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
@@ -1909,6 +1922,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'link-rates-to-company' || programId === 'link-company-rates') {
             setSelectedCompanyForRateLink('COM0002');
             setLinkRatesModalOpen(true);
+          } else if (programId === 'room-master' || programId === 'add-room-number') {
+            setSelectedRoomForMaster('202');
+            setRoomMasterModalOpen(true);
           }
         }}
       />
@@ -2157,7 +2173,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '32') {
+          if (videoId === '33') {
+            setSelectedRoomForMaster('202');
+            setRoomMasterModalOpen(true);
+          } else if (videoId === '32') {
             setSelectedCompanyForRateLink('COM0002');
             setLinkRatesModalOpen(true);
           } else if (videoId === '31') {
@@ -2502,6 +2521,20 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         onSaveLinkRate={(linkRecord) => {
           console.log('Link Rates to Company Saved:', linkRecord);
+        }}
+      />
+
+      {/* Video 33: Add Room Numbers in Room Status / Room Master in IDS 6.5 & 7.0 (Frames 010–030) */}
+      <IdsRoomMasterModal 
+        isOpen={roomMasterModalOpen}
+        onClose={() => setRoomMasterModalOpen(false)}
+        initialRoomNo={selectedRoomForMaster}
+        accountingDate={accountingDate}
+        onSaveRoomMaster={(newRoom) => {
+          console.log('Room Master Record Saved:', newRoom);
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
         }}
       />
     </div>
