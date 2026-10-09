@@ -6,6 +6,7 @@ import {
   LogOut, Play, Film, CheckCircle2, AlertCircle, Search, FileText
 } from 'lucide-react';
 import { IdsQuickReservationModal } from './IdsReservationForms';
+import { IdsScanBookingModal, IdsAssignGuestRoomsModal } from './IdsAssignRoomsModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -20,6 +21,9 @@ export default function IdsDesktopShell({
   
   // Modals
   const [quickReservationOpen, setQuickReservationOpen] = useState(false);
+  const [scanBookingModalOpen, setScanBookingModalOpen] = useState(false);
+  const [assignRoomsModalOpen, setAssignRoomsModalOpen] = useState(false);
+  const [selectedBookingForAssignment, setSelectedBookingForAssignment] = useState(null);
   const [tutorialPlayerOpen, setTutorialPlayerOpen] = useState(false);
   const [selectedTutorialVideoId, setSelectedTutorialVideoId] = useState('01');
   const [activeTool, setActiveTool] = useState('front-office');
@@ -64,25 +68,31 @@ export default function IdsDesktopShell({
   const subMenuMap = {
     'Reservations..': [
       { label: 'Room Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
-      { label: 'Assign Guest Rooms', videoId: '02', action: () => openTutorial('02') },
+      { label: 'Assign Guest Rooms', videoId: '02', action: () => setScanBookingModalOpen(true) },
       { label: 'Amend Booking', videoId: '03', action: () => openTutorial('03') },
       { label: 'Cancel Booking', videoId: '04', action: () => openTutorial('04') },
       { label: 'Room Type Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
-      { label: 'Room Rack Console', videoId: '02', action: () => openTutorial('02') },
+      { label: 'Room Rack Console', videoId: '02', action: () => setScanBookingModalOpen(true) },
       { label: 'Reserved Guest Messages', videoId: '01', action: () => openTutorial('01') },
       { label: 'Retentions-Cancel/No Show', videoId: '04', action: () => openTutorial('04') },
       { label: 'Close Room Inventory', videoId: '01', action: () => openTutorial('01') }
     ],
     'Registrations..': [
-      { label: 'Reservation Check In', videoId: '05', action: () => openTutorial('05') },
-      { label: 'Express Check-In (Single Room)', videoId: '06', action: () => openTutorial('06') },
-      { label: 'Group Booking & Express Check In', videoId: '07', action: () => openTutorial('07') },
-      { label: 'Upgrade Room Category at Check-In', videoId: '08', action: () => openTutorial('08') },
-      { label: 'Walk-In Process for Direct Guest', videoId: '17', action: () => openTutorial('17') },
-      { label: 'Walk-In Regular Guest (History)', videoId: '37', action: () => openTutorial('37') },
-      { label: 'Check-in 2nd Pax Later', videoId: '22', action: () => openTutorial('22') },
-      { label: 'Remove or Cancel Check-In', videoId: '38', action: () => openTutorial('38') },
-      { label: 'Delete Deposit Before Cancel Check-In', videoId: '39', action: () => openTutorial('39') }
+      { label: 'Express Check-in', videoId: '06', action: () => openTutorial('06') },
+      { label: 'Reservation Check-in', videoId: '05', action: () => openTutorial('05') },
+      { label: 'Walk-ins', videoId: '17', action: () => openTutorial('17') },
+      { label: 'Special Rooms Checkin', videoId: '08', action: () => openTutorial('08') },
+      { label: 'Room Floor Plan Display', videoId: '33', action: () => openTutorial('33') },
+      { label: 'Guest Management', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Guest Services', videoId: '21', action: () => openTutorial('21') },
+      { label: 'Guest Photo (In-House)', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Guest Photo Reg. Card', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Guest Reg Card (Crystal)', videoId: '35', action: () => openTutorial('35') },
+      { label: 'Invoice by Arrival', videoId: '36', action: () => openTutorial('36') },
+      { label: 'Mask Guests', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Turn Away / Walkout Guest', videoId: '04', action: () => openTutorial('04') },
+      { label: 'Room Instructions', videoId: '10', action: () => openTutorial('10') },
+      { label: 'Change Rate', videoId: '11', action: () => openTutorial('11') }
     ],
     'Cashiering..': [
       { label: 'Post Deposit / Advance to Room', videoId: '14', action: () => openTutorial('14') },
@@ -438,6 +448,29 @@ export default function IdsDesktopShell({
           alert(`✅ Reservation #${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
         }}
       />
+
+      {/* Video 02: Scan Booking Modal (Frame 004) */}
+      <IdsScanBookingModal 
+        isOpen={scanBookingModalOpen}
+        onClose={() => setScanBookingModalOpen(false)}
+        onSelectBooking={(b) => {
+          setSelectedBookingForAssignment(b);
+          setScanBookingModalOpen(false);
+          setAssignRoomsModalOpen(true);
+        }}
+      />
+
+      {/* Video 02: Assign Guest Rooms Modal (Frame 006) */}
+      {selectedBookingForAssignment && (
+        <IdsAssignGuestRoomsModal 
+          isOpen={assignRoomsModalOpen}
+          onClose={() => setAssignRoomsModalOpen(false)}
+          booking={selectedBookingForAssignment}
+          onConfirmAssignment={(data) => {
+            setAssignRoomsModalOpen(false);
+          }}
+        />
+      )}
 
       {/* Built-In 44-Video Tutorial Player Modal */}
       <IdsTutorialPlayerModal 
