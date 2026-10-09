@@ -47,6 +47,7 @@ import IdsCheckInSecondPaxModal from './IdsCheckInSecondPaxModal';
 import IdsBillAllowanceDayWiseModal from './IdsBillAllowanceDayWiseModal';
 import IdsBillAllowanceOptionModal from './IdsBillAllowanceOptionModal';
 import IdsTransferFolioModal from './IdsTransferFolioModal';
+import IdsFolioReinstateModal from './IdsFolioReinstateModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -295,6 +296,10 @@ export default function IdsDesktopShell({
   const [transferFolioModalOpen, setTransferFolioModalOpen] = useState(false);
   const [transferFolioFromRoom, setTransferFolioFromRoom] = useState('201');
   const [transferFolioToRoom, setTransferFolioToRoom] = useState('205');
+
+  // Video 26: Folio Reinstate Option (Frames 015–085)
+  const [folioReinstateModalOpen, setFolioReinstateModalOpen] = useState(false);
+  const [folioReinstateRoomNo, setFolioReinstateRoomNo] = useState('201');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -623,7 +628,14 @@ export default function IdsDesktopShell({
           setTransferFolioModalOpen(true);
         } 
       },
-      { label: 'Folio Reinstate Option', videoId: '26', action: () => openTutorial('26') },
+      { 
+        label: 'Folio Reinstate Option', 
+        videoId: '26', 
+        action: () => {
+          setFolioReinstateRoomNo('201');
+          setFolioReinstateModalOpen(true);
+        } 
+      },
       { label: 'Release Stop Posting Option', videoId: '27', action: () => openTutorial('27') },
       { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
     ],
@@ -1724,6 +1736,10 @@ export default function IdsDesktopShell({
           setTransferFolioToRoom('205');
           setTransferFolioModalOpen(true);
         }}
+        onOpenFolioReinstate={(roomNo) => {
+          setFolioReinstateRoomNo(roomNo || '201');
+          setFolioReinstateModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1788,6 +1804,9 @@ export default function IdsDesktopShell({
             setTransferFolioFromRoom('201');
             setTransferFolioToRoom('205');
             setTransferFolioModalOpen(true);
+          } else if (programId === 'folio-reinstate' || programId === 'folio-reinstate-option') {
+            setFolioReinstateRoomNo('201');
+            setFolioReinstateModalOpen(true);
           }
         }}
       />
@@ -2036,7 +2055,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '25') {
+          if (videoId === '26') {
+            setFolioReinstateRoomNo('201');
+            setFolioReinstateModalOpen(true);
+          } else if (videoId === '25') {
             setTransferFolioFromRoom('201');
             setTransferFolioToRoom('205');
             setTransferFolioModalOpen(true);
@@ -2241,6 +2263,48 @@ export default function IdsDesktopShell({
             }
             return g;
           }));
+        }}
+      />
+
+      {/* Video 26: Folio Reinstate Option in IDS 6.5 & 7.0 (Frames 015–085) */}
+      <IdsFolioReinstateModal 
+        isOpen={folioReinstateModalOpen}
+        onClose={() => setFolioReinstateModalOpen(false)}
+        initialRoomNo={folioReinstateRoomNo}
+        accountingDate={accountingDate}
+        clearedRooms={clearedDirtyRooms}
+        onClearRoom={(roomNo) => {
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
+        }}
+        onReinstateFolio={(reinstatedRecord) => {
+          setCheckedOutRooms(prev => prev.filter(r => r !== reinstatedRecord.roomNo));
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, reinstatedRecord.roomNo])));
+          setInhouseGuestsList(prev => {
+            const exists = prev.some(g => g.roomNo === reinstatedRecord.roomNo);
+            if (exists) {
+              return prev.map(g => g.roomNo === reinstatedRecord.roomNo ? {
+                ...g,
+                status: 'In-House',
+                balance: reinstatedRecord.billAmount || 5190,
+                guestName: reinstatedRecord.guestName || g.guestName
+              } : g);
+            }
+            return [
+              ...prev,
+              {
+                roomNo: reinstatedRecord.roomNo,
+                guestName: reinstatedRecord.guestName || 'Mr Sharma Raj',
+                regNo: reinstatedRecord.regNo || '624',
+                billNo: reinstatedRecord.billNo || '511',
+                balance: reinstatedRecord.billAmount || 5190,
+                category: reinstatedRecord.category || 'EXECUTIVE (EXE)',
+                arrivalDate: reinstatedRecord.arrivalDate || '27-JAN-2022 12:00',
+                departureDate: reinstatedRecord.departureDate || '28-JAN-2022 12:00',
+                pax: 1,
+                status: 'In-House'
+              }
+            ];
+          });
         }}
       />
     </div>

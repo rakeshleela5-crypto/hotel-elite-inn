@@ -41,6 +41,8 @@ export default function IdsQuickScanModal({
     { id: 'transfer-folio', label: 'Transfer Folios', code: 'TF01' },
     { id: 'pax-transfer', label: 'Pax Transfer', code: 'PT01' },
     { id: 'purge-fo', label: 'Purge FO Transaction', code: 'PF01' },
+    { id: 'folio-reinstate', label: 'Folio Re-instate', code: 'FR01' },
+    { id: 'folio-reinstate-option', label: 'Folio Reinstate Option', code: 'FR02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 

@@ -754,6 +754,7 @@ export function IdsRoomRackConsoleModal({
   onOpenBillAllowanceOption,
   onOpenTransferFolio,
   onOpenQuickBalances,
+  onOpenFolioReinstate,
   walkInRooms = [],
   checkedOutRooms = [],
   paxCheckedOutRooms = [],
@@ -1482,6 +1483,25 @@ export function IdsRoomRackConsoleModal({
                   >
                     🔍 Quick Balances
                   </div>
+                  {/* Video 26: Folio Reinstate */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A',
+                      borderTop: '1px solid #CCC'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenFolioReinstate) onOpenFolioReinstate(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Folio Reinstate Option (Video 26)"
+                  >
+                    Folio Reinstate
+                  </div>
                 </>
               ) : (
                 <>
@@ -1507,6 +1527,25 @@ export function IdsRoomRackConsoleModal({
                     }}
                   >
                     Walk-in
+                  </div>
+                  {/* Video 26: Folio Reinstate Option */}
+                  <div 
+                    style={{ 
+                      padding: '4px 8px', 
+                      cursor: 'pointer',
+                      borderTop: '1px solid #CCC',
+                      fontWeight: 600,
+                      color: '#0A246A'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenFolioReinstate) onOpenFolioReinstate(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Folio Reinstate Option (Video 26)"
+                  >
+                    Folio Reinstate
                   </div>
                 </>
               )}
