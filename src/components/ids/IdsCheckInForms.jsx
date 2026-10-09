@@ -732,6 +732,7 @@ export function IdsCheckedInPositionModal({
 export function IdsRoomRackConsoleModal({ 
   isOpen, 
   onClose, 
+  checkedInList = [],
   occupiedRoom = '516', 
   guestName = 'Biswakarma' 
 }) {
@@ -740,6 +741,9 @@ export function IdsRoomRackConsoleModal({
   const [filterFloor, setFilterFloor] = useState('All');
 
   if (!isOpen) return null;
+
+  const is516Occupied = checkedInList.some(c => c.roomNo === '516') || occupiedRoom === '516';
+  const is401Occupied = checkedInList.some(c => c.roomNo === '401');
 
   // 44 Rooms matching Frame 034 grid
   const roomsMatrix = [
@@ -773,7 +777,12 @@ export function IdsRoomRackConsoleModal({
     { no: '314', type: 'V/DLX', status: 'vacant' },
     { no: '315', type: 'V/EXE', status: 'vacant' },
     { no: '316', type: 'V/SUI', status: 'vacant' },
-    { no: '401', type: 'V/EXE', status: 'vacant' },
+    { 
+      no: '401', 
+      type: is401Occupied ? 'O/EXE' : 'V/EXE', 
+      guest: is401Occupied ? 'Khan' : undefined, 
+      status: is401Occupied ? 'occupied' : 'vacant' 
+    },
     { no: '403', type: 'O/DLX', guest: 'DEKA', status: 'occupied' },
 
     { no: '404', type: 'O/DLX', guest: 'DAS', status: 'occupied' },
@@ -803,9 +812,17 @@ export function IdsRoomRackConsoleModal({
     { no: '512', type: 'V/DLX', status: 'vacant' },
     { no: '514', type: 'V/DLX', status: 'vacant' },
     { no: '515', type: 'V/EXE', status: 'vacant' }, // Released in Video 04!
-    { no: '516', type: 'O/SUI', guest: guestName, status: 'occupied' }, // Checked in in Video 05!
+    { 
+      no: '516', 
+      type: is516Occupied ? 'O/SUI' : 'V/SUI', 
+      guest: is516Occupied ? (guestName || 'Biswakarma') : undefined, 
+      status: is516Occupied ? 'occupied' : 'vacant' 
+    },
     { no: '601', type: 'D/PNH', status: 'dirty' }
   ];
+
+  const occupiedCount = 14 + (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0);
+  const vacantCount = 25 - (is516Occupied ? 1 : 0) - (is401Occupied ? 1 : 0);
 
   const getCellBg = (status) => {
     switch (status) {
@@ -859,7 +876,7 @@ export function IdsRoomRackConsoleModal({
                 key={r.no}
                 style={{
                   background: getCellBg(r.status),
-                  border: '1px solid #777',
+                  border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
                   padding: '3px 4px',
                   minHeight: '44px',
                   display: 'flex',
@@ -885,7 +902,7 @@ export function IdsRoomRackConsoleModal({
           {/* Bottom Statistics Legend from Frame 034 */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginTop: '10px', fontSize: '11px', borderTop: '1px solid #CCC', paddingTop: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ background: '#58B957', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>25</span>
+              <span style={{ background: '#58B957', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{vacantCount}</span>
               <span>Vacant</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -893,7 +910,7 @@ export function IdsRoomRackConsoleModal({
               <span>Reservation</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ background: '#F15A24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>15</span>
+              <span style={{ background: '#F15A24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{occupiedCount}</span>
               <span>Occupied</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -911,6 +928,10 @@ export function IdsRoomRackConsoleModal({
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#ED1C24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>0</span>
               <span>Mask Guest</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ background: '#316AC5', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>2</span>
+              <span>Expected Departure</span>
             </div>
           </div>
 
