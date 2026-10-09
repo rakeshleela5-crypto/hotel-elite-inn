@@ -740,7 +740,8 @@ export function IdsRoomRackConsoleModal({
   onOpenClearRoomsModal,
   onOpenChangeRate,
   onOpenGuestInfo,
-  onOpenChangeGuestInfo
+  onOpenChangeGuestInfo,
+  onOpenAmendStay
 }) {
   const [filterType, setFilterType] = useState('All');
   const [filterBlock, setFilterBlock] = useState('All');
@@ -1149,7 +1150,18 @@ export function IdsRoomRackConsoleModal({
                   </div>
 
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Walk-in</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Amend Stay</div>
+                  <div 
+                    style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      if (onOpenAmendStay) onOpenAmendStay(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Amend Stay / Modify Departure (Video 12 Frame 035)"
+                  >
+                    Amend Stay
+                  </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Guest Services</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Check-Out</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Pax Check-Out</div>

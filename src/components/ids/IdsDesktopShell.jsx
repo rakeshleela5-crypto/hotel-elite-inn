@@ -34,6 +34,7 @@ import {
   INITIAL_INHOUSE_GUESTS 
 } from './IdsGuestManagementModal';
 import IdsChangeRateModal, { DEFAULT_ROOM_TARIFFS } from './IdsChangeRateModal';
+import IdsAmendStayModal from './IdsAmendStayModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -218,24 +219,57 @@ export default function IdsDesktopShell({
   const [selectedRoomForRate, setSelectedRoomForRate] = useState('312');
   const [roomTariffs, setRoomTariffs] = useState(DEFAULT_ROOM_TARIFFS);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058 sync)
+  // Video 12: Modify Guest Departure / Amend Stay States (Frames 018–045)
+  const [amendStayModalOpen, setAmendStayModalOpen] = useState(false);
+  const [selectedRoomForAmendStay, setSelectedRoomForAmendStay] = useState('301');
+  const [amendedDepartures, setAmendedDepartures] = useState({});
+
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035 sync)
   const stats = useMemo(() => {
     const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
     const hasGroupCheckedIn = checkedInList.some(c => c.resNo === '276');
     const has401CheckedIn = checkedInList.some(c => c.roomNo === '401');
+    const has301Amended = !!amendedDepartures['301'];
     const checkedInCount = checkedInList.length;
 
-    // Video 07 Frame 040 (Group Booked): Expected Arrivals jumps to 7 (2+5), Rooms to sell drops to 36 (41-5).
-    // Video 07 Frame 060 (Group Checked In): 3 rooms checked in (415, 501, 515), occupied increases.
-    // Video 08 Frame 008: Arrivals 4, Check-in Rooms 18, Inhouse 33/59, Rooms to sell 36.
-    // Video 08 Frame 058 (Upgraded 316 Checked In): Arrivals 3, Check-in Rooms 19, Inhouse 34/61, Rooms to sell 36.
+    // Video 12 Frame 022 & Frame 035: If Room 301 departure is extended, Expected Departures drops from 17 to 16, Rooms to sell drops from 40 to 39.
+    if (has301Amended || Object.keys(amendedDepartures).length > 0) {
+      return {
+        expectedArrivals: 0,
+        expectedDepartures: 16,
+        checkInRooms: 0,
+        walkInRooms: 0,
+        roomsToSell: 39,
+        registeredComplaints: 0,
+        inhouseRoomsGuests: '34/61',
+        extraAdultChild: '0/0',
+        inhouseForeigners: '0/0',
+        guestBlocks: 0
+      };
+    }
+
+    // Video 11 Frame 010 & Video 12 Frame 010 baseline
+    if (inhouseGuestsList.length >= 10) {
+      return {
+        expectedArrivals: 0,
+        expectedDepartures: 17,
+        checkInRooms: 0,
+        walkInRooms: 0,
+        roomsToSell: 40,
+        registeredComplaints: 0,
+        inhouseRoomsGuests: '34/61',
+        extraAdultChild: '0/0',
+        inhouseForeigners: '0/0',
+        guestBlocks: 0
+      };
+    }
+
     let expectedArrivals = 7;
     let roomsToSell = 36;
     let checkInRooms = 1;
     let inhouseRoomsGuests = '16/25';
 
     if (has316CheckedIn) {
-      // Video 08 Frame 058 sync
       expectedArrivals = 3;
       roomsToSell = 36;
       checkInRooms = 19;
@@ -274,7 +308,7 @@ export default function IdsDesktopShell({
       inhouseForeigners: '0/0',
       guestBlocks: has401CheckedIn ? 0 : 1
     };
-  }, [reservations, checkedInList]);
+  }, [reservations, checkedInList, inhouseGuestsList, amendedDepartures]);
 
   // Master Menu Items (Frame 001 & 013)
   const masterMenuItems = [
@@ -393,7 +427,14 @@ export default function IdsDesktopShell({
           setChangeGuestInfoOpen(true);
         } 
       },
-      { label: 'Modify Guest Departure / Extension', videoId: '12', action: () => openTutorial('12') },
+      { 
+        label: 'Modify Guest Departure / Extension', 
+        videoId: '12', 
+        action: () => {
+          setSelectedRoomForAmendStay('301');
+          setAmendStayModalOpen(true);
+        } 
+      },
       { label: 'Room Transfer / Shift', videoId: '13', action: () => openTutorial('13') },
       { label: 'Add Room Numbers in Room Status', videoId: '33', action: () => openTutorial('33') },
       { label: 'Modify Room Master', videoId: '34', action: () => openTutorial('34') }
@@ -1334,6 +1375,10 @@ export default function IdsDesktopShell({
           setSelectedGuestForEdit(g);
           setChangeGuestInfoOpen(true);
         }}
+        onOpenAmendStay={(roomNo) => {
+          setSelectedRoomForAmendStay(roomNo);
+          setAmendStayModalOpen(true);
+        }}
       />
 
       {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) */}
@@ -1365,6 +1410,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'change-rate') {
             setSelectedRoomForRate('312');
             setChangeRateModalOpen(true);
+          } else if (programId === 'amend-stay' || programId === 'modify-departure') {
+            setSelectedRoomForAmendStay('301');
+            setAmendStayModalOpen(true);
           } else if (programId === 'express-checkin') {
             setExpressCheckInOpen(true);
           } else if (programId === 'reservation-checkin') {
@@ -1422,7 +1470,9 @@ export default function IdsDesktopShell({
           // Future Room Transfer
         }}
         onOpenAmendStay={() => {
-          // Future Amend Stay
+          setGuestManagementOpen(false);
+          setSelectedRoomForAmendStay('301');
+          setAmendStayModalOpen(true);
         }}
       />
 
@@ -1454,6 +1504,34 @@ export default function IdsDesktopShell({
         isOpen={guestInformationModalOpen}
         onClose={() => setGuestInformationModalOpen(false)}
         guests={inhouseGuestsList}
+      />
+
+      {/* Video 12: Amend Stay V6.5.002.1 Modal (Frames 018–045) */}
+      <IdsAmendStayModal 
+        isOpen={amendStayModalOpen}
+        onClose={() => setAmendStayModalOpen(false)}
+        initialRoomNo={selectedRoomForAmendStay}
+        inhouseGuests={inhouseGuestsList}
+        onOpenRoomHelpLookup={() => setRoomHelpLookupOpen(true)}
+        onSaveAmendStay={({ roomNo, departure, roomNights, guestBalance }) => {
+          setAmendedDepartures(prev => ({
+            ...prev,
+            [roomNo]: { departure, roomNights, guestBalance }
+          }));
+
+          // Sync into inhouseGuestsList so Guest Information reflects new departure, nights, and balance
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === roomNo) {
+              return {
+                ...g,
+                departure,
+                roomNights,
+                balance: guestBalance
+              };
+            }
+            return g;
+          }));
+        }}
       />
 
       {/* Video 06, 07 & 08: Express Check-In Modal (Frames 012–060) */}
