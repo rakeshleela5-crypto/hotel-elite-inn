@@ -48,6 +48,7 @@ import IdsBillAllowanceDayWiseModal from './IdsBillAllowanceDayWiseModal';
 import IdsBillAllowanceOptionModal from './IdsBillAllowanceOptionModal';
 import IdsTransferFolioModal from './IdsTransferFolioModal';
 import IdsFolioReinstateModal from './IdsFolioReinstateModal';
+import IdsReleaseStopPostingModal from './IdsReleaseStopPostingModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -300,6 +301,10 @@ export default function IdsDesktopShell({
   // Video 26: Folio Reinstate Option (Frames 015–085)
   const [folioReinstateModalOpen, setFolioReinstateModalOpen] = useState(false);
   const [folioReinstateRoomNo, setFolioReinstateRoomNo] = useState('201');
+
+  // Video 27: Release Stop Posting Option (Frames 005–095)
+  const [releaseStopPostingModalOpen, setReleaseStopPostingModalOpen] = useState(false);
+  const [releaseStopPostingRoomNo, setReleaseStopPostingRoomNo] = useState('201');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -636,7 +641,14 @@ export default function IdsDesktopShell({
           setFolioReinstateModalOpen(true);
         } 
       },
-      { label: 'Release Stop Posting Option', videoId: '27', action: () => openTutorial('27') },
+      { 
+        label: 'Release Stop Posting Option', 
+        videoId: '27', 
+        action: () => {
+          setReleaseStopPostingRoomNo('201');
+          setReleaseStopPostingModalOpen(true);
+        } 
+      },
       { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
     ],
     'House Keeping..': [
@@ -1740,6 +1752,10 @@ export default function IdsDesktopShell({
           setFolioReinstateRoomNo(roomNo || '201');
           setFolioReinstateModalOpen(true);
         }}
+        onOpenReleaseStopPosting={(roomNo) => {
+          setReleaseStopPostingRoomNo(roomNo || '201');
+          setReleaseStopPostingModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1807,6 +1823,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'folio-reinstate' || programId === 'folio-reinstate-option') {
             setFolioReinstateRoomNo('201');
             setFolioReinstateModalOpen(true);
+          } else if (programId === 'release-stop-posting' || programId === 'release-stop-posting-option') {
+            setReleaseStopPostingRoomNo('201');
+            setReleaseStopPostingModalOpen(true);
           }
         }}
       />
@@ -2055,7 +2074,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '26') {
+          if (videoId === '27') {
+            setReleaseStopPostingRoomNo('201');
+            setReleaseStopPostingModalOpen(true);
+          } else if (videoId === '26') {
             setFolioReinstateRoomNo('201');
             setFolioReinstateModalOpen(true);
           } else if (videoId === '25') {
@@ -2305,6 +2327,28 @@ export default function IdsDesktopShell({
               }
             ];
           });
+        }}
+      />
+
+      {/* Video 27: Release Stop Posting Option in IDS 6.5 & 7.0 (Frames 005–095) */}
+      <IdsReleaseStopPostingModal 
+        isOpen={releaseStopPostingModalOpen}
+        onClose={() => setReleaseStopPostingModalOpen(false)}
+        initialRoomNo={releaseStopPostingRoomNo}
+        accountingDate={accountingDate}
+        onReleaseSuccess={({ roomNo, released }) => {
+          console.log(`Room ${roomNo} stop posting released: ${released}`);
+        }}
+        onPostAdditionalCharge={(chargeData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === chargeData.roomNo) {
+              return {
+                ...g,
+                balance: (g.balance || 4600) + (chargeData.total || 590)
+              };
+            }
+            return g;
+          }));
         }}
       />
     </div>

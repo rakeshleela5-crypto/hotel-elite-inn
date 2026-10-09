@@ -43,6 +43,8 @@ export default function IdsQuickScanModal({
     { id: 'purge-fo', label: 'Purge FO Transaction', code: 'PF01' },
     { id: 'folio-reinstate', label: 'Folio Re-instate', code: 'FR01' },
     { id: 'folio-reinstate-option', label: 'Folio Reinstate Option', code: 'FR02' },
+    { id: 'release-stop-posting', label: 'Release Stop Posting', code: 'SP01' },
+    { id: 'release-stop-posting-option', label: 'Release Stop Posting Option', code: 'SP02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 

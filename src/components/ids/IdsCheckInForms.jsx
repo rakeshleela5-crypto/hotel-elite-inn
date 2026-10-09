@@ -755,6 +755,7 @@ export function IdsRoomRackConsoleModal({
   onOpenTransferFolio,
   onOpenQuickBalances,
   onOpenFolioReinstate,
+  onOpenReleaseStopPosting,
   walkInRooms = [],
   checkedOutRooms = [],
   paxCheckedOutRooms = [],
@@ -1501,6 +1502,25 @@ export function IdsRoomRackConsoleModal({
                     title="Folio Reinstate Option (Video 26)"
                   >
                     Folio Reinstate
+                  </div>
+                  {/* Video 27: Release Stop Posting */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A',
+                      borderTop: '1px solid #CCC'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenReleaseStopPosting) onOpenReleaseStopPosting(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Release Stop Posting Option (Video 27)"
+                  >
+                    Release Stop Posting
                   </div>
                 </>
               ) : (
