@@ -64,6 +64,8 @@ export default function IdsQuickScanModal({
     { id: 'print-voucher', label: 'Print Voucher', code: 'PV01' },
     { id: 'reprint-fo-bill', label: 'Reprint FO Bill', code: 'RB01' },
     { id: 'reprint-front-office-bill', label: 'Reprint Front Office Bill (Rule 46 GST)', code: 'RB02' },
+    { id: 'regular-guest-walkin', label: 'Walk In Regular Guest (Guest History)', code: 'WG01' },
+    { id: 'walkin-regular-guest', label: 'Regular Guest Walk-in', code: 'WG02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 

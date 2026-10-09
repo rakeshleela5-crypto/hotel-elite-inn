@@ -57,6 +57,7 @@ import IdsLinkRatesToCompanyModal from './IdsLinkRatesToCompanyModal';
 import IdsRoomMasterModal from './IdsRoomMasterModal';
 import IdsReprintVoucherModal from './IdsReprintVoucherModal';
 import IdsReprintBillModal from './IdsReprintBillModal';
+import IdsRegularGuestWalkInModal from './IdsRegularGuestWalkInModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -344,6 +345,10 @@ export default function IdsDesktopShell({
   // Video 36: Reprint Front Office Bill (Rule 46 GST) in IDS 6.5 & 7.0 (Frames 010–040)
   const [reprintBillModalOpen, setReprintBillModalOpen] = useState(false);
 
+  // Video 37: Walk In Regular Guest in IDS 6.5 & 7.0 (Frames 010–040)
+  const [regularGuestWalkInModalOpen, setRegularGuestWalkInModalOpen] = useState(false);
+  const [selectedRoomForRegularWalkIn, setSelectedRoomForRegularWalkIn] = useState('202');
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
     const totalWalkInRooms = walkInCompletedList.length;
@@ -546,6 +551,14 @@ export default function IdsDesktopShell({
         action: () => {
           setWalkInInitialRoom('203');
           setWalkInModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Walk In Regular Guest (Guest History)', 
+        videoId: '37', 
+        action: () => {
+          setSelectedRoomForRegularWalkIn('202');
+          setRegularGuestWalkInModalOpen(true);
         } 
       },
       { 
@@ -1945,6 +1958,9 @@ export default function IdsDesktopShell({
             setReprintVoucherModalOpen(true);
           } else if (programId === 'reprint-fo-bill' || programId === 'reprint-front-office-bill' || programId === 'reprint-bill') {
             setReprintBillModalOpen(true);
+          } else if (programId === 'regular-guest-walkin' || programId === 'walkin-regular-guest') {
+            setSelectedRoomForRegularWalkIn('202');
+            setRegularGuestWalkInModalOpen(true);
           }
         }}
       />
@@ -2193,7 +2209,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '36') {
+          if (videoId === '37') {
+            setSelectedRoomForRegularWalkIn('202');
+            setRegularGuestWalkInModalOpen(true);
+          } else if (videoId === '36') {
             setReprintBillModalOpen(true);
           } else if (videoId === '35') {
             setReprintVoucherModalOpen(true);
@@ -2574,6 +2593,32 @@ export default function IdsDesktopShell({
         isOpen={reprintBillModalOpen}
         onClose={() => setReprintBillModalOpen(false)}
         accountingDate={accountingDate}
+      />
+
+      {/* Video 37: Walk In Regular Guest in IDS 6.5 & 7.0 (Frames 010–040) */}
+      <IdsRegularGuestWalkInModal 
+        isOpen={regularGuestWalkInModalOpen}
+        onClose={() => setRegularGuestWalkInModalOpen(false)}
+        initialRoomNo={selectedRoomForRegularWalkIn}
+        accountingDate={accountingDate}
+        onCompleteWalkIn={(regularWalkInData) => {
+          console.log('Regular Guest Walk-In Saved:', regularWalkInData);
+          setWalkInCompletedList(prev => [
+            {
+              roomNo: regularWalkInData.roomNo,
+              guestName: regularWalkInData.guestName,
+              pax: regularWalkInData.pax || 1,
+              folioNo: `${regularWalkInData.roomNo} / 1`,
+              rate: regularWalkInData.rate,
+              payMode: regularWalkInData.payMode,
+              planCode: regularWalkInData.planCode
+            },
+            ...prev
+          ]);
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
+        }}
       />
     </div>
   );
