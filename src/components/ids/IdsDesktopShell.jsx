@@ -49,6 +49,7 @@ import IdsBillAllowanceOptionModal from './IdsBillAllowanceOptionModal';
 import IdsTransferFolioModal from './IdsTransferFolioModal';
 import IdsFolioReinstateModal from './IdsFolioReinstateModal';
 import IdsReleaseStopPostingModal from './IdsReleaseStopPostingModal';
+import IdsCompanyProfileModal from './IdsCompanyProfileModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -305,6 +306,10 @@ export default function IdsDesktopShell({
   // Video 27: Release Stop Posting Option (Frames 005–095)
   const [releaseStopPostingModalOpen, setReleaseStopPostingModalOpen] = useState(false);
   const [releaseStopPostingRoomNo, setReleaseStopPostingRoomNo] = useState('201');
+
+  // Video 28: Create Company Profile in IDS 6.5 & 7.0 (Frames 010–075)
+  const [companyProfileModalOpen, setCompanyProfileModalOpen] = useState(false);
+  const [selectedCompanyCode, setSelectedCompanyCode] = useState('COM0001');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -724,7 +729,14 @@ export default function IdsDesktopShell({
       }
     ],
     'Guest History..': [
-      { label: 'Create Company Profile Master', videoId: '28', action: () => openTutorial('28') },
+      { 
+        label: 'Create Company Profile Master', 
+        videoId: '28', 
+        action: () => {
+          setSelectedCompanyCode('COM0001');
+          setCompanyProfileModalOpen(true);
+        } 
+      },
       { label: 'Create Company Contract Rates', videoId: '31', action: () => openTutorial('31') },
       { label: 'Link Company Rates to Bookings', videoId: '32', action: () => openTutorial('32') },
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => openTutorial('43') }
@@ -735,6 +747,14 @@ export default function IdsDesktopShell({
       { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => openTutorial('42') }
     ],
     'Setup..': [
+      { 
+        label: 'Company Profile Setup (Corporate Master)', 
+        videoId: '28', 
+        action: () => {
+          setSelectedCompanyCode('COM0001');
+          setCompanyProfileModalOpen(true);
+        } 
+      },
       { label: 'Add Business Source (OTA/Direct/BTC)', videoId: '29', action: () => openTutorial('29') },
       { label: 'Add Market Segment (Corporate/FIT)', videoId: '30', action: () => openTutorial('30') },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
@@ -1826,6 +1846,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'release-stop-posting' || programId === 'release-stop-posting-option') {
             setReleaseStopPostingRoomNo('201');
             setReleaseStopPostingModalOpen(true);
+          } else if (programId === 'company-profile' || programId === 'company-audit-log') {
+            setSelectedCompanyCode('COM0001');
+            setCompanyProfileModalOpen(true);
           }
         }}
       />
@@ -2074,7 +2097,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '27') {
+          if (videoId === '28') {
+            setSelectedCompanyCode('COM0001');
+            setCompanyProfileModalOpen(true);
+          } else if (videoId === '27') {
             setReleaseStopPostingRoomNo('201');
             setReleaseStopPostingModalOpen(true);
           } else if (videoId === '26') {
@@ -2349,6 +2375,17 @@ export default function IdsDesktopShell({
             }
             return g;
           }));
+        }}
+      />
+
+      {/* Video 28: Company Profile in IDS 6.5 & 7.0 (Frames 010–075) */}
+      <IdsCompanyProfileModal 
+        isOpen={companyProfileModalOpen}
+        onClose={() => setCompanyProfileModalOpen(false)}
+        initialCompanyCode={selectedCompanyCode}
+        accountingDate={accountingDate}
+        onSaveCompanyProfile={(companyRecord, linkRates) => {
+          console.log('Company Profile Saved:', companyRecord, 'Link Rates:', linkRates);
         }}
       />
     </div>
