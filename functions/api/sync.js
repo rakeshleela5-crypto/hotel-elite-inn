@@ -746,6 +746,19 @@ export async function onRequestPost({ request, env }) {
       return jsonResponse({ success: true, orderId });
     }
 
+    // 3A. STEWARD, POS & KDS ACTION: Update KOT Order Status in Remote D1
+    if (action === 'update_order_status') {
+      const { orderId, status } = payload || {};
+      if (orderId && status) {
+        await db.prepare(`
+          UPDATE food_orders 
+          SET status = ?
+          WHERE order_id = ?
+        `).bind(status, orderId).run().catch(err => console.warn("D1 update_order_status error:", err));
+      }
+      return jsonResponse({ success: true, orderId, status });
+    }
+
     // 3B. REAL-TIME MULTI-DEVICE KDS SYNC: Fetch Live KOT Orders Feed
     if (action === 'get_live_kots' || action === 'get_live_orders') {
       const res = await db.prepare("SELECT * FROM food_orders ORDER BY created_at DESC LIMIT 50").all();

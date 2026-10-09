@@ -5,6 +5,7 @@ import {
   Calendar, Layers, Sparkles, Scale, FileSpreadsheet
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import DexieSyncIndicator from './DexieSyncIndicator';
 
 export default function PmsControlHeader({
   isSidebarCollapsed = false,
@@ -176,6 +177,9 @@ export default function PmsControlHeader({
           </button>
         )}
 
+
+        {/* Dexie.js Offline Outbox & Cloudflare D1 Synchronization Indicator */}
+        <DexieSyncIndicator compact={false} />
 
         {/* Shift Cash Drawer Pill */}
         <div style={{

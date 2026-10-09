@@ -9,6 +9,8 @@ import { RESTAURANT_MENU } from '../data/hotelData';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 import StaffShiftLoginModal from './StaffShiftLoginModal';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
+import DexieSyncIndicator from './DexieSyncIndicator';
+import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
 
 export const RECOGNIZED_STEWARDS = [
   { id: 'SADANANDA', name: 'Sadananda', code: 'STW-01', phone: '94370 12001' },
@@ -305,6 +307,7 @@ export default function StewardMobileOrderPad({
     };
 
     setRunningTableSessions(updatedSessions);
+    saveTableSessionToDexie(tableNumber, updatedSession).catch(() => {});
     try {
       localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(updatedSessions));
     } catch (e) {}
@@ -450,16 +453,9 @@ export default function StewardMobileOrderPad({
         channelKot.close();
       }
 
-      // 4. Dispatch to Cloudflare D1 Remote Database Sync
-      const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-      fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-        body: JSON.stringify({
-          action: 'create_live_kot',
-          payload: newKotOrder
-        })
-      }).catch(err => console.warn('Offline KOT sync fallback:', err));
+      // 4. Dexie.js Persistent IndexedDB & Cloudflare D1 Outbox Background Sync
+      saveKotToDexie(newKotOrder).catch(err => console.warn('Dexie KOT save notice:', err));
+      saveTableSessionToDexie(tableNumber, tableSession).catch(err => console.warn('Dexie session save notice:', err));
 
       playSuccessChime();
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -554,6 +550,8 @@ export default function StewardMobileOrderPad({
 
         {/* Active Steward Chip & Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <DexieSyncIndicator compact={true} />
+
           <button
             type="button"
             onClick={() => setShowStewardSelector(true)}

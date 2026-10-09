@@ -4,6 +4,16 @@
 // 2. Kitchen Display System (KDS)
 // 3. Fenugreek Restaurant PMS Tab & CannonKitchenPOS
 // 4. Live Orders Drawer Modal & Front Desk Room Master Folio
+// 5. Dexie.js Offline IndexedDB & Outbox Engine
+
+import { 
+  saveKotToDexie, 
+  updateKotStatusInDexie, 
+  normalizeKotForDexie,
+  saveTableSessionToDexie,
+  settleTableSessionInDexie,
+  db
+} from '../db/dexieDb';
 
 export const KOT_STORAGE_KEY = 'hotel_elite_inn_live_kots';
 export const KDS_CHANNEL_NAME = 'hotel_elite_inn_live_kds';
@@ -207,21 +217,47 @@ export function updateKotStatusUnified(orderId, newStatus) {
     status: newStatus
   });
 
-  // Background sync to Cloudflare D1
-  if (typeof window !== 'undefined') {
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'update_order_status',
-        payload: { orderId, status: newStatus }
-      })
-    }).catch(err => console.debug('Offline status sync:', err));
-  }
+  // Primary Persistent Storage & Outbox Flush via Dexie.js
+  updateKotStatusInDexie(orderId, newStatus).catch(err => {
+    console.warn('Dexie status update fallback:', err);
+  });
 
   return updatedOrders;
+}
+
+/**
+ * Unified order dispatcher:
+ * Writes immediately to Dexie IndexedDB with Cloudflare D1 Outbox Queue,
+ * mirrors to localStorage, and notifies open tabs via BroadcastChannel.
+ */
+export async function dispatchKotUnified(newKotOrder, tableSession = null) {
+  const normalized = normalizeKotOrder(newKotOrder);
+
+  // 1. Write to Dexie IndexedDB + Enqueue in Outbox
+  try {
+    await saveKotToDexie(normalized);
+  } catch (err) {
+    console.warn('Dexie write warning, falling back to storage:', err);
+  }
+
+  // 2. If table session provided, persist in Dexie
+  if (tableSession && tableSession.tableNumber) {
+    try {
+      await saveTableSessionToDexie(tableSession.tableNumber, tableSession);
+    } catch (e) {}
+  }
+
+  // 3. Mirror to localStorage
+  const existingKots = getLiveKots();
+  const updatedKots = [normalized, ...existingKots.filter(k => k.id !== normalized.id)].slice(0, 100);
+  saveLiveKots(updatedKots);
+
+  // 4. Broadcast across tabs (Kitchen KDS, Reception Admin, Bar)
+  broadcastKotChannel({
+    type: 'NEW_KOT_ORDER',
+    order: normalized,
+    target: 'DUAL_KOT'
+  });
+
+  return normalized;
 }
