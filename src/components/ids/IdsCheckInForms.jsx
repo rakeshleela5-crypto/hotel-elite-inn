@@ -748,6 +748,7 @@ export function IdsRoomRackConsoleModal({
   onOpenWalkIn,
   onOpenPaxCheckout,
   onOpenAdditionalRoomRate,
+  onOpenPostCharges,
   onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
@@ -1320,7 +1321,24 @@ export function IdsRoomRackConsoleModal({
                   >
                     Pax Check-Out
                   </div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Charges</div>
+                  {/* Video 21: Post Charges / Room Charges (Frames 020–025) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenPostCharges) onOpenPostCharges(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Room Charges / Post Charges (Video 21 Frame 025)"
+                  >
+                    Room Charges
+                  </div>
                   
                   {/* Video 14: Post Deposits (Frame 009) */}
                   <div 

@@ -42,6 +42,7 @@ import IdsWalkInModal from './IdsWalkInModal';
 import IdsPaxCheckoutModal from './IdsPaxCheckoutModal';
 import IdsNightAuditModal from './IdsNightAuditModal';
 import IdsAdditionalRoomRateModal from './IdsAdditionalRoomRateModal';
+import IdsPostChargesModal from './IdsPostChargesModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -267,6 +268,11 @@ export default function IdsDesktopShell({
   const [additionalRoomRateModalOpen, setAdditionalRoomRateModalOpen] = useState(false);
   const [additionalRoomRateInitialMode, setAdditionalRoomRateInitialMode] = useState('additional-rate'); // 'additional-rate' | 'quick-balances'
   const [selectedRoomForAdditionalRate, setSelectedRoomForAdditionalRate] = useState('312');
+
+  // Video 21: Post Charges / Room Charges (Minibar / Laundry / Travel Desk) (Frames 010–070)
+  const [postChargesModalOpen, setPostChargesModalOpen] = useState(false);
+  const [selectedRoomForPostCharges, setSelectedRoomForPostCharges] = useState('312');
+  const [selectedRevenueCodeForPostCharges, setSelectedRevenueCodeForPostCharges] = useState('TRV');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -552,7 +558,15 @@ export default function IdsDesktopShell({
           setAdditionalRoomRateModalOpen(true);
         } 
       },
-      { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
+      { 
+        label: 'Post Charges / Room Charges (Minibar/Laundry/Travel Desk)', 
+        videoId: '21', 
+        action: () => {
+          setSelectedRoomForPostCharges('312');
+          setSelectedRevenueCodeForPostCharges('TRV');
+          setPostChargesModalOpen(true);
+        } 
+      },
       { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
       { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
       { label: 'Transfer Folio to Another Room', videoId: '25', action: () => openTutorial('25') },
@@ -1636,6 +1650,10 @@ export default function IdsDesktopShell({
           setAdditionalRoomRateInitialMode('quick-balances');
           setAdditionalRoomRateModalOpen(true);
         }}
+        onOpenPostCharges={(roomNo) => {
+          setSelectedRoomForPostCharges(roomNo || '312');
+          setPostChargesModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1943,7 +1961,11 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '20') {
+          if (videoId === '21') {
+            setSelectedRoomForPostCharges('312');
+            setSelectedRevenueCodeForPostCharges('TRV');
+            setPostChargesModalOpen(true);
+          } else if (videoId === '20') {
             setSelectedRoomForAdditionalRate('312');
             setAdditionalRoomRateInitialMode('additional-rate');
             setAdditionalRoomRateModalOpen(true);
@@ -2022,6 +2044,26 @@ export default function IdsDesktopShell({
               return {
                 ...g,
                 balance: (g.balance || 16800) + (chargeData.total || 0)
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 21: Post Charges / Room Charges in IDS 6.5 & 7.0 (Frames 010–070) */}
+      <IdsPostChargesModal 
+        isOpen={postChargesModalOpen}
+        onClose={() => setPostChargesModalOpen(false)}
+        initialRoomNo={selectedRoomForPostCharges}
+        accountingDate={accountingDate}
+        initialRevenueCode={selectedRevenueCodeForPostCharges}
+        onSaveCharge={(chargeData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === selectedRoomForPostCharges) {
+              return {
+                ...g,
+                balance: (g.balance || 13460) + (chargeData.total || 0)
               };
             }
             return g;
