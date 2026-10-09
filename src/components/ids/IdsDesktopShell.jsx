@@ -53,6 +53,7 @@ import IdsCompanyProfileModal from './IdsCompanyProfileModal';
 import IdsBusinessSourceModal from './IdsBusinessSourceModal';
 import IdsMarketSegmentModal from './IdsMarketSegmentModal';
 import IdsCompanyContractRatesModal from './IdsCompanyContractRatesModal';
+import IdsLinkRatesToCompanyModal from './IdsLinkRatesToCompanyModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -325,6 +326,10 @@ export default function IdsDesktopShell({
   // Video 31: Create Company Contract Rates in IDS 6.5 & 7.0 (Frames 010–075)
   const [companyContractRatesModalOpen, setCompanyContractRatesModalOpen] = useState(false);
   const [selectedRateTableNo, setSelectedRateTableNo] = useState('100');
+
+  // Video 32: Link Company Rates in IDS 6.5 & 7.0 (Frames 010–060)
+  const [linkRatesModalOpen, setLinkRatesModalOpen] = useState(false);
+  const [selectedCompanyForRateLink, setSelectedCompanyForRateLink] = useState('COM0002');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -760,7 +765,14 @@ export default function IdsDesktopShell({
           setCompanyContractRatesModalOpen(true);
         } 
       },
-      { label: 'Link Company Rates to Bookings', videoId: '32', action: () => openTutorial('32') },
+      { 
+        label: 'Link Company Rates to Bookings', 
+        videoId: '32', 
+        action: () => {
+          setSelectedCompanyForRateLink('COM0002');
+          setLinkRatesModalOpen(true);
+        } 
+      },
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => openTutorial('43') }
     ],
     'Reports..': [
@@ -1894,6 +1906,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'company-contract-rates' || programId === 'create-contract-rates' || programId === 'room-rate-master') {
             setSelectedRateTableNo('100');
             setCompanyContractRatesModalOpen(true);
+          } else if (programId === 'link-rates-to-company' || programId === 'link-company-rates') {
+            setSelectedCompanyForRateLink('COM0002');
+            setLinkRatesModalOpen(true);
           }
         }}
       />
@@ -2142,7 +2157,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '31') {
+          if (videoId === '32') {
+            setSelectedCompanyForRateLink('COM0002');
+            setLinkRatesModalOpen(true);
+          } else if (videoId === '31') {
             setSelectedRateTableNo('100');
             setCompanyContractRatesModalOpen(true);
           } else if (videoId === '30') {
@@ -2473,6 +2491,17 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         onSaveContractRate={(rateRecord) => {
           console.log('Company Contract Rate Saved:', rateRecord);
+        }}
+      />
+
+      {/* Video 32: Link Company Rates in IDS 6.5 & 7.0 (Frames 010–060) */}
+      <IdsLinkRatesToCompanyModal 
+        isOpen={linkRatesModalOpen}
+        onClose={() => setLinkRatesModalOpen(false)}
+        initialCompanyCode={selectedCompanyForRateLink}
+        accountingDate={accountingDate}
+        onSaveLinkRate={(linkRecord) => {
+          console.log('Link Rates to Company Saved:', linkRecord);
         }}
       />
     </div>

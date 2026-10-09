@@ -54,6 +54,8 @@ export default function IdsQuickScanModal({
     { id: 'company-contract-rates', label: 'Create Company Contract Rates', code: 'CR01' },
     { id: 'create-contract-rates', label: 'Company Contract Rates', code: 'CR02' },
     { id: 'room-rate-master', label: 'Room Rate Master', code: 'RRM01' },
+    { id: 'link-rates-to-company', label: 'Link Rates to Company', code: 'LRC01' },
+    { id: 'link-company-rates', label: 'Link Company Rates to Bookings', code: 'LRC02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
