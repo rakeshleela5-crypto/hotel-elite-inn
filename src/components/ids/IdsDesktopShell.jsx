@@ -35,6 +35,7 @@ import {
 } from './IdsGuestManagementModal';
 import IdsChangeRateModal, { DEFAULT_ROOM_TARIFFS } from './IdsChangeRateModal';
 import IdsAmendStayModal from './IdsAmendStayModal';
+import IdsRoomTransferModal from './IdsRoomTransferModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -223,6 +224,11 @@ export default function IdsDesktopShell({
   const [amendStayModalOpen, setAmendStayModalOpen] = useState(false);
   const [selectedRoomForAmendStay, setSelectedRoomForAmendStay] = useState('301');
   const [amendedDepartures, setAmendedDepartures] = useState({});
+
+  // Video 13: Room Transfer / Shift States (Frames 009–031)
+  const [roomTransferModalOpen, setRoomTransferModalOpen] = useState(false);
+  const [selectedRoomForTransfer, setSelectedRoomForTransfer] = useState('415');
+  const [transferredRooms, setTransferredRooms] = useState({});
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035 sync)
   const stats = useMemo(() => {
@@ -435,7 +441,14 @@ export default function IdsDesktopShell({
           setAmendStayModalOpen(true);
         } 
       },
-      { label: 'Room Transfer / Shift', videoId: '13', action: () => openTutorial('13') },
+      { 
+        label: 'Room Transfer / Shift', 
+        videoId: '13', 
+        action: () => {
+          setSelectedRoomForTransfer('415');
+          setRoomTransferModalOpen(true);
+        } 
+      },
       { label: 'Add Room Numbers in Room Status', videoId: '33', action: () => openTutorial('33') },
       { label: 'Modify Room Master', videoId: '34', action: () => openTutorial('34') }
     ],
@@ -1379,6 +1392,11 @@ export default function IdsDesktopShell({
           setSelectedRoomForAmendStay(roomNo);
           setAmendStayModalOpen(true);
         }}
+        onOpenRoomTransfer={(roomNo) => {
+          setSelectedRoomForTransfer(roomNo);
+          setRoomTransferModalOpen(true);
+        }}
+        transferredRooms={transferredRooms}
       />
 
       {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) */}
@@ -1413,6 +1431,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'amend-stay' || programId === 'modify-departure') {
             setSelectedRoomForAmendStay('301');
             setAmendStayModalOpen(true);
+          } else if (programId === 'room-transfer') {
+            setSelectedRoomForTransfer('415');
+            setRoomTransferModalOpen(true);
           } else if (programId === 'express-checkin') {
             setExpressCheckInOpen(true);
           } else if (programId === 'reservation-checkin') {
@@ -1467,7 +1488,9 @@ export default function IdsDesktopShell({
           setRoomHelpLookupOpen(true);
         }}
         onOpenRoomTransfer={() => {
-          // Future Room Transfer
+          setGuestManagementOpen(false);
+          setSelectedRoomForTransfer('301');
+          setRoomTransferModalOpen(true);
         }}
         onOpenAmendStay={() => {
           setGuestManagementOpen(false);
@@ -1527,6 +1550,39 @@ export default function IdsDesktopShell({
                 departure,
                 roomNights,
                 balance: guestBalance
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 13: Room Transfer V6.5.002.1 Modal (Frames 009–031) */}
+      <IdsRoomTransferModal 
+        isOpen={roomTransferModalOpen}
+        onClose={() => setRoomTransferModalOpen(false)}
+        initialRoomNo={selectedRoomForTransfer}
+        inhouseGuests={inhouseGuestsList}
+        onOpenRoomHelpLookup={() => setRoomHelpLookupOpen(true)}
+        onSaveRoomTransfer={({ fromRoom, toRoom, toRoomType, guest }) => {
+          setTransferredRooms(prev => ({
+            ...prev,
+            [fromRoom]: {
+              toRoom,
+              toRoomType,
+              guest,
+              guestName: guest.lastName || guest.guestName?.split(' ').pop() || 'Kumar'
+            }
+          }));
+
+          // Update in-house guests database: update roomNo and folio
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === fromRoom) {
+              return {
+                ...g,
+                roomNo: toRoom,
+                roomType: toRoomType || g.roomType,
+                folioNo: `${toRoom} / ${g.folioNo?.split('/')[1]?.trim() || '1'}`
               };
             }
             return g;

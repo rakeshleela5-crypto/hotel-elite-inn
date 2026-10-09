@@ -32,6 +32,7 @@ export default function IdsQuickScanModal({
     { id: 'hurdle-rate', label: 'Hurdle Rate', code: 'HR01' },
     { id: 'amend-stay', label: 'Amend Stay', code: 'AS01' },
     { id: 'modify-departure', label: 'Modify Guest Departure / Extension', code: 'MD01' },
+    { id: 'room-transfer', label: 'Room Transfer / Shift', code: 'RT01' },
     { id: 'express-checkin', label: 'Express Check-in', code: 'EX01' },
     { id: 'reservation-checkin', label: 'Reservation Check-in', code: 'RC01' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }

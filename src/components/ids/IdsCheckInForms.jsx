@@ -741,7 +741,9 @@ export function IdsRoomRackConsoleModal({
   onOpenChangeRate,
   onOpenGuestInfo,
   onOpenChangeGuestInfo,
-  onOpenAmendStay
+  onOpenAmendStay,
+  onOpenRoomTransfer,
+  transferredRooms = {}
 }) {
   const [filterType, setFilterType] = useState('All');
   const [filterBlock, setFilterBlock] = useState('All');
@@ -877,11 +879,13 @@ export function IdsRoomRackConsoleModal({
     { no: '601', type: isRoomCleared('601') ? 'V/PNH' : 'D/PNH', status: isRoomCleared('601') ? 'vacant' : 'dirty', category: 'PNH' }
   ];
 
-  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060:
+  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060 & Video 13 Frame 018:
   // Base dirty count is 17. Each cleared room decrements dirty and increments vacant!
+  // Room transfers increment dirty and decrement vacant.
+  const transferCount = Object.keys(transferredRooms).length;
   const clearedCount = allCleared.filter(no => dirtyCategories[no]).length;
-  const dirtyCount = Math.max(0, 17 - clearedCount);
-  const vacantCount = 6 + clearedCount;
+  const dirtyCount = Math.max(0, 17 - clearedCount) + transferCount;
+  const vacantCount = Math.max(0, 6 + clearedCount - transferCount);
   const occupiedCount = is316Occupied ? 32 : 14;
 
   const getCellBg = (status, roomNo) => {
@@ -996,24 +1000,31 @@ export function IdsRoomRackConsoleModal({
             </div>
           </div>
 
-          {/* Room Rack Console Grid (10 Columns, 6 Rows matching Frame 018 & 060) */}
+          {/* Room Rack Console Grid (10 Columns, 6 Rows matching Frame 018 & 060 & Video 13 Frame 018) */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px', background: '#999', padding: '2px', maxHeight: '460px', overflowY: 'auto' }}>
             {roomsMatrix.map((r) => {
-              const isDirty = r.status === 'dirty';
+              const sourceTransfer = transferredRooms[r.no];
+              const targetTransfer = Object.values(transferredRooms).find(t => t.toRoom === r.no);
+              const actualStatus = sourceTransfer ? 'dirty' : targetTransfer ? 'occupied' : r.status;
+              const actualType = sourceTransfer ? `D/${r.category || 'EXE'}` : targetTransfer ? `O/${targetTransfer.toRoomType || r.category || 'EXE'}` : r.type;
+              const actualGuest = sourceTransfer ? undefined : targetTransfer ? (targetTransfer.guest?.lastName || targetTransfer.guest?.guestName?.split(' ').pop() || 'Kumar') : r.guest;
+              const isDirty = actualStatus === 'dirty';
+              const activeRoom = { ...r, status: actualStatus, type: actualType, guest: actualGuest };
+
               return (
                 <div 
                   key={r.no}
-                  onClick={(e) => handleRoomClick(e, r)}
-                  onContextMenu={(e) => handleRoomClick(e, r)}
+                  onClick={(e) => handleRoomClick(e, activeRoom)}
+                  onContextMenu={(e) => handleRoomClick(e, activeRoom)}
                   title={
                     isDirty 
                       ? `Room #${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
-                      : r.status === 'occupied'
-                        ? `Room #${r.no} is Occupied (${r.guest || ''}). Right-click or click for Actions / Change Tariff (Video 11)`
+                      : actualStatus === 'occupied'
+                        ? `Room #${r.no} is Occupied (${actualGuest || ''}). Right-click or click for Actions / Room Transfer (Video 13)`
                         : undefined
                   }
                   style={{
-                    background: getCellBg(r.status, r.no),
+                    background: getCellBg(actualStatus, r.no),
                     border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
                     padding: '3px 4px',
                     minHeight: '44px',
@@ -1022,17 +1033,17 @@ export function IdsRoomRackConsoleModal({
                     justifyContent: 'space-between',
                     color: '#000',
                     fontSize: '10px',
-                    cursor: (isDirty || r.status === 'occupied') ? 'context-menu' : 'default',
+                    cursor: (isDirty || actualStatus === 'occupied') ? 'context-menu' : 'default',
                     userSelect: 'none'
                   }}
                 >
                   <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
                     <span>{r.no}</span>
-                    <span>{r.type}</span>
+                    <span>{actualType}</span>
                   </div>
-                  {r.guest && (
+                  {actualGuest && (
                     <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {r.guest}
+                      {actualGuest}
                     </div>
                   )}
                 </div>
@@ -1090,7 +1101,7 @@ export function IdsRoomRackConsoleModal({
         </div>
 
         {/* =========================================================================
-            VIDEO 09 & 11: ROOM CONTEXT MENU (Video 09 Frame 018 & Video 11 Frames 035–040)
+            VIDEO 09, 11 & 13: ROOM CONTEXT MENU (Video 09 Frame 018, Video 11 Frames 035–040, Video 13 Frame 007)
             ========================================================================= */}
         {contextMenu && (
           <>
@@ -1123,7 +1134,20 @@ export function IdsRoomRackConsoleModal({
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Audit</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Instructions</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Clear Room</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Transfer</div>
+                  
+                  {/* Video 13: Room Transfer (Frame 007) */}
+                  <div 
+                    style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      if (onOpenRoomTransfer) onOpenRoomTransfer(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Room Transfer (Video 13 Frame 007)"
+                  >
+                    Room Transfer
+                  </div>
                   
                   <div 
                     style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
