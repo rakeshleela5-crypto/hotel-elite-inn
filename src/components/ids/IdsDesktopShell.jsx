@@ -40,6 +40,7 @@ import IdsPostDepositModal from './IdsPostDepositModal';
 import IdsCheckoutBillModal from './IdsCheckoutBillModal';
 import IdsWalkInModal from './IdsWalkInModal';
 import IdsPaxCheckoutModal from './IdsPaxCheckoutModal';
+import IdsNightAuditModal from './IdsNightAuditModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -255,6 +256,11 @@ export default function IdsDesktopShell({
   const [selectedRoomForPaxCheckout, setSelectedRoomForPaxCheckout] = useState('312');
   const [paxCheckedOutRooms, setPaxCheckedOutRooms] = useState([]);
   const [selectedRoomForGuestInfo, setSelectedRoomForGuestInfo] = useState('312');
+
+  // Video 19: Night Audit Process States (Frames 010–095)
+  const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
+  const [nightAuditInitialStep, setNightAuditInitialStep] = useState('full-wizard'); // 'step1' | 'step2' | 'step3' | 'step4' | 'full-wizard' | 'info'
+  const [accountingDate, setAccountingDate] = useState('25-JAN-2022');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -523,6 +529,14 @@ export default function IdsDesktopShell({
           setPaxCheckoutModalOpen(true);
         } 
       },
+      { 
+        label: 'Posting V6.5.002.1 (1st Step: Post Room Rate)', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('step1');
+          setNightAuditModalOpen(true);
+        } 
+      },
       { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
       { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
       { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
@@ -562,9 +576,46 @@ export default function IdsDesktopShell({
       { label: 'Modify Room Master', videoId: '34', action: () => openTutorial('34') }
     ],
     'Day End process..': [
-      { label: 'Night Audit Process (Midnight Rollover)', videoId: '19', action: () => openTutorial('19') },
-      { label: 'Automatic Tariff Debiting', videoId: '19', action: () => openTutorial('19') },
-      { label: 'Financial Day Close Lock', videoId: '19', action: () => openTutorial('19') }
+      { 
+        label: 'Night Audit Process (Full Midnight Rollover)', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('full-wizard');
+          setNightAuditModalOpen(true);
+        } 
+      },
+      { 
+        label: '1st Step: Post Room Rate (Cashiering Posting)', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('step1');
+          setNightAuditModalOpen(true);
+        } 
+      },
+      { 
+        label: '2nd Step: Create Guest Balance', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('step2');
+          setNightAuditModalOpen(true);
+        } 
+      },
+      { 
+        label: '3rd Step: Create Night Balance (Pending KOTs)', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('step3');
+          setNightAuditModalOpen(true);
+        } 
+      },
+      { 
+        label: '4th Step: Open New Date (FOMPURG Rollover)', 
+        videoId: '19', 
+        action: () => {
+          setNightAuditInitialStep('step4');
+          setNightAuditModalOpen(true);
+        } 
+      }
     ],
     'Guest History..': [
       { label: 'Create Company Profile Master', videoId: '28', action: () => openTutorial('28') },
@@ -927,7 +978,17 @@ export default function IdsDesktopShell({
         {/* Menu Bar */}
         <div className="ids-menubar">
           <div className="ids-menu-item">User</div>
-          <div className="ids-menu-item">Info.</div>
+          <div 
+            className="ids-menu-item" 
+            onClick={() => {
+              setNightAuditInitialStep('info');
+              setNightAuditModalOpen(true);
+            }}
+            title="System Info & Current Accounting Date (Video 19 Frame 090)"
+            style={{ cursor: 'pointer' }}
+          >
+            Info.
+          </div>
           <div 
             className="ids-menu-item" 
             style={{ fontWeight: 700, color: '#0A246A', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -940,9 +1001,20 @@ export default function IdsDesktopShell({
 
         {/* Sub-bar */}
         <div className="ids-subbar">
-          <div style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             <span>BS/GN V(0)</span>
             <span>SP V(0)</span>
+            <span style={{ 
+              background: '#0A246A', 
+              color: '#FFF', 
+              padding: '1px 8px', 
+              borderRadius: '2px', 
+              fontWeight: 700, 
+              fontSize: '11px', 
+              letterSpacing: '0.5px' 
+            }}>
+              A/C DATE: {accountingDate}
+            </span>
           </div>
           <div>IT ADMIN (FRONT DESK DUTY MANAGER)</div>
         </div>
@@ -1829,7 +1901,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '18') {
+          if (videoId === '19') {
+            setNightAuditInitialStep('full-wizard');
+            setNightAuditModalOpen(true);
+          } else if (videoId === '18') {
             setSelectedRoomForPaxCheckout('312');
             setPaxCheckoutModalOpen(true);
           } else if (videoId === '17') {
@@ -1873,6 +1948,18 @@ export default function IdsDesktopShell({
         onOpenRoomRack={() => setRoomRackConsoleOpen(true)}
         onPaxCheckedOut={({ roomNo }) => {
           setPaxCheckedOutRooms(prev => Array.from(new Set([...prev, roomNo])));
+        }}
+      />
+
+      {/* Video 19: Night Audit Process in IDS 6.5 & 7.0 (Frames 010–095) */}
+      <IdsNightAuditModal 
+        isOpen={nightAuditModalOpen}
+        onClose={() => setNightAuditModalOpen(false)}
+        currentAccountingDate={accountingDate}
+        initialStep={nightAuditInitialStep}
+        onCompleteNightAudit={(auditInfo) => {
+          const newDate = typeof auditInfo === 'string' ? auditInfo : (auditInfo?.newDate || '26-JAN-2022');
+          setAccountingDate(newDate);
         }}
       />
     </div>
