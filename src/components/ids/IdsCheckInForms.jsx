@@ -728,17 +728,29 @@ export function IdsCheckedInPositionModal({
   );
 }
 
-// 6. ROOM STATUS RACK CONSOLE (Room Status V6.5.002.1, Frame 034)
+// 6. ROOM STATUS RACK CONSOLE (Room Status V6.5.002.1, Frames 018–035 & 060)
 export function IdsRoomRackConsoleModal({ 
   isOpen, 
   onClose, 
   checkedInList = [],
   occupiedRoom = '516', 
-  guestName = 'Biswakarma' 
+  guestName = 'Biswakarma',
+  clearedRooms = [],
+  onClearSingleRoom,
+  onOpenClearRoomsModal
 }) {
   const [filterType, setFilterType] = useState('All');
   const [filterBlock, setFilterBlock] = useState('All');
   const [filterFloor, setFilterFloor] = useState('All');
+
+  // Video 09: Context menu & Clear Room dialog states (Frames 018–035)
+  const [contextMenu, setContextMenu] = useState(null); // { roomNo, category, x, y }
+  const [clearDialogRoom, setClearDialogRoom] = useState(null); // roomNo being cleared
+  const [hskStaff, setHskStaff] = useState('Lakshyajit Changmai');
+  const [authorizedBy, setAuthorizedBy] = useState('HK SUPERVISOR');
+  const [remarks, setRemarks] = useState('CLEAN');
+  const [roomStatusOpt, setRoomStatusOpt] = useState('Clean');
+  const [localCleared, setLocalCleared] = useState([]);
 
   if (!isOpen) return null;
 
@@ -749,23 +761,37 @@ export function IdsRoomRackConsoleModal({
   const is515Occupied = checkedInList.some(c => c.roomNo === '515');
   const is316Occupied = checkedInList.some(c => c.roomNo === '316');
 
+  // Merge external cleared rooms with local session clears
+  const allCleared = Array.from(new Set([...clearedRooms, ...localCleared]));
+
+  // Base raw dirty rooms definition
+  const dirtyCategories = {
+    '201': 'EXE', '203': 'DLX', '204': 'DLX', '205': 'DLX',
+    '206': 'DLX', '207': 'DLX', '208': 'DLX', '209': 'DLX',
+    '210': 'DLX', '211': 'DLX', '212': 'DLX', '214': 'DLX',
+    '215': 'EXE', '216': 'SUI', '308': 'DLX', '309': 'DLX',
+    '601': 'PNH'
+  };
+
+  const isRoomCleared = (no) => allCleared.includes(no);
+
   // 44 Rooms matching Frame 034, Frame 060 & Video 08 Frame 062 grid
   const roomsMatrix = [
-    { no: '201', type: 'D/EXE', status: 'dirty' },
-    { no: '203', type: 'D/DLX', status: 'dirty' },
-    { no: '204', type: 'D/DLX', status: 'dirty' },
-    { no: '205', type: 'D/DLX', status: 'dirty' },
-    { no: '206', type: 'D/DLX', status: 'dirty' },
-    { no: '207', type: 'D/DLX', status: 'dirty' },
-    { no: '208', type: 'D/DLX', status: 'dirty' },
-    { no: '209', type: 'D/DLX', status: 'dirty' },
-    { no: '210', type: 'D/DLX', status: 'dirty' },
-    { no: '211', type: 'D/DLX', status: 'dirty' },
+    { no: '201', type: isRoomCleared('201') ? 'V/EXE' : 'D/EXE', status: isRoomCleared('201') ? 'vacant' : 'dirty', category: 'EXE' },
+    { no: '203', type: isRoomCleared('203') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('203') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '204', type: isRoomCleared('204') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('204') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '205', type: isRoomCleared('205') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('205') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '206', type: isRoomCleared('206') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('206') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '207', type: isRoomCleared('207') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('207') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '208', type: isRoomCleared('208') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('208') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '209', type: isRoomCleared('209') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('209') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '210', type: isRoomCleared('210') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('210') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '211', type: isRoomCleared('211') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('211') ? 'vacant' : 'dirty', category: 'DLX' },
 
-    { no: '212', type: 'D/DLX', status: 'dirty' },
-    { no: '214', type: 'D/DLX', status: 'dirty' },
-    { no: '215', type: 'D/EXE', status: 'dirty' },
-    { no: '216', type: 'D/SUI', status: 'dirty' },
+    { no: '212', type: isRoomCleared('212') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('212') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '214', type: isRoomCleared('214') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('214') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '215', type: isRoomCleared('215') ? 'V/EXE' : 'D/EXE', status: isRoomCleared('215') ? 'vacant' : 'dirty', category: 'EXE' },
+    { no: '216', type: isRoomCleared('216') ? 'V/SUI' : 'D/SUI', status: isRoomCleared('216') ? 'vacant' : 'dirty', category: 'SUI' },
     { no: '301', type: 'O/EXE', guest: 'Tenzing', status: 'occupied' },
     { no: '303', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
     { no: '304', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
@@ -773,8 +799,8 @@ export function IdsRoomRackConsoleModal({
     { no: '306', type: 'O/DLX', guest: 'SINGH', status: 'occupied' },
     { no: '307', type: 'O/DLX', guest: 'SINGH', status: 'occupied' },
 
-    { no: '308', type: 'D/DLX', status: 'dirty' },
-    { no: '309', type: 'D/DLX', status: 'dirty' },
+    { no: '308', type: isRoomCleared('308') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('308') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '309', type: isRoomCleared('309') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('309') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '310', type: 'O/DLX', guest: 'WAHLANG', status: 'occupied' },
     { no: '311', type: 'O/DLX', guest: 'DEURI', status: 'occupied' },
     { no: '312', type: 'O/DLX', guest: 'BASU', status: 'occupied' },
@@ -844,14 +870,19 @@ export function IdsRoomRackConsoleModal({
       guest: is516Occupied ? (guestName || 'Biswakarma') : undefined, 
       status: is516Occupied ? 'occupied' : 'vacant' 
     },
-    { no: '601', type: 'D/PNH', status: 'dirty' }
+    { no: '601', type: isRoomCleared('601') ? 'V/PNH' : 'D/PNH', status: isRoomCleared('601') ? 'vacant' : 'dirty', category: 'PNH' }
   ];
 
-  const addedOccupied = (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0) + (is415Occupied ? 1 : 0) + (is501Occupied ? 1 : 0) + (is515Occupied ? 1 : 0) + (is316Occupied ? 1 : 0);
-  const occupiedCount = is316Occupied ? 32 : (14 + addedOccupied);
-  const vacantCount = is316Occupied ? 6 : Math.max(0, 25 - addedOccupied);
+  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060:
+  // Base dirty count is 17. Each cleared room decrements dirty and increments vacant!
+  const clearedCount = allCleared.filter(no => dirtyCategories[no]).length;
+  const dirtyCount = Math.max(0, 17 - clearedCount);
+  const vacantCount = 6 + clearedCount;
+  const occupiedCount = is316Occupied ? 32 : 14;
 
-  const getCellBg = (status) => {
+  const getCellBg = (status, roomNo) => {
+    // Rooms 401 & 516 display in blue/purple for Expected Departure
+    if (roomNo === '401' || roomNo === '516') return '#6A89CC';
     switch (status) {
       case 'occupied': return '#F15A24'; // Vivid orange/red
       case 'vacant': return '#58B957';   // Vivid green
@@ -860,11 +891,53 @@ export function IdsRoomRackConsoleModal({
     }
   };
 
+  const handleRoomClick = (e, r) => {
+    // If dirty room, show context menu matching Frame 018
+    if (r.status === 'dirty' || dirtyCategories[r.no]) {
+      e.preventDefault();
+      const rect = e.currentTarget.getBoundingClientRect();
+      setContextMenu({
+        roomNo: r.no,
+        category: r.category || 'DLX',
+        x: rect.left,
+        y: rect.bottom + 2
+      });
+    }
+  };
+
+  const handleOpenClearDialog = (roomNo) => {
+    setContextMenu(null);
+    setClearDialogRoom(roomNo);
+    // Set realistic staff member matching Video 09 (Frame 022 Lakshyajit Changmai, Frame 032 Jayanta Chetia)
+    if (roomNo === '203') {
+      setHskStaff('Jayanta Chetia');
+    } else {
+      setHskStaff('Lakshyajit Changmai');
+    }
+    setAuthorizedBy('HK SUPERVISOR');
+    setRemarks('CLEAN');
+    setRoomStatusOpt('Clean');
+  };
+
+  const handleSaveClearDialog = () => {
+    if (clearDialogRoom) {
+      setLocalCleared(prev => [...prev, clearDialogRoom]);
+      if (onClearSingleRoom) {
+        onClearSingleRoom(clearDialogRoom, {
+          hskStaff,
+          authorizedBy,
+          remarks
+        });
+      }
+      setClearDialogRoom(null);
+    }
+  };
+
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1200 }}>
-      <div className="ids-dialog-window" style={{ width: '960px', maxWidth: '98vw' }}>
-        {/* Title Bar */}
-        <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="ids-dialog-window" style={{ width: '960px', maxWidth: '98vw', position: 'relative' }}>
+        {/* Title Bar matching Frame 018 */}
+        <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700 }}>Room Status V6.5.002.1</span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
@@ -890,43 +963,72 @@ export function IdsRoomRackConsoleModal({
                 <option value="All">All</option>
               </select>
             </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>Filter By</span>
+              <select className="ids-select" style={{ width: '60px' }}>
+                <option value="All">All</option>
+              </select>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>Room #</span>
+              <input className="ids-input" style={{ width: '50px' }} />
+            </div>
+
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span>Page 1 of 1</span>
               <span>Special Rooms 🙂</span>
+              {onOpenClearRoomsModal && (
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ fontSize: '10px', padding: '1px 6px', background: '#FFF7CC', fontWeight: 700 }}
+                  onClick={onOpenClearRoomsModal}
+                  title="Open Clear Rooms bulk program (Video 09)"
+                >
+                  🧹 Clear Rooms Pgm
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Room Rack Console Grid (10 Columns, 6 Rows matching Frame 034) */}
+          {/* Room Rack Console Grid (10 Columns, 6 Rows matching Frame 018 & 060) */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px', background: '#999', padding: '2px', maxHeight: '460px', overflowY: 'auto' }}>
-            {roomsMatrix.map((r) => (
-              <div 
-                key={r.no}
-                style={{
-                  background: getCellBg(r.status),
-                  border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
-                  padding: '3px 4px',
-                  minHeight: '44px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  color: '#000',
-                  fontSize: '10px'
-                }}
-              >
-                <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
-                  <span>{r.no}</span>
-                  <span>{r.type}</span>
-                </div>
-                {r.guest && (
-                  <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {r.guest}
+            {roomsMatrix.map((r) => {
+              const isDirty = r.status === 'dirty';
+              return (
+                <div 
+                  key={r.no}
+                  onClick={(e) => handleRoomClick(e, r)}
+                  onContextMenu={(e) => handleRoomClick(e, r)}
+                  title={isDirty ? `Room #${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` : undefined}
+                  style={{
+                    background: getCellBg(r.status, r.no),
+                    border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
+                    padding: '3px 4px',
+                    minHeight: '44px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    color: '#000',
+                    fontSize: '10px',
+                    cursor: isDirty ? 'context-menu' : 'default',
+                    userSelect: 'none'
+                  }}
+                >
+                  <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{r.no}</span>
+                    <span>{r.type}</span>
                   </div>
-                )}
-              </div>
-            ))}
+                  {r.guest && (
+                    <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {r.guest}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {/* Bottom Statistics Legend from Frame 034 */}
+          {/* Bottom Statistics Legend matching Frame 018 & Frame 060 */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginTop: '10px', fontSize: '11px', borderTop: '1px solid #CCC', paddingTop: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#58B957', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{vacantCount}</span>
@@ -940,9 +1042,13 @@ export function IdsRoomRackConsoleModal({
               <span style={{ background: '#F15A24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{occupiedCount}</span>
               <span>Occupied</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ background: '#E8E137', color: '#000', padding: '1px 5px', fontWeight: 700 }}>17</span>
-              <span>Dirty</span>
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: onOpenClearRoomsModal ? 'pointer' : 'default' }}
+              onClick={onOpenClearRoomsModal}
+              title="Click to open Clear Rooms V6.5.002.1"
+            >
+              <span style={{ background: '#E8E137', color: '#000', padding: '1px 5px', fontWeight: 700 }}>{dirtyCount}</span>
+              <span style={{ textDecoration: onOpenClearRoomsModal ? 'underline' : 'none' }}>Dirty</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#7A5230', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>0</span>
@@ -970,6 +1076,141 @@ export function IdsRoomRackConsoleModal({
             <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
           </div>
         </div>
+
+        {/* =========================================================================
+            VIDEO 09: ROOM CONTEXT MENU (Frame 018 & 028)
+            ========================================================================= */}
+        {contextMenu && (
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: contextMenu.y, 
+              left: contextMenu.x, 
+              background: '#ECE9D8', 
+              border: '2px outset #ECE9D8',
+              boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
+              zIndex: 1350,
+              minWidth: '105px',
+              fontSize: '11px'
+            }}
+          >
+            {/* Header: Room #201 */}
+            <div style={{ padding: '2px 6px', background: '#316AC5', color: '#FFF', fontWeight: 700, fontSize: '10px' }}>
+              Room #{contextMenu.roomNo}
+            </div>
+            <div 
+              style={{ padding: '4px 8px', cursor: 'pointer', borderBottom: '1px solid #CCC', fontWeight: 600 }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+              onClick={() => handleOpenClearDialog(contextMenu.roomNo)}
+            >
+              Clear Room
+            </div>
+            <div 
+              style={{ padding: '4px 8px', cursor: 'pointer' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+              onClick={() => {
+                alert(`Walk-in for Room ${contextMenu.roomNo}`);
+                setContextMenu(null);
+              }}
+            >
+              Walk-in
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            VIDEO 09: CLEAR ROOM DIALOG MODAL (Frame 022 & 026)
+            ========================================================================= */}
+        {clearDialogRoom && (
+          <div className="ids-modal-overlay" style={{ zIndex: 1400 }} onClick={() => setClearDialogRoom(null)}>
+            <div 
+              className="ids-dialog-window" 
+              style={{ width: '450px', maxWidth: '94vw', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Title Bar matching Frame 022 */}
+              <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>Clear Room</span>
+                <button className="ids-win-btn close" onClick={() => setClearDialogRoom(null)}>✕</button>
+              </div>
+
+              {/* Form Content matching Frame 022/026 */}
+              <div style={{ padding: '12px 14px', background: '#ECE9D8', fontSize: '11px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 600 }}>Room#</span>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <input 
+                      className="ids-input" 
+                      value={clearDialogRoom} 
+                      readOnly 
+                      style={{ width: '70px', fontWeight: 700, background: '#EBEBE4' }} 
+                    />
+                    <span style={{ fontWeight: 600, marginLeft: '12px' }}>Room Status</span>
+                    <select 
+                      className="ids-select" 
+                      value={roomStatusOpt} 
+                      onChange={(e) => setRoomStatusOpt(e.target.value)}
+                      style={{ width: '85px', fontWeight: 600 }}
+                    >
+                      <option value="Clean">Clean</option>
+                      <option value="Dirty">Dirty</option>
+                      <option value="Inspect">Inspect</option>
+                    </select>
+                  </div>
+
+                  <span style={{ fontWeight: 600 }}>House Keeping Staff</span>
+                  <select 
+                    className="ids-select" 
+                    value={hskStaff} 
+                    onChange={(e) => setHskStaff(e.target.value)}
+                    style={{ width: '100%', fontWeight: 600 }}
+                  >
+                    <option value="Lakshyajit Changmai">Lakshyajit Changmai</option>
+                    <option value="Jayanta Chetia">Jayanta Chetia</option>
+                    <option value="Manoranjan">Manoranjan</option>
+                    <option value="Dhonsing">Dhonsing</option>
+                  </select>
+
+                  <span style={{ fontWeight: 600 }}>Authorized by</span>
+                  <input 
+                    className="ids-input" 
+                    value={authorizedBy} 
+                    onChange={(e) => setAuthorizedBy(e.target.value)}
+                    style={{ width: '100%', fontWeight: 700 }} 
+                  />
+
+                  <span style={{ fontWeight: 600 }}>Remarks</span>
+                  <input 
+                    className="ids-input" 
+                    value={remarks} 
+                    onChange={(e) => setRemarks(e.target.value)}
+                    style={{ width: '100%' }} 
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ minWidth: '60px', fontWeight: 700 }}
+                    onClick={handleSaveClearDialog}
+                  >
+                    <u>S</u>ave
+                  </button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ minWidth: '60px' }}
+                    onClick={() => setClearDialogRoom(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

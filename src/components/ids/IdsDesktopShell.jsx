@@ -24,6 +24,8 @@ import {
   IdsRoomRackConsoleModal 
 } from './IdsCheckInForms';
 import IdsExpressCheckInModal from './IdsExpressCheckInModal';
+import IdsClearRoomsModal from './IdsClearRoomsModal';
+import IdsQuickScanModal from './IdsQuickScanModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -190,6 +192,11 @@ export default function IdsDesktopShell({
   const [roomRackConsoleOpen, setRoomRackConsoleOpen] = useState(false);
   const [expressCheckInOpen, setExpressCheckInOpen] = useState(false);
 
+  // Video 09: Clear Rooms & Quick Scan States (Frames 012–060)
+  const [clearRoomsModalOpen, setClearRoomsModalOpen] = useState(false);
+  const [quickScanModalOpen, setQuickScanModalOpen] = useState(false);
+  const [clearedDirtyRooms, setClearedDirtyRooms] = useState([]);
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058 sync)
   const stats = useMemo(() => {
     const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
@@ -348,8 +355,8 @@ export default function IdsDesktopShell({
       { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
     ],
     'House Keeping..': [
-      { label: 'House Keeping Room Status', videoId: '06', action: () => setRoomRackConsoleOpen(true) },
-      { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'House Keeping Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setClearRoomsModalOpen(true) },
       { label: 'Change Guest Details In-House', videoId: '10', action: () => openTutorial('10') },
       { label: 'Modify Guest Departure / Extension', videoId: '12', action: () => openTutorial('12') },
       { label: 'Room Transfer / Shift', videoId: '13', action: () => openTutorial('13') },
@@ -381,8 +388,9 @@ export default function IdsDesktopShell({
       { label: 'Change Room Rate / Tariff Override', videoId: '11', action: () => openTutorial('11') }
     ],
     'Lookups..': [
-      { label: 'Room Status', videoId: '08', action: () => setRoomRackConsoleOpen(true) },
-      { label: 'Room Status Matrix Lookup', videoId: '09', action: () => openTutorial('09') },
+      { label: 'Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'Clear Rooms Program', videoId: '09', action: () => setClearRoomsModalOpen(true) },
+      { label: 'Room Status Matrix Lookup', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
       { label: 'Company Lookup Directory', videoId: '28', action: () => openTutorial('28') }
     ],
     'SMS Setup..': [
@@ -982,7 +990,13 @@ export default function IdsDesktopShell({
           <button className="ids-btn-classic">Last Updated</button>
           <button className="ids-btn-classic">To-Do</button>
           <button className="ids-btn-classic">GI</button>
-          <button className="ids-btn-classic">Load Pgm</button>
+          <button 
+            className="ids-btn-classic" 
+            onClick={() => setQuickScanModalOpen(true)}
+            title="Quick Scan / Load Pgm (Video 09)"
+          >
+            Load Pgm
+          </button>
           <button 
             className="ids-btn-classic" 
             style={{ marginLeft: '12px', background: '#D9534F', color: '#FFF', border: '2px outset #E0706D' }}
@@ -1248,13 +1262,49 @@ export default function IdsDesktopShell({
         checkedInList={checkedInList}
       />
 
-      {/* Video 05 & 06: Room Status V6.5.002.1 Rack Console Modal (Frame 034) */}
+      {/* Video 05, 06, 08 & 09: Room Status V6.5.002.1 Rack Console Modal (Frames 018–035 & 060) */}
       <IdsRoomRackConsoleModal 
         isOpen={roomRackConsoleOpen}
         onClose={() => setRoomRackConsoleOpen(false)}
         checkedInList={checkedInList}
         occupiedRoom={checkedInList.length > 0 ? checkedInList[0].roomNo : '516'}
         guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
+        clearedRooms={clearedDirtyRooms}
+        onClearSingleRoom={(roomNo) => {
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
+        }}
+        onOpenClearRoomsModal={() => setClearRoomsModalOpen(true)}
+      />
+
+      {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) */}
+      <IdsClearRoomsModal 
+        isOpen={clearRoomsModalOpen}
+        onClose={() => setClearRoomsModalOpen(false)}
+        clearedRooms={clearedDirtyRooms}
+        onClearAllDirtyRooms={(allRoomNos) => {
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, ...allRoomNos])));
+        }}
+        onOpenRoomRack={() => setRoomRackConsoleOpen(true)}
+      />
+
+      {/* Video 09: Quick Scan Load Pgm Modal (Frames 012 & 038) */}
+      <IdsQuickScanModal 
+        isOpen={quickScanModalOpen}
+        onClose={() => setQuickScanModalOpen(false)}
+        onSelectProgram={(programId) => {
+          if (programId === 'room-status' || programId === 'housekeeping-room-status') {
+            setRoomRackConsoleOpen(true);
+          } else if (programId === 'clear-rooms') {
+            setClearRoomsModalOpen(true);
+          } else if (programId === 'express-checkin') {
+            setExpressCheckInOpen(true);
+          } else if (programId === 'reservation-checkin') {
+            setScanPurpose('checkin');
+            setScanBookingModalOpen(true);
+          } else if (programId === 'room-booking') {
+            setQuickReservationOpen(true);
+          }
+        }}
       />
 
       {/* Video 06, 07 & 08: Express Check-In Modal (Frames 012–060) */}
