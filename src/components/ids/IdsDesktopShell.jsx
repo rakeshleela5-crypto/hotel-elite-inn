@@ -190,20 +190,29 @@ export default function IdsDesktopShell({
   const [roomRackConsoleOpen, setRoomRackConsoleOpen] = useState(false);
   const [expressCheckInOpen, setExpressCheckInOpen] = useState(false);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060 sync)
+  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058 sync)
   const stats = useMemo(() => {
+    const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
     const hasGroupCheckedIn = checkedInList.some(c => c.resNo === '276');
     const has401CheckedIn = checkedInList.some(c => c.roomNo === '401');
     const checkedInCount = checkedInList.length;
 
     // Video 07 Frame 040 (Group Booked): Expected Arrivals jumps to 7 (2+5), Rooms to sell drops to 36 (41-5).
     // Video 07 Frame 060 (Group Checked In): 3 rooms checked in (415, 501, 515), occupied increases.
+    // Video 08 Frame 008: Arrivals 4, Check-in Rooms 18, Inhouse 33/59, Rooms to sell 36.
+    // Video 08 Frame 058 (Upgraded 316 Checked In): Arrivals 3, Check-in Rooms 19, Inhouse 34/61, Rooms to sell 36.
     let expectedArrivals = 7;
     let roomsToSell = 36;
     let checkInRooms = 1;
     let inhouseRoomsGuests = '16/25';
 
-    if (hasGroupCheckedIn && has401CheckedIn) {
+    if (has316CheckedIn) {
+      // Video 08 Frame 058 sync
+      expectedArrivals = 3;
+      roomsToSell = 36;
+      checkInRooms = 19;
+      inhouseRoomsGuests = '34/61';
+    } else if (hasGroupCheckedIn && has401CheckedIn) {
       expectedArrivals = 3;
       roomsToSell = 47;
       checkInRooms = 5;
@@ -211,8 +220,8 @@ export default function IdsDesktopShell({
     } else if (hasGroupCheckedIn) {
       expectedArrivals = 4;
       roomsToSell = 36;
-      checkInRooms = 4;
-      inhouseRoomsGuests = '19/31';
+      checkInRooms = 18;
+      inhouseRoomsGuests = '33/59';
     } else if (has401CheckedIn) {
       expectedArrivals = 6;
       roomsToSell = 51;
@@ -302,6 +311,7 @@ export default function IdsDesktopShell({
     'Registrations..': [
       { label: 'Express Check-in', videoId: '06', action: () => setExpressCheckInOpen(true) },
       { label: 'Group Express Check-in', videoId: '07', action: () => setExpressCheckInOpen(true) },
+      { label: 'Upgrade Room Express Check-in', videoId: '08', action: () => setExpressCheckInOpen(true) },
       { 
         label: 'Reservation Check-in', 
         videoId: '05', 
@@ -371,7 +381,7 @@ export default function IdsDesktopShell({
       { label: 'Change Room Rate / Tariff Override', videoId: '11', action: () => openTutorial('11') }
     ],
     'Lookups..': [
-      { label: 'Room Status', videoId: '06', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'Room Status', videoId: '08', action: () => setRoomRackConsoleOpen(true) },
       { label: 'Room Status Matrix Lookup', videoId: '09', action: () => openTutorial('09') },
       { label: 'Company Lookup Directory', videoId: '28', action: () => openTutorial('28') }
     ],
@@ -636,6 +646,46 @@ export default function IdsDesktopShell({
           status: 'Checked In',
           blocked: false,
           rooms: rooms
+        };
+      }
+      return r;
+    }));
+  };
+
+  // Video 08: Room Category Upgrade Express Check-In Workflow Handler
+  const handleCompleteUpgradeCheckin = (data) => {
+    const record = {
+      resNo: data.resNo || '276',
+      roomNo: data.roomNo || '316',
+      regNo: data.regNo || '619',
+      type: data.roomType || 'SUI',
+      guestName: data.guestName || 'Anil Kumar Group',
+      companyName: data.company || 'COM0003 - Varun Beverages Ltd',
+      rate: data.rate || '4,250.00',
+      planAmt: '0.00',
+      arrivalDate: data.arrivalDate || '16-JAN-2022',
+      departureDate: data.departureDate || '18-JAN-2022',
+      nation: 'IND',
+      user: 'MANAGER',
+      totalGuests: 2,
+      isUpgrade: true,
+      upgradeCategory: data.roomType || 'SUI',
+      bookedCategory: data.bookedType || 'EXE',
+      authorisedBy: data.authorisedBy || 'Manager',
+      remarks: data.remarks || 'Executive'
+    };
+
+    setCheckedInList(prev => [record, ...prev]);
+
+    setReservations(prev => prev.map(r => {
+      if (r.resNo === (data.resNo || '276')) {
+        return {
+          ...r,
+          isCheckedIn: true,
+          status: 'Checked In',
+          blocked: false,
+          roomNo: '316',
+          category: 'SUI'
         };
       }
       return r;
@@ -1207,12 +1257,13 @@ export default function IdsDesktopShell({
         guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
       />
 
-      {/* Video 06 & 07: Express Check-In Modal (Frames 012–060) */}
+      {/* Video 06, 07 & 08: Express Check-In Modal (Frames 012–060) */}
       <IdsExpressCheckInModal 
         isOpen={expressCheckInOpen}
         onClose={() => setExpressCheckInOpen(false)}
         onCompleteExpressCheckin={handleCompleteExpressCheckin}
         onCompleteGroupCheckin={handleCompleteGroupCheckin}
+        onCompleteUpgradeCheckin={handleCompleteUpgradeCheckin}
         onOpenStandardCheckin={() => {
           setExpressCheckInOpen(false);
           setScanPurpose('checkin');

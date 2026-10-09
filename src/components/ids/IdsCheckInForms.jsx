@@ -747,8 +747,9 @@ export function IdsRoomRackConsoleModal({
   const is415Occupied = checkedInList.some(c => c.roomNo === '415');
   const is501Occupied = checkedInList.some(c => c.roomNo === '501');
   const is515Occupied = checkedInList.some(c => c.roomNo === '515');
+  const is316Occupied = checkedInList.some(c => c.roomNo === '316');
 
-  // 44 Rooms matching Frame 034 & Frame 060 grid
+  // 44 Rooms matching Frame 034, Frame 060 & Video 08 Frame 062 grid
   const roomsMatrix = [
     { no: '201', type: 'D/EXE', status: 'dirty' },
     { no: '203', type: 'D/DLX', status: 'dirty' },
@@ -765,7 +766,7 @@ export function IdsRoomRackConsoleModal({
     { no: '214', type: 'D/DLX', status: 'dirty' },
     { no: '215', type: 'D/EXE', status: 'dirty' },
     { no: '216', type: 'D/SUI', status: 'dirty' },
-    { no: '301', type: 'O/EXE', guest: 'Sajin Ahmed', status: 'occupied' },
+    { no: '301', type: 'O/EXE', guest: 'Tenzing', status: 'occupied' },
     { no: '303', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
     { no: '304', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
     { no: '305', type: 'O/DLX', guest: 'KAKATI', status: 'occupied' },
@@ -776,10 +777,16 @@ export function IdsRoomRackConsoleModal({
     { no: '309', type: 'D/DLX', status: 'dirty' },
     { no: '310', type: 'O/DLX', guest: 'WAHLANG', status: 'occupied' },
     { no: '311', type: 'O/DLX', guest: 'DEURI', status: 'occupied' },
-    { no: '312', type: 'V/DLX', status: 'vacant' },
-    { no: '314', type: 'V/DLX', status: 'vacant' },
-    { no: '315', type: 'V/EXE', status: 'vacant' },
-    { no: '316', type: 'V/SUI', status: 'vacant' },
+    { no: '312', type: 'O/DLX', guest: 'BASU', status: 'occupied' },
+    { no: '314', type: 'O/DLX', guest: 'Anirudh', status: 'occupied' },
+    { no: '315', type: 'O/EXE', guest: 'Khan', status: 'occupied' },
+    { 
+      no: '316', 
+      type: is316Occupied ? 'O/SUI' : 'V/SUI', 
+      guest: is316Occupied ? 'Anil Kumar G' : undefined, 
+      status: is316Occupied ? 'occupied' : 'vacant',
+      tooltip: is316Occupied ? 'ROOM # 316 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)' : undefined
+    },
     { 
       no: '401', 
       type: is401Occupied ? 'O/EXE' : 'V/EXE', 
@@ -789,15 +796,15 @@ export function IdsRoomRackConsoleModal({
     { no: '403', type: 'O/DLX', guest: 'DEKA', status: 'occupied' },
 
     { no: '404', type: 'O/DLX', guest: 'DAS', status: 'occupied' },
-    { no: '405', type: 'V/DLX', status: 'vacant' },
-    { no: '406', type: 'V/DLX', status: 'vacant' },
-    { no: '407', type: 'V/DLX', status: 'vacant' },
-    { no: '408', type: 'V/DLX', status: 'vacant' },
+    { no: '405', type: 'O/DLX', guest: 'Anirudh', status: 'occupied' },
+    { no: '406', type: 'O/DLX', guest: 'Sharma', status: 'occupied' },
+    { no: '407', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '408', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
     { no: '409', type: 'O/DLX', guest: 'BHATTASALI', status: 'occupied' },
-    { no: '410', type: 'V/DLX', status: 'vacant' },
-    { no: '411', type: 'V/DLX', status: 'vacant' },
-    { no: '412', type: 'V/DLX', status: 'vacant' },
-    { no: '414', type: 'V/DLX', status: 'vacant' },
+    { no: '410', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '411', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '412', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '414', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
 
     { 
       no: '415', 
@@ -816,9 +823,9 @@ export function IdsRoomRackConsoleModal({
     { no: '503', type: 'O/DLX', guest: 'NATRAJ', status: 'occupied' },
     { no: '504', type: 'O/DLX', guest: 'MENAN', status: 'occupied' },
     { no: '505', type: 'O/DLX', guest: 'BEDI', status: 'occupied' },
-    { no: '506', type: 'V/DLX', status: 'vacant' },
-    { no: '507', type: 'V/DLX', status: 'vacant' },
-    { no: '508', type: 'V/DLX', status: 'vacant' },
+    { no: '506', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '507', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
+    { no: '508', type: 'O/DLX', guest: 'Sharma Group', status: 'occupied' },
     { no: '509', type: 'V/DLX', status: 'vacant' },
 
     { no: '510', type: 'V/DLX', status: 'vacant' },
@@ -840,9 +847,9 @@ export function IdsRoomRackConsoleModal({
     { no: '601', type: 'D/PNH', status: 'dirty' }
   ];
 
-  const addedOccupied = (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0) + (is415Occupied ? 1 : 0) + (is501Occupied ? 1 : 0) + (is515Occupied ? 1 : 0);
-  const occupiedCount = 14 + addedOccupied;
-  const vacantCount = Math.max(0, 25 - addedOccupied);
+  const addedOccupied = (is516Occupied ? 1 : 0) + (is401Occupied ? 1 : 0) + (is415Occupied ? 1 : 0) + (is501Occupied ? 1 : 0) + (is515Occupied ? 1 : 0) + (is316Occupied ? 1 : 0);
+  const occupiedCount = is316Occupied ? 32 : (14 + addedOccupied);
+  const vacantCount = is316Occupied ? 6 : Math.max(0, 25 - addedOccupied);
 
   const getCellBg = (status) => {
     switch (status) {

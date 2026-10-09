@@ -24,6 +24,7 @@ export default function IdsExpressCheckInModal({
   onClose,
   onCompleteExpressCheckin,
   onCompleteGroupCheckin,
+  onCompleteUpgradeCheckin,
   onOpenStandardCheckin
 }) {
   const [activeTab, setActiveTab] = useState('Expected Arrivals'); // 'Expected Arrivals' | 'No Show' | 'Next Day Arrivals'
@@ -39,6 +40,17 @@ export default function IdsExpressCheckInModal({
   const [confirmSummaryOpen, setConfirmSummaryOpen] = useState(false);
   const [groupSummaryOpen, setGroupSummaryOpen] = useState(false);
   const [selectedRoomNumber, setSelectedRoomNumber] = useState('401');
+
+  // Video 08: Room Category Upgrade & Reg Card States (Frames 012–050)
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [regCardModalOpen, setRegCardModalOpen] = useState(false);
+  const [upgradeOption, setUpgradeOption] = useState('Upgrade'); // 'None' | 'Upgrade' | 'Upselling'
+  const [upgradeAuthorisedBy, setUpgradeAuthorisedBy] = useState('Manager');
+  const [upgradeRemarks, setUpgradeRemarks] = useState('Executive');
+  const [printRegCardOpt, setPrintRegCardOpt] = useState('GUEST PHOTO REG.CA');
+  const [is316Upgraded, setIs316Upgraded] = useState(false);
+  const [hoveredRoomNo, setHoveredRoomNo] = useState('316');
+  const [selectedArrivalRowIndex, setSelectedArrivalRowIndex] = useState(6); // Default row for Res 276 Anil Kumar Group (EXE)
 
   // Video 07: Mode toggle between Main Arrivals Grid vs Group Allocation Panel
   const [groupAllocationMode, setGroupAllocationMode] = useState(false);
@@ -64,18 +76,20 @@ export default function IdsExpressCheckInModal({
   const [editMiddleName, setEditMiddleName] = useState('');
   const [editFirstName, setEditFirstName] = useState('Anil');
 
-  // Arrivals dataset matching Video 06 Frame 012 and Video 07 Frame 044
+  // Arrivals dataset matching Video 06 Frame 012, Video 07 Frame 044, Video 08 Frame 012
   const initialArrivalsList = [
-    { resNo: '272', title: 'MS', guestName: 'Basu Anirudh', isRepeat: true, roomType: 'DLX', roomNo: '312', pax: 1 },
-    { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: '314', pax: 1 },
+    { resNo: '272', title: 'MS', guestName: 'Basu Anirudh', isRepeat: true, roomType: 'DLX', roomNo: '312', pax: 1, isPartial: false },
+    { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
+    { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
+    { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
+    { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
     { resNo: '274', title: 'Mr', guestName: 'Khan Pravez', isRepeat: false, roomType: 'EXE', roomNo: '401', pax: 2, companion: 'Khan Pavez' },
-    { resNo: '274', title: 'Mrs', guestName: 'Khan Pavez', isRepeat: false, roomType: 'EXE', roomNo: '401', pax: 2, isCompanion: true },
-    { resNo: '276', title: 'Mr', guestName: 'Kumar Anil', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '415', pax: 2 },
-    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '415', pax: 2, isCompanion: true },
-    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '501', pax: 2, isCompanion: true },
-    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '501', pax: 2, isCompanion: true },
-    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '515', pax: 2, isCompanion: true },
-    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '515', pax: 2, isCompanion: true }
+    { resNo: '276', title: 'Mr', guestName: 'Kumar Anil', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '415', pax: 2, isPartial: true },
+    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: false },
+    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: true },
+    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: true },
+    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: true },
+    { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: true }
   ];
 
   const [arrivals, setArrivals] = useState(initialArrivalsList);
@@ -182,6 +196,57 @@ export default function IdsExpressCheckInModal({
     setGroupRoomAssignments(prev => prev.map((item, i) => i === idx ? { ...item, roomNo: newRoom } : item));
   };
 
+  // Video 08: Room Category Upgrade Handlers
+  const handleTriggerUpgradeFor316 = (rowIndex) => {
+    if (typeof rowIndex === 'number') {
+      setSelectedArrivalRowIndex(rowIndex);
+    }
+    setHoveredRoomNo('316');
+    setUpgradeOption('Upgrade');
+    setUpgradeAuthorisedBy('Manager');
+    setUpgradeRemarks('Executive');
+    setUpgradeModalOpen(true);
+  };
+
+  const handleConfirmUpgradeOk = () => {
+    setUpgradeModalOpen(false);
+    setRegCardModalOpen(true);
+  };
+
+  const handleConfirmRegCardSelect = () => {
+    setRegCardModalOpen(false);
+    setIs316Upgraded(true);
+
+    // Update the arrivals list row
+    setArrivals(prev => prev.map((a, idx) => {
+      if (idx === selectedArrivalRowIndex || (a.resNo === '276' && a.roomNo === 'EXE')) {
+        return {
+          ...a,
+          roomNo: '316',
+          roomType: 'SUI',
+          isUpgraded: true
+        };
+      }
+      return a;
+    }));
+
+    if (onCompleteUpgradeCheckin) {
+      onCompleteUpgradeCheckin({
+        resNo: '276',
+        roomNo: '316',
+        roomType: 'SUI',
+        bookedType: 'EXE',
+        regNo: '619',
+        guestName: 'Anil Kumar Group',
+        company: 'COM0003 - Varun Beverages Ltd',
+        upgradeType: upgradeOption,
+        authorisedBy: upgradeAuthorisedBy || 'Manager',
+        remarks: upgradeRemarks || 'Executive',
+        printOpt: printRegCardOpt
+      });
+    }
+  };
+
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
       {/* Express Check-In Main Window */}
@@ -196,10 +261,10 @@ export default function IdsExpressCheckInModal({
           flexDirection: 'column' 
         }}
       >
-        {/* Title Bar */}
+        {/* Title Bar (Video 08 Frame 012 shows V6.5.002.4) */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontWeight: 700 }}>Express Check-In V6.5.002.1</span>
+            <span style={{ fontWeight: 700 }}>Express Check-in V6.5.002.4</span>
             <span style={{ fontSize: '11px', color: '#333' }}>
               {groupAllocationMode ? '[Group Allocation Console - Res # 276]' : '[Front Desk Rapid Check-In]'}
             </span>
@@ -298,24 +363,49 @@ export default function IdsExpressCheckInModal({
                       {arrivals.map((row, idx) => {
                         const isChecked = checkedArrivals[row.resNo] || false;
                         const isSelected = selectedArrivalRes === row.resNo;
+                        const isPartialCheckIn = row.isPartial;
+                        const isUpgradedRow = row.isUpgraded || (row.roomNo === '316');
+
                         return (
                           <tr 
                             key={idx}
-                            onClick={() => handleRowClick(row)}
+                            onClick={() => {
+                              setSelectedArrivalRowIndex(idx);
+                              handleRowClick(row);
+                            }}
                             style={{
-                              background: isSelected ? '#316AC5' : idx % 2 === 0 ? '#FFFFFF' : '#F9F8F2',
-                              color: isSelected ? '#FFFFFF' : '#000000',
+                              background: isPartialCheckIn 
+                                ? '#A6EDF9' 
+                                : isSelected 
+                                  ? '#316AC5' 
+                                  : isUpgradedRow 
+                                    ? '#FFF2D6' 
+                                    : idx % 2 === 0 ? '#FFFFFF' : '#F9F8F2',
+                              color: isSelected && !isPartialCheckIn ? '#FFFFFF' : '#000000',
                               cursor: 'pointer'
                             }}
                           >
                             <td style={{ fontWeight: 600 }}>{row.resNo}</td>
                             <td>{row.title}</td>
                             <td style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              {row.isRepeat && <span style={{ color: isSelected ? '#FFF' : '#BD5317', fontWeight: 800 }}>•</span>}
-                              {row.isGroup && <span style={{ color: isSelected ? '#FFF' : '#A02020', fontWeight: 800, fontSize: '9px' }}>[GRP]</span>}
+                              {row.isRepeat && <span style={{ color: isSelected && !isPartialCheckIn ? '#FFF' : '#BD5317', fontWeight: 800 }}>•</span>}
+                              {row.isGroup && <span style={{ color: isSelected && !isPartialCheckIn ? '#FFF' : '#A02020', fontWeight: 800, fontSize: '9px' }}>[GRP]</span>}
                               <span style={{ fontWeight: row.resNo === '276' || row.resNo === '274' ? 700 : 500 }}>
                                 {row.guestName}
                               </span>
+                              {row.resNo === '276' && row.roomType === 'EXE' && !isUpgradedRow && (
+                                <button 
+                                  className="ids-btn-classic" 
+                                  style={{ fontSize: '9px', padding: '0 4px', background: '#FFD700', fontWeight: 700, marginLeft: 'auto', border: '1px solid #716F64' }}
+                                  title="Upgrade Room Category to 316 SUI (Video 08)"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleTriggerUpgradeFor316(idx);
+                                  }}
+                                >
+                                  Upgrade
+                                </button>
+                              )}
                             </td>
                             <td 
                               style={{ textAlign: 'center' }}
@@ -331,8 +421,8 @@ export default function IdsExpressCheckInModal({
                                 style={{ cursor: 'pointer' }}
                               />
                             </td>
-                            <td style={{ fontWeight: 700, color: isSelected ? '#FFF' : row.roomNo ? '#0A246A' : '#777' }}>
-                              {row.roomNo || row.roomType}
+                            <td style={{ fontWeight: 700, color: isUpgradedRow ? '#D9381E' : isSelected && !isPartialCheckIn ? '#FFF' : row.roomNo ? '#0A246A' : '#777' }}>
+                              {isUpgradedRow ? '316 SUI 🚪➔' : row.roomNo || row.roomType}
                             </td>
                           </tr>
                         );
@@ -489,6 +579,14 @@ export default function IdsExpressCheckInModal({
                     <option value="ALL">ALL</option>
                   </select>
                 </div>
+
+                {/* Video 08 Frame 020/030/045 Header indicator */}
+                <span 
+                  style={{ fontWeight: 700, color: '#A02020', fontSize: '11px', margin: '0 6px', background: '#F8F7F0', padding: '1px 6px', border: '1px solid #CCC' }}
+                  title="Hovered / Target Room"
+                >
+                  Room #{hoveredRoomNo}
+                </span>
               </div>
 
               {/* 3 Authentic IDS Toolbar action buttons on top right (Frame 012) */}
@@ -593,6 +691,49 @@ export default function IdsExpressCheckInModal({
                     </tr>
                   </thead>
                   <tbody>
+                    {/* BA-FF03 (Floor 3) matching Video 08 Frame 012, 020, 045 */}
+                    <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
+                      <td colSpan={8}>BA-FF03 (Floor 3)</td>
+                    </tr>
+                    <tr style={{ background: '#FFFFFF' }}>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>312 DLX</td>
+                      <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                        BASU
+                      </td>
+                      <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr style={{ background: '#FFFFFF' }}>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>314 DLX</td>
+                      <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                        ANIRUDH
+                      </td>
+                      <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+                    <tr 
+                      style={{ 
+                        background: is316Upgraded ? '#FFEBE6' : '#FFFFFF', 
+                        cursor: 'pointer' 
+                      }}
+                      onMouseEnter={() => setHoveredRoomNo('316')}
+                      onClick={() => handleTriggerUpgradeFor316()}
+                      title="Click & Drag RoomGrid against the Room no. for Check-in"
+                    >
+                      <td style={{ fontWeight: 700, color: '#0A246A' }}>316 SUI</td>
+                      {is316Upgraded ? (
+                        <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                            <span style={{ fontSize: '11px' }}>🚪➔</span>
+                            <span>KUMAR GROUP</span>
+                          </span>
+                        </td>
+                      ) : (
+                        <td colSpan={2} style={{ background: '#FFFFFF', color: '#0A246A', textAlign: 'center', fontWeight: 600, border: '1px dashed #316AC5' }}>
+                          [ Click to Assign / Upgrade Room 316 SUI ]
+                        </td>
+                      )}
+                      <td></td><td></td><td></td><td></td><td></td>
+                    </tr>
+
                     {/* BA-FF04 Header */}
                     <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
                       <td colSpan={8}>BA-FF04 (Floor 4)</td>
@@ -600,6 +741,7 @@ export default function IdsExpressCheckInModal({
                     <tr 
                       style={{ background: '#FFF7E6', cursor: 'pointer' }}
                       onClick={() => setRightViewMode('preview')}
+                      onMouseEnter={() => setHoveredRoomNo('401')}
                       title="Room 401 EXE"
                     >
                       <td style={{ fontWeight: 700, color: '#A02020' }}>401 EXE</td>
@@ -608,7 +750,7 @@ export default function IdsExpressCheckInModal({
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
-                    <tr style={{ background: '#E6F0FA' }}>
+                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('415')}>
                       <td style={{ fontWeight: 700, color: '#0A246A' }}>415 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         KUMAR (ALLOCATED)
@@ -620,21 +762,21 @@ export default function IdsExpressCheckInModal({
                     <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
                       <td colSpan={8}>BA-FF05 (Floor 5)</td>
                     </tr>
-                    <tr style={{ background: '#E6F0FA' }}>
+                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('501')}>
                       <td style={{ fontWeight: 700, color: '#0A246A' }}>501 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         ANIL KUMAR G (ALLOCATED)
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
-                    <tr style={{ background: '#E6F0FA' }}>
+                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('515')}>
                       <td style={{ fontWeight: 700, color: '#0A246A' }}>515 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         ANIL KUMAR G (ALLOCATED)
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
-                    <tr>
+                    <tr onMouseEnter={() => setHoveredRoomNo('516')}>
                       <td style={{ fontWeight: 700 }}>516 SUI</td>
                       <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         BISWAKARMA (OCCUPIED)
@@ -889,6 +1031,166 @@ export default function IdsExpressCheckInModal({
                   onClick={handleConfirmGroupOk}
                 >
                   Ok
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          VIDEO 08: UPGRADE / UPSELLING MODAL (Frame 030 & Frame 035)
+          ========================================================================= */}
+      {upgradeModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-dialog-window" 
+            style={{ 
+              width: '380px', 
+              maxWidth: '96vw', 
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+              position: 'relative'
+            }}
+          >
+            {/* Title Bar */}
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700 }}>Upgrade/Upselling</span>
+              <button className="ids-win-btn close" onClick={() => setUpgradeModalOpen(false)}>✕</button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '12px 14px', background: '#ECE9D8', fontSize: '11px' }}>
+              {/* Radio Group in single row */}
+              <div style={{ border: '1px solid #716F64', padding: '8px 12px', background: '#F8F7F0', display: 'flex', gap: '16px', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                  <input 
+                    type="radio" 
+                    name="upgradeOption" 
+                    value="None" 
+                    checked={upgradeOption === 'None'} 
+                    onChange={() => setUpgradeOption('None')} 
+                  />
+                  <span>None</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontWeight: upgradeOption === 'Upgrade' ? 700 : 400 }}>
+                  <input 
+                    type="radio" 
+                    name="upgradeOption" 
+                    value="Upgrade" 
+                    checked={upgradeOption === 'Upgrade'} 
+                    onChange={() => setUpgradeOption('Upgrade')} 
+                  />
+                  <span>Upgrade</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                  <input 
+                    type="radio" 
+                    name="upgradeOption" 
+                    value="Upselling" 
+                    checked={upgradeOption === 'Upselling'} 
+                    onChange={() => setUpgradeOption('Upselling')} 
+                  />
+                  <span>Upselling</span>
+                </label>
+              </div>
+
+              {/* Input Fields */}
+              <div style={{ marginTop: '10px', display: 'grid', gridTemplateColumns: '95px 1fr', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600 }}>Authorised By</span>
+                <input 
+                  className="ids-input" 
+                  value={upgradeAuthorisedBy} 
+                  onChange={(e) => setUpgradeAuthorisedBy(e.target.value)} 
+                  style={{ width: '100%', fontWeight: 600 }}
+                />
+
+                <span style={{ fontWeight: 600 }}>Remarks</span>
+                <input 
+                  className="ids-input" 
+                  value={upgradeRemarks} 
+                  onChange={(e) => setUpgradeRemarks(e.target.value)} 
+                  style={{ width: '100%' }}
+                />
+              </div>
+
+              {/* Status Notice (matching Frame 030/035) */}
+              <div style={{ marginTop: '8px', padding: '4px 6px', background: '#FFF9D7', border: '1px solid #D4B106', textAlign: 'center', fontSize: '10px', color: '#666' }}>
+                Check-in Progress, Please wait..
+              </div>
+
+              {/* Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                  onClick={handleConfirmUpgradeOk}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }}
+                  onClick={() => setUpgradeModalOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          VIDEO 08: SELECT PRINT REG.CARD OPT MODAL (Frame 040)
+          ========================================================================= */}
+      {regCardModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-dialog-window" 
+            style={{ 
+              width: '320px', 
+              maxWidth: '96vw', 
+              boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+              position: 'relative'
+            }}
+          >
+            {/* Title Bar */}
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Select print reg.card opt</span>
+              <button className="ids-win-btn close" onClick={() => setRegCardModalOpen(false)}>✕</button>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '12px 14px', background: '#ECE9D8', fontSize: '11px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600 }}>Print Reg.card</span>
+                <select 
+                  className="ids-select" 
+                  value={printRegCardOpt} 
+                  onChange={(e) => setPrintRegCardOpt(e.target.value)}
+                  style={{ width: '100%', fontWeight: 700, color: '#0A246A' }}
+                >
+                  <option value="GUEST PHOTO REG.CA">GUEST PHOTO REG.CA</option>
+                  <option value="STANDARD REG. CARD">STANDARD REG. CARD</option>
+                  <option value="EXPRESS REG. CARD">EXPRESS REG. CARD</option>
+                </select>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '16px' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                  onClick={handleConfirmRegCardSelect}
+                >
+                  Select
+                </button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }}
+                  onClick={() => setRegCardModalOpen(false)}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
