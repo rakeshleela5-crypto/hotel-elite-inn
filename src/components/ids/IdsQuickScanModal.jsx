@@ -66,6 +66,8 @@ export default function IdsQuickScanModal({
     { id: 'reprint-front-office-bill', label: 'Reprint Front Office Bill (Rule 46 GST)', code: 'RB02' },
     { id: 'regular-guest-walkin', label: 'Walk In Regular Guest (Guest History)', code: 'WG01' },
     { id: 'walkin-regular-guest', label: 'Regular Guest Walk-in', code: 'WG02' },
+    { id: 'cancel-checkins', label: 'Cancel Check-Ins', code: 'CC01' },
+    { id: 'remove-checkin', label: 'Remove or Cancel Check-In', code: 'CC02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 

@@ -58,6 +58,7 @@ import IdsRoomMasterModal from './IdsRoomMasterModal';
 import IdsReprintVoucherModal from './IdsReprintVoucherModal';
 import IdsReprintBillModal from './IdsReprintBillModal';
 import IdsRegularGuestWalkInModal from './IdsRegularGuestWalkInModal';
+import IdsCancelCheckInModal from './IdsCancelCheckInModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -349,6 +350,9 @@ export default function IdsDesktopShell({
   const [regularGuestWalkInModalOpen, setRegularGuestWalkInModalOpen] = useState(false);
   const [selectedRoomForRegularWalkIn, setSelectedRoomForRegularWalkIn] = useState('202');
 
+  // Video 38: Cancel Check-Ins in IDS 6.5 & 7.0 (Frames 010–040)
+  const [cancelCheckInModalOpen, setCancelCheckInModalOpen] = useState(false);
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
     const totalWalkInRooms = walkInCompletedList.length;
@@ -560,6 +564,11 @@ export default function IdsDesktopShell({
           setSelectedRoomForRegularWalkIn('202');
           setRegularGuestWalkInModalOpen(true);
         } 
+      },
+      { 
+        label: 'Cancel Check-Ins (Remove Check-In)', 
+        videoId: '38', 
+        action: () => setCancelCheckInModalOpen(true) 
       },
       { 
         label: 'Check-in 2nd Pax later into Room', 
@@ -1961,6 +1970,8 @@ export default function IdsDesktopShell({
           } else if (programId === 'regular-guest-walkin' || programId === 'walkin-regular-guest') {
             setSelectedRoomForRegularWalkIn('202');
             setRegularGuestWalkInModalOpen(true);
+          } else if (programId === 'cancel-checkins' || programId === 'cancel-checkin' || programId === 'remove-checkin') {
+            setCancelCheckInModalOpen(true);
           }
         }}
       />
@@ -2209,7 +2220,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '37') {
+          if (videoId === '38') {
+            setCancelCheckInModalOpen(true);
+          } else if (videoId === '37') {
             setSelectedRoomForRegularWalkIn('202');
             setRegularGuestWalkInModalOpen(true);
           } else if (videoId === '36') {
@@ -2615,6 +2628,20 @@ export default function IdsDesktopShell({
             },
             ...prev
           ]);
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
+        }}
+      />
+
+      {/* Video 38: Cancel Check-Ins in IDS 6.5 & 7.0 (Frames 010–040) */}
+      <IdsCancelCheckInModal 
+        isOpen={cancelCheckInModalOpen}
+        onClose={() => setCancelCheckInModalOpen(false)}
+        accountingDate={accountingDate}
+        onCancelCheckInSuccess={({ roomNo }) => {
+          console.log(`Cancelled check-in for room ${roomNo}`);
+          setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== roomNo));
         }}
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
