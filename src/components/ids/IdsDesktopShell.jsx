@@ -818,6 +818,14 @@ export default function IdsDesktopShell({
           setRoomMasterModalOpen(true);
         } 
       },
+      { 
+        label: 'Modify Room Master (Features / Passive Status)', 
+        videoId: '34', 
+        action: () => {
+          setSelectedRoomForMaster('202');
+          setRoomMasterModalOpen(true);
+        } 
+      },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
       { 
@@ -1922,7 +1930,7 @@ export default function IdsDesktopShell({
           } else if (programId === 'link-rates-to-company' || programId === 'link-company-rates') {
             setSelectedCompanyForRateLink('COM0002');
             setLinkRatesModalOpen(true);
-          } else if (programId === 'room-master' || programId === 'add-room-number') {
+          } else if (programId === 'room-master' || programId === 'add-room-number' || programId === 'modify-room-master') {
             setSelectedRoomForMaster('202');
             setRoomMasterModalOpen(true);
           }
@@ -2173,7 +2181,7 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '33') {
+          if (videoId === '34' || videoId === '33') {
             setSelectedRoomForMaster('202');
             setRoomMasterModalOpen(true);
           } else if (videoId === '32') {

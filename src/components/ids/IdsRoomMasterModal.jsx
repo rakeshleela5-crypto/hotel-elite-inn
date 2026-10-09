@@ -3,37 +3,40 @@ import './idsFortuneNext.css';
 import { 
   Building2, BedDouble, CheckCircle2, Search, Plus, 
   Edit, Trash2, Save, X, Layers, Sparkles, LayoutGrid,
-  ChevronLeft, ChevronRight, Check, AlertCircle, ShieldCheck
+  ChevronLeft, ChevronRight, Check, AlertCircle, ShieldCheck,
+  ArrowRight, ArrowLeft, DoorOpen, Link2
 } from 'lucide-react';
 
 /* =========================================================================
-   VIDEO 33: HOW TO ADD ROOM NUMBERS IN ROOM STATUS IN IDS 6.5 & 7.0 SOFTWARE
+   VIDEOS 33 & 34: 
+   - VIDEO 33: HOW TO ADD ROOM NUMBERS IN ROOM STATUS IN IDS 6.5 & 7.0 SOFTWARE
+   - VIDEO 34: HOW TO MODIFY ROOM MASTER IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
    Replication of:
-   1. Window Title: Room Master V6.5.002.1 (Frames 010–022)
+   1. Window Title: Room Master V6.5.002.1 (Frames 010–035)
    2. Entry Points (Frame 008):
       - Setup.. -> Room Master
-      - Setup.. -> How to Add Room Numbers in Room Status
-      - Quick Scan (Load Pgm) -> Type "room master" -> "Room Master" -> [ Load ]
-      - 44-Video Tutorial Player -> Video 33 -> Launch Interactive Feature Clone
-   3. Fields & Controls (Frames 014 & 018):
+      - Setup.. -> Modify Room Master
+      - Quick Scan (Load Pgm) -> Type "room master" / "modify room" -> [ Load ]
+      - 44-Video Tutorial Player -> Videos 33 & 34 -> Launch Interactive Feature Clone
+   3. Fields & Controls (Video 34 Frame 016):
       - Property Code: DEMO / HOTEL ELITE INN
       - Room#: 202 with [ ? ] lookup
       - Room Type: EXE / DLX / SUI / PNH with [ ? ] Room Types Lookup
-      - Block: MAIN / TOWER / WING A
-      - Floor: 2 / 3 / 4 / 5 / 6
-      - Available Features: King Size Bed, Non Smoking Room, Queen Size Bed, etc.
+      - Block: MAIN / TOWER / WING A / VILLAS
+      - Floor: Basement 01 / 1st Floor / 2nd Floor / 3rd Floor / 4th Floor / 5th Floor / 6th Floor
+      - Available Features on Left <-> Features Selected on Right (with transfer)
       - Maximum Pax: 2 / 3 / 4
       - Rate Table: 100 / 101 with [ ? ] lookup
-      - [ Opposite Rooms ] button
-      - [ Change Room Type ] button
-      - Status: Active / Inactive / Out of Order
+      - [ Connecting Rooms ] button (Frame 016)
+      - [ Opposite Rooms ] button (Frame 016)
+      - [ Change Room Type ] button (Frame 016)
+      - Status: Active / Inactive (Passive) / Out of Order
       - User: MANAGER
       - Last Updated: 23-FEB-2022 18:16
-   4. Room Types Lookup Modal (Frame 014):
-      - Room Types V6.5.002.1 (DLX, EXE, PNH, SUI, ZZZ)
-   5. Live Sync with Room Status Rack (Frame 026):
-      - Added rooms automatically reflect in Room Status V6.5.002.1 (e.g. 202 V/EXE)
+   4. Live Sync with Room Status Rack (Video 34 Frame 020):
+      - Active: visible in Room Status Rack (e.g. 202 V/EXE)
+      - Inactive (Passive): hidden from Room Status Rack, reducing Rooms to Sell count!
    ========================================================================= */
 
 export const INITIAL_ROOM_TYPES_DATABASE = [
@@ -44,12 +47,12 @@ export const INITIAL_ROOM_TYPES_DATABASE = [
   { propertyCode: 'DEM', roomType: 'ZZZ', applicableFrom: '26-SEP-2021', name: 'Special Rooms / Dormitory', status: 'Active', maxPax: 6, defaultRate: 1500 }
 ];
 
-export const INITIAL_ROOM_FEATURES = [
-  'King Size Bed',
+export const ALL_ROOM_FEATURES_MASTER = [
   'Non Smoking Room',
   'Queen Size Bed',
   'Smoking Room',
   'Twin Bed',
+  'King Size Bed',
   'Pool View',
   'City View / Garden View',
   'Balcony',
@@ -59,17 +62,149 @@ export const INITIAL_ROOM_FEATURES = [
 ];
 
 export const INITIAL_ROOM_MASTER_INVENTORY = [
-  { roomNo: '201', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['King Size Bed', 'Non Smoking Room'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '202', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['King Size Bed', 'Non Smoking Room', 'City View / Garden View'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '203', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['Twin Bed', 'Non Smoking Room'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '204', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['Queen Size Bed', 'Pool View'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '205', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['Queen Size Bed', 'Non Smoking Room'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '206', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['Twin Bed', 'Non Smoking Room'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '301', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'Balcony'], maxPax: 2, rateTable: '101', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '312', roomType: 'DLX', block: 'MAIN', floor: '3', features: ['King Size Bed', 'Pool View'], maxPax: 2, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '316', roomType: 'SUI', block: 'TOWER', floor: '3', features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony'], maxPax: 3, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '516', roomType: 'SUI', block: 'TOWER', floor: '5', features: ['King Size Bed', 'Jacuzzi & Bathtub', 'City View / Garden View'], maxPax: 3, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' },
-  { roomNo: '601', roomType: 'PNH', block: 'TOWER', floor: '6', features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony', 'Smart 4K LED TV'], maxPax: 4, rateTable: '100', status: 'Active', lastUpdated: '23-FEB-2022 18:16' }
+  { 
+    roomNo: '201', 
+    roomType: 'EXE', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['King Size Bed', 'Non Smoking Room'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '202',
+    oppositeRoom: '208',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '202', 
+    roomType: 'EXE', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['King Size Bed', 'Non Smoking Room', 'City View / Garden View'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '201',
+    oppositeRoom: '207',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '203', 
+    roomType: 'DLX', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['Twin Bed', 'Non Smoking Room'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '206',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '204', 
+    roomType: 'DLX', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['Queen Size Bed', 'Pool View'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '205',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '205', 
+    roomType: 'DLX', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['Queen Size Bed', 'Non Smoking Room'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '204',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '206', 
+    roomType: 'DLX', 
+    block: 'MAIN', 
+    floor: '2', 
+    features: ['Twin Bed', 'Non Smoking Room'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '203',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '301', 
+    roomType: 'EXE', 
+    block: 'MAIN', 
+    floor: '3', 
+    features: ['King Size Bed', 'Balcony'], 
+    maxPax: 2, 
+    rateTable: '101', 
+    connectingRoom: '',
+    oppositeRoom: '308',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '312', 
+    roomType: 'DLX', 
+    block: 'MAIN', 
+    floor: '3', 
+    features: ['King Size Bed', 'Pool View'], 
+    maxPax: 2, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '316', 
+    roomType: 'SUI', 
+    block: 'TOWER', 
+    floor: '3', 
+    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony'], 
+    maxPax: 3, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '516', 
+    roomType: 'SUI', 
+    block: 'TOWER', 
+    floor: '5', 
+    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'City View / Garden View'], 
+    maxPax: 3, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  },
+  { 
+    roomNo: '601', 
+    roomType: 'PNH', 
+    block: 'TOWER', 
+    floor: '6', 
+    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony', 'Smart 4K LED TV'], 
+    maxPax: 4, 
+    rateTable: '100', 
+    connectingRoom: '',
+    oppositeRoom: '',
+    status: 'Active', 
+    lastUpdated: '23-FEB-2022 18:16' 
+  }
 ];
 
 export default function IdsRoomMasterModal({
@@ -83,15 +218,21 @@ export default function IdsRoomMasterModal({
   const [roomList, setRoomList] = useState(INITIAL_ROOM_MASTER_INVENTORY);
   const [currentIndex, setCurrentIndex] = useState(1); // Room 202
 
-  // Form State matching Video 33 Frames 014–022
+  // Form State matching Video 34 Frame 016
   const [formData, setFormData] = useState(() => {
     const found = INITIAL_ROOM_MASTER_INVENTORY.find(r => r.roomNo === initialRoomNo);
     return found || INITIAL_ROOM_MASTER_INVENTORY[1];
   });
 
+  // Dual-list feature selections
+  const [selectedAvailableFeature, setSelectedAvailableFeature] = useState('');
+  const [selectedSelectedFeature, setSelectedSelectedFeature] = useState('');
+
   // Lookup Modals
   const [roomTypesLookupOpen, setRoomTypesLookupOpen] = useState(false);
   const [roomBrowseOpen, setRoomBrowseOpen] = useState(false);
+  const [connectingRoomsOpen, setConnectingRoomsOpen] = useState(false);
+  const [oppositeRoomsOpen, setOppositeRoomsOpen] = useState(false);
   const [searchRoomTerm, setSearchRoomTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
 
@@ -101,15 +242,24 @@ export default function IdsRoomMasterModal({
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Toggle Feature checkbox
-  const handleToggleFeature = (feature) => {
-    setFormData(prev => {
-      const exists = (prev.features || []).includes(feature);
-      if (exists) {
-        return { ...prev, features: prev.features.filter(f => f !== feature) };
-      }
-      return { ...prev, features: [...(prev.features || []), feature] };
-    });
+  // Move feature to Selected (Left -> Right)
+  const handleMoveToSelected = () => {
+    if (!selectedAvailableFeature) return;
+    setFormData(prev => ({
+      ...prev,
+      features: [...(prev.features || []), selectedAvailableFeature]
+    }));
+    setSelectedAvailableFeature('');
+  };
+
+  // Move feature to Available (Right -> Left)
+  const handleMoveToAvailable = () => {
+    if (!selectedSelectedFeature) return;
+    setFormData(prev => ({
+      ...prev,
+      features: (prev.features || []).filter(f => f !== selectedSelectedFeature)
+    }));
+    setSelectedSelectedFeature('');
   };
 
   // Add New Room
@@ -123,6 +273,8 @@ export default function IdsRoomMasterModal({
       features: ['King Size Bed', 'Non Smoking Room'],
       maxPax: 2,
       rateTable: '100',
+      connectingRoom: '',
+      oppositeRoom: '',
       status: 'Active',
       lastUpdated: `${accountingDate} 18:16`
     };
@@ -157,11 +309,16 @@ export default function IdsRoomMasterModal({
       return [...prev, updatedRoom];
     });
 
-    setStatusMessage(`Room ${updatedRoom.roomNo} (${updatedRoom.roomType}) saved successfully and synced with Room Status Rack!`);
+    const isPassive = updatedRoom.status === 'Inactive';
+    const statusNote = isPassive 
+      ? 'Room set to Inactive (Passive) — hidden from Room Status Rack.' 
+      : 'Room set to Active — live in Room Status Rack.';
+
+    setStatusMessage(`Room ${updatedRoom.roomNo} (${updatedRoom.roomType}) saved! ${statusNote}`);
     if (onSaveRoomMaster) {
       onSaveRoomMaster(updatedRoom);
     }
-    setTimeout(() => setStatusMessage(''), 4000);
+    setTimeout(() => setStatusMessage(''), 4500);
   };
 
   // Previous & Next
@@ -177,19 +334,23 @@ export default function IdsRoomMasterModal({
     setFormData(roomList[newIdx]);
   };
 
+  // Available features list (not currently assigned)
+  const currentFeatures = formData.features || [];
+  const availableFeatures = ALL_ROOM_FEATURES_MASTER.filter(f => !currentFeatures.includes(f));
+
   return (
     <div className="ids-modal-overlay">
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '680px', 
+          width: '740px', 
           maxWidth: '96vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8'
         }}
       >
-        {/* Titlebar matching Frame 014 */}
+        {/* Titlebar matching Frame 016 */}
         <div 
           className="ids-dialog-titlebar" 
           style={{ 
@@ -231,194 +392,244 @@ export default function IdsRoomMasterModal({
           </div>
         )}
 
-        {/* Main Content Body matching Frame 014 & Frame 018 */}
+        {/* Main Content Body matching Video 34 Frame 016 */}
         <div style={{ padding: '14px 18px', fontSize: '11px' }}>
           
           <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '12px 14px', marginBottom: '10px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+            
+            {/* Upper Form Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: '100px 180px 100px 1fr', gap: '8px 12px', alignItems: 'center', marginBottom: '12px' }}>
               
-              {/* Left Column: Room Identifiers & Features */}
-              <div>
-                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '8px 10px', alignItems: 'center', marginBottom: '10px' }}>
-                  
-                  <span style={{ fontWeight: 600 }}>Property Code</span>
-                  <select 
-                    className="ids-input" 
-                    value={formData.propertyCode || 'DEMO'} 
-                    onChange={(e) => handleFieldChange('propertyCode', e.target.value)}
-                    style={{ width: '100%', fontWeight: 600 }}
-                  >
-                    <option value="DEMO">DEMO</option>
-                    <option value="ELITE">HOTEL ELITE INN</option>
-                  </select>
+              <span style={{ fontWeight: 600 }}>Property Code</span>
+              <select 
+                className="ids-input" 
+                value={formData.propertyCode || 'DEMO'} 
+                onChange={(e) => handleFieldChange('propertyCode', e.target.value)}
+                style={{ width: '100%', fontWeight: 600 }}
+              >
+                <option value="DEMO">DEMO</option>
+                <option value="ELITE">HOTEL ELITE INN</option>
+              </select>
 
-                  <span style={{ fontWeight: 600 }}>Room#</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <input 
-                      className="ids-input" 
-                      value={formData.roomNo} 
-                      onChange={(e) => handleFieldChange('roomNo', e.target.value)}
-                      placeholder="e.g. 202"
-                      style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} 
-                    />
-                    <button 
-                      className="ids-btn-classic" 
-                      style={{ width: '22px' }} 
-                      onClick={() => setRoomBrowseOpen(true)}
-                      title="Browse Room Numbers"
-                    >
-                      ?
-                    </button>
-                  </div>
+              <span style={{ fontWeight: 600 }}>Maximum Pax</span>
+              <input 
+                className="ids-input" 
+                type="number"
+                value={formData.maxPax || 2} 
+                onChange={(e) => handleFieldChange('maxPax', parseInt(e.target.value) || 2)}
+                style={{ width: '60px', fontWeight: 700 }}
+              />
 
-                  <span style={{ fontWeight: 600 }}>Room Type</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <input 
-                      className="ids-input" 
-                      value={formData.roomType} 
-                      onChange={(e) => handleFieldChange('roomType', e.target.value)}
-                      placeholder="e.g. EXE"
-                      style={{ width: '80px', fontWeight: 700, textTransform: 'uppercase' }} 
-                    />
-                    <button 
-                      className="ids-btn-classic" 
-                      style={{ width: '22px' }} 
-                      onClick={() => setRoomTypesLookupOpen(true)}
-                      title="Lookup Room Types (Frame 014)"
-                    >
-                      ?
-                    </button>
-                  </div>
-
-                  <span style={{ fontWeight: 600 }}>Block</span>
-                  <select 
-                    className="ids-input" 
-                    value={formData.block || 'MAIN'} 
-                    onChange={(e) => handleFieldChange('block', e.target.value)}
-                    style={{ width: '120px' }}
-                  >
-                    <option value="MAIN">MAIN BLOCK</option>
-                    <option value="TOWER">TOWER WING</option>
-                    <option value="WING A">WING A</option>
-                    <option value="VILLAS">VILLAS</option>
-                  </select>
-
-                  <span style={{ fontWeight: 600 }}>Floor</span>
-                  <select 
-                    className="ids-input" 
-                    value={formData.floor || '2'} 
-                    onChange={(e) => handleFieldChange('floor', e.target.value)}
-                    style={{ width: '80px', fontWeight: 600 }}
-                  >
-                    <option value="1">1st Floor</option>
-                    <option value="2">2nd Floor</option>
-                    <option value="3">3rd Floor</option>
-                    <option value="4">4th Floor</option>
-                    <option value="5">5th Floor</option>
-                    <option value="6">6th Floor</option>
-                  </select>
-
-                </div>
-
-                {/* Available Features matching Frame 014 */}
-                <div>
-                  <div style={{ fontWeight: 700, color: '#0A246A', marginBottom: '3px' }}>
-                    Available Features:
-                  </div>
-                  <div style={{ height: '110px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px' }}>
-                    {INITIAL_ROOM_FEATURES.map((feat) => {
-                      const isChecked = (formData.features || []).includes(feat);
-                      return (
-                        <label key={feat} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '2px 0', cursor: 'pointer' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={isChecked}
-                            onChange={() => handleToggleFeature(feat)}
-                          />
-                          <span style={{ fontSize: '10.5px' }}>{feat}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-
+              <span style={{ fontWeight: 600 }}>Room#</span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input 
+                  className="ids-input" 
+                  value={formData.roomNo} 
+                  onChange={(e) => handleFieldChange('roomNo', e.target.value)}
+                  placeholder="e.g. 202"
+                  style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} 
+                />
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '22px' }} 
+                  onClick={() => setRoomBrowseOpen(true)}
+                  title="Browse Room Numbers"
+                >
+                  ?
+                </button>
               </div>
 
-              {/* Right Column: Capacity, Rates & Shortcuts */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '8px 10px', alignItems: 'center' }}>
-                  
-                  <span style={{ fontWeight: 600 }}>Maximum Pax</span>
-                  <input 
-                    className="ids-input" 
-                    type="number"
-                    value={formData.maxPax || 2} 
-                    onChange={(e) => handleFieldChange('maxPax', parseInt(e.target.value) || 2)}
-                    style={{ width: '60px', fontWeight: 700 }}
-                  />
+              <span style={{ fontWeight: 600 }}>Rate Table</span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input 
+                  className="ids-input" 
+                  value={formData.rateTable || '100'} 
+                  onChange={(e) => handleFieldChange('rateTable', e.target.value)}
+                  style={{ width: '80px', fontWeight: 700 }}
+                />
+                <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
+              </div>
 
-                  <span style={{ fontWeight: 600 }}>Rate Table</span>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    <input 
-                      className="ids-input" 
-                      value={formData.rateTable || '100'} 
-                      onChange={(e) => handleFieldChange('rateTable', e.target.value)}
-                      style={{ width: '80px', fontWeight: 700 }}
-                    />
-                    <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
-                  </div>
+              <span style={{ fontWeight: 600 }}>Room Type</span>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input 
+                  className="ids-input" 
+                  value={formData.roomType} 
+                  onChange={(e) => handleFieldChange('roomType', e.target.value)}
+                  placeholder="e.g. EXE"
+                  style={{ width: '80px', fontWeight: 700, textTransform: 'uppercase' }} 
+                />
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '22px' }} 
+                  onClick={() => setRoomTypesLookupOpen(true)}
+                  title="Lookup Room Types (Frame 014)"
+                >
+                  ?
+                </button>
+              </div>
 
-                  <span style={{ fontWeight: 600 }}>Status</span>
-                  <select 
-                    className="ids-input" 
-                    value={formData.status || 'Active'} 
-                    onChange={(e) => handleFieldChange('status', e.target.value)}
-                    style={{ width: '120px', fontWeight: 600, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Out of Order">Out of Order</option>
-                  </select>
+              <span style={{ fontWeight: 600 }}>Block</span>
+              <select 
+                className="ids-input" 
+                value={formData.block || 'MAIN'} 
+                onChange={(e) => handleFieldChange('block', e.target.value)}
+                style={{ width: '130px' }}
+              >
+                <option value="MAIN">MAIN BLOCK</option>
+                <option value="TOWER">TOWER WING</option>
+                <option value="WING A">WING A</option>
+                <option value="VILLAS">VILLAS</option>
+              </select>
 
-                  <span style={{ fontWeight: 600 }}>Last Updated</span>
-                  <input 
-                    className="ids-input" 
-                    value={formData.lastUpdated || `${accountingDate} 18:16`} 
-                    readOnly
-                    style={{ width: '140px', background: '#F0F0F0' }}
-                  />
+              <span style={{ fontWeight: 600 }}>Floor</span>
+              <select 
+                className="ids-input" 
+                value={formData.floor || '2'} 
+                onChange={(e) => handleFieldChange('floor', e.target.value)}
+                style={{ width: '120px', fontWeight: 600 }}
+              >
+                <option value="Basement 01">Basement 01</option>
+                <option value="1">1st Floor</option>
+                <option value="2">2nd Floor</option>
+                <option value="3">3rd Floor</option>
+                <option value="4">4th Floor</option>
+                <option value="5">5th Floor</option>
+                <option value="6">6th Floor</option>
+              </select>
 
-                </div>
-
-                {/* Auxiliary Control Buttons matching Frame 014 */}
-                <div style={{ borderTop: '1px solid #CCC', paddingTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <button className="ids-btn-classic" onClick={() => alert('Opposite Room linkage panel')}>
-                    Opposite Rooms
-                  </button>
-                  <button className="ids-btn-classic" onClick={() => setRoomTypesLookupOpen(true)}>
-                    Change Room Type
-                  </button>
-                  {onOpenRoomRack && (
-                    <button 
-                      className="ids-btn-classic" 
-                      style={{ background: '#E6F4EA', color: '#137333', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                      onClick={() => {
-                        onClose();
-                        onOpenRoomRack();
-                      }}
-                    >
-                      <LayoutGrid size={13} /> View in Room Status (Rack)
-                    </button>
-                  )}
-                </div>
-
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button className="ids-btn-classic" onClick={() => setConnectingRoomsOpen(true)}>
+                  Connecting Rooms
+                </button>
+                <button className="ids-btn-classic" onClick={() => setOppositeRoomsOpen(true)}>
+                  Opposite Rooms
+                </button>
               </div>
 
             </div>
+
+            {/* Dual List Box: Available Features <-> Features Selected matching Video 34 Frame 016 */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 40px 1fr', gap: '8px', alignItems: 'center', marginBottom: '10px' }}>
+              
+              {/* Left Box: Available Features */}
+              <div>
+                <div style={{ fontWeight: 700, color: '#0A246A', marginBottom: '3px' }}>
+                  Available Features:
+                </div>
+                <div style={{ height: '110px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px' }}>
+                  {availableFeatures.map(feat => (
+                    <div 
+                      key={feat}
+                      onClick={() => setSelectedAvailableFeature(feat)}
+                      onDoubleClick={() => {
+                        setFormData(prev => ({ ...prev, features: [...(prev.features || []), feat] }));
+                      }}
+                      style={{ 
+                        padding: '2px 4px', 
+                        cursor: 'pointer',
+                        fontSize: '10.5px',
+                        background: selectedAvailableFeature === feat ? '#316AC5' : 'transparent',
+                        color: selectedAvailableFeature === feat ? '#FFF' : '#000'
+                      }}
+                    >
+                      {feat}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Middle Transfer Buttons */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '28px', height: '24px', padding: 0, fontWeight: 700 }}
+                  onClick={handleMoveToSelected}
+                  title="Add Feature"
+                >
+                  &gt;
+                </button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '28px', height: '24px', padding: 0, fontWeight: 700 }}
+                  onClick={handleMoveToAvailable}
+                  title="Remove Feature"
+                >
+                  &lt;
+                </button>
+              </div>
+
+              {/* Right Box: Features Selected */}
+              <div>
+                <div style={{ fontWeight: 700, color: '#0A246A', marginBottom: '3px' }}>
+                  Features Selected:
+                </div>
+                <div style={{ height: '110px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px' }}>
+                  {currentFeatures.map(feat => (
+                    <div 
+                      key={feat}
+                      onClick={() => setSelectedSelectedFeature(feat)}
+                      onDoubleClick={() => {
+                        setFormData(prev => ({ ...prev, features: (prev.features || []).filter(f => f !== feat) }));
+                      }}
+                      style={{ 
+                        padding: '2px 4px', 
+                        cursor: 'pointer',
+                        fontSize: '10.5px',
+                        background: selectedSelectedFeature === feat ? '#316AC5' : 'transparent',
+                        color: selectedSelectedFeature === feat ? '#FFF' : '#000'
+                      }}
+                    >
+                      {feat}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Bottom Row: Status, User, Last Updated & Action Shortcuts */}
+            <div style={{ display: 'grid', gridTemplateColumns: '70px 140px 50px 100px 90px 140px 1fr', gap: '6px 10px', alignItems: 'center' }}>
+              
+              <span style={{ fontWeight: 600 }}>Status</span>
+              <select 
+                className="ids-input" 
+                value={formData.status || 'Active'} 
+                onChange={(e) => handleFieldChange('status', e.target.value)}
+                style={{ width: '100%', fontWeight: 700, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
+              >
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive (Passive)</option>
+                <option value="Out of Order">Out of Order</option>
+              </select>
+
+              <span style={{ fontWeight: 600 }}>User</span>
+              <input 
+                className="ids-input" 
+                value={formData.user || 'MANAGER'} 
+                readOnly
+                style={{ width: '100%', background: '#F0F0F0' }}
+              />
+
+              <span style={{ fontWeight: 600 }}>Last Updated</span>
+              <input 
+                className="ids-input" 
+                value={formData.lastUpdated || `${accountingDate} 18:16`} 
+                readOnly
+                style={{ width: '100%', background: '#F0F0F0' }}
+              />
+
+              <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                <button className="ids-btn-classic" onClick={() => setRoomTypesLookupOpen(true)}>
+                  Change Room Type
+                </button>
+              </div>
+
+            </div>
+
           </div>
 
-          {/* Bottom Action Ribbon matching Frame 014 */}
+          {/* Bottom Action Ribbon matching Video 34 Frame 016 */}
           <div 
             style={{ 
               background: '#D4D0C8', 
@@ -439,6 +650,18 @@ export default function IdsRoomMasterModal({
             </div>
 
             <div style={{ display: 'flex', gap: '6px' }}>
+              {onOpenRoomRack && (
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ background: '#E6F4EA', color: '#137333', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
+                  onClick={() => {
+                    onClose();
+                    onOpenRoomRack();
+                  }}
+                >
+                  <LayoutGrid size={12} /> Room Status Rack (Frame 020)
+                </button>
+              )}
               <button 
                 className="ids-btn-classic" 
                 style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
@@ -454,7 +677,7 @@ export default function IdsRoomMasterModal({
         </div>
 
         {/* =========================================================================
-            FRAME 014: ROOM TYPES V6.5.002.1 LOOKUP MODAL
+            LOOKUP 1: ROOM TYPES V6.5.002.1 LOOKUP MODAL
             ========================================================================= */}
         {roomTypesLookupOpen && (
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setRoomTypesLookupOpen(false)}>
@@ -490,6 +713,7 @@ export default function IdsRoomMasterModal({
                           onClick={() => {
                             setFormData(prev => ({ ...prev, roomType: rt.roomType, maxPax: rt.maxPax }));
                             setRoomTypesLookupOpen(false);
+                            setStatusMessage(`Changed Room Type to ${rt.roomType} (${rt.name})`);
                           }}
                           style={{ background: idx % 2 === 0 ? '#FFF' : '#F9F9F9', cursor: 'pointer', borderBottom: '1px solid #E0E0E0' }}
                         >
@@ -513,7 +737,7 @@ export default function IdsRoomMasterModal({
         )}
 
         {/* =========================================================================
-            ROOM MASTER HELP / BROWSE MODAL
+            LOOKUP 2: ROOM MASTER HELP / BROWSE MODAL
             ========================================================================= */}
         {roomBrowseOpen && (
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setRoomBrowseOpen(false)}>
@@ -584,6 +808,90 @@ export default function IdsRoomMasterModal({
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
                   <button className="ids-btn-classic" onClick={() => setRoomBrowseOpen(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            LOOKUP 3: CONNECTING ROOMS MODAL
+            ========================================================================= */}
+        {connectingRoomsOpen && (
+          <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setConnectingRoomsOpen(false)}>
+            <div 
+              className="ids-dialog-window" 
+              style={{ width: '420px', maxWidth: '90vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.65)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div 
+                className="ids-dialog-titlebar plain" 
+                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+              >
+                <span>Connecting Rooms for Room {formData.roomNo}</span>
+                <button className="ids-win-btn close" onClick={() => setConnectingRoomsOpen(false)}>✕</button>
+              </div>
+              <div style={{ padding: '12px 14px', fontSize: '11px' }}>
+                <div style={{ marginBottom: '10px' }}>
+                  Select connecting room for adjacent suite/family linkage:
+                </div>
+                <select 
+                  className="ids-input"
+                  value={formData.connectingRoom || ''}
+                  onChange={(e) => handleFieldChange('connectingRoom', e.target.value)}
+                  style={{ width: '100%', fontWeight: 700 }}
+                >
+                  <option value="">-- No Connecting Room --</option>
+                  {roomList.filter(r => r.roomNo !== formData.roomNo).map(r => (
+                    <option key={r.roomNo} value={r.roomNo}>
+                      Room {r.roomNo} ({r.roomType} - Floor {r.floor})
+                    </option>
+                  ))}
+                </select>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
+                  <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => setConnectingRoomsOpen(false)}>Ok</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* =========================================================================
+            LOOKUP 4: OPPOSITE ROOMS MODAL
+            ========================================================================= */}
+        {oppositeRoomsOpen && (
+          <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setOppositeRoomsOpen(false)}>
+            <div 
+              className="ids-dialog-window" 
+              style={{ width: '420px', maxWidth: '90vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.65)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div 
+                className="ids-dialog-titlebar plain" 
+                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+              >
+                <span>Opposite Rooms for Room {formData.roomNo}</span>
+                <button className="ids-win-btn close" onClick={() => setOppositeRoomsOpen(false)}>✕</button>
+              </div>
+              <div style={{ padding: '12px 14px', fontSize: '11px' }}>
+                <div style={{ marginBottom: '10px' }}>
+                  Select corridor opposite room:
+                </div>
+                <select 
+                  className="ids-input"
+                  value={formData.oppositeRoom || ''}
+                  onChange={(e) => handleFieldChange('oppositeRoom', e.target.value)}
+                  style={{ width: '100%', fontWeight: 700 }}
+                >
+                  <option value="">-- No Opposite Room --</option>
+                  {roomList.filter(r => r.roomNo !== formData.roomNo).map(r => (
+                    <option key={r.roomNo} value={r.roomNo}>
+                      Room {r.roomNo} ({r.roomType} - Floor {r.floor})
+                    </option>
+                  ))}
+                </select>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
+                  <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => setOppositeRoomsOpen(false)}>Ok</button>
                 </div>
               </div>
             </div>

@@ -58,6 +58,7 @@ export default function IdsQuickScanModal({
     { id: 'link-company-rates', label: 'Link Company Rates to Bookings', code: 'LRC02' },
     { id: 'room-master', label: 'Room Master', code: 'RM01' },
     { id: 'add-room-number', label: 'Add Room Numbers in Room Status', code: 'RM02' },
+    { id: 'modify-room-master', label: 'Modify Room Master', code: 'RM03' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
