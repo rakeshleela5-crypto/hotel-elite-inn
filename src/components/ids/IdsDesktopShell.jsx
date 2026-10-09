@@ -65,6 +65,19 @@ import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsForeignExchangeModal from './IdsForeignExchangeModal';
 import IdsGstnChangeModal from './IdsGstnChangeModal';
 import IdsPaidOutModal from './IdsPaidOutModal';
+import IdsMessageBox from './IdsMessageBox';
+import IdsCrystalReportModal from './IdsCrystalReportModal';
+import { 
+  INITIAL_COMPANIES, 
+  INITIAL_BUSINESS_SOURCES, 
+  INITIAL_MARKET_SEGMENTS, 
+  INITIAL_CONTRACT_RATES, 
+  INITIAL_PACKAGE_RATES,
+  INITIAL_DEPOSITS_LOG,
+  INITIAL_PAID_OUTS_LOG,
+  INITIAL_FOREX_LOG,
+  INITIAL_SETTLED_BILLS
+} from '../../data/idsPmsStore';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
 export default function IdsDesktopShell({ 
@@ -375,6 +388,53 @@ export default function IdsDesktopShell({
 
   // Video 44: Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 (Frames 010–110)
   const [paidOutModalOpen, setPaidOutModalOpen] = useState(false);
+
+  // Windows MessageBox System Dialog State
+  const [msgBoxOpen, setMsgBoxOpen] = useState(false);
+  const [msgBoxConfig, setMsgBoxConfig] = useState({
+    title: 'IDS Fortune NEXT',
+    message: '',
+    type: 'info',
+    buttons: 'ok',
+    onOk: () => setMsgBoxOpen(false)
+  });
+
+  // Crystal Reports 8.5/9.0 Viewer Modal State
+  const [crystalReportModalOpen, setCrystalReportModalOpen] = useState(false);
+  const [crystalReportType, setCrystalReportType] = useState('rule46-bill');
+  const [crystalReportData, setCrystalReportData] = useState({});
+
+  const showMessageBox = (message, title = 'IDS Fortune NEXT', type = 'info', buttons = 'ok', onOk = null) => {
+    setMsgBoxConfig({
+      title,
+      message,
+      type,
+      buttons,
+      onOk: () => {
+        setMsgBoxOpen(false);
+        if (onOk) onOk();
+      }
+    });
+    setMsgBoxOpen(true);
+  };
+
+  const openCrystalReport = (type, data = {}) => {
+    setCrystalReportType(type);
+    setCrystalReportData(data);
+    setCrystalReportModalOpen(true);
+  };
+
+  // Global IDS Keyboard Shortcuts (F2 = Quick Scan / Load Pgm)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'F2') {
+        e.preventDefault();
+        setQuickScanModalOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -1547,12 +1607,42 @@ export default function IdsDesktopShell({
 
         {/* Bottom Command Strip (Frame 001 & 013) */}
         <div className="ids-bottom-commands">
-          <button className="ids-btn-classic">Sys Update</button>
-          <button className="ids-btn-classic">HotKey</button>
-          <button className="ids-btn-classic">Other</button>
-          <button className="ids-btn-classic">Events</button>
-          <button className="ids-btn-classic">Last Updated</button>
-          <button className="ids-btn-classic">To-Do</button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox('System Update: All 27 physical room ledgers reconciled with remote Cloudflare D1 database. Status: NORMAL.', 'IDS Fortune NEXT - System Update', 'info')}
+          >
+            Sys Update
+          </button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox('IDS PMS Keyboard Shortcuts:\n• F2 / Load Pgm: Quick Scan Program Launcher\n• Enter: Advance to next input field\n• Esc: Close active dialog\n• Alt+S: Save Transaction\n• Alt+E: Exit Window', 'IDS Fortune NEXT - System HotKeys', 'info')}
+          >
+            HotKey
+          </button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox('Other Utilities: Night Audit Queue, POS 5 Room Service Sync, Remote Cloudflare D1 Connection: ACTIVE.', 'IDS Fortune NEXT - Utilities', 'info')}
+          >
+            Other
+          </button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox('Events Register: 0 pending maintenance events. 1 active banquet booking scheduled.', 'IDS Fortune NEXT - Events Register', 'info')}
+          >
+            Events
+          </button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox(`Last Updated: ${accountingDate} 18:02 by USER: IT ADMIN (FRONT DESK DUTY MANAGER).`, 'IDS Fortune NEXT - Audit Info', 'info')}
+          >
+            Last Updated
+          </button>
+          <button 
+            className="ids-btn-classic"
+            onClick={() => showMessageBox('Front Office Duty Checklist:\n1. Reconcile Guest Ledgers\n2. Verify Inhouse Guest KYC (Aadhaar/Passports)\n3. Check unbilled restaurant KOTs\n4. Perform Night Audit rollover at 00:00', 'IDS Fortune NEXT - Duty To-Do List', 'info')}
+          >
+            To-Do
+          </button>
           <button 
             className="ids-btn-classic"
             onClick={() => setGuestInformationModalOpen(true)}
@@ -2707,6 +2797,27 @@ export default function IdsDesktopShell({
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
         }}
+      />
+
+      {/* Windows 98/2000/XP System Message Dialog */}
+      <IdsMessageBox
+        isOpen={msgBoxOpen}
+        title={msgBoxConfig.title}
+        message={msgBoxConfig.message}
+        type={msgBoxConfig.type}
+        buttons={msgBoxConfig.buttons}
+        onOk={msgBoxConfig.onOk}
+        onCancel={() => setMsgBoxOpen(false)}
+        onYes={msgBoxConfig.onYes}
+        onNo={msgBoxConfig.onNo}
+      />
+
+      {/* Crystal Reports 8.5/9.0 Statutory Print Preview Modal */}
+      <IdsCrystalReportModal
+        isOpen={crystalReportModalOpen}
+        onClose={() => setCrystalReportModalOpen(false)}
+        reportType={crystalReportType}
+        data={crystalReportData}
       />
     </div>
   );
