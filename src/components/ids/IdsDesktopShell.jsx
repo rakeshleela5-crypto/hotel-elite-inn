@@ -1285,14 +1285,6 @@ export default function IdsDesktopShell({
           >
             Info.
           </div>
-          <div 
-            className="ids-menu-item" 
-            style={{ fontWeight: 700, color: '#0A246A', display: 'flex', alignItems: 'center', gap: '4px' }}
-            onClick={() => setTutorialPlayerOpen(true)}
-          >
-            <Film size={12} />
-            <span>Tutorial Videos (44 Screen Recordings)</span>
-          </div>
         </div>
 
         {/* Sub-bar */}
