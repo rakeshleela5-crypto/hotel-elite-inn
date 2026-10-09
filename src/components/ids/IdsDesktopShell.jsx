@@ -36,6 +36,7 @@ import {
 import IdsChangeRateModal, { DEFAULT_ROOM_TARIFFS } from './IdsChangeRateModal';
 import IdsAmendStayModal from './IdsAmendStayModal';
 import IdsRoomTransferModal from './IdsRoomTransferModal';
+import IdsPostDepositModal from './IdsPostDepositModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -230,6 +231,11 @@ export default function IdsDesktopShell({
   const [selectedRoomForTransfer, setSelectedRoomForTransfer] = useState('415');
   const [transferredRooms, setTransferredRooms] = useState({});
 
+  // Video 14: Post Deposit / Advance States (Frames 011–020)
+  const [postDepositModalOpen, setPostDepositModalOpen] = useState(false);
+  const [selectedRoomForDeposit, setSelectedRoomForDeposit] = useState('201');
+  const [postedDeposits, setPostedDeposits] = useState([]);
+
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035 sync)
   const stats = useMemo(() => {
     const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
@@ -410,7 +416,14 @@ export default function IdsDesktopShell({
       }
     ],
     'Cashiering..': [
-      { label: 'Post Deposit / Advance to Room', videoId: '14', action: () => openTutorial('14') },
+      { 
+        label: 'Post Deposit / Advance to Room', 
+        videoId: '14', 
+        action: () => {
+          setSelectedRoomForDeposit('201');
+          setPostDepositModalOpen(true);
+        } 
+      },
       { label: 'Checkout & Settle Front Office Bill (Split Bill)', videoId: '15', action: () => openTutorial('15') },
       { label: 'Bulk Check Out at Once (Group)', videoId: '16', action: () => openTutorial('16') },
       { label: 'Pax Check-Out', videoId: '18', action: () => openTutorial('18') },
@@ -1396,6 +1409,10 @@ export default function IdsDesktopShell({
           setSelectedRoomForTransfer(roomNo);
           setRoomTransferModalOpen(true);
         }}
+        onOpenPostDeposit={(roomNo) => {
+          setSelectedRoomForDeposit(roomNo);
+          setPostDepositModalOpen(true);
+        }}
         transferredRooms={transferredRooms}
       />
 
@@ -1434,6 +1451,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'room-transfer') {
             setSelectedRoomForTransfer('415');
             setRoomTransferModalOpen(true);
+          } else if (programId === 'post-deposit') {
+            setSelectedRoomForDeposit('201');
+            setPostDepositModalOpen(true);
           } else if (programId === 'express-checkin') {
             setExpressCheckInOpen(true);
           } else if (programId === 'reservation-checkin') {
@@ -1583,6 +1603,34 @@ export default function IdsDesktopShell({
                 roomNo: toRoom,
                 roomType: toRoomType || g.roomType,
                 folioNo: `${toRoom} / ${g.folioNo?.split('/')[1]?.trim() || '1'}`
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 14: Post Deposit / Advance to Room V6.5.002.1 Modal (Frames 011–020) */}
+      <IdsPostDepositModal 
+        isOpen={postDepositModalOpen}
+        onClose={() => setPostDepositModalOpen(false)}
+        initialRoomNo={selectedRoomForDeposit}
+        inhouseGuests={inhouseGuestsList}
+        onOpenRoomHelpLookup={() => setRoomHelpLookupOpen(true)}
+        onSaveDeposit={({ roomNo, guestName, folioNo, amount, paymentMode, particulars, receiptNo, date }) => {
+          setPostedDeposits(prev => [
+            ...prev,
+            { roomNo, guestName, folioNo, amount, paymentMode, particulars, receiptNo, date }
+          ]);
+
+          // Sync with inhouse guest database: decrease outstanding balance / increase paid deposit
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === roomNo) {
+              const currentBal = g.balance || 16800;
+              return {
+                ...g,
+                deposit: (g.deposit || 0) + amount,
+                balance: Math.max(0, currentBal - amount)
               };
             }
             return g;

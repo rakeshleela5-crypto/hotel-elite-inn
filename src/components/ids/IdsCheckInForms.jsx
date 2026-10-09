@@ -743,6 +743,7 @@ export function IdsRoomRackConsoleModal({
   onOpenChangeGuestInfo,
   onOpenAmendStay,
   onOpenRoomTransfer,
+  onOpenPostDeposit,
   transferredRooms = {}
 }) {
   const [filterType, setFilterType] = useState('All');
@@ -1190,7 +1191,21 @@ export function IdsRoomRackConsoleModal({
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Check-Out</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Pax Check-Out</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Charges</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Deposits</div>
+                  
+                  {/* Video 14: Post Deposits (Frame 009) */}
+                  <div 
+                    style={{ padding: '3px 8px', cursor: 'pointer', fontWeight: 600 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
+                      if (onOpenPostDeposit) onOpenPostDeposit(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Post Deposit / Advance (Video 14 Frame 009)"
+                  >
+                    Deposits
+                  </div>
+
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Paidouts</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Rate</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Additional Room Rate</div>
