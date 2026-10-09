@@ -41,6 +41,7 @@ import IdsCheckoutBillModal from './IdsCheckoutBillModal';
 import IdsWalkInModal from './IdsWalkInModal';
 import IdsPaxCheckoutModal from './IdsPaxCheckoutModal';
 import IdsNightAuditModal from './IdsNightAuditModal';
+import IdsAdditionalRoomRateModal from './IdsAdditionalRoomRateModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -261,6 +262,11 @@ export default function IdsDesktopShell({
   const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
   const [nightAuditInitialStep, setNightAuditInitialStep] = useState('full-wizard'); // 'step1' | 'step2' | 'step3' | 'step4' | 'full-wizard' | 'info'
   const [accountingDate, setAccountingDate] = useState('25-JAN-2022');
+
+  // Video 20: Additional Room Rate & Quick Balances States (Frames 015–065)
+  const [additionalRoomRateModalOpen, setAdditionalRoomRateModalOpen] = useState(false);
+  const [additionalRoomRateInitialMode, setAdditionalRoomRateInitialMode] = useState('additional-rate'); // 'additional-rate' | 'quick-balances'
+  const [selectedRoomForAdditionalRate, setSelectedRoomForAdditionalRate] = useState('312');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -537,6 +543,15 @@ export default function IdsDesktopShell({
           setNightAuditModalOpen(true);
         } 
       },
+      { 
+        label: 'Additional Room Rate (Plan / Extra Bed / Retention)', 
+        videoId: '20', 
+        action: () => {
+          setSelectedRoomForAdditionalRate('312');
+          setAdditionalRoomRateInitialMode('additional-rate');
+          setAdditionalRoomRateModalOpen(true);
+        } 
+      },
       { label: 'Post Charges / Room Charges (Minibar/Laundry)', videoId: '21', action: () => openTutorial('21') },
       { label: 'Bill Allowance Day Wise', videoId: '23', action: () => openTutorial('23') },
       { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
@@ -633,7 +648,15 @@ export default function IdsDesktopShell({
       { label: 'Add Market Segment (Corporate/FIT)', videoId: '30', action: () => openTutorial('30') },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
-      { label: 'Additional Room Rate Option (Half-Day)', videoId: '20', action: () => openTutorial('20') },
+      { 
+        label: 'Additional Room Rate Option (Plans / Extra Bed / Retention)', 
+        videoId: '20', 
+        action: () => {
+          setSelectedRoomForAdditionalRate('312');
+          setAdditionalRoomRateInitialMode('additional-rate');
+          setAdditionalRoomRateModalOpen(true);
+        } 
+      },
       { 
         label: 'Change Room Rate / Tariff Override', 
         videoId: '11', 
@@ -645,6 +668,15 @@ export default function IdsDesktopShell({
     ],
     'Lookups..': [
       { label: 'Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
+      { 
+        label: 'Quick Balances (Guest Folio Breakdown)', 
+        videoId: '20', 
+        action: () => {
+          setSelectedRoomForAdditionalRate('312');
+          setAdditionalRoomRateInitialMode('quick-balances');
+          setAdditionalRoomRateModalOpen(true);
+        } 
+      },
       { label: 'Clear Rooms Program', videoId: '09', action: () => setClearRoomsModalOpen(true) },
       { label: 'Room Status Matrix Lookup', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
       { label: 'Company Lookup Directory', videoId: '28', action: () => openTutorial('28') }
@@ -1594,6 +1626,16 @@ export default function IdsDesktopShell({
           setSelectedRoomForPaxCheckout(roomNo || '312');
           setPaxCheckoutModalOpen(true);
         }}
+        onOpenAdditionalRoomRate={(roomNo) => {
+          setSelectedRoomForAdditionalRate(roomNo || '312');
+          setAdditionalRoomRateInitialMode('additional-rate');
+          setAdditionalRoomRateModalOpen(true);
+        }}
+        onOpenQuickBalances={(roomNo) => {
+          setSelectedRoomForAdditionalRate(roomNo || '312');
+          setAdditionalRoomRateInitialMode('quick-balances');
+          setAdditionalRoomRateModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1901,7 +1943,11 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '19') {
+          if (videoId === '20') {
+            setSelectedRoomForAdditionalRate('312');
+            setAdditionalRoomRateInitialMode('additional-rate');
+            setAdditionalRoomRateModalOpen(true);
+          } else if (videoId === '19') {
             setNightAuditInitialStep('full-wizard');
             setNightAuditModalOpen(true);
           } else if (videoId === '18') {
@@ -1960,6 +2006,26 @@ export default function IdsDesktopShell({
         onCompleteNightAudit={(auditInfo) => {
           const newDate = typeof auditInfo === 'string' ? auditInfo : (auditInfo?.newDate || '26-JAN-2022');
           setAccountingDate(newDate);
+        }}
+      />
+
+      {/* Video 20: Additional Room Rate Option in IDS 6.5 & 7.0 (Frames 015–065) */}
+      <IdsAdditionalRoomRateModal 
+        isOpen={additionalRoomRateModalOpen}
+        onClose={() => setAdditionalRoomRateModalOpen(false)}
+        initialRoomNo={selectedRoomForAdditionalRate}
+        accountingDate={accountingDate}
+        initialMode={additionalRoomRateInitialMode}
+        onSaveAdditionalCharge={(chargeData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === selectedRoomForAdditionalRate) {
+              return {
+                ...g,
+                balance: (g.balance || 16800) + (chargeData.total || 0)
+              };
+            }
+            return g;
+          }));
         }}
       />
     </div>

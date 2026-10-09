@@ -747,6 +747,8 @@ export function IdsRoomRackConsoleModal({
   onOpenCheckout,
   onOpenWalkIn,
   onOpenPaxCheckout,
+  onOpenAdditionalRoomRate,
+  onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
   paxCheckedOutRooms = [],
@@ -1336,28 +1338,45 @@ export function IdsRoomRackConsoleModal({
 
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Paidouts</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Rate</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Additional Room Rate</div>
 
-                  {/* Video 11: Change Tariff (Frames 035 & 040) */}
+                  {/* Video 20: Additional Room Rate (Frames 012 & 018) */}
                   <div 
                     style={{ 
                       padding: '4px 8px', 
                       cursor: 'pointer', 
-                      background: '#FFF7CC', 
                       fontWeight: 700, 
                       color: '#0A246A',
+                      background: '#FFF7CC',
                       borderTop: '1px solid #CCC',
                       borderBottom: '1px solid #CCC'
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = '#FFF7CC'; e.currentTarget.style.color = '#0A246A'; }}
                     onClick={() => {
+                      if (onOpenAdditionalRoomRate) onOpenAdditionalRoomRate(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Additional Room Rate / Plans / Extra Bed / Retention (Video 20 Frame 012)"
+                  >
+                    ⭐ Additional Room Rate
+                  </div>
+
+                  {/* Video 11: Change Tariff (Frames 035 & 040) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 600
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#000'; }}
+                    onClick={() => {
                       if (onOpenChangeRate) onOpenChangeRate(contextMenu.roomNo);
                       setContextMenu(null);
                     }}
                     title="Change Room Rate / Tariff (Video 11)"
                   >
-                    ⭐ Change Tariff
+                    Change Tariff
                   </div>
 
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Bill Allowance</div>
@@ -1366,7 +1385,26 @@ export function IdsRoomRackConsoleModal({
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Link Fit Rooms to Groups</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Guest Details</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Photo Reg. Card</div>
-                  <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Quick Balances</div>
+
+                  {/* Video 20: Quick Balances (Frames 012 & 060) */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A',
+                      borderTop: '1px solid #CCC'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenQuickBalances) onOpenQuickBalances(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Quick Balances - Folio Revenue Breakdown (Video 20 Frame 060)"
+                  >
+                    🔍 Quick Balances
+                  </div>
                 </>
               ) : (
                 <>
