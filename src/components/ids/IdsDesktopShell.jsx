@@ -51,6 +51,7 @@ import IdsFolioReinstateModal from './IdsFolioReinstateModal';
 import IdsReleaseStopPostingModal from './IdsReleaseStopPostingModal';
 import IdsCompanyProfileModal from './IdsCompanyProfileModal';
 import IdsBusinessSourceModal from './IdsBusinessSourceModal';
+import IdsMarketSegmentModal from './IdsMarketSegmentModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -315,6 +316,10 @@ export default function IdsDesktopShell({
   // Video 29: Add Business Source in IDS 6.5 & 7.0 (Frames 010–040)
   const [businessSourceModalOpen, setBusinessSourceModalOpen] = useState(false);
   const [selectedBusinessSourceCode, setSelectedBusinessSourceCode] = useState('OTA');
+
+  // Video 30: Add Market Segment in IDS 6.5 & 7.0 (Frames 010–050)
+  const [marketSegmentModalOpen, setMarketSegmentModalOpen] = useState(false);
+  const [selectedMarketSegmentCode, setSelectedMarketSegmentCode] = useState('CVG');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -768,7 +773,14 @@ export default function IdsDesktopShell({
           setBusinessSourceModalOpen(true);
         } 
       },
-      { label: 'Add Market Segment (Corporate/FIT)', videoId: '30', action: () => openTutorial('30') },
+      { 
+        label: 'Add Market Segment (Corporate/FIT)', 
+        videoId: '30', 
+        action: () => {
+          setSelectedMarketSegmentCode('CVG');
+          setMarketSegmentModalOpen(true);
+        } 
+      },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
       { 
@@ -1864,6 +1876,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'business-sources' || programId === 'add-business-source') {
             setSelectedBusinessSourceCode('OTA');
             setBusinessSourceModalOpen(true);
+          } else if (programId === 'market-segments' || programId === 'add-market-segment') {
+            setSelectedMarketSegmentCode('CVG');
+            setMarketSegmentModalOpen(true);
           }
         }}
       />
@@ -2112,7 +2127,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '29') {
+          if (videoId === '30') {
+            setSelectedMarketSegmentCode('CVG');
+            setMarketSegmentModalOpen(true);
+          } else if (videoId === '29') {
             setSelectedBusinessSourceCode('OTA');
             setBusinessSourceModalOpen(true);
           } else if (videoId === '28') {
@@ -2415,6 +2433,17 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         onSaveBusinessSource={(sourceRecord) => {
           console.log('Business Source Saved:', sourceRecord);
+        }}
+      />
+
+      {/* Video 30: Add Market Segment in IDS 6.5 & 7.0 (Frames 010–050) */}
+      <IdsMarketSegmentModal 
+        isOpen={marketSegmentModalOpen}
+        onClose={() => setMarketSegmentModalOpen(false)}
+        initialCode={selectedMarketSegmentCode}
+        accountingDate={accountingDate}
+        onSaveMarketSegment={(segmentRecord) => {
+          console.log('Market Segment Saved:', segmentRecord);
         }}
       />
     </div>

@@ -49,6 +49,8 @@ export default function IdsQuickScanModal({
     { id: 'company-audit-log', label: 'Company Audit Log', code: 'CAL01' },
     { id: 'business-sources', label: 'Business Sources', code: 'BS01' },
     { id: 'add-business-source', label: 'Add Business Source', code: 'BS02' },
+    { id: 'market-segments', label: 'Market Segments', code: 'MS01' },
+    { id: 'add-market-segment', label: 'Add Market Segment', code: 'MS02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 
