@@ -81,6 +81,9 @@ export default function IdsQuickScanModal({
     { id: 'gstn-number-change', label: 'GSTN Number Change (Add Company After Check-Out)', code: 'GC01' },
     { id: 'gstn-change', label: 'GSTN / VAT Number Change **', code: 'GC02' },
     { id: 'add-company-details-after-checkout', label: 'Add Company Details & GSTN After Check-out', code: 'GC03' },
+    { id: 'paidouts', label: 'Paidouts (Excess Advance Refund to Guest)', code: 'PO01' },
+    { id: 'paidout', label: 'Paidouts', code: 'PO02' },
+    { id: 'paid-out-excess-amount', label: 'Paid-out Excess Amount to Guest', code: 'PO03' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 

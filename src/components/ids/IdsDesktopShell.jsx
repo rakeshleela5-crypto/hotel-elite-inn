@@ -64,6 +64,7 @@ import IdsPackageRatesModal from './IdsPackageRatesModal';
 import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsForeignExchangeModal from './IdsForeignExchangeModal';
 import IdsGstnChangeModal from './IdsGstnChangeModal';
+import IdsPaidOutModal from './IdsPaidOutModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -374,6 +375,9 @@ export default function IdsDesktopShell({
 
   // Video 43: Add Company Details & GSTN After Check-out in IDS 6.5 & 7.0 (Frames 010–074)
   const [gstnChangeModalOpen, setGstnChangeModalOpen] = useState(false);
+
+  // Video 44: Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 (Frames 010–110)
+  const [paidOutModalOpen, setPaidOutModalOpen] = useState(false);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -736,7 +740,11 @@ export default function IdsDesktopShell({
           setReleaseStopPostingModalOpen(true);
         } 
       },
-      { label: 'Paid-Out Excess Amount to Guest', videoId: '44', action: () => openTutorial('44') }
+      { 
+        label: 'Paid-Out Excess Amount to Guest (Refund Advance)', 
+        videoId: '44', 
+        action: () => setPaidOutModalOpen(true) 
+      }
     ],
     'House Keeping..': [
       { label: 'House Keeping Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
@@ -2030,6 +2038,8 @@ export default function IdsDesktopShell({
             setForeignExchangeModalOpen(true);
           } else if (programId === 'gstn-number-change' || programId === 'gstn-change' || programId === 'add-company-details-after-checkout') {
             setGstnChangeModalOpen(true);
+          } else if (programId === 'paidouts' || programId === 'paidout' || programId === 'paid-out-excess-amount') {
+            setPaidOutModalOpen(true);
           }
         }}
       />
@@ -2278,7 +2288,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '43') {
+          if (videoId === '44') {
+            setPaidOutModalOpen(true);
+          } else if (videoId === '43') {
             setGstnChangeModalOpen(true);
           } else if (videoId === '42') {
             setForeignExchangeModalOpen(true);
@@ -2796,6 +2808,21 @@ export default function IdsDesktopShell({
         isOpen={gstnChangeModalOpen}
         onClose={() => setGstnChangeModalOpen(false)}
         accountingDate={accountingDate}
+      />
+
+      {/* Video 44: Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 (Frames 010–110) */}
+      <IdsPaidOutModal 
+        isOpen={paidOutModalOpen}
+        onClose={() => setPaidOutModalOpen(false)}
+        accountingDate={accountingDate}
+        onCheckOutComplete={(checkOutData) => {
+          console.log('Paid-Out & Check-Out completed:', checkOutData);
+          setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== checkOutData.roomNo));
+          setPaxCheckedOutRooms(prev => [...new Set([...prev, checkOutData.roomNo])]);
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
+        }}
       />
     </div>
   );
