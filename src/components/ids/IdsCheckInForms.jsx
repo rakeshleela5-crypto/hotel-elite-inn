@@ -751,6 +751,7 @@ export function IdsRoomRackConsoleModal({
   onOpenPostCharges,
   onOpenSecondPaxCheckIn,
   onOpenBillAllowanceDayWise,
+  onOpenBillAllowanceOption,
   onOpenQuickBalances,
   walkInRooms = [],
   checkedOutRooms = [],
@@ -1427,10 +1428,14 @@ export function IdsRoomRackConsoleModal({
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
                     onClick={() => {
-                      if (onOpenBillAllowanceDayWise) onOpenBillAllowanceDayWise(contextMenu.roomNo);
+                      if (contextMenu.roomNo === '201' && onOpenBillAllowanceOption) {
+                        onOpenBillAllowanceOption(contextMenu.roomNo);
+                      } else if (onOpenBillAllowanceDayWise) {
+                        onOpenBillAllowanceDayWise(contextMenu.roomNo);
+                      }
                       setContextMenu(null);
                     }}
-                    title="Bill Allowance Day Wise (Video 23 Frame 020)"
+                    title="Bill Allowance (Video 23 & Video 24 Frame 020)"
                   >
                     Bill Allowance
                   </div>

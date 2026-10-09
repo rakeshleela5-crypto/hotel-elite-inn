@@ -45,6 +45,7 @@ import IdsAdditionalRoomRateModal from './IdsAdditionalRoomRateModal';
 import IdsPostChargesModal from './IdsPostChargesModal';
 import IdsCheckInSecondPaxModal from './IdsCheckInSecondPaxModal';
 import IdsBillAllowanceDayWiseModal from './IdsBillAllowanceDayWiseModal';
+import IdsBillAllowanceOptionModal from './IdsBillAllowanceOptionModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -284,6 +285,10 @@ export default function IdsDesktopShell({
   // Video 23: Bill Allowance Day Wise (Frames 015–115)
   const [billAllowanceModalOpen, setBillAllowanceModalOpen] = useState(false);
   const [selectedRoomForBillAllowance, setSelectedRoomForBillAllowance] = useState('311');
+
+  // Video 24: Bill Allowance Option (Multi-Day Batch Discount) (Frames 015–100)
+  const [billAllowanceOptionModalOpen, setBillAllowanceOptionModalOpen] = useState(false);
+  const [selectedRoomForBillAllowanceOption, setSelectedRoomForBillAllowanceOption] = useState('201');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -595,7 +600,14 @@ export default function IdsDesktopShell({
           setBillAllowanceModalOpen(true);
         } 
       },
-      { label: 'Bill Allowance Option (Dispute Waiver)', videoId: '24', action: () => openTutorial('24') },
+      { 
+        label: 'Bill Allowance Option (Batch / Multi-Day Discount)', 
+        videoId: '24', 
+        action: () => {
+          setSelectedRoomForBillAllowanceOption('201');
+          setBillAllowanceOptionModalOpen(true);
+        } 
+      },
       { label: 'Transfer Folio to Another Room', videoId: '25', action: () => openTutorial('25') },
       { label: 'Folio Reinstate Option', videoId: '26', action: () => openTutorial('26') },
       { label: 'Release Stop Posting Option', videoId: '27', action: () => openTutorial('27') },
@@ -1689,6 +1701,10 @@ export default function IdsDesktopShell({
           setSelectedRoomForBillAllowance(roomNo || '311');
           setBillAllowanceModalOpen(true);
         }}
+        onOpenBillAllowanceOption={(roomNo) => {
+          setSelectedRoomForBillAllowanceOption(roomNo || '201');
+          setBillAllowanceOptionModalOpen(true);
+        }}
         paxCheckedOutRooms={paxCheckedOutRooms}
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
@@ -1997,7 +2013,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '23') {
+          if (videoId === '24') {
+            setSelectedRoomForBillAllowanceOption('201');
+            setBillAllowanceOptionModalOpen(true);
+          } else if (videoId === '23') {
             setSelectedRoomForBillAllowance('311');
             setBillAllowanceModalOpen(true);
           } else if (videoId === '22') {
@@ -2146,6 +2165,25 @@ export default function IdsDesktopShell({
               return {
                 ...g,
                 balance: Math.max(0, (g.balance || 3500) - (allowanceData.totalDisc || 500))
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Video 24: Bill Allowance Option in IDS 6.5 & 7.0 (Frames 015–100) */}
+      <IdsBillAllowanceOptionModal
+        isOpen={billAllowanceOptionModalOpen}
+        onClose={() => setBillAllowanceOptionModalOpen(false)}
+        initialRoomNo={selectedRoomForBillAllowanceOption}
+        accountingDate={accountingDate}
+        onSaveAllowance={(allowanceData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === selectedRoomForBillAllowanceOption) {
+              return {
+                ...g,
+                balance: Math.max(0, (g.balance || 4250) - (allowanceData.grandTotalDiscount || 1428))
               };
             }
             return g;
