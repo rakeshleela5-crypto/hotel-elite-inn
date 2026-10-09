@@ -62,6 +62,7 @@ import IdsCancelCheckInModal from './IdsCancelCheckInModal';
 import IdsDeleteDepositModal from './IdsDeleteDepositModal';
 import IdsPackageRatesModal from './IdsPackageRatesModal';
 import IdsMultiRateModal from './IdsMultiRateModal';
+import IdsForeignExchangeModal from './IdsForeignExchangeModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -366,6 +367,9 @@ export default function IdsDesktopShell({
   // Video 41: Multi Rate Option (Weekday vs Weekend) in IDS 6.5 & 7.0 (Frames 010–045)
   const [multiRateModalOpen, setMultiRateModalOpen] = useState(false);
   const [selectedRoomForMultiRate, setSelectedRoomForMultiRate] = useState('201');
+
+  // Video 42: Foreign Exchange Entry in IDS 6.5 & 7.0 (Frames 010–074)
+  const [foreignExchangeModalOpen, setForeignExchangeModalOpen] = useState(false);
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -832,7 +836,7 @@ export default function IdsDesktopShell({
     'Reports..': [
       { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
       { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => setReprintBillModalOpen(true) },
-      { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => openTutorial('42') }
+      { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => setForeignExchangeModalOpen(true) }
     ],
     'Setup..': [
       { 
@@ -2013,6 +2017,8 @@ export default function IdsDesktopShell({
           } else if (programId === 'multi-rate-option' || programId === 'multi-rate') {
             setSelectedRoomForMultiRate('201');
             setMultiRateModalOpen(true);
+          } else if (programId === 'foreign-exchange-entry' || programId === 'foreign-exchange' || programId === 'forex-entry') {
+            setForeignExchangeModalOpen(true);
           }
         }}
       />
@@ -2261,7 +2267,9 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '41') {
+          if (videoId === '42') {
+            setForeignExchangeModalOpen(true);
+          } else if (videoId === '41') {
             setSelectedRoomForMultiRate('201');
             setMultiRateModalOpen(true);
           } else if (videoId === '40') {
@@ -2761,6 +2769,13 @@ export default function IdsDesktopShell({
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
         }}
+      />
+
+      {/* Video 42: Foreign Exchange Entry in IDS 6.5 & 7.0 (Frames 010–074) */}
+      <IdsForeignExchangeModal 
+        isOpen={foreignExchangeModalOpen}
+        onClose={() => setForeignExchangeModalOpen(false)}
+        accountingDate={accountingDate}
       />
     </div>
   );

@@ -75,6 +75,9 @@ export default function IdsQuickScanModal({
     { id: 'sell-package-rates', label: 'Sell Package Rates (Room Booking / Walk-In)', code: 'PR03' },
     { id: 'multi-rate-option', label: 'Multi Rate Option (Weekday vs Weekend)', code: 'MR01' },
     { id: 'multi-rate', label: 'Multi Rate Option', code: 'MR02' },
+    { id: 'foreign-exchange-entry', label: 'Foreign Exchange Entry (RBI Encashment)', code: 'FX01' },
+    { id: 'foreign-exchange', label: 'Foreign Exchange Entry', code: 'FX02' },
+    { id: 'forex-entry', label: 'Forex Currency Encashment (Form ECF)', code: 'FX03' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 
