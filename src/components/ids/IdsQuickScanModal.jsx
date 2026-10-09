@@ -47,6 +47,8 @@ export default function IdsQuickScanModal({
     { id: 'release-stop-posting-option', label: 'Release Stop Posting Option', code: 'SP02' },
     { id: 'company-profile', label: 'Company Profile', code: 'CP01' },
     { id: 'company-audit-log', label: 'Company Audit Log', code: 'CAL01' },
+    { id: 'business-sources', label: 'Business Sources', code: 'BS01' },
+    { id: 'add-business-source', label: 'Add Business Source', code: 'BS02' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB01' }
   ];
 

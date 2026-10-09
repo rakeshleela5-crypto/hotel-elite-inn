@@ -50,6 +50,7 @@ import IdsTransferFolioModal from './IdsTransferFolioModal';
 import IdsFolioReinstateModal from './IdsFolioReinstateModal';
 import IdsReleaseStopPostingModal from './IdsReleaseStopPostingModal';
 import IdsCompanyProfileModal from './IdsCompanyProfileModal';
+import IdsBusinessSourceModal from './IdsBusinessSourceModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -310,6 +311,10 @@ export default function IdsDesktopShell({
   // Video 28: Create Company Profile in IDS 6.5 & 7.0 (Frames 010–075)
   const [companyProfileModalOpen, setCompanyProfileModalOpen] = useState(false);
   const [selectedCompanyCode, setSelectedCompanyCode] = useState('COM0001');
+
+  // Video 29: Add Business Source in IDS 6.5 & 7.0 (Frames 010–040)
+  const [businessSourceModalOpen, setBusinessSourceModalOpen] = useState(false);
+  const [selectedBusinessSourceCode, setSelectedBusinessSourceCode] = useState('OTA');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -755,7 +760,14 @@ export default function IdsDesktopShell({
           setCompanyProfileModalOpen(true);
         } 
       },
-      { label: 'Add Business Source (OTA/Direct/BTC)', videoId: '29', action: () => openTutorial('29') },
+      { 
+        label: 'Add Business Source (OTA/Direct/BTC)', 
+        videoId: '29', 
+        action: () => {
+          setSelectedBusinessSourceCode('OTA');
+          setBusinessSourceModalOpen(true);
+        } 
+      },
       { label: 'Add Market Segment (Corporate/FIT)', videoId: '30', action: () => openTutorial('30') },
       { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
@@ -1849,6 +1861,9 @@ export default function IdsDesktopShell({
           } else if (programId === 'company-profile' || programId === 'company-audit-log') {
             setSelectedCompanyCode('COM0001');
             setCompanyProfileModalOpen(true);
+          } else if (programId === 'business-sources' || programId === 'add-business-source') {
+            setSelectedBusinessSourceCode('OTA');
+            setBusinessSourceModalOpen(true);
           }
         }}
       />
@@ -2097,7 +2112,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '28') {
+          if (videoId === '29') {
+            setSelectedBusinessSourceCode('OTA');
+            setBusinessSourceModalOpen(true);
+          } else if (videoId === '28') {
             setSelectedCompanyCode('COM0001');
             setCompanyProfileModalOpen(true);
           } else if (videoId === '27') {
@@ -2386,6 +2404,17 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         onSaveCompanyProfile={(companyRecord, linkRates) => {
           console.log('Company Profile Saved:', companyRecord, 'Link Rates:', linkRates);
+        }}
+      />
+
+      {/* Video 29: Add Business Source in IDS 6.5 & 7.0 (Frames 010–040) */}
+      <IdsBusinessSourceModal 
+        isOpen={businessSourceModalOpen}
+        onClose={() => setBusinessSourceModalOpen(false)}
+        initialCode={selectedBusinessSourceCode}
+        accountingDate={accountingDate}
+        onSaveBusinessSource={(sourceRecord) => {
+          console.log('Business Source Saved:', sourceRecord);
         }}
       />
     </div>
