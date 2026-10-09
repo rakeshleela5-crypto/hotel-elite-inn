@@ -70,6 +70,9 @@ export default function IdsQuickScanModal({
     { id: 'remove-checkin', label: 'Remove or Cancel Check-In', code: 'CC02' },
     { id: 'delete-deposit-before-cancel-checkin', label: 'Delete Deposit Before Cancel Check in', code: 'DD01' },
     { id: 'delete-deposit', label: 'Delete Deposit', code: 'DD02' },
+    { id: 'package-rates', label: 'Create / Sell Package Rates (Room Rate Master)', code: 'PR01' },
+    { id: 'create-package-rates', label: 'Create Package Rates', code: 'PR02' },
+    { id: 'sell-package-rates', label: 'Sell Package Rates (Room Booking / Walk-In)', code: 'PR03' },
     { id: 'room-booking', label: 'Room Booking', code: 'RB03' }
   ];
 

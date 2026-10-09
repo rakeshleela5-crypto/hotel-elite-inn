@@ -60,6 +60,7 @@ import IdsReprintBillModal from './IdsReprintBillModal';
 import IdsRegularGuestWalkInModal from './IdsRegularGuestWalkInModal';
 import IdsCancelCheckInModal from './IdsCancelCheckInModal';
 import IdsDeleteDepositModal from './IdsDeleteDepositModal';
+import IdsPackageRatesModal from './IdsPackageRatesModal';
 import IdsTutorialPlayerModal, { TUTORIAL_PLAYLIST_DATA } from './IdsTutorialPlayerModal';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -356,6 +357,10 @@ export default function IdsDesktopShell({
 
   // Video 39: Delete Deposit Before Cancel Check In in IDS 6.5 & 7.0 (Frames 010–076)
   const [deleteDepositModalOpen, setDeleteDepositModalOpen] = useState(false);
+
+  // Video 40: Create / Sell Package Rates in IDS 6.5 & 7.0 (Frames 010–096)
+  const [packageRatesModalOpen, setPackageRatesModalOpen] = useState(false);
+  const [packageRatesInitialMode, setPackageRatesInitialMode] = useState('create');
 
   // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
   const stats = useMemo(() => {
@@ -865,7 +870,14 @@ export default function IdsDesktopShell({
           setRoomMasterModalOpen(true);
         } 
       },
-      { label: 'Create / Sell Package Rates', videoId: '40', action: () => openTutorial('40') },
+      { 
+        label: 'Create / Sell Package Rates (Room Rate Master)', 
+        videoId: '40', 
+        action: () => {
+          setPackageRatesInitialMode('create');
+          setPackageRatesModalOpen(true);
+        } 
+      },
       { label: 'Multi Rate Option (Weekday vs Weekend)', videoId: '41', action: () => openTutorial('41') },
       { 
         label: 'Additional Room Rate Option (Plans / Extra Bed / Retention)', 
@@ -1983,6 +1995,9 @@ export default function IdsDesktopShell({
             setCancelCheckInModalOpen(true);
           } else if (programId === 'delete-deposit-before-cancel-checkin' || programId === 'delete-deposit') {
             setDeleteDepositModalOpen(true);
+          } else if (programId === 'package-rates' || programId === 'create-package-rates' || programId === 'sell-package-rates') {
+            setPackageRatesInitialMode(programId.includes('sell') ? 'sell' : 'create');
+            setPackageRatesModalOpen(true);
           }
         }}
       />
@@ -2231,7 +2246,10 @@ export default function IdsDesktopShell({
         onClose={() => setTutorialPlayerOpen(false)}
         initialVideoId={selectedTutorialVideoId}
         onLaunchInteractive={(videoId) => {
-          if (videoId === '39') {
+          if (videoId === '40') {
+            setPackageRatesInitialMode('create');
+            setPackageRatesModalOpen(true);
+          } else if (videoId === '39') {
             setDeleteDepositModalOpen(true);
           } else if (videoId === '38') {
             setCancelCheckInModalOpen(true);
@@ -2669,6 +2687,32 @@ export default function IdsDesktopShell({
         onCancelCheckInSuccess={({ roomNo }) => {
           console.log(`Cancelled check-in and deleted deposit for room ${roomNo}`);
           setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== roomNo));
+        }}
+        onOpenRoomRack={() => {
+          setRoomRackConsoleOpen(true);
+        }}
+      />
+
+      {/* Video 40: Create / Sell Package Rates in IDS 6.5 & 7.0 (Frames 010–096) */}
+      <IdsPackageRatesModal 
+        isOpen={packageRatesModalOpen}
+        onClose={() => setPackageRatesModalOpen(false)}
+        initialMode={packageRatesInitialMode}
+        accountingDate={accountingDate}
+        onPackageBookingComplete={(pkgBooking) => {
+          console.log('Package Rate Booking Saved:', pkgBooking);
+          setWalkInCompletedList(prev => [
+            {
+              roomNo: pkgBooking.roomNo,
+              guestName: pkgBooking.guestName,
+              pax: pkgBooking.pax || 2,
+              folioNo: `${pkgBooking.roomNo} / 1`,
+              rate: pkgBooking.rate,
+              payMode: 'CAS',
+              planCode: pkgBooking.planCode
+            },
+            ...prev
+          ]);
         }}
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
