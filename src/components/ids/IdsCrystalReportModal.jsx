@@ -24,6 +24,7 @@ export default function IdsCrystalReportModal({
       case 'forex-cert': return 'Foreign Currency Encashment Certificate (Form FLM)';
       case 'laundry-bill': return 'Laundry & Dry Cleaning Statutory Tax Invoice (SAC 999791)';
       case 'room-verification': return 'Housekeeping Room Verification & Discrepancy Audit Report';
+      case 'pos-bill': return 'Restaurant / Bar POS Guest Tax Invoice (SAC 996331)';
       case 'rule46-bill':
       default: return 'Rule 46 Statutory GST Tax Invoice';
     }
@@ -466,6 +467,67 @@ export default function IdsCrystalReportModal({
                       <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
                       <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
                       <td style={{ padding: '4px', color: '#008000' }}>MATCH</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* POS Restaurant / Bar Bill Format (Video 03 Frame 033 / 036) */}
+            {reportType === 'pos-bill' && (
+              <div style={{ marginTop: '10px', fontSize: '11px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', borderBottom: '1px solid #000', paddingBottom: '8px', marginBottom: '10px' }}>
+                  <div>
+                    <div><strong>Bill No:</strong> {data.billNo || 'B-1042'}</div>
+                    <div><strong>Table No:</strong> {data.tableNo || '10'}</div>
+                    <div><strong>Covers:</strong> {data.covers || '2'}</div>
+                    <div><strong>Outlet:</strong> {data.outlet || 'RESTAURANT'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2022'}</div>
+                    <div><strong>Session:</strong> {data.session || 'General'}</div>
+                    <div><strong>Steward:</strong> {data.server || 'Manash'}</div>
+                    <div><strong>HSN/SAC:</strong> 996331 (Restaurant Services)</div>
+                  </div>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', marginBottom: '15px' }}>
+                  <thead>
+                    <tr style={{ background: '#E0E0E0', borderBottom: '1px solid #000' }}>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Item Description</th>
+                      <th style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000', width: '50px' }}>Qty</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>Rate (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'right', width: '80px' }}>Amount (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(data.items || [
+                      { name: 'Classic Russian Salad .', quantity: 1, rate: 199.0, value: 199.0 },
+                      { name: 'Red Beans Peanut _Dry', quantity: 1, rate: 199.0, value: 199.0 },
+                      { name: 'Sprouted Moong Peanut D', quantity: 1, rate: 199.0, value: 199.0 }
+                    ]).map((it, idx) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid #DDD' }}>
+                        <td style={{ padding: '4px', borderRight: '1px solid #000' }}>{it.name}</td>
+                        <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>{Number(it.quantity || 1).toFixed(0)}</td>
+                        <td style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>{Number(it.rate || it.value || 0).toFixed(2)}</td>
+                        <td style={{ padding: '4px', textAlign: 'right' }}>{Number(it.value || (it.quantity * it.rate) || 0).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                    <tr style={{ borderTop: '1px solid #000', fontWeight: 'bold' }}>
+                      <td colSpan={3} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>Sub Total (Item Value)</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{Number(data.subTotal || 597.0).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>Central GST @ 2.50%</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{Number(data.cgst || 14.93).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>State GST @ 2.50%</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{Number(data.sgst || 14.93).toFixed(2)}</td>
+                    </tr>
+                    <tr style={{ borderTop: '2px solid #000', background: '#F0F0F0', fontSize: '13px', fontWeight: 'bold' }}>
+                      <td colSpan={3} style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>NET TOTAL AMOUNT PAYABLE</td>
+                      <td style={{ padding: '6px', textAlign: 'right', color: '#000080' }}>₹{Number(data.total || 627.0).toFixed(2)}</td>
                     </tr>
                   </tbody>
                 </table>

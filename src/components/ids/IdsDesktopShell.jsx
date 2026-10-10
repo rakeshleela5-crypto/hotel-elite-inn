@@ -3026,11 +3026,16 @@ export default function IdsDesktopShell({
         onOpenMessageBox={showMessageBox}
       />
 
-      {/* POS Video 01: Order Entry V6.5.002.4 (Chargeable KOT) */}
+      {/* POS Videos 01-03: Order Entry & POS Bill Printing */}
       <IdsOrderEntryModal
         isOpen={orderEntryModalOpen}
         onClose={() => setOrderEntryModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={({ reportType: rType, data }) => {
+          setCrystalReportType(rType || 'pos-bill');
+          setCrystalReportData(data || {});
+          setCrystalReportModalOpen(true);
+        }}
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}

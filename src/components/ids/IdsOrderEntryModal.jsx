@@ -10,6 +10,7 @@ import {
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
 } from '../../utils/kotDataSync';
+import IdsPosBillModal from './IdsPosBillModal';
 
 // Authentic Menu Database from Videos 01, 02 and Hotel Elite Inn
 export const POS_MENU_ITEMS = [
@@ -67,7 +68,8 @@ export default function IdsOrderEntryModal({
   isOpen,
   onClose,
   accountingDate = '03-FEB-2022',
-  onKOTCreated
+  onKOTCreated,
+  onOpenCrystalReport
 }) {
   // Outlet selection state (Video 01 Frame 010)
   const [outletConfirmed, setOutletConfirmed] = useState(false);
@@ -76,7 +78,7 @@ export default function IdsOrderEntryModal({
 
   // Order Header state (Video 01 Frame 015 & 025)
   const [currency, setCurrency] = useState('INR');
-  const [tableNo, setTableNo] = useState('15');
+  const [tableNo, setTableNo] = useState('10');
   const [kotNo, setKotNo] = useState('AUTO');
   const [covers, setCovers] = useState('2');
   const [server, setServer] = useState('Manash');
@@ -102,13 +104,17 @@ export default function IdsOrderEntryModal({
   const [pendingKotOpen, setPendingKotOpen] = useState(false);
   const [tableStatusOpen, setTableStatusOpen] = useState(false);
   const [tableDetailsOpen, setTableDetailsOpen] = useState(false);
-  const [selectedTableForDetails, setSelectedTableForDetails] = useState('12');
+  const [selectedTableForDetails, setSelectedTableForDetails] = useState('10');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
 
   // KOT Modification State (Video 02 Frame 020 - Frame 032)
   const [editingKotNo, setEditingKotNo] = useState(null);
   const [stagedKotToModify, setStagedKotToModify] = useState(null);
   const [updateConfirmModalOpen, setUpdateConfirmModalOpen] = useState(false);
+
+  // POS Bill Printing State (Video 03 Frame 018 - Frame 036)
+  const [posBillModalOpen, setPosBillModalOpen] = useState(false);
+  const [billedTables, setBilledTables] = useState(['10']);
 
   // Live Saved KOTs Registry (Videos 01 & 02)
   const [savedKots, setSavedKots] = useState([
@@ -363,7 +369,7 @@ export default function IdsOrderEntryModal({
 
           {/* 12-Icon Win32 Command Toolbar (Frame 015) */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '4px', alignItems: 'center' }}>
-            <button className="ids-btn" title="Print KOT" onClick={handleSaveKOT} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
+            <button className="ids-btn" title="Print Bill / Checkout (Video 03 Frame 018)" onClick={() => setPosBillModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Printer size={16} />
             </button>
             <button className="ids-btn" title="Modify KOT" onClick={() => setPendingKotOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
@@ -700,7 +706,7 @@ export default function IdsOrderEntryModal({
               </button>
               <button 
                 className="ids-btn" 
-                onClick={() => alert(`Proceeding to Bill Settlement for Table ${tableNo}`)}
+                onClick={() => setPosBillModalOpen(true)}
                 style={{ minWidth: '70px', fontWeight: 600 }}
               >
                 Check Out
@@ -1109,6 +1115,22 @@ export default function IdsOrderEntryModal({
           </div>
         );
       })()}
+
+      {/* 8. POS BILL PRINTING MODAL (Video 03 Frame 018 - Frame 036) */}
+      <IdsPosBillModal
+        isOpen={posBillModalOpen}
+        onClose={() => setPosBillModalOpen(false)}
+        initialTableNo={tableNo}
+        accountingDate={accountingDate}
+        outlet={selectedOutlet}
+        session={selectedSession}
+        steward={server}
+        kots={savedKots}
+        onOpenCrystalReport={onOpenCrystalReport}
+        onBillPrinted={({ billNo, tableNo: bTableNo }) => {
+          setBilledTables(prev => Array.from(new Set([...prev, bTableNo])));
+        }}
+      />
     </div>
   );
 }
