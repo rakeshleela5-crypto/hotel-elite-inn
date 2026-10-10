@@ -45,8 +45,8 @@ import {
 export const REVENUE_CODES_DATA = [
   { code: 'TRV', name: 'TRAVEL DESK', defaultTax: 0.05, particular: 'Airport Pickup Drop', defaultAmt: 1500 },
   { code: 'MSC', name: 'MISCELLENEOUS CHARGES', defaultTax: 0.00, particular: 'Miscellenous Charges', defaultAmt: 200 },
-  { code: 'LAR', name: 'LAUNDRY FOR ROOM', defaultTax: 0.12, particular: 'Laundry Express 3 pcs', defaultAmt: 350 },
-  { code: 'LAC', name: 'LAUNDRY CLEAN', defaultTax: 0.12, particular: 'Dry Cleaning Service', defaultAmt: 450 },
+  { code: 'LAR', name: 'LAUNDRY FOR ROOM', defaultTax: 0.18, particular: 'Laundry Express 3 pcs', defaultAmt: 350 },
+  { code: 'LAC', name: 'LAUNDRY CLEAN', defaultTax: 0.18, particular: 'Dry Cleaning Service', defaultAmt: 450 },
   { code: 'MIB', name: 'MINIBAR', defaultTax: 0.18, particular: 'Mini Bar Beverages & Dry Fruits', defaultAmt: 500 },
   { code: 'RES', name: 'RESTAURANT', defaultTax: 0.05, particular: 'Cannon Restaurant Dinner Service', defaultAmt: 850 },
   { code: 'BAR', name: 'BAR', defaultTax: 0.18, particular: 'Cocktail & Beverage Service', defaultAmt: 1200 },

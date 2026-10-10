@@ -1595,8 +1595,18 @@ export default function IdsDesktopShell({
                 <div className="ids-stat-val green">{stats.roomsToSell}</div>
                 <div className="ids-stat-lbl">Rooms to sell</div>
               </div>
-              <div className="ids-stat-card">
-                <div className="ids-stat-val">{stats.registeredComplaints}</div>
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view & attend registered complaints (Video 05 & 07)"
+                onClick={() => {
+                  setGuestServicesTab('attend-complaints');
+                  setGuestServicesOpen(true);
+                }}
+              >
+                <div className="ids-stat-val" style={{ color: stats.registeredComplaints > 0 ? '#C00' : 'inherit', fontWeight: stats.registeredComplaints > 0 ? 'bold' : 'normal' }}>
+                  {stats.registeredComplaints}
+                </div>
                 <div className="ids-stat-lbl">Registered<br />complaint</div>
               </div>
 
@@ -1620,7 +1630,12 @@ export default function IdsDesktopShell({
                 <div className="ids-stat-val">{stats.inhouseForeigners}</div>
                 <div className="ids-stat-lbl">Inhouse Forgn.<br />Rooms/Guests</div>
               </div>
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view & manage room blocks (Video 09 & 10)"
+                onClick={() => setRoomBlockOpen(true)}
+              >
                 <div className="ids-stat-val">{stats.guestBlocks}</div>
                 <div className="ids-stat-lbl">Guest Block</div>
               </div>
