@@ -1510,7 +1510,9 @@ export default function IdsDesktopShell({
         <div className="ids-main-layout">
           {/* Column 1: Left Master Menu */}
           <div className="ids-master-menu">
-            <div className="ids-column-header">FRONT OFFICE</div>
+            <div className="ids-column-header">
+              {selectedMaster === 'House Keeping..' ? 'HOUSE KEEPING' : 'FRONT OFFICE'}
+            </div>
             {masterMenuItems.map((item) => {
               const isSelected = selectedMaster === item.id;
               return (
@@ -2052,6 +2054,15 @@ export default function IdsDesktopShell({
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
         transferredRooms={transferredRooms}
+        blockedRooms={['206']}
+        onOpenRoomBlock={() => setRoomBlockOpen(true)}
+        onOpenLaundryEntry={(roomNo) => {
+          setLaundryEntryOpen(true);
+        }}
+        onOpenGuestServices={(roomNo) => {
+          setGuestServicesTab('log-complaints');
+          setGuestServicesOpen(true);
+        }}
       />
 
       {/* Video 09: Clear Rooms V6.5.002.1 Bulk Modal (Frames 042–054) & Video 16 Frame 092 */}

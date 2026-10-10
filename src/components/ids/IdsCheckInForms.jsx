@@ -759,7 +759,12 @@ export function IdsRoomRackConsoleModal({
   walkInRooms = [],
   checkedOutRooms = [],
   paxCheckedOutRooms = [],
-  transferredRooms = {}
+  transferredRooms = {},
+  blockedRooms = ['206'],
+  onOpenRoomBlock,
+  onOpenLaundryEntry,
+  onOpenGuestServices,
+  onOpenHkRoomStatus
 }) {
   const [filterType, setFilterType] = useState('All');
   const [filterBlock, setFilterBlock] = useState('All');
@@ -809,7 +814,7 @@ export function IdsRoomRackConsoleModal({
     },
     { no: '204', type: isRoomCleared('204') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('204') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '205', type: isRoomCleared('205') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('205') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '206', type: isRoomCleared('206') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('206') ? 'vacant' : 'dirty', category: 'DLX' },
+    { no: '206', type: blockedRooms.includes('206') ? 'OOO/DLX' : (isRoomCleared('206') ? 'V/DLX' : 'D/DLX'), status: blockedRooms.includes('206') ? 'ooo' : (isRoomCleared('206') ? 'vacant' : 'dirty'), category: 'DLX' },
     { no: '207', type: isRoomCleared('207') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('207') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '208', type: isRoomCleared('208') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('208') ? 'vacant' : 'dirty', category: 'DLX' },
     { no: '209', type: isRoomCleared('209') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('209') ? 'vacant' : 'dirty', category: 'DLX' },
@@ -999,13 +1004,15 @@ export function IdsRoomRackConsoleModal({
       case 'occupied': return '#F15A24'; // Vivid orange/red
       case 'vacant': return '#58B957';   // Vivid green
       case 'dirty': return '#E8E137';    // Vivid yellow
+      case 'ooo': return '#7A5230';      // Authentic Brown Out of Order (Video 09)
+      case 'oos': return '#800080';      // Authentic Purple Out of Service
       default: return '#E0DEC8';
     }
   };
 
   const handleRoomClick = (e, r) => {
-    // If dirty room or occupied room, show context menu (Video 09 Frame 018 & Video 11 Frames 035-040)
-    if (r.status === 'dirty' || dirtyCategories[r.no] || r.status === 'occupied') {
+    // If dirty room, occupied room, or blocked OOO room, show context menu
+    if (r.status === 'dirty' || dirtyCategories[r.no] || r.status === 'occupied' || r.status === 'ooo') {
       e.preventDefault();
       const rect = e.currentTarget.getBoundingClientRect();
       setContextMenu({
@@ -1177,9 +1184,13 @@ export function IdsRoomRackConsoleModal({
               <span style={{ background: '#E8E137', color: '#000', padding: '1px 5px', fontWeight: 700 }}>{dirtyCount}</span>
               <span style={{ textDecoration: onOpenClearRoomsModal ? 'underline' : 'none' }}>Dirty</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ background: '#7A5230', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>0</span>
-              <span>Out of order</span>
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: onOpenRoomBlock ? 'pointer' : 'default' }}
+              onClick={onOpenRoomBlock}
+              title="Click to open Room Block V6.5.002.1"
+            >
+              <span style={{ background: '#7A5230', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{blockedRooms.length}</span>
+              <span style={{ textDecoration: onOpenRoomBlock ? 'underline' : 'none' }}>Out of order</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#800080', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>0</span>
@@ -1361,6 +1372,44 @@ export function IdsRoomRackConsoleModal({
                     title="Room Charges / Post Charges (Video 21 Frame 025)"
                   >
                     Room Charges
+                  </div>
+
+                  {/* Housekeeping Video 03: Laundry Service Entry */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#0A246A' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenLaundryEntry) onOpenLaundryEntry(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Laundry Receipt Entry (Video 03)"
+                  >
+                    Laundry Service Entry
+                  </div>
+
+                  {/* Housekeeping Video 05: Log Guest Complaint */}
+                  <div 
+                    style={{ 
+                      padding: '3px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 700,
+                      color: '#C00' 
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#C00'; }}
+                    onClick={() => {
+                      if (onOpenGuestServices) onOpenGuestServices(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Log Guest / Room Complaint (Video 05)"
+                  >
+                    Log Room Complaint
                   </div>
                   
                   {/* Video 14: Post Deposits (Frame 009) */}
@@ -1547,6 +1596,25 @@ export function IdsRoomRackConsoleModal({
                     }}
                   >
                     Walk-in
+                  </div>
+                  {/* Housekeeping Video 09: Room Block Option */}
+                  <div 
+                    style={{ 
+                      padding: '4px 8px', 
+                      cursor: 'pointer',
+                      borderTop: '1px solid #CCC',
+                      fontWeight: 600,
+                      color: '#8D6E63'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#8D6E63'; }}
+                    onClick={() => {
+                      if (onOpenRoomBlock) onOpenRoomBlock(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Room Block / Hold (OOO / OOS - Video 09)"
+                  >
+                    Room Block (OOO / OOS)
                   </div>
                   {/* Video 26: Folio Reinstate Option */}
                   <div 
