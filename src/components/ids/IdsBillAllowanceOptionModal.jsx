@@ -4,6 +4,7 @@ import {
   DollarSign, Calendar, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw, Percent
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 24: HOW TO USE BILL ALLOWANCE OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -15,17 +16,17 @@ import {
    2. Bill Allowance V6.5.002.4 Primary Dialog (Frames 025–070):
       - Header: Room# 201, Folio # 1, Reg. # 613, Outlet: TRF
       - Name: Kumar Anil, Classification: Regular, Nationality: India
-      - Arrival: 16-JAN-2022 12:02, Departure: 26-JAN-2022 12:00
+      - Arrival: 16-JAN-2026 12:02, Departure: 26-JAN-2026 12:00
    3. Select Revenue Dialog (Frames 025–038):
       - Radio: (•) Insert  ( ) Delete
-      - From Date: 16-JAN-2022
-      - To Date: 26-JAN-2022
+      - From Date: 16-JAN-2026
+      - To Date: 26-JAN-2026
       - Revenue Code: TRF (Tariff) / CP / MIB / LAR / RES
       - [ Ok ], [ Back ]
    4. Multi-Day Grid Loading & Apply Discount Dialog (Frames 040–054):
-      - Day 1: 16-JAN-2022 | Tariff | 4,250.00
-      - Day 2: 23-JAN-2022 | Tariff | 4,250.00
-      - Day 3: 25-JAN-2022 | Tariff | 4,250.00
+      - Day 1: 16-JAN-2026 | Tariff | 4,250.00
+      - Day 2: 23-JAN-2026 | Tariff | 4,250.00
+      - Day 3: 25-JAN-2026 | Tariff | 4,250.00
       - Clicking [ Apply Discount ] opens modal:
         * Radio: (•) Percentage  ( ) Amount
         * Percentage: 10
@@ -51,55 +52,55 @@ export const BATCH_ALLOWANCE_ROOMS = [
   {
     roomNo: '201',
     category: 'EXECUTIVE (EXE)',
-    guestName: 'Kumar Anil',
+    guestName: 'Mr. Rajesh Sharma',
     regNo: '613',
     folioNo: '1',
     resvNo: '276',
-    arrival: '16-JAN-2022 12:02',
-    departure: '26-JAN-2022 12:00',
-    classification: 'Regular',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 12:02`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    classification: 'Corporate',
     nationality: 'India',
     outlet: 'TRF',
     postedDays: [
-      { date: '16-JAN-2022', description: 'Tariff', amount: 4250.00, billRef: '2' },
-      { date: '23-JAN-2022', description: 'Tariff', amount: 4250.00, billRef: '3' },
-      { date: '25-JAN-2022', description: 'Tariff', amount: 4250.00, billRef: '4' }
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '2' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '3' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '4' }
     ]
   },
   {
-    roomNo: '311',
-    category: 'DELUXE (DLX)',
-    guestName: 'DEURI HEMCHANDRA',
+    roomNo: '205',
+    category: 'EXECUTIVE (EXE)',
+    guestName: 'Mr. Anil Patnaik',
     regNo: '566',
     folioNo: '1',
     resvNo: '245',
-    arrival: '02-DEC-2021 12:47',
-    departure: '26-JAN-2022 12:00',
-    classification: 'Regular',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 12:47`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    classification: 'Corporate',
     nationality: 'India',
     outlet: 'TRF',
     postedDays: [
-      { date: '23-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '2' },
-      { date: '24-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '3' },
-      { date: '25-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '4' }
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '2' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '3' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2999.00, billRef: '4' }
     ]
   },
   {
-    roomNo: '312',
+    roomNo: '206',
     category: 'DELUXE (DLX)',
-    guestName: 'BASU ANIRUDH',
+    guestName: 'Mr. Deepak Mohanty',
     regNo: '587',
     folioNo: '1',
     resvNo: '246',
-    arrival: '16-JAN-2022 11:49',
-    departure: '27-JAN-2022 12:00',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 11:49`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
     classification: 'Regular',
     nationality: 'India',
     outlet: 'TRF',
     postedDays: [
-      { date: '22-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '2' },
-      { date: '24-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '3' },
-      { date: '25-JAN-2022', description: 'Tariff', amount: 3500.00, billRef: '4' }
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2499.00, billRef: '2' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2499.00, billRef: '3' },
+      { date: INITIAL_ACCOUNTING_DATE, description: 'Tariff', amount: 2499.00, billRef: '4' }
     ]
   }
 ];
@@ -117,7 +118,7 @@ export default function IdsBillAllowanceOptionModal({
   isOpen,
   onClose,
   initialRoomNo = '201',
-  accountingDate = '26-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onSaveAllowance
 }) {
   // Active window view: 'bill-allowance' | 'view-folio'
@@ -135,17 +136,17 @@ export default function IdsBillAllowanceOptionModal({
 
   // Select Revenue Dialog State (Frames 025–038)
   const [actionType, setActionType] = useState('Insert'); // 'Insert' | 'Delete'
-  const [fromDate, setFromDate] = useState('16-JAN-2022');
-  const [toDate, setToDate] = useState('26-JAN-2022');
+  const [fromDate, setFromDate] = useState(INITIAL_ACCOUNTING_DATE);
+  const [toDate, setToDate] = useState(NEXT_ACCOUNTING_DATE);
   const [selectedRevenueCode, setSelectedRevenueCode] = useState('TRF');
 
   // Day-wise Grid Rows State (Frames 040–060)
   const [gridRows, setGridRows] = useState([
     {
       id: 1,
-      date: '16-JAN-2022',
+      date: INITIAL_ACCOUNTING_DATE,
       description: 'Tariff',
-      amount: 4250.00,
+      amount: 2999.00,
       allowance: 0.00,
       type: 'Discount',
       option: '-',
@@ -154,9 +155,9 @@ export default function IdsBillAllowanceOptionModal({
     },
     {
       id: 2,
-      date: '23-JAN-2022',
+      date: INITIAL_ACCOUNTING_DATE,
       description: 'Tariff',
-      amount: 4250.00,
+      amount: 2999.00,
       allowance: 0.00,
       type: 'Discount',
       option: '-',
@@ -165,9 +166,9 @@ export default function IdsBillAllowanceOptionModal({
     },
     {
       id: 3,
-      date: '25-JAN-2022',
+      date: INITIAL_ACCOUNTING_DATE,
       description: 'Tariff',
-      amount: 4250.00,
+      amount: 2999.00,
       allowance: 0.00,
       type: 'Discount',
       option: '-',
@@ -196,8 +197,8 @@ export default function IdsBillAllowanceOptionModal({
     if (isOpen) {
       const room = BATCH_ALLOWANCE_ROOMS.find(r => r.roomNo === initialRoomNo) || BATCH_ALLOWANCE_ROOMS[0];
       setSelectedRoomNo(room.roomNo);
-      setFromDate(room.arrival ? room.arrival.split(' ')[0] : '16-JAN-2022');
-      setToDate(accountingDate || '26-JAN-2022');
+      setFromDate(room.arrival ? room.arrival.split(' ')[0] : INITIAL_ACCOUNTING_DATE);
+      setToDate(accountingDate || NEXT_ACCOUNTING_DATE);
       setCurrentView('bill-allowance');
       setShowSelectRevenue(false);
       setShowApplyDiscount(false);
@@ -441,8 +442,8 @@ export default function IdsBillAllowanceOptionModal({
                 }}
                 onClick={() => {
                   setSelectedRoomNo(r.roomNo);
-                  setFromDate(r.arrival ? r.arrival.split(' ')[0] : '16-JAN-2022');
-                  setToDate('26-JAN-2022');
+                  setFromDate(r.arrival ? r.arrival.split(' ')[0] : INITIAL_ACCOUNTING_DATE);
+                  setToDate(NEXT_ACCOUNTING_DATE);
                   if (r.postedDays) {
                     setGridRows(r.postedDays.map((d, idx) => ({
                       id: idx + 1,
@@ -912,7 +913,7 @@ export default function IdsBillAllowanceOptionModal({
                 </div>
                 <div>
                   <div style={{ color: '#666' }}>Guest Name</div>
-                  <strong>Mr. Kumar Anil</strong>
+                  <strong>Mr. Rajesh Sharma</strong>
                 </div>
                 <div>
                   <div style={{ color: '#666' }}>Billing Mode</div>
@@ -920,7 +921,7 @@ export default function IdsBillAllowanceOptionModal({
                 </div>
                 <div>
                   <div style={{ color: '#666' }}>Stay Period</div>
-                  <strong>16-JAN-2022 to 26-JAN-2022</strong>
+                  <strong>{accountingDate} to {NEXT_ACCOUNTING_DATE}</strong>
                 </div>
                 <div>
                   <div style={{ color: '#666' }}>Allowance Concession</div>
@@ -955,223 +956,45 @@ export default function IdsBillAllowanceOptionModal({
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Stay Charges (Lines 1 to 10) */}
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>1</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>415</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Tariff 415</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>4,250.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>2</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>415</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Central GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>3</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>415</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*State GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE', background: '#F8FFF8' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>4</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>17-JAN-2022 19:13</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>ADV</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>168</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>Advance(Cash)</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', color: '#006600' }}>- 2,000.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>5</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>23-JAN-2022 15:49</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Tariff 201</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>4,250.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>6</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>23-JAN-2022 15:49</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Central GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>7</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>23-JAN-2022 15:49</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*State GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>8</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>25-JAN-2022 16:01</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Tariff 201</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>4,250.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>9</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>25-JAN-2022 16:01</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*Central GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #EEE' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>10</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>25-JAN-2022 16:01</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600 }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}></td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>*State GST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>255.00</td>
-                    </tr>
-
-                    {/* Newly Posted Bill Allowance Rows (Lines 11 to 19 matching Frame 090) */}
-                    {/* Bill 2 (16-JAN discount) */}
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>11</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>2</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', fontWeight: 600, color: '#006600' }}>Tariff 201/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 425.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>12</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>2</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>Central GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>13</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>2</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>State GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
-
-                    {/* Bill 3 (23-JAN discount) */}
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>14</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>3</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', fontWeight: 600, color: '#006600' }}>Tariff 201/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 425.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>15</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>3</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>Central GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>16</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>3</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>State GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
-
-                    {/* Bill 4 (25-JAN discount) */}
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>17</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>TRF</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>4</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', fontWeight: 600, color: '#006600' }}>Tariff 201/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 425.00</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>18</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>CGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>4</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>Central GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #DDD', background: '#F0FFF0' }}>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>19</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>26-JAN-2022 16:05</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>276</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>201</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>613</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#006600' }}>SGT</td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 700 }}>4</td>
-                      <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', color: '#006600' }}>State GST/Discount</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>- 25.50</td>
-                    </tr>
+                    {[
+                      { sl: 1, date: `${accountingDate} 18:56`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '', desc: '*Tariff 201', amt: '2,999.00', isCredit: false },
+                      { sl: 2, date: `${accountingDate} 18:56`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '', desc: '*Central GST', amt: '180.00', isCredit: false },
+                      { sl: 3, date: `${accountingDate} 18:56`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '', desc: '*State GST', amt: '180.00', isCredit: false },
+                      { sl: 4, date: `${accountingDate} 19:13`, resv: '276', room: '201', reg: '613', rev: 'ADV', bill: '168', desc: 'Advance(Cash)', amt: '- 2,000.00', isCredit: true },
+                      { sl: 5, date: `${accountingDate} 15:49`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '', desc: '*Tariff 201', amt: '2,999.00', isCredit: false },
+                      { sl: 6, date: `${accountingDate} 15:49`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '', desc: '*Central GST', amt: '180.00', isCredit: false },
+                      { sl: 7, date: `${accountingDate} 15:49`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '', desc: '*State GST', amt: '180.00', isCredit: false },
+                      { sl: 8, date: `${accountingDate} 16:01`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '', desc: '*Tariff 201', amt: '2,999.00', isCredit: false },
+                      { sl: 9, date: `${accountingDate} 16:01`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '', desc: '*Central GST', amt: '180.00', isCredit: false },
+                      { sl: 10, date: `${accountingDate} 16:01`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '', desc: '*State GST', amt: '180.00', isCredit: false },
+                      { sl: 11, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '2', desc: 'Tariff 201/Discount', amt: '- 300.00', isCredit: true, isDiscount: true },
+                      { sl: 12, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '2', desc: 'Central GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true },
+                      { sl: 13, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '2', desc: 'State GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true },
+                      { sl: 14, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '3', desc: 'Tariff 201/Discount', amt: '- 300.00', isCredit: true, isDiscount: true },
+                      { sl: 15, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '3', desc: 'Central GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true },
+                      { sl: 16, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '3', desc: 'State GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true },
+                      { sl: 17, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'TRF', bill: '4', desc: 'Tariff 201/Discount', amt: '- 300.00', isCredit: true, isDiscount: true },
+                      { sl: 18, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'CGT', bill: '4', desc: 'Central GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true },
+                      { sl: 19, date: `${accountingDate} 16:05`, resv: '276', room: '201', reg: '613', rev: 'SGT', bill: '4', desc: 'State GST/Discount', amt: '- 18.00', isCredit: true, isDiscount: true }
+                    ].map(row => (
+                      <tr 
+                        key={row.sl} 
+                        style={{ 
+                          borderBottom: row.isDiscount ? '1px solid #DDD' : '1px solid #EEE',
+                          background: row.isDiscount ? '#F0FFF0' : (row.rev === 'ADV' ? '#F8FFF8' : '#FFF') 
+                        }}
+                      >
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: row.isDiscount ? 700 : 400 }}>{row.sl}</td>
+                        <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>{row.date}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>{row.resv}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>{row.room}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>{row.reg}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: 600, color: row.isDiscount ? '#006600' : 'inherit' }}>{row.rev}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE', fontWeight: row.isDiscount ? 700 : 400 }}>{row.bill}</td>
+                        <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE', fontWeight: row.isDiscount ? 600 : 400, color: row.isDiscount ? '#006600' : 'inherit' }}>{row.desc}</td>
+                        <td style={{ padding: '2px 6px', textAlign: 'right', fontWeight: row.isDiscount ? 700 : 400, color: row.isCredit ? '#006600' : 'inherit' }}>{row.amt}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

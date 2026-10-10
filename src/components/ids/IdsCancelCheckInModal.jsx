@@ -17,8 +17,8 @@ import {
       - 44-Video Tutorial Player -> Video 38 -> Launch Interactive Feature Clone
    3. In-House Check-In List Grid (Frame 028):
       - Reg # | Room# | Guest Name | Company | Arrival | Departure | Group | ERASE
-      - Row 1: Reg # 627 | Room 202 | MR CHOWKHANI PRATICK | 25-FEB-2022 | 26-FEB-2022 | ERASE (X)
-      - Row 2: Reg # 626 | Room 202 | MR GURKANWAR SINGH BEDI | 25-FEB-2022 | 26-FEB-2022 | ERASE (X)
+      - Row 1: Reg # 627 | Room 202 | MR CHOWKHANI PRATICK | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
+      - Row 2: Reg # 626 | Room 202 | MR GURKANWAR SINGH BEDI | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
    4. Reason Entry & Authorization Dialog (Frame 032):
       - Reason: Guest request / wrong room assigned / walkout
       - Authorized By: MANAGER
@@ -35,8 +35,8 @@ export const INITIAL_CHECKINS_DATABASE = [
     roomType: 'EXE',
     guestName: 'MR CHOWKHANI PRATICK',
     company: '',
-    arrival: '25-FEB-2022',
-    departure: '26-FEB-2022',
+    arrival: '25-FEB-2026',
+    departure: '26-FEB-2026',
     group: 'FIT',
     rate: 2800.00,
     hasTransactions: false,
@@ -49,8 +49,8 @@ export const INITIAL_CHECKINS_DATABASE = [
     roomType: 'DLX',
     guestName: 'MR GURKANWAR SINGH BEDI',
     company: 'LSR Logistics',
-    arrival: '25-FEB-2022',
-    departure: '26-FEB-2022',
+    arrival: '25-FEB-2026',
+    departure: '26-FEB-2026',
     group: 'FIT',
     rate: 2800.00,
     hasTransactions: false,
@@ -63,8 +63,8 @@ export const INITIAL_CHECKINS_DATABASE = [
     roomType: 'EXE',
     guestName: 'MR SHARMA RAJ',
     company: 'Tata Motors Limited',
-    arrival: '20-FEB-2022',
-    departure: '23-FEB-2022',
+    arrival: '20-FEB-2026',
+    departure: '23-FEB-2026',
     group: 'Corporate',
     rate: 3999.00,
     hasTransactions: true,
@@ -76,7 +76,7 @@ export const INITIAL_CHECKINS_DATABASE = [
 export default function IdsCancelCheckInModal({
   isOpen,
   onClose,
-  accountingDate = '25-FEB-2022',
+  accountingDate = '25-FEB-2026',
   onCancelCheckInSuccess,
   onOpenRoomRack
 }) {

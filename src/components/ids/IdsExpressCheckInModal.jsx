@@ -3,19 +3,20 @@ import {
   Building2, Users, Check, X, Calendar, DollarSign, 
   Search, RefreshCw, Printer, FileText, ChevronRight, BedDouble, Sparkles, ArrowRightLeft
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEOS 06 & 07: EXPRESS CHECK-IN (SINGLE & GROUP MULTI-ROOM) IN IDS 6.5 & 7.0
    Replication of:
    1. Express Check-In Console Split Window (Video 06 & Video 07 Frames 012 & 044)
-   2. Single Room Express Check-In: Res # 274, Room 401 (Khan Pravez & Khan Pavez)
+   2. Single Room Express Check-In: Res # 274, Room 102 (Sharma Rajesh & Sharma Sunita)
    3. Group Multi-Room Check-In: Res # 276 (Group 003: Anil Kumar Group, 5 Rooms, 13 Pax)
    4. Group Allocation Console with summary & room assigning grid (Video 07 Frame 048)
    5. Room Type filter to 'EXE' and Room Availability Tape Chart (Frame 048–052)
    6. Progress overlay "Check-in Progress, Please wait..." (Frame 022)
    7. Confirmation Tables:
-      - Single: Res # 274, Room 401, Reg # 585 & 586 (Video 06 Frame 024)
-      - Group: Res # 276, Rooms 415, 501, 515, Reg # 613–618 (Video 07 Frame 056)
+      - Single: Res # 274, Room 102, Reg # 585 & 586 (Video 06 Frame 024)
+      - Group: Res # 276, Rooms 201, 205, 207, Reg # 613–618 (Video 07 Frame 056)
    8. Live desktop statistics & Room Rack Console synchronization (Frame 060)
    ========================================================================= */
 
@@ -39,7 +40,7 @@ export default function IdsExpressCheckInModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmSummaryOpen, setConfirmSummaryOpen] = useState(false);
   const [groupSummaryOpen, setGroupSummaryOpen] = useState(false);
-  const [selectedRoomNumber, setSelectedRoomNumber] = useState('401');
+  const [selectedRoomNumber, setSelectedRoomNumber] = useState('102');
 
   // Video 08: Room Category Upgrade & Reg Card States (Frames 012–050)
   const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
@@ -48,8 +49,8 @@ export default function IdsExpressCheckInModal({
   const [upgradeAuthorisedBy, setUpgradeAuthorisedBy] = useState('Manager');
   const [upgradeRemarks, setUpgradeRemarks] = useState('Executive');
   const [printRegCardOpt, setPrintRegCardOpt] = useState('GUEST PHOTO REG.CA');
-  const [is316Upgraded, setIs316Upgraded] = useState(false);
-  const [hoveredRoomNo, setHoveredRoomNo] = useState('316');
+  const [is309Upgraded, setIs309Upgraded] = useState(false);
+  const [hoveredRoomNo, setHoveredRoomNo] = useState('309');
   const [selectedArrivalRowIndex, setSelectedArrivalRowIndex] = useState(6); // Default row for Res 276 Anil Kumar Group (EXE)
 
   // Video 07: Mode toggle between Main Arrivals Grid vs Group Allocation Panel
@@ -57,16 +58,16 @@ export default function IdsExpressCheckInModal({
 
   // Group 276 Room Allocations matching Video 07 Frame 048–052
   const [groupRoomAssignments, setGroupRoomAssignments] = useState([
-    { id: 1, name: 'Mr Kumar Anil', roomNo: '415' },
-    { id: 2, name: 'MR Anil Kumar Group', roomNo: '415' },
-    { id: 3, name: 'MR Anil Kumar Group', roomNo: '501' },
-    { id: 4, name: 'MR Anil Kumar Group', roomNo: '501' },
-    { id: 5, name: 'MR Anil Kumar Group', roomNo: '515' },
-    { id: 6, name: 'MR Anil Kumar Group', roomNo: '515' },
-    { id: 7, name: 'MR Anil Kumar Group', roomNo: '515' },
-    { id: 8, name: 'MR Anil Kumar Group', roomNo: '515' },
-    { id: 9, name: 'MR Anil Kumar Group', roomNo: '515' },
-    { id: 10, name: 'MR Anil Kumar Group', roomNo: '515' }
+    { id: 1, name: 'Mr Kumar Anil', roomNo: '201' },
+    { id: 2, name: 'MR Anil Kumar Group', roomNo: '201' },
+    { id: 3, name: 'MR Anil Kumar Group', roomNo: '205' },
+    { id: 4, name: 'MR Anil Kumar Group', roomNo: '205' },
+    { id: 5, name: 'MR Anil Kumar Group', roomNo: '207' },
+    { id: 6, name: 'MR Anil Kumar Group', roomNo: '207' },
+    { id: 7, name: 'MR Anil Kumar Group', roomNo: '207' },
+    { id: 8, name: 'MR Anil Kumar Group', roomNo: '207' },
+    { id: 9, name: 'MR Anil Kumar Group', roomNo: '207' },
+    { id: 10, name: 'MR Anil Kumar Group', roomNo: '207' }
   ]);
 
   // Quick edit inputs for guest names in Group Allocation (Frame 048)
@@ -78,12 +79,12 @@ export default function IdsExpressCheckInModal({
 
   // Arrivals dataset matching Video 06 Frame 012, Video 07 Frame 044, Video 08 Frame 012
   const initialArrivalsList = [
-    { resNo: '272', title: 'MS', guestName: 'Basu Anirudh', isRepeat: true, roomType: 'DLX', roomNo: '312', pax: 1, isPartial: false },
+    { resNo: '272', title: 'MR', guestName: 'Sharma Rajesh', isRepeat: true, roomType: 'EXE', roomNo: '102', pax: 1, isPartial: false },
     { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
     { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
     { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
     { resNo: '272', title: 'MR', guestName: 'Anirudh', isRepeat: false, roomType: 'DLX', roomNo: 'DLX', pax: 1 },
-    { resNo: '274', title: 'Mr', guestName: 'Khan Pravez', isRepeat: false, roomType: 'EXE', roomNo: '401', pax: 2, companion: 'Khan Pavez' },
+    { resNo: '274', title: 'Mr', guestName: 'Sharma Rajesh', isRepeat: false, roomType: 'EXE', roomNo: '102', pax: 2, companion: 'Sharma Sunita' },
     { resNo: '276', title: 'Mr', guestName: 'Kumar Anil', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: '415', pax: 2, isPartial: true },
     { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: false },
     { resNo: '276', title: 'MR', guestName: 'Anil Kumar Group', isRepeat: false, isGroup: true, groupName: 'Anil Kumar Group', roomType: 'EXE', roomNo: 'EXE', pax: 2, isCompanion: true },
@@ -103,7 +104,7 @@ export default function IdsExpressCheckInModal({
     }));
     setSelectedArrivalRes(resNo);
     if (resNo === '274') {
-      setSelectedRoomNumber('401');
+      setSelectedRoomNumber('102');
       setRightViewMode('preview');
       setGroupAllocationMode(false);
       setRoomTypeFilter('ALL');
@@ -120,8 +121,8 @@ export default function IdsExpressCheckInModal({
       setRoomTypeFilter('EXE');
     } else {
       setGroupAllocationMode(false);
-      if (row.roomNo === '401') {
-        setSelectedRoomNumber('401');
+      if (row.roomNo === '102') {
+        setSelectedRoomNumber('102');
         setRightViewMode('preview');
       } else {
         setRightViewMode('tape');
@@ -148,15 +149,15 @@ export default function IdsExpressCheckInModal({
     if (onCompleteExpressCheckin) {
       onCompleteExpressCheckin({
         resNo: '274',
-        roomNo: '401',
+        roomNo: '102',
         type: 'EXE',
         regNo1: '585',
         regNo2: '586',
-        guest1: { title: 'Mr', name: 'Khan Pravez' },
-        guest2: { title: 'Mrs', name: 'Khan Pavez' },
+        guest1: { title: 'Mr', name: 'Sharma Rajesh' },
+        guest2: { title: 'Mrs', name: 'Sharma Sunita' },
         pax: 2,
-        arrivalDate: '16-JAN-2022',
-        departureDate: '18-JAN-2022',
+        arrivalDate: INITIAL_ACCOUNTING_DATE,
+        departureDate: NEXT_ACCOUNTING_DATE,
         rate: '4,500.00',
         planAmt: '500.00'
       });
@@ -172,20 +173,20 @@ export default function IdsExpressCheckInModal({
       onCompleteGroupCheckin({
         resNo: '276',
         groupCode: '003',
-        groupName: 'Anil Kumar Group',
-        company: 'COM0003 - Varun Beverages Ltd',
-        rooms: ['415', '501', '515'],
+        groupName: 'JK Paper Delegation',
+        company: 'COM0003 - JK Paper Mills Ltd',
+        rooms: ['201', '205', '207'],
         type: 'EXE',
         guests: [
-          { roomNo: '415', name: 'Mr Kumar Anil', regNo: '613' },
-          { roomNo: '415', name: 'MR Anil Kumar Group', regNo: '614' },
-          { roomNo: '501', name: 'MR Anil Kumar Group', regNo: '615' },
-          { roomNo: '501', name: 'MR Anil Kumar Group', regNo: '616' },
-          { roomNo: '515', name: 'MR Anil Kumar Group', regNo: '617' },
-          { roomNo: '515', name: 'MR Anil Kumar Group', regNo: '618' }
+          { roomNo: '201', name: 'Mr Sunil Mohapatra', regNo: '613' },
+          { roomNo: '201', name: 'JK Paper Delegation', regNo: '614' },
+          { roomNo: '205', name: 'JK Paper Delegation', regNo: '615' },
+          { roomNo: '205', name: 'JK Paper Delegation', regNo: '616' },
+          { roomNo: '207', name: 'JK Paper Delegation', regNo: '617' },
+          { roomNo: '207', name: 'JK Paper Delegation', regNo: '618' }
         ],
-        arrivalDate: '16-JAN-2022',
-        departureDate: '18-JAN-2022',
+        arrivalDate: INITIAL_ACCOUNTING_DATE,
+        departureDate: NEXT_ACCOUNTING_DATE,
         totalRooms: 3,
         totalGuests: 6
       });
@@ -197,11 +198,11 @@ export default function IdsExpressCheckInModal({
   };
 
   // Video 08: Room Category Upgrade Handlers
-  const handleTriggerUpgradeFor316 = (rowIndex) => {
+  const handleTriggerUpgradeFor309 = (rowIndex) => {
     if (typeof rowIndex === 'number') {
       setSelectedArrivalRowIndex(rowIndex);
     }
-    setHoveredRoomNo('316');
+    setHoveredRoomNo('309');
     setUpgradeOption('Upgrade');
     setUpgradeAuthorisedBy('Manager');
     setUpgradeRemarks('Executive');
@@ -215,14 +216,14 @@ export default function IdsExpressCheckInModal({
 
   const handleConfirmRegCardSelect = () => {
     setRegCardModalOpen(false);
-    setIs316Upgraded(true);
+    setIs309Upgraded(true);
 
     // Update the arrivals list row
     setArrivals(prev => prev.map((a, idx) => {
       if (idx === selectedArrivalRowIndex || (a.resNo === '276' && a.roomNo === 'EXE')) {
         return {
           ...a,
-          roomNo: '316',
+          roomNo: '309',
           roomType: 'SUI',
           isUpgraded: true
         };
@@ -233,12 +234,12 @@ export default function IdsExpressCheckInModal({
     if (onCompleteUpgradeCheckin) {
       onCompleteUpgradeCheckin({
         resNo: '276',
-        roomNo: '316',
+        roomNo: '309',
         roomType: 'SUI',
         bookedType: 'EXE',
         regNo: '619',
         guestName: 'Anil Kumar Group',
-        company: 'COM0003 - Varun Beverages Ltd',
+        company: 'COM0002 - Utkal Alumina International Ltd',
         upgradeType: upgradeOption,
         authorisedBy: upgradeAuthorisedBy || 'Manager',
         remarks: upgradeRemarks || 'Executive',
@@ -364,7 +365,7 @@ export default function IdsExpressCheckInModal({
                         const isChecked = checkedArrivals[row.resNo] || false;
                         const isSelected = selectedArrivalRes === row.resNo;
                         const isPartialCheckIn = row.isPartial;
-                        const isUpgradedRow = row.isUpgraded || (row.roomNo === '316');
+                        const isUpgradedRow = row.isUpgraded || (row.roomNo === '309');
 
                         return (
                           <tr 
@@ -397,10 +398,10 @@ export default function IdsExpressCheckInModal({
                                 <button 
                                   className="ids-btn-classic" 
                                   style={{ fontSize: '9px', padding: '0 4px', background: '#FFD700', fontWeight: 700, marginLeft: 'auto', border: '1px solid #716F64' }}
-                                  title="Upgrade Room Category to 316 SUI (Video 08)"
+                                  title="Upgrade Room Category to 309 SUI (Video 08)"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleTriggerUpgradeFor316(idx);
+                                    handleTriggerUpgradeFor309(idx);
                                   }}
                                 >
                                   Upgrade
@@ -422,7 +423,7 @@ export default function IdsExpressCheckInModal({
                               />
                             </td>
                             <td style={{ fontWeight: 700, color: isUpgradedRow ? '#D9381E' : isSelected && !isPartialCheckIn ? '#FFF' : row.roomNo ? '#0A246A' : '#777' }}>
-                              {isUpgradedRow ? '316 SUI 🚪➔' : row.roomNo || row.roomType}
+                              {isUpgradedRow ? '309 SUI 🚪➔' : row.roomNo || row.roomType}
                             </td>
                           </tr>
                         );
@@ -512,7 +513,7 @@ export default function IdsExpressCheckInModal({
                               onChange={(e) => updateGroupRoomNumber(idx, e.target.value)}
                             >
                               <option value="415">415</option>
-                              <option value="501">501</option>
+                              <option value="205">205</option>
                               <option value="515">515</option>
                             </select>
                           </td>
@@ -628,7 +629,7 @@ export default function IdsExpressCheckInModal({
                 <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', background: '#222' }}>
                   <img 
                     src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80" 
-                    alt="Room 401 Executive Suite"
+                    alt="Room 102 Executive AC"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <div 
@@ -647,9 +648,9 @@ export default function IdsExpressCheckInModal({
                       gap: '8px'
                     }}
                   >
-                    <span style={{ fontWeight: 800, color: '#FFD700', fontSize: '13px' }}>Room 401 (Executive Suite)</span>
+                    <span style={{ fontWeight: 800, color: '#FFD700', fontSize: '13px' }}>Room 102 (Executive AC)</span>
                     <span>•</span>
-                    <span>Assigned: <strong>Mr Khan Pravez &amp; Mrs Khan Pavez</strong></span>
+                    <span>Assigned: <strong>Mr Sharma Rajesh &amp; Mrs Sharma Sunita</strong></span>
                   </div>
 
                   <div 
@@ -696,9 +697,9 @@ export default function IdsExpressCheckInModal({
                       <td colSpan={8}>BA-FF03 (Floor 3)</td>
                     </tr>
                     <tr style={{ background: '#FFFFFF' }}>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>312 DLX</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>302 DLX</td>
                       <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        BASU
+                        SHARMA
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
@@ -711,15 +712,15 @@ export default function IdsExpressCheckInModal({
                     </tr>
                     <tr 
                       style={{ 
-                        background: is316Upgraded ? '#FFEBE6' : '#FFFFFF', 
+                        background: is309Upgraded ? '#FFEBE6' : '#FFFFFF', 
                         cursor: 'pointer' 
                       }}
-                      onMouseEnter={() => setHoveredRoomNo('316')}
-                      onClick={() => handleTriggerUpgradeFor316()}
+                      onMouseEnter={() => setHoveredRoomNo('309')}
+                      onClick={() => handleTriggerUpgradeFor309()}
                       title="Click & Drag RoomGrid against the Room no. for Check-in"
                     >
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>316 SUI</td>
-                      {is316Upgraded ? (
+                      <td style={{ fontWeight: 700, color: '#0A246A' }}>309 SUI</td>
+                      {is309Upgraded ? (
                         <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
                             <span style={{ fontSize: '11px' }}>🚪➔</span>
@@ -728,7 +729,7 @@ export default function IdsExpressCheckInModal({
                         </td>
                       ) : (
                         <td colSpan={2} style={{ background: '#FFFFFF', color: '#0A246A', textAlign: 'center', fontWeight: 600, border: '1px dashed #316AC5' }}>
-                          [ Click to Assign / Upgrade Room 316 SUI ]
+                          [ Click to Assign / Upgrade Room 309 SUI ]
                         </td>
                       )}
                       <td></td><td></td><td></td><td></td><td></td>
@@ -736,22 +737,22 @@ export default function IdsExpressCheckInModal({
 
                     {/* BA-FF04 Header */}
                     <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
-                      <td colSpan={8}>BA-FF04 (Floor 4)</td>
+                      <td colSpan={8}>BA-FF01 (Floor 1)</td>
                     </tr>
                     <tr 
                       style={{ background: '#FFF7E6', cursor: 'pointer' }}
                       onClick={() => setRightViewMode('preview')}
-                      onMouseEnter={() => setHoveredRoomNo('401')}
-                      title="Room 401 EXE"
+                      onMouseEnter={() => setHoveredRoomNo('102')}
+                      title="Room 102 EXE"
                     >
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>401 EXE</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>102 EXE</td>
                       <td colSpan={2} style={{ background: '#00AEEF', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         KHAN,KH (RES #274)
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
                     <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('415')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>415 EXE</td>
+                      <td style={{ fontWeight: 700, color: '#0A246A' }}>201 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         KUMAR (ALLOCATED)
                       </td>
@@ -760,24 +761,24 @@ export default function IdsExpressCheckInModal({
 
                     {/* BA-FF05 Header */}
                     <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
-                      <td colSpan={8}>BA-FF05 (Floor 5)</td>
+                      <td colSpan={8}>BA-FF02 (Floor 2)</td>
                     </tr>
-                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('501')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>501 EXE</td>
+                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('205')}>
+                      <td style={{ fontWeight: 700, color: '#0A246A' }}>205 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         ANIL KUMAR G (ALLOCATED)
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
                     <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('515')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>515 EXE</td>
+                      <td style={{ fontWeight: 700, color: '#0A246A' }}>207 EXE</td>
                       <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         ANIL KUMAR G (ALLOCATED)
                       </td>
                       <td></td><td></td><td></td><td></td><td></td>
                     </tr>
-                    <tr onMouseEnter={() => setHoveredRoomNo('516')}>
-                      <td style={{ fontWeight: 700 }}>516 SUI</td>
+                    <tr onMouseEnter={() => setHoveredRoomNo('309')}>
+                      <td style={{ fontWeight: 700 }}>301 EXE</td>
                       <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
                         BISWAKARMA (OCCUPIED)
                       </td>
@@ -926,15 +927,15 @@ export default function IdsExpressCheckInModal({
                     <tr style={{ background: '#F8F7F0' }}>
                       <td style={{ fontWeight: 600 }}>274</td>
                       <td>1</td>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>401</td>
-                      <td style={{ fontWeight: 700 }}>Khan Pravez</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>102</td>
+                      <td style={{ fontWeight: 700 }}>Sharma Rajesh</td>
                       <td style={{ textAlign: 'center', fontWeight: 700, color: '#0A246A' }}>585</td>
                     </tr>
                     <tr style={{ background: '#FFFFFF' }}>
                       <td style={{ fontWeight: 600 }}>274</td>
                       <td>1</td>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>401</td>
-                      <td style={{ fontWeight: 700 }}>Khan Pavez</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>102</td>
+                      <td style={{ fontWeight: 700 }}>Sharma Sunita</td>
                       <td style={{ textAlign: 'center', fontWeight: 700, color: '#0A246A' }}>586</td>
                     </tr>
                   </tbody>
@@ -992,14 +993,14 @@ export default function IdsExpressCheckInModal({
                     <tr style={{ background: '#F8F7F0' }}>
                       <td style={{ fontWeight: 600 }}>276</td>
                       <td>1</td>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>501</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>201</td>
                       <td>MR Anil Kumar Group</td>
                       <td style={{ textAlign: 'center', fontWeight: 700, color: '#0A246A' }}>615</td>
                     </tr>
                     <tr style={{ background: '#FFFFFF' }}>
                       <td style={{ fontWeight: 600 }}>276</td>
                       <td>1</td>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>501</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>201</td>
                       <td>MR Anil Kumar Group</td>
                       <td style={{ textAlign: 'center', fontWeight: 700, color: '#0A246A' }}>616</td>
                     </tr>

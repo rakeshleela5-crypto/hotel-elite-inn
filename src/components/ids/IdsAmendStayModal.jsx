@@ -20,7 +20,7 @@ export default function IdsAmendStayModal({
 }) {
   const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo);
   const [selectedGuest, setSelectedGuest] = useState(null);
-  const [departureDate, setDepartureDate] = useState('20-JAN-2022');
+  const [departureDate, setDepartureDate] = useState('15-OCT-2026');
   const [departureTime, setDepartureTime] = useState('12:00');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -36,9 +36,9 @@ export default function IdsAmendStayModal({
       setSelectedGuest(found);
       // If room 301, default to Video 12 target departure date
       if (found.roomNo === '301') {
-        setDepartureDate('20-JAN-2022');
+        setDepartureDate('15-OCT-2026');
       } else if (found.departure) {
-        setDepartureDate(found.departure.split(' ')[0] || '20-JAN-2022');
+        setDepartureDate(found.departure.split(' ')[0] || '15-OCT-2026');
       }
     }
   }, [selectedRoomNo, inhouseGuests]);
@@ -56,17 +56,17 @@ export default function IdsAmendStayModal({
 
   const handlePresetExtension = (days) => {
     if (days === 5) {
-      setDepartureDate('20-JAN-2022'); // Video 12 Frame 019 & 025 (15 nights)
+      setDepartureDate('15-OCT-2026'); // Video 12 Frame 019 & 025 (15 nights)
     } else if (days === 3) {
-      setDepartureDate('18-JAN-2022'); // Video 12 Frame 040 (13 nights)
+      setDepartureDate('18-JAN-2026'); // Video 12 Frame 040 (13 nights)
     } else {
-      setDepartureDate('22-JAN-2022');
+      setDepartureDate('22-JAN-2026');
     }
   };
 
   const handleSave = () => {
     const updatedDeparture = `${departureDate} ${departureTime}`;
-    const nights = departureDate === '20-JAN-2022' ? 15 : departureDate === '18-JAN-2022' ? 13 : 16;
+    const nights = departureDate === '15-OCT-2026' ? 15 : departureDate === '18-JAN-2026' ? 13 : 16;
     const balance = nights === 15 ? 16800 : nights === 13 ? 14600 : 18000;
 
     if (onSaveAmendStay && selectedGuest) {
@@ -128,17 +128,17 @@ export default function IdsAmendStayModal({
               <span style={{ fontSize: '10px', color: '#666' }}>Extend:</span>
               <button 
                 className="ids-btn-classic" 
-                style={{ fontSize: '10px', padding: '1px 6px', background: departureDate === '20-JAN-2022' ? '#FFF7CC' : '#ECE9D8', fontWeight: departureDate === '20-JAN-2022' ? 700 : 400 }}
+                style={{ fontSize: '10px', padding: '1px 6px', background: departureDate === '15-OCT-2026' ? '#FFF7CC' : '#ECE9D8', fontWeight: departureDate === '15-OCT-2026' ? 700 : 400 }}
                 onClick={() => handlePresetExtension(5)}
-                title="Extend to 20-JAN-2022 (15 nights, Video 12 Frame 019)"
+                title="Extend to 15-OCT-2026 (15 nights, Video 12 Frame 019)"
               >
                 +5 Days (20-JAN)
               </button>
               <button 
                 className="ids-btn-classic" 
-                style={{ fontSize: '10px', padding: '1px 6px', background: departureDate === '18-JAN-2022' ? '#FFF7CC' : '#ECE9D8', fontWeight: departureDate === '18-JAN-2022' ? 700 : 400 }}
+                style={{ fontSize: '10px', padding: '1px 6px', background: departureDate === '18-JAN-2026' ? '#FFF7CC' : '#ECE9D8', fontWeight: departureDate === '18-JAN-2026' ? 700 : 400 }}
                 onClick={() => handlePresetExtension(3)}
-                title="Extend to 18-JAN-2022 (13 nights, Video 12 Frame 040)"
+                title="Extend to 18-JAN-2026 (13 nights, Video 12 Frame 040)"
               >
                 +3 Days (18-JAN)
               </button>
@@ -175,7 +175,7 @@ export default function IdsAmendStayModal({
                           value={departureDate} 
                           onChange={(e) => setDepartureDate(e.target.value)}
                           style={{ width: '110px', fontWeight: 700, color: '#900', background: '#FFF7CC' }} 
-                          title="Departure Date (e.g. 20-JAN-2022)"
+                          title="Departure Date (e.g. 15-OCT-2026)"
                         />
                         <input 
                           className="ids-input" 
@@ -211,10 +211,10 @@ export default function IdsAmendStayModal({
           {selectedGuest && (
             <div style={{ background: '#F5F5F0', border: '1px solid #D0D0C0', padding: '6px 10px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
               <div>
-                Arrival: <strong>{selectedGuest.arrival || '05-JAN-2022 20:28'}</strong> | Original Departure: <strong>{selectedGuest.departure || '15-JAN-2022 12:00'}</strong>
+                Arrival: <strong>{selectedGuest.arrival || '05-JAN-2026 20:28'}</strong> | Original Departure: <strong>{selectedGuest.departure || '15-JAN-2026 12:00'}</strong>
               </div>
               <div style={{ color: '#0A246A', fontWeight: 700 }}>
-                Amended Stay: {departureDate === '20-JAN-2022' ? '15 Nights' : departureDate === '18-JAN-2022' ? '13 Nights' : 'Extended'}
+                Amended Stay: {departureDate === '15-OCT-2026' ? '15 Nights' : departureDate === '18-JAN-2026' ? '13 Nights' : 'Extended'}
               </div>
             </div>
           )}
@@ -231,7 +231,7 @@ export default function IdsAmendStayModal({
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '60px' }}
-              onClick={() => handlePresetExtension(departureDate === '20-JAN-2022' ? 3 : 5)}
+              onClick={() => handlePresetExtension(departureDate === '15-OCT-2026' ? 3 : 5)}
             >
               Change
             </button>
@@ -240,7 +240,7 @@ export default function IdsAmendStayModal({
               className="ids-btn-classic" 
               style={{ minWidth: '60px' }}
               onClick={() => {
-                setDepartureDate('15-JAN-2022');
+                setDepartureDate('15-JAN-2026');
                 setDepartureTime('12:00');
               }}
             >

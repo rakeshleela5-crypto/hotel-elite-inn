@@ -4,62 +4,35 @@ import {
   User, Users, Calendar, AlertTriangle, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, FileText, Bed, Key, DoorClosed, Printer
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 22: HOW TO CHECK-IN 2ND PAX LATER IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Entry Points:
-      - Room Status V6.5.002.1 Rack Console (Frames 015–020)
-      - Right-click on occupied room (312 O/DLX BASU) -> Walk-in (Frames 035–040)
-      - Verification in Guest Information V6.5002.2 (1 Pax: 1(1/0)) (Frames 025–030)
-   2. Room Rack V6.5.002.2 Dialog (Frames 042–060):
-      - Room# 312, Departure: 27-JAN-2022 12:00
-      - Calendar matrix grid (WED-26-01 to FRI-04-02)
-      - 2nd Pax Name Fields:
-        * Title: Mrs
-        * Last Name: Basu
-        * Middle Name: (empty)
-        * First Name: Anamika
-      - Buttons: [ Express Walk-in ], [ Walk-in ], [ Exit ]
-   3. Alert Message Dialog (Frames 062–065):
-      - Section: Room Info
-      - Id: FOMN399, Code: W/968
-      - "Room is occupied. Do you want to Abort or Continue?"
-      - [ Abort ], [ Continue ]
-   4. Room Rack Success Confirmation Dialog (Frames 072–074):
-      - Reg.Number: 623
-      - Room Number: 312
-      - Departure: 27-JAN-2022 12:00
-      - [ OK ]
-   5. Dynamic Guest Information V6.5002.2 Master Verification (Frames 085–090):
-      - Total Pax (ADT/CHD): 2 (2/0) (incremented from 1(1/0))
-      - Guest 1: MS BASU ANIRUDH (Reg# 587)
-      - Guest 2: Mrs Basu Anamika (Reg# 623)
    ========================================================================= */
 
 export const OCCUPIED_ROOMS_DEMO = [
   {
-    roomNo: '312',
-    category: 'DELUXE (DLX)',
+    roomNo: '102',
+    category: 'EXECUTIVE (EXE)',
     primaryGuest: {
       regNo: '587',
-      name: 'MS BASU ANIRUDH',
-      title: 'Ms',
-      lastName: 'Basu',
-      firstName: 'Anirudh',
-      arrival: '16-JAN-2022 11:49 SUNDAY',
-      departure: '27-JAN-2022 12:00 WEDNESDAY',
-      rate: '3,500.00 - DISCOUNT',
-      balance: 11760.00,
+      name: 'MR RAJESH SHARMA',
+      title: 'Mr',
+      lastName: 'Sharma',
+      firstName: 'Rajesh',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 11:49`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      rate: '2,999.00 - CORPORATE',
+      balance: 2999.00,
       plan: 'CP',
-      company: 'Indian Bank'
+      company: 'Ashok Leyland Ltd'
     },
     defaultSecondPax: {
       title: 'Mrs',
-      lastName: 'Basu',
+      lastName: 'Sharma',
       middleName: '',
-      firstName: 'Anamika',
+      firstName: 'Sunita',
       regNo: '623',
       relation: 'Spouse',
       phone: '9876543210',
@@ -68,26 +41,26 @@ export const OCCUPIED_ROOMS_DEMO = [
     }
   },
   {
-    roomNo: '315',
-    category: 'EXECUTIVE (EXE)',
+    roomNo: '203',
+    category: 'PREMIUM CLUB (DLX)',
     primaryGuest: {
       regNo: '588',
-      name: 'MR KHAN ARIF',
+      name: 'MR MANOJ KUMAR',
       title: 'Mr',
-      lastName: 'Khan',
-      firstName: 'Arif',
-      arrival: '22-JAN-2022 14:00 SATURDAY',
-      departure: '28-JAN-2022 12:00 FRIDAY',
-      rate: '4,500.00',
-      balance: 9000.00,
+      lastName: 'Kumar',
+      firstName: 'Manoj',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      rate: '3,499.00',
+      balance: 3499.00,
       plan: 'MAP',
-      company: 'Tata Consultancy'
+      company: 'Linde India Ltd'
     },
     defaultSecondPax: {
       title: 'Mrs',
-      lastName: 'Khan',
+      lastName: 'Kumar',
       middleName: '',
-      firstName: 'Fatima',
+      firstName: 'Neha',
       regNo: '624',
       relation: 'Spouse',
       phone: '9845123456',
@@ -96,31 +69,31 @@ export const OCCUPIED_ROOMS_DEMO = [
     }
   },
   {
-    roomNo: '201',
-    category: 'EXECUTIVE (EXE)',
+    roomNo: '206',
+    category: 'DELUXE (DLX)',
     primaryGuest: {
       regNo: '582',
-      name: 'MR KUMAR ROHIT',
+      name: 'MR DEEPAK MOHANTY',
       title: 'Mr',
-      lastName: 'Kumar',
-      firstName: 'Rohit',
-      arrival: '20-JAN-2022 10:30 THURSDAY',
-      departure: '27-JAN-2022 12:00 THURSDAY',
-      rate: '3,800.00',
-      balance: 7600.00,
+      lastName: 'Mohanty',
+      firstName: 'Deepak',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 10:30`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      rate: '2,499.00',
+      balance: 2499.00,
       plan: 'EP',
-      company: 'Direct FIT'
+      company: 'Utkal Alumina'
     },
     defaultSecondPax: {
       title: 'Mrs',
-      lastName: 'Kumar',
+      lastName: 'Mohanty',
       middleName: '',
-      firstName: 'Sunita',
+      firstName: 'Priya',
       regNo: '625',
       relation: 'Spouse',
       phone: '9123456789',
       idType: 'Driving License',
-      idNumber: 'DL-042018-9921'
+      idNumber: 'OD-18-2023-0091'
     }
   }
 ];
@@ -128,24 +101,24 @@ export const OCCUPIED_ROOMS_DEMO = [
 export default function IdsCheckInSecondPaxModal({
   isOpen,
   onClose,
-  initialRoomNo = '312',
-  accountingDate = '26-JAN-2022',
+  initialRoomNo = '102',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onCompleteSecondPaxCheckIn
 }) {
   // Active step view: 'room-rack' | 'alert-confirm' | 'success-dialog' | 'guest-info-view'
   const [currentStep, setCurrentStep] = useState('room-rack');
 
   // Selected Room Context
-  const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '312');
+  const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '102');
   const activeRoomData = OCCUPIED_ROOMS_DEMO.find(r => r.roomNo === selectedRoomNo) || OCCUPIED_ROOMS_DEMO[0];
 
   // Room Rack Form Fields
-  const [departureDate, setDepartureDate] = useState('27-JAN-2022');
+  const [departureDate, setDepartureDate] = useState(NEXT_ACCOUNTING_DATE);
   const [departureTime, setDepartureTime] = useState('12:00');
   const [title, setTitle] = useState(activeRoomData.defaultSecondPax.title || 'Mrs');
-  const [lastName, setLastName] = useState(activeRoomData.defaultSecondPax.lastName || 'Basu');
+  const [lastName, setLastName] = useState(activeRoomData.defaultSecondPax.lastName || 'Sharma');
   const [middleName, setMiddleName] = useState(activeRoomData.defaultSecondPax.middleName || '');
-  const [firstName, setFirstName] = useState(activeRoomData.defaultSecondPax.firstName || 'Anamika');
+  const [firstName, setFirstName] = useState(activeRoomData.defaultSecondPax.firstName || 'Sunita');
   const [regNo, setRegNo] = useState(activeRoomData.defaultSecondPax.regNo || '623');
 
   // Timeline rack tab
@@ -165,7 +138,7 @@ export default function IdsCheckInSecondPaxModal({
       setMiddleName(room.defaultSecondPax.middleName);
       setFirstName(room.defaultSecondPax.firstName);
       setRegNo(room.defaultSecondPax.regNo);
-      setDepartureDate('27-JAN-2022');
+      setDepartureDate(NEXT_ACCOUNTING_DATE);
       setCurrentStep('room-rack');
       setStatusMessage('');
       setSelectedGuestTab(1);
@@ -451,7 +424,14 @@ export default function IdsCheckInSecondPaxModal({
                   <thead style={{ position: 'sticky', top: 0, background: '#E0DFE3', borderBottom: '1px solid #999' }}>
                     <tr>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '90px' }}>Room#</th>
-                      {['WED-26-01', 'THU-27-01', 'FRI-28-01', 'SAT-29-01', 'SUN-30-01', 'MON-31-01', 'TUE-01-02', 'WED-02-02', 'THU-03-02', 'FRI-04-02'].map(date => (
+                      {Array.from({ length: 10 }).map((_, i) => {
+                        const d = new Date();
+                        d.setDate(d.getDate() + i);
+                        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                        const dayNum = String(d.getDate()).padStart(2, '0');
+                        const monthNum = String(d.getMonth() + 1).padStart(2, '0');
+                        return `${dayName}-${dayNum}-${monthNum}`;
+                      }).map(date => (
                         <th key={date} style={{ border: '1px solid #B0AB9A', padding: '3px 4px', textAlign: 'center', width: '65px' }}>
                           {date}
                         </th>
@@ -460,18 +440,18 @@ export default function IdsCheckInSecondPaxModal({
                   </thead>
                   <tbody>
                     {[
-                      { r: '203', t: 'DLX', status: 'V' },
+                      { r: '101', t: 'EXE', status: 'V' },
+                      { r: '102', t: 'EXE', status: 'O', guest: 'SHARMA RAJESH', isTarget: true },
+                      { r: '103', t: 'DLX', status: 'V' },
+                      { r: '105', t: 'EXE', status: 'O', guest: 'PATNAIK ANIL' },
+                      { r: '201', t: 'EXE', status: 'V' },
+                      { r: '203', t: 'DLX', status: 'O', guest: 'KUMAR MANOJ' },
                       { r: '204', t: 'DLX', status: 'V' },
-                      { r: '205', t: 'DLX', status: 'V' },
-                      { r: '211', t: 'DLX', status: 'V' },
-                      { r: '311', t: 'DLX', status: 'O', guest: 'DEURI HEMCHANDRA' },
-                      { r: '312', t: 'DLX', status: 'O', guest: 'BASU ANIRUDH', isTarget: true },
-                      { r: '314', t: 'DLX', status: 'V' },
-                      { r: '315', t: 'EXE', status: 'O', guest: 'KHAN ARIF' },
-                      { r: '316', t: 'SUI', status: 'O', guest: 'ANIL KUMAR G' },
-                      { r: '401', t: 'EXE', status: 'V' },
-                      { r: '405', t: 'DLX', status: 'O', guest: 'ANIRUDH' },
-                      { r: '501', t: 'EXE', status: 'O', guest: 'ANIL KUMAR G' }
+                      { r: '205', t: 'EXE', status: 'V' },
+                      { r: '206', t: 'DLX', status: 'O', guest: 'MOHANTY DEEPAK' },
+                      { r: '301', t: 'SUI', status: 'V' },
+                      { r: '302', t: 'DLX', status: 'V' },
+                      { r: '303', t: 'DLX', status: 'O', guest: 'MISHRA S' }
                     ].map(row => {
                       const isSelected = row.r === selectedRoomNo;
                       return (
@@ -721,7 +701,7 @@ export default function IdsCheckInSecondPaxModal({
 
       {/* =========================================================================
           VIEW 2: GUEST INFORMATION V6.5002.2 (Video 22 Frames 085–090)
-          Displays Room 312 with 2 (2/0) Pax: MS BASU ANIRUDH & Mrs Basu Anamika
+          Displays Room 102 with 2 (2/0) Pax: MR SHARMA RAJESH & Mrs Sharma Sunita
          ========================================================================= */}
       {currentStep === 'guest-info-view' && (
         <div 
@@ -910,7 +890,7 @@ export default function IdsCheckInSecondPaxModal({
             {/* Bottom Actions Toolbar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #716F64', paddingTop: '6px' }}>
               <div style={{ fontSize: '10px', color: '#276749', fontWeight: 600 }}>
-                ✓ Room 312 now has 2 registered guests. Both can receive room keys and billing folios.
+                ✓ Room 102 now has 2 registered guests. Both can receive room keys and billing folios.
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button 

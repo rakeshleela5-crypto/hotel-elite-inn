@@ -19,7 +19,7 @@ import {
       - [ Front Office ] | [ Point Of Sale ] | [ Banquet ] | [ Laundry ] | [ Misc. Sales ]
    4. Search & Filter:
       - (o) Specific Date | ( ) Month/Year
-      - Date: 02-MAR-2022 | Bill #: 1429 with [ ? ] lookup
+      - Date: 02-MAR-2026 | Bill #: 1429 with [ ? ] lookup
    5. Dual Comparison Columns (Frame 038):
       - OLD (Unregistered B2C Guest):
         * GSTN #: [empty]
@@ -33,7 +33,7 @@ import {
         * City: Mumbai | State: Maharashtra (27) | Country: India
    6. Statutory Audit Trail (Frame 038):
       - Reason: Guest requested corporate tax invoice post check-out for GST input credit
-      - Approved By: MANAGER | User ID: MANAGER | Last Updated: 25-MAR-2022 10:55
+      - Approved By: MANAGER | User ID: MANAGER | Last Updated: 25-MAR-2026 10:55
    7. Post-Update Invoice Regeneration (Frame 068):
       - Rule 46 Tax Invoice (1429 new.pdf) with B2B Company & GSTN details!
    ========================================================================= */
@@ -41,7 +41,7 @@ import {
 export const INITIAL_CHECKED_OUT_BILLS = [
   {
     billNo: '1429',
-    billDate: '02-MAR-2022',
+    billDate: '02-MAR-2026',
     roomNo: '404',
     roomType: 'DELUXE',
     pax: 2,
@@ -67,7 +67,7 @@ export const INITIAL_CHECKED_OUT_BILLS = [
   },
   {
     billNo: '1428',
-    billDate: '01-MAR-2022',
+    billDate: '01-MAR-2026',
     roomNo: '202',
     roomType: 'EXECUTIVE',
     pax: 1,
@@ -103,7 +103,7 @@ export const COMPANY_LOOKUP_DATABASE = [
 export default function IdsGstnChangeModal({
   isOpen,
   onClose,
-  accountingDate = '25-MAR-2022',
+  accountingDate = '25-MAR-2026',
   onOpenCrystalReport
 }) {
   const [activeModuleTab, setActiveModuleTab] = useState('Front Office');
@@ -111,7 +111,7 @@ export default function IdsGstnChangeModal({
   const [selectedBill, setSelectedBill] = useState(INITIAL_CHECKED_OUT_BILLS[0]);
 
   // Form State matching Frame 038
-  const [searchDate, setSearchDate] = useState('02-MAR-2022');
+  const [searchDate, setSearchDate] = useState('02-MAR-2026');
   const [searchBillNo, setSearchBillNo] = useState('1429');
   
   // NEW Company details
@@ -357,7 +357,7 @@ export default function IdsGstnChangeModal({
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#555', borderTop: '1px solid #CCC', paddingTop: '4px' }}>
               <div>User ID: <strong>MANAGER</strong></div>
-              <div>Last Updated: <strong>25-MAR-2022 10:55</strong></div>
+              <div>Last Updated: <strong>25-MAR-2026 10:55</strong></div>
             </div>
           </div>
 
@@ -563,8 +563,8 @@ export default function IdsGstnChangeModal({
                     <div><strong>Bill Date:</strong> {selectedBill.billDate}</div>
                     <div><strong>Room No:</strong> {selectedBill.roomNo} ({selectedBill.roomType})</div>
                     <div><strong>Pax:</strong> {selectedBill.pax}</div>
-                    <div><strong>Arrival:</strong> 01-Mar-2022 16:00</div>
-                    <div><strong>Departure:</strong> 02-Mar-2022 13:44</div>
+                    <div><strong>Arrival:</strong> 01-Mar-2026 16:00</div>
+                    <div><strong>Departure:</strong> 02-Mar-2026 13:44</div>
                     <div><strong>Meal Plan:</strong> EP</div>
                   </div>
                 </div>

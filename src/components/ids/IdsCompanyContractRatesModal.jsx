@@ -17,8 +17,8 @@ import {
       - Property: DEMO / ELITE INN
       - Rate Table #: 100 with [ ? ] lookup
       - Description: Rate for Tata Motors / Mahindra / Corporate Contract
-      - Applicable From: 23-FEB-2022
-      - Applicable To: 31-MAR-2022
+      - Applicable From: 23-FEB-2026
+      - Applicable To: 31-MAR-2026
       - Currency: Indian Rupees (INR)
       - Meal Plan: Modified American Plan (MAP) / CP / EP / AP
       - [ ] Include Spl. Rooms
@@ -56,8 +56,8 @@ export const INITIAL_RATE_TABLES = [
     tableNo: '100',
     description: 'Rate for Tata Motors Limited',
     prpCode: 'DEMO',
-    applicableFrom: '23-FEB-2022',
-    validUpto: '31-MAR-2022',
+    applicableFrom: '23-FEB-2026',
+    validUpto: '31-MAR-2026',
     mealPlan: 'Modified American Plan',
     planCode: 'MAP',
     currency: 'Indian Rupees',
@@ -107,8 +107,8 @@ export const INITIAL_RATE_TABLES = [
     tableNo: '101',
     description: 'Rate for Mahindra & Mahindra Ltd',
     prpCode: 'DEMO',
-    applicableFrom: '01-JAN-2022',
-    validUpto: '31-DEC-2022',
+    applicableFrom: '01-JAN-2026',
+    validUpto: '31-DEC-2026',
     mealPlan: 'Continental Plan',
     planCode: 'CP',
     currency: 'Indian Rupees',
@@ -146,8 +146,8 @@ export const INITIAL_RATE_TABLES = [
     tableNo: '102',
     description: 'Rate for Infosys Technologies',
     prpCode: 'DEMO',
-    applicableFrom: '01-JAN-2022',
-    validUpto: '31-DEC-2022',
+    applicableFrom: '01-JAN-2026',
+    validUpto: '31-DEC-2026',
     mealPlan: 'European Plan',
     planCode: 'EP',
     currency: 'Indian Rupees',
@@ -175,7 +175,7 @@ export default function IdsCompanyContractRatesModal({
   isOpen,
   onClose,
   initialTableNo = '100',
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   onSaveContractRate
 }) {
   const [rateTablesList, setRateTablesList] = useState(INITIAL_RATE_TABLES);
@@ -333,7 +333,7 @@ export default function IdsCompanyContractRatesModal({
       description: '',
       prpCode: 'DEMO',
       applicableFrom: accountingDate,
-      validUpto: '31-DEC-2022',
+      validUpto: '31-DEC-2026',
       mealPlan: 'Modified American Plan',
       planCode: 'MAP',
       currency: 'Indian Rupees',

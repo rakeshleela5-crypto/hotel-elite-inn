@@ -15,13 +15,13 @@ import {
       - Quick Scan (Load Pgm) -> Type "business" -> "Business Sources" -> [ Load ]
       - 44-Video Tutorial Player -> Video 29 -> Launch Interactive Feature Clone
    3. Fields & Creation Flow (Frames 015–035):
-      - Applicable From: 23-FEB-2022
+      - Applicable From: 23-FEB-2026
       - Code: OTA / URO / USO / WAL / WEB / MMT
       - Name: Online Travel Agent / Unit Reservation Office / Unit Sales Office / Walkin / Website
       - Short Name: OTA / URO / USO
       - Status: Active / Inactive
       - User: MANAGER
-      - Last Updated: 23-FEB-2022 18:02
+      - Last Updated: 23-FEB-2026 18:02
    4. Action Buttons:
       - [ Add ], [ Modify ], [ Delete ], [ Browse ], [ Previous ], [ Next ], [ Save ], [ Panel... ], [ Exit ]
    5. Browse Lookup Modal (Frame 040):
@@ -32,48 +32,48 @@ import {
 export const INITIAL_BUSINESS_SOURCES = [
   {
     code: 'OTA',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Online Travel Agent',
     shortName: 'OTA',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:02'
+    lastUpdated: '23-FEB-2026 18:02'
   },
   {
     code: 'URO',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Unit Reservation Office',
     shortName: 'URO',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:03'
+    lastUpdated: '23-FEB-2026 18:03'
   },
   {
     code: 'USO',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Unit Sales Office',
     shortName: 'USO',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:02'
+    lastUpdated: '23-FEB-2026 18:02'
   },
   {
     code: 'WAL',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Walkin',
     shortName: 'WAL',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 17:55'
+    lastUpdated: '23-FEB-2026 17:55'
   },
   {
     code: 'WEB',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Website Direct Booking',
     shortName: 'WEB',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 17:58'
+    lastUpdated: '23-FEB-2026 17:58'
   },
   {
     code: 'MMT',
@@ -86,21 +86,21 @@ export const INITIAL_BUSINESS_SOURCES = [
   },
   {
     code: 'BKG',
-    applicableFrom: '01-JAN-2022',
+    applicableFrom: '01-JAN-2026',
     name: 'Booking.com Online',
     shortName: 'BKG',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '01-JAN-2022 10:00'
+    lastUpdated: '01-JAN-2026 10:00'
   },
   {
     code: 'DIR',
-    applicableFrom: '01-JAN-2022',
+    applicableFrom: '01-JAN-2026',
     name: 'Direct Guest / Corporate Call',
     shortName: 'DIR',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '01-JAN-2022 10:05'
+    lastUpdated: '01-JAN-2026 10:05'
   }
 ];
 
@@ -108,7 +108,7 @@ export default function IdsBusinessSourceModal({
   isOpen,
   onClose,
   initialCode = 'OTA',
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   onSaveBusinessSource
 }) {
   const [sourcesList, setSourcesList] = useState(INITIAL_BUSINESS_SOURCES);

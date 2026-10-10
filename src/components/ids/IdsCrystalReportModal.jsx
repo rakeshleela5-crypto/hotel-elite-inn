@@ -215,15 +215,15 @@ export default function IdsCrystalReportModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', border: '1px solid #000', padding: '8px', marginBottom: '12px', fontSize: '11px' }}>
                   <div>
                     <div><strong>Bill No:</strong> {data.billNo || '503'}</div>
-                    <div><strong>Date & Time:</strong> {data.billDate || '25-JAN-2022'} {data.time || '14:20'}</div>
+                    <div><strong>Date & Time:</strong> {data.billDate || '25-JAN-2026'} {data.time || '14:20'}</div>
                     <div><strong>Room No:</strong> {data.roomNo || '314'} (Folio: {data.folioNo || '314/1'})</div>
                     <div><strong>Guest Name:</strong> {data.guestName || 'MR RAJESH SHARMA'}</div>
                   </div>
                   <div>
                     <div><strong>Company:</strong> {data.companyName || 'Tata Consultancy Services Ltd'}</div>
                     <div><strong>Client GSTIN:</strong> {data.gstin || '27AAACT2727Q1ZB'}</div>
-                    <div><strong>Arrival:</strong> {data.arrivalDate || '23-JAN-2022'}</div>
-                    <div><strong>Departure:</strong> {data.departureDate || '25-JAN-2022'}</div>
+                    <div><strong>Arrival:</strong> {data.arrivalDate || '23-JAN-2026'}</div>
+                    <div><strong>Departure:</strong> {data.departureDate || '25-JAN-2026'}</div>
                   </div>
                 </div>
 
@@ -239,19 +239,19 @@ export default function IdsCrystalReportModal({
                   </thead>
                   <tbody>
                     <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                      <td style={{ padding: '4px' }}>23-JAN-2022</td>
+                      <td style={{ padding: '4px' }}>23-JAN-2026</td>
                       <td style={{ padding: '4px' }}>Room Tariff (Executive AC)</td>
                       <td style={{ textAlign: 'center', padding: '4px' }}>996311</td>
                       <td style={{ textAlign: 'right', padding: '4px' }}>2,050.00</td>
                     </tr>
                     <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                      <td style={{ padding: '4px' }}>24-JAN-2022</td>
+                      <td style={{ padding: '4px' }}>24-JAN-2026</td>
                       <td style={{ padding: '4px' }}>Room Tariff (Executive AC)</td>
                       <td style={{ textAlign: 'center', padding: '4px' }}>996311</td>
                       <td style={{ textAlign: 'right', padding: '4px' }}>2,050.00</td>
                     </tr>
                     <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                      <td style={{ padding: '4px' }}>24-JAN-2022</td>
+                      <td style={{ padding: '4px' }}>24-JAN-2026</td>
                       <td style={{ padding: '4px' }}>Restaurant Room Service (POS-5)</td>
                       <td style={{ textAlign: 'center', padding: '4px' }}>996332</td>
                       <td style={{ textAlign: 'right', padding: '4px' }}>850.00</td>
@@ -300,7 +300,7 @@ export default function IdsCrystalReportModal({
                 <div style={{ border: '1px solid #000', padding: '12px', marginBottom: '14px', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span><strong>Receipt No:</strong> {data.receiptNo || 'RCP-1042'}</span>
-                    <span><strong>Date:</strong> {data.date || '25-JAN-2022'}</span>
+                    <span><strong>Date:</strong> {data.date || '25-JAN-2026'}</span>
                   </div>
                   <div><strong>Room No:</strong> {data.roomNo || '201'} (Folio: {data.folioNo || '201/1'})</div>
                   <div><strong>Received With Thanks From:</strong> {data.guestName || 'MR VIKRAM SINGHANIA'}</div>
@@ -319,8 +319,8 @@ export default function IdsCrystalReportModal({
 
                 <div style={{ border: '1px solid #000', padding: '12px', marginBottom: '14px', lineHeight: '1.6' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span><strong>Voucher No:</strong> {data.voucherNo || 'PO-2022-089'}</span>
-                    <span><strong>Date:</strong> {data.date || '25-JAN-2022'}</span>
+                    <span><strong>Voucher No:</strong> {data.voucherNo || 'PO-2026-089'}</span>
+                    <span><strong>Date:</strong> {data.date || '25-JAN-2026'}</span>
                   </div>
                   <div><strong>Room No:</strong> {data.roomNo || '203'} (Folio: {data.folioNo || '203/1'})</div>
                   <div><strong>Paid To Guest:</strong> {data.guestName || 'MR K. S. PATNAIK'}</div>
@@ -339,8 +339,8 @@ export default function IdsCrystalReportModal({
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
                   <div>
-                    <div><strong>Invoice No:</strong> {data.billNo || 'LAU-BL-205-2022'}</div>
-                    <div><strong>Date:</strong> {data.billDate || '27-JAN-2022'}</div>
+                    <div><strong>Invoice No:</strong> {data.billNo || 'LAU-BL-205-2026'}</div>
+                    <div><strong>Date:</strong> {data.billDate || '27-JAN-2026'}</div>
                     <div><strong>SAC Code:</strong> {data.sacCode || '999791'}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
@@ -382,7 +382,7 @@ export default function IdsCrystalReportModal({
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '10px' }}>
                   <div>
-                    <div><strong>Audit Date:</strong> {data.auditDate || '27-JAN-2022'}</div>
+                    <div><strong>Audit Date:</strong> {data.auditDate || '27-JAN-2026'}</div>
                     <div><strong>Audit Shift:</strong> {data.shift || 'Morning Shift (07:00 - 15:30)'}</div>
                     <div><strong>Audited By:</strong> {data.auditor || 'Executive Housekeeper / Floor Supervisor'}</div>
                   </div>
@@ -485,7 +485,7 @@ export default function IdsCrystalReportModal({
                     <div><strong>Outlet:</strong> {data.outlet || 'RESTAURANT'}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2022'}</div>
+                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2026'}</div>
                     <div><strong>Session:</strong> {data.session || 'General'}</div>
                     <div><strong>Steward:</strong> {data.server || 'Manash'}</div>
                     <div><strong>HSN/SAC:</strong> 996331 (Restaurant Services)</div>
@@ -549,7 +549,7 @@ export default function IdsCrystalReportModal({
                     <div><strong>Guest / Requisitioner:</strong> {data.guestName || 'MANAGER.IT'}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2022'}</div>
+                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2026'}</div>
                     <div><strong>Outlet / Session:</strong> {data.outlet || 'RESTAURANT'} / {data.session || 'General'}</div>
                     <div><strong>Steward:</strong> {data.server || 'Biren'}</div>
                     <div><strong>SAC / HSN Code:</strong> 996331 (F&B Internal Requisition)</div>

@@ -67,43 +67,43 @@ export const INITIAL_COMPANIES_DATABASE = [
     fnbDiscountPct: 10,
     sezExempt: false,
     user: 'MANAGER',
-    lastUpdated: '22-FEB-2022 19:52'
+    lastUpdated: '22-FEB-2026 19:52'
   },
   {
     companyCode: 'COM0003',
-    name: 'Varun Beverages Ltd',
+    name: 'Utkal Alumina International Ltd',
     classification: 'Companies',
     watchList: 'No',
-    address: 'Plot No. 12, Industrial Area, Phase II',
-    area: 'Industrial Area',
-    city: 'Chandigarh',
-    state: 'Punjab',
+    address: 'Aditya Birla Complex, Doraguda, Kashipur',
+    area: 'Kashipur',
+    city: 'Rayagada',
+    state: 'Odisha',
     country: 'India',
-    zip: '160002',
-    phone: '0172-2658900',
-    mobile: '9815099887',
-    fax: '0172-2658901',
+    zip: '765015',
+    phone: '06865-286100',
+    mobile: '9437012345',
+    fax: '',
     iataNo: '',
-    email: 'admin@varunbeverages.com',
-    web: 'www.varunbeverages.com',
+    email: 'travel.utkal@adityabirla.com',
+    web: 'www.adityabirla.com',
     status: 'Active',
-    gstin: '03AABCV1234F1Z8',
-    salesOffice: 'CHD',
-    salesExec: 'SO02',
+    gstin: '21AAACU1234F1Z8',
+    salesOffice: 'RGDA',
+    salesExec: 'SO01',
     billInst: '1',
     marSeg: 'CORP',
     busSource: 'DIR',
-    natureOfBusiness: 'Beverage Bottling & Distribution',
-    creditLimit: 250000.00,
-    creditDays: 15,
-    contactPerson: 'Mr. Anil Kumar',
-    contactDesignation: 'Head - Procurement & Travel',
-    contactPhone: '9815099887',
+    natureOfBusiness: 'Alumina Refinery & Mining',
+    creditLimit: 500000.00,
+    creditDays: 30,
+    contactPerson: 'Mr. Manoj Kumar Sahu',
+    contactDesignation: 'VP - Administration & Travel',
+    contactPhone: '9437012345',
     roomDiscountPct: 20,
     fnbDiscountPct: 15,
     sezExempt: false,
     user: 'MANAGER',
-    lastUpdated: '14-JAN-2022 11:30'
+    lastUpdated: '10-OCT-2026 11:30'
   },
   {
     companyCode: 'COM0007',
@@ -139,7 +139,7 @@ export const INITIAL_COMPANIES_DATABASE = [
     fnbDiscountPct: 20,
     sezExempt: false,
     user: 'MANAGER',
-    lastUpdated: '14-JAN-2022 19:56'
+    lastUpdated: '14-JAN-2026 19:56'
   }
 ];
 
@@ -154,16 +154,16 @@ export const BUSINESS_SOURCES_LIST = [
   { code: 'LUD', applicableFrom: '15-SEP-2021', name: 'RSO LUDHIANA', status: 'Active' },
   { code: 'MIC', applicableFrom: '15-SEP-2021', name: 'MICROSITE', status: 'Active' },
   { code: 'MUM', applicableFrom: '15-SEP-2021', name: 'RSO MUMBAI', status: 'Active' },
-  { code: 'BKG', applicableFrom: '01-JAN-2022', name: 'BOOKING.COM', status: 'Active' },
-  { code: 'EXP', applicableFrom: '01-JAN-2022', name: 'EXPEDIA TRAVEL', status: 'Active' },
-  { code: 'AGD', applicableFrom: '01-JAN-2022', name: 'AGODA INTERNATIONAL', status: 'Active' }
+  { code: 'BKG', applicableFrom: '01-JAN-2026', name: 'BOOKING.COM', status: 'Active' },
+  { code: 'EXP', applicableFrom: '01-JAN-2026', name: 'EXPEDIA TRAVEL', status: 'Active' },
+  { code: 'AGD', applicableFrom: '01-JAN-2026', name: 'AGODA INTERNATIONAL', status: 'Active' }
 ];
 
 export default function IdsCompanyProfileModal({
   isOpen,
   onClose,
   initialCompanyCode = 'COM0001',
-  accountingDate = '22-FEB-2022',
+  accountingDate = '22-FEB-2026',
   onSaveCompanyProfile
 }) {
   const [companiesList, setCompaniesList] = useState(INITIAL_COMPANIES_DATABASE);
@@ -983,7 +983,7 @@ export default function IdsCompanyProfileModal({
                   <div>
                     <div style={{ color: '#555', marginBottom: '8px' }}>Attached Corporate Contracts & KYC Documents:</div>
                     <ul style={{ margin: 0, paddingLeft: '18px', lineHeight: '1.6' }}>
-                      <li>📄 Corporate_Rate_Contract_2022_MakeMyTrip.pdf (Signed)</li>
+                      <li>📄 Corporate_Rate_Contract_2026_MakeMyTrip.pdf (Signed)</li>
                       <li>📄 GST_Registration_Certificate_WestBengal.pdf (Verified)</li>
                     </ul>
                   </div>

@@ -39,7 +39,7 @@ const TOUCH_ITEMS = [
 export default function IdsTouchPosTerminalModal({
   isOpen,
   onClose,
-  accountingDate = '08-FEB-2022',
+  accountingDate = '08-FEB-2026',
   currentUser = 'MANAGER',
   onKotPunched,
   onBillSettled

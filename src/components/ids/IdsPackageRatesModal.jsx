@@ -19,7 +19,7 @@ import {
    3. Phase 1: Package Creation in Room Rate Master (Frames 018–060):
       - Property: DEM | Package ID: 10 with [ ? ] lookup
       - Description: Corporate Executive Package (3N/4D)
-      - Applicable From: 13-MAR-2022 to 31-DEC-2022
+      - Applicable From: 13-MAR-2026 to 31-DEC-2026
       - Room Type: DLX / EXE / SUI | Occupancy: DOUBLE (2 Adults, 0 Child)
       - Days: 4, Nights: 3 | Currency: INR
       - Package Plan Dialog: Plan AP (American Plan - ₹1,500.00/day)
@@ -40,8 +40,8 @@ export const INITIAL_PACKAGES_DATABASE = [
     packageId: '10',
     property: 'DEM',
     description: 'Corporate Executive Package (3N/4D)',
-    applicableFrom: '13-MAR-2022',
-    applicableTo: '31-DEC-2022',
+    applicableFrom: '13-MAR-2026',
+    applicableTo: '31-DEC-2026',
     roomType: 'DLX',
     occupancyType: 'DOUBLE',
     adultPax: 2,
@@ -65,8 +65,8 @@ export const INITIAL_PACKAGES_DATABASE = [
     packageId: '5',
     property: 'DEM',
     description: 'Honeymoon Suite Royale Package (2N/3D)',
-    applicableFrom: '13-MAR-2022',
-    applicableTo: '31-DEC-2022',
+    applicableFrom: '13-MAR-2026',
+    applicableTo: '31-DEC-2026',
     roomType: 'SUI',
     occupancyType: 'DOUBLE',
     adultPax: 2,
@@ -89,8 +89,8 @@ export const INITIAL_PACKAGES_DATABASE = [
     packageId: '3',
     property: 'DEM',
     description: 'Weekend Getaway Deluxe Package (1N/2D)',
-    applicableFrom: '11-MAR-2022',
-    applicableTo: '31-DEC-2022',
+    applicableFrom: '11-MAR-2026',
+    applicableTo: '31-DEC-2026',
     roomType: 'DLX',
     occupancyType: 'SINGLE',
     adultPax: 1,
@@ -114,7 +114,7 @@ export default function IdsPackageRatesModal({
   isOpen,
   onClose,
   initialMode = 'create', // 'create' | 'sell'
-  accountingDate = '13-MAR-2022',
+  accountingDate = '13-MAR-2026',
   onPackageBookingComplete,
   onOpenRoomRack
 }) {
@@ -125,8 +125,8 @@ export default function IdsPackageRatesModal({
   // Master Form Editor State
   const [packageId, setPackageId] = useState('10');
   const [description, setDescription] = useState('Corporate Executive Package (3N/4D)');
-  const [applicableFrom, setApplicableFrom] = useState('13-MAR-2022');
-  const [applicableTo, setApplicableTo] = useState('31-DEC-2022');
+  const [applicableFrom, setApplicableFrom] = useState('13-MAR-2026');
+  const [applicableTo, setApplicableTo] = useState('31-DEC-2026');
   const [roomType, setRoomType] = useState('DLX');
   const [occupancyType, setOccupancyType] = useState('DOUBLE');
   const [adultPax, setAdultPax] = useState(2);
@@ -211,7 +211,7 @@ export default function IdsPackageRatesModal({
       rate: sellSelectedPkg.totalPackageAmount,
       planCode: sellSelectedPkg.planCode,
       arrival: `${accountingDate} 18:05`,
-      departure: '16-MAR-2022 12:00'
+      departure: '16-MAR-2026 12:00'
     };
 
     if (onPackageBookingComplete) {

@@ -43,7 +43,7 @@ import {
 export default function IdsPaidOutModal({
   isOpen,
   onClose,
-  accountingDate = '26-MAR-2022',
+  accountingDate = '26-MAR-2026',
   onCheckOutComplete,
   onOpenRoomRack,
   onOpenCrystalReport
@@ -71,7 +71,7 @@ export default function IdsPaidOutModal({
   const [particulars, setParticulars] = useState('Excess Advance Refund');
   const [paidOutReason, setPaidOutReason] = useState('Excess Advance Amount Refund');
   const [paidOutExecuted, setPaidOutExecuted] = useState(false);
-  const [voucherNo, setVoucherNo] = useState('POT/2022/02');
+  const [voucherNo, setVoucherNo] = useState('POT/2026/02');
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
@@ -413,35 +413,35 @@ export default function IdsPaidOutModal({
                 <tbody>
                   <tr style={{ borderBottom: '1px solid #E0E0E0' }}>
                     <td style={{ padding: '2px 4px' }}>1</td>
-                    <td style={{ padding: '2px 4px' }}>26-MAR-2022 10:22</td>
+                    <td style={{ padding: '2px 4px' }}>26-MAR-2026 10:22</td>
                     <td style={{ padding: '2px 4px', fontWeight: 700 }}>ADV</td>
                     <td style={{ padding: '2px 4px' }}>Advance (Cash)</td>
                     <td style={{ padding: '2px 4px', textAlign: 'right', color: '#137333', fontWeight: 700 }}>-5,000.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E0E0E0' }}>
                     <td style={{ padding: '2px 4px' }}>2</td>
-                    <td style={{ padding: '2px 4px' }}>26-MAR-2022 10:22</td>
+                    <td style={{ padding: '2px 4px' }}>26-MAR-2026 10:22</td>
                     <td style={{ padding: '2px 4px', fontWeight: 700 }}>TRF</td>
                     <td style={{ padding: '2px 4px' }}>Tariff 201</td>
                     <td style={{ padding: '2px 4px', textAlign: 'right' }}>3,125.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E0E0E0' }}>
                     <td style={{ padding: '2px 4px' }}>3</td>
-                    <td style={{ padding: '2px 4px' }}>26-MAR-2022 10:22</td>
+                    <td style={{ padding: '2px 4px' }}>26-MAR-2026 10:22</td>
                     <td style={{ padding: '2px 4px', fontWeight: 700 }}>CGT</td>
                     <td style={{ padding: '2px 4px' }}>Central GST</td>
                     <td style={{ padding: '2px 4px', textAlign: 'right' }}>187.50</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E0E0E0' }}>
                     <td style={{ padding: '2px 4px' }}>4</td>
-                    <td style={{ padding: '2px 4px' }}>26-MAR-2022 10:22</td>
+                    <td style={{ padding: '2px 4px' }}>26-MAR-2026 10:22</td>
                     <td style={{ padding: '2px 4px', fontWeight: 700 }}>SGT</td>
                     <td style={{ padding: '2px 4px' }}>State GST</td>
                     <td style={{ padding: '2px 4px', textAlign: 'right' }}>187.50</td>
                   </tr>
                   <tr style={{ background: '#FFF7CC', borderBottom: '1px solid #E0E0E0' }}>
                     <td style={{ padding: '2px 4px' }}>5</td>
-                    <td style={{ padding: '2px 4px' }}>26-MAR-2022 10:24</td>
+                    <td style={{ padding: '2px 4px' }}>26-MAR-2026 10:24</td>
                     <td style={{ padding: '2px 4px', fontWeight: 900, color: '#C5221F' }}>POT</td>
                     <td style={{ padding: '2px 4px', fontWeight: 700, color: '#C5221F' }}>(POT) Excess Advance Amount</td>
                     <td style={{ padding: '2px 4px', textAlign: 'right', fontWeight: 900, color: '#C5221F' }}>1,500.00</td>
@@ -534,7 +534,7 @@ export default function IdsPaidOutModal({
                 <div><strong>Total Charges + Tax:</strong></div>
                 <div>₹3,500.00</div>
                 <div><strong>Excess Amount Paid:</strong></div>
-                <div style={{ fontWeight: 700, color: '#C5221F' }}>₹1,500.00 in Cash (POT/2022/02)</div>
+                <div style={{ fontWeight: 700, color: '#C5221F' }}>₹1,500.00 in Cash (POT/2026/02)</div>
                 <div><strong>Final Folio Balance:</strong></div>
                 <div style={{ fontWeight: 900, color: '#137333' }}>₹0.00 (Balanced)</div>
                 <div><strong>Room Status:</strong></div>

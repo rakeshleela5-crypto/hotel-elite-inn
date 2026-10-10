@@ -4,16 +4,16 @@ import './idsFortuneNext.css';
 export default function IdsLaundryHolidayTableModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onOpenMessageBox
 }) {
   const [holidays, setHolidays] = useState([
-    { date: '01-JAN-2022', day: 'Saturday', desc: 'New Year Day', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
-    { date: '26-JAN-2022', day: 'Wednesday', desc: 'Republic Day', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
-    { date: '18-MAR-2022', day: 'Friday', desc: 'Holi Holiday', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' },
-    { date: '15-AUG-2022', day: 'Monday', desc: 'Independence Day', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' },
-    { date: '02-OCT-2022', day: 'Sunday', desc: 'Gandhi Jayanti', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
-    { date: '24-OCT-2022', day: 'Monday', desc: 'Diwali Festival', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' }
+    { date: '01-JAN-2026', day: 'Saturday', desc: 'New Year Day', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
+    { date: '26-JAN-2026', day: 'Wednesday', desc: 'Republic Day', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
+    { date: '18-MAR-2026', day: 'Friday', desc: 'Holi Holiday', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' },
+    { date: '15-AUG-2026', day: 'Monday', desc: 'Independence Day', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' },
+    { date: '02-OCT-2026', day: 'Sunday', desc: 'Gandhi Jayanti', mode: 'Express Surcharge Only (+50%)', surcharge: '50.00', status: 'Active' },
+    { date: '24-OCT-2026', day: 'Monday', desc: 'Diwali Festival', mode: 'Plant Closed / Off Day', surcharge: '0.00', status: 'Active' }
   ]);
 
   const [currentIndex, setCurrentIndex] = useState(0);

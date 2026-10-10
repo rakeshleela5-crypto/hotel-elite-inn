@@ -23,8 +23,8 @@ import {
       - Rate Type: Discount | Currency: INR | Rate ID: 1 | Rate Desc: Room Rate
    4. Multi Rate Date-Wise Grid (Frames 018 & 030):
       - "You Can Change Rates Date Wise By double click on Particular Date."
-      - Row 1: 13-MAR-2022 SUNDAY -> Charges: 5,000.00 | Type: EXE | Plan: CP | B/F: Yes (Weekend Peak)
-      - Row 2: 14-MAR-2022 MONDAY -> Charges: 3,500.00 | Type: EXE | Plan: CP | B/F: Yes (Weekday Base)
+      - Row 1: 13-MAR-2026 SUNDAY -> Charges: 5,000.00 | Type: EXE | Plan: CP | B/F: Yes (Weekend Peak)
+      - Row 2: 14-MAR-2026 MONDAY -> Charges: 3,500.00 | Type: EXE | Plan: CP | B/F: Yes (Weekday Base)
       - Double-clicking row loads "Selected Rate on <Date>" editor
       - Shortcuts: F2 - Apply rates of Prv. day (RateId), F5 - Clear All Rates
    5. Walk-in Registration Console (Frame 038):
@@ -34,7 +34,7 @@ import {
 
 export const INITIAL_MULTI_RATE_DAYS = [
   {
-    date: '13-MAR-2022',
+    date: '13-MAR-2026',
     dayName: 'SUNDAY',
     hurdleRate: '',
     roomType: 'EXE',
@@ -53,7 +53,7 @@ export const INITIAL_MULTI_RATE_DAYS = [
     exBedTax: '804'
   },
   {
-    date: '14-MAR-2022',
+    date: '14-MAR-2026',
     dayName: 'MONDAY',
     hurdleRate: '',
     roomType: 'EXE',
@@ -72,7 +72,7 @@ export const INITIAL_MULTI_RATE_DAYS = [
     exBedTax: '804'
   },
   {
-    date: '15-MAR-2022',
+    date: '15-MAR-2026',
     dayName: 'TUESDAY',
     hurdleRate: '',
     roomType: 'EXE',
@@ -96,7 +96,7 @@ export default function IdsMultiRateModal({
   isOpen,
   onClose,
   initialRoomNo = '201',
-  accountingDate = '13-MAR-2022',
+  accountingDate = '13-MAR-2026',
   onMultiRateSaved,
   onOpenRoomRack
 }) {
@@ -207,7 +207,7 @@ export default function IdsMultiRateModal({
       averageRate: totalAmount / dailyRates.length,
       planCode: 'MULTI-RATE',
       arrival: `${accountingDate} 18:05`,
-      departure: '16-MAR-2022 12:00'
+      departure: '16-MAR-2026 12:00'
     };
 
     if (onMultiRateSaved) {

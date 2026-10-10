@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { User, Users, Check, X, Search, ShieldCheck, AlertCircle, Info, ChevronRight } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 18: PAX CHECK-OUT IN IDS 6.5 & 7.0 SOFTWARE
@@ -13,7 +14,7 @@ import { User, Users, Check, X, Search, ShieldCheck, AlertCircle, Info, ChevronR
       - [ Checkout ], [ Clear ], [ Panel ], [ Exit ]
    3. "Pax Checkout" Lookup Table Popup (Frame 028–030)
       - Data Grid: Room#, Reg #, Folio #, Guest Name
-      - Selectable Multi-Pax Rooms: 311 (MRS DEURI KABITA), 312 (MR Anirudh), 315, 316, 405, 501, 515, 203
+      - Selectable Multi-Pax Rooms: 102 (MR RAJESH SHARMA), 203 (MR MANOJ KUMAR), 206 (MR DEEPAK MOHANTY), 301 (MR ANIL PATNAIK)
       - [ Select ], [ Cancel ]
    4. "Authorized By" Dialog (Frames 035–045 & 085–090)
       - Remarks: "Checked Out" / "Guest Checkout"
@@ -36,12 +37,12 @@ export const DEFAULT_PAX_CHECKOUT_LIST = [
     roomNo: '102',
     regNo: '588',
     folioNo: '1',
-    guestName: 'MRS Sharma',
+    guestName: 'MRS Pooja Sharma',
     title: 'MRS',
     firstName: 'Pooja',
     lastName: 'Sharma',
-    arrival: '09-OCT-2026 14:00',
-    departure: '11-OCT-2026 12:00',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
     roomType: 'DLX',
     company: 'Ashok Leyland Ltd',
     mainFolio: {
@@ -52,8 +53,8 @@ export const DEFAULT_PAX_CHECKOUT_LIST = [
       title: 'MR',
       firstName: 'RAJESH',
       lastName: 'SHARMA',
-      arrival: '09-OCT-2026 14:00',
-      departure: '11-OCT-2026 12:00',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
       company: 'Ashok Leyland Ltd',
       balance: '3,500.00',
       rate: '1,750.00',
@@ -62,177 +63,119 @@ export const DEFAULT_PAX_CHECKOUT_LIST = [
     }
   },
   {
-    roomNo: '311',
-    regNo: '567',
+    roomNo: '203',
+    regNo: '590',
     folioNo: '1',
-    guestName: 'MRS DEURI KABITA',
+    guestName: 'MRS Sunita Patel',
     title: 'MRS',
-    firstName: 'KABITA',
-    lastName: 'DEURI',
-    arrival: '02-DEC-2021 12:47',
-    departure: '26-JAN-2022 12:00',
-    roomType: 'DLX',
-    company: 'DEURI TOURS',
-    mainFolio: {
-      roomNo: '311',
-      regNo: '566',
-      folioNo: '1',
-      guestName: 'MR DEURI HEMCHANDRA',
-      title: 'MR',
-      firstName: 'HEMCHANDRA',
-      lastName: 'DEURI',
-      arrival: '02-DEC-2021 12:47',
-      departure: '26-JAN-2022 12:00',
-      company: 'DEURI TOURS',
-      balance: '8,400.00',
-      rate: '3,200.00 - DISCOUNT',
-      plan: '0.00',
-      nights: 55
-    }
-  },
-  {
-    roomNo: '315',
-    regNo: '584',
-    folioNo: '1',
-    guestName: 'Mrs Khan',
-    title: 'Mrs',
-    firstName: 'Khan',
-    lastName: 'Khan',
-    arrival: '14-JAN-2022 15:30',
-    departure: '26-JAN-2022 12:00',
+    firstName: 'Sunita',
+    lastName: 'Patel',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
     roomType: 'EXE',
-    company: 'Khan Group',
+    company: 'Utkal Alumina International Ltd',
     mainFolio: {
-      roomNo: '315',
-      regNo: '583',
+      roomNo: '203',
+      regNo: '589',
       folioNo: '1',
-      guestName: 'MR Khan Pravez',
+      guestName: 'MR VIKRAM PATEL',
       title: 'MR',
-      firstName: 'Pravez',
-      lastName: 'Khan',
-      arrival: '14-JAN-2022 15:30',
-      departure: '26-JAN-2022 12:00',
-      company: 'Khan Group',
-      balance: '9,200.00',
-      rate: '4,000.00 - REG',
+      firstName: 'VIKRAM',
+      lastName: 'PATEL',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      company: 'Utkal Alumina International Ltd',
+      balance: '4,100.00',
+      rate: '2,050.00',
       plan: '0.00',
-      nights: 12
+      nights: 2
     }
   },
   {
-    roomNo: '316',
-    regNo: '620',
-    folioNo: '1',
-    guestName: 'MR Anil Kumar Group',
-    title: 'MR',
-    firstName: 'Group',
-    lastName: 'Anil Kumar Group',
-    arrival: '18-JAN-2022 12:10',
-    departure: '26-JAN-2022 12:00',
-    roomType: 'SUI',
-    company: 'G Enterprise',
-    mainFolio: {
-      roomNo: '316',
-      regNo: '619',
-      folioNo: '1',
-      guestName: 'MR Anil Kumar G',
-      title: 'MR',
-      firstName: 'Anil Kumar',
-      lastName: 'G',
-      arrival: '18-JAN-2022 12:10',
-      departure: '26-JAN-2022 12:00',
-      company: 'G Enterprise',
-      balance: '14,500.00',
-      rate: '6,500.00 - CORP',
-      plan: '0.00',
-      nights: 8
-    }
-  },
-  {
-    roomNo: '405',
+    roomNo: '206',
     regNo: '592',
     folioNo: '1',
-    guestName: 'MR Anirudh',
-    title: 'MR',
-    firstName: 'Anirudh',
-    lastName: 'Anirudh',
-    arrival: '15-JAN-2022 10:20',
-    departure: '26-JAN-2022 12:00',
+    guestName: 'MRS Rashmita Jena',
+    title: 'MRS',
+    firstName: 'Rashmita',
+    lastName: 'Jena',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
     roomType: 'DLX',
-    company: 'Self',
+    company: 'Vedanta Ltd',
     mainFolio: {
-      roomNo: '405',
+      roomNo: '206',
       regNo: '591',
       folioNo: '1',
-      guestName: 'MR Anirudh Senior',
+      guestName: 'MR SUBRAT JENA',
       title: 'MR',
-      firstName: 'Anirudh',
-      lastName: 'Senior',
-      arrival: '15-JAN-2022 10:20',
-      departure: '26-JAN-2022 12:00',
-      company: 'Self',
-      balance: '7,800.00',
-      rate: '3,500.00 - DISCOUNT',
+      firstName: 'SUBRAT',
+      lastName: 'JENA',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      company: 'Vedanta Ltd',
+      balance: '3,500.00',
+      rate: '1,750.00',
       plan: '0.00',
-      nights: 11
+      nights: 2
     }
   },
   {
-    roomNo: '501',
-    regNo: '616',
+    roomNo: '301',
+    regNo: '594',
     folioNo: '1',
-    guestName: 'MR Anil Kumar Group',
-    title: 'MR',
-    firstName: 'Group',
-    lastName: 'Anil Kumar Group',
-    arrival: '19-JAN-2022 14:00',
-    departure: '26-JAN-2022 12:00',
-    roomType: 'EXE',
-    company: 'G Enterprise',
+    guestName: 'MRS Smita Rath',
+    title: 'MRS',
+    firstName: 'Smita',
+    lastName: 'Rath',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    roomType: 'STD',
+    company: 'Corporate FIT',
     mainFolio: {
-      roomNo: '501',
-      regNo: '615',
+      roomNo: '301',
+      regNo: '593',
       folioNo: '1',
-      guestName: 'MR Anil Kumar G',
+      guestName: 'MR AMITAV RATH',
       title: 'MR',
-      firstName: 'Anil Kumar',
-      lastName: 'G',
-      arrival: '19-JAN-2022 14:00',
-      departure: '26-JAN-2022 12:00',
-      company: 'G Enterprise',
-      balance: '12,000.00',
-      rate: '4,500.00 - CORP',
+      firstName: 'AMITAV',
+      lastName: 'RATH',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      company: 'Corporate FIT',
+      balance: '2,900.00',
+      rate: '1,450.00',
       plan: '0.00',
-      nights: 7
+      nights: 2
     }
   },
   {
-    roomNo: '515',
-    regNo: '618',
+    roomNo: '109',
+    regNo: '596',
     folioNo: '1',
-    guestName: 'MR Anil Kumar Group',
-    title: 'MR',
-    firstName: 'Group',
-    lastName: 'Anil Kumar Group',
-    arrival: '20-JAN-2022 16:30',
-    departure: '26-JAN-2022 12:00',
-    roomType: 'EXE',
-    company: 'G Enterprise',
+    guestName: 'MRS Mohanty',
+    title: 'MRS',
+    firstName: 'Swarna',
+    lastName: 'Mohanty',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 18:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    roomType: 'SUI',
+    company: 'AIIMS Healthcare Consultant',
     mainFolio: {
-      roomNo: '515',
-      regNo: '617',
+      roomNo: '109',
+      regNo: '595',
       folioNo: '1',
-      guestName: 'MR Anil Kumar G',
-      title: 'MR',
-      firstName: 'Anil Kumar',
-      lastName: 'G',
-      arrival: '20-JAN-2022 16:30',
-      departure: '26-JAN-2022 12:00',
-      company: 'G Enterprise',
-      balance: '10,800.00',
-      rate: '4,500.00 - CORP',
+      guestName: 'DR S N MOHANTY',
+      title: 'DR',
+      firstName: 'S N',
+      lastName: 'MOHANTY',
+      arrival: `${INITIAL_ACCOUNTING_DATE} 18:00`,
+      departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+      company: 'AIIMS Healthcare Consultant',
+      balance: '6,500.00',
+      rate: '3,250.00',
       plan: '0.00',
-      nights: 6
+      nights: 2
     }
   }
 ];
@@ -367,8 +310,8 @@ export default function IdsPaxCheckoutModal({
       alert('Please select a pax from lookup first.');
       return;
     }
-    // Set default remarks matching video (Frame 040 uses "Guest Checkout", Frame 085 uses "Checked Out")
-    if (formRoomNo === '311') {
+    // Set default remarks (Frame 040 uses "Guest Checkout", Frame 085 uses "Checked Out")
+    if (formRoomNo === '102') {
       setAuthRemarks('Guest Checkout');
       setAuthAuthorisedBy('Manager');
       setAuthReason('secori');

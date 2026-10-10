@@ -105,7 +105,7 @@ export default function IdsPostDepositModal({
         paymentMode,
         particulars,
         receiptNo,
-        date: '17-JAN-2022 19:13'
+        date: '17-JAN-2026 19:13'
       });
     }
 
@@ -113,11 +113,11 @@ export default function IdsPostDepositModal({
       if (onOpenCrystalReport) {
         onOpenCrystalReport('advance-receipt', {
           receiptNo,
-          date: '17-JAN-2022 19:13',
+          date: '17-JAN-2026 19:13',
           roomNo: selectedGuest?.roomNo || selectedRoomNo,
           folioNo: selectedGuest?.folioNo || '1',
           guestName: selectedGuest?.guestName || 'Mr Kumar Anil',
-          companyName: selectedGuest?.companyName || 'Varun Beverages Ltd',
+          companyName: selectedGuest?.companyName || 'JK Paper Mills Ltd',
           amount: parsedAmount,
           paymentMode,
           particulars
@@ -224,7 +224,7 @@ export default function IdsPostDepositModal({
               <span style={{ fontWeight: 600 }}>Company Name</span>
               <input 
                 className="ids-input" 
-                value={selectedGuest?.companyName || 'Varun Beverages Ltd (Mr. Arobin De)'} 
+                value={selectedGuest?.companyName || 'JK Paper Mills Ltd (Mr. Arobin De)'} 
                 readOnly 
                 style={{ width: '100%', background: '#EBEBE4' }} 
               />
@@ -473,13 +473,13 @@ export default function IdsPostDepositModal({
               {/* Accounting Metadata */}
               <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                <input className="ids-input" value="17-JAN-2022" readOnly style={{ background: '#EBEBE4' }} />
+                <input className="ids-input" value="17-JAN-2026" readOnly style={{ background: '#EBEBE4' }} />
 
                 <span style={{ fontWeight: 600 }}>User</span>
                 <input className="ids-input" value="MANAGER" readOnly style={{ background: '#EBEBE4', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Last Updated</span>
-                <input className="ids-input" value="17-JAN-2022 19:13" readOnly style={{ background: '#EBEBE4', fontSize: '10px' }} />
+                <input className="ids-input" value="17-JAN-2026 19:13" readOnly style={{ background: '#EBEBE4', fontSize: '10px' }} />
               </div>
             </div>
           </div>
@@ -585,13 +585,13 @@ export default function IdsPostDepositModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '11px' }}>
                   <div>
                     <div>Receipt No : <strong>#{receiptNo}</strong></div>
-                    <div>Date & Time: 17-JAN-2022 19:13</div>
+                    <div>Date & Time: 17-JAN-2026 19:13</div>
                     <div>Room No    : <strong>{selectedGuest?.roomNo || selectedRoomNo}</strong></div>
                     <div>Folio No   : {selectedGuest?.folioNo || '1'}</div>
                   </div>
                   <div>
                     <div>Guest Name : <strong>{selectedGuest?.guestName || 'Mr Kumar Anil'}</strong></div>
-                    <div>Company    : {selectedGuest?.companyName || 'Varun Beverages Ltd'}</div>
+                    <div>Company    : {selectedGuest?.companyName || 'JK Paper Mills Ltd'}</div>
                     <div>Cashier    : <strong>MANAGER</strong></div>
                     <div>Payment    : <strong>{paymentMode.toUpperCase()}</strong></div>
                   </div>
@@ -653,11 +653,11 @@ export default function IdsPostDepositModal({
                       if (onOpenCrystalReport) {
                         onOpenCrystalReport('advance-receipt', {
                           receiptNo,
-                          date: '17-JAN-2022 19:13',
+                          date: '17-JAN-2026 19:13',
                           roomNo: selectedGuest?.roomNo || selectedRoomNo,
                           folioNo: selectedGuest?.folioNo || '1',
                           guestName: selectedGuest?.guestName || 'Mr Kumar Anil',
-                          companyName: selectedGuest?.companyName || 'Varun Beverages Ltd',
+                          companyName: selectedGuest?.companyName || 'JK Paper Mills Ltd',
                           amount: parseFloat(receivedAmount) || 2000,
                           paymentMode,
                           particulars

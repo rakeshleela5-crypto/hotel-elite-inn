@@ -1,44 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { User, Users, Calendar, DollarSign, Check, X, FileText, Search, CreditCard, Building, Car } from 'lucide-react';
+import { 
+  INITIAL_ACCOUNTING_DATE, 
+  NEXT_ACCOUNTING_DATE, 
+  getFormattedPmsDate, 
+  getFormattedPmsDateTime 
+} from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 17: WALK-IN PROCESS FOR DIRECT GUEST IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Room Rack V6.5.002.2 (Video 17 Frames 010–030)
-      - Interactive room timeline calendar matrix
-      - Room# 203 selection & Departure: 25-FEB-2022 12:00
-      - Guest Title: Mr, Last Name: Sarkar, First Name: Rajesh
-      - [ Express Walk-in ], [ Walk-in ], [ Exit ] command buttons
-   2. Walk-Ins V6.5002.5 Registration Console (Video 17 Frames 035–075)
-      - Registration for 203, Pax: 1 (or 2), Folio #: 1
-      - Address (Patna, Bihar, India, 874562), Mobile (1234567890), Email (xyz@gmail.com)
-      - Classification: Regular, Guest Status: WLK, Nationality: IND
-      - Rate: Discount, 2,500.00 INR display badge
-      - Company: COM0010 (Pooja Associates), Bill Inst: 1, Plan Code: CP
-   3. Rate Details V6.5.002.5 Dialog (Video 17 Frame 065)
-      - Plan CP, Reason Entry: DISCOUNT / No Reason / Not applicable
-      - Tax Structure 798 / 804, Exb. Tax Struct 804 / 804
-   4. Special Instruction Dialog (Video 17 Frame 080)
-   5. Other Details V6.5002.2 Dialog (Video 17 Frame 085)
-      - Arrival From: Kolkata, Proceeding To: Bihar, Post History: Yes
-      - Credit Card Swipe Grid & Identification details
-   6. Room Number203 Folio Selection Dialog (Video 17 Frame 095)
-      - Reg # 621, Folio # 1, Pax 1, Sarkar Rajesh
-   7. Checkins "Add More Pax To This Room" Dialog (Video 17 Frame 100)
-      - Adding Pax 2: Mrs Sharma, Reg # 622
-   8. Guest Information V6.5002.2 Master Sheet (Video 17 Frame 110)
-      - Displays Room 203 with both Mr Sarkar Rajesh & Mrs Sharma
    ========================================================================= */
 
 export const DEFAULT_WALK_IN_ROOM = {
   roomNo: '203',
   roomType: 'DLX',
   category: 'DELUXE (DLX)',
-  rate: 2500.00,
+  rate: 2050.00,
   plan: 'CP',
-  departureDate: '25-FEB-2022',
+  departureDate: NEXT_ACCOUNTING_DATE,
   departureTime: '12:00',
   guest1: {
     title: 'Mr',
@@ -96,7 +77,7 @@ export default function IdsWalkInModal({
 
   // Step 1: Room Rack State (Video 17 Frame 010–030)
   const [selectedRoom, setSelectedRoom] = useState(initialRoomNo || '203');
-  const [rackDepDate, setRackDepDate] = useState('25-FEB-2022');
+  const [rackDepDate, setRackDepDate] = useState(NEXT_ACCOUNTING_DATE);
   const [rackDepTime, setRackDepTime] = useState('12:00');
   const [rackTitle, setRackTitle] = useState('Mr');
   const [rackLastName, setRackLastName] = useState('Sarkar');
@@ -178,7 +159,7 @@ export default function IdsWalkInModal({
     if (isOpen) {
       setActiveStep('rack');
       setSelectedRoom(initialRoomNo || '203');
-      setRackDepDate('25-FEB-2022');
+      setRackDepDate(NEXT_ACCOUNTING_DATE);
       setRackDepTime('12:00');
       setRackTitle('Mr');
       setRackLastName('Sarkar');
@@ -201,7 +182,7 @@ export default function IdsWalkInModal({
   // Handle Quick Fill
   const handleAutoFillVideo17 = () => {
     setSelectedRoom('203');
-    setRackDepDate('25-FEB-2022');
+    setRackDepDate(NEXT_ACCOUNTING_DATE);
     setRackDepTime('12:00');
     setRackTitle('Mr');
     setRackLastName('Sarkar');
@@ -242,7 +223,7 @@ export default function IdsWalkInModal({
           { name: `${guest1Title} ${guest1LastName} ${guest1FirstName}`, regNo: '621' },
           ...(isSecondPaxActive ? [{ name: `${guest2Title} ${guest2LastName}`, regNo: '622' }] : [])
         ],
-        arrival: '23-JAN-2022 20:16',
+        arrival: getFormattedPmsDateTime(),
         departure: `${rackDepDate} ${rackDepTime}`,
         rate: rateAmount,
         company: companyName,
@@ -1245,17 +1226,17 @@ export default function IdsWalkInModal({
                   {/* Arrival & Departure dates matching Frame 110 */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Arrival</span>
-                    <input className="ids-input" readOnly value="23-JAN-2022 20:16 SUNDAY" style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
+                    <input className="ids-input" readOnly value={`${INITIAL_ACCOUNTING_DATE} 14:00`} style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Departure</span>
-                    <input className="ids-input" readOnly value={`${rackDepDate} ${rackDepTime} FRIDAY`} style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
+                    <input className="ids-input" readOnly value={`${rackDepDate} ${rackDepTime}`} style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Room Night(s)</span>
-                    <input className="ids-input" readOnly value="33" style={{ width: '40px', textAlign: 'center', background: '#F5F5F5' }} />
+                    <input className="ids-input" readOnly value="1" style={{ width: '40px', textAlign: 'center', background: '#F5F5F5' }} />
                     <span style={{ marginLeft: '12px' }}>Ref. #</span>
                     <input className="ids-input" readOnly value="" style={{ width: '80px', background: '#F5F5F5' }} />
                   </div>

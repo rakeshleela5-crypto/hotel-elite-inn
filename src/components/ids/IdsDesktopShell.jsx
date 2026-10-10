@@ -101,7 +101,9 @@ import {
   INITIAL_DEPOSITS_LOG,
   INITIAL_PAID_OUTS_LOG,
   INITIAL_FOREX_LOG,
-  INITIAL_SETTLED_BILLS
+  INITIAL_SETTLED_BILLS,
+  INITIAL_ACCOUNTING_DATE,
+  NEXT_ACCOUNTING_DATE
 } from '../../data/idsPmsStore';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -324,7 +326,7 @@ export default function IdsDesktopShell({
   // Video 19: Night Audit Process States (Frames 010–095)
   const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
   const [nightAuditInitialStep, setNightAuditInitialStep] = useState('full-wizard'); // 'step1' | 'step2' | 'step3' | 'step4' | 'full-wizard' | 'info'
-  const [accountingDate, setAccountingDate] = useState('25-JAN-2022');
+  const [accountingDate, setAccountingDate] = useState(INITIAL_ACCOUNTING_DATE);
 
   // Video 20: Additional Room Rate & Quick Balances States (Frames 015–065)
   const [additionalRoomRateModalOpen, setAdditionalRoomRateModalOpen] = useState(false);
@@ -1231,23 +1233,23 @@ export default function IdsDesktopShell({
 
   const handleExecuteCancellation = (shouldPrintVoucher) => {
     const finalRecord = {
-      cancellationNo: `CAN-2022-0${selectedBookingForCancel?.resNo || '270'}`,
+      cancellationNo: `CAN-${new Date().getFullYear()}-0${selectedBookingForCancel?.resNo || '270'}`,
       resNo: selectedBookingForCancel?.resNo || '270',
       title: selectedBookingForCancel?.title || 'Mr',
-      guestName: selectedBookingForCancel?.guestName || 'Biswakarma Santosh',
-      companyName: selectedBookingForCancel?.companyName || 'Quality Pharma Products Pvt Ltd.',
+      guestName: selectedBookingForCancel?.guestName || 'Santosh Biswakarma',
+      companyName: selectedBookingForCancel?.companyName || 'Linde India Ltd',
       type: selectedBookingForCancel?.type || 'EXE',
-      roomNo: selectedBookingForCancel?.roomNo || '515',
-      arrivalDate: selectedBookingForCancel?.arrivalDate || '14-JAN-2022',
-      departureDate: selectedBookingForCancel?.departureDate || '17-JAN-2022',
+      roomNo: selectedBookingForCancel?.roomNo || '101',
+      arrivalDate: selectedBookingForCancel?.arrivalDate || INITIAL_ACCOUNTING_DATE,
+      departureDate: selectedBookingForCancel?.departureDate || NEXT_ACCOUNTING_DATE,
       depositAmount: selectedBookingForCancel?.depositAmount || 2000,
       refundAmount: cancellationContext.refundAmount ?? 2000,
       retentionCharges: cancellationContext.retentionCharges ?? 0,
       payMode: cancellationContext.payMode || 'CASH',
       reason: cancellationContext.reason || 'Cancelled by Customer',
       authorizedBy: cancellationContext.authorizedBy || 'Manager',
-      callerDetails: cancellationContext.callerDetails || 'Mr Biswakarma Santosh',
-      mobileNumber: cancellationContext.mobileNumber || '1234567890'
+      callerDetails: cancellationContext.callerDetails || 'Santosh Biswakarma',
+      mobileNumber: cancellationContext.mobileNumber || '9437012345'
     };
 
     setCompletedCancelRecord(finalRecord);
@@ -1292,15 +1294,15 @@ export default function IdsDesktopShell({
     setCheckInRegistrationOpen(false);
     const checkedInRecord = {
       resNo: checkInData.resNo || '271',
-      roomNo: checkInData.roomNo || '516',
+      roomNo: checkInData.roomNo || '201',
       regNo: checkInData.regNo || '581',
       type: selectedBookingForCheckin?.type || 'SUI',
       guestName: `${checkInData.guest1?.title || 'Mr'} ${checkInData.guest1?.lastName || 'Biswakarma'} ${checkInData.guest1?.firstName || 'Santosh'}`,
       companyName: selectedBookingForCheckin?.companyName || 'Mahindra & Mahindra Limited',
-      rate: checkInData.rate || '6,500.00',
+      rate: checkInData.rate || '3,250.00',
       planAmt: checkInData.planAmt || '700.00',
-      arrivalDate: checkInData.arrivalDate || '14-JAN-2022',
-      departureDate: checkInData.departureDate || '16-JAN-2022',
+      arrivalDate: checkInData.arrivalDate || INITIAL_ACCOUNTING_DATE,
+      departureDate: checkInData.departureDate || NEXT_ACCOUNTING_DATE,
       nation: 'IND',
       user: 'MANAGER',
       totalGuests: checkInData.totalGuests || 2
@@ -1326,15 +1328,15 @@ export default function IdsDesktopShell({
   const handleCompleteExpressCheckin = (data) => {
     const record = {
       resNo: data.resNo || '274',
-      roomNo: data.roomNo || '401',
+      roomNo: data.roomNo || '203',
       regNo: data.regNo1 || '585',
       type: data.type || 'EXE',
-      guestName: `${data.guest1?.title || 'Mr'} ${data.guest1?.name || 'Khan Pravez'}`,
-      companyName: 'Corporate FIT',
-      rate: data.rate || '4,500.00',
-      planAmt: data.planAmt || '500.00',
-      arrivalDate: data.arrivalDate || '16-JAN-2022',
-      departureDate: data.departureDate || '18-JAN-2022',
+      guestName: `${data.guest1?.title || 'Mr'} ${data.guest1?.name || 'Vikram Patel'}`,
+      companyName: 'Utkal Alumina International Ltd',
+      rate: data.rate || '2,050.00',
+      planAmt: data.planAmt || '300.00',
+      arrivalDate: data.arrivalDate || INITIAL_ACCOUNTING_DATE,
+      departureDate: data.departureDate || NEXT_ACCOUNTING_DATE,
       nation: 'IND',
       user: 'MANAGER',
       totalGuests: data.pax || 2
@@ -1358,49 +1360,49 @@ export default function IdsDesktopShell({
 
   // Video 07: Group Express Check-In Workflow Handler
   const handleCompleteGroupCheckin = (data) => {
-    const rooms = data.rooms || ['415', '501', '515'];
+    const rooms = data.rooms || ['201', '205', '207'];
     const newRecords = [
       {
         resNo: data.resNo || '276',
-        roomNo: '415',
+        roomNo: '201',
         regNo: '613',
         type: data.type || 'EXE',
-        guestName: 'Kumar Anil',
-        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
-        rate: '4,250.00',
+        guestName: 'Anil Kumar',
+        companyName: data.company || 'COM0003 - JK Paper Mills Ltd',
+        rate: '2,050.00',
         planAmt: '0.00',
-        arrivalDate: data.arrivalDate || '16-JAN-2022',
-        departureDate: data.departureDate || '18-JAN-2022',
+        arrivalDate: data.arrivalDate || INITIAL_ACCOUNTING_DATE,
+        departureDate: data.departureDate || NEXT_ACCOUNTING_DATE,
         nation: 'IND',
         user: 'MANAGER',
         totalGuests: 2
       },
       {
         resNo: data.resNo || '276',
-        roomNo: '501',
+        roomNo: '205',
         regNo: '615',
         type: data.type || 'EXE',
-        guestName: 'Anil Kumar Group',
-        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
-        rate: '4,250.00',
+        guestName: 'JK Paper Delegation',
+        companyName: data.company || 'COM0003 - JK Paper Mills Ltd',
+        rate: '2,050.00',
         planAmt: '0.00',
-        arrivalDate: data.arrivalDate || '16-JAN-2022',
-        departureDate: data.departureDate || '18-JAN-2022',
+        arrivalDate: data.arrivalDate || INITIAL_ACCOUNTING_DATE,
+        departureDate: data.departureDate || NEXT_ACCOUNTING_DATE,
         nation: 'IND',
         user: 'MANAGER',
         totalGuests: 2
       },
       {
         resNo: data.resNo || '276',
-        roomNo: '515',
+        roomNo: '207',
         regNo: '617',
         type: data.type || 'EXE',
-        guestName: 'Anil Kumar Group',
-        companyName: data.company || 'COM0003 - Varun Beverages Ltd',
-        rate: '4,250.00',
+        guestName: 'JK Paper Delegation',
+        companyName: data.company || 'COM0003 - JK Paper Mills Ltd',
+        rate: '2,050.00',
         planAmt: '0.00',
-        arrivalDate: data.arrivalDate || '16-JAN-2022',
-        departureDate: data.departureDate || '18-JAN-2022',
+        arrivalDate: data.arrivalDate || INITIAL_ACCOUNTING_DATE,
+        departureDate: data.departureDate || NEXT_ACCOUNTING_DATE,
         nation: 'IND',
         user: 'MANAGER',
         totalGuests: 2
@@ -1427,15 +1429,15 @@ export default function IdsDesktopShell({
   const handleCompleteUpgradeCheckin = (data) => {
     const record = {
       resNo: data.resNo || '276',
-      roomNo: data.roomNo || '316',
+      roomNo: data.roomNo || '309',
       regNo: data.regNo || '619',
       type: data.roomType || 'SUI',
-      guestName: data.guestName || 'Anil Kumar Group',
-      companyName: data.company || 'COM0003 - Varun Beverages Ltd',
-      rate: data.rate || '4,250.00',
+      guestName: data.guestName || 'JK Paper Delegation',
+      companyName: data.company || 'COM0003 - JK Paper Mills Ltd',
+      rate: data.rate || '3,250.00',
       planAmt: '0.00',
-      arrivalDate: data.arrivalDate || '16-JAN-2022',
-      departureDate: data.departureDate || '18-JAN-2022',
+      arrivalDate: data.arrivalDate || INITIAL_ACCOUNTING_DATE,
+      departureDate: data.departureDate || NEXT_ACCOUNTING_DATE,
       nation: 'IND',
       user: 'MANAGER',
       totalGuests: 2,
@@ -1443,7 +1445,7 @@ export default function IdsDesktopShell({
       upgradeCategory: data.roomType || 'SUI',
       bookedCategory: data.bookedType || 'EXE',
       authorisedBy: data.authorisedBy || 'Manager',
-      remarks: data.remarks || 'Executive'
+      remarks: data.remarks || 'Executive Suite Upgrade'
     };
 
     setCheckedInList(prev => [record, ...prev]);
@@ -1455,7 +1457,7 @@ export default function IdsDesktopShell({
           isCheckedIn: true,
           status: 'Checked In',
           blocked: false,
-          roomNo: '316',
+          roomNo: '309',
           category: 'SUI'
         };
       }
@@ -1827,23 +1829,23 @@ export default function IdsDesktopShell({
               {
                 resNo: bookingData.reservationNo || '276',
                 title: 'Mr',
-                guestName: bookingData.guestName || 'Anil Kumar Group',
+                guestName: bookingData.guestName || 'JK Paper Delegation',
                 contactPerson: bookingData.contactPerson || 'Mr. Anil Kumar',
                 booker: bookingData.booker || 'Mr Sharma',
                 groupCode: bookingData.groupCode || '003',
-                groupName: bookingData.groupName || 'Anil Kumar Group',
-                companyName: bookingData.company || 'Varun Beverages Ltd',
+                groupName: bookingData.groupName || 'JK Paper Technical Delegation',
+                companyName: bookingData.company || 'JK Paper Mills Ltd',
                 companyCode: bookingData.companyCode || 'COM0003',
-                roomNo: '415, 501, 515',
-                rooms: ['415', '501', '515'],
+                roomNo: '201, 205, 207',
+                rooms: ['201', '205', '207'],
                 type: 'EXE',
-                confirm: '0+5+0',
+                confirm: '0+3+0',
                 provisional: '0+0+0',
-                pax: '10+3+0',
-                arrivalDate: bookingData.arrivalDate || '16-JAN-2022 14:00',
-                departureDate: bookingData.departureDate || '18-JAN-2022 12:00',
-                depositAmount: 0,
-                rate: bookingData.rate || '4,250.00',
+                pax: '6+0+0',
+                arrivalDate: bookingData.arrivalDate || `${INITIAL_ACCOUNTING_DATE} 14:00`,
+                departureDate: bookingData.departureDate || `${NEXT_ACCOUNTING_DATE} 12:00`,
+                depositAmount: 6000,
+                rate: bookingData.rate || '2,050.00',
                 status: 'Confirmed Group',
                 blocked: false,
                 isCancelled: false,
@@ -1851,22 +1853,22 @@ export default function IdsDesktopShell({
               },
               ...prev.filter(r => r.resNo !== (bookingData.reservationNo || '276'))
             ]);
-            alert(`✅ Group Reservation #${bookingData.reservationNo || '276'} (Group: ${bookingData.groupName || 'Anil Kumar Group'}) confirmed with 5 Executive Rooms!`);
+            alert(`✅ Group Reservation #${bookingData.reservationNo || '276'} (Group: ${bookingData.groupName || 'JK Paper Technical Delegation'}) confirmed with 3 Executive Rooms!`);
           } else {
             setReservations(prev => [
               {
                 resNo: bookingData.reservationNo || `${272 + prev.length}`,
                 title: 'Mr',
                 guestName: bookingData.guestName,
-                companyName: bookingData.company || 'FIT',
+                companyName: bookingData.company || 'Direct FIT',
                 companyCode: 'COM0001',
                 roomNo: '',
                 type: bookingData.roomType || 'DLX',
                 confirm: '1+0+0',
                 provisional: '0+0+0',
                 pax: `${bookingData.adults || 1}+0+0`,
-                arrivalDate: bookingData.arrivalDate || '14-JAN-2022',
-                departureDate: bookingData.departureDate || '16-JAN-2022',
+                arrivalDate: bookingData.arrivalDate || INITIAL_ACCOUNTING_DATE,
+                departureDate: bookingData.departureDate || NEXT_ACCOUNTING_DATE,
                 depositAmount: parseFloat(bookingData.advancePaid) || 0,
                 status: 'Confirmed',
                 blocked: false,
@@ -2042,7 +2044,7 @@ export default function IdsDesktopShell({
         booking={selectedBookingForCheckin}
         onSelectGuest={handleSelectGuestForRegistration}
         onRelease={(b) => {
-          alert(`Room ${b?.roomNo || '516'} released from assignment.`);
+          alert(`Room ${b?.roomNo || '201'} released from assignment.`);
           setCheckinGuestListOpen(false);
         }}
       />
@@ -2060,6 +2062,7 @@ export default function IdsDesktopShell({
         isOpen={detailedPositionOpen}
         onClose={() => setDetailedPositionOpen(false)}
         checkedInList={checkedInList}
+        accountingDate={accountingDate}
       />
 
       {/* Video 05, 06, 08 & 09: Room Status V6.5.002.1 Rack Console Modal (Frames 018–035 & 060) */}
@@ -2067,7 +2070,7 @@ export default function IdsDesktopShell({
         isOpen={roomRackConsoleOpen}
         onClose={() => setRoomRackConsoleOpen(false)}
         checkedInList={checkedInList}
-        occupiedRoom={checkedInList.length > 0 ? checkedInList[0].roomNo : '516'}
+        occupiedRoom={checkedInList.length > 0 ? checkedInList[0].roomNo : '201'}
         guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
         clearedRooms={clearedDirtyRooms}
         onClearSingleRoom={(roomNo) => {
@@ -2538,7 +2541,7 @@ export default function IdsDesktopShell({
         currentAccountingDate={accountingDate}
         initialStep={nightAuditInitialStep}
         onCompleteNightAudit={(auditInfo) => {
-          const newDate = typeof auditInfo === 'string' ? auditInfo : (auditInfo?.newDate || '26-JAN-2022');
+          const newDate = typeof auditInfo === 'string' ? auditInfo : (auditInfo?.newDate || NEXT_ACCOUNTING_DATE);
           setAccountingDate(newDate);
         }}
       />
@@ -2596,7 +2599,7 @@ export default function IdsDesktopShell({
               return {
                 ...g,
                 pax: 2,
-                paxList: [g.guestName || 'MS BASU ANIRUDH', secondPaxRecord.name]
+                paxList: [g.guestName || 'Mr Rajesh Sharma', secondPaxRecord.name]
               };
             }
             return g;
@@ -2700,8 +2703,8 @@ export default function IdsDesktopShell({
                 billNo: reinstatedRecord.billNo || '511',
                 balance: reinstatedRecord.billAmount || 5190,
                 category: reinstatedRecord.category || 'EXECUTIVE (EXE)',
-                arrivalDate: reinstatedRecord.arrivalDate || '27-JAN-2022 12:00',
-                departureDate: reinstatedRecord.departureDate || '28-JAN-2022 12:00',
+                arrivalDate: reinstatedRecord.arrivalDate || `${INITIAL_ACCOUNTING_DATE} 12:00`,
+                departureDate: reinstatedRecord.departureDate || `${NEXT_ACCOUNTING_DATE} 12:00`,
                 pax: 1,
                 status: 'In-House'
               }
@@ -3047,8 +3050,8 @@ export default function IdsDesktopShell({
         onOpenRoomVerificationReport={() => {
           setCrystalReportType('room-verification');
           setCrystalReportData({
-            asOnDate: accountingDate || '27/01/2022',
-            asOnTime: '15:28:44'
+            asOnDate: accountingDate || INITIAL_ACCOUNTING_DATE,
+            asOnTime: new Date().toTimeString().slice(0, 8)
           });
           setCrystalReportModalOpen(true);
         }}

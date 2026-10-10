@@ -69,8 +69,8 @@ export function IdsCancelBookingDialog({
                   <td style={{ textAlign: 'center' }}>DEM</td>
                   <td style={{ textAlign: 'center', fontWeight: 600 }}>{booking.type || 'EXE'}</td>
                   <td style={{ fontWeight: 600, color: '#0A246A' }}>{booking.title || 'Mr'} {booking.guestName}</td>
-                  <td>{booking.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2022'}</td>
-                  <td>{booking.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2022'}</td>
+                  <td>{booking.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2026'}</td>
+                  <td>{booking.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2026'}</td>
                   <td style={{ textAlign: 'center' }}>1</td>
                   <td style={{ textAlign: 'center' }}>{booking.pax || '1'}</td>
                 </tr>
@@ -248,9 +248,9 @@ export function IdsDepositRefundModal({
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 110px 100px 110px', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Arrival Date</span>
-              <input className="ids-input" value={booking.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2022'} readOnly />
+              <input className="ids-input" value={booking.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2026'} readOnly />
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Departure Date</span>
-              <input className="ids-input" value={booking.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2022'} readOnly />
+              <input className="ids-input" value={booking.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2026'} readOnly />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 60px 80px 60px 100px 1fr', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
@@ -375,7 +375,7 @@ export function IdsDepositRefundModal({
               <span>User: <strong>MANAGER</strong></span>
             </div>
             <div>
-              <span>Last Updated: <strong>14-JAN-2022 20:14</strong></span>
+              <span>Last Updated: <strong>14-JAN-2026 20:14</strong></span>
             </div>
           </div>
 
@@ -671,7 +671,7 @@ export function IdsCancellationVoucherModal({
 
           {/* Metadata Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '14px', fontSize: '11px' }}>
-            <div><strong>Cancellation No:</strong> {cancelRecord.cancellationNo || 'CAN-2022-0270'}</div>
+            <div><strong>Cancellation No:</strong> {cancelRecord.cancellationNo || 'CAN-2026-0270'}</div>
             <div><strong>Date & Time:</strong> {new Date().toLocaleString()}</div>
             <div><strong>Original Res. #:</strong> {cancelRecord.resNo || '270'}</div>
             <div><strong>Status:</strong> <span style={{ color: '#A02020', fontWeight: 700 }}>CANCELLED</span></div>
@@ -691,10 +691,10 @@ export function IdsCancellationVoucherModal({
             <span>{cancelRecord.type || 'EXECUTIVE'} (Room #{cancelRecord.roomNo || '515'} - Inventory Released)</span>
 
             <span>Arrival Date:</span>
-            <span>{cancelRecord.arrivalDate || '14-JAN-2022'}</span>
+            <span>{cancelRecord.arrivalDate || '14-JAN-2026'}</span>
 
             <span>Departure Date:</span>
-            <span>{cancelRecord.departureDate || '17-JAN-2022'}</span>
+            <span>{cancelRecord.departureDate || '17-JAN-2026'}</span>
 
             <span>Reason:</span>
             <strong>{cancelRecord.reason || 'Cancelled by Customer'}</strong>

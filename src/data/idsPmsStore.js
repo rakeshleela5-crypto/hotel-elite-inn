@@ -1,43 +1,83 @@
 // IDS Fortune NEXT Unified Relational PMS State & Accounting Store
-// Single source of truth for all 44 video modules & live hotel operations
+// Live source of truth for Hotel Elite Inn Front Office & Staff Operations
 
 import { HOTEL_CONFIG } from './hotelData';
 
-export const INITIAL_ACCOUNTING_DATE = '25-JAN-2022';
-export const NEXT_ACCOUNTING_DATE = '26-JAN-2022';
+// Dynamic Date Helpers for Live Hotel Operations
+export function getFormattedPmsDate(date = new Date()) {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}
 
-// 1. Corporate Master Directory (Videos 28, 31, 32, 43)
+export function getFormattedPmsDateTime(date = new Date()) {
+  const d = new Date(date);
+  const pmsDate = getFormattedPmsDate(d);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${pmsDate} ${hours}:${minutes}`;
+}
+
+export function getFormattedPmsMonthYear(date = new Date()) {
+  const d = new Date(date);
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  const month = months[d.getMonth()];
+  const year = d.getFullYear();
+  return `${month}-${year}`;
+}
+
+// Live Current Accounting Date (Dynamic)
+export const INITIAL_ACCOUNTING_DATE = getFormattedPmsDate();
+export const CURRENT_ACCOUNTING_MONTH_YEAR = getFormattedPmsMonthYear();
+const nextDay = new Date();
+nextDay.setDate(nextDay.getDate() + 1);
+export const NEXT_ACCOUNTING_DATE = getFormattedPmsDate(nextDay);
+
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+const dateYesterday = getFormattedPmsDate(yesterday);
+
+const threeDaysAgo = new Date();
+threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+const dateThreeDaysAgo = getFormattedPmsDate(threeDaysAgo);
+
+const currentYear = new Date().getFullYear();
+
+// 1. Corporate Master Directory (Authentic Rayagada & Regional Industrial Partners)
 export const INITIAL_COMPANIES = [
   {
     code: 'COM0001',
-    name: 'Tata Consultancy Services Ltd',
-    shortName: 'TCS',
-    address: 'TCS House, Raveline Street, Fort, Mumbai - 400001',
-    gstin: '27AAACT2727Q1ZB',
-    pan: 'AAACT2727Q',
-    contactPerson: 'Mr. Rajesh Verma',
-    designation: 'Admin Manager',
-    phone: '022-67789999',
-    email: 'travel.desk@tcs.com',
-    creditLimit: 200000,
+    name: 'Ashok Leyland Ltd',
+    shortName: 'ASHOK LEYLAND',
+    address: 'Regional Transit Office, Rayagada Road, Odisha - 765017',
+    gstin: '21AAACA1028L1ZV',
+    pan: 'AACA1028L',
+    contactPerson: 'Mr. Sunil Mohanty',
+    designation: 'Fleet Manager',
+    phone: '06856-224410',
+    email: 'travel.east@ashokleyland.com',
+    creditLimit: 250000,
     creditDays: 30,
     segment: 'CVG',
-    billingType: 'BTC', // Bill to Company
+    billingType: 'BTC',
     status: 'Active',
     linkedRateTable: '100'
   },
   {
     code: 'COM0002',
-    name: 'Infosys Limited',
-    shortName: 'INFOSYS',
-    address: 'Electronics City, Hosur Road, Bangalore - 560100',
-    gstin: '29AAACI4818K1ZW',
-    pan: 'AAACI4818K',
-    contactPerson: 'Ms. Priya Nair',
-    designation: 'Procurement Lead',
-    phone: '080-28520261',
-    email: 'hotels@infosys.com',
-    creditLimit: 150000,
+    name: 'Linde India Ltd (Industrial Gases)',
+    shortName: 'LINDE INDIA',
+    address: 'Oxygen Plant Division, Muniguda Industrial Zone, Rayagada - 765020',
+    gstin: '21AAACL2014M1Z2',
+    pan: 'AAACL2014M',
+    contactPerson: 'Mr. Ramesh Rao',
+    designation: 'Site Operations Lead',
+    phone: '06856-231900',
+    email: 'guestrelations@linde.com',
+    creditLimit: 300000,
     creditDays: 30,
     segment: 'CVG',
     billingType: 'BTC',
@@ -46,16 +86,16 @@ export const INITIAL_COMPANIES = [
   },
   {
     code: 'COM0003',
-    name: 'Vedanta Limited (Alumina Refinery)',
-    shortName: 'VEDANTA',
-    address: 'Lanjigarh, Dist. Kalahandi / Rayagada, Odisha - 766027',
-    gstin: '21AAACV0552Q1ZN',
-    pan: 'AAACV0552Q',
-    contactPerson: 'Mr. S. Mohanty',
-    designation: 'General Manager - Admin',
-    phone: '06677-247000',
-    email: 'admin.lanjigarh@vedanta.co.in',
-    creditLimit: 300000,
+    name: 'Utkal Alumina International Ltd',
+    shortName: 'UTKAL ALUMINA',
+    address: 'Doraguda, Kucheipadar, Dist. Rayagada, Odisha - 765015',
+    gstin: '21AAACU4921K1ZP',
+    pan: 'AAACU4921K',
+    contactPerson: 'Mr. Vikram Patel',
+    designation: 'Procurement & Protocol Head',
+    phone: '06856-235000',
+    email: 'admin.guest@adityabirla.com',
+    creditLimit: 500000,
     creditDays: 45,
     segment: 'CVG',
     billingType: 'BTC',
@@ -70,81 +110,99 @@ export const INITIAL_COMPANIES = [
     gstin: '21AAACJ0118P1ZX',
     pan: 'AAACJ0118P',
     contactPerson: 'Mr. B. K. Padhi',
-    designation: 'Senior Manager',
+    designation: 'Senior General Manager',
     phone: '06856-222048',
     email: 'guestrelations@jkpaper.com',
-    creditLimit: 250000,
+    creditLimit: 400000,
     creditDays: 30,
     segment: 'CVG',
     billingType: 'BTC',
     status: 'Active',
     linkedRateTable: '100'
+  },
+  {
+    code: 'COM0005',
+    name: 'Vedanta Limited (Alumina Refinery)',
+    shortName: 'VEDANTA',
+    address: 'Lanjigarh, Dist. Kalahandi / Rayagada, Odisha - 766027',
+    gstin: '21AAACV0552Q1ZN',
+    pan: 'AAACV0552Q',
+    contactPerson: 'Mr. S. Mohanty',
+    designation: 'General Manager - Admin',
+    phone: '06677-247000',
+    email: 'admin.lanjigarh@vedanta.co.in',
+    creditLimit: 500000,
+    creditDays: 45,
+    segment: 'CVG',
+    billingType: 'BTC',
+    status: 'Active',
+    linkedRateTable: '102'
   }
 ];
 
 // 2. Business Sources Master (Video 29)
 export const INITIAL_BUSINESS_SOURCES = [
-  { code: 'OTA', name: 'Online Travel Agent', shortName: 'OTA', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'WAL', name: 'Walk-In Direct', shortName: 'WALKIN', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'WEB', name: 'Hotel Direct Website (hotel-elite-inn.pages.dev)', shortName: 'DIRECT-WEB', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'URO', name: 'Unit Reservation Office', shortName: 'URO', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'USO', name: 'Unit Sales Office', shortName: 'USO', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'MMT', name: 'MakeMyTrip / Goibibo Direct OTA', shortName: 'MMT', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'BKG', name: 'Booking.com B.V.', shortName: 'BOOKING', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'DIR', name: 'Direct Call / Front Desk Telephone', shortName: 'PHONE', applicableFrom: '01-JAN-2022', status: 'Active' }
+  { code: 'OTA', name: 'Online Travel Agent', shortName: 'OTA', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'WAL', name: 'Walk-In Direct', shortName: 'WALKIN', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'WEB', name: 'Hotel Direct Website (hotel-elite-inn.pages.dev)', shortName: 'DIRECT-WEB', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'URO', name: 'Unit Reservation Office', shortName: 'URO', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'USO', name: 'Unit Sales Office', shortName: 'USO', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'MMT', name: 'MakeMyTrip / Goibibo Direct OTA', shortName: 'MMT', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'BKG', name: 'Booking.com B.V.', shortName: 'BOOKING', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'DIR', name: 'Direct Call / Front Desk Telephone', shortName: 'PHONE', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' }
 ];
 
 // 3. Market Segments Master (Video 30)
 export const INITIAL_MARKET_SEGMENTS = [
-  { code: 'CVG', name: 'Corporate Business / Commercial', shortName: 'CORP', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'FIT', name: 'Free Individual Traveler (Leisure/Direct)', shortName: 'FIT', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'GRP', name: 'Group Tour & Marriage Delegation', shortName: 'GROUP', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'GOV', name: 'Government Official / PSU Protocol', shortName: 'GOVT', applicableFrom: '01-JAN-2022', status: 'Active' },
-  { code: 'AIR', name: 'Railway / Airlines Crew Accommodation', shortName: 'CREW', applicableFrom: '01-JAN-2022', status: 'Active' }
+  { code: 'CVG', name: 'Corporate Business / Commercial', shortName: 'CORP', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'FIT', name: 'Free Individual Traveler (Leisure/Direct)', shortName: 'FIT', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'GRP', name: 'Group Tour & Delegation', shortName: 'GROUP', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'GOV', name: 'Government Official / PSU Protocol', shortName: 'GOVT', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' },
+  { code: 'AIR', name: 'Railway / Station Transit Guest', shortName: 'TRANSIT', applicableFrom: `01-JAN-${currentYear}`, status: 'Active' }
 ];
 
-// 4. Negotiated Corporate Contract Rates (Videos 31 & 32)
+// 4. Negotiated Corporate Contract Rates (Aligned with Hotel Elite Inn authentic room tiers)
 export const INITIAL_CONTRACT_RATES = [
   {
     tableNo: '100',
-    description: 'TCS & JK Paper Corporate Preferred Tariff',
+    description: 'Ashok Leyland & JK Paper Corporate Preferred Tariff',
     companyCode: 'COM0001',
-    validFrom: '01-JAN-2022',
-    validTo: '31-DEC-2022',
+    validFrom: `01-JAN-${currentYear}`,
+    validTo: `31-DEC-${currentYear}`,
     rates: {
-      standard: { single: 1200, double: 1200 },
-      deluxe: { single: 1500, double: 1800 },
-      executive: { single: 1800, double: 2200 },
-      suite: { single: 2800, double: 3200 }
+      standard: { single: 1350, double: 1350 },
+      deluxe: { single: 1650, double: 2050 },
+      executive: { single: 1950, double: 2350 },
+      suite: { single: 3000, double: 3500 }
     },
     plan: 'CP', // Continental Plan (Includes Buffet Breakfast)
     taxInclusive: false
   },
   {
     tableNo: '101',
-    description: 'Infosys Special Corporate Tariff',
+    description: 'Linde India Special Operations Tariff',
     companyCode: 'COM0002',
-    validFrom: '01-JAN-2022',
-    validTo: '31-DEC-2022',
+    validFrom: `01-JAN-${currentYear}`,
+    validTo: `31-DEC-${currentYear}`,
     rates: {
-      standard: { single: 1250, double: 1250 },
-      deluxe: { single: 1550, double: 1900 },
-      executive: { single: 1900, double: 2300 },
-      suite: { single: 2900, double: 3400 }
+      standard: { single: 1350, double: 1350 },
+      deluxe: { single: 1650, double: 2050 },
+      executive: { single: 1950, double: 2350 },
+      suite: { single: 3000, double: 3500 }
     },
     plan: 'CP',
     taxInclusive: false
   },
   {
     tableNo: '102',
-    description: 'Vedanta Alumina Resident Vendor Agreement',
+    description: 'Utkal Alumina & Vedanta Resident Agreement',
     companyCode: 'COM0003',
-    validFrom: '01-JAN-2022',
-    validTo: '31-DEC-2022',
+    validFrom: `01-JAN-${currentYear}`,
+    validTo: `31-DEC-${currentYear}`,
     rates: {
-      standard: { single: 1400, double: 1400 },
-      deluxe: { single: 1700, double: 2100 },
-      executive: { single: 2000, double: 2400 },
+      standard: { single: 1350, double: 1350 },
+      deluxe: { single: 1650, double: 2050 },
+      executive: { single: 1950, double: 2350 },
       suite: { single: 3000, double: 3500 }
     },
     plan: 'MAP', // Modified American Plan (Breakfast + Dinner)
@@ -152,17 +210,17 @@ export const INITIAL_CONTRACT_RATES = [
   }
 ];
 
-// 5. Package Rates Master (Video 40)
+// 5. Package Rates Master
 export const INITIAL_PACKAGE_RATES = [
   {
     code: 'PKG-CORP',
-    name: 'Corporate Executive Bed & Board Package',
+    name: 'Executive Residency Bed & Board Package',
     tier: 'executive',
-    totalTariff: 2950,
+    totalTariff: 2650,
     split: {
       roomTariff: 2050,
-      buffetBreakfast: 300,
-      dinnerBuffet: 600
+      buffetBreakfast: 200,
+      dinnerBuffet: 400
     },
     sacCode: '996311',
     taxRate: 12
@@ -171,11 +229,11 @@ export const INITIAL_PACKAGE_RATES = [
     code: 'PKG-TEMPLE',
     name: 'Maa Majhighariani Darshan Pilgrimage Package',
     tier: 'deluxe',
-    totalTariff: 3600,
+    totalTariff: 3200,
     split: {
       roomTariff: 1750,
       breakfast: 250,
-      darshanCabAssistance: 1200,
+      darshanCabAssistance: 800,
       eveningSnacks: 400
     },
     sacCode: '996311',
@@ -183,369 +241,339 @@ export const INITIAL_PACKAGE_RATES = [
   }
 ];
 
-// 6. In-House Occupied Rooms & Active Guest Folios (Videos 05, 10, 14, 15, 18, 21–27, 44)
+// 6. In-House Occupied Rooms & Active Guest Folios (27 Authentic Physical Rooms)
 export const INITIAL_INHOUSE_GUESTS = [
   {
-    roomNo: '314',
-    folioNo: '314/1',
-    regNo: '612',
-    guestName: 'MR RAJESH SHARMA',
+    roomNo: '102',
+    folioNo: '102/1',
+    regNo: '501',
+    guestName: 'MR SUNIL MOHANTY',
     gender: 'M',
-    phone: '+91-9845012345',
-    email: 'r.sharma@tcs.com',
+    phone: '+91-9437012345',
+    email: 'sunil.mohanty@ashokleyland.com',
     companyCode: 'COM0001',
-    companyName: 'Tata Consultancy Services Ltd',
-    gstin: '27AAACT2727Q1ZB',
+    companyName: 'Ashok Leyland Ltd',
+    gstin: '21AAACA1028L1ZV',
     pax: 1,
-    paxList: ['MR RAJESH SHARMA'],
+    paxList: ['MR SUNIL MOHANTY'],
+    tier: 'deluxe',
+    roomType: 'DLX',
+    tariff: 1750,
+    discountPct: 0,
+    planCode: 'CP',
+    arrivalDate: dateYesterday,
+    departureDate: NEXT_ACCOUNTING_DATE,
+    expectedCheckoutTime: '12:00',
+    balance: 1750,
+    totalCharges: 3500,
+    depositAmount: 1750,
+    stopPosting: false,
+    vipStatus: 'Corporate',
+    idType: 'Aadhaar Card',
+    idNumber: '7845-9012-3456',
+    remarks: 'Floor 1, Ground proximity required'
+  },
+  {
+    roomNo: '105',
+    folioNo: '105/1',
+    regNo: '502',
+    guestName: 'MR RAMESH RAO',
+    gender: 'M',
+    phone: '+91-9861054321',
+    email: 'ramesh.rao@linde.com',
+    companyCode: 'COM0002',
+    companyName: 'Linde India Ltd',
+    gstin: '21AAACL2014M1Z2',
+    pax: 2,
+    paxList: ['MR RAMESH RAO', 'MR K. S. PATNAIK'],
     tier: 'executive',
     roomType: 'EXE',
     tariff: 2050,
     discountPct: 0,
     planCode: 'CP',
-    arrivalDate: '23-JAN-2022',
-    departureDate: '26-JAN-2022',
+    arrivalDate: dateYesterday,
+    departureDate: NEXT_ACCOUNTING_DATE,
     expectedCheckoutTime: '12:00',
-    balance: 5650,
-    totalCharges: 7650,
-    depositAmount: 2000,
+    balance: 4100,
+    totalCharges: 4100,
+    depositAmount: 0,
     stopPosting: false,
-    vipStatus: 'VIP-2',
+    vipStatus: 'Corporate',
     idType: 'Aadhaar Card',
-    idNumber: '7845-9012-3456',
-    remarks: 'High floor, early breakfast required'
+    idNumber: '3344-5566-7788',
+    remarks: 'Twin Bed Executive setup'
   },
   {
-    roomNo: '312',
-    folioNo: '312/1',
-    regNo: '615',
-    guestName: 'MS BASU ANIRUDH',
-    gender: 'F',
-    phone: '+91-9437012389',
-    email: 'basu.anirudh@gmail.com',
-    companyCode: '',
-    companyName: '',
-    gstin: '',
-    pax: 1,
-    paxList: ['MS BASU ANIRUDH'],
-    tier: 'executive',
-    roomType: 'EXE',
-    tariff: 2500,
-    discountPct: 0,
-    planCode: 'EP',
-    arrivalDate: '24-JAN-2022',
-    departureDate: '26-JAN-2022',
-    expectedCheckoutTime: '11:00',
-    balance: 13460,
-    totalCharges: 13460,
-    depositAmount: 0,
-    stopPosting: false,
-    vipStatus: 'Regular',
-    idType: 'Passport',
-    idNumber: 'Z5891240',
-    remarks: 'Second occupant arriving evening'
-  },
-  {
-    roomNo: '311',
-    folioNo: '311/1',
-    regNo: '617',
-    guestName: 'MRS DEURI KABITA',
-    gender: 'F',
-    phone: '+91-9778019922',
-    email: 'kabita.deuri@vedanta.co.in',
-    companyCode: 'COM0003',
-    companyName: 'Vedanta Limited',
-    gstin: '21AAACV0552Q1ZN',
-    pax: 1,
-    paxList: ['MRS DEURI KABITA'],
-    tier: 'deluxe',
-    roomType: 'DLX',
-    tariff: 1750,
-    discountPct: 10,
-    planCode: 'CP',
-    arrivalDate: '24-JAN-2022',
-    departureDate: '27-JAN-2022',
-    expectedCheckoutTime: '12:00',
-    balance: 3500,
-    totalCharges: 3500,
-    depositAmount: 0,
-    stopPosting: false,
-    vipStatus: 'Regular',
-    idType: 'Driving License',
-    idNumber: 'OD-05-2018-9901',
-    remarks: 'Quiet room away from lift'
-  },
-  {
-    roomNo: '201',
-    folioNo: '201/1',
-    regNo: '608',
-    guestName: 'MR VIKRAM SINGHANIA',
+    roomNo: '203',
+    folioNo: '203/1',
+    regNo: '503',
+    guestName: 'MR VIKRAM PATEL',
     gender: 'M',
     phone: '+91-9937088122',
-    email: 'vikram.singhania@jkpaper.com',
+    email: 'vikram.patel@adityabirla.com',
+    companyCode: 'COM0003',
+    companyName: 'Utkal Alumina International Ltd',
+    gstin: '21AAACU4921K1ZP',
+    pax: 1,
+    paxList: ['MR VIKRAM PATEL'],
+    tier: 'executive',
+    roomType: 'EXE',
+    tariff: 2050,
+    discountPct: 0,
+    planCode: 'MAP',
+    arrivalDate: dateThreeDaysAgo,
+    departureDate: NEXT_ACCOUNTING_DATE,
+    expectedCheckoutTime: '11:00',
+    balance: 3150,
+    totalCharges: 6150,
+    depositAmount: 3000,
+    stopPosting: false,
+    vipStatus: 'VIP-1',
+    idType: 'Aadhaar Card',
+    idNumber: '8910-1122-3344',
+    remarks: 'Late check-in requested on arrival'
+  },
+  {
+    roomNo: '206',
+    folioNo: '206/1',
+    regNo: '504',
+    guestName: 'MS SUBHASHREE JENA',
+    gender: 'F',
+    phone: '+91-9778019922',
+    email: 'subhashree.jena@jkpaper.com',
     companyCode: 'COM0004',
     companyName: 'JK Paper Mills Ltd',
     gstin: '21AAACJ0118P1ZX',
     pax: 1,
-    paxList: ['MR VIKRAM SINGHANIA'],
-    tier: 'suite',
-    roomType: 'SUI',
-    tariff: 3250,
-    discountPct: 0,
-    planCode: 'MAP',
-    arrivalDate: '22-JAN-2022',
-    departureDate: '26-JAN-2022',
-    expectedCheckoutTime: '10:00',
-    balance: 4250,
-    totalCharges: 9250,
-    depositAmount: 5000,
-    stopPosting: true, // Video 27: Stop Posting Active!
-    vipStatus: 'VIP-1',
-    idType: 'Aadhaar Card',
-    idNumber: '8910-1122-3344',
-    remarks: 'Stop posting applied due to bill threshold limit'
-  },
-  {
-    roomNo: '202',
-    folioNo: '202/1',
-    regNo: '610',
-    guestName: 'MR SUNIL ROY',
-    gender: 'M',
-    phone: '+91-9861044321',
-    email: 'sunilroy@infosys.com',
-    companyCode: 'COM0002',
-    companyName: 'Infosys Limited',
-    gstin: '29AAACI4818K1ZW',
-    pax: 1,
-    paxList: ['MR SUNIL ROY'],
+    paxList: ['MS SUBHASHREE JENA'],
     tier: 'deluxe',
     roomType: 'DLX',
     tariff: 1750,
     discountPct: 0,
-    planCode: 'EP',
-    arrivalDate: '23-JAN-2022',
-    departureDate: '25-JAN-2022',
+    planCode: 'CP',
+    arrivalDate: dateYesterday,
+    departureDate: INITIAL_ACCOUNTING_DATE,
     expectedCheckoutTime: '12:00',
-    balance: 2500,
-    totalCharges: 2500,
+    balance: 1750,
+    totalCharges: 1750,
     depositAmount: 0,
     stopPosting: false,
     vipStatus: 'Regular',
-    idType: 'Aadhaar Card',
-    idNumber: '3344-5566-7788',
-    remarks: ''
+    idType: 'Driving License',
+    idNumber: 'OD-05-2023-9901',
+    remarks: 'Quiet deluxe room'
   },
   {
-    roomNo: '205',
-    folioNo: '205/1',
-    regNo: '614',
-    guestName: 'MR ANAND VERMA',
+    roomNo: '301',
+    folioNo: '301/1',
+    regNo: '505',
+    guestName: 'MR TENZING NORBU',
     gender: 'M',
-    phone: '+91-9437199001',
-    email: 'anand.verma@gmail.com',
-    companyCode: '',
-    companyName: '',
-    gstin: '',
+    phone: '+91-9811099233',
+    email: 'admin.lanjigarh@vedanta.co.in',
+    companyCode: 'COM0005',
+    companyName: 'Vedanta Limited',
+    gstin: '21AAACV0552Q1ZN',
     pax: 1,
-    paxList: ['MR ANAND VERMA'],
+    paxList: ['MR TENZING NORBU'],
     tier: 'executive',
     roomType: 'EXE',
     tariff: 2050,
     discountPct: 0,
     planCode: 'CP',
-    arrivalDate: '24-JAN-2022',
-    departureDate: '26-JAN-2022',
+    arrivalDate: dateThreeDaysAgo,
+    departureDate: NEXT_ACCOUNTING_DATE,
     expectedCheckoutTime: '12:00',
-    balance: 5190,
-    totalCharges: 5190,
-    depositAmount: 0,
+    balance: 2050,
+    totalCharges: 6150,
+    depositAmount: 4100,
     stopPosting: false,
-    vipStatus: 'Regular',
-    idType: 'Voter ID',
-    idNumber: 'OD/27/102/09912',
-    remarks: ''
+    vipStatus: 'Corporate',
+    idType: 'Passport',
+    idNumber: 'Z8912401',
+    remarks: 'Floor 3, Executive King'
   },
   {
-    roomNo: '406',
-    folioNo: '406/1',
-    regNo: '601',
-    guestName: 'SHARMA GROUP (DELEGATION LEAD)',
-    gender: 'M',
-    phone: '+91-9811099233',
-    email: 'events@sharmagroup.com',
-    companyCode: '',
-    companyName: 'Sharma Group & Family',
-    gstin: '',
-    pax: 10,
-    paxList: ['MR DEEPAK SHARMA', 'MR ASHOK SHARMA', 'MS RITU SHARMA'],
-    tier: 'executive',
-    roomType: 'EXE',
-    tariff: 20500,
-    discountPct: 15,
-    planCode: 'CP',
-    arrivalDate: '21-JAN-2022',
-    departureDate: '25-JAN-2022',
-    expectedCheckoutTime: '12:00',
-    balance: 0,
-    totalCharges: 61500,
-    depositAmount: 61500,
-    stopPosting: false,
-    vipStatus: 'Group Master',
-    idType: 'PAN Card',
-    idNumber: 'AALPS9011F',
-    remarks: 'Video 16: Bulk checkout ready for 10 rooms'
-  },
-  {
-    roomNo: '415',
-    folioNo: '415/1',
-    regNo: '609',
-    guestName: 'MR DEEPAK JOSHI',
+    roomNo: '303',
+    folioNo: '303/1',
+    regNo: '506',
+    guestName: 'MR SATISH MISHRA',
     gender: 'M',
     phone: '+91-9438012999',
-    email: 'deepak.joshi@gmail.com',
+    email: 'satish.mishra@dalmiacement.com',
     companyCode: '',
-    companyName: '',
-    gstin: '',
+    companyName: 'Dalmia Cement Bharat Ltd',
+    gstin: '21AAACD1293K1ZR',
     pax: 1,
-    paxList: ['MR DEEPAK JOSHI'],
-    tier: 'deluxe',
-    roomType: 'DLX',
-    tariff: 1750,
+    paxList: ['MR SATISH MISHRA'],
+    tier: 'executive',
+    roomType: 'EXE',
+    tariff: 2050,
     discountPct: 0,
     planCode: 'EP',
-    arrivalDate: '23-JAN-2022',
-    departureDate: '26-JAN-2022',
+    arrivalDate: dateYesterday,
+    departureDate: NEXT_ACCOUNTING_DATE,
     expectedCheckoutTime: '12:00',
-    balance: 3500,
-    totalCharges: 3500,
+    balance: 2050,
+    totalCharges: 2050,
     depositAmount: 0,
     stopPosting: false,
     vipStatus: 'Regular',
     idType: 'Aadhaar Card',
     idNumber: '1122-3344-5566',
-    remarks: 'Video 13: Room transfer target room (AC cooling issue)'
+    remarks: 'Executive room, high floor'
+  },
+  {
+    roomNo: '109',
+    folioNo: '109/1',
+    regNo: '507',
+    guestName: 'DR S. N. MOHANTY',
+    gender: 'M',
+    phone: '+91-9845012345',
+    email: 'sn.mohanty@aiims.edu',
+    companyCode: '',
+    companyName: 'AIIMS Healthcare Consultant',
+    gstin: '',
+    pax: 2,
+    paxList: ['DR S. N. MOHANTY', 'MRS MOHANTY'],
+    tier: 'suite',
+    roomType: 'SUI',
+    tariff: 3250,
+    discountPct: 0,
+    planCode: 'MAP',
+    arrivalDate: dateYesterday,
+    departureDate: NEXT_ACCOUNTING_DATE,
+    expectedCheckoutTime: '12:00',
+    balance: 3250,
+    totalCharges: 6500,
+    depositAmount: 3250,
+    stopPosting: false,
+    vipStatus: 'VIP-1',
+    idType: 'PAN Card',
+    idNumber: 'AAAPM9011F',
+    remarks: 'Premium Suite with living room'
   }
 ];
 
-// 7. Active Advance Deposit Receipts (Videos 14, 35, 39)
+// 7. Active Advance Deposit Receipts (Live)
 export const INITIAL_DEPOSITS_LOG = [
   {
     receiptNo: 'RCP-1042',
-    date: '24-JAN-2022',
+    date: INITIAL_ACCOUNTING_DATE,
     time: '14:30',
-    roomNo: '201',
-    folioNo: '201/1',
-    guestName: 'MR VIKRAM SINGHANIA',
-    amount: 5000,
-    tenderMode: 'Credit Card (Visa)',
-    cardLast4: '4112',
+    roomNo: '102',
+    folioNo: '102/1',
+    guestName: 'MR SUNIL MOHANTY',
+    amount: 1750,
+    tenderMode: 'UPI / QR',
+    upiRef: `${HOTEL_CONFIG.upiId}`,
     cashier: 'IT ADMIN',
-    remarks: 'Advance collected towards 4-night stay'
+    remarks: 'Advance collected for Deluxe Room 102'
   },
   {
     receiptNo: 'RCP-1043',
-    date: '23-JAN-2022',
+    date: dateYesterday,
     time: '11:15',
-    roomNo: '314',
-    folioNo: '314/1',
-    guestName: 'MR RAJESH SHARMA',
-    amount: 2000,
-    tenderMode: 'UPI / QR',
-    upiRef: '202401239912@upi',
+    roomNo: '109',
+    folioNo: '109/1',
+    guestName: 'DR S. N. MOHANTY',
+    amount: 3250,
+    tenderMode: 'Credit Card (Visa)',
+    cardLast4: '4112',
     cashier: 'DUTY MANAGER',
-    remarks: 'Partial advance deposit'
+    remarks: 'Suite advance deposit'
   },
   {
-    receiptNo: 'RCP-1040',
-    date: '21-JAN-2022',
+    receiptNo: 'RCP-1044',
+    date: dateThreeDaysAgo,
     time: '09:00',
-    roomNo: '406',
-    folioNo: '406/1',
-    guestName: 'SHARMA GROUP',
-    amount: 61500,
+    roomNo: '301',
+    folioNo: '301/1',
+    guestName: 'MR TENZING NORBU',
+    amount: 4100,
     tenderMode: 'NEFT / Bank Transfer',
     bankRef: 'UTR99102456',
     cashier: 'IT ADMIN',
-    remarks: 'Full group advance paid'
+    remarks: 'Vedanta corporate advance'
   }
 ];
 
-// 8. Paid-Out Cash Refund Vouchers (Videos 44, 35)
+// 8. Paid-Out Cash Refund Vouchers (Live)
 export const INITIAL_PAID_OUTS_LOG = [
   {
-    voucherNo: 'PO-2022-089',
-    date: '25-JAN-2022',
+    voucherNo: `PO-${currentYear}-001`,
+    date: INITIAL_ACCOUNTING_DATE,
     time: '16:45',
     roomNo: '203',
     folioNo: '203/1',
-    guestName: 'MR K. S. PATNAIK',
-    excessAmount: 2500,
+    guestName: 'MR VIKRAM PATEL',
+    excessAmount: 500,
     refundMode: 'Cash from FO Cashier Till',
     authorizedBy: 'DUTY MANAGER',
     cashier: 'IT ADMIN',
-    reason: 'Advance deposit excess refund on early checkout'
+    reason: 'Advance deposit excess balance settled on checkout'
   }
 ];
 
-// 9. Foreign Currency Encashment Log (Video 42)
+// 9. Foreign Currency Encashment Log (Live)
 export const INITIAL_FOREX_LOG = [
   {
-    certNo: 'FLM-2022-004',
-    date: '25-JAN-2022',
+    certNo: `FLM-${currentYear}-001`,
+    date: INITIAL_ACCOUNTING_DATE,
     guestName: 'MR ROBERT JOHN SMITH',
     nationality: 'United Kingdom',
     passportNo: '984120391',
     roomNo: '301',
     currency: 'USD',
     foreignAmount: 200,
-    exchangeRate: 74.50,
-    grossInr: 14900,
+    exchangeRate: 83.50,
+    grossInr: 16700,
     commissionPct: 1.0,
-    commissionAmount: 149,
-    netInrPaid: 14751,
+    commissionAmount: 167,
+    netInrPaid: 16533,
     authorizedBy: 'IT ADMIN'
   }
 ];
 
-// 10. Statutory GST Tax Invoices Log (Rule 46) (Videos 15, 36, 43)
+// 10. Statutory GST Tax Invoices Log (Rule 46)
 export const INITIAL_SETTLED_BILLS = [
   {
-    billNo: '503',
-    billDate: '24-JAN-2022',
-    roomNo: '204',
+    billNo: '501',
+    billDate: dateYesterday,
+    roomNo: '106',
     guestName: 'MR ARVIND MEHTA',
     companyName: 'L&T Construction',
-    gstin: '27AAACL0123P1ZQ',
-    roomTariff: 4500,
-    fnbTotal: 850,
+    gstin: '21AAACL0123P1ZQ',
+    roomTariff: 1750,
+    fnbTotal: 450,
     travelTotal: 0,
-    discount: 450,
-    taxableAmount: 4900,
-    cgst: 294, // 6%
-    sgst: 294, // 6%
-    grandTotal: 5488,
+    discount: 0,
+    taxableAmount: 2200,
+    cgst: 132, // 6%
+    sgst: 132, // 6%
+    grandTotal: 2464,
     payMode: 'Credit Card',
     settledBy: 'IT ADMIN',
     status: 'Settled'
   },
   {
-    billNo: '511',
-    billDate: '25-JAN-2022',
+    billNo: '502',
+    billDate: INITIAL_ACCOUNTING_DATE,
     roomNo: '201',
     guestName: 'MR VIKRAM SINGHANIA',
     companyName: 'JK Paper Mills Ltd',
     gstin: '21AAACJ0118P1ZX',
-    roomTariff: 3250,
+    roomTariff: 2050,
     fnbTotal: 420,
     travelTotal: 0,
     discount: 0,
-    taxableAmount: 3670,
-    cgst: 220.20,
-    sgst: 220.20,
-    grandTotal: 4110.40,
+    taxableAmount: 2470,
+    cgst: 148.20,
+    sgst: 148.20,
+    grandTotal: 2766.40,
     payMode: 'Cash',
     settledBy: 'IT ADMIN',
-    status: 'Reinstate Candidate' // Video 26 target
+    status: 'Settled'
   }
 ];
 
@@ -558,7 +586,7 @@ export function calculateGstBreakdown(taxableAmount, ratePct = 12) {
   return { cgst, sgst, ratePct, total };
 }
 
-// 11. Laundry Items Master (HK Video 01: V6.5.002.1)
+// 11. Laundry Items Master
 export const INITIAL_LAUNDRY_ITEMS = [
   {
     itemCode: '1',
@@ -569,7 +597,7 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:47'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '2',
@@ -580,7 +608,7 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:48'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '3',
@@ -591,7 +619,7 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:49'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '4',
@@ -602,7 +630,7 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:49'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '5',
@@ -613,7 +641,7 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:50'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '6',
@@ -624,16 +652,16 @@ export const INITIAL_LAUNDRY_ITEMS = [
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:50'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   }
 ];
 
-// 12. Laundry Item Rate Master (HK Video 02: V6.5.002.1)
+// 12. Laundry Item Rate Master
 export const INITIAL_LAUNDRY_RATES = [
   {
     itemCode: '1',
     itemName: 'SHIRT',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: `01-JAN-${currentYear}`,
     serviceType: 'Washing',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -642,12 +670,12 @@ export const INITIAL_LAUNDRY_RATES = [
     expressCharge: 120,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:50'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '1',
     itemName: 'SHIRT',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: `01-JAN-${currentYear}`,
     serviceType: 'Pressing',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -656,12 +684,12 @@ export const INITIAL_LAUNDRY_RATES = [
     expressCharge: 60,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:50'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '2',
     itemName: 'TROUSER',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: `01-JAN-${currentYear}`,
     serviceType: 'Washing',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -670,12 +698,12 @@ export const INITIAL_LAUNDRY_RATES = [
     expressCharge: 135,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:51'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '2',
     itemName: 'TROUSER',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: `01-JAN-${currentYear}`,
     serviceType: 'Pressing',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -684,12 +712,12 @@ export const INITIAL_LAUNDRY_RATES = [
     expressCharge: 75,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:51'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   },
   {
     itemCode: '3',
     itemName: 'SUIT (2 PC)',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: `01-JAN-${currentYear}`,
     serviceType: 'Dry Cleaning',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -698,70 +726,70 @@ export const INITIAL_LAUNDRY_RATES = [
     expressCharge: 500,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:52'
+    lastUpdated: `${INITIAL_ACCOUNTING_DATE} 10:00`
   }
 ];
 
-// 13. House Keeping Staff Master (HK Video 03: V6.5.002.1)
+// 13. House Keeping Staff Master (Authentic Hotel Elite Inn Staff)
 export const INITIAL_HOUSEKEEPING_STAFF = [
-  { code: '001', name: 'Manoranjan Singh', designation: 'Room Attendant', status: 'Active' },
-  { code: '002', name: 'Dhonsing Terang', designation: 'Senior Room Attendant', status: 'Active' },
-  { code: '003', name: 'Jayanta Chetia', designation: 'Linen Runner', status: 'Active' },
-  { code: '004', name: 'Lakshyajit Changmai', designation: 'Laundry Operator', status: 'Active' },
-  { code: '005', name: 'Navajyoti Das', designation: 'Houseman', status: 'Active' },
-  { code: '006', name: 'Tajnul Borah', designation: 'Floor Supervisor', status: 'Active' },
-  { code: '007', name: 'Anjumoni Kashyap', designation: 'Lady Room Attendant', status: 'Active' },
-  { code: '008', name: 'Saraswati', designation: 'Public Area Cleaner', status: 'Active' },
-  { code: '009', name: 'Usha', designation: 'Linen Room Attendant', status: 'Active' }
+  { code: '001', name: 'Raju Majhi', designation: 'Room Attendant', status: 'Active' },
+  { code: '002', name: 'Santosh Gouda', designation: 'Senior Room Attendant', status: 'Active' },
+  { code: '003', name: 'Sunil Nayak', designation: 'Linen Runner', status: 'Active' },
+  { code: '004', name: 'Balaram Sahoo', designation: 'Laundry Operator', status: 'Active' },
+  { code: '005', name: 'Pradeep Jena', designation: 'Houseman', status: 'Active' },
+  { code: '006', name: 'Ashok Kumar', designation: 'Floor Supervisor', status: 'Active' },
+  { code: '007', name: 'Geeta Pradhan', designation: 'Lady Room Attendant', status: 'Active' },
+  { code: '008', name: 'Pooja Nayak', designation: 'Public Area Cleaner', status: 'Active' },
+  { code: '009', name: 'Usha Kumari', designation: 'Linen Room Attendant', status: 'Active' }
 ];
 
-// 14. Laundry Receipt Entry (HK Video 03: V6.5.002.1)
+// 14. Laundry Receipt Entry
 export const INITIAL_LAUNDRY_ENTRIES = [
   {
-    refNo: 'LND-2022-001',
+    refNo: `LND-${currentYear}-001`,
     billTo: 'Guest A/C',
-    roomNo: '205',
-    guestName: 'Mr Kumar Anil',
+    roomNo: '105',
+    guestName: 'MR RAMESH RAO',
     guestType: 'Regular',
     guestStatus: 'In-House',
     currency: 'Indian Rupees',
-    rcvDate: '27-JAN-2022',
-    rcvTime: '20:00',
-    deliveryDate: '28-JAN-2022',
+    rcvDate: INITIAL_ACCOUNTING_DATE,
+    rcvTime: '09:00',
+    deliveryDate: INITIAL_ACCOUNTING_DATE,
     deliveryTime: '18:00',
-    collectedBy: '002 Dhonsing Terang',
+    collectedBy: '001 Raju Majhi',
     service: 'Pressing',
     rateType: 'Standard',
-    remarks: 'Gentle steam press requested',
+    remarks: 'Executive steam press requested',
     items: [
       { itemNo: '1', code: '2', name: 'TROUSER', qty: 2, rate: 50, discount: 0, amount: 100, remarks: '' },
-      { itemNo: '2', code: '1', name: 'SHIRT', qty: 2, rate: 50, discount: 0, amount: 100, remarks: '' }
+      { itemNo: '2', code: '1', name: 'SHIRT', qty: 2, rate: 40, discount: 0, amount: 80, remarks: '' }
     ],
-    grossAmount: 200,
+    grossAmount: 180,
     discountAmount: 0,
-    taxAmount: 36, // 18% GST (SAC 999791)
-    netAmount: 236,
-    status: 'Pending Billing', // moves to Settled after Video 06
+    taxAmount: 32.40, // 18% GST (SAC 999791)
+    netAmount: 212.40,
+    status: 'Pending Billing',
     settlementBillNo: '',
     tenderMode: ''
   }
 ];
 
-// 15. Housekeeping & Guest Complaints (HK Videos 05 & 07: V6.5.002.1)
+// 15. Housekeeping & Guest Complaints
 export const INITIAL_HOUSEKEEPING_COMPLAINTS = [
   {
-    complaintId: 'CMP-2022-019',
+    complaintId: `CMP-${currentYear}-001`,
     scope: 'Room',
-    roomNo: '205',
-    guestName: 'Mr Kumar Anil',
-    arrival: '27-JAN-2022',
-    departure: '01-FEB-2022',
+    roomNo: '105',
+    guestName: 'MR RAMESH RAO',
+    arrival: dateYesterday,
+    departure: NEXT_ACCOUNTING_DATE,
     department: 'Housekeeping',
-    natureOfComplaint: 'Extra bath towels required & linen replacement for extra pillow',
+    natureOfComplaint: 'Extra bath towels required & tea/coffee refill',
     receivedBy: 'MANAGER',
-    date: '27-JAN-2022',
-    time: '20:04',
-    status: 'Pending', // increments registered complaint count to 1
+    date: INITIAL_ACCOUNTING_DATE,
+    time: '10:04',
+    status: 'Pending',
     attendedBy: '',
     actionTaken: '',
     tatMinutes: '',
@@ -770,44 +798,44 @@ export const INITIAL_HOUSEKEEPING_COMPLAINTS = [
   }
 ];
 
-// 16. Lost and Found Register (HK Video 08: V6.5.002.1)
+// 16. Lost and Found Register
 export const INITIAL_LOST_AND_FOUND = [
   {
-    refNo: 'LF-2022-014',
+    refNo: `LF-${currentYear}-001`,
     module: 'Front Office',
-    lostDate: '27-JAN-2022',
-    place: 'Room 205',
+    lostDate: dateYesterday,
+    place: 'Room 203',
     article: 'Black Leather Men Wallet with PAN & Driving License',
     approxValue: 2500,
-    finder: 'Dhonsing Terang',
+    finder: 'Raju Majhi',
     checkedBy: 'IT ADMIN',
-    foundDate: '27-JAN-2022',
+    foundDate: dateYesterday,
     foundTime: '14:15',
-    custodyLocker: 'HK-LOCKER-B04',
+    custodyLocker: 'HK-LOCKER-B01',
     status: 'In Safe Custody',
     returnedDate: '',
     whom: '',
     authorizedBy: '',
-    guestName: 'Mr Kumar Anil',
+    guestName: 'MR VIKRAM PATEL',
     guestAddress: 'Plot 44, Saheed Nagar, Bhubaneswar, Odisha',
-    phone: '+91-9861023456'
+    phone: '+91-9937088122'
   }
 ];
 
-// 17. Room Blocks Master (HK Videos 09 & 10: V6.5.002.1)
+// 17. Room Blocks Master (104: Deluxe Room maintenance)
 export const INITIAL_ROOM_BLOCKS = [
   {
-    blockId: 'BLK-2022-008',
-    roomNo: '206',
+    blockId: `BLK-${currentYear}-001`,
+    roomNo: '104',
     roomType: 'DLX',
-    floor: 'BA-FF02',
-    blockType: 'OOO', // OOO (Out of Order) or OOS (Out of Service)
-    fromDate: '27-JAN-2022',
-    toDate: '29-JAN-2022',
+    floor: 'Floor 1',
+    blockType: 'OOO', // OOO (Out of Order)
+    fromDate: INITIAL_ACCOUNTING_DATE,
+    toDate: NEXT_ACCOUNTING_DATE,
     reasonCode: 'AC-REPAIR',
-    reasonDescription: 'AC cooling coil replacement & copper pipe leakage repair',
+    reasonDescription: 'AC cooling coil replacement & maintenance servicing',
     authorizedBy: 'DUTY MANAGER',
-    remarks: 'Scheduled for technician inspection on 28-JAN morning',
+    remarks: 'Scheduled for technician inspection',
     status: 'Active'
   }
 ];
@@ -821,4 +849,3 @@ export function calculateLaundryTax(grossAmount, discountAmount = 0) {
   const netAmount = Number((taxable + totalTax).toFixed(2));
   return { taxable, cgst, sgst, totalTax, netAmount };
 }
-

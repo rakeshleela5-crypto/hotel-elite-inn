@@ -66,7 +66,7 @@ export const INITIAL_COMPANY_RATE_LINKS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:10'
+    lastUpdated: '23-FEB-2026 18:10'
   },
   {
     companyCode: 'COM0001',
@@ -95,7 +95,7 @@ export const INITIAL_COMPANY_RATE_LINKS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:05'
+    lastUpdated: '23-FEB-2026 18:05'
   },
   {
     companyCode: 'COM0007',
@@ -121,7 +121,7 @@ export const INITIAL_COMPANY_RATE_LINKS = [
     companyAmenities: [],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '01-JAN-2022 10:30'
+    lastUpdated: '01-JAN-2026 10:30'
   }
 ];
 
@@ -140,7 +140,7 @@ export default function IdsLinkRatesToCompanyModal({
   isOpen,
   onClose,
   initialCompanyCode = 'COM0002',
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   onSaveLinkRate
 }) {
   const [linksList, setLinksList] = useState(INITIAL_COMPANY_RATE_LINKS);

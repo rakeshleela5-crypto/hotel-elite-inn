@@ -16,13 +16,13 @@ import {
       - Quick Scan (Load Pgm) -> Type "market" or "segment" -> "Market Segments" -> [ Load ]
       - 44-Video Tutorial Player -> Video 30 -> Launch Interactive Feature Clone
    3. Fields & Creation Flow (Frames 015–040):
-      - Applicable From: 23-FEB-2022
+      - Applicable From: 23-FEB-2026
       - Code: AIR / CON / CVG / FIT / MAR / NCV / CORP / GRP
       - Name: Airlines / Conference / CVGR / FIT / Marriage / Non CVGR / Corporate Business / Group Tour
       - Short Name: AIR / CON / CVG / FIT / MAR / NCV
       - Status: Active / Inactive
       - User: MANAGER
-      - Last Updated: 23-FEB-2022 18:01
+      - Last Updated: 23-FEB-2026 18:01
    4. Action Buttons (Frames 012–044):
       - [ Add ], [ Modify ], [ Delete ], [ Browse ], [ Previous ], [ Next ], [ Save ], [ Panel... ], [ Exit ]
    5. Browse Lookup Modal (Frame 044):
@@ -35,75 +35,75 @@ import {
 export const INITIAL_MARKET_SEGMENTS = [
   {
     code: 'AIR',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Airlines Crew & Passenger Layover',
     shortName: 'AIR',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'CON',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Conference & Event Delegations',
     shortName: 'Conference',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'CVG',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'CVGR (Commercial Volume Guaranteed Rate)',
     shortName: 'CVG',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'FIT',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'FIT (Free Independent Traveler)',
     shortName: 'FIT',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'MAR',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Marriage & Banquet Guest Rooms',
     shortName: 'Marriage',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'NCV',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     name: 'Non CVGR (Retail Corporate Rate)',
     shortName: 'Non CVGR',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 18:01'
+    lastUpdated: '23-FEB-2026 18:01'
   },
   {
     code: 'CORP',
-    applicableFrom: '01-JAN-2022',
+    applicableFrom: '01-JAN-2026',
     name: 'Corporate Contracted Business',
     shortName: 'CORP',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '01-JAN-2022 10:15'
+    lastUpdated: '01-JAN-2026 10:15'
   },
   {
     code: 'GRP',
-    applicableFrom: '01-JAN-2022',
+    applicableFrom: '01-JAN-2026',
     name: 'Group Leisure & Pilgrim Series',
     shortName: 'GRP',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '01-JAN-2022 10:20'
+    lastUpdated: '01-JAN-2026 10:20'
   }
 ];
 
@@ -111,7 +111,7 @@ export default function IdsMarketSegmentModal({
   isOpen,
   onClose,
   initialCode = 'CVG',
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   onSaveMarketSegment
 }) {
   const [segmentsList, setSegmentsList] = useState(INITIAL_MARKET_SEGMENTS);

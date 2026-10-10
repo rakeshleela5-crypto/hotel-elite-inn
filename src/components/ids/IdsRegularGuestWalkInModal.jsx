@@ -68,7 +68,7 @@ export const REGULAR_GUEST_PROFILES_DATABASE = [
     discountAmount: 2800.00,
     rackRate: 3500.00,
     visitsCount: 14,
-    lastVisitDate: '15-JAN-2022',
+    lastVisitDate: '15-JAN-2026',
     vipStatus: 'VIP 2 (Regular Guest)'
   },
   {
@@ -105,7 +105,7 @@ export const REGULAR_GUEST_PROFILES_DATABASE = [
     discountAmount: 3200.00,
     rackRate: 3999.00,
     visitsCount: 22,
-    lastVisitDate: '20-FEB-2022',
+    lastVisitDate: '20-FEB-2026',
     vipStatus: 'VIP 1 (Corporate Key Account)'
   },
   {
@@ -142,7 +142,7 @@ export const REGULAR_GUEST_PROFILES_DATABASE = [
     discountAmount: 2500.00,
     rackRate: 2999.00,
     visitsCount: 8,
-    lastVisitDate: '27-JAN-2022',
+    lastVisitDate: '27-JAN-2026',
     vipStatus: 'Regular Corporate'
   }
 ];
@@ -151,7 +151,7 @@ export default function IdsRegularGuestWalkInModal({
   isOpen,
   onClose,
   initialRoomNo = '202',
-  accountingDate = '25-FEB-2022',
+  accountingDate = '25-FEB-2026',
   onCompleteWalkIn,
   onOpenRoomRack
 }) {
@@ -159,7 +159,7 @@ export default function IdsRegularGuestWalkInModal({
 
   // Room Rack Search State (Frames 012 & 018)
   const [roomNo, setRoomNo] = useState(initialRoomNo);
-  const [departureDate, setDepartureDate] = useState('26-FEB-2022');
+  const [departureDate, setDepartureDate] = useState('26-FEB-2026');
   const [departureTime, setDepartureTime] = useState('12:00');
   const [guestTitle, setGuestTitle] = useState('MR');
   const [guestLastName, setGuestLastName] = useState('Singh');
@@ -626,7 +626,7 @@ export default function IdsRegularGuestWalkInModal({
             <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '14px 18px', maxWidth: '480px', margin: '0 auto 16px auto', textAlign: 'left' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '6px' }}>
                 <div><strong>Registration #:</strong></div>
-                <div style={{ fontWeight: 700, color: '#0A246A' }}>REG/2022/{assignedRegNo}</div>
+                <div style={{ fontWeight: 700, color: '#0A246A' }}>REG/2026/{assignedRegNo}</div>
                 <div><strong>Assigned Room:</strong></div>
                 <div style={{ fontWeight: 700, color: '#C5221F' }}>Room {roomNo} (Executive Room)</div>
                 <div><strong>Guest Name:</strong></div>

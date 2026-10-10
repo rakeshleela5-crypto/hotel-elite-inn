@@ -16,7 +16,7 @@ export const DEFAULT_BILL_KOTS = [
     server: 'Biren',
     outlet: 'RESTAURANT',
     session: 'General',
-    accountingDate: '03-FEB-2022',
+    accountingDate: '03-FEB-2026',
     covers: '1',
     items: [
       { code: '1', kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 2.0, rate: 199.0, value: 398.0 },
@@ -35,7 +35,7 @@ export const DEFAULT_BILL_KOTS = [
     server: 'Biren',
     outlet: 'RESTAURANT',
     session: 'General',
-    accountingDate: '03-FEB-2022',
+    accountingDate: '03-FEB-2026',
     covers: '1',
     items: [
       { res: 'RES', code: '1', kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
@@ -54,7 +54,7 @@ export const DEFAULT_BILL_KOTS = [
     server: 'Biren',
     outlet: 'RESTAURANT',
     session: 'General',
-    accountingDate: '03-FEB-2022',
+    accountingDate: '03-FEB-2026',
     covers: '1',
     items: [
       { code: '1', kotNo: '1315', name: 'Russian Salad', originalName: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0, isRenamed: true },
@@ -71,7 +71,7 @@ export const DEFAULT_BILL_KOTS = [
     server: 'Manash',
     outlet: 'RESTAURANT',
     session: 'General',
-    accountingDate: '03-FEB-2022',
+    accountingDate: '03-FEB-2026',
     covers: '2',
     items: [
       { code: '1', kotNo: '1312', name: 'Classic Russian Salad .', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
@@ -89,7 +89,7 @@ export const DEFAULT_BILL_KOTS = [
     server: 'Biren',
     outlet: 'RESTAURANT',
     session: 'General',
-    accountingDate: '03-FEB-2022',
+    accountingDate: '03-FEB-2026',
     covers: '2',
     items: [
       { code: '1', kotNo: '1316', name: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
@@ -108,7 +108,7 @@ export default function IdsPosBillModal({
   isOpen,
   onClose,
   initialTableNo = '14',
-  accountingDate = '03-FEB-2022',
+  accountingDate = '03-FEB-2026',
   outlet = 'RESTAURANT',
   session = 'General',
   steward = 'Biren',

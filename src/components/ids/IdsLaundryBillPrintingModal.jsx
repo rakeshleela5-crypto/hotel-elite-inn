@@ -5,7 +5,7 @@ import { INITIAL_LAUNDRY_ENTRIES, calculateLaundryTax } from '../../data/idsPmsS
 export default function IdsLaundryBillPrintingModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onOpenCrystalReport,
   onSettleBill,
   onOpenMessageBox
@@ -14,13 +14,13 @@ export default function IdsLaundryBillPrintingModal({
   const [roomNo, setRoomNo] = useState('205');
   const [guestName, setGuestName] = useState('Mr Kumar Anil');
   const [option, setOption] = useState('Delivery Date');
-  const [departure, setDeparture] = useState('01-FEB-2022 12:00');
+  const [departure, setDeparture] = useState('01-FEB-2026 12:00');
   const [classification, setClassification] = useState('Regular');
 
   // Bills List
   const [bills, setBills] = useState([
     {
-      delvDate: '27/01/2022',
+      delvDate: '27/01/2026',
       grossValue: 200.00,
       discount: 0.00,
       taxAmount: 36.00,
@@ -73,7 +73,7 @@ export default function IdsLaundryBillPrintingModal({
   const handlePrint = () => {
     const activeBill = bills.find(b => b.selected) || bills[0];
     const reportPayload = {
-      billNo: `LAU-BL-${roomNo}-2022`,
+      billNo: `LAU-BL-${roomNo}-2026`,
       billDate: accountingDate,
       roomNo,
       guestName,
@@ -112,7 +112,7 @@ export default function IdsLaundryBillPrintingModal({
               roomNo,
               guestName,
               amount: activeBill.netAmount,
-              billNo: `LAU-BL-${roomNo}-2022`
+              billNo: `LAU-BL-${roomNo}-2026`
             });
           }
           if (onOpenMessageBox) {

@@ -7,11 +7,11 @@ import React, { useState, useEffect } from 'react';
  */
 
 export const DEFAULT_MENU_GROUPS = [
-  { code: 1, applicableFrom: '08-FEB-2022', name: 'MAIN COURSE', shortName: 'MAIN', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 2, applicableFrom: '08-FEB-2022', name: 'TANDOOR ITEMS', shortName: 'TAND', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 3, applicableFrom: '08-FEB-2022', name: 'STARTERS', shortName: 'STARTERS', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 4, applicableFrom: '08-FEB-2022', name: 'SOUP', shortName: 'SOUP', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 5, applicableFrom: '08-FEB-2022', name: 'SALAD', shortName: 'SALAD', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:48' }
+  { code: 1, applicableFrom: '08-FEB-2026', name: 'MAIN COURSE', shortName: 'MAIN', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:47' },
+  { code: 2, applicableFrom: '08-FEB-2026', name: 'TANDOOR ITEMS', shortName: 'TAND', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:47' },
+  { code: 3, applicableFrom: '08-FEB-2026', name: 'STARTERS', shortName: 'STARTERS', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:47' },
+  { code: 4, applicableFrom: '08-FEB-2026', name: 'SOUP', shortName: 'SOUP', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:47' },
+  { code: 5, applicableFrom: '08-FEB-2026', name: 'SALAD', shortName: 'SALAD', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:48' }
 ];
 
 const STORAGE_KEY = 'ids_fortune_next_pos_menu_groups';
@@ -40,7 +40,7 @@ export const saveStoredMenuGroups = (groups) => {
 export default function IdsMenuGroupsModal({
   isOpen,
   onClose,
-  accountingDate = '08-FEB-2022',
+  accountingDate = '08-FEB-2026',
   currentUser = 'MANAGER',
   onSelectGroup,
   onOpenTouchScreenGroups
@@ -55,7 +55,7 @@ export default function IdsMenuGroupsModal({
   const [shortName, setShortName] = useState('MAIN');
   const [status, setStatus] = useState('Active');
   const [user, setUser] = useState(currentUser);
-  const [lastUpdated, setLastUpdated] = useState('08-FEB-2022 18:47');
+  const [lastUpdated, setLastUpdated] = useState('08-FEB-2026 18:47');
 
   // Mode: 'VIEW' | 'ADD' | 'MODIFY'
   const [formMode, setFormMode] = useState('VIEW');

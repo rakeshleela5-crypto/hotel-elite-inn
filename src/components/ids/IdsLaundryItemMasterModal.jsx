@@ -5,7 +5,7 @@ import { INITIAL_LAUNDRY_ITEMS } from '../../data/idsPmsStore';
 export default function IdsLaundryItemMasterModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onSaveItem,
   onOpenMessageBox
 }) {
@@ -26,7 +26,7 @@ export default function IdsLaundryItemMasterModal({
     printerDevice: 'LAU_PRT_01',
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:47'
+    lastUpdated: '27-JAN-2026 19:47'
   };
 
   const [formData, setFormData] = useState({

@@ -11,7 +11,7 @@ import {
 export default function IdsLaundryEntryModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   inhouseGuests = [],
   onSaveEntry,
   onOpenMessageBox
@@ -25,18 +25,18 @@ export default function IdsLaundryEntryModal({
 
   // Active Entry
   const currentEntry = entries[currentIndex] || entries[0] || {
-    refNo: 'LND-2022-001',
+    refNo: 'LND-2026-001',
     billTo: 'Guest A/C',
     roomNo: '205',
     guestName: 'Mr Kumar Anil',
     guestType: 'Regular',
     guestStatus: 'In-House',
     currency: 'Indian Rupees',
-    rcvDate: '27-JAN-2022',
+    rcvDate: '27-JAN-2026',
     rcvTime: '20:00',
-    deliveryDate: '28-JAN-2022',
+    deliveryDate: '28-JAN-2026',
     deliveryTime: '18:00',
-    collectedBy: '002 Dhonsing Terang',
+    collectedBy: '002 Ramesh Nayak',
     service: 'Pressing',
     rateType: 'Standard',
     remarks: 'Gentle steam press requested',
@@ -72,8 +72,8 @@ export default function IdsLaundryEntryModal({
     const matched = inhouseGuests.find(g => g.roomNo === roomNo) || {
       roomNo,
       guestName: roomNo === '205' ? 'Mr Kumar Anil' : (roomNo === '201' ? 'Mr Vikram Singhania' : 'Mr Walk-in Guest'),
-      arrivalDate: '27-JAN-2022 19:07',
-      departureDate: '01-FEB-2022 12:00',
+      arrivalDate: '27-JAN-2026 19:07',
+      departureDate: '01-FEB-2026 12:00',
       vipStatus: 'Regular'
     };
 
@@ -82,8 +82,8 @@ export default function IdsLaundryEntryModal({
       roomNo,
       guestName: matched.guestName,
       guestType: matched.vipStatus || 'Regular',
-      arrivalDate: matched.arrivalDate || '27-JAN-2022 19:07',
-      departureDate: matched.departureDate || '01-FEB-2022 12:00'
+      arrivalDate: matched.arrivalDate || '27-JAN-2026 19:07',
+      departureDate: matched.departureDate || '01-FEB-2026 12:00'
     });
   };
 
@@ -154,9 +154,9 @@ export default function IdsLaundryEntryModal({
       currency: 'Indian Rupees',
       rcvDate: accountingDate,
       rcvTime: '20:00',
-      deliveryDate: '28-JAN-2022',
+      deliveryDate: '28-JAN-2026',
       deliveryTime: '18:00',
-      collectedBy: '002 Dhonsing Terang',
+      collectedBy: '002 Ramesh Nayak',
       service: 'Pressing',
       rateType: 'Standard',
       remarks: '',
@@ -396,12 +396,12 @@ export default function IdsLaundryEntryModal({
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Arrival</label>
-                <input type="text" value="27-JAN-2022 19:07" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value="27-JAN-2026 19:07" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Dep Date</label>
-                <input type="text" value="01-FEB-2022 12:00" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value="01-FEB-2026 12:00" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -669,7 +669,7 @@ export default function IdsLaundryEntryModal({
                       </tr>
                     </thead>
                     <tbody>
-                      {['205', '201', '301', '312', '415'].map(rNo => (
+                      {['102', '201', '205', '206', '301'].map(rNo => (
                         <tr 
                           key={rNo}
                           onClick={() => {
@@ -680,7 +680,7 @@ export default function IdsLaundryEntryModal({
                         >
                           <td style={{ padding: '4px', fontWeight: 'bold' }}>{rNo}</td>
                           <td style={{ padding: '4px' }}>{rNo === '205' ? 'Mr Kumar Anil' : (rNo === '201' ? 'Mr Vikram Singhania' : 'In-House Guest')}</td>
-                          <td style={{ padding: '4px' }}>27-JAN-2022</td>
+                          <td style={{ padding: '4px' }}>27-JAN-2026</td>
                         </tr>
                       ))}
                     </tbody>

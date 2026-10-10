@@ -19,7 +19,7 @@ export default function IdsPosBillSettlementModal({
   isOpen,
   onClose,
   initialBillNo = '4',
-  accountingDate = '03-FEB-2022',
+  accountingDate = '03-FEB-2026',
   outlet = 'RESTAURANT',
   session = 'General',
   steward = 'Manash',
@@ -32,7 +32,7 @@ export default function IdsPosBillSettlementModal({
     {
       billNo: '4',
       outlet: 'RES',
-      billDate: '03-FEB-2022',
+      billDate: '03-FEB-2026',
       session: 'GN',
       tableNo: '10',
       covers: '2',
@@ -50,7 +50,7 @@ export default function IdsPosBillSettlementModal({
     {
       billNo: '3',
       outlet: 'RES',
-      billDate: '03-FEB-2022',
+      billDate: '03-FEB-2026',
       session: 'GN',
       tableNo: '15',
       covers: '2',
@@ -69,7 +69,7 @@ export default function IdsPosBillSettlementModal({
     {
       billNo: '2',
       outlet: 'RES',
-      billDate: '03-FEB-2022',
+      billDate: '03-FEB-2026',
       session: 'GN',
       tableNo: '10',
       covers: '1',

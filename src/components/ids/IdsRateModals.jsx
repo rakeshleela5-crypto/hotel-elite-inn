@@ -233,7 +233,7 @@ export function IdsDuplicateGuestModal({ isOpen, onClose, guestName = 'Biswakarm
                 <td>DLX</td>
                 <td style={{ color: '#0A246A' }}>{guestName}</td>
                 <td>Fit</td>
-                <td style={{ color: '#0A246A' }}>18-JAN-2022</td>
+                <td style={{ color: '#0A246A' }}>18-JAN-2026</td>
               </tr>
               <tr>
                 <td>&nbsp;</td><td></td><td></td><td></td><td></td>
@@ -321,7 +321,7 @@ export function IdsPostReceiptsModal({
   const [amount, setAmount] = useState('5000.00');
   const [authNo, setAuthNo] = useState('Nu1090499550mle');
   const [receiptNo, setReceiptNo] = useState('167');
-  const [accountingDate, setAccountingDate] = useState('14-JAN-2022');
+  const [accountingDate, setAccountingDate] = useState('14-JAN-2026');
   const [userName, setUserName] = useState('MANAGER');
 
   if (!isOpen) return null;
@@ -450,7 +450,7 @@ export function IdsPostReceiptsModal({
               </div>
               <div>
                 <span style={{ fontSize: '10px', color: '#666' }}>Last Updated</span>
-                <input className="ids-input" style={{ width: '100%' }} defaultValue="14-JAN-2022 19:57" readOnly />
+                <input className="ids-input" style={{ width: '100%' }} defaultValue="14-JAN-2026 19:57" readOnly />
               </div>
             </div>
           </div>

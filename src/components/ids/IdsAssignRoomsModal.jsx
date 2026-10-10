@@ -9,7 +9,7 @@ export function IdsScanBookingModal({
   bookings = [] 
 }) {
   const [filterMode, setFilterMode] = useState('Arrival Date');
-  const [arrivalDate, setArrivalDate] = useState('14/01/2022');
+  const [arrivalDate, setArrivalDate] = useState('14/01/2026');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sample or live reservation records matching video Frame 014
@@ -193,7 +193,7 @@ export function IdsScanBookingModal({
 export function IdsAssignGuestRoomsModal({ 
   isOpen, 
   onClose, 
-  booking = { resNo: '270', type: 'EXECUTIVE', guestName: 'Mr Biswakarma Santosh', arrivalDate: '14-JAN-2022 20:07', departureDate: '17-JAN-2022 12:00' },
+  booking = { resNo: '270', type: 'EXECUTIVE', guestName: 'Mr Biswakarma Santosh', arrivalDate: '14-JAN-2026 20:07', departureDate: '17-JAN-2026 12:00' },
   onConfirmAssignment 
 }) {
   const [selectedBlock, setSelectedBlock] = useState('All');
@@ -271,10 +271,10 @@ export function IdsAssignGuestRoomsModal({
             <input className="ids-input" value={booking.type || 'EXECUTIVE'} readOnly style={{ fontWeight: 700 }} />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Arrival</span>
-            <input className="ids-input" value={booking.arrivalDate || '14-JAN-2022 20:07'} readOnly />
+            <input className="ids-input" value={booking.arrivalDate || '14-JAN-2026 20:07'} readOnly />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Departure</span>
-            <input className="ids-input" value={booking.departureDate || '17-JAN-2022 12:00'} readOnly />
+            <input className="ids-input" value={booking.departureDate || '17-JAN-2026 12:00'} readOnly />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Group</span>
             <input className="ids-input" defaultValue="" />
@@ -369,7 +369,7 @@ export function IdsAssignGuestRoomsModal({
             {/* Right Column: Month Tape Chart Calendar Grid (Frame 006) */}
             <div style={{ border: '1px solid #716F64', background: '#FFF', overflowX: 'auto' }}>
               <div style={{ background: '#DFDBC9', padding: '4px', textAlign: 'center', fontWeight: 800, borderBottom: '1px solid #B0AB9A' }}>
-                JAN'2022
+                JAN'2026
               </div>
 
               <table className="ids-grid-table" style={{ fontSize: '10px', width: '100%', minWidth: '600px' }}>

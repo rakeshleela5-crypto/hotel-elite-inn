@@ -8,12 +8,12 @@ import { getStoredMenuGroups } from './IdsMenuGroupsModal';
  */
 
 export const DEFAULT_TOUCH_SCREEN_GROUPS = [
-  { code: 1, menuGroupCode: 1, applicableFrom: '08-FEB-2022', name: 'MAIN COURSE', shortName: 'MAIN C', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:51' },
-  { code: 2, menuGroupCode: 2, applicableFrom: '08-FEB-2022', name: 'TANDOOR ITEMS', shortName: 'TAND', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:51' },
-  { code: 3, menuGroupCode: 3, applicableFrom: '08-FEB-2022', name: 'STARTERS', shortName: 'STARTE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
-  { code: 4, menuGroupCode: 4, applicableFrom: '08-FEB-2022', name: 'SOUP', shortName: 'SOUP', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
-  { code: 5, menuGroupCode: 5, applicableFrom: '08-FEB-2022', name: 'SALAD', shortName: 'SALAD', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
-  { code: 6, menuGroupCode: 6, applicableFrom: '08-FEB-2022', name: 'APPETISERS', shortName: 'APPE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' }
+  { code: 1, menuGroupCode: 1, applicableFrom: '08-FEB-2026', name: 'MAIN COURSE', shortName: 'MAIN C', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:51' },
+  { code: 2, menuGroupCode: 2, applicableFrom: '08-FEB-2026', name: 'TANDOOR ITEMS', shortName: 'TAND', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:51' },
+  { code: 3, menuGroupCode: 3, applicableFrom: '08-FEB-2026', name: 'STARTERS', shortName: 'STARTE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:52' },
+  { code: 4, menuGroupCode: 4, applicableFrom: '08-FEB-2026', name: 'SOUP', shortName: 'SOUP', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:52' },
+  { code: 5, menuGroupCode: 5, applicableFrom: '08-FEB-2026', name: 'SALAD', shortName: 'SALAD', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:52' },
+  { code: 6, menuGroupCode: 6, applicableFrom: '08-FEB-2026', name: 'APPETISERS', shortName: 'APPE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:52' }
 ];
 
 const STORAGE_KEY = 'ids_fortune_next_pos_touch_screen_groups';
@@ -42,7 +42,7 @@ export const saveStoredTouchScreenGroups = (groups) => {
 export default function IdsTouchScreenGroupsModal({
   isOpen,
   onClose,
-  accountingDate = '08-FEB-2022',
+  accountingDate = '08-FEB-2026',
   currentUser = 'MANAGER',
   initialMenuGroupCode = null,
   onOpenMenuGroups
@@ -59,7 +59,7 @@ export default function IdsTouchScreenGroupsModal({
   const [otherLanguageShort, setOtherLanguageShort] = useState('');
   const [status, setStatus] = useState('Active');
   const [user, setUser] = useState(currentUser);
-  const [lastUpdated, setLastUpdated] = useState('08-FEB-2022 18:51');
+  const [lastUpdated, setLastUpdated] = useState('08-FEB-2026 18:51');
 
   // Form Mode: 'VIEW' | 'ADD' | 'MODIFY'
   const [formMode, setFormMode] = useState('VIEW');

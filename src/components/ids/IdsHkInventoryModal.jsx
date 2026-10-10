@@ -5,7 +5,7 @@ export default function IdsHkInventoryModal({
   isOpen,
   onClose,
   initialTab = 'master', // 'master' | 'issue' | 'return'
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onOpenMessageBox
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -32,20 +32,20 @@ export default function IdsHkInventoryModal({
 
   // 2. Issue Transactions
   const [issueLogs, setIssueLogs] = useState([
-    { issueId: 'ISS-2022-041', date: '27-JAN-2022', floor: 'FL-02 (2nd Floor Trolley)', attendant: '006 Tejnur Borah', item: 'Bath Towel 650 GSM', qty: 24, shift: 'Morning' },
-    { issueId: 'ISS-2022-042', date: '27-JAN-2022', floor: 'FL-03 (3rd Floor Trolley)', attendant: '002 Dhonsing Terang', item: 'Bed Sheet King White', qty: 16, shift: 'Morning' }
+    { issueId: 'ISS-2026-041', date: '27-JAN-2026', floor: 'FL-02 (2nd Floor Trolley)', attendant: '006 Sunil Mohapatra', item: 'Bath Towel 650 GSM', qty: 24, shift: 'Morning' },
+    { issueId: 'ISS-2026-042', date: '27-JAN-2026', floor: 'FL-03 (3rd Floor Trolley)', attendant: '002 Ramesh Nayak', item: 'Bed Sheet King White', qty: 16, shift: 'Morning' }
   ]);
 
   // 3. Return Transactions
   const [returnLogs, setReturnLogs] = useState([
-    { returnId: 'RET-2022-022', date: '26-JAN-2022', floor: 'FL-02 (2nd Floor Trolley)', attendant: '006 Tejnur Borah', item: 'Bath Towel 650 GSM', cleanRet: 4, soiledRet: 20, damaged: 0 },
-    { returnId: 'RET-2022-023', date: '26-JAN-2022', floor: 'FL-03 (3rd Floor Trolley)', attendant: '002 Dhonsing Terang', item: 'Bed Sheet King White', cleanRet: 2, soiledRet: 14, damaged: 1 }
+    { returnId: 'RET-2026-022', date: '26-JAN-2026', floor: 'FL-02 (2nd Floor Trolley)', attendant: '006 Sunil Mohapatra', item: 'Bath Towel 650 GSM', cleanRet: 4, soiledRet: 20, damaged: 0 },
+    { returnId: 'RET-2026-023', date: '26-JAN-2026', floor: 'FL-03 (3rd Floor Trolley)', attendant: '002 Ramesh Nayak', item: 'Bed Sheet King White', cleanRet: 2, soiledRet: 14, damaged: 1 }
   ]);
 
   // Issue Form State
   const [issueForm, setIssueForm] = useState({
     floor: 'FL-02 (2nd Floor Trolley)',
-    attendant: '006 Tejnur Borah',
+    attendant: '006 Sunil Mohapatra',
     itemCode: 'HK-LIN-002',
     qty: 12,
     shift: 'Morning'
@@ -54,7 +54,7 @@ export default function IdsHkInventoryModal({
   // Return Form State
   const [returnForm, setReturnForm] = useState({
     floor: 'FL-02 (2nd Floor Trolley)',
-    attendant: '006 Tejnur Borah',
+    attendant: '006 Sunil Mohapatra',
     itemCode: 'HK-LIN-002',
     cleanRet: 2,
     soiledRet: 10,
@@ -66,7 +66,7 @@ export default function IdsHkInventoryModal({
   const handleSaveIssue = () => {
     const selectedItem = inventoryItems.find(i => i.code === issueForm.itemCode) || inventoryItems[0];
     const newIssue = {
-      issueId: `ISS-2022-${String(issueLogs.length + 43).padStart(3, '0')}`,
+      issueId: `ISS-2026-${String(issueLogs.length + 43).padStart(3, '0')}`,
       date: accountingDate,
       floor: issueForm.floor,
       attendant: issueForm.attendant,
@@ -97,7 +97,7 @@ export default function IdsHkInventoryModal({
   const handleSaveReturn = () => {
     const selectedItem = inventoryItems.find(i => i.code === returnForm.itemCode) || inventoryItems[0];
     const newReturn = {
-      returnId: `RET-2022-${String(returnLogs.length + 24).padStart(3, '0')}`,
+      returnId: `RET-2026-${String(returnLogs.length + 24).padStart(3, '0')}`,
       date: accountingDate,
       floor: returnForm.floor,
       attendant: returnForm.attendant,

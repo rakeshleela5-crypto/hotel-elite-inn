@@ -5,29 +5,11 @@ import {
   HelpCircle, ChevronDown, FileText, Printer, RefreshCw, 
   CheckCircle2, DollarSign, Layers, Search
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 27: HOW TO USE RELEASE STOP POSTING OPTION IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Stop Posting Protection Trigger (Frames 005–030):
-      - When FO Bill is printed for Room 201 (Mr Sharma Raj), room enters Stop Posting state.
-      - Any attempt to Post Charges or Paidouts triggers supervisor alert:
-        "FO Bill already generated for the guest. Contact Supervisor." (ID: FOMT550, MSG CODE: 3395)
-   2. Entry Points:
-      - Quick Scan (Load Pgm) -> Type "release" -> "Release Stop Posting" -> [ Load ] (Frame 035)
-      - Cashiering.. -> Release Stop Posting Option
-      - Room Status V6.5.002.1 Rack Console -> Context Menu -> Release Stop Posting
-      - 44-Video Tutorial Player -> Video 27 -> Launch Interactive Feature Clone
-   3. Release Stop Posting V6.5.002.1 Dialog (Frame 038):
-      - Header Title: Release Stop Posting V6.5.002.1
-      - Columns: Room # | Fol # | Reg # | Guest Name | Release (Yes/No toggle)
-      - Row: 201 | 1 | 624 | MR SHARMA | Yes
-      - Buttons: [ Save ], [ Panel ], [ Exit ]
-   4. Post-Release Charge Posting & Folio Merge (Frames 045–095):
-      - Post Charges (Laundry ₹500 + ₹90 GST = ₹590) posts smoothly without error.
-      - Quick Balances shows updated total: ₹6,190 debit - ₹1,000 advance = ₹5,190 balance.
-      - Split bill merge & final checkout settlement.
    ========================================================================= */
 
 export const DEFAULT_STOP_POSTING_ROOMS = [
@@ -38,22 +20,22 @@ export const DEFAULT_STOP_POSTING_ROOMS = [
     guestName: 'MR SHARMA RAJ',
     released: false,
     lockReason: 'FO Bill #511 Printed / Provisional Bill Generated',
-    accountingDate: '27-JAN-2022',
-    arrivalDate: '27-JAN-2022 12:00',
-    tariff: 5600.00,
+    accountingDate: INITIAL_ACCOUNTING_DATE,
+    arrivalDate: `${INITIAL_ACCOUNTING_DATE} 12:00`,
+    tariff: 2999.00,
     advance: 1000.00,
     charges: []
   },
   {
-    roomNo: '312',
+    roomNo: '205',
     folNo: '1',
     regNo: '582',
-    guestName: 'MR DEURI PRANAB',
+    guestName: 'MR ANIL PATNAIK',
     released: true,
     lockReason: 'None (Active In-House)',
-    accountingDate: '27-JAN-2022',
-    arrivalDate: '25-JAN-2022 14:00',
-    tariff: 4250.00,
+    accountingDate: INITIAL_ACCOUNTING_DATE,
+    arrivalDate: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    tariff: 2999.00,
     advance: 2000.00,
     charges: []
   }
@@ -63,7 +45,7 @@ export default function IdsReleaseStopPostingModal({
   isOpen,
   onClose,
   initialRoomNo = '201',
-  accountingDate = '27-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onReleaseSuccess,
   onPostAdditionalCharge
 }) {
@@ -94,7 +76,7 @@ export default function IdsReleaseStopPostingModal({
 
   // Added charges list for Room 201
   const [postedChargesList, setPostedChargesList] = useState([
-    { code: 'LAU', desc: 'Laundry', base: 500, sgst: 45, cgst: 45, total: 590, date: '27-JAN-2022 19:02', ref: '227' }
+    { code: 'LAU', desc: 'Laundry', base: 500, sgst: 45, cgst: 45, total: 590, date: `${INITIAL_ACCOUNTING_DATE} 19:02`, ref: '227' }
   ]);
 
   if (!isOpen) return null;
@@ -563,7 +545,7 @@ export default function IdsReleaseStopPostingModal({
                   <div><strong>Reg #:</strong> {currentRoomRecord.regNo}</div>
                   <div><strong>Folio #:</strong> {currentRoomRecord.folNo}</div>
                   <div><strong>Arrival:</strong> {currentRoomRecord.arrivalDate}</div>
-                  <div><strong>Departure:</strong> 01-FEB-2022</div>
+                  <div><strong>Departure:</strong> {NEXT_ACCOUNTING_DATE}</div>
                   <div><strong>Accounting Date:</strong> {accountingDate}</div>
                   <div><strong>Status:</strong> <span style={{ color: '#137333', fontWeight: 700 }}>In-House</span></div>
                 </div>
@@ -582,27 +564,27 @@ export default function IdsReleaseStopPostingModal({
                     </thead>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>27-JAN-2022</td>
+                        <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                         <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE', fontWeight: 600 }}>Room Tariff + Taxes</td>
-                        <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>5,600.00</td>
+                        <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>2,999.00</td>
                         <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>-</td>
-                        <td style={{ padding: '4px 8px', textAlign: 'right' }}>5,600.00</td>
+                        <td style={{ padding: '4px 8px', textAlign: 'right' }}>2,999.00</td>
                       </tr>
                       {postedChargesList.map((c, i) => (
                         <tr key={i}>
-                          <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>27-JAN-2022</td>
+                          <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                           <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE', fontWeight: 600 }}>{c.desc} ({c.code})</td>
                           <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{c.total.toFixed(2)}</td>
                           <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>-</td>
-                          <td style={{ padding: '4px 8px', textAlign: 'right' }}>{(5600 + c.total).toFixed(2)}</td>
+                          <td style={{ padding: '4px 8px', textAlign: 'right' }}>{(2999 + c.total).toFixed(2)}</td>
                         </tr>
                       ))}
                       <tr>
-                        <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>27-JAN-2022</td>
+                        <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                         <td style={{ padding: '4px 8px', borderRight: '1px solid #EEE', color: '#137333', fontWeight: 600 }}>Advance Deposit (Cash)</td>
                         <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE' }}>-</td>
                         <td style={{ padding: '4px 8px', textAlign: 'right', borderRight: '1px solid #EEE', color: '#137333' }}>-1,000.00</td>
-                        <td style={{ padding: '4px 8px', textAlign: 'right', fontWeight: 700 }}>4,600.00</td>
+                        <td style={{ padding: '4px 8px', textAlign: 'right', fontWeight: 700 }}>1,999.00</td>
                       </tr>
                     </tbody>
                     <tfoot>

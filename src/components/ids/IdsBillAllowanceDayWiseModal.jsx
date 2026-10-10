@@ -4,105 +4,70 @@ import {
   DollarSign, Calendar, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 23: BILL ALLOWANCE DAY WISE IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Entry Points:
-      - Room Status V6.5.002.1 Rack Console -> Right click 311 O/DLX DEURI -> Bill Allowance (Frames 015–022)
-      - Cashiering.. -> Bill Allowance Day Wise (Menu Bar)
-   2. Bill Allowance V6.5.002.4 Primary Dialog (Frames 025–060):
-      - Header: Room# 311, Folio # 1, Reg. # 566, Outlet: TRF
-      - Name: DEURI HEMCHANDRA, Classification: Regular, Nationality: India
-      - Arrival: 02-DEC-2021 12:47, Departure: 26-JAN-2022 12:00
-   3. Select Revenue Dialog (Frames 025–048):
-      - Radio: (•) Insert  ( ) Delete
-      - From Date: 25-JAN-2022
-      - To Date: 25-JAN-2022 ("Enter Same Date")
-      - Revenue Code: TRF (Tariff) / CP / MIB / LAR / RES
-      - [ Ok ], [ Back ]
-   4. Day-Wise Grid Posting (Frames 050–060):
-      - Ref. #, Date (25-JAN-2022), Description (Tariff), Amount (3,500.00)
-      - Allowance: 446.40
-      - Type: Discount
-      - Option: -
-      - Tax: Yes
-      - Dynamic Tax rebate proportioning:
-        * Base Allowance: 446.40
-        * CGT (6%): 26.80
-        * SGT (6%): 26.80
-        * Total Concession: 500.00
-      - Buttons: [ F&B Break ], [ Apply Discount ], [ Save ], [ Clear ], [ Panel ], [ Exit ]
-   5. Authorization Dialog (Frames 065–080):
-      - Reason: Guest Requested
-      - Remarks: Discount Given
-      - Authorized By: MANAGER
-      - [ Confirm ], [ Cancel ]
-   6. Integrated Folio Verification (Frames 095–115):
-      - Check out V6.5.002.8 / View Bill for Room 311
-      - Row 31: 26-JAN-2022 16:08 | TRF | *Tariff 311/Discount | -446.40
-      - Row 32: 26-JAN-2022 16:08 | CGT | Central GST/Discount | -26.80
-      - Row 33: 26-JAN-2022 16:08 | SGT | State GST/Discount | -26.80
    ========================================================================= */
 
 export const BILL_ALLOWANCE_ROOMS = [
   {
-    roomNo: '311',
-    category: 'DELUXE (DLX)',
-    guestName: 'DEURI HEMCHANDRA',
+    roomNo: '102',
+    category: 'EXECUTIVE (EXE)',
+    guestName: 'MR RAJESH SHARMA',
     regNo: '566',
     folioNo: '1',
     resvNo: '245',
-    arrival: '02-DEC-2021 12:47',
-    departure: '26-JAN-2022 12:00',
-    classification: 'Regular',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 12:47`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    classification: 'Corporate',
     nationality: 'India',
-    defaultDate: '25-JAN-2022',
+    defaultDate: INITIAL_ACCOUNTING_DATE,
     outlet: 'TRF',
-    tariffAmt: 3500.00,
+    tariffAmt: 2999.00,
     defaultAllowance: 446.40,
     defaultTotalDisc: 500.00,
     cgtTax: 26.80,
     sgtTax: 26.80
   },
   {
-    roomNo: '312',
-    category: 'DELUXE (DLX)',
-    guestName: 'BASU ANIRUDH',
+    roomNo: '205',
+    category: 'EXECUTIVE (EXE)',
+    guestName: 'MR ANIL PATNAIK',
     regNo: '587',
     folioNo: '1',
     resvNo: '246',
-    arrival: '16-JAN-2022 11:49',
-    departure: '27-JAN-2022 12:00',
-    classification: 'Regular',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 11:49`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    classification: 'Corporate',
     nationality: 'India',
-    defaultDate: '25-JAN-2022',
+    defaultDate: INITIAL_ACCOUNTING_DATE,
     outlet: 'TRF',
-    tariffAmt: 3500.00,
+    tariffAmt: 2999.00,
     defaultAllowance: 312.50,
     defaultTotalDisc: 350.00,
     cgtTax: 18.75,
     sgtTax: 18.75
   },
   {
-    roomNo: '315',
-    category: 'EXECUTIVE (EXE)',
-    guestName: 'KHAN ARIF',
+    roomNo: '206',
+    category: 'DELUXE (DLX)',
+    guestName: 'MR DEEPAK MOHANTY',
     regNo: '588',
     folioNo: '1',
     resvNo: '248',
-    arrival: '22-JAN-2022 14:00',
-    departure: '28-JAN-2022 12:00',
-    classification: 'Corporate',
+    arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+    classification: 'Regular',
     nationality: 'India',
-    defaultDate: '25-JAN-2022',
+    defaultDate: INITIAL_ACCOUNTING_DATE,
     outlet: 'TRF',
-    tariffAmt: 4500.00,
-    defaultAllowance: 714.28,
-    defaultTotalDisc: 800.00,
-    cgtTax: 42.86,
-    sgtTax: 42.86
+    tariffAmt: 2499.00,
+    defaultAllowance: 357.14,
+    defaultTotalDisc: 400.00,
+    cgtTax: 21.43,
+    sgtTax: 21.43
   }
 ];
 
@@ -118,15 +83,15 @@ export const REVENUE_CODES_ALLOWANCE = [
 export default function IdsBillAllowanceDayWiseModal({
   isOpen,
   onClose,
-  initialRoomNo = '311',
-  accountingDate = '26-JAN-2022',
+  initialRoomNo = '102',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onSaveAllowance
 }) {
   // Active window view: 'bill-allowance' | 'view-folio'
   const [currentView, setCurrentView] = useState('bill-allowance');
 
   // Room Context
-  const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '311');
+  const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '102');
   const activeRoom = BILL_ALLOWANCE_ROOMS.find(r => r.roomNo === selectedRoomNo) || BILL_ALLOWANCE_ROOMS[0];
 
   // Dialog Visibility states
@@ -135,15 +100,15 @@ export default function IdsBillAllowanceDayWiseModal({
 
   // Select Revenue Dialog State (Frames 025–048)
   const [actionType, setActionType] = useState('Insert'); // 'Insert' | 'Delete'
-  const [fromDate, setFromDate] = useState('25-JAN-2022');
-  const [toDate, setToDate] = useState('25-JAN-2022');
+  const [fromDate, setFromDate] = useState(INITIAL_ACCOUNTING_DATE);
+  const [toDate, setToDate] = useState(INITIAL_ACCOUNTING_DATE);
   const [selectedRevenueCode, setSelectedRevenueCode] = useState('TRF');
 
   // Day-wise Grid Row State (Frames 050–060)
   const [gridLoaded, setGridLoaded] = useState(true);
-  const [rowDate, setRowDate] = useState('25-JAN-2022');
+  const [rowDate, setRowDate] = useState(INITIAL_ACCOUNTING_DATE);
   const [rowDescription, setRowDescription] = useState('Tariff');
-  const [rowAmount, setRowAmount] = useState('3500.00');
+  const [rowAmount, setRowAmount] = useState('2999.00');
   const [allowanceInput, setAllowanceInput] = useState('446.40');
   const [allowanceType, setAllowanceType] = useState('Discount');
   const [optionType, setOptionType] = useState('-');
@@ -160,19 +125,19 @@ export default function IdsBillAllowanceDayWiseModal({
   // Saved allowances history for this room session
   const [postedAllowances, setPostedAllowances] = useState([
     {
-      date: '26-JAN-2022 16:08',
+      date: `${INITIAL_ACCOUNTING_DATE} 16:08`,
       resvNo: '245',
-      roomNo: '311',
+      roomNo: '102',
       regNo: '566',
       revCode: 'TRF',
       billNo: '5',
-      particulars: '*Tariff 311/Discount',
+      particulars: '*Tariff 102/Discount',
       amount: -446.40
     },
     {
-      date: '26-JAN-2022 16:08',
+      date: `${INITIAL_ACCOUNTING_DATE} 16:08`,
       resvNo: '245',
-      roomNo: '311',
+      roomNo: '102',
       regNo: '566',
       revCode: 'CGT',
       billNo: '5',
@@ -180,9 +145,9 @@ export default function IdsBillAllowanceDayWiseModal({
       amount: -26.80
     },
     {
-      date: '26-JAN-2022 16:08',
+      date: `${INITIAL_ACCOUNTING_DATE} 16:08`,
       resvNo: '245',
-      roomNo: '311',
+      roomNo: '102',
       regNo: '566',
       revCode: 'SGT',
       billNo: '5',
@@ -920,12 +885,12 @@ export default function IdsBillAllowanceDayWiseModal({
                   <tbody>
                     {/* Sample Prior Ledger Entries matching Video 23 Frame 105 */}
                     {[
-                      { sl: 25, date: '25-JAN-2022 16:01', rev: 'TRF', bill: '', part: 'Tariff 311', amt: 3500.00 },
-                      { sl: 26, date: '25-JAN-2022 16:01', rev: 'CGT', bill: '', part: 'Central GST', amt: 210.00 },
-                      { sl: 27, date: '25-JAN-2022 16:01', rev: 'SGT', bill: '', part: 'State GST', amt: 210.00 },
-                      { sl: 28, date: '25-JAN-2022 16:01', rev: 'CP', bill: '', part: 'Continental Plan 311', amt: 500.00 },
-                      { sl: 29, date: '25-JAN-2022 16:01', rev: 'SGT', bill: '', part: 'State GST', amt: 30.00 },
-                      { sl: 30, date: '25-JAN-2022 16:01', rev: 'CGT', bill: '', part: 'Central GST', amt: 30.00 }
+                      { sl: 25, date: `${accountingDate} 16:01`, rev: 'TRF', bill: '', part: `Tariff ${selectedRoomNo}`, amt: 2999.00 },
+                      { sl: 26, date: `${accountingDate} 16:01`, rev: 'CGT', bill: '', part: 'Central GST', amt: 180.00 },
+                      { sl: 27, date: `${accountingDate} 16:01`, rev: 'SGT', bill: '', part: 'State GST', amt: 180.00 },
+                      { sl: 28, date: `${accountingDate} 16:01`, rev: 'CP', bill: '', part: `Continental Plan ${selectedRoomNo}`, amt: 500.00 },
+                      { sl: 29, date: `${accountingDate} 16:01`, rev: 'SGT', bill: '', part: 'State GST', amt: 30.00 },
+                      { sl: 30, date: `${accountingDate} 16:01`, rev: 'CGT', bill: '', part: 'Central GST', amt: 30.00 }
                     ].map(row => (
                       <tr key={row.sl} style={{ background: '#FFF' }}>
                         <td style={{ border: '1px solid #EBEBEB', textAlign: 'center' }}>{row.sl}</td>

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import './idsFortuneNext.css';
-import { INITIAL_ROOM_BLOCKS } from '../../data/idsPmsStore';
+import { INITIAL_ROOM_BLOCKS, INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 export default function IdsRoomBlockModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onBlockChange,
   onOpenMessageBox
 }) {
@@ -29,7 +29,7 @@ export default function IdsRoomBlockModal({
     roomNo: '206',
     blockType: 'OOO', // OOO or OOS
     fromDate: accountingDate,
-    toDate: '29-JAN-2022',
+    toDate: NEXT_ACCOUNTING_DATE,
     reasonCode: 'AC-REPAIR',
     reasonDescription: 'AC cooling coil replacement & maintenance',
     authorizedBy: 'DUTY MANAGER'
@@ -37,33 +37,23 @@ export default function IdsRoomBlockModal({
 
   if (!isOpen) return null;
 
-  // Calendar 30-Day Sequence
+  // Calendar 30-Day Sequence dynamically generated from live accounting date
   const daysHeader = [
-    { day: 'T', date: '27', full: '27-JAN-2022' },
-    { day: 'F', date: '28', full: '28-JAN-2022' },
-    { day: 'S', date: '29', full: '29-JAN-2022' },
-    { day: 'S', date: '30', full: '30-JAN-2022' },
-    { day: 'M', date: '31', full: '31-JAN-2022' },
-    { day: 'T', date: '01', full: '01-FEB-2022' },
-    { day: 'W', date: '02', full: '02-FEB-2022' },
-    { day: 'T', date: '03', full: '03-FEB-2022' },
-    { day: 'F', date: '04', full: '04-FEB-2022' },
-    { day: 'S', date: '05', full: '05-FEB-2022' },
-    { day: 'S', date: '06', full: '06-FEB-2022' },
-    { day: 'M', date: '07', full: '07-FEB-2022' },
-    { day: 'T', date: '08', full: '08-FEB-2022' },
-    { day: 'W', date: '09', full: '09-FEB-2022' },
-    { day: 'T', date: '10', full: '10-FEB-2022' },
-    { day: 'F', date: '11', full: '11-FEB-2022' },
-    { day: 'S', date: '12', full: '12-FEB-2022' },
-    { day: 'S', date: '13', full: '13-FEB-2022' },
-    { day: 'M', date: '14', full: '14-FEB-2022' },
-    { day: 'T', date: '15', full: '15-FEB-2022' },
-    { day: 'W', date: '16', full: '16-FEB-2022' },
-    { day: 'T', date: '17', full: '17-FEB-2022' },
-    { day: 'F', date: '18', full: '18-FEB-2022' },
-    { day: 'S', date: '19', full: '19-FEB-2022' },
-    { day: 'S', date: '20', full: '20-FEB-2022' }
+    ...Array.from({ length: 25 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      const dayChars = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const dayLetter = dayChars[d.getDay()];
+      const dayNum = String(d.getDate()).padStart(2, '0');
+      const monthStr = months[d.getMonth()];
+      const year = d.getFullYear();
+      return {
+        day: dayLetter,
+        date: dayNum,
+        full: `${dayNum}-${monthStr}-${year}`
+      };
+    })
   ];
 
   const floorsList = [
@@ -124,7 +114,7 @@ export default function IdsRoomBlockModal({
         roomNo: room.roomNo,
         blockType: 'OOO',
         fromDate: dateObj.full,
-        toDate: '29-JAN-2022',
+        toDate: '29-JAN-2026',
         reasonCode: 'MAINTENANCE',
         reasonDescription: 'Preventive deep cleaning & AC maintenance',
         authorizedBy: 'DUTY MANAGER'
@@ -307,7 +297,7 @@ export default function IdsRoomBlockModal({
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9' }}>
                   <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '90px', textAlign: 'left' }}>Room #</th>
                   <th colSpan={daysHeader.length} style={{ padding: '4px', textAlign: 'center', fontWeight: 'bold' }}>
-                    JAN'2022 - FEB'2022
+                    JAN'2026 - FEB'2026
                   </th>
                 </tr>
 

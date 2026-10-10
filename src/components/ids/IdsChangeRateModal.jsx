@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
    1. Change Rate V6.5002.2 Dialog (Video 11 Frames 024–025 & 045)
    2. Rate Details Dialog (Video 11 Frames 028–030 & 045)
    3. Package Selection V6.5.002.1 Sub-Dialog (Video 11 Frame 032)
-   4. Live persistence into Room 312 and sync with Room Rack & Guest Information
+   4. Live persistence into Room 102 and sync with Room Rack & Guest Information
    ========================================================================= */
 
 // Authentic 27-Room Tariff Database for Hotel Elite Inn Front Desk PMS

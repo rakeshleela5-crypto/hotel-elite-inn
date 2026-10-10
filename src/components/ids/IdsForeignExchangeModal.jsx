@@ -20,7 +20,7 @@ import {
       - Currency: United States of Dollar (USD - 77.75), Euro (EUR - 85.50), GBP (99.20), AED (21.15)
       - Particulars: Money Exchange
       - Exg. Amount: 2,000.00 | Voucher: 3 with [ ? ] lookup
-      - Encashment #: ENC/2022/003 | Accounting Date: 17-MAR-2022
+      - Encashment #: ENC/2026/003 | Accounting Date: 17-MAR-2026
       - [ Reprint ] button
    4. Guest KYC & Passport Profile (Frame 048):
       - Room#: 1002 / 201 | Name: Mr Gomes | Passport #: S1234567
@@ -49,8 +49,8 @@ export const CURRENCY_RATES = {
 export const INITIAL_ENCASHMENTS_DATABASE = [
   {
     voucherNo: '3',
-    encashmentNo: 'ENC/2022/003',
-    accountingDate: '17-MAR-2022',
+    encashmentNo: 'ENC/2026/003',
+    accountingDate: '17-MAR-2026',
     currencyCode: 'USD',
     currencyName: 'United States of Dollar',
     roomNo: '1002',
@@ -73,8 +73,8 @@ export const INITIAL_ENCASHMENTS_DATABASE = [
   },
   {
     voucherNo: '2',
-    encashmentNo: 'ENC/2022/002',
-    accountingDate: '16-MAR-2022',
+    encashmentNo: 'ENC/2026/002',
+    accountingDate: '16-MAR-2026',
     currencyCode: 'EUR',
     currencyName: 'Euro',
     roomNo: '201',
@@ -100,7 +100,7 @@ export const INITIAL_ENCASHMENTS_DATABASE = [
 export default function IdsForeignExchangeModal({
   isOpen,
   onClose,
-  accountingDate = '17-MAR-2022',
+  accountingDate = '17-MAR-2026',
   onOpenCrystalReport
 }) {
   const [encashmentsList, setEncashmentsList] = useState(INITIAL_ENCASHMENTS_DATABASE);
@@ -110,7 +110,7 @@ export default function IdsForeignExchangeModal({
   const [currencyCode, setCurrencyCode] = useState('USD');
   const [particulars, setParticulars] = useState('Money Exchange');
   const [voucherNo, setVoucherNo] = useState('3');
-  const [encashmentNo, setEncashmentNo] = useState('ENC/2022/003');
+  const [encashmentNo, setEncashmentNo] = useState('ENC/2026/003');
   const [roomNo, setRoomNo] = useState('1002');
   const [guestName, setGuestName] = useState('Mr Gomes');
   const [passportNo, setPassportNo] = useState('S1234567');
@@ -165,7 +165,7 @@ export default function IdsForeignExchangeModal({
   const handleSaveEncashment = () => {
     const newRecord = {
       voucherNo,
-      encashmentNo: `ENC/2022/00${voucherNo}`,
+      encashmentNo: `ENC/2026/00${voucherNo}`,
       accountingDate,
       currencyCode,
       currencyName: currentRateObj.name,
@@ -478,7 +478,7 @@ export default function IdsForeignExchangeModal({
                 <div style={{ textAlign: 'center', borderBottom: '2px double #000', paddingBottom: '8px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '14px', fontWeight: 900 }}>HOTEL ELITE INN</div>
                   <div style={{ fontSize: '10px' }}>Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020</div>
-                  <div style={{ fontSize: '10px' }}>RBI AUTHORIZED MONEY CHANGER (FFMC) • Licence No: RL/BBSR/2022/1084 | GSTIN: 21AEWFS9433F1ZN</div>
+                  <div style={{ fontSize: '10px' }}>RBI AUTHORIZED MONEY CHANGER (FFMC) • Licence No: RL/BBSR/2026/1084 | GSTIN: 21AEWFS9433F1ZN</div>
                   <div style={{ fontSize: '12px', fontWeight: 800, marginTop: '4px', textDecoration: 'underline' }}>
                     CERTIFICATE OF ENCASHMENT (FORM E.C.F.)
                   </div>

@@ -5,7 +5,7 @@ import { Users, Building, CreditCard, Gift, AlertOctagon } from 'lucide-react';
 export default function IdsLaundryReSettlementModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onReSettlementComplete,
   onOpenMessageBox
 }) {

@@ -711,12 +711,12 @@ export function IdsChangeGuestInfoModal({
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '11px' }}>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span>Arrival</span>
-                <input className="ids-input" value={formData.arrival || '05-JAN-2022 20:28'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
+                <input className="ids-input" value={formData.arrival || '05-JAN-2026 20:28'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
               </div>
 
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span>Departure</span>
-                <input className="ids-input" value={formData.departure || '15-JAN-2022 12:00'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
+                <input className="ids-input" value={formData.departure || '15-JAN-2026 12:00'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
               </div>
 
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -1285,7 +1285,7 @@ export function IdsGuestInformationModal({
           {/* Company Row */}
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px' }}>
             <span style={{ fontWeight: 600, width: '90px' }}>Company</span>
-            <input className="ids-input" value={selectedGuest?.companyName || 'Indian Bank'} readOnly style={{ width: '240px', background: '#EBEBE4' }} />
+            <input className="ids-input" value={selectedGuest?.companyName || 'JK Paper Mills Ltd'} readOnly style={{ width: '240px', background: '#EBEBE4' }} />
             <span style={{ fontWeight: 600, marginLeft: '12px', width: '90px' }}>Com. Remarks</span>
             <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
           </div>
@@ -1295,10 +1295,10 @@ export function IdsGuestInformationModal({
             {/* Left Details */}
             <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '4px', alignItems: 'center', fontSize: '10.5px' }}>
               <span>Arrival</span>
-              <input className="ids-input" value={selectedGuest?.arrival || '16-JAN-2022 11:49 SUNDAY'} readOnly style={{ background: '#EBEBE4' }} />
+              <input className="ids-input" value={selectedGuest?.arrival || '16-JAN-2026 11:49 SUNDAY'} readOnly style={{ background: '#EBEBE4' }} />
 
               <span>Departure</span>
-              <input className="ids-input" value={selectedGuest?.departure || '26-JAN-2022 12:00 WEDNESDAY'} readOnly style={{ background: '#EBEBE4' }} />
+              <input className="ids-input" value={selectedGuest?.departure || '26-JAN-2026 12:00 WEDNESDAY'} readOnly style={{ background: '#EBEBE4' }} />
 
               <span>Room Night(s)</span>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>

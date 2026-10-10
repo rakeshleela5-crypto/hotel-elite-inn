@@ -5,7 +5,7 @@ import { INITIAL_LAUNDRY_ITEMS, INITIAL_LAUNDRY_RATES } from '../../data/idsPmsS
 export default function IdsLaundryRateMasterModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onSaveRate,
   onOpenMessageBox
 }) {
@@ -20,7 +20,7 @@ export default function IdsLaundryRateMasterModal({
   const currentRate = rates[currentIndex] || rates[0] || {
     itemCode: '1',
     itemName: 'SHIRT',
-    applicableFrom: '27-JAN-2022',
+    applicableFrom: '27-JAN-2026',
     serviceType: 'Washing',
     category: 'Gentleman',
     currency: 'Indian Rupees',
@@ -29,7 +29,7 @@ export default function IdsLaundryRateMasterModal({
     expressCharge: 120,
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 19:50'
+    lastUpdated: '27-JAN-2026 19:50'
   };
 
   const [formData, setFormData] = useState({

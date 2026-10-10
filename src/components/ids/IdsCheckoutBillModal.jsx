@@ -1,110 +1,88 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { Printer, Search, Scissors, DollarSign, X, Check, FileText, Users } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 15 & 16: CHECKOUT & SETTLE FRONT OFFICE BILL & BULK CHECK OUT
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT V6.5 & V7.0
-   Replication of:
-   1. Check-out V6.5.002.6 Console (Video 15 Frame 010 & Video 16 Frame 018/022)
-   2. Bill Summary V6.5.002.6 Dialog (Video 15 Frame 013 & Video 16 Frame 024/038)
-   3. Bill Split Dialog (Video 15 Frame 020 & Video 16 Frame 032)
-   4. View Bill Line-Item Detail Dialog (Video 15 Frame 022)
-   5. FO Bill Print Crystal Dialog & Invoice Preview (Video 15 Frame 030 & Video 16 Frame 042)
-   6. Settlements V6.5.008.30 Dialog (Video 15 Frame 035/060 & Video 16 Frame 055)
-   7. Clear Room# Multi-Room Confirmation Popup (Video 16 Frame 070)
-   8. Bill # Lookup Dialog (Video 15 Frame 036)
    ========================================================================= */
 
-// All 16 Expected Departures matching Video 15 Frame 010
+// Expected Departures for Hotel Elite Inn
 export const DEFAULT_EXPECTED_DEPARTURES = [
-  { roomNo: '305', time: '00:00', date: '17-JAN-2022', guest: 'KAKATI', type: 'DLX', company: 'ALL' },
-  { roomNo: '403', time: '00:00', date: '17-JAN-2022', guest: 'DEKA', type: 'DLX', company: 'ALL' },
-  { roomNo: '404', time: '00:00', date: '17-JAN-2022', guest: 'DAS', type: 'DLX', company: 'ALL' },
-  { roomNo: '303', time: '12:00', date: '17-JAN-2022', guest: 'CHETIA', type: 'DLX', company: 'Mr. Gaurav Baruah' },
-  { roomNo: '304', time: '12:00', date: '17-JAN-2022', guest: 'CHETIA', type: 'DLX', company: 'Mr. Gaurav Baruah' },
-  { roomNo: '306', time: '12:00', date: '17-JAN-2022', guest: 'SINGH', type: 'DLX', company: 'ALL' },
-  { roomNo: '307', time: '12:00', date: '17-JAN-2022', guest: 'SINGH', type: 'DLX', company: 'ALL' },
-  { roomNo: '310', time: '12:00', date: '17-JAN-2022', guest: 'WAHLANG', type: 'DLX', company: 'ALL' },
-  { roomNo: '311', time: '12:00', date: '17-JAN-2022', guest: 'DEURI', type: 'DLX', company: 'ALL' },
-  { roomNo: '315', time: '12:00', date: '17-JAN-2022', guest: 'Khan', type: 'EXE', company: 'Corporate FIT' },
-  { roomNo: '409', time: '12:00', date: '17-JAN-2022', guest: 'BHATTASALI', type: 'DLX', company: 'ALL' },
-  { roomNo: '503', time: '12:00', date: '17-JAN-2022', guest: 'NATRAJ', type: 'DLX', company: 'ALL' },
-  { roomNo: '504', time: '12:00', date: '17-JAN-2022', guest: 'MENAN', type: 'DLX', company: 'ALL' },
-  { roomNo: '505', time: '12:00', date: '17-JAN-2022', guest: 'BEDI', type: 'DLX', company: 'ALL' },
-  { roomNo: '516', time: '12:00', date: '17-JAN-2022', guest: 'Biswakarma', type: 'SUI', company: 'Mahindra & Mahindra' },
-  { roomNo: '401', time: '23:00', date: '17-JAN-2022', guest: 'Khan', type: 'EXE', company: 'Corporate FIT' },
-  // Video 15 Target Room 314
-  { roomNo: '314', time: '12:00', date: '18-JAN-2022', guest: 'Anirudh', type: 'DLX', company: 'COM0015 / Indian Bank', isGroup: false }
+  { roomNo: '102', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'SHARMA', type: 'DLX', company: 'Ashok Leyland Ltd' },
+  { roomNo: '105', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'MOHANTY', type: 'EXE', company: 'Linde India Ltd' },
+  { roomNo: '108', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'SHARMA', type: 'STD', company: 'Direct FIT' },
+  { roomNo: '109', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'MOHANTY', type: 'SUI', company: 'AIIMS Consultant' },
+  { roomNo: '201', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'KUMAR', type: 'EXE', company: 'JK Paper Mills Ltd' },
+  { roomNo: '203', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'PATEL', type: 'EXE', company: 'Utkal Alumina' },
+  { roomNo: '205', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'KUMAR', type: 'EXE', company: 'JK Paper Mills Ltd' },
+  { roomNo: '206', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'JENA', type: 'DLX', company: 'Vedanta Ltd' },
+  { roomNo: '207', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'DELEGATION', type: 'EXE', company: 'JK Paper Mills Ltd' },
+  { roomNo: '301', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'RATH', type: 'STD', company: 'Corporate FIT' },
+  { roomNo: '303', time: '12:00', date: INITIAL_ACCOUNTING_DATE, guest: 'MISHRA', type: 'DLX', company: 'Direct FIT' }
 ];
 
-// Video 16: Sharma Group 10 Rooms matching Video 16 Frame 020, 024 & 070
+// Video 16: Corporate Group Rooms (JK Paper Technical Delegation)
 export const SHARMA_GROUP_ROOMS = [
-  { roomNo: '406', regNo: '593', guest: 'Mr. Sharma Rohir', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', isLeader: true, selected: true },
-  { roomNo: '407', regNo: '595', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '408', regNo: '597', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '410', regNo: '599', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '411', regNo: '601', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '412', regNo: '603', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '414', regNo: '605', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '506', regNo: '607', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '508', regNo: '609', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true },
-  { roomNo: '507', regNo: '611', guest: 'MR Sharma Group', billTo: 'DIRECT', rate: 2975.00, charges: 0, taxes: 357.00, receipts: 0, netAmount: 3332.00, time: '12:00', date: '18-JAN-2022', selected: true }
+  { roomNo: '201', regNo: '613', guest: 'Mr. Anil Kumar', billTo: 'BTC', rate: 2050.00, charges: 0, taxes: 246.00, receipts: 0, netAmount: 2296.00, time: '12:00', date: INITIAL_ACCOUNTING_DATE, isLeader: true, selected: true },
+  { roomNo: '205', regNo: '615', guest: 'JK Paper Technical Team', billTo: 'BTC', rate: 2050.00, charges: 0, taxes: 246.00, receipts: 0, netAmount: 2296.00, time: '12:00', date: INITIAL_ACCOUNTING_DATE, selected: true },
+  { roomNo: '207', regNo: '617', guest: 'JK Paper Delegation', billTo: 'BTC', rate: 2050.00, charges: 0, taxes: 246.00, receipts: 0, netAmount: 2296.00, time: '12:00', date: INITIAL_ACCOUNTING_DATE, selected: true }
 ];
 
-// Target Single Room 314 Bill Profile (Video 15 Frame 013 & 020)
+// Target Single Room 102 Bill Profile
 export const TARGET_ROOM_314_BILL = {
-  roomNo: '314',
-  regNo: '589',
-  resNo: '272',
-  guestName: 'MR. Anirudh',
+  roomNo: '102',
+  regNo: '501',
+  resNo: '269',
+  guestName: 'MR. RAJESH SHARMA',
   groupName: '',
   folioNo: '1',
-  companyCode: 'COM0015',
-  companyName: 'Indian Bank',
+  companyCode: 'COM0001',
+  companyName: 'Ashok Leyland Ltd',
   billing: '1 / Direct',
   payMode: 'Cash',
   specialIns: '',
-  arrival: '16-JAN-2022 11:50',
-  departure: '18-JAN-2022 12:00',
-  rate: 3500.00,
+  arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+  departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+  rate: 1750.00,
   plan: 0.00,
-  charges: 765.66,
-  taxes: 458.34,
+  charges: 0.00,
+  taxes: 210.00,
   receipts: 0.00,
-  netAmount: 4724.00,
+  netAmount: 1960.00,
   billNo: '501'
 };
 
-// Target Sharma Group Consolidated Bill Profile (Video 16 Frame 024, 038 & 055)
+// Target Corporate Delegation Consolidated Bill Profile
 export const TARGET_SHARMA_GROUP_BILL = {
-  roomNo: '406',
-  regNo: '593',
+  roomNo: '201',
+  regNo: '613',
   resNo: '276',
-  guestName: 'Mr. Sharma Rohir',
-  groupName: 'Sharma Group',
+  guestName: 'Mr. Anil Kumar',
+  groupName: 'JK Paper Delegation',
   folioNo: '1',
-  companyCode: 'COM0006',
-  companyName: 'M/S. ALKEM LABS. LTD.',
+  companyCode: 'COM0003',
+  companyName: 'JK Paper Mills Ltd',
   billing: '4 / Room to Company Extras Direct',
-  payMode: 'Cash',
+  payMode: 'BTC',
   specialIns: '',
-  arrival: '16-JAN-2022 11:56',
-  departure: '18-JAN-2022 12:00',
-  rate: 2975.00,
-  totalRate: 29750.00,
+  arrival: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+  departure: `${NEXT_ACCOUNTING_DATE} 12:00`,
+  rate: 2050.00,
+  totalRate: 6150.00,
   plan: 0.00,
   charges: 0.00,
-  totalTaxes: 3570.00,
+  totalTaxes: 738.00,
   receipts: 0.00,
-  netAmount: 33320.00,
+  netAmount: 6888.00,
   billNo: '502'
 };
 
 export default function IdsCheckoutBillModal({
   isOpen,
   onClose,
-  initialRoomNo = '314',
+  initialRoomNo = '102',
   initialGroup = '',
   initialMode = 'checkout', // 'checkout' | 'bulk' | 'settlement'
   onCompleteCheckout,
@@ -199,7 +177,7 @@ export default function IdsCheckoutBillModal({
   const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal #1');
 
   const [companyCodeInput, setCompanyCodeInput] = useState(initialMode === 'bulk' ? 'COM0006' : 'COM0015');
-  const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'Indian Bank');
+  const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'JK Paper Mills Ltd');
   const [companyAmountInput, setCompanyAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4724.00');
 
   const [statusMessage, setStatusMessage] = useState('');
@@ -402,7 +380,7 @@ export default function IdsCheckoutBillModal({
                   }}
                 >
                   <option value="ALL">ALL</option>
-                  <option value="Indian Bank">COM0015 / Indian Bank</option>
+                  <option value="JK Paper Mills Ltd">COM0015 / JK Paper Mills Ltd</option>
                   <option value="M/S ALKEM LABS. LTD.">COM0006 / M/S ALKEM LABS. LTD.</option>
                   <option value="Corporate FIT">COM0005 / Corporate FIT</option>
                   <option value="Mahindra">COM0007 / Mahindra</option>
@@ -1368,38 +1346,38 @@ export default function IdsCheckoutBillModal({
                       SHARMA_GROUP_ROOMS.flatMap((r, i) => [
                         <tr key={`t-${r.roomNo}`} style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 1}</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 11:56</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>276</td>
                           <td style={{ borderRight: '1px solid #EEE', fontWeight: 600 }}>{r.roomNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>TRF</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* Tariff {r.roomNo}</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>2,975.00</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>2,050.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>,
                         <tr key={`cg-${r.roomNo}`} style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 2}</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 11:56</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>276</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>{r.roomNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* Central GST</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>178.50</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>123.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>,
                         <tr key={`sg-${r.roomNo}`} style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>{i * 3 + 3}</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 11:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 11:56</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>276</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>{r.roomNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>{r.regNo}</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* State GST</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>178.50</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>123.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                       ])
@@ -1407,74 +1385,74 @@ export default function IdsCheckoutBillModal({
                       <>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>1</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>TRF</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>* Tariff 314</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>3,500.00</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>* Tariff 102</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>1,750.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>2</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* Central GST</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>105.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>3</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>16-JAN-2022 18:56</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 18:56</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}></td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* State GST</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>210.00</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>105.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>4</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>POS</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>1</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* RMS/GN / FOOD</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>765.66</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>450.00</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>5</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>CGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>1</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* Central GST (F&amp;B)</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>11.25</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                         <tr style={{ background: '#FFF' }}>
                           <td style={{ textAlign: 'center', borderRight: '1px solid #EEE' }}>6</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>17-JAN-2022 14:10</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>272</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>314</td>
-                          <td style={{ borderRight: '1px solid #EEE' }}>589</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>{INITIAL_ACCOUNTING_DATE} 14:10</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>269</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>102</td>
+                          <td style={{ borderRight: '1px solid #EEE' }}>501</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>SGT</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>1</td>
                           <td style={{ borderRight: '1px solid #EEE' }}>* State GST (F&amp;B)</td>
-                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>19.17</td>
+                          <td style={{ textAlign: 'right', borderRight: '1px solid #EEE' }}>11.25</td>
                           <td style={{ textAlign: 'right' }}>0.00</td>
                         </tr>
                       </>
@@ -1556,16 +1534,16 @@ export default function IdsCheckoutBillModal({
                     if (onOpenCrystalReport) {
                       onOpenCrystalReport('rule46-bill', {
                         billNo: settlementBillNo,
-                        billDate: '25-JAN-2022',
-                        roomNo: isGroupMode ? '406 (Sharma Group)' : currentRoom,
-                        guestName: isGroupMode ? 'SHARMA GROUP (10 ROOMS)' : billData.guestName,
-                        companyName: isGroupMode ? 'M/S. ALKEM LABS. LTD.' : 'Corporate FIT',
-                        gstin: isGroupMode ? '27AABCA1234F1Z8' : '',
-                        roomType: isGroupMode ? 'EXE' : (billData.roomType || 'EXE'),
+                        billDate: INITIAL_ACCOUNTING_DATE,
+                        roomNo: isGroupMode ? '201 (JK Paper Delegation)' : currentRoom,
+                        guestName: isGroupMode ? 'JK PAPER TECHNICAL DELEGATION' : billData.guestName,
+                        companyName: isGroupMode ? 'JK Paper Mills Ltd' : 'Ashok Leyland Ltd',
+                        gstin: isGroupMode ? '21AAACA1028L1ZV' : '',
+                        roomType: isGroupMode ? 'EXE' : (billData.roomType || 'DLX'),
                         ratePlan: 'CP',
-                        roomTariff: isGroupMode ? 29750.00 : (billData.rate || 3500.00),
-                        cgst: isGroupMode ? 1785.00 : 210.00,
-                        sgst: isGroupMode ? 1785.00 : 210.00,
+                        roomTariff: isGroupMode ? 6150.00 : (billData.rate || 1750.00),
+                        cgst: isGroupMode ? 369.00 : 105.00,
+                        sgst: isGroupMode ? 369.00 : 105.00,
                         grandTotal: totalBillNet,
                         payMode: Object.keys(settlementOptions).filter(k => settlementOptions[k] > 0).join(', ') || 'Cash'
                       });
@@ -1615,47 +1593,47 @@ export default function IdsCheckoutBillModal({
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Bill 502 (Sharma Group) */}
+                    {/* Bill 502 (JK Paper Delegation) */}
                     <tr 
                       style={{ background: settlementBillNo === '502' ? '#316AC5' : '#FFF', color: settlementBillNo === '502' ? '#FFF' : '#000', cursor: 'pointer', fontWeight: 700 }}
                       onClick={() => {
                         setSettlementBillNo('502');
                         setIsGroupMode(true);
                         setBillData(TARGET_SHARMA_GROUP_BILL);
-                        setCardAmountInput('33320.00');
-                        setCompanyAmountInput('33320.00');
+                        setCardAmountInput('6888.00');
+                        setCompanyAmountInput('6888.00');
                         setSettlementLoaded(true);
                         setBillLookupOpen(false);
                       }}
                     >
                       <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>502</td>
-                      <td style={{ borderRight: '1px solid #4477DD' }}>18-JAN-2022</td>
+                      <td style={{ borderRight: '1px solid #4477DD' }}>{INITIAL_ACCOUNTING_DATE}</td>
                       <td style={{ borderRight: '1px solid #4477DD' }}>PENDING</td>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>406</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>201</td>
                       <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>1</td>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>593</td>
-                      <td style={{ textAlign: 'right' }}>33,320.00</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>613</td>
+                      <td style={{ textAlign: 'right' }}>6,888.00</td>
                     </tr>
-                    {/* Bill 501 (Room 314) */}
+                    {/* Bill 501 (Room 102) */}
                     <tr 
                       style={{ background: settlementBillNo === '501' ? '#316AC5' : '#FFF', color: settlementBillNo === '501' ? '#FFF' : '#000', cursor: 'pointer', fontWeight: 700 }}
                       onClick={() => {
                         setSettlementBillNo('501');
                         setIsGroupMode(false);
                         setBillData(TARGET_ROOM_314_BILL);
-                        setCardAmountInput('4000.00');
-                        setCompanyAmountInput('4724.00');
+                        setCardAmountInput('1960.00');
+                        setCompanyAmountInput('1960.00');
                         setSettlementLoaded(true);
                         setBillLookupOpen(false);
                       }}
                     >
                       <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>501</td>
-                      <td style={{ borderRight: '1px solid #4477DD' }}>17-JAN-2022</td>
+                      <td style={{ borderRight: '1px solid #4477DD' }}>{INITIAL_ACCOUNTING_DATE}</td>
                       <td style={{ borderRight: '1px solid #4477DD' }}>PENDING</td>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>314</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>102</td>
                       <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>1</td>
-                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>589</td>
-                      <td style={{ textAlign: 'right' }}>4,724.00</td>
+                      <td style={{ textAlign: 'center', borderRight: '1px solid #4477DD' }}>501</td>
+                      <td style={{ textAlign: 'right' }}>1,960.00</td>
                     </tr>
                   </tbody>
                 </table>

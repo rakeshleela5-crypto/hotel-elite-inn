@@ -4,6 +4,7 @@ import {
   HelpCircle, Car, ArrowRight, ArrowLeft, Printer, ShieldCheck 
 } from 'lucide-react';
 import { INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 05: RESERVATION CHECK-IN FOR SINGLE ROOM IN IDS FORTUNE NEXT 6.5 & 7.0
@@ -73,8 +74,8 @@ export function IdsCheckinGuestListModal({
   if (!isOpen || !booking) return null;
 
   const guests = booking.guestList || [
-    { title: 'Mr', name: 'Biswakarma Santosh', roomNo: booking.roomNo || '516', flag: 'No', refNo: '' },
-    { title: 'Mrs', name: 'Rai Sangeeta', roomNo: booking.roomNo || '516', flag: 'No', refNo: '' }
+    { title: 'Mr', name: 'Biswakarma Santosh', roomNo: booking.roomNo || '201', flag: 'No', refNo: '' },
+    { title: 'Mrs', name: 'Rai Sangeeta', roomNo: booking.roomNo || '201', flag: 'No', refNo: '' }
   ];
 
   return (
@@ -358,15 +359,15 @@ export function IdsCheckInRegistrationModal({
         // All guests checked in!
         onCompleteCheckIn({
           resNo: booking.resNo || '271',
-          roomNo: booking.roomNo || '516',
+          roomNo: booking.roomNo || '201',
           regNo: regNo || '581',
           guest1,
           guest2,
           rate: '6,500.00',
           planAmt: '700.00',
           totalGuests: 2,
-          arrivalDate: booking.arrivalDate || '14-JAN-2022',
-          departureDate: booking.departureDate || '16-JAN-2022'
+          arrivalDate: booking.arrivalDate || INITIAL_ACCOUNTING_DATE,
+          departureDate: booking.departureDate || NEXT_ACCOUNTING_DATE
         });
       }
     }, 400);
@@ -386,7 +387,7 @@ export function IdsCheckInRegistrationModal({
             {/* Top Registration Title & Pax/Folio Strip */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
               <div style={{ border: '1px solid #716F64', padding: '3px 8px', background: '#F8F7F0', fontWeight: 700, fontSize: '11px' }}>
-                Registration for {booking.roomNo || '516'}
+                Registration for {booking.roomNo || '201'}
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -651,7 +652,8 @@ export function IdsCheckInRegistrationModal({
 export function IdsCheckedInPositionModal({ 
   isOpen, 
   onClose, 
-  checkedInList = [] 
+  checkedInList = [],
+  accountingDate = INITIAL_ACCOUNTING_DATE
 }) {
   if (!isOpen) return null;
 
@@ -660,7 +662,7 @@ export function IdsCheckedInPositionModal({
       <div className="ids-dialog-window" style={{ width: '820px', maxWidth: '98vw' }}>
         {/* Title Bar */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontWeight: 700 }}>Detailed Position - Already checked-in - 14-JAN-2022</span>
+          <span style={{ fontWeight: 700 }}>Detailed Position - Already checked-in - {accountingDate}</span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
 
@@ -685,14 +687,14 @@ export function IdsCheckedInPositionModal({
                 {checkedInList.map((c, idx) => (
                   <React.Fragment key={idx}>
                     <tr style={{ background: '#F8F7F0' }}>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>{c.roomNo || '516'}</td>
+                      <td style={{ fontWeight: 700, color: '#A02020' }}>{c.roomNo || '201'}</td>
                       <td style={{ fontWeight: 700 }}>{c.regNo || '581'}</td>
                       <td>{c.type || 'SUI'}</td>
                       <td style={{ fontWeight: 600 }}>{c.guestName || 'Mr Biswakarma Santosh'}</td>
                       <td style={{ textAlign: 'right', fontWeight: 600 }}>{c.rate || '6,500.00'}</td>
                       <td style={{ textAlign: 'right' }}>{c.planAmt || '700.00'}</td>
-                      <td>{c.arrivalDate ? c.arrivalDate.split(' ')[0] : '14-JAN-2022'}</td>
-                      <td>{c.departureDate ? c.departureDate.split(' ')[0] : '16-JAN-2022'}</td>
+                      <td>{c.arrivalDate ? c.arrivalDate.split(' ')[0] : accountingDate}</td>
+                      <td>{c.departureDate ? c.departureDate.split(' ')[0] : NEXT_ACCOUNTING_DATE}</td>
                       <td>{c.nation || 'IND'}</td>
                       <td>{c.user || 'MANAGER'}</td>
                     </tr>
@@ -734,7 +736,7 @@ export function IdsRoomRackConsoleModal({
   isOpen, 
   onClose, 
   checkedInList = [],
-  occupiedRoom = '516', 
+  occupiedRoom = '201', 
   guestName = 'Biswakarma',
   clearedRooms = [],
   onClearSingleRoom,
@@ -774,7 +776,7 @@ export function IdsRoomRackConsoleModal({
   // Video 09: Context menu & Clear Room dialog states (Frames 018–035)
   const [contextMenu, setContextMenu] = useState(null); // { roomNo, category, x, y }
   const [clearDialogRoom, setClearDialogRoom] = useState(null); // roomNo being cleared
-  const [hskStaff, setHskStaff] = useState('Lakshyajit Changmai');
+  const [hskStaff, setHskStaff] = useState('Sunil Mohapatra');
   const [authorizedBy, setAuthorizedBy] = useState('HK SUPERVISOR');
   const [remarks, setRemarks] = useState('CLEAN');
   const [roomStatusOpt, setRoomStatusOpt] = useState('Clean');
@@ -810,7 +812,7 @@ export function IdsRoomRackConsoleModal({
     '203': 'V. Patel',
     '206': 'S. Jena',
     '301': 'Tenzing',
-    '303': 'J. Chetia',
+    '303': 'S. Mishra',
     '109': 'Dr. Mohanty'
   };
 
@@ -902,11 +904,11 @@ export function IdsRoomRackConsoleModal({
   const handleOpenClearDialog = (roomNo) => {
     setContextMenu(null);
     setClearDialogRoom(roomNo);
-    // Set realistic staff member matching Video 09 (Frame 022 Lakshyajit Changmai, Frame 032 Jayanta Chetia)
+    // Set realistic housekeeping staff
     if (roomNo === '203') {
-      setHskStaff('Jayanta Chetia');
+      setHskStaff('Sunil Mohapatra');
     } else {
-      setHskStaff('Lakshyajit Changmai');
+      setHskStaff('Ramesh Nayak');
     }
     setAuthorizedBy('HK SUPERVISOR');
     setRemarks('CLEAN');
@@ -1570,10 +1572,10 @@ export function IdsRoomRackConsoleModal({
                     onChange={(e) => setHskStaff(e.target.value)}
                     style={{ width: '100%', fontWeight: 600 }}
                   >
-                    <option value="Lakshyajit Changmai">Lakshyajit Changmai</option>
-                    <option value="Jayanta Chetia">Jayanta Chetia</option>
-                    <option value="Manoranjan">Manoranjan</option>
-                    <option value="Dhonsing">Dhonsing</option>
+                    <option value="Sunil Mohapatra">Sunil Mohapatra</option>
+                    <option value="Ramesh Nayak">Ramesh Nayak</option>
+                    <option value="Santosh Biswal">Santosh Biswal</option>
+                    <option value="Prakash Sahu">Prakash Sahu</option>
                   </select>
 
                   <span style={{ fontWeight: 600 }}>Authorized by</span>

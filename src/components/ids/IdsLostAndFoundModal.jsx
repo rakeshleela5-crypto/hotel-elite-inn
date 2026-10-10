@@ -5,7 +5,7 @@ import { INITIAL_LOST_AND_FOUND } from '../../data/idsPmsStore';
 export default function IdsLostAndFoundModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onSaveRecord,
   onOpenMessageBox
 }) {
@@ -31,15 +31,15 @@ export default function IdsLostAndFoundModal({
   });
 
   const currentRecord = records[currentIndex] || records[0] || {
-    refNo: 'LF-2022-014',
+    refNo: 'LF-2026-014',
     module: 'Front Office',
-    lostDate: '27-JAN-2022',
+    lostDate: '27-JAN-2026',
     place: 'Room 205',
     article: 'Black Leather Men Wallet with PAN & Driving License',
     approxValue: 2500,
-    finder: 'Dhonsing Terang',
+    finder: 'Ramesh Nayak',
     checkedBy: 'IT ADMIN',
-    foundDate: '27-JAN-2022',
+    foundDate: '27-JAN-2026',
     foundTime: '14:15',
     custodyLocker: 'HK-LOCKER-B04',
     status: 'In Safe Custody',
@@ -49,7 +49,7 @@ export default function IdsLostAndFoundModal({
     guestName: 'Mr Kumar Anil',
     guestAddress: 'Plot 44, Saheed Nagar, Bhubaneswar, Odisha',
     user: 'MANAGER',
-    lastUpdated: '27-JAN-2022 20:11'
+    lastUpdated: '27-JAN-2026 20:11'
   };
 
   const [formData, setFormData] = useState({ ...currentRecord });
@@ -69,7 +69,7 @@ export default function IdsLostAndFoundModal({
       place: 'Room 205',
       article: '',
       approxValue: '',
-      finder: 'Dhonsing Terang',
+      finder: 'Ramesh Nayak',
       checkedBy: 'IT ADMIN',
       foundDate: accountingDate,
       foundTime: '20:10',

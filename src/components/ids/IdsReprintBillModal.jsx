@@ -16,16 +16,16 @@ import {
       - Quick Scan (Load Pgm) -> Type "reprint" -> "Reprint FO Bill" -> [ Load ]
       - 44-Video Tutorial Player -> Video 36 -> Launch Interactive Feature Clone
    3. Step 1 Window (Frame 022):
-      - Month/Year: FEB-2022
+      - Month/Year: OCT-2026
       - Bill #: 512 with [ ? ] lookup
       - [ Continue ], [ Panel ], [ Exit ]
    4. Step 2 Details Window (Frame 026):
-      - Bill #: 512 | Bill Date: 24-FEB-2022
+      - Bill #: 512 | Bill Date: 24-OCT-2026
       - Room#: 205 | Reg. #: 625 | Folio #: 1
       - Guest Name: Mr Kumar Anil
       - Company: Mahindra & Mahindra Ltd
-      - Arrival Date: 27-JAN-2022 19:07 | Group: FIT
-      - Departure Date: 24-FEB-2022 18:03 | Net Amount: 16,360.00
+      - Arrival Date: 27-JAN-2026 19:07 | Group: FIT
+      - Departure Date: 24-OCT-2026 18:03 | Net Amount: 16,360.00
       - [ Details ], [ Print ], [ Panel ], [ Back ]
    5. Rule 46 GST Tax Invoice Print Preview & PDF Export (Frames 030 & 034)
    ========================================================================= */
@@ -33,15 +33,15 @@ import {
 export const INITIAL_BILLS_DATABASE = [
   {
     billNo: '512',
-    billDate: '24-FEB-2022',
+    billDate: '24-OCT-2026',
     roomNo: '205',
     regNo: '625',
     folioNo: '1',
     guestName: 'Mr Kumar Anil',
     companyName: 'Mahindra & Mahindra Ltd',
     gstin: '27AABCM8822P1ZX',
-    arrivalDate: '27-JAN-2022 19:07',
-    departureDate: '24-FEB-2022 18:03',
+    arrivalDate: '27-JAN-2026 19:07',
+    departureDate: '24-OCT-2026 18:03',
     group: 'FIT',
     roomType: 'DLX',
     ratePlan: 'CP',
@@ -52,29 +52,29 @@ export const INITIAL_BILLS_DATABASE = [
     payMode: 'Credit Card / Visa',
     cashier: 'MANAGER',
     lineItems: [
-      { date: '21-FEB-2022', description: 'Room Tariff - Deluxe Room (3 Nights)', sac: '996311', amount: 9300.00, tax: 1674.00 },
-      { date: '22-FEB-2022', description: 'Cannon Restaurant - In-Room Dining', sac: '996331', amount: 2450.00, tax: 122.50 },
-      { date: '23-FEB-2022', description: 'Laundry Services (Dry Clean & Press)', sac: '999799', amount: 850.00, tax: 153.00 },
-      { date: '24-FEB-2022', description: 'Travel Desk Airport Drop', sac: '996412', amount: 1264.40, tax: 63.20 },
-      { date: '24-FEB-2022', description: 'CGST 9% (Accommodation) + 2.5% (F&B)', sac: 'TAX', amount: 0.00, tax: 1247.80 },
-      { date: '24-FEB-2022', description: 'SGST 9% (Accommodation) + 2.5% (F&B)', sac: 'TAX', amount: 0.00, tax: 1247.80 }
+      { date: '21-OCT-2026', description: 'Room Tariff - Deluxe Room (3 Nights)', sac: '996311', amount: 9300.00, tax: 1674.00 },
+      { date: '22-OCT-2026', description: 'Cannon Restaurant - In-Room Dining', sac: '996331', amount: 2450.00, tax: 122.50 },
+      { date: '23-OCT-2026', description: 'Laundry Services (Dry Clean & Press)', sac: '999799', amount: 850.00, tax: 153.00 },
+      { date: '24-OCT-2026', description: 'Travel Desk Airport Drop', sac: '996412', amount: 1264.40, tax: 63.20 },
+      { date: '24-OCT-2026', description: 'CGST 9% (Accommodation) + 2.5% (F&B)', sac: 'TAX', amount: 0.00, tax: 1247.80 },
+      { date: '24-OCT-2026', description: 'SGST 9% (Accommodation) + 2.5% (F&B)', sac: 'TAX', amount: 0.00, tax: 1247.80 }
     ],
     payments: [
-      { date: '27-JAN-2022', mode: 'Advance Deposit', ref: 'REC-0091', amount: 3000.00 },
-      { date: '24-FEB-2022', mode: 'Credit Card Settlement', ref: 'POS-897612', amount: 13360.00 }
+      { date: '27-JAN-2026', mode: 'Advance Deposit', ref: 'REC-0091', amount: 3000.00 },
+      { date: '24-OCT-2026', mode: 'Credit Card Settlement', ref: 'POS-897612', amount: 13360.00 }
     ]
   },
   {
     billNo: '511',
-    billDate: '23-FEB-2022',
+    billDate: '23-OCT-2026',
     roomNo: '201',
     regNo: '624',
     folioNo: '1',
     guestName: 'Mr Sharma Raj',
     companyName: 'Tata Motors Limited',
     gstin: '27AABCT3518Q1ZY',
-    arrivalDate: '20-FEB-2022 14:00',
-    departureDate: '23-FEB-2022 12:00',
+    arrivalDate: '20-OCT-2026 14:00',
+    departureDate: '23-OCT-2026 12:00',
     group: 'Corporate',
     roomType: 'EXE',
     ratePlan: 'MAP',
@@ -85,25 +85,25 @@ export const INITIAL_BILLS_DATABASE = [
     payMode: 'Corporate Direct Bill (BTC)',
     cashier: 'MANAGER',
     lineItems: [
-      { date: '20-FEB-2022', description: 'Room Tariff - Executive Room (3 Nights)', sac: '996311', amount: 8997.00, tax: 1619.46 },
-      { date: '21-FEB-2022', description: 'Room Service Beverages', sac: '996331', amount: 494.52, tax: 24.73 }
+      { date: '20-OCT-2026', description: 'Room Tariff - Executive Room (3 Nights)', sac: '996311', amount: 8997.00, tax: 1619.46 },
+      { date: '21-OCT-2026', description: 'Room Service Beverages', sac: '996331', amount: 494.52, tax: 24.73 }
     ],
     payments: [
-      { date: '20-FEB-2022', mode: 'Advance Deposit', ref: 'REC-0088', amount: 5000.00 },
-      { date: '23-FEB-2022', mode: 'Bill to Company (BTC)', ref: 'INV-511-BTC', amount: 6200.00 }
+      { date: '20-OCT-2026', mode: 'Advance Deposit', ref: 'REC-0088', amount: 5000.00 },
+      { date: '23-OCT-2026', mode: 'Bill to Company (BTC)', ref: 'INV-511-BTC', amount: 6200.00 }
     ]
   },
   {
     billNo: '510',
-    billDate: '22-FEB-2022',
+    billDate: '22-OCT-2026',
     roomNo: '301',
     regNo: '620',
     folioNo: '1',
     guestName: 'Ms Desai Priya',
     companyName: 'Infosys Technologies',
     gstin: '29AAACI1234K1ZB',
-    arrivalDate: '19-FEB-2022 18:30',
-    departureDate: '22-FEB-2022 11:30',
+    arrivalDate: '19-OCT-2026 18:30',
+    departureDate: '22-OCT-2026 11:30',
     group: 'Corporate',
     roomType: 'EXE',
     ratePlan: 'EP',
@@ -114,10 +114,10 @@ export const INITIAL_BILLS_DATABASE = [
     payMode: 'UPI / QR Code',
     cashier: 'MANAGER',
     lineItems: [
-      { date: '19-FEB-2022', description: 'Room Tariff - Executive Room (3 Nights)', sac: '996311', amount: 7200.00, tax: 1296.00 }
+      { date: '19-OCT-2026', description: 'Room Tariff - Executive Room (3 Nights)', sac: '996311', amount: 7200.00, tax: 1296.00 }
     ],
     payments: [
-      { date: '22-FEB-2022', mode: 'UPI Settlement', ref: 'UPI-984210', amount: 8496.00 }
+      { date: '22-OCT-2026', mode: 'UPI Settlement', ref: 'UPI-984210', amount: 8496.00 }
     ]
   }
 ];
@@ -125,11 +125,11 @@ export const INITIAL_BILLS_DATABASE = [
 export default function IdsReprintBillModal({
   isOpen,
   onClose,
-  accountingDate = '24-FEB-2022',
+  accountingDate = '24-OCT-2026',
   onOpenCrystalReport
 }) {
   const [stage, setStage] = useState('input'); // 'input' | 'details'
-  const [monthYear, setMonthYear] = useState('FEB-2022');
+  const [monthYear, setMonthYear] = useState('OCT-2026');
   const [billNoInput, setBillNoInput] = useState('512');
   const [activeBill, setActiveBill] = useState(INITIAL_BILLS_DATABASE[0]);
 

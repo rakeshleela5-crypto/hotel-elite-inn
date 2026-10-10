@@ -8,23 +8,23 @@ import React, { useState, useEffect } from 'react';
 
 export const DEFAULT_RESTAURANT_TABLES = [
   // RESTAURANT Outlet Tables (Video 16 Frames 015–035)
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T1', maxCovers: 6, locationView: 'AC MAIN HALL', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:55', status: 'Vacant' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T2', maxCovers: 6, locationView: 'AC MAIN HALL', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T3', maxCovers: 6, locationView: 'WINDOW SIDE', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T4', maxCovers: 6, locationView: 'WINDOW SIDE', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T5', maxCovers: 6, locationView: 'GARDEN VIEW', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: '10', maxCovers: 4, locationView: 'CENTRAL DINING', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:30', status: 'Occupied' },
-  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: '14', maxCovers: 4, locationView: 'BALCONY TERRACE', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:30', status: 'Occupied' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T1', maxCovers: 6, locationView: 'AC MAIN HALL', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:55', status: 'Vacant' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T2', maxCovers: 6, locationView: 'AC MAIN HALL', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T3', maxCovers: 6, locationView: 'WINDOW SIDE', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T4', maxCovers: 6, locationView: 'WINDOW SIDE', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: 'T5', maxCovers: 6, locationView: 'GARDEN VIEW', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: '10', maxCovers: 4, locationView: 'CENTRAL DINING', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:30', status: 'Occupied' },
+  { outlet: 'RESTAURANT', outletCode: 'RES', tableNo: '14', maxCovers: 4, locationView: 'BALCONY TERRACE', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:30', status: 'Occupied' },
 
   // LIQUOR BAR Outlet Tables (Video 16 Frames 040–047)
-  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B1', maxCovers: 6, locationView: 'BAR COUNTER', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B2', maxCovers: 6, locationView: 'LOUNGE BOOTH', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
-  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B3', maxCovers: 6, locationView: 'VIP SECTION', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:56', status: 'Vacant' },
+  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B1', maxCovers: 6, locationView: 'BAR COUNTER', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B2', maxCovers: 6, locationView: 'LOUNGE BOOTH', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
+  { outlet: 'LIQUOR BAR', outletCode: 'BAR', tableNo: 'B3', maxCovers: 6, locationView: 'VIP SECTION', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:56', status: 'Vacant' },
 
   // OLIVE HALL Banquet / Private Dining Tables
-  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-1', maxCovers: 10, locationView: 'HEAD TABLE', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:50', status: 'Vacant' },
-  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-2', maxCovers: 8, locationView: 'ROUND TABLE 1', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:50', status: 'Vacant' },
-  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-3', maxCovers: 8, locationView: 'ROUND TABLE 2', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:50', status: 'Vacant' }
+  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-1', maxCovers: 10, locationView: 'HEAD TABLE', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:50', status: 'Vacant' },
+  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-2', maxCovers: 8, locationView: 'ROUND TABLE 1', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:50', status: 'Vacant' },
+  { outlet: 'OLIVE HALL', outletCode: 'OLIVE', tableNo: 'OH-3', maxCovers: 8, locationView: 'ROUND TABLE 2', user: 'MANAGER', lastUpdated: '08-FEB-2026 18:50', status: 'Vacant' }
 ];
 
 const STORAGE_KEY = 'ids_fortune_next_pos_restaurant_tables';
@@ -53,7 +53,7 @@ export const saveStoredRestaurantTables = (tables) => {
 export default function IdsRestaurantTableMasterModal({
   isOpen,
   onClose,
-  accountingDate = '08-FEB-2022',
+  accountingDate = '08-FEB-2026',
   currentUser = 'MANAGER',
   initialOutlet = 'RESTAURANT',
   onSelectTableForOrder
@@ -67,7 +67,7 @@ export default function IdsRestaurantTableMasterModal({
   const [maxCovers, setMaxCovers] = useState('6');
   const [locationView, setLocationView] = useState('');
   const [user, setUser] = useState(currentUser);
-  const [lastUpdated, setLastUpdated] = useState('08-FEB-2022 18:55');
+  const [lastUpdated, setLastUpdated] = useState('08-FEB-2026 18:55');
 
   // Form Modes: 'VIEW' | 'ADD' | 'MODIFY'
   const [formMode, setFormMode] = useState('VIEW');

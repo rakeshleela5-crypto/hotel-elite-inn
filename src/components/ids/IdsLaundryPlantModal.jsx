@@ -4,7 +4,7 @@ import './idsFortuneNext.css';
 export default function IdsLaundryPlantModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onOpenMessageBox
 }) {
   const [formData, setFormData] = useState({

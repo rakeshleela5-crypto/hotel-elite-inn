@@ -18,17 +18,17 @@ export const DEFAULT_TAX_STRUCTURES = [
 ];
 
 export const DEFAULT_TOUCH_SCREEN_CLASSIFICATIONS = [
-  { code: '60', name: 'REFRESHERS', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '61', name: 'THE D JUICE', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '62', name: 'TEA, SNACKS & BREAKFAST', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '63', name: 'CHAT', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '64', name: 'SOUP', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '65', name: 'KEBAB', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '66', name: 'INDIAN MAIN COURSE', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '67', name: 'LENTILS', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '68', name: 'RICE/PULAO', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '69', name: 'INDIAN BREADS', applicableFrom: '01-FEB-2022', status: 'Active' },
-  { code: '70', name: 'CONDIMENTS', applicableFrom: '01-FEB-2022', status: 'Active' }
+  { code: '60', name: 'REFRESHERS', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '61', name: 'THE D JUICE', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '62', name: 'TEA, SNACKS & BREAKFAST', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '63', name: 'CHAT', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '64', name: 'SOUP', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '65', name: 'KEBAB', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '66', name: 'INDIAN MAIN COURSE', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '67', name: 'LENTILS', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '68', name: 'RICE/PULAO', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '69', name: 'INDIAN BREADS', applicableFrom: '01-FEB-2026', status: 'Active' },
+  { code: '70', name: 'CONDIMENTS', applicableFrom: '01-FEB-2026', status: 'Active' }
 ];
 
 export const UOM_DEFINITIONS = [
@@ -44,7 +44,7 @@ export const UOM_DEFINITIONS = [
 export const DEFAULT_MENU_ITEMS = [
   {
     itemCode: '1',
-    applicableFrom: '22-FEB-2022',
+    applicableFrom: '22-FEB-2026',
     outletName: 'RESTAURANT',
     name: 'Rice',
     shortName: 'Rice',
@@ -83,11 +83,11 @@ export const DEFAULT_MENU_ITEMS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '22-FEB-2022 19:56'
+    lastUpdated: '22-FEB-2026 19:56'
   },
   {
     itemCode: '2',
-    applicableFrom: '22-FEB-2022',
+    applicableFrom: '22-FEB-2026',
     outletName: 'RESTAURANT',
     name: 'Tandoori Chicken',
     shortName: 'Tandoori',
@@ -125,11 +125,11 @@ export const DEFAULT_MENU_ITEMS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '22-FEB-2022 19:58'
+    lastUpdated: '22-FEB-2026 19:58'
   },
   {
     itemCode: '3',
-    applicableFrom: '22-FEB-2022',
+    applicableFrom: '22-FEB-2026',
     outletName: 'RESTAURANT',
     name: 'Mineral Water',
     shortName: 'Mineral Wa',
@@ -166,7 +166,7 @@ export const DEFAULT_MENU_ITEMS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '22-FEB-2022 19:59'
+    lastUpdated: '22-FEB-2026 19:59'
   }
 ];
 
@@ -196,7 +196,7 @@ export const saveStoredMenuItems = (items) => {
 export default function IdsMenuMasterModal({
   isOpen,
   onClose,
-  accountingDate = '22-FEB-2022',
+  accountingDate = '22-FEB-2026',
   currentUser = 'MANAGER',
   onOpenOrderEntryWithItem = null
 }) {

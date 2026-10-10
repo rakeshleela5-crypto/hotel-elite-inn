@@ -10,7 +10,7 @@ export default function IdsGuestServicesModal({
   isOpen,
   onClose,
   initialTab = 'log-complaints',
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   inhouseGuests = [],
   onComplaintsCountChange,
   onOpenMessageBox
@@ -25,8 +25,8 @@ export default function IdsGuestServicesModal({
     roomNo: '205',
     guestName: 'Mr Kumar Anil',
     department: 'Housekeeping',
-    arrival: '27-JAN-2022',
-    departure: '01-FEB-2022',
+    arrival: '27-JAN-2026',
+    departure: '01-FEB-2026',
     guestStatus: 'In-House',
     natureOfComplaint: 'Extra bath towels required & linen replacement for extra pillow',
     receivedBy: 'MANAGER',
@@ -36,7 +36,7 @@ export default function IdsGuestServicesModal({
 
   // State for Attend Complaints (Video 07 Frame 015)
   const [attendData, setAttendData] = useState({
-    attendedBy: '002 Dhonsing Terang',
+    attendedBy: '002 Ramesh Nayak',
     actionTaken: 'Fresh sanitized bath towels delivered to Room 205. Linen replaced.',
     tatMinutes: '12',
     status: 'Resolved'
@@ -48,16 +48,16 @@ export default function IdsGuestServicesModal({
     const matched = inhouseGuests.find(g => g.roomNo === rNo) || {
       roomNo: rNo,
       guestName: rNo === '205' ? 'Mr Kumar Anil' : (rNo === '201' ? 'Mr Vikram Singhania' : 'In-House Guest'),
-      arrivalDate: '27-JAN-2022',
-      departureDate: '01-FEB-2022'
+      arrivalDate: '27-JAN-2026',
+      departureDate: '01-FEB-2026'
     };
 
     setLogFormData({
       ...logFormData,
       roomNo: rNo,
       guestName: matched.guestName,
-      arrival: matched.arrivalDate || '27-JAN-2022',
-      departure: matched.departureDate || '01-FEB-2022'
+      arrival: matched.arrivalDate || '27-JAN-2026',
+      departure: matched.departureDate || '01-FEB-2026'
     });
   };
 

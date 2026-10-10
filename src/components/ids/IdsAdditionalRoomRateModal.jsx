@@ -4,36 +4,11 @@ import {
   Building2, DollarSign, Calendar, RefreshCw, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, Layers, FileText, ArrowRight
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 20: HOW TO USE ADDITIONAL ROOM RATE OPTION IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Room Status V6.5.002.1 Right-Click Context Menu:
-      - [ Additional Room Rate ] on Occupied Room 312 (MS BASU ANIRUDH)
-      - [ Quick Balances ]
-   2. Additional Room Rate V6.5.002.1 Dialog (Frames 015–055):
-      - 4 Radio options: (•) Rate, ( ) Plan, ( ) Extra bed, ( ) Retention Charge
-      - Dynamic labels: TRF Amount, PLN Amount, EXB Amount, RTN Amount
-      - [x] With Tax checkbox for Retention Charge
-      - Currency: INR, Exchange Rate: 1.000000
-      - Room# 312, Folio # 1, Reg # 587, MS BASU ANIRUDH, 26-JAN-2022
-      - Tax Details Grid: CGT (Central GST 6%), SGT (State GST 6%)
-      - Day Total, Room Count (No/Yes), Local Value
-      - Action Bar: [ Add ], [ Modify ], [ Delete ], [ Browse ], [ Previous ], [ Next ], [ Save ], [ Panel ], [ Exit ]
-   3. Quick Balances V6.5.002.2 Dialog (Frames 060–065):
-      - Room# 312, MS. BASU ANIRUDH, Reg.# 587, Folio # 1
-      - Arrival: 16-JAN-2022, Departure: 26-JAN-2022, Status: Regular Guest
-      - Date / Revenue Code / Debit / Credit / Balance grid
-      - Double Click on Date / Revenue column to expand 26-JAN-2022 breakdown:
-        * Travel Desk + : 1,500.00
-        * Miscellaneous Charges : 200.00
-        * Tariff + : 2,800.00
-        * Continental Plan + : 280.00
-        * Extra Bed + : 1,680.00
-        * Retention Charge + : 2,240.00
-        Total: 8,700.00 (Grand Total: 20,460.00)
-      - Summary Box breakdown
    ========================================================================= */
 
 export const DEFAULT_ADDITIONAL_POSTINGS = [
@@ -46,7 +21,7 @@ export const DEFAULT_ADDITIONAL_POSTINGS = [
     tax: 300,
     total: 2800,
     description: 'Previous',
-    date: '26-JAN-2022'
+    date: INITIAL_ACCOUNTING_DATE
   },
   {
     type: 'plan',
@@ -57,7 +32,7 @@ export const DEFAULT_ADDITIONAL_POSTINGS = [
     tax: 30,
     total: 280,
     description: 'Plan Charge',
-    date: '26-JAN-2022'
+    date: INITIAL_ACCOUNTING_DATE
   },
   {
     type: 'extrabed',
@@ -68,7 +43,7 @@ export const DEFAULT_ADDITIONAL_POSTINGS = [
     tax: 180,
     total: 1680,
     description: 'Extra Bed Charge',
-    date: '26-JAN-2022'
+    date: INITIAL_ACCOUNTING_DATE
   },
   {
     type: 'retention',
@@ -79,15 +54,15 @@ export const DEFAULT_ADDITIONAL_POSTINGS = [
     tax: 240,
     total: 2240,
     description: 'Retention Charge',
-    date: '26-JAN-2022'
+    date: INITIAL_ACCOUNTING_DATE
   }
 ];
 
 export default function IdsAdditionalRoomRateModal({
   isOpen,
   onClose,
-  initialRoomNo = '312',
-  accountingDate = '26-JAN-2022',
+  initialRoomNo = '102',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   initialMode = 'additional-rate', // 'additional-rate' | 'quick-balances'
   onSaveAdditionalCharge
 }) {
@@ -95,13 +70,13 @@ export default function IdsAdditionalRoomRateModal({
   const [currentView, setCurrentView] = useState('additional-rate');
 
   // Room & Guest Data
-  const [roomNo, setRoomNo] = useState(initialRoomNo || '312');
+  const [roomNo, setRoomNo] = useState(initialRoomNo || '102');
   const [folioNo, setFolioNo] = useState('1');
   const [regNo, setRegNo] = useState('587');
-  const [guestName, setGuestName] = useState('MS BASU ANIRUDH');
+  const [guestName, setGuestName] = useState('MR RAJESH SHARMA');
   const [currencyCode, setCurrencyCode] = useState('INR');
   const [exchangeRate, setExchangeRate] = useState('1.000000');
-  const [acDate, setAcDate] = useState(accountingDate || '26-JAN-2022');
+  const [acDate, setAcDate] = useState(accountingDate || INITIAL_ACCOUNTING_DATE);
 
   // Charge Category Radio: 'rate' | 'plan' | 'extrabed' | 'retention'
   const [chargeType, setChargeType] = useState('rate');
@@ -118,14 +93,15 @@ export default function IdsAdditionalRoomRateModal({
   const [successNotice, setSuccessNotice] = useState('');
 
   // Quick Balances View State
-  const [expandedDate, setExpandedDate] = useState('26-JAN-2022'); // double-clicked expanded row
+  const [expandedDate, setExpandedDate] = useState(INITIAL_ACCOUNTING_DATE); // double-clicked expanded row
 
   // Synchronize initial settings
   useEffect(() => {
     if (isOpen) {
-      setRoomNo(initialRoomNo || '312');
+      setRoomNo(initialRoomNo || '102');
       setCurrentView(initialMode === 'quick-balances' ? 'quick-balances' : 'additional-rate');
-      setAcDate(accountingDate || '26-JAN-2022');
+      setAcDate(accountingDate || INITIAL_ACCOUNTING_DATE);
+      setExpandedDate(accountingDate || INITIAL_ACCOUNTING_DATE);
       setSuccessNotice('');
     }
   }, [isOpen, initialRoomNo, initialMode, accountingDate]);
@@ -651,7 +627,7 @@ export default function IdsAdditionalRoomRateModal({
               <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
-              <span style={{ fontWeight: 700, color: '#0A246A' }}>MS. BASU ANIRUDH</span>
+              <span style={{ fontWeight: 700, color: '#0A246A' }}>{guestName}</span>
 
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg.#</span>
               <span style={{ fontWeight: 700 }}>587</span>
@@ -669,8 +645,8 @@ export default function IdsAdditionalRoomRateModal({
                 fontSize: '10.5px'
               }}
             >
-              <div>Arrival: <strong style={{ color: '#0A246A' }}>16-JAN-2022</strong></div>
-              <div>Departure: <strong style={{ color: '#0A246A' }}>26-JAN-2022</strong></div>
+              <div>Arrival: <strong style={{ color: '#0A246A' }}>{accountingDate}</strong></div>
+              <div>Departure: <strong style={{ color: '#0A246A' }}>{NEXT_ACCOUNTING_DATE}</strong></div>
               <div>Status: <strong>Regular Guest</strong></div>
             </div>
 
@@ -689,39 +665,39 @@ export default function IdsAdditionalRoomRateModal({
                 <tbody>
                   {/* Prior dates */}
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>16-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>23-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>25-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
 
-                  {/* 26-JAN-2022 Main Aggregate Row (Interactive Expand) */}
+                  {/* Main Aggregate Row (Interactive Expand) */}
                   <tr 
                     style={{ 
-                      background: expandedDate === '26-JAN-2022' ? '#FFF7CC' : '#F9F8F5', 
+                      background: expandedDate === accountingDate ? '#FFF7CC' : '#F9F8F5', 
                       cursor: 'pointer',
                       borderBottom: '1px solid #CCC' 
                     }}
-                    onDoubleClick={() => setExpandedDate(expandedDate === '26-JAN-2022' ? '' : '26-JAN-2022')}
+                    onDoubleClick={() => setExpandedDate(expandedDate === accountingDate ? '' : accountingDate)}
                     title="Double-click to expand/collapse itemized revenue heads (Frame 065)"
                   >
                     <td style={{ padding: '4px 6px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#0A246A' }}>
-                      26-JAN-2022 {expandedDate === '26-JAN-2022' ? '▼' : '▶'}
+                      {accountingDate} {expandedDate === accountingDate ? '▼' : '▶'}
                     </td>
                     <td style={{ padding: '4px 6px', borderRight: '1px solid #EEE', fontStyle: 'italic', color: '#666' }}>
                       (Double click to view 6 sub-postings)
@@ -736,7 +712,7 @@ export default function IdsAdditionalRoomRateModal({
                   </tr>
 
                   {/* Expanded Sub-Postings matching Frame 065 */}
-                  {expandedDate === '26-JAN-2022' && (
+                  {expandedDate === accountingDate && (
                     <>
                       <tr style={{ background: '#FCFBF7', borderBottom: '1px dotted #E0E0E0' }}>
                         <td style={{ padding: '2px 6px 2px 20px', borderRight: '1px solid #EEE', color: '#777' }}>↳ Sub</td>

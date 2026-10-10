@@ -1,53 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 13: HOW TO DO ROOM TRANSFER IN IDS 6.5 & 7.0 SOFTWARE
-   Replication of:
-   1. Room Transfer V6.5.002.1 Dialog (Frames 009, 013, 015, 024, 029)
-   2. Radio options: "Room Change" vs "Swap Rooms"
-   3. From Room# lookup, [ ? ] help button, room category indicator
-   4. Transfer To room input and [ Show Rooms ] Room Rack modal (Frame 011, 027)
-   5. Stay details table (Folio #, Reg. #, Guest Name, Arrival, Departure)
-   6. Alert Confirmation Dialog: "Room Transfer operation is complete. If you want to change tariff use change tariff menu option." (ID: FOMT260, MSG CODE: 1427) (Frame 016, 031)
-   7. Real-time Rack synchronization: Source room -> Dirty (yellow D/EXE), Target room -> Occupied (red O/EXE) (Frame 018)
+   Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
    ========================================================================= */
 
 export const VACANT_ROOMS_CATALOG = [
+  { no: '101', type: 'EXE', block: 'BA-FF01', floor: '1' },
+  { no: '103', type: 'DLX', block: 'BA-FF01', floor: '1' },
+  { no: '104', type: 'DLX', block: 'BA-FF01', floor: '1' },
+  { no: '106', type: 'DLX', block: 'BA-FF01', floor: '1' },
+  { no: '107', type: 'DLX', block: 'BA-FF01', floor: '1' },
+  { no: '108', type: 'DLX', block: 'BA-FF01', floor: '1' },
   { no: '201', type: 'EXE', block: 'BA-FF02', floor: '2' },
-  { no: '203', type: 'DLX', block: 'BA-FF02', floor: '2' },
+  { no: '202', type: 'DLX', block: 'BA-FF02', floor: '2' },
   { no: '204', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '205', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '206', type: 'DLX', block: 'BA-FF02', floor: '2' },
+  { no: '205', type: 'EXE', block: 'BA-FF02', floor: '2' },
   { no: '207', type: 'DLX', block: 'BA-FF02', floor: '2' },
   { no: '208', type: 'DLX', block: 'BA-FF02', floor: '2' },
   { no: '209', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '210', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '211', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '212', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '214', type: 'DLX', block: 'BA-FF02', floor: '2' },
-  { no: '215', type: 'EXE', block: 'BA-FF02', floor: '2' },
-  { no: '216', type: 'SUI', block: 'BA-FF02', floor: '2' },
+  { no: '302', type: 'DLX', block: 'BA-FF03', floor: '3' },
+  { no: '304', type: 'DLX', block: 'BA-FF03', floor: '3' },
+  { no: '305', type: 'DLX', block: 'BA-FF03', floor: '3' },
+  { no: '306', type: 'DLX', block: 'BA-FF03', floor: '3' },
+  { no: '307', type: 'DLX', block: 'BA-FF03', floor: '3' },
   { no: '308', type: 'DLX', block: 'BA-FF03', floor: '3' },
-  { no: '309', type: 'DLX', block: 'BA-FF03', floor: '3' },
-  { no: '416', type: 'SUI', block: 'BA-FF04', floor: '4' },
-  { no: '509', type: 'DLX', block: 'BA-FF05', floor: '5' },
-  { no: '510', type: 'DLX', block: 'BA-FF05', floor: '5' },
-  { no: '511', type: 'DLX', block: 'BA-FF05', floor: '5' },
-  { no: '512', type: 'DLX', block: 'BA-FF05', floor: '5' },
-  { no: '514', type: 'DLX', block: 'BA-FF05', floor: '5' },
-  { no: '601', type: 'PNH', block: 'BA-FF06', floor: '6' }
+  { no: '309', type: 'SUI', block: 'BA-FF03', floor: '3' }
 ];
 
 export default function IdsRoomTransferModal({
   isOpen,
   onClose,
-  initialRoomNo = '415',
+  initialRoomNo = '102',
   inhouseGuests = [],
   onOpenRoomHelpLookup,
   onSaveRoomTransfer
 }) {
   const [transferMode, setTransferMode] = useState('roomChange'); // 'roomChange' or 'swapRooms'
-  const [fromRoomNo, setFromRoomNo] = useState(initialRoomNo || '415');
+  const [fromRoomNo, setFromRoomNo] = useState(initialRoomNo || '102');
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [toRoomNo, setToRoomNo] = useState('201');
   const [toRoomType, setToRoomType] = useState('EXE');
@@ -236,10 +227,10 @@ export default function IdsRoomTransferModal({
                         {selectedGuest.guestName || `${selectedGuest.title} ${selectedGuest.lastName || ''} ${selectedGuest.firstName || ''}`}
                       </td>
                       <td style={{ border: '1px solid #CCC', padding: '3px 4px' }}>
-                        {selectedGuest.arrival || '16-JAN-2022 12:02'}
+                        {selectedGuest.arrival || `${INITIAL_ACCOUNTING_DATE} 12:02`}
                       </td>
                       <td style={{ border: '1px solid #CCC', padding: '3px 4px' }}>
-                        {selectedGuest.departure || '18-JAN-2022 12:00'}
+                        {selectedGuest.departure || `${NEXT_ACCOUNTING_DATE} 12:00`}
                       </td>
                     </tr>
                   ) : (

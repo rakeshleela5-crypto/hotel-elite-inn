@@ -29,21 +29,14 @@ export default function IdsClearRoomsModal({
 
   // Master dirty room dataset matching Video 09 Frame 045
   const initialDirtyRooms = [
+    { roomNo: '104', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
+    { roomNo: '107', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
     { roomNo: '204', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '205', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
     { roomNo: '206', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '207', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '208', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '209', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'ADMIN' },
-    { roomNo: '210', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '211', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '212', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '214', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '215', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'IDS' },
-    { roomNo: '216', type: 'SUI', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'MANORANJAN' },
-    { roomNo: '308', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'MANORANJAN' },
-    { roomNo: '309', type: 'DLX', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'DHONSING' },
-    { roomNo: '601', type: 'PNH', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'MANORANJAN' }
+    { roomNo: '207', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'SUNIL' },
+    { roomNo: '304', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'RAMESH' },
+    { roomNo: '308', type: 'EXE', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'SUNIL' },
+    { roomNo: '309', type: 'PRM', occupied: '', status: 'Dirty', hskStaff: '', authorizedBy: '', blockedDateTime: '', guestReason: '', lastUpdated: 'RAMESH' }
   ];
 
   // Video 16 Frame 092: Include any checked-out rooms (e.g. Sharma Group 10 rooms) that are now Dirty
@@ -93,7 +86,7 @@ export default function IdsClearRoomsModal({
         ...r,
         status: checked ? 'Clean' : 'Dirty',
         authorizedBy: checked ? 'HK SUPERVISOR' : r.authorizedBy,
-        hskStaff: checked ? (r.hskStaff || 'Lakshyajit Changmai') : r.hskStaff
+        hskStaff: checked ? (r.hskStaff || 'Sunil Mohapatra') : r.hskStaff
       })));
     }
   };

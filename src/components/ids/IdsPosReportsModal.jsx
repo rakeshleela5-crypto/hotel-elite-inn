@@ -9,7 +9,7 @@ const INITIAL_SALES_RECORDS = [
     outlet: 'RESTAURANT',
     shift: 'Shift 1',
     time: '12:35',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     server: 'Kaushik',
     pax: 2,
     gross: 1100.00,
@@ -30,7 +30,7 @@ const INITIAL_SALES_RECORDS = [
     outlet: 'RESTAURANT',
     shift: 'Shift 1',
     time: '13:15',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     server: 'Biren',
     pax: 4,
     gross: 991.43,
@@ -51,7 +51,7 @@ const INITIAL_SALES_RECORDS = [
     outlet: 'LIQUOR BAR',
     shift: 'Shift 2',
     time: '19:40',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     server: 'Ajay',
     pax: 2,
     gross: 2400.00,
@@ -74,7 +74,7 @@ const INITIAL_SALES_RECORDS = [
     outlet: 'RESTAURANT',
     shift: 'Shift 2',
     time: '20:10',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     server: 'Bijay',
     pax: 3,
     gross: 1650.00,
@@ -95,7 +95,7 @@ const INITIAL_SALES_RECORDS = [
     outlet: 'RESTAURANT',
     shift: 'Shift 2',
     time: '21:30',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     server: 'Kaushik',
     pax: 6,
     gross: 4500.00,
@@ -116,11 +116,11 @@ const INITIAL_SALES_RECORDS = [
 // Void & Cancellation audit log (Videos 05 & 06)
 const INITIAL_VOID_RECORDS = [
   {
-    voucherNo: 'VD-2022-001',
+    voucherNo: 'VD-2026-001',
     kotNo: 'KOT-1042',
     tableNo: '10',
     outlet: 'RESTAURANT',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '12:48',
     itemCode: '2',
     itemName: 'Tandoori Chicken (Full)',
@@ -134,11 +134,11 @@ const INITIAL_VOID_RECORDS = [
     authBy: 'MANAGER'
   },
   {
-    voucherNo: 'VD-2022-002',
+    voucherNo: 'VD-2026-002',
     kotNo: 'KOT-1049',
     tableNo: '4',
     outlet: 'RESTAURANT',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '13:30',
     itemCode: '8',
     itemName: 'Garlic Naan Butter',
@@ -152,11 +152,11 @@ const INITIAL_VOID_RECORDS = [
     authBy: 'MANAGER'
   },
   {
-    voucherNo: 'VD-2022-003',
+    voucherNo: 'VD-2026-003',
     kotNo: 'KOT-1055',
     tableNo: '7',
     outlet: 'RESTAURANT',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '14:10',
     itemCode: '15',
     itemName: 'Fresh Prawns Masala',
@@ -170,11 +170,11 @@ const INITIAL_VOID_RECORDS = [
     authBy: 'CHEF'
   },
   {
-    voucherNo: 'VD-2022-004',
+    voucherNo: 'VD-2026-004',
     kotNo: 'KOT-1061',
     tableNo: '12',
     outlet: 'RESTAURANT',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '20:45',
     itemCode: 'ALL',
     itemName: 'Full KOT Void (3 Items)',
@@ -194,7 +194,7 @@ const INITIAL_NC_RECORDS = [
   {
     ncKotNo: 'NC-KOT-089',
     ncBillNo: 'NC-B-0012',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '13:00',
     outlet: 'RESTAURANT',
     department: 'GM Complimentary',
@@ -208,7 +208,7 @@ const INITIAL_NC_RECORDS = [
   {
     ncKotNo: 'NC-KOT-090',
     ncBillNo: 'NC-B-0013',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '16:30',
     outlet: 'RESTAURANT',
     department: 'Food Tasting',
@@ -222,7 +222,7 @@ const INITIAL_NC_RECORDS = [
   {
     ncKotNo: 'NC-KOT-091',
     ncBillNo: 'NC-B-0014',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '21:00',
     outlet: 'RESTAURANT',
     department: 'Executive Office',
@@ -236,7 +236,7 @@ const INITIAL_NC_RECORDS = [
   {
     ncKotNo: 'NC-KOT-092',
     ncBillNo: 'NC-B-0015',
-    date: '08-FEB-2022',
+    date: '08-FEB-2026',
     time: '23:30',
     outlet: 'RESTAURANT',
     department: 'Staff Duty Meal',
@@ -327,15 +327,15 @@ export default function IdsPosReportsModal({
   isOpen,
   onClose,
   initialTab = 'shift-sales',
-  accountingDate = '08-FEB-2022',
+  accountingDate = '08-FEB-2026',
   currentUser = 'MANAGER'
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [filterOutlet, setFilterOutlet] = useState('ALL');
   const [filterShift, setFilterShift] = useState('ALL');
   const [filterSearch, setFilterSearch] = useState('');
-  const [fromDate, setFromDate] = useState('08-FEB-2022');
-  const [toDate, setToDate] = useState('08-FEB-2022');
+  const [fromDate, setFromDate] = useState('08-FEB-2026');
+  const [toDate, setToDate] = useState('08-FEB-2026');
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   if (!isOpen) return null;

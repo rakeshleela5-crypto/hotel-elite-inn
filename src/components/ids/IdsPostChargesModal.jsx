@@ -4,6 +4,7 @@ import {
   Building2, DollarSign, Calendar, RefreshCw, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, Layers, FileText, ArrowRight, Printer
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 21: HOW TO USE POST CHARGES / ROOM CHARGES OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -11,11 +12,11 @@ import {
    Replication of:
    1. Navigation entry points:
       - Cashiering.. -> Posting -> Post Charges (Video 21 Frame 008 & 012)
-      - Room Status V6.5.002.1 Rack -> Right Click Occupied Room 312 -> Room Charges (Frames 020-025)
+      - Room Status V6.5.002.1 Rack -> Right Click Occupied Room 102 -> Room Charges (Frames 020-025)
    2. Post Charges V6.5.002.1 Dialog (Frames 012–060):
-      - Room# 312, [ Guest Details ], Folio # 1, [ More... ]
-      - Registration # 587, Name: MS BASU ANIRUDH
-      - Reference Date: 26-JAN-2022, Accounting Date: 26-JAN-2022
+      - Room# 102, [ Guest Details ], Folio # 1, [ More... ]
+      - Registration # 587, Name: MR. RAJESH SHARMA
+      - Reference Date: 26-JAN-2026, Accounting Date: 26-JAN-2026
       - Revenue Code Dropdown:
         * TRV: TRAVEL DESK (Airport Pickup Drop)
         * MSC: MISCELLENEOUS CHARGES
@@ -32,12 +33,12 @@ import {
       - Tax Inclusive: No / Yes
       - Charges & Total Amount calculations
       - Tax Details Grid: Tax Code | Taxable Amount (SGT, CGT)
-      - User: MANAGER, Last Updated: 26-JAN-2022 16:16
+      - User: MANAGER, Last Updated: 26-JAN-2026 16:16
       - Buttons: [ Add ], [ Modify ], [ Delete ], [ Browse ], [ Previous ], [ Next ], [ Save ], [ Panel ], [ Exit ]
    3. "DO YOU WANT TO PRINT VOUCHER?" Prompt Dialog (Frames 045 & 060)
    4. Printable Front Office Charge Voucher Preview
    5. Quick Balances V6.5.002.2 Dialog Integration (Frames 065–068):
-      - 26-JAN-2022 Debit: 1,700.00
+      - 26-JAN-2026 Debit: 1,700.00
       - Total: 13,460.00
       - Summary: Tariff + 11,760.00, Travel Desk + 1,500.00, Miscellaneous Charges 200.00
    ========================================================================= */
@@ -57,7 +58,7 @@ export default function IdsPostChargesModal({
   isOpen,
   onClose,
   initialRoomNo = '101',
-  accountingDate = '26-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   initialRevenueCode = 'TRV',
   onSaveCharge
 }) {
@@ -69,8 +70,8 @@ export default function IdsPostChargesModal({
   const [folioNo, setFolioNo] = useState('1');
   const [regNo, setRegNo] = useState('587');
   const [guestName, setGuestName] = useState('MR SANTOSH BISWAKARMA');
-  const [refDate, setRefDate] = useState(accountingDate || '26-JAN-2022');
-  const [acDate, setAcDate] = useState(accountingDate || '26-JAN-2022');
+  const [refDate, setRefDate] = useState(accountingDate || INITIAL_ACCOUNTING_DATE);
+  const [acDate, setAcDate] = useState(accountingDate || INITIAL_ACCOUNTING_DATE);
 
   // Charge Posting Form State
   const [revenueCode, setRevenueCode] = useState(initialRevenueCode || 'TRV');
@@ -99,7 +100,7 @@ export default function IdsPostChargesModal({
       charges: 1500,
       tax: 75,
       total: 1575,
-      date: '26-JAN-2022'
+      date: INITIAL_ACCOUNTING_DATE
     },
     {
       receiptNo: '226',
@@ -110,7 +111,7 @@ export default function IdsPostChargesModal({
       charges: 200,
       tax: 10,
       total: 210,
-      date: '26-JAN-2022'
+      date: INITIAL_ACCOUNTING_DATE
     }
   ]);
 
@@ -121,8 +122,8 @@ export default function IdsPostChargesModal({
   useEffect(() => {
     if (isOpen) {
       setRoomNo(initialRoomNo || '101');
-      setAcDate(accountingDate || '26-JAN-2022');
-      setRefDate(accountingDate || '26-JAN-2022');
+      setAcDate(accountingDate || INITIAL_ACCOUNTING_DATE);
+      setRefDate(accountingDate || INITIAL_ACCOUNTING_DATE);
       setCurrentView('post-charges');
       setShowPrintPrompt(false);
       setShowVoucherPreview(false);
@@ -676,7 +677,7 @@ export default function IdsPostChargesModal({
               <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
-              <span style={{ fontWeight: 700, color: '#0A246A' }}>MS. BASU ANIRUDH</span>
+              <span style={{ fontWeight: 700, color: '#0A246A' }}>MR. RAJESH SHARMA</span>
 
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg.#</span>
               <span style={{ fontWeight: 700 }}>587</span>
@@ -694,8 +695,8 @@ export default function IdsPostChargesModal({
                 fontSize: '10.5px'
               }}
             >
-              <div>Arrival: <strong style={{ color: '#0A246A' }}>16-JAN-2022</strong></div>
-              <div>Departure: <strong style={{ color: '#0A246A' }}>26-JAN-2022</strong></div>
+              <div>Arrival: <strong style={{ color: '#0A246A' }}>{accountingDate}</strong></div>
+              <div>Departure: <strong style={{ color: '#0A246A' }}>{NEXT_ACCOUNTING_DATE}</strong></div>
               <div>Status: <strong>Regular Guest</strong></div>
             </div>
 
@@ -713,30 +714,30 @@ export default function IdsPostChargesModal({
                 </thead>
                 <tbody>
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>16-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>23-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid #E5E5E5' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>25-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}>3,920.00</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right' }}></td>
                     <td style={{ padding: '3px 6px', textAlign: 'right' }}>3,920.00</td>
                   </tr>
 
-                  {/* 26-JAN-2022 Row matching Frame 065 (1,700.00) */}
+                  {/* Current Date Row matching Frame 065 (1,700.00) */}
                   <tr style={{ background: '#FFFDF0', borderBottom: '1px solid #CCC' }}>
-                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#0A246A' }}>26-JAN-2022</td>
+                    <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', fontWeight: 700, color: '#0A246A' }}>{accountingDate}</td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}></td>
                     <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}>
                       1,700.00

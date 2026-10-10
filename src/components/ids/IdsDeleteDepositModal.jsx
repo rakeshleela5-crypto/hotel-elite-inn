@@ -23,7 +23,7 @@ import {
       - [ Delete ] -> Alert Window V6.5.002.1: "Delete Record? [ Yes ] [ No ]"
       - Click [ Save ] to confirm deletion of deposit
    4. Step 2: Cancel Check-Ins V6.5.002.1 (Frames 060–076):
-      - Reg # 2 | Room 1002 | Mr Sourab Raj | Arrival: 26-FEB-2022 | Departure: 27-FEB-2022
+      - Reg # 2 | Room 1002 | Mr Sourab Raj | Arrival: 26-FEB-2026 | Departure: 27-FEB-2026
       - Click ERASE (X)
       - Reason Entry: Reason: Guest Cancel | Authorized By: Manager -> [ Ok ]
    5. Step 3: Room Status Sync (Frames 070–076):
@@ -37,8 +37,8 @@ export const INITIAL_DEPOSITS_CHECKIN_LIST = [
     regNo: '2',
     guestName: 'Mr Sourab Raj',
     company: '',
-    arrival: '26-FEB-2022',
-    departure: '27-FEB-2022',
+    arrival: '26-FEB-2026',
+    departure: '27-FEB-2026',
     group: 'FIT',
     depositReceiptNo: '1',
     depositAmount: 1500.00,
@@ -53,8 +53,8 @@ export const INITIAL_DEPOSITS_CHECKIN_LIST = [
     regNo: '624',
     guestName: 'Mr Sharma Raj',
     company: 'Tata Motors Limited',
-    arrival: '25-FEB-2022',
-    departure: '26-FEB-2022',
+    arrival: '25-FEB-2026',
+    departure: '26-FEB-2026',
     group: 'Corporate',
     depositReceiptNo: '3',
     depositAmount: 5000.00,
@@ -68,7 +68,7 @@ export const INITIAL_DEPOSITS_CHECKIN_LIST = [
 export default function IdsDeleteDepositModal({
   isOpen,
   onClose,
-  accountingDate = '26-FEB-2022',
+  accountingDate = '26-FEB-2026',
   onCancelCheckInSuccess,
   onOpenRoomRack
 }) {

@@ -4,59 +4,28 @@ import {
   ArrowRightLeft, Check, X, Info, Search, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 25: HOW TO TRANSFER FOLIO FROM ONE ROOM TO ANOTHER ROOM IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. Entry Points:
-      - Quick Scan -> Search "trans" -> Select "Transfer Folios" -> [ Load ] (Frame 055)
-      - Cashiering.. -> Transfer Folio to Another Room (Menu Bar)
-      - Room Status V6.5.002.1 Rack Console -> Right click room -> Transfer Folio (Frame 125)
-   2. Transfer Folios V6.5.002.1 Dialog (Frames 065–085):
-      - From Room: 201 [ ? ], Guest Name: Mr Sharma Raj, Folio #: 1, Reg. #: 624
-      - To Room: 205 [ ? ], Guest Name: Mr Kumar Anil, Folio #: 1, Reg #: 625
-      - Radio: (•) Selective Transactions  ( ) All Transactions
-      - Selective Revenue Checklist:
-        [x] All, [x] Laundry, [x] Traveldesk, [x] MiscCharg, [x] LDR Romm, [x] LACL, [x] MINI BAR,
-        [x] EP, [x] CP, [x] MAP, [x] AP, [x] QUBE, [x] TAP21, [x] RMS, [x] BANQUET, [x] Tariff, etc.
-      - Transactions Table:
-        * Tag (Yes/No toggle) | REV | Description | Date | Bill # | Amount
-        * Row 1: Tag: Yes | TRF | Tariff | 27-JAN-2022 | 5,000.00
-        * Row 2: Tag: Yes | CGT | Central GST | 27-JAN-2022 | 300.00
-        * Row 3: Tag: Yes | SGT | State GST | 27-JAN-2022 | 300.00
-        * Row 4: Tag: No  | LAU | Laundry | 27-JAN-2022 | Bill 227 | 500.00
-        * Row 5: Tag: No  | SGT | State GST | 27-JAN-2022 | Bill 227 | 45.00
-        * Row 6: Tag: No  | CGT | Central GST | 27-JAN-2022 | Bill 227 | 45.00
-        * Row 7: Tag: Yes | ADV | Adv.Cash | 27-JAN-2022 | Bill 177 | -1,000.00
-      - Tagged Total Amount: 4,600.00 (5000 + 300 + 300 - 1000)
-      - Buttons: [ Save ], [ Clear ], [ Exit ]
-   3. Authorization Popup: "Authorized By ?" (Frames 085–092):
-      - Remarks: Tran
-      - Authorized By: MANAGER
-      - [ Ok ]
-   4. Dual Folio & Guest Bill Synchronization (Frames 095–140):
-      - Room 201 Folio (View Bill):
-        Line 8: TRC | *TRANSFER CREDIT -> FROM 205 | -4,600.00 (Credit reducing 201 balance)
-      - Room 205 Folio (View Bill):
-        Line 1: TRD | *TRANSFER DEBIT -> FROM 201 | 4,600.00 (Debit transferred to 205)
    ========================================================================= */
 
 export const INITIAL_ROOM_201_TRANSACTIONS = [
-  { id: 1, tag: 'Yes', rev: 'TRF', description: 'Tariff', date: '27-JAN-2022', billNo: '', amount: 5000.00 },
-  { id: 2, tag: 'Yes', rev: 'CGT', description: 'Central GST', date: '27-JAN-2022', billNo: '', amount: 300.00 },
-  { id: 3, tag: 'Yes', rev: 'SGT', description: 'State GST', date: '27-JAN-2022', billNo: '', amount: 300.00 },
-  { id: 4, tag: 'No',  rev: 'LAU', description: 'Laundry', date: '27-JAN-2022', billNo: '227', amount: 500.00 },
-  { id: 5, tag: 'No',  rev: 'SGT', description: 'State GST', date: '27-JAN-2022', billNo: '227', amount: 45.00 },
-  { id: 6, tag: 'No',  rev: 'CGT', description: 'Central GST', date: '27-JAN-2022', billNo: '227', amount: 45.00 },
-  { id: 7, tag: 'Yes', rev: 'ADV', description: 'Adv.Cash', date: '27-JAN-2022', billNo: '177', amount: -1000.00 }
+  { id: 1, tag: 'Yes', rev: 'TRF', description: 'Tariff', date: INITIAL_ACCOUNTING_DATE, billNo: '', amount: 5000.00 },
+  { id: 2, tag: 'Yes', rev: 'CGT', description: 'Central GST', date: INITIAL_ACCOUNTING_DATE, billNo: '', amount: 300.00 },
+  { id: 3, tag: 'Yes', rev: 'SGT', description: 'State GST', date: INITIAL_ACCOUNTING_DATE, billNo: '', amount: 300.00 },
+  { id: 4, tag: 'No',  rev: 'LAU', description: 'Laundry', date: INITIAL_ACCOUNTING_DATE, billNo: '227', amount: 500.00 },
+  { id: 5, tag: 'No',  rev: 'SGT', description: 'State GST', date: INITIAL_ACCOUNTING_DATE, billNo: '227', amount: 45.00 },
+  { id: 6, tag: 'No',  rev: 'CGT', description: 'Central GST', date: INITIAL_ACCOUNTING_DATE, billNo: '227', amount: 45.00 },
+  { id: 7, tag: 'Yes', rev: 'ADV', description: 'Adv.Cash', date: INITIAL_ACCOUNTING_DATE, billNo: '177', amount: -1000.00 }
 ];
 
 export const AVAILABLE_GUESTS_FOR_TRANSFER = [
-  { roomNo: '201', guestName: 'Mr Sharma Raj', regNo: '624', folioNo: '1', resvNo: '276', arrival: '27-JAN-2022 18:56' },
-  { roomNo: '205', guestName: 'Mr Kumar Anil', regNo: '625', folioNo: '1', resvNo: '277', arrival: '27-JAN-2022 19:07' },
-  { roomNo: '311', guestName: 'DEURI HEMCHANDRA', regNo: '566', folioNo: '1', resvNo: '245', arrival: '02-DEC-2021 12:47' },
-  { roomNo: '312', guestName: 'BASU ANIRUDH', regNo: '587', folioNo: '1', resvNo: '246', arrival: '16-JAN-2022 11:49' }
+  { roomNo: '201', guestName: 'Mr Sharma Raj', regNo: '624', folioNo: '1', resvNo: '276', arrival: `${INITIAL_ACCOUNTING_DATE} 18:56` },
+  { roomNo: '205', guestName: 'Mr Kumar Anil', regNo: '625', folioNo: '1', resvNo: '277', arrival: `${INITIAL_ACCOUNTING_DATE} 19:07` },
+  { roomNo: '301', guestName: 'Mr Rath Amitav', regNo: '505', folioNo: '1', resvNo: '278', arrival: `${INITIAL_ACCOUNTING_DATE} 12:47` },
+  { roomNo: '303', guestName: 'Mr Mishra Priyadarshi', regNo: '506', folioNo: '1', resvNo: '279', arrival: `${INITIAL_ACCOUNTING_DATE} 11:49` }
 ];
 
 export const REVENUE_FILTER_CHECKLIST = [
@@ -70,7 +39,7 @@ export default function IdsTransferFolioModal({
   onClose,
   initialFromRoom = '201',
   initialToRoom = '205',
-  accountingDate = '27-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   onCompleteTransfer
 }) {
   // Views: 'transfer-folios' | 'view-bill-source' | 'view-bill-destination'
@@ -770,18 +739,18 @@ export default function IdsTransferFolioModal({
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td style={{ padding: '2px 4px' }}>1</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>TRF</td><td></td><td>*Tariff 201</td><td style={{ textAlign: 'right' }}>5,000.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>2</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>CGT</td><td></td><td>*Central GST</td><td style={{ textAlign: 'right' }}>300.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>3</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>SGT</td><td></td><td>*State GST</td><td style={{ textAlign: 'right' }}>300.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>4</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>LAU</td><td>227</td><td>Laundry</td><td style={{ textAlign: 'right' }}>500.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>5</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>SGT</td><td>227</td><td>State GST</td><td style={{ textAlign: 'right' }}>45.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>6</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>CGT</td><td>227</td><td>Central GST</td><td style={{ textAlign: 'right' }}>45.00</td></tr>
-                    <tr><td style={{ padding: '2px 4px' }}>7</td><td style={{ padding: '2px 6px' }}>27-JAN-2022 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>ADV</td><td>177</td><td>Advance(Cash)</td><td style={{ textAlign: 'right', color: '#006600' }}>-1,000.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>1</td><td style={{ padding: '2px 6px' }}>{accountingDate} 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>TRF</td><td></td><td>*Tariff 201</td><td style={{ textAlign: 'right' }}>5,000.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>2</td><td style={{ padding: '2px 6px' }}>{accountingDate} 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>CGT</td><td></td><td>*Central GST</td><td style={{ textAlign: 'right' }}>300.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>3</td><td style={{ padding: '2px 6px' }}>{accountingDate} 18:57</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>SGT</td><td></td><td>*State GST</td><td style={{ textAlign: 'right' }}>300.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>4</td><td style={{ padding: '2px 6px' }}>{accountingDate} 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>LAU</td><td>227</td><td>Laundry</td><td style={{ textAlign: 'right' }}>500.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>5</td><td style={{ padding: '2px 6px' }}>{accountingDate} 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>SGT</td><td>227</td><td>State GST</td><td style={{ textAlign: 'right' }}>45.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>6</td><td style={{ padding: '2px 6px' }}>{accountingDate} 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>CGT</td><td>227</td><td>Central GST</td><td style={{ textAlign: 'right' }}>45.00</td></tr>
+                    <tr><td style={{ padding: '2px 4px' }}>7</td><td style={{ padding: '2px 6px' }}>{accountingDate} 19:02</td><td>0</td><td>201</td><td>624</td><td style={{ fontWeight: 600 }}>ADV</td><td>177</td><td>Advance(Cash)</td><td style={{ textAlign: 'right', color: '#006600' }}>-1,000.00</td></tr>
                     
                     {/* Line 8: Transfer Credit matching Frame 110 */}
                     <tr style={{ background: '#F0FFF0', borderTop: '1px solid #ACA899' }}>
                       <td style={{ padding: '2px 4px', fontWeight: 700 }}>8</td>
-                      <td style={{ padding: '2px 6px' }}>27-JAN-2022 19:11</td>
+                      <td style={{ padding: '2px 6px' }}>{accountingDate} 19:11</td>
                       <td>0</td>
                       <td>201</td>
                       <td>624</td>
@@ -856,7 +825,7 @@ export default function IdsTransferFolioModal({
                   <tbody>
                     <tr style={{ background: '#F0FFF0' }}>
                       <td style={{ padding: '3px 4px', fontWeight: 700 }}>1</td>
-                      <td style={{ padding: '3px 6px' }}>27-JAN-2022 19:11</td>
+                      <td style={{ padding: '3px 6px' }}>{accountingDate} 19:11</td>
                       <td>0</td>
                       <td>{toRoomNo}</td>
                       <td>{targetGuest.regNo}</td>

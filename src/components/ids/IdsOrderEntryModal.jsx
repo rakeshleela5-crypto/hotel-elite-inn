@@ -165,7 +165,7 @@ export const POS_STANDARD_MODIFIERS = [
 export default function IdsOrderEntryModal({
   isOpen,
   onClose,
-  accountingDate = '03-FEB-2022',
+  accountingDate = '03-FEB-2026',
   onKOTCreated,
   onOpenCrystalReport
 }) {
@@ -258,7 +258,7 @@ export default function IdsOrderEntryModal({
   const [sessionTransferOpen, setSessionTransferOpen] = useState(false);
   const [sessionSourceSession, setSessionSourceSession] = useState('General');
   const [sessionNewSession, setSessionNewSession] = useState('Breakfast');
-  const [sessionTransferDate, setSessionTransferDate] = useState('08-FEB-2022');
+  const [sessionTransferDate, setSessionTransferDate] = useState('08-FEB-2026');
   const [sessionGridItems, setSessionGridItems] = useState([]);
   const [sessionNotice, setSessionNotice] = useState(null);
 
@@ -291,7 +291,7 @@ export default function IdsOrderEntryModal({
   const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
   const [selectOutletModalOpen, setSelectOutletModalOpen] = useState(false);
   const [selectOutletRestaurant, setSelectOutletRestaurant] = useState('RESTAURANT');
-  const [selectOutletAccountingDate, setSelectOutletAccountingDate] = useState('22-FEB-2022');
+  const [selectOutletAccountingDate, setSelectOutletAccountingDate] = useState('22-FEB-2026');
   const [selectOutletSession, setSelectOutletSession] = useState('General');
   const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
   const [eatAsULikeModalOpen, setEatAsULikeModalOpen] = useState(false);
@@ -321,7 +321,7 @@ export default function IdsOrderEntryModal({
   const [savedKots, setSavedKots] = useState([
     {
       kotNo: '1313',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '10',
       server: 'Biren',
       outlet: 'RESTAURANT',
@@ -339,7 +339,7 @@ export default function IdsOrderEntryModal({
     },
     {
       kotNo: '107',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '100',
       server: 'Biren',
       outlet: 'RESTAURANT',
@@ -359,7 +359,7 @@ export default function IdsOrderEntryModal({
     },
     {
       kotNo: '1315',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '11',
       server: 'Biren',
       outlet: 'RESTAURANT',
@@ -374,7 +374,7 @@ export default function IdsOrderEntryModal({
     },
     {
       kotNo: '1316',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '12',
       server: 'Biren',
       outlet: 'RESTAURANT',
@@ -392,7 +392,7 @@ export default function IdsOrderEntryModal({
     },
     {
       kotNo: '1311',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '15',
       server: 'Manash',
       outlet: 'RESTAURANT',
@@ -603,7 +603,7 @@ export default function IdsOrderEntryModal({
             guestName: activeNcKotForPrint?.guestName || 'MANAGER.IT',
             department: activeNcKotForPrint?.department || 'Managers (MGR)',
             deptCode: activeNcKotForPrint?.ncDeptCode || 'MGR',
-            accountingDate: accountingDate || '03-FEB-2022',
+            accountingDate: accountingDate || '03-FEB-2026',
             outlet: selectedOutlet || 'RESTAURANT',
             session: selectedSession || 'General',
             printer: ncPrintReportPrinter,
@@ -821,7 +821,7 @@ export default function IdsOrderEntryModal({
   const handleLoadVideo12Demo = () => {
     const v12T10Kot = {
       kotNo: '1313',
-      accountingDate: '03-FEB-2022',
+      accountingDate: '03-FEB-2026',
       tableNo: '10',
       server: 'Biren',
       outlet: 'RESTAURANT',

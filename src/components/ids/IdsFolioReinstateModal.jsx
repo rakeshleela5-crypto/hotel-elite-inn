@@ -4,6 +4,7 @@ import {
   RotateCcw, Check, X, Info, AlertTriangle, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw, CheckCircle2
 } from 'lucide-react';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 26: HOW TO USE FOLIO REINSTATE OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -42,40 +43,40 @@ export const DEFAULT_CHECKED_OUT_FOLIOS = [
     category: 'EXECUTIVE (EXE)',
     regNo: '624',
     guestName: 'Mr Sharma Raj',
-    billAmount: 5190.00,
+    billAmount: 2999.00,
     settlement: 'Cash',
     coBillNo: '511',
-    checkoutDate: '27-JAN-2022 18:55',
-    arrivalDate: '27-JAN-2022 12:00',
-    departureDate: '27-JAN-2022 18:55',
+    checkoutDate: `${INITIAL_ACCOUNTING_DATE} 18:55`,
+    arrivalDate: `${INITIAL_ACCOUNTING_DATE} 12:00`,
+    departureDate: `${INITIAL_ACCOUNTING_DATE} 18:55`,
     folioType: 'Full Checkout'
   },
   {
     billNo: '508',
-    roomNo: '314',
-    category: 'DELUXE (DLX)',
+    roomNo: '102',
+    category: 'EXECUTIVE (EXE)',
     regNo: '570',
-    guestName: 'Mr John Doe',
-    billAmount: 8400.00,
+    guestName: 'Mr Rajesh Sharma',
+    billAmount: 2999.00,
     settlement: 'Credit Card',
     coBillNo: '508',
-    checkoutDate: '26-JAN-2022 12:00',
-    arrivalDate: '24-JAN-2022 14:00',
-    departureDate: '26-JAN-2022 12:00',
+    checkoutDate: `${INITIAL_ACCOUNTING_DATE} 12:00`,
+    arrivalDate: `${INITIAL_ACCOUNTING_DATE} 14:00`,
+    departureDate: `${INITIAL_ACCOUNTING_DATE} 12:00`,
     folioType: 'Full Checkout'
   },
   {
     billNo: '509',
-    roomNo: '406',
-    category: 'DELUXE (DLX)',
+    roomNo: '205',
+    category: 'EXECUTIVE (EXE)',
     regNo: '575',
-    guestName: 'Sharma Group Master',
-    billAmount: 45000.00,
+    guestName: 'JK Paper Delegation',
+    billAmount: 14999.00,
     settlement: 'Direct Bill/BTC',
     coBillNo: '509',
-    checkoutDate: '26-JAN-2022 11:30',
-    arrivalDate: '22-JAN-2022 11:00',
-    departureDate: '26-JAN-2022 12:00',
+    checkoutDate: `${INITIAL_ACCOUNTING_DATE} 11:30`,
+    arrivalDate: `${INITIAL_ACCOUNTING_DATE} 11:00`,
+    departureDate: `${INITIAL_ACCOUNTING_DATE} 12:00`,
     folioType: 'Group Folio'
   }
 ];
@@ -84,7 +85,7 @@ export default function IdsFolioReinstateModal({
   isOpen,
   onClose,
   initialRoomNo = '201',
-  accountingDate = '27-JAN-2022',
+  accountingDate = INITIAL_ACCOUNTING_DATE,
   clearedRooms = [],
   onClearRoom,
   onReinstateFolio
@@ -505,7 +506,7 @@ export default function IdsFolioReinstateModal({
 
                 <div style={{ fontWeight: 600 }}>House Keeping Staff</div>
                 <div>
-                  <input type="text" readOnly value="Jayanta Chetia" style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
+                  <input type="text" readOnly value="Sunil Mohapatra" style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
                 </div>
 
                 <div style={{ fontWeight: 600 }}>Authorized by</div>

@@ -12,7 +12,7 @@ import { DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
 export const DEFAULT_PROMOTIONS = [
   {
     promotionCode: '1',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     restaurant: 'LIQUOR BAR',
     promotionName: 'Buy 2 Get 1 Free',
     covers: 1,
@@ -38,11 +38,11 @@ export const DEFAULT_PROMOTIONS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 10:16'
+    lastUpdated: '23-FEB-2026 10:16'
   },
   {
     promotionCode: '2',
-    applicableFrom: '23-FEB-2022',
+    applicableFrom: '23-FEB-2026',
     restaurant: 'RESTAURANT',
     promotionName: 'Happy Hour Tandoori Feast',
     covers: 2,
@@ -69,7 +69,7 @@ export const DEFAULT_PROMOTIONS = [
     ],
     status: 'Active',
     user: 'MANAGER',
-    lastUpdated: '23-FEB-2022 10:20'
+    lastUpdated: '23-FEB-2026 10:20'
   }
 ];
 
@@ -99,7 +99,7 @@ export const saveStoredPromotions = (promos) => {
 export default function IdsSalesPromotionMasterModal({
   isOpen,
   onClose,
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   currentUser = 'MANAGER',
   onSelectPromotionForOrder = null
 }) {
@@ -933,7 +933,7 @@ export default function IdsSalesPromotionMasterModal({
                   </thead>
                   <tbody>
                     {[
-                      { outlet: 'BAR', code: '1', applicableFrom: '23-FEB-2022', name: 'KingFisher Strong 650ML', status: 'Active', group: 'BEER' },
+                      { outlet: 'BAR', code: '1', applicableFrom: '23-FEB-2026', name: 'KingFisher Strong 650ML', status: 'Active', group: 'BEER' },
                       ...allMenuItems.map(m => ({
                         outlet: m.outletName === 'LIQUOR BAR' ? 'BAR' : 'RES',
                         code: m.itemCode,

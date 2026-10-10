@@ -26,11 +26,11 @@ export function IdsQuickReservationModal({
   const isModify = mode === 'modify' || (!!initialBooking && !isCancel);
   const resNumber = initialBooking?.resNo || '270';
 
-  const [arrivalDate, setArrivalDate] = useState(() => initialBooking?.arrivalDate || '14-JAN-2022');
+  const [arrivalDate, setArrivalDate] = useState(() => initialBooking?.arrivalDate || INITIAL_ACCOUNTING_DATE);
   const [arrivalTime, setArrivalTime] = useState('20:06');
   const [arrivalDay, setArrivalDay] = useState('FRIDAY');
   const [nights, setNights] = useState(() => isModify ? '3' : '2');
-  const [departureDate, setDepartureDate] = useState(() => isModify ? '17-JAN-2022 12:00' : '16-JAN-2022 12:00');
+  const [departureDate, setDepartureDate] = useState(() => isModify ? `${NEXT_ACCOUNTING_DATE} 12:00` : `${NEXT_ACCOUNTING_DATE} 12:00`);
   const [departureDay, setDepartureDay] = useState(() => isModify ? 'MONDAY' : 'SUNDAY');
 
   const [property, setProperty] = useState('DEMO');
@@ -58,7 +58,7 @@ export function IdsQuickReservationModal({
       setContactPerson('Mr. Anil Kumar');
       setBookerName('Mr Sharma');
       setCompanyCode('COM0003');
-      setCompanyName('Varun Beverages Ltd');
+      setCompanyName('JK Paper Mills Ltd');
       setRoomType('EXECUTIVE');
       setRoomsCount('5');
       setAdultCount('10');
@@ -119,7 +119,7 @@ export function IdsQuickReservationModal({
     workPermit: '',
     expiryDate: '',
     guardianName: '',
-    arrivalDate: '14-JAN-2022',
+    arrivalDate: INITIAL_ACCOUNTING_DATE,
     guardianPassport: '',
     visaNo: '',
     visaIssueDate: '',
@@ -306,8 +306,8 @@ export function IdsQuickReservationModal({
                   companyCode: 'COM0009',
                   roomNo: '515',
                   type: 'EXE',
-                  arrivalDate: '14-JAN-2022',
-                  departureDate: '17-JAN-2022',
+                  arrivalDate: INITIAL_ACCOUNTING_DATE,
+                  departureDate: NEXT_ACCOUNTING_DATE,
                   pax: '1',
                   depositAmount: 2000
                 });

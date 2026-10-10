@@ -4,7 +4,7 @@ import './idsFortuneNext.css';
 export default function IdsHoldLaundryModal({
   isOpen,
   onClose,
-  accountingDate = '27-JAN-2022',
+  accountingDate = '27-JAN-2026',
   onOpenMessageBox
 }) {
   const [heldBags, setHeldBags] = useState([
@@ -14,11 +14,11 @@ export default function IdsHoldLaundryModal({
       guestName: 'Mr Kumar Anil',
       pcs: 4,
       reason: 'Special Chemical Stain Treatment in Progress',
-      holdDate: '27-JAN-2022 18:30',
-      expectedRelease: '28-JAN-2022 10:00',
+      holdDate: '27-JAN-2026 18:30',
+      expectedRelease: '28-JAN-2026 10:00',
       storageBin: 'HK-LAU-BIN-08',
       status: 'On Hold',
-      handledBy: '006 Tejnur Borah'
+      handledBy: '006 Sunil Mohapatra'
     },
     {
       refNo: 'HL-PKG-009',
@@ -26,11 +26,11 @@ export default function IdsHoldLaundryModal({
       guestName: 'Biswakarma Santosh',
       pcs: 2,
       reason: 'Guest Out of Station / Delivery on Hold',
-      holdDate: '26-JAN-2022 20:15',
-      expectedRelease: '28-JAN-2022 14:00',
+      holdDate: '26-JAN-2026 20:15',
+      expectedRelease: '28-JAN-2026 14:00',
       storageBin: 'HK-LAU-BIN-03',
       status: 'On Hold',
-      handledBy: '002 Dhonsing Terang'
+      handledBy: '002 Ramesh Nayak'
     }
   ]);
 
@@ -54,7 +54,7 @@ export default function IdsHoldLaundryModal({
       expectedRelease: `${accountingDate} 21:30`,
       storageBin: 'HK-LAU-BIN-05',
       status: 'On Hold',
-      handledBy: '006 Tejnur Borah'
+      handledBy: '006 Sunil Mohapatra'
     });
   };
 

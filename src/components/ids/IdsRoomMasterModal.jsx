@@ -33,7 +33,7 @@ import {
       - [ Change Room Type ] button (Frame 016)
       - Status: Active / Inactive (Passive) / Out of Order
       - User: MANAGER
-      - Last Updated: 23-FEB-2022 18:16
+      - Last Updated: 23-FEB-2026 18:16
    4. Live Sync with Room Status Rack (Video 34 Frame 020):
       - Active: visible in Room Status Rack (e.g. 202 V/EXE)
       - Inactive (Passive): hidden from Room Status Rack, reducing Rooms to Sell count!
@@ -100,7 +100,7 @@ export default function IdsRoomMasterModal({
   isOpen,
   onClose,
   initialRoomNo = '202',
-  accountingDate = '23-FEB-2022',
+  accountingDate = '23-FEB-2026',
   onSaveRoomMaster,
   onOpenRoomRack
 }) {

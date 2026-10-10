@@ -1,39 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { RefreshCw, Check, X, Calendar, DollarSign, Clock, ShieldCheck, AlertCircle, Info, ChevronRight, Play } from 'lucide-react';
+import { 
+  INITIAL_ACCOUNTING_DATE, 
+  NEXT_ACCOUNTING_DATE, 
+  getFormattedPmsDate 
+} from '../../data/idsPmsStore';
 
 /* =========================================================================
    VIDEO 19: NIGHT AUDIT PROCESS IN IDS 6.5 & 7.0 SOFTWARE
    Authentic 1:1 Windows Desktop Replica of IDS Fortune NEXT PMS
-   Replication of:
-   1. 1st Step: Post Room Rate (Frames 015–040)
-      - Cashiering.. -> Posting V6.5.002.1 -> [ Room Rate ]
-      - Post Room Rate V6.5.002.1 Dialog
-      - Radio: Individual / All Rooms (default)
-      - Accounting Date: 25-JAN-2022
-      - Status animation: "Deleting old Trn/Tax records...", "Add 201", "Add 311", "Add 312", etc.
-   2. 2nd Step: Create Guest Balance (Frames 045–055)
-      - Day End process.. -> Create Guest Balance V6.5.002.1 Dialog
-      - Accounting Date: 25-JAN-2022
-      - Status: "Processing Tax Records(Inhouse) For Reg#566"
-      - "Updating FOM Gst Number.. Invoice # : 503"
-      - "Processing: GST GSTR1 Consolidation"
-   3. 3rd Step: Create Night Balance (Frames 060–065)
-      - Day End process.. -> Create Night Balance
-      - PENDING KOT'S Dialog (BAR GN, RES BF, RES LN by User BIREN)
-      - [ Continue ], [ Exit ]
-   4. 4th Step: Open New Date (Frames 070–085)
-      - Day End process.. -> Open New Date V6.5002.2 Dialog
-      - Current A/c Date: 25-JAN-2022
-      - New Date: 26-JAN-2022
-      - Confirm New Date: 26-JAN-2022
-      - Status animation: "Posting HPTTBL Information", "Executing: FOMPURG"
-   5. System Date Verification via "Info.." Dialog (Frames 090–092)
-      - Fortune NEXT 6.5 Logo & License Info
-      - Accounting Date: 26-JAN-2022 16:02
-      - Server Date: 26-JAN-2022 16:02
-      - Login Date: 26-JAN-2022 15:46
-      - Help Desk: +91 80 6772 0000 / techsupport@idsnext.com
    ========================================================================= */
 
 export const PENDING_KOTS_DATA = [
@@ -43,20 +19,20 @@ export const PENDING_KOTS_DATA = [
 ];
 
 export const INHOUSE_AUDIT_ROOMS = [
-  { roomNo: '201', guest: 'Kumar', regNo: '613', rate: '3,800.00' },
-  { roomNo: '311', guest: 'DEURI', regNo: '566', rate: '3,200.00' },
-  { roomNo: '312', guest: 'BASU', regNo: '587', rate: '3,500.00' },
-  { roomNo: '315', guest: 'Khan', regNo: '583', rate: '4,000.00' },
-  { roomNo: '316', guest: 'Anil Kumar Group', regNo: '619', rate: '6,500.00' },
-  { roomNo: '405', guest: 'Anirudh', regNo: '591', rate: '3,500.00' },
-  { roomNo: '501', guest: 'Anil Kumar Group', regNo: '615', rate: '4,500.00' },
-  { roomNo: '515', guest: 'Anil Kumar Group', regNo: '617', rate: '4,500.00' }
+  { roomNo: '102', guest: 'Sharma Rajesh', regNo: '501', rate: '1,750.00' },
+  { roomNo: '105', guest: 'Mohanty Sunil', regNo: '502', rate: '2,050.00' },
+  { roomNo: '201', guest: 'Kumar Anil', regNo: '613', rate: '2,050.00' },
+  { roomNo: '203', guest: 'Patel Vikram', regNo: '503', rate: '2,050.00' },
+  { roomNo: '206', guest: 'Jena Subrat', regNo: '504', rate: '2,050.00' },
+  { roomNo: '301', guest: 'Rath Amitav', regNo: '505', rate: '1,450.00' },
+  { roomNo: '303', guest: 'Mishra Priyadarshi', regNo: '506', rate: '1,750.00' },
+  { roomNo: '109', guest: 'Dr. Mohanty S N', regNo: '507', rate: '3,250.00' }
 ];
 
 export default function IdsNightAuditModal({
   isOpen,
   onClose,
-  currentAccountingDate = '25-JAN-2022',
+  currentAccountingDate = INITIAL_ACCOUNTING_DATE,
   onCompleteNightAudit,
   initialStep = 'full-wizard' // 'step1' | 'step2' | 'step3' | 'step4' | 'full-wizard' | 'info'
 }) {
@@ -64,9 +40,9 @@ export default function IdsNightAuditModal({
   const [activeStep, setActiveStep] = useState(1);
 
   // Dates
-  const [acDate, setAcDate] = useState(currentAccountingDate);
-  const [nextDate, setNextDate] = useState('26-JAN-2022');
-  const [confirmNextDate, setConfirmNextDate] = useState('26-JAN-2022');
+  const [acDate, setAcDate] = useState(currentAccountingDate || INITIAL_ACCOUNTING_DATE);
+  const [nextDate, setNextDate] = useState(NEXT_ACCOUNTING_DATE);
+  const [confirmNextDate, setConfirmNextDate] = useState(NEXT_ACCOUNTING_DATE);
 
   // Step 1: Post Room Rate State
   const [postMode, setPostMode] = useState('all'); // 'individual' | 'all'
@@ -106,18 +82,23 @@ export default function IdsNightAuditModal({
 
   // Synchronize next date based on acDate
   useEffect(() => {
-    if (acDate.startsWith('25-JAN')) {
-      setNextDate('26-JAN-2022');
-      setConfirmNextDate('26-JAN-2022');
-    } else {
+    try {
       const parts = acDate.split('-');
       if (parts.length === 3) {
-        const day = parseInt(parts[0], 10);
-        const nextDay = String(day + 1).padStart(2, '0');
-        const calculatedNext = `${nextDay}-${parts[1]}-${parts[2]}`;
+        const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const mIdx = months.indexOf(parts[1].toUpperCase());
+        const d = new Date(parseInt(parts[2], 10), mIdx >= 0 ? mIdx : 0, parseInt(parts[0], 10));
+        d.setDate(d.getDate() + 1);
+        const calculatedNext = getFormattedPmsDate(d);
         setNextDate(calculatedNext);
         setConfirmNextDate(calculatedNext);
+      } else {
+        setNextDate(NEXT_ACCOUNTING_DATE);
+        setConfirmNextDate(NEXT_ACCOUNTING_DATE);
       }
+    } catch (e) {
+      setNextDate(NEXT_ACCOUNTING_DATE);
+      setConfirmNextDate(NEXT_ACCOUNTING_DATE);
     }
   }, [acDate]);
 
@@ -126,7 +107,7 @@ export default function IdsNightAuditModal({
     setStep1Running(true);
     setStep1Log('Deleting old Trn/Tax records for selected room........');
 
-    const rooms = ['201', '311', '312', '315', '316', '405', '501', '515'];
+    const rooms = ['102', '105', '201', '203', '206', '301', '303', '109'];
     let idx = 0;
 
     const interval = setInterval(() => {
@@ -786,14 +767,14 @@ export default function IdsNightAuditModal({
                   <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', rowGap: '3px' }}>
                     <span style={{ fontWeight: 600 }}>Accounting Date</span>
                     <span style={{ fontWeight: 700, color: '#0A246A' }}>
-                      {step4Done ? '26-JAN-2022 16:02' : `${acDate} 15:46`}
+                      {step4Done ? `${nextDate} 16:02` : `${acDate} 15:46`}
                     </span>
 
                     <span style={{ fontWeight: 600 }}>Server Date</span>
-                    <span>{step4Done ? '26-JAN-2022 16:02' : `${acDate} 15:46`}</span>
+                    <span>{step4Done ? `${nextDate} 16:02` : `${acDate} 15:46`}</span>
 
                     <span style={{ fontWeight: 600 }}>Login Date</span>
-                    <span>26-JAN-2022 15:46</span>
+                    <span>{`${acDate} 15:46`}</span>
                   </div>
 
                   <div style={{ borderTop: '1px solid #EEE', marginTop: '6px', paddingTop: '6px' }}>
