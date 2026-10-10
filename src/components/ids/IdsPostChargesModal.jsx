@@ -619,8 +619,8 @@ export default function IdsPostChargesModal({
                 className="ids-btn-classic" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
-                  const amt = prompt("Modify Charge Amount (INR):", baseAmount);
-                  if (amt && !isNaN(amt)) setBaseAmount(parseFloat(amt));
+                  const amt = prompt("Modify Charge Amount (INR):", charges);
+                  if (amt && !isNaN(amt)) setCharges(parseFloat(amt).toFixed(2));
                 }}
               >
                 Modify
@@ -630,8 +630,8 @@ export default function IdsPostChargesModal({
                 className="ids-btn-classic" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
-                  if (confirm(`Remove charge (${revenueCode} - ₹${netAmount}) from posting queue?`)) {
-                    setBaseAmount(0);
+                  if (confirm(`Remove charge (${revenueCode} - ₹${charges}) from posting queue?`)) {
+                    setCharges('0.00');
                     alert("Charge entry cleared.");
                   }
                 }}
@@ -915,7 +915,10 @@ export default function IdsPostChargesModal({
                 type="button" 
                 className="ids-btn-classic" 
                 style={{ minWidth: '70px' }}
-                onClick={() => alert(`🧾 Bill Summary for Room ${roomNo}:\nTotal Debits: ₹${(2050 + (savedPostings.length > 0 ? netAmount : 0)).toFixed(2)}\nDeposits: ₹2,000.00\nNet Outstanding: ₹${Math.max(0, 2050 + (savedPostings.length > 0 ? netAmount : 0) - 2000).toFixed(2)}`)}
+                onClick={() => {
+                  const totalPosted = postedCharges.reduce((acc, c) => acc + (c.total || 0), 0);
+                  alert(`🧾 Bill Summary for Room ${roomNo}:\nTotal Debits: ₹${(2050 + totalPosted).toFixed(2)}\nDeposits: ₹2,000.00\nNet Outstanding: ₹${Math.max(0, 2050 + totalPosted - 2000).toFixed(2)}`);
+                }}
               >
                 Bill Details
               </button>
@@ -924,8 +927,8 @@ export default function IdsPostChargesModal({
                 className="ids-btn-classic" 
                 style={{ minWidth: '60px' }}
                 onClick={() => {
-                  setBaseAmount(0);
-                  setRemarks('');
+                  setCharges('0.00');
+                  setParticulars('');
                   alert("Post charge entry reset.");
                 }}
               >

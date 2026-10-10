@@ -173,6 +173,7 @@ export default function IdsOrderEntryModal({
   // Outlet selection state (Video 01 Frame 010)
   const [outletConfirmed, setOutletConfirmed] = useState(false);
   const [selectedOutlet, setSelectedOutlet] = useState('RESTAURANT');
+  const [resOutlet, setResOutlet] = useState('RES');
   const [selectedSession, setSelectedSession] = useState('General');
 
   // Order Header state (Video 01 Frame 015 & 025)
@@ -1472,7 +1473,11 @@ export default function IdsOrderEntryModal({
               <label style={{ fontWeight: 600 }}>Restaurant</label>
               <select 
                 value={selectedOutlet}
-                onChange={e => setSelectedOutlet(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value;
+                  setSelectedOutlet(val);
+                  setResOutlet(val === 'LIQUOR BAR' || val === 'BAR / LOUNGE' || val === 'BAR' ? 'BAR' : 'RES');
+                }}
                 style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
               >
                 <option value="RESTAURANT">RESTAURANT</option>

@@ -424,7 +424,7 @@ export default function IdsReleaseStopPostingModal({
                       onClick={() => {
                         playReceptionChime();
                         const r = prompt("Select Room (201, 202, 105):", selectedRoom);
-                        if (r && roomsList.find(x => x.roomNo === r)) setSelectedRoom(r);
+                        if (r && stopPostingList.find(x => x.roomNo === r)) setSelectedRoom(r);
                       }}
                     >?</button>
                   </div>

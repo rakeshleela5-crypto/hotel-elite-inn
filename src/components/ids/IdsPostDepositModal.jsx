@@ -524,7 +524,7 @@ export default function IdsPostDepositModal({
                 style={{ minWidth: '45px' }}
                 onClick={() => {
                   setReceivedAmount('1000.00');
-                  setRemarks('Fresh Advance Deposit Entry');
+                  setParticulars('Fresh Advance Deposit Entry');
                   alert("New advance deposit voucher draft initialized.");
                 }}
               >

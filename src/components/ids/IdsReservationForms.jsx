@@ -428,7 +428,7 @@ export function IdsQuickReservationModal({
                 <option value="Special">Special</option>
               </select>
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Mode</span>
-              <input className="ids-input" value={mode} onChange={(e) => setMode(e.target.value)} />
+              <input className="ids-input" value={contactMode} onChange={(e) => setContactMode(e.target.value)} />
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
