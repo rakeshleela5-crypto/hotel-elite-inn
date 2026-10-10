@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "hotel-elite-inn-db"
-database_id = "4d58260c-d200-4493-9b1c-2ef44d891b0d"
+database_id = "9cbfb04f-0a04-420d-b6e7-6ffa98f5a672"
 
 # Public environment variables (safe to commit)
 [vars]
