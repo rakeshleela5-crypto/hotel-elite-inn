@@ -19,7 +19,6 @@ import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsR
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
 import IdsMenuMasterModal, { getStoredMenuItems, DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal, { getStoredPromotions } from './IdsSalesPromotionMasterModal';
-import ManagerMobilePortal from '../ManagerMobilePortal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -282,10 +281,9 @@ export default function IdsOrderEntryModal({
   const [modifierName, setModifierName] = useState('OPEN MODIFIER');
   const [modifierRate, setModifierRate] = useState('0.00');
   const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
-  // Audio 4 Requirements: Dedicated 80mm/58mm Thermal KOT routing (Kitchen vs Restaurant) & Manager Mobile Ops
+  // Audio 4 Requirements: Dedicated 80mm/58mm Thermal KOT routing (Kitchen vs Restaurant)
   const [thermalKotModalOpen, setThermalKotModalOpen] = useState(false);
   const [thermalDestination, setThermalDestination] = useState('kitchen'); // 'kitchen' | 'restaurant'
-  const [managerMobilePortalOpen, setManagerMobilePortalOpen] = useState(false);
   const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
   const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
   const [restaurantTableMasterOpen, setRestaurantTableMasterOpen] = useState(false);
@@ -1792,19 +1790,6 @@ export default function IdsOrderEntryModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <span style={{ fontSize: '11px' }}>🖨️</span>
                 <span style={{ fontSize: '8px', fontWeight: 800, color: '#1B5E20' }}>80MM</span>
-              </div>
-            </button>
-
-            {/* Audio 4: Manager Mobile & Tablet Operations Portal */}
-            <button 
-              className="ids-btn" 
-              title="Manager Mobile Operations Portal — Live Billing Cards, Inventory & Mobile Print (Audio 4 Min 15 & 50)" 
-              onClick={() => setManagerMobilePortalOpen(true)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: '#FFF3CD', borderColor: '#856404' }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                <span style={{ fontSize: '11px' }}>📱</span>
-                <span style={{ fontSize: '8px', fontWeight: 800, color: '#856404' }}>OPS</span>
               </div>
             </button>
 
@@ -5410,15 +5395,6 @@ export default function IdsOrderEntryModal({
           </div>
         </div>
       )}
-
-      {/* 5T. MANAGER MOBILE & TABLET OPERATIONS PORTAL (Audio 4 Min 15 & Min 50) */}
-      <ManagerMobilePortal 
-        isOpen={managerMobilePortalOpen}
-        onClose={() => setManagerMobilePortalOpen(false)}
-        onOpenOrderEntry={() => {
-          setManagerMobilePortalOpen(false);
-        }}
-      />
     </div>
   );
 }

@@ -30,7 +30,6 @@ export default function Navbar({
   onOpenAuditedSalesRegister,
   onOpenAuditedRestaurantRegister,
   onOpenRoomSearch,
-  onOpenManagerMobilePortal,
   cartCount = 0,
   rooms = [],
   adminPinVerified,
@@ -399,28 +398,6 @@ export default function Navbar({
               <span className="hide-on-mobile">AI Concierge</span>
             </button>
 
-            {/* Manager Mobile Ops Portal Trigger (Audio 4) */}
-            <button
-              onClick={onOpenManagerMobilePortal}
-              style={{
-                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(133, 77, 14, 0.3))',
-                border: '1px solid rgba(212, 175, 55, 0.55)',
-                color: '#fef08a',
-                padding: '0.45rem 0.8rem',
-                borderRadius: '8px',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              title="Hotel Manager Mobile Ops & Billing Portal (Audio 4)"
-            >
-              <span>📱</span>
-              <span className="hide-on-mobile">Manager Ops</span>
-            </button>
-
             {/* FastAPI Interactive Swagger Docs */}
             <a
               href="https://hotel-elite-inn-backend-api-production-0dc9.up.railway.app/docs"
@@ -532,9 +509,6 @@ export default function Navbar({
             </button>
             <button onClick={() => { onOpenRoomSearch?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fbbf24', padding: '0.55rem 0.75rem', background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.4)', borderRadius: '8px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Search size={16} /> 🔍 Search 27 Rooms (Quick Navigator)
-            </button>
-            <button onClick={() => { onOpenManagerMobilePortal?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fef08a', padding: '0.55rem 0.75rem', background: 'rgba(212, 175, 55, 0.18)', border: '1px solid rgba(212, 175, 55, 0.5)', borderRadius: '8px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>📱</span> Manager Mobile Ops &amp; Billing (Audio 4)
             </button>
             <a
               href="https://hotel-elite-inn-backend-api-production-0dc9.up.railway.app/docs"

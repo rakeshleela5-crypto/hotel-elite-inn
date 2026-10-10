@@ -950,7 +950,6 @@ export default function IdsDesktopShell({
       { label: 'Food Item Cancellation / Void (Guest Disliked Taste - Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
       { label: 'Table Merging for Single Bill (Client Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
       { label: 'Thermal KOT Spooler (Kitchen vs Restaurant Slip - Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Manager Mobile Ops & Billing Console (Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
       { label: 'Menu Groups V6.5.002.1 (Setup -> Menu Groups)', videoId: 'POS-14', action: () => setMenuGroupsModalOpen(true) },
       { label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', videoId: 'POS-15', action: () => setTouchScreenGroupsModalOpen(true) },
       { label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
