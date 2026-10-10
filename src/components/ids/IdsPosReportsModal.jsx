@@ -468,10 +468,11 @@ export default function IdsPosReportsModal({
         <div
           style={{
             display: 'flex',
-            gap: '2px',
+            gap: '3px',
             background: '#ECE9D8',
             borderBottom: '2px solid #716F64',
-            padding: '6px 8px 0 8px'
+            padding: '6px 8px 0 8px',
+            overflowX: 'auto'
           }}
         >
           {[
@@ -480,25 +481,34 @@ export default function IdsPosReportsModal({
             { id: 'nc-ledger', label: '3. NC Department Cost Ledger' },
             { id: 'server-perf', label: '4. Server Sales & Commission' },
             { id: 'menu-sales', label: '5. Menu Item Engineering Sales' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '5px 12px',
-                fontSize: '11px',
-                fontWeight: activeTab === tab.id ? 700 : 400,
-                background: activeTab === tab.id ? '#FFF' : '#E0DFD8',
-                border: '1px solid #716F64',
-                borderBottom: activeTab === tab.id ? '2px solid #FFF' : '1px solid #716F64',
-                marginBottom: activeTab === tab.id ? '-2px' : '0px',
-                cursor: 'pointer',
-                borderRadius: '3px 3px 0 0'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+          ].map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '5px 12px',
+                  fontSize: '11px',
+                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  fontWeight: isActive ? 700 : 600,
+                  color: isActive ? '#0A246A' : '#1A1A1A',
+                  background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                  border: '1px solid #716F64',
+                  borderBottom: isActive ? '2px solid #FFFFFF' : '1px solid #716F64',
+                  marginBottom: isActive ? '-2px' : '0px',
+                  cursor: 'pointer',
+                  borderRadius: '3px 3px 0 0',
+                  boxShadow: isActive ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
+                  whiteSpace: 'nowrap',
+                  textShadow: 'none',
+                  outline: 'none'
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Filter Controls Bar */}
@@ -512,33 +522,34 @@ export default function IdsPosReportsModal({
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '8px',
-            fontSize: '11px'
+            fontSize: '11px',
+            color: '#000000'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div>
-              <span style={{ fontWeight: 600, marginRight: '4px' }}>Date:</span>
+            <div style={{ color: '#000000' }}>
+              <span style={{ fontWeight: 600, marginRight: '4px', color: '#000000' }}>Date:</span>
               <input
                 type="text"
                 value={fromDate}
                 onChange={e => setFromDate(e.target.value)}
-                style={{ width: '85px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                style={{ width: '85px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', color: '#000000', background: '#FFFFFF' }}
               />
-              <span style={{ margin: '0 4px' }}>to</span>
+              <span style={{ margin: '0 4px', color: '#000000' }}>to</span>
               <input
                 type="text"
                 value={toDate}
                 onChange={e => setToDate(e.target.value)}
-                style={{ width: '85px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                style={{ width: '85px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', color: '#000000', background: '#FFFFFF' }}
               />
             </div>
 
-            <div>
-              <span style={{ fontWeight: 600, marginRight: '4px' }}>Outlet:</span>
+            <div style={{ color: '#000000' }}>
+              <span style={{ fontWeight: 600, marginRight: '4px', color: '#000000' }}>Outlet:</span>
               <select
                 value={filterOutlet}
                 onChange={e => setFilterOutlet(e.target.value)}
-                style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', color: '#000000', background: '#FFFFFF' }}
               >
                 <option value="ALL">All Outlets</option>
                 <option value="RESTAURANT">RESTAURANT</option>
@@ -549,12 +560,12 @@ export default function IdsPosReportsModal({
             </div>
 
             {activeTab === 'shift-sales' && (
-              <div>
-                <span style={{ fontWeight: 600, marginRight: '4px' }}>Shift:</span>
+              <div style={{ color: '#000000' }}>
+                <span style={{ fontWeight: 600, marginRight: '4px', color: '#000000' }}>Shift:</span>
                 <select
                   value={filterShift}
                   onChange={e => setFilterShift(e.target.value)}
-                  style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                  style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', color: '#000000', background: '#FFFFFF' }}
                 >
                   <option value="ALL">All Shifts</option>
                   <option value="Shift 1">Shift 1 (Day)</option>
@@ -564,14 +575,14 @@ export default function IdsPosReportsModal({
               </div>
             )}
 
-            <div>
-              <span style={{ fontWeight: 600, marginRight: '4px' }}>Filter:</span>
+            <div style={{ color: '#000000' }}>
+              <span style={{ fontWeight: 600, marginRight: '4px', color: '#000000' }}>Filter:</span>
               <input
                 type="text"
                 placeholder="Search..."
                 value={filterSearch}
                 onChange={e => setFilterSearch(e.target.value)}
-                style={{ width: '100px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                style={{ width: '100px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', color: '#000000', background: '#FFFFFF' }}
               />
             </div>
           </div>
@@ -587,6 +598,7 @@ export default function IdsPosReportsModal({
                 padding: '2px 8px',
                 fontSize: '11px',
                 fontWeight: 600,
+                color: '#000000',
                 cursor: 'pointer'
               }}
             >
@@ -602,6 +614,7 @@ export default function IdsPosReportsModal({
                 padding: '2px 8px',
                 fontSize: '11px',
                 fontWeight: 600,
+                color: '#000000',
                 cursor: 'pointer'
               }}
             >
