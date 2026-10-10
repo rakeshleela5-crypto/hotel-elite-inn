@@ -948,6 +948,45 @@ Approved for Hotel Elite Inn Management • Muniguda, Rayagada`;
                   />
                 </div>
 
+                {/* Audio 2: Corporate Accounts Outstanding Aging & Billings Status Due Today */}
+                <div style={{
+                  marginBottom: '1.25rem',
+                  background: 'rgba(212, 175, 55, 0.08)',
+                  border: '1px solid rgba(212, 175, 55, 0.3)',
+                  borderRadius: '8px',
+                  padding: '10px 14px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fef08a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span>🏢</span> Corporate Accounts Aging &amp; Billings Status Due Today (Audio 2)
+                    </div>
+                    <span style={{ fontSize: '0.78rem', color: '#38bdf8', fontWeight: 700 }}>
+                      Total Due: ₹1,35,800.00
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                    Reconciled aging ledger for Rayagada industrial corporate clients before midnight day lock:
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', fontSize: '0.78rem' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Ashok Leyland:</span>
+                      <strong style={{ color: '#fbbf24' }}>₹64,500 (15d)</strong>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Utkal Alumina:</span>
+                      <strong style={{ color: '#fbbf24' }}>₹32,400 (12d)</strong>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Linde India Gases:</span>
+                      <strong style={{ color: '#f87171' }}>₹38,900 (38d Overdue)</strong>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>JK Paper Mills:</span>
+                      <strong style={{ color: '#4ade80' }}>₹0.00 (Settled)</strong>
+                    </div>
+                  </div>
+                </div>
+
                 <div style={{ marginBottom: '1.5rem' }}>
                   <label htmlFor="managerPinInput" style={{ display: 'block', fontSize: '0.82rem', color: '#c084fc', fontWeight: 600, marginBottom: '0.35rem' }}>
                     Enter Back-Office Manager PIN to Seal Day:

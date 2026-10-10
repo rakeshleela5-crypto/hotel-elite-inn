@@ -4,7 +4,7 @@ import {
   Printer, Edit3, ArrowRightLeft, Users, BookOpen, Scissors, 
   Trash2, XOctagon, ToggleLeft, ToggleRight, Building, HelpCircle, 
   RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard, FileText,
-  SlidersHorizontal, Archive, LogOut
+  SlidersHorizontal, Archive, LogOut, Smartphone
 } from 'lucide-react';
 import { RESTAURANT_MENU } from '../../data/hotelData';
 import { 
@@ -19,6 +19,7 @@ import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsR
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
 import IdsMenuMasterModal, { getStoredMenuItems, DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal, { getStoredPromotions } from './IdsSalesPromotionMasterModal';
+import ManagerMobilePortal from '../ManagerMobilePortal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -114,8 +115,11 @@ export const POS_TABLES = [
   '34', '35', '40', '41'
 ];
 
-// Authentic Statutory KOT Item Deletion / Void Reasons (Video 05 Frame 30 & 32)
+// Authentic Statutory KOT Item Deletion / Void Reasons (Video 05 Frame 30 & 32, Client Audio 4 Min 00-02)
 export const POS_DELETION_REASONS = [
+  'Guest Disliked Taste / Food Quality Reject',
+  'Wrong Item Punched by Steward',
+  'Item Unavailable / Kitchen 86 Stockout',
   'Guest Requested',
   'Cancelled by Guest',
   'Double Entry',
@@ -278,6 +282,10 @@ export default function IdsOrderEntryModal({
   const [modifierName, setModifierName] = useState('OPEN MODIFIER');
   const [modifierRate, setModifierRate] = useState('0.00');
   const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
+  // Audio 4 Requirements: Dedicated 80mm/58mm Thermal KOT routing (Kitchen vs Restaurant) & Manager Mobile Ops
+  const [thermalKotModalOpen, setThermalKotModalOpen] = useState(false);
+  const [thermalDestination, setThermalDestination] = useState('kitchen'); // 'kitchen' | 'restaurant'
+  const [managerMobilePortalOpen, setManagerMobilePortalOpen] = useState(false);
   const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
   const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
   const [restaurantTableMasterOpen, setRestaurantTableMasterOpen] = useState(false);
@@ -1433,6 +1441,15 @@ export default function IdsOrderEntryModal({
       setSelectedRowIdx(null);
       setReasonModalAction('SAVE_KOT');
     } else {
+      // Audio 4: Check if we are voiding a single selected line item
+      if (selectedRowIdx !== null && selectedRowIdx >= 0 && selectedRowIdx < lineItems.length) {
+        const removedItem = lineItems[selectedRowIdx];
+        setLineItems(prev => prev.filter((_, idx) => idx !== selectedRowIdx));
+        setSelectedRowIdx(null);
+        setSaveSuccessMsg(`Item '${removedItem.name}' Voided / Cancelled [Reason: ${selectedReason}]. Kitchen cancellation slip generated!`);
+        setTimeout(() => setSaveSuccessMsg(null), 4000);
+        return;
+      }
       handleSaveKOT(selectedReason);
     }
   };
@@ -1762,6 +1779,32 @@ export default function IdsOrderEntryModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <span style={{ fontSize: '11px' }}>📝</span>
                 <span style={{ fontSize: '8px', fontWeight: 700, color: '#1B5E20' }}>OPEN</span>
+              </div>
+            </button>
+
+            {/* Audio 4: Small Thermal Printer Routing to Kitchen / Restaurant */}
+            <button 
+              className="ids-btn" 
+              title="Thermal KOT (80mm/58mm) — Small Thermal Printer routing to Kitchen or Restaurant (Audio 4 Min 05-08 & 50)" 
+              onClick={() => setThermalKotModalOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: thermalKotModalOpen ? '#C1D2EE' : '#E8F5E9', borderColor: '#2E7D32' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>🖨️</span>
+                <span style={{ fontSize: '8px', fontWeight: 800, color: '#1B5E20' }}>80MM</span>
+              </div>
+            </button>
+
+            {/* Audio 4: Manager Mobile & Tablet Operations Portal */}
+            <button 
+              className="ids-btn" 
+              title="Manager Mobile Operations Portal — Live Billing Cards, Inventory & Mobile Print (Audio 4 Min 15 & 50)" 
+              onClick={() => setManagerMobilePortalOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: '#FFF3CD', borderColor: '#856404' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>📱</span>
+                <span style={{ fontSize: '8px', fontWeight: 800, color: '#856404' }}>OPS</span>
               </div>
             </button>
 
@@ -2129,7 +2172,7 @@ export default function IdsOrderEntryModal({
                         <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
                           {item.rate.toFixed(2)}
                         </td>
-                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                        <td style={{ padding: '2px 4px', textAlign: 'center', display: 'flex', gap: '3px', justifyContent: 'center' }}>
                           <button 
                             className="ids-btn" 
                             onClick={(e) => {
@@ -2147,6 +2190,27 @@ export default function IdsOrderEntryModal({
                             }}
                           >
                             Modifier
+                          </button>
+                          <button 
+                            className="ids-btn" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedRowIdx(idx);
+                              setReasonModalAction('SAVE_KOT');
+                              setSelectedReason('Guest Disliked Taste / Food Quality Reject');
+                              setReasonModalOpen(true);
+                            }}
+                            title="Void / Cancel Item (Audio 4: Guest Disliked Taste / Food Quality Reject)"
+                            style={{ 
+                              fontSize: '10px', 
+                              padding: '1px 4px', 
+                              background: '#F8D7DA', 
+                              color: '#721C24', 
+                              fontWeight: 700,
+                              border: '1px solid #F5C6CB'
+                            }}
+                          >
+                            Void
                           </button>
                         </td>
                       </tr>
@@ -5128,6 +5192,129 @@ export default function IdsOrderEntryModal({
           </div>
         </div>
       )}
+
+      {/* 5S. WIN32 THERMAL KOT SLIP ROUTING MODAL (Audio 4 Min 05-08 & Min 50) */}
+      {thermalKotModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-modal-container"
+            style={{ width: '420px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '5px 5px 20px rgba(0,0,0,0.7)' }}
+          >
+            <div 
+              className="ids-modal-titlebar"
+              style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Thermal KOT / POS Slip Spooler (Audio 4)</span>
+              <button className="ids-win-btn close" onClick={() => setThermalKotModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '10px 12px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, color: '#0A246A' }}>Select Thermal Destination:</span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <button 
+                    className="ids-btn" 
+                    onClick={() => setThermalDestination('kitchen')}
+                    style={{ 
+                      padding: '2px 8px', 
+                      background: thermalDestination === 'kitchen' ? '#316AC5' : '#ECE9D8', 
+                      color: thermalDestination === 'kitchen' ? '#FFF' : '#000', 
+                      fontWeight: 700 
+                    }}
+                  >
+                    🍳 Kitchen Printer
+                  </button>
+                  <button 
+                    className="ids-btn" 
+                    onClick={() => setThermalDestination('restaurant')}
+                    style={{ 
+                      padding: '2px 8px', 
+                      background: thermalDestination === 'restaurant' ? '#316AC5' : '#ECE9D8', 
+                      color: thermalDestination === 'restaurant' ? '#FFF' : '#000', 
+                      fontWeight: 700 
+                    }}
+                  >
+                    🧾 Restaurant Desk
+                  </button>
+                </div>
+              </div>
+
+              {/* Monospace Thermal Slip Preview */}
+              <div style={{
+                background: '#FFF',
+                border: '1px solid #7F9DB9',
+                padding: '10px',
+                fontFamily: '"Courier New", Courier, monospace',
+                fontSize: '11px',
+                lineHeight: '1.25',
+                maxHeight: '260px',
+                overflowY: 'auto'
+              }}>
+                <div style={{ textAlign: 'center', fontWeight: 'bold' }}>HOTEL ELITE INN - RAYAGADA</div>
+                <div style={{ textAlign: 'center', fontSize: '9px' }}>KITCHEN ORDER TICKET (KOT) - ESC/POS 80mm</div>
+                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                  <span>Table: T-{tableNo || '10'}</span>
+                  <span>KOT #: {kotNo === 'AUTO' ? '1312' : kotNo}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                  <span>Server: {server || 'Biren'}</span>
+                  <span>Covers: {covers || '2'}</span>
+                </div>
+                <div style={{ fontSize: '9px' }}>
+                  Target: {thermalDestination === 'kitchen' ? 'PRINTER 1: KITCHEN DISPLAY / THERMAL' : 'PRINTER 2: RESTAURANT CASHIER'}
+                </div>
+                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                {lineItems.map((it, idx) => (
+                  <div key={idx} style={{ margin: '2px 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{it.quantity} x {it.name}</span>
+                      <span>₹{(it.quantity * it.rate).toFixed(2)}</span>
+                    </div>
+                    {it.modifier && (
+                      <div style={{ fontSize: '9px', fontStyle: 'italic', paddingLeft: '8px' }}>
+                        * Mod: {typeof it.modifier === 'object' ? it.modifier.name : it.modifier}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                  <span>TOTAL ESTIMATE:</span>
+                  <span>₹{calculations.totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '4px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    handleDrawerKickOut();
+                    setSaveSuccessMsg(`Thermal KOT sent to ${thermalDestination === 'kitchen' ? 'Kitchen Small Thermal Printer' : 'Restaurant Counter Printer'}.`);
+                    setThermalKotModalOpen(false);
+                    setTimeout(() => setSaveSuccessMsg(null), 3500);
+                    window.print();
+                  }}
+                  style={{ minWidth: '100px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}
+                >
+                  🖨️ Print Thermal Slip
+                </button>
+                <button className="ids-btn" onClick={() => setThermalKotModalOpen(false)} style={{ minWidth: '60px' }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5T. MANAGER MOBILE & TABLET OPERATIONS PORTAL (Audio 4 Min 15 & Min 50) */}
+      <ManagerMobilePortal 
+        isOpen={managerMobilePortalOpen}
+        onClose={() => setManagerMobilePortalOpen(false)}
+        onOpenOrderEntry={() => {
+          setManagerMobilePortalOpen(false);
+        }}
+      />
     </div>
   );
 }

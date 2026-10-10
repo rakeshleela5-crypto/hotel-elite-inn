@@ -58,6 +58,7 @@ const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMo
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
+const ManagerMobilePortal = lazyWithRetry(() => import('./components/ManagerMobilePortal'));
 const RoomQuickSearchModal = lazyWithRetry(() => import('./components/RoomQuickSearchModal'));
 import { 
   getLiveKots, saveLiveKots, broadcastKotChannel, 
@@ -112,6 +113,13 @@ export default function App() {
   });
 
   const [stewardQrModalOpen, setStewardQrModalOpen] = useState(false);
+
+  // Dedicated Hotel Manager Mobile & Tablet Operations Portal (Audio 4 Min 15 & Min 50)
+  const [managerMobilePortalOpen, setManagerMobilePortalOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') === 'manager' || params.get('portal') === 'manager' || params.get('ops') === 'manager';
+  });
 
   const handleOpenD1Database = () => {
     setPmsInitialTab('d1-database-explorer');
@@ -1187,6 +1195,7 @@ export default function App() {
           onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
           onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
           onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
+          onOpenManagerMobilePortal={() => setManagerMobilePortalOpen(true)}
           rooms={rooms}
           adminPinVerified={adminPinVerified}
           setAdminPinVerified={setAdminPinVerified}
@@ -1533,6 +1542,20 @@ export default function App() {
             onClose={() => setRoomQrModalOpen(false)}
             initialRoomNumber={selectedRoomForQr}
             rooms={rooms}
+          />
+        )}
+
+        {/* Dedicated Hotel Manager Mobile & Tablet Operations Portal (Audio 4 Min 15 & Min 50) */}
+        {managerMobilePortalOpen && (
+          <ManagerMobilePortal 
+            isOpen={managerMobilePortalOpen}
+            onClose={() => setManagerMobilePortalOpen(false)}
+            rooms={rooms}
+            bookings={bookings}
+            foodOrders={foodOrders}
+            onOpenKitchenPOS={() => setPosModalOpen(true)}
+            onOpenAccountsLedger={() => setAccountsModalOpen(true)}
+            onOpenNightAudit={() => setNightAuditModalOpen(true)}
           />
         )}
       </Suspense>
