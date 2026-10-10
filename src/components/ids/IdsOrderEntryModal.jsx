@@ -13,6 +13,7 @@ import {
 } from '../../utils/kotDataSync';
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
+import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -265,6 +266,7 @@ export default function IdsOrderEntryModal({
   const [modifierName, setModifierName] = useState('OPEN MODIFIER');
   const [modifierRate, setModifierRate] = useState('0.00');
   const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
+  const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -1521,6 +1523,16 @@ export default function IdsOrderEntryModal({
               <SlidersHorizontal size={15} color="#0A246A" />
             </button>
 
+            {/* Menu Groups Setup (Video 14: Menu Groups V6.5.002.1 & Touch Screen Groups) */}
+            <button 
+              className="ids-btn" 
+              title="Menu Groups V6.5.002.1 & Touch Screen Groups Setup (Video 14)" 
+              onClick={() => setMenuGroupsOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '38px', padding: '2px 4px', background: menuGroupsOpen ? '#C1D2EE' : undefined }}
+            >
+              <Archive size={15} color="#274E13" />
+            </button>
+
             {/* HotKey Help (Shift+F1 to Shift+F10 Quick Reference) */}
             <button 
               className="ids-btn" 
@@ -2133,6 +2145,14 @@ export default function IdsOrderEntryModal({
                 style={{ fontSize: '10px', background: '#F8CECC', borderColor: '#B85450', color: '#6B1B18', fontWeight: 600 }}
               >
                 Table Link
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setMenuGroupsOpen(true)}
+                title="Menu Groups V6.5.002.1 & Touch Screen Groups Setup (Video 14)"
+                style={{ fontSize: '10px', background: '#D5E8D4', borderColor: '#82B366', color: '#274E13', fontWeight: 700 }}
+              >
+                Menu Groups (POS-14)
               </button>
               <button 
                 className="ids-btn" 
@@ -4134,7 +4154,8 @@ export default function IdsOrderEntryModal({
                       { key: 'Shift + F11', name: 'Rename / Import', desc: '@ Qty: Rename Item | @ Code: Import items from other outlet', action: () => { setHotKeyHelpOpen(false); handleOpenSupRestaurant(0); } },
                       { key: '<F1>', name: 'Item Modifier', desc: '@ Qty column: Open Item Modifiers dialog (spicy, less spicy, jain)', action: () => { setHotKeyHelpOpen(false); handleOpenItemModifier(0); } },
                       { key: '<F5>', name: 'Delete Item', desc: 'Delete currently selected row from order entry grid', action: () => { setHotKeyHelpOpen(false); handleDeleteRow(0); } },
-                      { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } }
+                      { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } },
+                      { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
@@ -4203,6 +4224,14 @@ export default function IdsOrderEntryModal({
           setTimeout(() => setSaveSuccessMsg(null), 3000);
         }}
         onOpenCrystalReport={onOpenCrystalReport}
+      />
+
+      {/* POS Video 14: Menu Groups V6.5.002.1 & Touch Screen Groups Setup */}
+      <IdsMenuGroupsModal
+        isOpen={menuGroupsOpen}
+        onClose={() => setMenuGroupsOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
       />
     </div>
   );
