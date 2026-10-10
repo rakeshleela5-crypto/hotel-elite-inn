@@ -80,6 +80,7 @@ import IdsHkInventoryModal from './IdsHkInventoryModal';
 import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
+import IdsOrderEntryModal from './IdsOrderEntryModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -420,6 +421,9 @@ export default function IdsDesktopShell({
   const [laundryPlantOpen, setLaundryPlantOpen] = useState(false);
   const [registeredComplaintsCount, setRegisteredComplaintsCount] = useState(0);
 
+  // POS Order Entry & F&B Suite (POS Videos 01–22)
+  const [orderEntryModalOpen, setOrderEntryModalOpen] = useState(false);
+
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
   const [msgBoxConfig, setMsgBoxConfig] = useState({
@@ -599,6 +603,7 @@ export default function IdsDesktopShell({
     { id: 'Day End process..', label: 'Day End process..' },
     { id: 'Guest History..', label: 'Guest History..' },
     { id: 'House Keeping..', label: 'House Keeping..' },
+    { id: 'Point of Sale..', label: 'Point of Sale..' },
     { id: 'Reports..', label: 'Reports..' },
     { id: 'Lookups..', label: 'Lookups..' },
     { id: 'SMS Setup..', label: 'SMS Setup..' },
@@ -893,6 +898,21 @@ export default function IdsDesktopShell({
           setRoomMasterModalOpen(true);
         } 
       }
+    ],
+    'Point of Sale..': [
+      { label: 'Open Shift', videoId: 'POS-01', action: () => showMessageBox("Shift Opened for RESTAURANT Outlet on " + accountingDate, "POS Shift Control") },
+      { label: 'Open Outlets', videoId: 'POS-01', action: () => showMessageBox("All Outlets (Restaurant, Bar, Room Service, Banquet) Opened.", "Outlet Control") },
+      { label: 'Order Entry', videoId: 'POS-01', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Close Shift', videoId: 'POS-01', action: () => showMessageBox("Current Shift Closed & Audited.", "POS Shift Control") },
+      { label: 'Close Outlet', videoId: 'POS-01', action: () => showMessageBox("Outlet Closed for Operations.", "Outlet Control") },
+      { label: 'Void KOTs', videoId: 'POS-06', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Chefs Recommendation', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Table Booking', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Update Covers', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Delete NC KOT', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Create POS MIS', action: () => showMessageBox("POS MIS Register Compiled.", "MIS Report") },
+      { label: 'Restaurant Table View', videoId: 'POS-12', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
     'Day End process..': [
       { 
@@ -1492,8 +1512,8 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className={`ids-tool-btn ${activeTool === 'dining' ? 'active' : ''}`}
-            title="Food & Beverage / Restaurant"
-            onClick={() => { setActiveTool('dining'); setSelectedMaster('Reports..'); }}
+            title="Food & Beverage / Restaurant (Point of Sale)"
+            onClick={() => { setActiveTool('dining'); setSelectedMaster('Point of Sale..'); }}
           >
             <Utensils size={20} />
           </button>
@@ -3004,6 +3024,13 @@ export default function IdsDesktopShell({
         onClose={() => setLaundryPlantOpen(false)}
         accountingDate={accountingDate}
         onOpenMessageBox={showMessageBox}
+      />
+
+      {/* POS Video 01: Order Entry V6.5.002.4 (Chargeable KOT) */}
+      <IdsOrderEntryModal
+        isOpen={orderEntryModalOpen}
+        onClose={() => setOrderEntryModalOpen(false)}
+        accountingDate={accountingDate}
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}
