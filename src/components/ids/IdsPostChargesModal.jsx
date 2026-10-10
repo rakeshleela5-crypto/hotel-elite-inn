@@ -56,7 +56,7 @@ export const REVENUE_CODES_DATA = [
 export default function IdsPostChargesModal({
   isOpen,
   onClose,
-  initialRoomNo = '312',
+  initialRoomNo = '101',
   accountingDate = '26-JAN-2022',
   initialRevenueCode = 'TRV',
   onSaveCharge
@@ -65,10 +65,10 @@ export default function IdsPostChargesModal({
   const [currentView, setCurrentView] = useState('post-charges');
 
   // Room & Guest Data
-  const [roomNo, setRoomNo] = useState(initialRoomNo || '312');
+  const [roomNo, setRoomNo] = useState(initialRoomNo || '101');
   const [folioNo, setFolioNo] = useState('1');
   const [regNo, setRegNo] = useState('587');
-  const [guestName, setGuestName] = useState('MS BASU ANIRUDH');
+  const [guestName, setGuestName] = useState('MR SANTOSH BISWAKARMA');
   const [refDate, setRefDate] = useState(accountingDate || '26-JAN-2022');
   const [acDate, setAcDate] = useState(accountingDate || '26-JAN-2022');
 
@@ -92,7 +92,7 @@ export default function IdsPostChargesModal({
   const [postedCharges, setPostedCharges] = useState([
     {
       receiptNo: '225',
-      roomNo: '312',
+      roomNo: '101',
       revenueCode: 'TRV',
       description: 'TRAVEL DESK',
       particulars: 'Airport Pickup Drop',
@@ -103,13 +103,13 @@ export default function IdsPostChargesModal({
     },
     {
       receiptNo: '226',
-      roomNo: '312',
+      roomNo: '101',
       revenueCode: 'MSC',
       description: 'MISCELLENEOUS CHARGES',
       particulars: 'Miscellenous Charges',
       charges: 200,
-      tax: 0,
-      total: 200,
+      tax: 10,
+      total: 210,
       date: '26-JAN-2022'
     }
   ]);
@@ -120,7 +120,7 @@ export default function IdsPostChargesModal({
   // Synchronize when opened
   useEffect(() => {
     if (isOpen) {
-      setRoomNo(initialRoomNo || '312');
+      setRoomNo(initialRoomNo || '101');
       setAcDate(accountingDate || '26-JAN-2022');
       setRefDate(accountingDate || '26-JAN-2022');
       setCurrentView('post-charges');

@@ -13,10 +13,6 @@ Whenever any changes, bug fixes, UI updates, schema modifications, or features a
    - Deploy immediately to Cloudflare Pages:
      `npx wrangler pages deploy dist --project-name hotel-elite-inn --branch main`
 
-3. **Cloudflare D1 Remote Database Sync**:
-   - If SQL migrations, table definitions, or seed scripts are altered or added, apply them directly to the remote Cloudflare D1 database:
-     `npx wrangler d1 execute hotel-elite-inn-db --remote --file=<migration_file>`
-
-4. **Response Requirement**:
+3. **Response Requirement**:
    - Do NOT ask the user for permission to push or deploy.
    - Run the pipeline proactively and provide the commit hash, the live GitHub link, and the live Cloudflare Pages URL in the final response.

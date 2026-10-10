@@ -40,171 +40,60 @@ import {
    ========================================================================= */
 
 export const INITIAL_ROOM_TYPES_DATABASE = [
-  { propertyCode: 'DEM', roomType: 'DLX', applicableFrom: '15-SEP-2021', name: 'DELUXE ROOM', status: 'Active', maxPax: 2, defaultRate: 2999 },
-  { propertyCode: 'DEM', roomType: 'EXE', applicableFrom: '15-SEP-2021', name: 'EXECUTIVE ROOM', status: 'Active', maxPax: 2, defaultRate: 3999 },
-  { propertyCode: 'DEM', roomType: 'PNH', applicableFrom: '15-SEP-2021', name: 'PENT HOUSE SUITE', status: 'Active', maxPax: 4, defaultRate: 9999 },
-  { propertyCode: 'DEM', roomType: 'SUI', applicableFrom: '15-SEP-2021', name: 'ROYAL SUITE', status: 'Active', maxPax: 3, defaultRate: 7499 },
-  { propertyCode: 'DEM', roomType: 'ZZZ', applicableFrom: '26-SEP-2021', name: 'Special Rooms / Dormitory', status: 'Active', maxPax: 6, defaultRate: 1500 }
+  { propertyCode: 'HEI', roomType: 'STD', applicableFrom: '01-JAN-2023', name: 'STANDARD SINGLE BED', status: 'Active', maxPax: 1, defaultRate: 1450 },
+  { propertyCode: 'HEI', roomType: 'DLX', applicableFrom: '01-JAN-2023', name: 'DELUXE KING BED', status: 'Active', maxPax: 2, defaultRate: 1750 },
+  { propertyCode: 'HEI', roomType: 'EXE', applicableFrom: '01-JAN-2023', name: 'EXECUTIVE ROOM (KING/TWIN/TRIPLE)', status: 'Active', maxPax: 3, defaultRate: 2050 },
+  { propertyCode: 'HEI', roomType: 'PRM', applicableFrom: '01-JAN-2023', name: 'PREMIUM KING BED', status: 'Active', maxPax: 2, defaultRate: 2450 },
+  { propertyCode: 'HEI', roomType: 'SUI', applicableFrom: '01-JAN-2023', name: 'PREMIUM SUITE KING BED', status: 'Active', maxPax: 2, defaultRate: 3250 }
 ];
 
 export const ALL_ROOM_FEATURES_MASTER = [
   'Non Smoking Room',
-  'Queen Size Bed',
-  'Smoking Room',
-  'Twin Bed',
   'King Size Bed',
-  'Pool View',
-  'City View / Garden View',
-  'Balcony',
-  'Jacuzzi & Bathtub',
+  'Twin Bed',
+  'Triple Bedding',
+  'Single Bed',
+  'AC / Climate Control',
+  '24h Hot Water',
   'High Speed Wi-Fi Enabled',
-  'Smart 4K LED TV'
+  'Smart LED TV',
+  'Complimentary Breakfast',
+  'Plush Living Area'
 ];
 
 export const INITIAL_ROOM_MASTER_INVENTORY = [
-  { 
-    roomNo: '201', 
-    roomType: 'EXE', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['King Size Bed', 'Non Smoking Room'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '202',
-    oppositeRoom: '208',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '202', 
-    roomType: 'EXE', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['King Size Bed', 'Non Smoking Room', 'City View / Garden View'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '201',
-    oppositeRoom: '207',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '203', 
-    roomType: 'DLX', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['Twin Bed', 'Non Smoking Room'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '206',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '204', 
-    roomType: 'DLX', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['Queen Size Bed', 'Pool View'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '205',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '205', 
-    roomType: 'DLX', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['Queen Size Bed', 'Non Smoking Room'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '204',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '206', 
-    roomType: 'DLX', 
-    block: 'MAIN', 
-    floor: '2', 
-    features: ['Twin Bed', 'Non Smoking Room'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '203',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '301', 
-    roomType: 'EXE', 
-    block: 'MAIN', 
-    floor: '3', 
-    features: ['King Size Bed', 'Balcony'], 
-    maxPax: 2, 
-    rateTable: '101', 
-    connectingRoom: '',
-    oppositeRoom: '308',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '312', 
-    roomType: 'DLX', 
-    block: 'MAIN', 
-    floor: '3', 
-    features: ['King Size Bed', 'Pool View'], 
-    maxPax: 2, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '316', 
-    roomType: 'SUI', 
-    block: 'TOWER', 
-    floor: '3', 
-    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony'], 
-    maxPax: 3, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '516', 
-    roomType: 'SUI', 
-    block: 'TOWER', 
-    floor: '5', 
-    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'City View / Garden View'], 
-    maxPax: 3, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  },
-  { 
-    roomNo: '601', 
-    roomType: 'PNH', 
-    block: 'TOWER', 
-    floor: '6', 
-    features: ['King Size Bed', 'Jacuzzi & Bathtub', 'Balcony', 'Smart 4K LED TV'], 
-    maxPax: 4, 
-    rateTable: '100', 
-    connectingRoom: '',
-    oppositeRoom: '',
-    status: 'Active', 
-    lastUpdated: '23-FEB-2022 18:16' 
-  }
+  // Floor 1 (9 Rooms: 101 - 109)
+  { roomNo: '101', roomType: 'EXE', block: 'MAIN', floor: '1', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '102', oppositeRoom: '108', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '102', roomType: 'DLX', block: 'MAIN', floor: '1', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '101', oppositeRoom: '107', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '103', roomType: 'EXE', block: 'MAIN', floor: '1', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '106', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '104', roomType: 'DLX', block: 'MAIN', floor: '1', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '105', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '105', roomType: 'EXE', block: 'MAIN', floor: '1', features: ['Twin Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '104', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '106', roomType: 'DLX', block: 'MAIN', floor: '1', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '103', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '107', roomType: 'EXE', block: 'MAIN', floor: '1', features: ['Triple Bedding', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 3, rateTable: '100', connectingRoom: '', oppositeRoom: '102', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '108', roomType: 'STD', block: 'MAIN', floor: '1', features: ['Single Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 1, rateTable: '100', connectingRoom: '', oppositeRoom: '101', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '109', roomType: 'SUI', block: 'MAIN', floor: '1', features: ['King Size Bed', 'Plush Living Area', 'AC / Climate Control'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+
+  // Floor 2 (9 Rooms: 201 - 209)
+  { roomNo: '201', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '202', oppositeRoom: '208', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '202', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '201', oppositeRoom: '207', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '203', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '206', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '204', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '205', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '205', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['Twin Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '204', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '206', roomType: 'DLX', block: 'MAIN', floor: '2', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '203', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '207', roomType: 'EXE', block: 'MAIN', floor: '2', features: ['Triple Bedding', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 3, rateTable: '100', connectingRoom: '', oppositeRoom: '202', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '208', roomType: 'STD', block: 'MAIN', floor: '2', features: ['Single Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 1, rateTable: '100', connectingRoom: '', oppositeRoom: '201', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '209', roomType: 'SUI', block: 'MAIN', floor: '2', features: ['King Size Bed', 'Plush Living Area', 'AC / Climate Control'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+
+  // Floor 3 (9 Rooms: 301 - 309)
+  { roomNo: '301', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '302', oppositeRoom: '308', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '302', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '301', oppositeRoom: '307', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '303', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '306', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '304', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '305', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '305', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '304', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '306', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '303', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '307', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '302', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '308', roomType: 'EXE', block: 'MAIN', floor: '3', features: ['King Size Bed', 'AC / Climate Control', 'High Speed Wi-Fi Enabled'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '301', status: 'Active', lastUpdated: '01-JAN-2023 10:00' },
+  { roomNo: '309', roomType: 'PRM', block: 'MAIN', floor: '3', features: ['King Size Bed', 'Plush Living Area', 'AC / Climate Control'], maxPax: 2, rateTable: '100', connectingRoom: '', oppositeRoom: '', status: 'Active', lastUpdated: '01-JAN-2023 10:00' }
 ];
 
 export default function IdsRoomMasterModal({

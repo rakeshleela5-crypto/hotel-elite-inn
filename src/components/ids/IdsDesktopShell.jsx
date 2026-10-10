@@ -114,22 +114,23 @@ export default function IdsDesktopShell({
   const [selectedMaster, setSelectedMaster] = useState('Reservations..');
   const [activeSubItem, setActiveSubItem] = useState('Room Booking');
   
-  // Dynamic Live Reservations List matching Videos 01, 02, 03 & 04
+  // Dynamic Live Reservations List for Hotel Elite Inn
   const [reservations, setReservations] = useState([
     { 
       resNo: '270', 
       title: 'Mr', 
-      guestName: 'Biswakarma Santosh', 
-      companyName: 'Quality Pharma Products Pvt Ltd.', 
-      companyCode: 'COM0009', 
-      roomNo: '515', 
+      guestName: 'Santosh Biswakarma', 
+      companyName: 'Linde India Ltd', 
+      companyCode: 'COM0004', 
+      roomNo: '101', 
       type: 'EXE', 
       confirm: '1+0+0', 
       provisional: '0+0+0', 
       pax: '1+0+0', 
-      arrivalDate: '14-JAN-2022 20:07', 
-      departureDate: '17-JAN-2022 12:00', 
+      arrivalDate: '10-OCT-2026 14:00', 
+      departureDate: '12-OCT-2026 12:00', 
       depositAmount: 2000, 
+      rate: '2,050.00',
       status: 'Repeat Guest', 
       blocked: true,
       isCancelled: false 
@@ -137,17 +138,18 @@ export default function IdsDesktopShell({
     { 
       resNo: '271', 
       title: 'Mr', 
-      guestName: 'Biswakarma Santosh', 
-      companyName: 'Mahindra & Mahindra Limited', 
+      guestName: 'Dr. S. N. Mohanty', 
+      companyName: 'AIIMS Healthcare Consultant', 
       companyCode: 'COM0007', 
-      roomNo: '516', 
+      roomNo: '109', 
       type: 'SUI', 
       confirm: '0+1+0', 
       provisional: '0+0+0', 
       pax: '2+0+0', 
-      arrivalDate: '14-JAN-2022 19:56', 
-      departureDate: '16-JAN-2022 12:00', 
-      depositAmount: 0, 
+      arrivalDate: '10-OCT-2026 18:00', 
+      departureDate: '13-OCT-2026 12:00', 
+      depositAmount: 3250, 
+      rate: '3,250.00',
       status: 'VIP', 
       blocked: true,
       isCancelled: false 
@@ -155,17 +157,18 @@ export default function IdsDesktopShell({
     { 
       resNo: '274', 
       title: 'Mr', 
-      guestName: 'Khan Pravez', 
-      companyName: 'Corporate FIT', 
+      guestName: 'Vikram Patel', 
+      companyName: 'Utkal Alumina International Ltd', 
       companyCode: 'COM0005', 
-      roomNo: '401', 
+      roomNo: '203', 
       type: 'EXE', 
       confirm: '1+0+0', 
       provisional: '0+0+0', 
       pax: '2+0+0', 
-      arrivalDate: '16-JAN-2022 14:00', 
-      departureDate: '18-JAN-2022 12:00', 
+      arrivalDate: '11-OCT-2026 14:00', 
+      departureDate: '14-OCT-2026 12:00', 
       depositAmount: 0, 
+      rate: '2,050.00',
       status: 'Confirmed', 
       blocked: true,
       isCancelled: false 
@@ -173,23 +176,23 @@ export default function IdsDesktopShell({
     { 
       resNo: '276', 
       title: 'Mr', 
-      guestName: 'Anil Kumar Group', 
+      guestName: 'JK Paper Delegation', 
       contactPerson: 'Mr. Anil Kumar',
       booker: 'Mr Sharma',
       groupCode: '003',
-      groupName: 'Anil Kumar Group',
-      companyName: 'Varun Beverages Ltd', 
+      groupName: 'JK Paper Technical Delegation',
+      companyName: 'JK Paper Mills Ltd', 
       companyCode: 'COM0003', 
-      roomNo: '415, 501, 515', 
-      rooms: ['415', '501', '515'],
+      roomNo: '201, 205, 207', 
+      rooms: ['201', '205', '207'],
       type: 'EXE', 
-      confirm: '0+5+0', 
+      confirm: '0+3+0', 
       provisional: '0+0+0', 
-      pax: '10+3+0', 
-      arrivalDate: '16-JAN-2022 14:00', 
-      departureDate: '18-JAN-2022 12:00', 
-      depositAmount: 0, 
-      rate: '4,250.00',
+      pax: '6+0+0', 
+      arrivalDate: '12-OCT-2026 14:00', 
+      departureDate: '15-OCT-2026 12:00', 
+      depositAmount: 6000, 
+      rate: '2,050.00',
       status: 'Confirmed Group', 
       blocked: false,
       isCancelled: false,
@@ -198,17 +201,18 @@ export default function IdsDesktopShell({
     { 
       resNo: '269', 
       title: 'Mr', 
-      guestName: 'P Ashok', 
-      companyName: 'Linde India Ltd', 
-      companyCode: 'COM0004', 
-      roomNo: '201', 
+      guestName: 'Rajesh Sharma', 
+      companyName: 'Ashok Leyland Ltd', 
+      companyCode: 'COM0001', 
+      roomNo: '102', 
       type: 'DLX', 
       confirm: '1+0+0', 
       provisional: '0+0+0', 
-      pax: '1+0+0', 
-      arrivalDate: '14-JAN-2022 14:00', 
-      departureDate: '15-JAN-2022 12:00', 
-      depositAmount: 1500, 
+      pax: '2+0+0', 
+      arrivalDate: '09-OCT-2026 14:00', 
+      departureDate: '11-OCT-2026 12:00', 
+      depositAmount: 1750, 
+      rate: '1,750.00',
       status: 'Checked In', 
       blocked: false,
       isCancelled: false 
@@ -219,14 +223,15 @@ export default function IdsDesktopShell({
       guestName: 'Anjali Sharma', 
       companyName: 'Direct FIT', 
       companyCode: '', 
-      roomNo: '', 
-      type: 'DLX', 
+      roomNo: '108', 
+      type: 'STD', 
       confirm: '0+0+0', 
       provisional: '1+0+0', 
-      pax: '2+0+0', 
-      arrivalDate: '15-JAN-2022 12:00', 
-      departureDate: '18-JAN-2022 12:00', 
+      pax: '1+0+0', 
+      arrivalDate: '12-OCT-2026 12:00', 
+      departureDate: '14-OCT-2026 12:00', 
       depositAmount: 0, 
+      rate: '1,450.00',
       status: 'Waitlist', 
       blocked: false,
       isCancelled: false 
@@ -281,7 +286,7 @@ export default function IdsDesktopShell({
   
   // Video 11: Change Room Rate / Change Tariff States (Frames 024–048)
   const [changeRateModalOpen, setChangeRateModalOpen] = useState(false);
-  const [selectedRoomForRate, setSelectedRoomForRate] = useState('312');
+  const [selectedRoomForRate, setSelectedRoomForRate] = useState('101');
   const [roomTariffs, setRoomTariffs] = useState(DEFAULT_ROOM_TARIFFS);
 
   // Video 12: Modify Guest Departure / Amend Stay States (Frames 018–045)
@@ -291,7 +296,7 @@ export default function IdsDesktopShell({
 
   // Video 13: Room Transfer / Shift States (Frames 009–031)
   const [roomTransferModalOpen, setRoomTransferModalOpen] = useState(false);
-  const [selectedRoomForTransfer, setSelectedRoomForTransfer] = useState('415');
+  const [selectedRoomForTransfer, setSelectedRoomForTransfer] = useState('105');
   const [transferredRooms, setTransferredRooms] = useState({});
 
   // Video 14: Post Deposit / Advance States (Frames 011–020)
@@ -301,7 +306,7 @@ export default function IdsDesktopShell({
 
   // Video 15: Checkout & Settle Front Office Bill States (Frames 010–060)
   const [checkoutBillModalOpen, setCheckoutBillModalOpen] = useState(false);
-  const [selectedRoomForCheckout, setSelectedRoomForCheckout] = useState('314');
+  const [selectedRoomForCheckout, setSelectedRoomForCheckout] = useState('102');
   const [checkoutInitialMode, setCheckoutInitialMode] = useState('checkout'); // 'checkout' | 'settlement'
   const [checkedOutRooms, setCheckedOutRooms] = useState([]);
 
@@ -312,9 +317,9 @@ export default function IdsDesktopShell({
 
   // Video 18: Pax Check-Out States (Frames 020–095)
   const [paxCheckoutModalOpen, setPaxCheckoutModalOpen] = useState(false);
-  const [selectedRoomForPaxCheckout, setSelectedRoomForPaxCheckout] = useState('312');
+  const [selectedRoomForPaxCheckout, setSelectedRoomForPaxCheckout] = useState('102');
   const [paxCheckedOutRooms, setPaxCheckedOutRooms] = useState([]);
-  const [selectedRoomForGuestInfo, setSelectedRoomForGuestInfo] = useState('312');
+  const [selectedRoomForGuestInfo, setSelectedRoomForGuestInfo] = useState('102');
 
   // Video 19: Night Audit Process States (Frames 010–095)
   const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
@@ -324,21 +329,21 @@ export default function IdsDesktopShell({
   // Video 20: Additional Room Rate & Quick Balances States (Frames 015–065)
   const [additionalRoomRateModalOpen, setAdditionalRoomRateModalOpen] = useState(false);
   const [additionalRoomRateInitialMode, setAdditionalRoomRateInitialMode] = useState('additional-rate'); // 'additional-rate' | 'quick-balances'
-  const [selectedRoomForAdditionalRate, setSelectedRoomForAdditionalRate] = useState('312');
+  const [selectedRoomForAdditionalRate, setSelectedRoomForAdditionalRate] = useState('101');
 
   // Video 21: Post Charges / Room Charges (Minibar / Laundry / Travel Desk) (Frames 010–070)
   const [postChargesModalOpen, setPostChargesModalOpen] = useState(false);
-  const [selectedRoomForPostCharges, setSelectedRoomForPostCharges] = useState('312');
+  const [selectedRoomForPostCharges, setSelectedRoomForPostCharges] = useState('101');
   const [selectedRevenueCodeForPostCharges, setSelectedRevenueCodeForPostCharges] = useState('TRV');
 
   // Video 22: How to Check-in 2nd Pax Later (Frames 015–090)
   const [secondPaxModalOpen, setSecondPaxModalOpen] = useState(false);
-  const [selectedRoomForSecondPax, setSelectedRoomForSecondPax] = useState('312');
+  const [selectedRoomForSecondPax, setSelectedRoomForSecondPax] = useState('102');
   const [secondPaxCheckedInRooms, setSecondPaxCheckedInRooms] = useState([]);
 
   // Video 23: Bill Allowance Day Wise (Frames 015–115)
   const [billAllowanceModalOpen, setBillAllowanceModalOpen] = useState(false);
-  const [selectedRoomForBillAllowance, setSelectedRoomForBillAllowance] = useState('311');
+  const [selectedRoomForBillAllowance, setSelectedRoomForBillAllowance] = useState('102');
 
   // Video 24: Bill Allowance Option (Multi-Day Batch Discount) (Frames 015–100)
   const [billAllowanceOptionModalOpen, setBillAllowanceOptionModalOpen] = useState(false);
@@ -495,129 +500,38 @@ export default function IdsDesktopShell({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Real-time statistics computed dynamically (Frame 004, 030, Video 06 Frame 028, Video 07 Frame 040 & 060, Video 08 Frame 008 & 058, Video 12 Frames 022 & 035, Video 15 Frame 062, Video 16 Frame 085, Video 17 Frame 110 & Video 18 Frame 050 sync)
+  // Real-time statistics computed dynamically for Hotel Elite Inn (27 Physical Rooms across Floors 1, 2 & 3)
   const stats = useMemo(() => {
     const totalWalkInRooms = walkInCompletedList.length;
     const totalWalkInPax = walkInCompletedList.reduce((sum, w) => sum + (w.pax || 2), 0);
     const paxDeduction = paxCheckedOutRooms.length;
-    const secondPaxAddition = secondPaxCheckedInRooms.length;
+    const baseOccupiedRooms = 7; // In-house occupied rooms (102, 105, 203, 206, 301, 303, 109)
+    const baseGuests = 11;
+    const blockedRoomsCount = 1; // Room 104 (Maintenance / Servicing)
 
-    // Video 16 Frame 085: When Sharma Group (10 rooms) is bulk checked out
-    const hasBulkCheckedOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
-    if (hasBulkCheckedOut) {
-      return {
-        expectedArrivals: 0,
-        expectedDepartures: 0,
-        checkInRooms: totalWalkInRooms,
-        walkInRooms: totalWalkInRooms,
-        roomsToSell: Math.max(0, 57 - totalWalkInRooms),
-        registeredComplaints: 0,
-        inhouseRoomsGuests: `${23 + totalWalkInRooms}/${Math.max(0, 39 + totalWalkInPax - paxDeduction)}`,
-        extraAdultChild: '0/0',
-        inhouseForeigners: '0/0',
-        guestBlocks: 0
-      };
-    }
-
-    // Video 15 Frame 062: When Room 314 is checked out, Inhouse Rooms/Guests transitions to 33/59, Rooms to sell is 40, Expected Departures is 16
-    if (checkedOutRooms.includes('314') || checkedOutRooms.length > 0) {
-      return {
-        expectedArrivals: 0,
-        expectedDepartures: 16,
-        checkInRooms: totalWalkInRooms,
-        walkInRooms: totalWalkInRooms,
-        roomsToSell: Math.max(0, 40 - totalWalkInRooms),
-        registeredComplaints: 0,
-        inhouseRoomsGuests: `${33 + totalWalkInRooms}/${Math.max(0, 59 + totalWalkInPax - paxDeduction)}`,
-        extraAdultChild: '0/0',
-        inhouseForeigners: '0/0',
-        guestBlocks: 0
-      };
-    }
-
-    const has316CheckedIn = checkedInList.some(c => c.roomNo === '316');
-    const hasGroupCheckedIn = checkedInList.some(c => c.resNo === '276');
-    const has401CheckedIn = checkedInList.some(c => c.roomNo === '401');
-    const has301Amended = !!amendedDepartures['301'];
+    const checkedOutCount = checkedOutRooms.length;
     const checkedInCount = checkedInList.length;
 
-    // Video 12 Frame 022 & Frame 035: If Room 301 departure is extended, Expected Departures drops from 17 to 16, Rooms to sell drops from 40 to 39.
-    if (has301Amended || Object.keys(amendedDepartures).length > 0) {
-      return {
-        expectedArrivals: 0,
-        expectedDepartures: 16,
-        checkInRooms: 0,
-        walkInRooms: 0,
-        roomsToSell: 39,
-        registeredComplaints: 0,
-        inhouseRoomsGuests: '34/61',
-        extraAdultChild: '0/0',
-        inhouseForeigners: '0/0',
-        guestBlocks: 0
-      };
-    }
+    const currentOccupiedRooms = Math.max(0, baseOccupiedRooms + totalWalkInRooms + checkedInCount - checkedOutCount);
+    const currentGuests = Math.max(0, baseGuests + totalWalkInPax + (checkedInCount * 2) - (checkedOutCount * 2) - paxDeduction);
+    const roomsToSell = Math.max(0, 27 - currentOccupiedRooms - blockedRoomsCount);
 
-    // Video 11 Frame 010 & Video 12 Frame 010 baseline
-    if (inhouseGuestsList.length >= 10) {
-      return {
-        expectedArrivals: 0,
-        expectedDepartures: 17,
-        checkInRooms: totalWalkInRooms,
-        walkInRooms: totalWalkInRooms,
-        roomsToSell: Math.max(0, 40 - totalWalkInRooms),
-        registeredComplaints: registeredComplaintsCount,
-        inhouseRoomsGuests: `${34 + totalWalkInRooms}/${Math.max(0, 61 + totalWalkInPax - paxDeduction)}`,
-        extraAdultChild: '0/0',
-        inhouseForeigners: '0/0',
-        guestBlocks: 0
-      };
-    }
-
-    let expectedArrivals = 7;
-    let roomsToSell = 36;
-    let checkInRooms = 1;
-    let inhouseRoomsGuests = '16/25';
-
-    if (has316CheckedIn) {
-      expectedArrivals = 3;
-      roomsToSell = 36;
-      checkInRooms = 19;
-      inhouseRoomsGuests = '34/61';
-    } else if (hasGroupCheckedIn && has401CheckedIn) {
-      expectedArrivals = 3;
-      roomsToSell = 47;
-      checkInRooms = 5;
-      inhouseRoomsGuests = '20/33';
-    } else if (hasGroupCheckedIn) {
-      expectedArrivals = 4;
-      roomsToSell = 36;
-      checkInRooms = 18;
-      inhouseRoomsGuests = '33/59';
-    } else if (has401CheckedIn) {
-      expectedArrivals = 6;
-      roomsToSell = 51;
-      checkInRooms = 2;
-      inhouseRoomsGuests = '17/27';
-    } else if (checkedInCount === 0) {
-      expectedArrivals = 7;
-      roomsToSell = 36;
-      checkInRooms = 1;
-      inhouseRoomsGuests = '16/25';
-    }
+    const pendingArrivals = (reservations || []).filter(r => !r.isCancelled && r.status !== 'Checked In').length;
+    const expectedDepartures = Math.max(0, 2 - checkedOutCount);
 
     return {
-      expectedArrivals,
-      expectedDepartures: 2,
-      checkInRooms,
-      walkInRooms: 0,
+      expectedArrivals: pendingArrivals,
+      expectedDepartures,
+      checkInRooms: checkedInCount + totalWalkInRooms,
+      walkInRooms: totalWalkInRooms,
       roomsToSell,
       registeredComplaints: registeredComplaintsCount,
-      inhouseRoomsGuests,
+      inhouseRoomsGuests: `${currentOccupiedRooms}/${currentGuests}`,
       extraAdultChild: '0/0',
       inhouseForeigners: '0/0',
-      guestBlocks: has401CheckedIn ? 0 : 1
+      guestBlocks: blockedRoomsCount
     };
-  }, [reservations, checkedInList, inhouseGuestsList, amendedDepartures, registeredComplaintsCount]);
+  }, [reservations, checkedInList, inhouseGuestsList, walkInCompletedList, checkedOutRooms, paxCheckedOutRooms, registeredComplaintsCount]);
 
   // Master Menu Items (Frame 001 & 013)
   const masterMenuItems = [
@@ -721,7 +635,7 @@ export default function IdsDesktopShell({
         label: 'Check-in 2nd Pax later into Room', 
         videoId: '22', 
         action: () => {
-          setSelectedRoomForSecondPax('312');
+          setSelectedRoomForSecondPax('102');
           setSecondPaxModalOpen(true);
         } 
       },
@@ -731,7 +645,7 @@ export default function IdsDesktopShell({
       { 
         label: 'Guest Services', 
         action: () => {
-          setSelectedRoomForPostCharges('312');
+          setSelectedRoomForPostCharges('101');
           setSelectedRevenueCodeForPostCharges('TRV');
           setPostChargesModalOpen(true);
         } 
@@ -753,7 +667,7 @@ export default function IdsDesktopShell({
         label: 'Change Rate', 
         videoId: '11', 
         action: () => {
-          setSelectedRoomForRate('312');
+          setSelectedRoomForRate('101');
           setChangeRateModalOpen(true);
         } 
       }
@@ -771,7 +685,7 @@ export default function IdsDesktopShell({
         label: 'Checkout & Settle Front Office Bill (Split Bill)', 
         videoId: '15', 
         action: () => {
-          setSelectedRoomForCheckout('314');
+          setSelectedRoomForCheckout('102');
           setCheckoutInitialMode('checkout');
           setCheckoutBillModalOpen(true);
         } 
@@ -780,7 +694,7 @@ export default function IdsDesktopShell({
         label: 'Settlements V6.5.008.30 (FO Bill Settle)', 
         videoId: '15', 
         action: () => {
-          setSelectedRoomForCheckout('314');
+          setSelectedRoomForCheckout('102');
           setCheckoutInitialMode('settlement');
           setCheckoutBillModalOpen(true);
         } 
@@ -789,7 +703,7 @@ export default function IdsDesktopShell({
         label: 'Bulk Check Out at Once (Group)', 
         videoId: '16', 
         action: () => {
-          setSelectedRoomForCheckout('406');
+          setSelectedRoomForCheckout('201');
           setCheckoutInitialMode('bulk');
           setCheckoutBillModalOpen(true);
         } 
@@ -798,7 +712,7 @@ export default function IdsDesktopShell({
         label: 'Pax Check-Out', 
         videoId: '18', 
         action: () => {
-          setSelectedRoomForPaxCheckout('312');
+          setSelectedRoomForPaxCheckout('102');
           setPaxCheckoutModalOpen(true);
         } 
       },
@@ -814,7 +728,7 @@ export default function IdsDesktopShell({
         label: 'Additional Room Rate (Plan / Extra Bed / Retention)', 
         videoId: '20', 
         action: () => {
-          setSelectedRoomForAdditionalRate('312');
+          setSelectedRoomForAdditionalRate('101');
           setAdditionalRoomRateInitialMode('additional-rate');
           setAdditionalRoomRateModalOpen(true);
         } 
@@ -823,7 +737,7 @@ export default function IdsDesktopShell({
         label: 'Post Charges / Room Charges (Minibar/Laundry/Travel Desk)', 
         videoId: '21', 
         action: () => {
-          setSelectedRoomForPostCharges('312');
+          setSelectedRoomForPostCharges('101');
           setSelectedRevenueCodeForPostCharges('TRV');
           setPostChargesModalOpen(true);
         } 
@@ -832,7 +746,7 @@ export default function IdsDesktopShell({
         label: 'Bill Allowance Day Wise (Discount & GST Rebate)', 
         videoId: '23', 
         action: () => {
-          setSelectedRoomForBillAllowance('311');
+          setSelectedRoomForBillAllowance('102');
           setBillAllowanceModalOpen(true);
         } 
       },
@@ -1201,7 +1115,7 @@ export default function IdsDesktopShell({
         label: 'Additional Room Rate Option (Plans / Extra Bed / Retention)', 
         videoId: '20', 
         action: () => {
-          setSelectedRoomForAdditionalRate('312');
+          setSelectedRoomForAdditionalRate('101');
           setAdditionalRoomRateInitialMode('additional-rate');
           setAdditionalRoomRateModalOpen(true);
         } 
@@ -1210,7 +1124,7 @@ export default function IdsDesktopShell({
         label: 'Change Room Rate / Tariff Override', 
         videoId: '11', 
         action: () => {
-          setSelectedRoomForRate('312');
+          setSelectedRoomForRate('101');
           setChangeRateModalOpen(true);
         } 
       },
@@ -1226,7 +1140,7 @@ export default function IdsDesktopShell({
         label: 'Quick Balances (Guest Folio Breakdown)', 
         videoId: '20', 
         action: () => {
-          setSelectedRoomForAdditionalRate('312');
+          setSelectedRoomForAdditionalRate('101');
           setAdditionalRoomRateInitialMode('quick-balances');
           setAdditionalRoomRateModalOpen(true);
         } 
@@ -1835,7 +1749,7 @@ export default function IdsDesktopShell({
         <div className="ids-bottom-commands">
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('System Update: All 27 physical room ledgers reconciled with remote Cloudflare D1 database. Status: NORMAL.', 'IDS Fortune NEXT - System Update', 'info')}
+            onClick={() => showMessageBox('System Update: All 27 physical room ledgers reconciled with Hotel Elite Inn local ledger. Status: NORMAL.', 'IDS Fortune NEXT - System Update', 'info')}
           >
             Sys Update
           </button>
@@ -1847,7 +1761,7 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('Other Utilities: Night Audit Queue, POS 5 Room Service Sync, Remote Cloudflare D1 Connection: ACTIVE.', 'IDS Fortune NEXT - Utilities', 'info')}
+            onClick={() => showMessageBox('Other Utilities: Night Audit Queue, POS 5 Room Service Sync, Local Master Ledger: ACTIVE.', 'IDS Fortune NEXT - Utilities', 'info')}
           >
             Other
           </button>
@@ -2185,7 +2099,7 @@ export default function IdsDesktopShell({
           setPostDepositModalOpen(true);
         }}
         onOpenCheckout={(roomNo) => {
-          setSelectedRoomForCheckout(roomNo || '314');
+          setSelectedRoomForCheckout(roomNo || '102');
           setCheckoutInitialMode('checkout');
           setCheckoutBillModalOpen(true);
         }}
@@ -2194,29 +2108,29 @@ export default function IdsDesktopShell({
           setWalkInModalOpen(true);
         }}
         onOpenPaxCheckout={(roomNo) => {
-          setSelectedRoomForPaxCheckout(roomNo || '312');
+          setSelectedRoomForPaxCheckout(roomNo || '102');
           setPaxCheckoutModalOpen(true);
         }}
         onOpenAdditionalRoomRate={(roomNo) => {
-          setSelectedRoomForAdditionalRate(roomNo || '312');
+          setSelectedRoomForAdditionalRate(roomNo || '101');
           setAdditionalRoomRateInitialMode('additional-rate');
           setAdditionalRoomRateModalOpen(true);
         }}
         onOpenQuickBalances={(roomNo) => {
-          setSelectedRoomForAdditionalRate(roomNo || '312');
+          setSelectedRoomForAdditionalRate(roomNo || '101');
           setAdditionalRoomRateInitialMode('quick-balances');
           setAdditionalRoomRateModalOpen(true);
         }}
         onOpenPostCharges={(roomNo) => {
-          setSelectedRoomForPostCharges(roomNo || '312');
+          setSelectedRoomForPostCharges(roomNo || '101');
           setPostChargesModalOpen(true);
         }}
         onOpenSecondPaxCheckIn={(roomNo) => {
-          setSelectedRoomForSecondPax(roomNo || '312');
+          setSelectedRoomForSecondPax(roomNo || '102');
           setSecondPaxModalOpen(true);
         }}
         onOpenBillAllowanceDayWise={(roomNo) => {
-          setSelectedRoomForBillAllowance(roomNo || '311');
+          setSelectedRoomForBillAllowance(roomNo || '102');
           setBillAllowanceModalOpen(true);
         }}
         onOpenBillAllowanceOption={(roomNo) => {
@@ -2240,7 +2154,7 @@ export default function IdsDesktopShell({
         walkInRooms={walkInCompletedList}
         checkedOutRooms={checkedOutRooms}
         transferredRooms={transferredRooms}
-        blockedRooms={['206']}
+        blockedRooms={['104']}
         onOpenRoomBlock={() => setRoomBlockOpen(true)}
         onOpenLaundryEntry={(roomNo) => {
           setLaundryEntryOpen(true);
@@ -2279,13 +2193,13 @@ export default function IdsDesktopShell({
           } else if (programId === 'change-guest-info') {
             setRoomHelpLookupOpen(true);
           } else if (programId === 'change-rate') {
-            setSelectedRoomForRate('312');
+            setSelectedRoomForRate('101');
             setChangeRateModalOpen(true);
           } else if (programId === 'amend-stay' || programId === 'modify-departure') {
             setSelectedRoomForAmendStay('301');
             setAmendStayModalOpen(true);
           } else if (programId === 'room-transfer') {
-            setSelectedRoomForTransfer('415');
+            setSelectedRoomForTransfer('105');
             setRoomTransferModalOpen(true);
           } else if (programId === 'post-deposit') {
             setSelectedRoomForDeposit('201');
@@ -2608,7 +2522,7 @@ export default function IdsDesktopShell({
         initialRoomNo={selectedRoomForPaxCheckout}
         paxCheckedOutRooms={paxCheckedOutRooms}
         onOpenGuestInfo={(roomNo) => {
-          setSelectedRoomForGuestInfo(roomNo || '312');
+          setSelectedRoomForGuestInfo(roomNo || '102');
           setGuestInformationModalOpen(true);
         }}
         onOpenRoomRack={() => setRoomRackConsoleOpen(true)}

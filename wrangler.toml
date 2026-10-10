@@ -3,10 +3,6 @@ pages_build_output_dir = "dist"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-[[d1_databases]]
-binding = "DB"
-database_name = "hotel-elite-inn-db"
-database_id = "9cbfb04f-0a04-420d-b6e7-6ffa98f5a672"
 
 # Public environment variables (safe to commit)
 [vars]

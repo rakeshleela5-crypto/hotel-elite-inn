@@ -16,10 +16,10 @@ export function IdsScanBookingModal({
   const activeBookings = useMemo(() => {
     if (bookings && bookings.length > 0) return bookings;
     return [
-      { resNo: '270', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Quality Pharma Products Pvt Ltd.', companyCode: 'COM0009', roomNo: '515', type: 'EXE', confirm: '1+0+0', provisional: '0+0+0', pax: '1+0+0', arrivalDate: '14-JAN-2022 20:07', departureDate: '17-JAN-2022 12:00', depositAmount: 2000, status: 'Repeat Guest', blocked: true },
-      { resNo: '271', title: 'Mr', guestName: 'Biswakarma Santosh', companyName: 'Mahindra & Mahindra Limited', companyCode: 'COM0007', roomNo: '516', type: 'SUI', confirm: '0+1+0', provisional: '0+0+0', pax: '2+0+0', arrivalDate: '14-JAN-2022 19:56', departureDate: '16-JAN-2022 12:00', depositAmount: 0, status: 'VIP', blocked: true },
-      { resNo: '269', title: 'Mr', guestName: 'P Ashok', companyName: 'Linde India Ltd', companyCode: 'COM0004', roomNo: '201', type: 'DLX', confirm: '1+0+0', provisional: '0+0+0', pax: '1+0+0', arrivalDate: '14-JAN-2022 14:00', departureDate: '15-JAN-2022 12:00', depositAmount: 1500, status: 'Checked In', blocked: false },
-      { resNo: '268', title: 'Mrs', guestName: 'Anjali Sharma', companyName: 'Direct FIT', companyCode: '', roomNo: '', type: 'DLX', confirm: '0+0+0', provisional: '1+0+0', pax: '2+0+0', arrivalDate: '15-JAN-2022 12:00', departureDate: '18-JAN-2022 12:00', depositAmount: 0, status: 'Waitlist', blocked: false }
+      { resNo: '270', title: 'Mr', guestName: 'Santosh Biswakarma', companyName: 'Linde India Ltd', companyCode: 'COM0004', roomNo: '101', type: 'EXE', confirm: '1+0+0', provisional: '0+0+0', pax: '1+0+0', arrivalDate: '10-OCT-2026 14:00', departureDate: '12-OCT-2026 12:00', depositAmount: 2000, status: 'Repeat Guest', blocked: true },
+      { resNo: '271', title: 'Mr', guestName: 'Dr. S. N. Mohanty', companyName: 'AIIMS Healthcare Consultant', companyCode: 'COM0007', roomNo: '109', type: 'SUI', confirm: '0+1+0', provisional: '0+0+0', pax: '2+0+0', arrivalDate: '10-OCT-2026 18:00', departureDate: '13-OCT-2026 12:00', depositAmount: 3250, status: 'VIP', blocked: true },
+      { resNo: '269', title: 'Mr', guestName: 'Rajesh Sharma', companyName: 'Ashok Leyland Ltd', companyCode: 'COM0001', roomNo: '102', type: 'DLX', confirm: '1+0+0', provisional: '0+0+0', pax: '2+0+0', arrivalDate: '09-OCT-2026 14:00', departureDate: '11-OCT-2026 12:00', depositAmount: 1750, status: 'Checked In', blocked: false },
+      { resNo: '268', title: 'Mrs', guestName: 'Anjali Sharma', companyName: 'Direct FIT', companyCode: '', roomNo: '108', type: 'STD', confirm: '0+0+0', provisional: '1+0+0', pax: '1+0+0', arrivalDate: '12-OCT-2026 12:00', departureDate: '14-OCT-2026 12:00', depositAmount: 0, status: 'Waitlist', blocked: false }
     ];
   }, [bookings]);
 
@@ -201,16 +201,20 @@ export function IdsAssignGuestRoomsModal({
   const [assignedRoom, setAssignedRoom] = useState(booking.roomNo || '');
   const [selectedCell, setSelectedCell] = useState('301');
 
-  // Rooms Inventory list organized by Block & Floor (Frame 006)
+  // Rooms Inventory list organized by Floor for Hotel Elite Inn (Floors 1, 2 & 3)
   const roomInventory = [
-    { block: 'BA-FF02', roomNo: '201', type: 'EXE', status: 'Dirty', statusCode: 'DY' },
-    { block: 'BA-FF02', roomNo: '215', type: 'EXE', status: 'Dirty', statusCode: 'DY' },
-    { block: 'BA-FF03', roomNo: '301', type: 'EXE', status: 'Vacant', statusCode: '' },
-    { block: 'BA-FF03', roomNo: '315', type: 'EXE', status: 'Vacant', statusCode: '' },
-    { block: 'BA-FF04', roomNo: '401', type: 'EXE', status: 'Vacant', statusCode: '' },
-    { block: 'BA-FF04', roomNo: '415', type: 'EXE', status: 'Vacant', statusCode: '' },
-    { block: 'BA-FF05', roomNo: '501', type: 'EXE', status: 'Vacant', statusCode: '' },
-    { block: 'BA-FF05', roomNo: '515', type: 'EXE', status: 'Vacant', statusCode: '' }
+    { block: 'FL-01', roomNo: '101', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-01', roomNo: '103', type: 'EXE', status: 'Dirty', statusCode: 'DY' },
+    { block: 'FL-01', roomNo: '105', type: 'EXE', status: 'Occupied', statusCode: 'OCC' },
+    { block: 'FL-01', roomNo: '107', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-02', roomNo: '201', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-02', roomNo: '203', type: 'EXE', status: 'Occupied', statusCode: 'OCC' },
+    { block: 'FL-02', roomNo: '205', type: 'EXE', status: 'Dirty', statusCode: 'DY' },
+    { block: 'FL-02', roomNo: '207', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-03', roomNo: '301', type: 'EXE', status: 'Occupied', statusCode: 'OCC' },
+    { block: 'FL-03', roomNo: '302', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-03', roomNo: '305', type: 'EXE', status: 'Vacant', statusCode: '' },
+    { block: 'FL-03', roomNo: '308', type: 'EXE', status: 'Dirty', statusCode: 'DY' }
   ];
 
   // Days list across Tape Chart

@@ -142,12 +142,15 @@ export async function onRequestGet({ request, env }) {
     const offset = Math.max(parseInt(url.searchParams.get("offset") || "0", 10), 0);
     const searchQuery = (url.searchParams.get("search") || "").trim();
 
-    const db = env.DB;
+    const db = env?.DB;
     if (!db) {
       return jsonResponse({
-        success: false,
-        error: "Cloudflare D1 database binding 'DB' not configured on Worker environment."
-      }, 500, request);
+        success: true,
+        decoupled: true,
+        message: "Cloudflare D1 database decoupled. Data is managed via local storage and FastAPI backend.",
+        directory: [],
+        tables: []
+      }, 200, request);
     }
 
     // 1. If no specific table requested, return table directory with counts and schema summaries

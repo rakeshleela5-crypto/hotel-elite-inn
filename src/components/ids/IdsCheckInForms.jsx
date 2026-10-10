@@ -3,6 +3,7 @@ import {
   Building2, Users, Check, X, Calendar, DollarSign, 
   HelpCircle, Car, ArrowRight, ArrowLeft, Printer, ShieldCheck 
 } from 'lucide-react';
+import { INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
 /* =========================================================================
    VIDEO 05: RESERVATION CHECK-IN FOR SINGLE ROOM IN IDS FORTUNE NEXT 6.5 & 7.0
@@ -781,230 +782,102 @@ export function IdsRoomRackConsoleModal({
 
   if (!isOpen) return null;
 
-  const is516Occupied = checkedInList.some(c => c.roomNo === '516') || occupiedRoom === '516';
-  const is401Occupied = checkedInList.some(c => c.roomNo === '401');
-  const is415Occupied = checkedInList.some(c => c.roomNo === '415');
-  const is501Occupied = checkedInList.some(c => c.roomNo === '501');
-  const is515Occupied = checkedInList.some(c => c.roomNo === '515');
-  const is316Occupied = checkedInList.some(c => c.roomNo === '316');
-
   // Merge external cleared rooms with local session clears
   const allCleared = Array.from(new Set([...clearedRooms, ...localCleared]));
 
-  // Base raw dirty rooms definition
+  // Base raw dirty rooms definition for Hotel Elite Inn
   const dirtyCategories = {
-    '201': 'EXE', '203': 'DLX', '204': 'DLX', '205': 'DLX',
-    '206': 'DLX', '207': 'DLX', '208': 'DLX', '209': 'DLX',
-    '210': 'DLX', '211': 'DLX', '212': 'DLX', '214': 'DLX',
-    '215': 'EXE', '216': 'SUI', '308': 'DLX', '309': 'DLX',
-    '601': 'PNH'
+    '103': 'EXE', '205': 'EXE', '308': 'EXE'
   };
 
   const isRoomCleared = (no) => allCleared.includes(no);
 
-  // 44 Rooms matching Frame 034, Frame 060 & Video 08 Frame 062 grid
-  const roomsMatrix = [
-    { no: '201', type: isRoomCleared('201') ? 'V/EXE' : 'D/EXE', status: isRoomCleared('201') ? 'vacant' : 'dirty', category: 'EXE' },
-    { 
-      no: '203', 
-      type: walkInRooms.some(w => w.roomNo === '203') ? 'O/DLX' : (isRoomCleared('203') ? 'V/DLX' : 'D/DLX'), 
-      guest: walkInRooms.find(w => w.roomNo === '203') ? 'Rajesh / Sharma' : undefined,
-      status: walkInRooms.some(w => w.roomNo === '203') ? 'occupied' : (isRoomCleared('203') ? 'vacant' : 'dirty'), 
-      category: 'DLX' 
-    },
-    { no: '204', type: isRoomCleared('204') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('204') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '205', type: isRoomCleared('205') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('205') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '206', type: blockedRooms.includes('206') ? 'OOO/DLX' : (isRoomCleared('206') ? 'V/DLX' : 'D/DLX'), status: blockedRooms.includes('206') ? 'ooo' : (isRoomCleared('206') ? 'vacant' : 'dirty'), category: 'DLX' },
-    { no: '207', type: isRoomCleared('207') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('207') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '208', type: isRoomCleared('208') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('208') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '209', type: isRoomCleared('209') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('209') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '210', type: isRoomCleared('210') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('210') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '211', type: isRoomCleared('211') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('211') ? 'vacant' : 'dirty', category: 'DLX' },
+  const getCategoryCode = (roomType) => {
+    switch (roomType) {
+      case 'STANDARD': return 'STD';
+      case 'DELUXE': return 'DLX';
+      case 'EXECUTIVE': return 'EXE';
+      case 'PREMIUM': return 'PRM';
+      case 'SUITE': return 'SUI';
+      default: return 'EXE';
+    }
+  };
 
-    { no: '212', type: isRoomCleared('212') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('212') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '214', type: isRoomCleared('214') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('214') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '215', type: isRoomCleared('215') ? 'V/EXE' : 'D/EXE', status: isRoomCleared('215') ? 'vacant' : 'dirty', category: 'EXE' },
-    { no: '216', type: isRoomCleared('216') ? 'V/SUI' : 'D/SUI', status: isRoomCleared('216') ? 'vacant' : 'dirty', category: 'SUI' },
-    { no: '301', type: 'O/EXE', guest: 'Tenzing', status: 'occupied' },
-    { no: '303', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
-    { no: '304', type: 'O/DLX', guest: 'CHETIA', status: 'occupied' },
-    { no: '305', type: 'O/DLX', guest: 'KAKATI', status: 'occupied' },
-    { no: '306', type: 'O/DLX', guest: 'SINGH', status: 'occupied' },
-    { no: '307', type: 'O/DLX', guest: 'SINGH', status: 'occupied' },
+  // Default in-house corporate guests for occupied rooms
+  const defaultOccupiedGuests = {
+    '102': 'R. Sharma',
+    '105': 'A. Roy',
+    '203': 'V. Patel',
+    '206': 'S. Jena',
+    '301': 'Tenzing',
+    '303': 'J. Chetia',
+    '109': 'Dr. Mohanty'
+  };
 
-    { no: '308', type: isRoomCleared('308') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('308') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '309', type: isRoomCleared('309') ? 'V/DLX' : 'D/DLX', status: isRoomCleared('309') ? 'vacant' : 'dirty', category: 'DLX' },
-    { no: '310', type: 'O/DLX', guest: 'WAHLANG', status: 'occupied' },
-    { 
-      no: '311', 
-      type: 'O/DLX', 
-      guest: paxCheckedOutRooms.includes('311') ? 'DEURI' : 'DEURI / KABITA', 
-      status: 'occupied',
-      category: 'DLX',
-      tooltip: 'ROOM #311 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)'
-    },
-    { 
-      no: '312', 
-      type: 'O/DLX', 
-      guest: paxCheckedOutRooms.includes('312') ? 'BASU' : 'BASU / ANIRUDH', 
-      status: 'occupied',
-      category: 'DLX',
-      tooltip: 'ROOM #312 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)'
-    },
-    { 
-      no: '314', 
-      type: checkedOutRooms.includes('314') ? (isRoomCleared('314') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('314') ? undefined : 'Anirudh', 
-      status: checkedOutRooms.includes('314') ? (isRoomCleared('314') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { no: '315', type: 'O/EXE', guest: 'Khan', status: 'occupied' },
-    { 
-      no: '316', 
-      type: is316Occupied ? 'O/SUI' : 'V/SUI', 
-      guest: is316Occupied ? 'Anil Kumar G' : undefined, 
-      status: is316Occupied ? 'occupied' : 'vacant',
-      tooltip: is316Occupied ? 'ROOM # 316 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)' : undefined
-    },
-    { 
-      no: '401', 
-      type: is401Occupied ? 'O/EXE' : 'V/EXE', 
-      guest: is401Occupied ? 'Khan' : undefined, 
-      status: is401Occupied ? 'occupied' : 'vacant' 
-    },
-    { no: '403', type: 'O/DLX', guest: 'DEKA', status: 'occupied' },
+  // 27 Authentic Rooms matching Hotel Elite Inn physical inventory (Floors 1, 2 & 3)
+  const roomsMatrix = (INITIAL_ROOMS_INVENTORY || []).map(r => {
+    const no = r.roomNumber;
+    const cat = getCategoryCode(r.roomType);
+    const isCheckedIn = checkedInList.some(c => c.roomNo === no) || occupiedRoom === no;
+    const walkIn = (walkInRooms || []).find(w => w.roomNo === no);
+    const isCheckedOut = (checkedOutRooms || []).includes(no);
+    const isPaxOut = (paxCheckedOutRooms || []).includes(no);
+    const isBlocked = (blockedRooms || []).includes(no);
+    const isCleared = isRoomCleared(no);
+    const isDirty = (dirtyCategories[no] || isCheckedOut) && !isCleared;
 
-    { no: '404', type: 'O/DLX', guest: 'DAS', status: 'occupied' },
-    { no: '405', type: 'O/DLX', guest: 'Anirudh', status: 'occupied' },
-    { 
-      no: '406', 
-      type: checkedOutRooms.includes('406') ? (isRoomCleared('406') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('406') ? undefined : 'Sharma', 
-      status: checkedOutRooms.includes('406') ? (isRoomCleared('406') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '407', 
-      type: checkedOutRooms.includes('407') ? (isRoomCleared('407') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('407') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('407') ? (isRoomCleared('407') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '408', 
-      type: checkedOutRooms.includes('408') ? (isRoomCleared('408') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('408') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('408') ? (isRoomCleared('408') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { no: '409', type: 'O/DLX', guest: 'BHATTASALI', status: 'occupied' },
-    { 
-      no: '410', 
-      type: checkedOutRooms.includes('410') ? (isRoomCleared('410') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('410') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('410') ? (isRoomCleared('410') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '411', 
-      type: checkedOutRooms.includes('411') ? (isRoomCleared('411') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('411') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('411') ? (isRoomCleared('411') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '412', 
-      type: checkedOutRooms.includes('412') ? (isRoomCleared('412') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('412') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('412') ? (isRoomCleared('412') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '414', 
-      type: checkedOutRooms.includes('414') ? (isRoomCleared('414') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('414') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('414') ? (isRoomCleared('414') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
+    let status = 'vacant';
+    let typeCode = isCleared ? `V/${cat}` : (dirtyCategories[no] ? `D/${cat}` : `V/${cat}`);
+    let guestName = undefined;
 
-    { 
-      no: '415', 
-      type: is415Occupied ? 'O/EXE' : 'V/EXE', 
-      guest: is415Occupied ? 'Kumar' : undefined, 
-      status: is415Occupied ? 'occupied' : 'vacant' 
-    },
-    { no: '416', type: 'V/SUI', status: 'vacant' },
-    { 
-      no: '501', 
-      type: is501Occupied ? 'O/EXE' : 'V/EXE', 
-      guest: is501Occupied ? 'Anil Kumar G' : undefined, 
-      status: is501Occupied ? 'occupied' : 'vacant',
-      tooltip: is501Occupied ? 'ROOM # 501 IS OCCUPIED BY (DOUBLE CLICK HERE FOR MORE INFORMATION)' : undefined
-    },
-    { no: '503', type: 'O/DLX', guest: 'NATRAJ', status: 'occupied' },
-    { no: '504', type: 'O/DLX', guest: 'MENAN', status: 'occupied' },
-    { no: '505', type: 'O/DLX', guest: 'BEDI', status: 'occupied' },
-    { 
-      no: '506', 
-      type: checkedOutRooms.includes('506') ? (isRoomCleared('506') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('506') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('506') ? (isRoomCleared('506') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '507', 
-      type: checkedOutRooms.includes('507') ? (isRoomCleared('507') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('507') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('507') ? (isRoomCleared('507') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { 
-      no: '508', 
-      type: checkedOutRooms.includes('508') ? (isRoomCleared('508') ? 'V/DLX' : 'D/DLX') : 'O/DLX', 
-      guest: checkedOutRooms.includes('508') ? undefined : 'Sharma Group', 
-      status: checkedOutRooms.includes('508') ? (isRoomCleared('508') ? 'vacant' : 'dirty') : 'occupied',
-      category: 'DLX'
-    },
-    { no: '509', type: 'V/DLX', status: 'vacant' },
+    if (isBlocked) {
+      status = 'ooo';
+      typeCode = `OOO/${cat}`;
+    } else if (isCheckedIn || walkIn || (!isCheckedOut && defaultOccupiedGuests[no])) {
+      status = 'occupied';
+      typeCode = `O/${cat}`;
+      guestName = walkIn ? (walkIn.guestName || 'Walk-In') : (isCheckedIn ? (guestName || 'Guest') : defaultOccupiedGuests[no]);
+      if (isPaxOut && guestName) {
+        guestName = guestName.split(' ')[0];
+      }
+    } else if (isDirty) {
+      status = 'dirty';
+      typeCode = `D/${cat}`;
+    } else {
+      status = 'vacant';
+      typeCode = `V/${cat}`;
+    }
 
-    { no: '510', type: 'V/DLX', status: 'vacant' },
-    { no: '511', type: 'V/DLX', status: 'vacant' },
-    { no: '512', type: 'V/DLX', status: 'vacant' },
-    { no: '514', type: 'V/DLX', status: 'vacant' },
-    { 
-      no: '515', 
-      type: is515Occupied ? 'O/EXE' : 'V/EXE', 
-      guest: is515Occupied ? 'Anil Kumar G' : undefined, 
-      status: is515Occupied ? 'occupied' : 'vacant' 
-    },
-    { 
-      no: '516', 
-      type: is516Occupied ? 'O/SUI' : 'V/SUI', 
-      guest: is516Occupied ? (guestName || 'Biswakarma') : undefined, 
-      status: is516Occupied ? 'occupied' : 'vacant' 
-    },
-    { no: '601', type: isRoomCleared('601') ? 'V/PNH' : 'D/PNH', status: isRoomCleared('601') ? 'vacant' : 'dirty', category: 'PNH' }
-  ];
+    return {
+      no,
+      type: typeCode,
+      guest: guestName,
+      status,
+      category: cat,
+      floor: r.floor,
+      tooltip: status === 'occupied' ? `ROOM #${no} IS OCCUPIED BY ${guestName} (DOUBLE CLICK FOR INFO)` : undefined
+    };
+  });
 
-  // Dynamic calculations matching Video 09 Frames 018, 028, 034, 060, Video 13 Frame 018 & Video 16 Frame 085:
-  // Base dirty count is 17. Each cleared room decrements dirty and increments vacant!
-  // Room transfers increment dirty and decrement vacant.
-  const isBulkOut = checkedOutRooms.includes('406') || checkedOutRooms.filter(r => ['406','407','408','410','411','412','414','506','507','508'].includes(r)).length >= 5;
-  const transferCount = Object.keys(transferredRooms).length;
-  const clearedCount = allCleared.filter(no => dirtyCategories[no] || checkedOutRooms.includes(no)).length;
-  const baseDirty = isBulkOut ? 27 : (checkedOutRooms.includes('314') ? 18 : 17);
-  const dirtyCount = Math.max(0, baseDirty - clearedCount) + transferCount;
-  const vacantCount = Math.max(0, 6 + clearedCount - transferCount);
-  const occupiedCount = isBulkOut ? 22 : (is316Occupied ? 32 : 14);
+  const filteredRoomsMatrix = roomsMatrix.filter(r => {
+    if (filterFloor !== 'All' && String(r.floor) !== String(filterFloor)) return false;
+    if (filterType !== 'All' && r.category !== filterType) return false;
+    return true;
+  });
+
+  // Dynamic statistics for 27 rooms
+  const vacantCount = roomsMatrix.filter(r => r.status === 'vacant').length;
+  const occupiedCount = roomsMatrix.filter(r => r.status === 'occupied').length;
+  const dirtyCount = roomsMatrix.filter(r => r.status === 'dirty').length;
+  const oooCount = roomsMatrix.filter(r => r.status === 'ooo').length;
 
   const getCellBg = (status, roomNo) => {
-    // Rooms 401 & 516 display in blue/purple for Expected Departure
-    if (roomNo === '401' || roomNo === '516') return '#6A89CC';
+    if (roomNo === '102' || roomNo === '206') return '#6A89CC'; // Expected Departure / Corporate
     switch (status) {
       case 'occupied': return '#F15A24'; // Vivid orange/red
       case 'vacant': return '#58B957';   // Vivid green
       case 'dirty': return '#E8E137';    // Vivid yellow
-      case 'ooo': return '#7A5230';      // Authentic Brown Out of Order (Video 09)
+      case 'ooo': return '#7A5230';      // Authentic Brown Out of Order
       case 'oos': return '#800080';      // Authentic Purple Out of Service
       default: return '#E0DEC8';
     }
@@ -1068,20 +941,29 @@ export function IdsRoomRackConsoleModal({
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '8px', fontSize: '11px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>Room Type</span>
-              <select className="ids-select" style={{ width: '70px', background: '#316AC5', color: '#FFF', fontWeight: 700 }} value={filterType} onChange={(e) => setFilterType(e.target.value)}>
-                <option value="All">All</option>
+              <select className="ids-select" style={{ width: '80px', background: '#316AC5', color: '#FFF', fontWeight: 700 }} value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+                <option value="All">All Types</option>
+                <option value="STD">STD (2)</option>
+                <option value="DLX">DLX (6)</option>
+                <option value="EXE">EXE (16)</option>
+                <option value="PRM">PRM (1)</option>
+                <option value="SUI">SUI (2)</option>
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>Block</span>
-              <select className="ids-select" style={{ width: '60px' }} value={filterBlock} onChange={(e) => setFilterBlock(e.target.value)}>
+              <select className="ids-select" style={{ width: '70px' }} value={filterBlock} onChange={(e) => setFilterBlock(e.target.value)}>
                 <option value="All">All</option>
+                <option value="MAIN">Main Wing</option>
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span>Floor</span>
-              <select className="ids-select" style={{ width: '60px' }} value={filterFloor} onChange={(e) => setFilterFloor(e.target.value)}>
-                <option value="All">All</option>
+              <select className="ids-select" style={{ width: '90px' }} value={filterFloor} onChange={(e) => setFilterFloor(e.target.value)}>
+                <option value="All">All Floors (27)</option>
+                <option value="1">1st Floor (9)</option>
+                <option value="2">2nd Floor (9)</option>
+                <option value="3">3rd Floor (9)</option>
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1097,7 +979,7 @@ export function IdsRoomRackConsoleModal({
 
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span>Page 1 of 1</span>
-              <span>Special Rooms 🙂</span>
+              <span>27 Rooms Total</span>
               {onOpenClearRoomsModal && (
                 <button 
                   className="ids-btn-classic" 
@@ -1111,9 +993,9 @@ export function IdsRoomRackConsoleModal({
             </div>
           </div>
 
-          {/* Room Rack Console Grid (10 Columns, 6 Rows matching Frame 018 & 060 & Video 13 Frame 018) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '2px', background: '#999', padding: '2px', maxHeight: '460px', overflowY: 'auto' }}>
-            {roomsMatrix.map((r) => {
+          {/* Room Rack Console Grid (9 Columns across 3 Floors: 101-109, 201-209, 301-309) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '2px', background: '#999', padding: '2px', maxHeight: '460px', overflowY: 'auto' }}>
+            {filteredRoomsMatrix.map((r) => {
               const sourceTransfer = transferredRooms[r.no];
               const targetTransfer = Object.values(transferredRooms).find(t => t.toRoom === r.no);
               const actualStatus = sourceTransfer ? 'dirty' : targetTransfer ? 'occupied' : r.status;
@@ -1136,7 +1018,7 @@ export function IdsRoomRackConsoleModal({
                   }
                   style={{
                     background: getCellBg(actualStatus, r.no),
-                    border: r.no === '401' && is401Occupied ? '2px solid #000080' : '1px solid #777',
+                    border: r.no === '102' ? '2px solid #000080' : '1px solid #777',
                     padding: '3px 4px',
                     minHeight: '44px',
                     display: 'flex',

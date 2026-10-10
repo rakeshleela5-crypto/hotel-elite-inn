@@ -9,125 +9,40 @@ import React, { useState, useEffect } from 'react';
    4. Live persistence into Room 312 and sync with Room Rack & Guest Information
    ========================================================================= */
 
-// Default room tariff database for in-house rooms matching Video 11
+// Authentic 27-Room Tariff Database for Hotel Elite Inn Front Desk PMS
 export const DEFAULT_ROOM_TARIFFS = {
-  '312': {
-    roomNo: '312',
-    roomType: 'DLX',
-    folioNo: '1',
-    regNo: '587',
-    arrival: '16-JAN-2022 11:49',
-    departure: '18-JAN-2022 12:00',
-    billingInstruction: '1',
-    pax: '2 Extra Adult 0 Extra Child 0',
-    guestName: 'MS BASU ANIRUDH',
-    nationality: 'IND',
-    guestStatus: 'REG',
-    group: '001',
-    payMode: 'CAS',
-    companyCode: 'COM0015',
-    companyName: 'Indian Bank',
-    currency: 'INR',
-    guestClassification: 'Regular',
-    checkOut: '12 Noon',
-    roomUpgrade: 'DLX',
-    plan: 'CP',
-    rateName: 'Discount',
-    rackRate: 3500,
-    currentRate: 3500,
-    extraAdult: 1000,
-    extraChild: 0,
-    mealPlanRate: 0,
-    mealPlanAdult: 0,
-    mealPlanChild: 0,
-    rateTaxCode: '798',
-    rateTaxDesc: 'Oct New Tax Slab',
-    planTaxCode: '804',
-    planTaxDesc: 'SGST_CGST 12%',
-    extraBedRateTaxCode: '804',
-    extraBedPlanTaxCode: '804',
-    remarks: 'Corporate discount applied',
-    reason: 'Manager Special Approval',
-    authorizedBy: 'Manager'
-  },
-  '301': {
-    roomNo: '301',
-    roomType: 'EXE',
-    folioNo: '1',
-    regNo: '580',
-    arrival: '05-JAN-2022 20:28',
-    departure: '15-JAN-2022 12:00',
-    billingInstruction: '1',
-    pax: '1 Extra Adult 0 Extra Child 0',
-    guestName: 'Mr Tenzing Norbu',
-    nationality: 'IND',
-    guestStatus: 'WLK',
-    group: '',
-    payMode: 'CAS',
-    companyCode: '',
-    companyName: '',
-    currency: 'INR',
-    guestClassification: 'Regular',
-    checkOut: '12 Noon',
-    roomUpgrade: 'EXE',
-    plan: 'CP',
-    rateName: 'Discount',
-    rackRate: 4000,
-    currentRate: 4000,
-    extraAdult: 1000,
-    extraChild: 0,
-    mealPlanRate: 0,
-    mealPlanAdult: 0,
-    mealPlanChild: 0,
-    rateTaxCode: '798',
-    rateTaxDesc: 'Oct New Tax Slab',
-    planTaxCode: '804',
-    planTaxDesc: 'SGST_CGST 12%',
-    extraBedRateTaxCode: '804',
-    extraBedPlanTaxCode: '804',
-    remarks: '',
-    reason: '',
-    authorizedBy: 'Manager'
-  },
-  '401': {
-    roomNo: '401',
-    roomType: 'EXE',
-    folioNo: '1',
-    regNo: '585',
-    arrival: '14-JAN-2022 12:00',
-    departure: '16-JAN-2022 12:00',
-    billingInstruction: '1',
-    pax: '2 Extra Adult 0 Extra Child 0',
-    guestName: 'Mr Khan Pravez',
-    nationality: 'IND',
-    guestStatus: 'REG',
-    group: '',
-    payMode: 'CAS',
-    companyCode: 'COM0005',
-    companyName: 'Corporate FIT',
-    currency: 'INR',
-    guestClassification: 'Regular',
-    checkOut: '12 Noon',
-    roomUpgrade: 'EXE',
-    plan: 'CP',
-    rateName: 'Corporate',
-    rackRate: 4000,
-    currentRate: 3200,
-    extraAdult: 1000,
-    extraChild: 0,
-    mealPlanRate: 0,
-    mealPlanAdult: 0,
-    mealPlanChild: 0,
-    rateTaxCode: '798',
-    rateTaxDesc: 'Oct New Tax Slab',
-    planTaxCode: '804',
-    planTaxDesc: 'SGST_CGST 12%',
-    extraBedRateTaxCode: '804',
-    extraBedPlanTaxCode: '804',
-    remarks: 'Corp Contract Rate',
-    reason: 'Contractual',
-    authorizedBy: 'Manager'
-  }
+  // Floor 1 (9 Rooms: 101 - 109)
+  '101': { roomNo: '101', roomType: 'EXE', folioNo: '1', regNo: 'REG-101', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '102': { roomNo: '102', roomType: 'DLX', folioNo: '1', regNo: 'REG-102', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Sunil Mohanty', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'BTC', companyCode: 'CORP01', companyName: 'Ashok Leyland Logistics', currency: 'INR', guestClassification: 'Corporate', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Deluxe King Bed', reason: '', authorizedBy: 'Manager' },
+  '103': { roomNo: '103', roomType: 'EXE', folioNo: '1', regNo: 'REG-103', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '104': { roomNo: '104', roomType: 'DLX', folioNo: '1', regNo: 'REG-104', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Maintenance Block', nationality: 'IND', guestStatus: 'OOO', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Deluxe King Bed (Under AC Service)', reason: 'Cooling Coil Servicing', authorizedBy: 'Maintenance' },
+  '105': { roomNo: '105', roomType: 'EXE', folioNo: '1', regNo: 'REG-105', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Ramesh Rao', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'BTC', companyCode: 'CORP02', companyName: 'Linde India Industrial Gases', currency: 'INR', guestClassification: 'Corporate', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive Twin Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Executive Twin Bed', reason: '', authorizedBy: 'Manager' },
+  '106': { roomNo: '106', roomType: 'DLX', folioNo: '1', regNo: 'REG-106', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Deluxe Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Deluxe King Bed', reason: '', authorizedBy: 'Manager' },
+  '107': { roomNo: '107', roomType: 'EXE', folioNo: '1', regNo: 'REG-107', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '3 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'DIRTY', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive Triple Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Executive Triple Bed', reason: '', authorizedBy: 'Housekeeping' },
+  '108': { roomNo: '108', roomType: 'STD', folioNo: '1', regNo: 'REG-108', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '1 Extra Adult 0 Extra Child 0', guestName: 'Standard Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'STD', plan: 'CP', rateName: 'Standard Single Rate', rackRate: 1450, currentRate: 1450, doubleTariff: 1450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Standard Single Bed', reason: '', authorizedBy: 'Manager' },
+  '109': { roomNo: '109', roomType: 'SUI', folioNo: '1', regNo: 'REG-109', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Suite Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'VIP', checkOut: '12 Noon', roomUpgrade: 'SUI', plan: 'CP', rateName: 'Suite King Rate', rackRate: 3250, currentRate: 3250, doubleTariff: 3850, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 1 Premium Suite King Bed', reason: '', authorizedBy: 'Manager' },
+
+  // Floor 2 (9 Rooms: 201 - 209)
+  '201': { roomNo: '201', roomType: 'EXE', folioNo: '1', regNo: 'REG-201', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '202': { roomNo: '202', roomType: 'DLX', folioNo: '1', regNo: 'REG-202', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Deluxe Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Deluxe King Bed', reason: '', authorizedBy: 'Manager' },
+  '203': { roomNo: '203', roomType: 'EXE', folioNo: '1', regNo: 'REG-203', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'P. K. Verma', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'BTC', companyCode: 'CORP03', companyName: 'Utkal Alumina Int. Ltd (Aditya Birla)', currency: 'INR', guestClassification: 'Corporate', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '204': { roomNo: '204', roomType: 'DLX', folioNo: '1', regNo: 'REG-204', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Deluxe Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Deluxe King Bed', reason: '', authorizedBy: 'Manager' },
+  '205': { roomNo: '205', roomType: 'EXE', folioNo: '1', regNo: 'REG-205', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive Twin Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Executive Twin Bed', reason: '', authorizedBy: 'Manager' },
+  '206': { roomNo: '206', roomType: 'DLX', folioNo: '1', regNo: 'REG-206', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Corporate Guest', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'BTC', companyCode: 'CORP04', companyName: 'JK Paper Mills Ltd (Rayagada)', currency: 'INR', guestClassification: 'Corporate', checkOut: '12 Noon', roomUpgrade: 'DLX', plan: 'CP', rateName: 'Deluxe King Rate', rackRate: 1750, currentRate: 1750, doubleTariff: 2250, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Deluxe King Bed', reason: '', authorizedBy: 'Manager' },
+  '207': { roomNo: '207', roomType: 'EXE', folioNo: '1', regNo: 'REG-207', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '3 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'DIRTY', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive Triple Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Executive Triple Bed (Geyser Inspection)', reason: '', authorizedBy: 'Housekeeping' },
+  '208': { roomNo: '208', roomType: 'STD', folioNo: '1', regNo: 'REG-208', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '1 Extra Adult 0 Extra Child 0', guestName: 'Standard Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'STD', plan: 'CP', rateName: 'Standard Single Rate', rackRate: 1450, currentRate: 1450, doubleTariff: 1450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Standard Single Bed', reason: '', authorizedBy: 'Manager' },
+  '209': { roomNo: '209', roomType: 'SUI', folioNo: '1', regNo: 'REG-209', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Suite Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'VIP', checkOut: '12 Noon', roomUpgrade: 'SUI', plan: 'CP', rateName: 'Suite King Rate', rackRate: 3250, currentRate: 3250, doubleTariff: 3850, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 2 Premium Suite King Bed', reason: '', authorizedBy: 'Manager' },
+
+  // Floor 3 (9 Rooms: 301 - 309)
+  '301': { roomNo: '301', roomType: 'EXE', folioNo: '1', regNo: 'REG-301', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Rajesh Sharma', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '302': { roomNo: '302', roomType: 'EXE', folioNo: '1', regNo: 'REG-302', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '303': { roomNo: '303', roomType: 'EXE', folioNo: '1', regNo: 'REG-303', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Prakash Jena', nationality: 'IND', guestStatus: 'REG', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '304': { roomNo: '304', roomType: 'EXE', folioNo: '1', regNo: 'REG-304', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '305': { roomNo: '305', roomType: 'EXE', folioNo: '1', regNo: 'REG-305', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '306': { roomNo: '306', roomType: 'EXE', folioNo: '1', regNo: 'REG-306', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '307': { roomNo: '307', roomType: 'EXE', folioNo: '1', regNo: 'REG-307', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '308': { roomNo: '308', roomType: 'EXE', folioNo: '1', regNo: 'REG-308', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Executive Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'Regular', checkOut: '12 Noon', roomUpgrade: 'EXE', plan: 'CP', rateName: 'Executive King Rate', rackRate: 2050, currentRate: 2050, doubleTariff: 2450, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Executive King Bed', reason: '', authorizedBy: 'Manager' },
+  '309': { roomNo: '309', roomType: 'PRM', folioNo: '1', regNo: 'REG-309', arrival: 'Today 12:00', departure: 'Tomorrow 12:00', billingInstruction: '1', pax: '2 Extra Adult 0 Extra Child 0', guestName: 'Premium Guest', nationality: 'IND', guestStatus: 'WLK', group: '', payMode: 'CAS', companyCode: '', companyName: '', currency: 'INR', guestClassification: 'VIP', checkOut: '12 Noon', roomUpgrade: 'PRM', plan: 'CP', rateName: 'Premium King Rate', rackRate: 2450, currentRate: 2450, doubleTariff: 2850, extraAdult: 550, extraChild: 0, mealPlanRate: 0, mealPlanAdult: 0, mealPlanChild: 0, rateTaxCode: '804', rateTaxDesc: 'SGST_CGST 12%', planTaxCode: '804', planTaxDesc: 'SGST_CGST 12%', extraBedRateTaxCode: '804', extraBedPlanTaxCode: '804', remarks: 'Floor 3 Premium King Bed', reason: '', authorizedBy: 'Manager' }
 };
 
 /* =========================================================================
@@ -519,13 +434,13 @@ export function IdsRateDetailsModal({
 export default function IdsChangeRateModal({
   isOpen,
   onClose,
-  initialRoomNo = '312',
+  initialRoomNo = '101',
   roomTariffs = DEFAULT_ROOM_TARIFFS,
   onSaveTariffChange,
   onOpenRoomHelpLookup
 }) {
   const [selectedRoom, setSelectedRoom] = useState(initialRoomNo);
-  const [tariffData, setTariffData] = useState(roomTariffs[initialRoomNo] || roomTariffs['312']);
+  const [tariffData, setTariffData] = useState(roomTariffs[initialRoomNo] || roomTariffs['101']);
   const [rateDetailsOpen, setRateDetailsOpen] = useState(false);
   const [packageSelectionOpen, setPackageSelectionOpen] = useState(false);
   const [isSavedFlash, setIsSavedFlash] = useState(false);
@@ -534,9 +449,9 @@ export default function IdsChangeRateModal({
     if (initialRoomNo && roomTariffs[initialRoomNo]) {
       setSelectedRoom(initialRoomNo);
       setTariffData(roomTariffs[initialRoomNo]);
-    } else if (roomTariffs['312']) {
-      setSelectedRoom('312');
-      setTariffData(roomTariffs['312']);
+    } else if (roomTariffs['101']) {
+      setSelectedRoom('101');
+      setTariffData(roomTariffs['101']);
     }
   }, [initialRoomNo, roomTariffs, isOpen]);
 

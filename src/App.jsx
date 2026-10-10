@@ -1610,11 +1610,6 @@ export default function App() {
               onClick: () => setPosModalOpen(true)
             },
             {
-              title: "D1 Database (68 Tables)",
-              icon: <Database className="h-5 w-5 text-amber-400" />,
-              onClick: handleOpenD1Database
-            },
-            {
               title: "24/7 WhatsApp Concierge",
               icon: <MessageCircle className="h-5 w-5 text-emerald-400" />,
               onClick: () => window.open(`https://wa.me/916370757541?text=Hello%20${encodeURIComponent(HOTEL_CONFIG.name)}%20Front%20Desk,%20I%20would%20like%20to%20inquire%20about%20a%20booking`, '_blank', 'noopener,noreferrer')
