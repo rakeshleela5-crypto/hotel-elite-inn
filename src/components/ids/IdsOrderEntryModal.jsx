@@ -3,7 +3,8 @@ import './idsFortuneNext.css';
 import { 
   Printer, Edit3, ArrowRightLeft, Users, BookOpen, Scissors, 
   Trash2, XOctagon, ToggleLeft, ToggleRight, Building, HelpCircle, 
-  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard, FileText
+  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard, FileText,
+  SlidersHorizontal, Archive, LogOut
 } from 'lucide-react';
 import { RESTAURANT_MENU } from '../../data/hotelData';
 import { 
@@ -166,16 +167,47 @@ export default function IdsOrderEntryModal({
   // NC KOT State (Video 07 Frame 016 & Frame 020)
   const [ncModalOpen, setNcModalOpen] = useState(false);
   const [selectedNcDept, setSelectedNcDept] = useState('Managers');
-  const [ncGuestNameInput, setNcGuestNameInput] = useState('MANAGER IT');
+  const [ncGuestNameInput, setNcGuestNameInput] = useState('MANAGER.IT');
+
+  // Video 08: Options & NC Bill Print Suite (Frames 011–026)
+  const [optionsModalOpen, setOptionsModalOpen] = useState(false);
+  const [ncBillPrintModalOpen, setNcBillPrintModalOpen] = useState(false);
+  const [ncPrintTable, setNcPrintTable] = useState('10');
+  const [pendingNcTablesModalOpen, setPendingNcTablesModalOpen] = useState(false);
+  const [selectedPendingNcTableIdx, setSelectedPendingNcTableIdx] = useState(0);
+  const [posPrintBillModalOpen, setPosPrintBillModalOpen] = useState(false);
+  const [printingRecordsModalOpen, setPrintingRecordsModalOpen] = useState(false);
+  const [ncPrintReportDesc, setNcPrintReportDesc] = useState('RES/NC');
+  const [ncPrintReportPrinter, setNcPrintReportPrinter] = useState('Microsoft Print to PDF');
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
   const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
-  const [billedTables, setBilledTables] = useState(['10']);
+  const [billedTables, setBilledTables] = useState([]);
   const [settledTables, setSettledTables] = useState([]);
 
-  // Live Saved KOTs Registry (Videos 01, 02 & Video 05 Frame 16)
+  // Live Saved KOTs Registry (Videos 01, 02, 07 & Video 08 Frame 16/18)
   const [savedKots, setSavedKots] = useState([
+    {
+      kotNo: '107',
+      accountingDate: '03-FEB-2022',
+      tableNo: '10',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      isNc: true,
+      ncDept: 'Managers',
+      ncDeptCode: 'MGR',
+      guestName: 'MANAGER.IT',
+      items: [
+        { code: '189', name: 'MILK SHAKE WITH ICE CREAM', quantity: 1.0, rate: 150.0, costRate: 45.0, value: 45.0, department: 'MGR' },
+        { code: '155', name: 'BLUEBERRY COLD CHEESE CAKE', quantity: 1.0, rate: 165.0, costRate: 49.5, value: 49.5, department: 'MGR' }
+      ],
+      totalAmount: 94.50,
+      cgst: 0,
+      sgst: 0,
+      nettAmount: 94.50,
+      ncBillPrinted: false
+    },
     {
       kotNo: '1314',
       accountingDate: '03-FEB-2022',
@@ -228,6 +260,131 @@ export default function IdsOrderEntryModal({
       nettAmount: 688.0
     }
   ]);
+
+  // Video 08: Computed Pending NC Tables for lookup modal (Video 08 Frame 016)
+  const pendingNcTables = useMemo(() => {
+    const list = savedKots
+      .filter(k => k.isNc && !k.ncBillPrinted)
+      .map(k => ({
+        tableNo: k.tableNo,
+        serverMember: `${k.server || 'Biren'} - ${k.guestName || 'MANAGER.IT'}`
+      }));
+    if (!list.some(p => p.tableNo === '10')) {
+      list.unshift({ tableNo: '10', serverMember: 'Biren - MANAGER.IT' });
+    }
+    return list;
+  }, [savedKots]);
+
+  // Video 08: Computed Active NC KOT for NC Bill Print grid (Video 08 Frame 018)
+  const activeNcKotForPrint = useMemo(() => {
+    if (!ncPrintTable) return null;
+    const found = savedKots.find(k => k.tableNo === String(ncPrintTable).trim() && k.isNc && !k.ncBillPrinted);
+    if (found) {
+      return {
+        ...found,
+        items: found.items.map((it, idx) => ({
+          type: '2',
+          kotNo: found.kotNo || '107',
+          name: it.name,
+          quantity: it.quantity || 1.0,
+          value: Number(it.costRate || it.value || 45.0),
+          department: found.ncDeptCode || (found.ncDept === 'Managers' ? 'MGR' : 'GEN')
+        }))
+      };
+    }
+    if (String(ncPrintTable).trim() === '10') {
+      return {
+        kotNo: '107',
+        tableNo: '10',
+        server: 'Biren',
+        guestName: 'MANAGER.IT',
+        department: 'Managers',
+        ncDeptCode: 'MGR',
+        items: [
+          { type: '2', kotNo: '107', name: 'MILK SHAKE WITH ICE CREAM', quantity: 1.0, value: 45.00, department: 'MGR' },
+          { type: '2', kotNo: '107', name: 'BLUEBERRY COLD CHEESE CAKE', quantity: 1.0, value: 49.50, department: 'MGR' }
+        ]
+      };
+    }
+    return null;
+  }, [ncPrintTable, savedKots]);
+
+  // Video 08 Frame 014: Cash Drawer Kick-out hardware emulation
+  const handleDrawerKickOut = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(740, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1480, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+      }
+    } catch (e) {
+      // Audio fallback silent
+    }
+    setSaveSuccessMsg("Cash Drawer Kick Out Pulse Sent (EPSON TM-T88V Pin 2/5 24V Solenoid)!");
+    setTimeout(() => setSaveSuccessMsg(null), 3500);
+    setOptionsModalOpen(false);
+  };
+
+  // Video 08 Frame 024: Execute NC Bill Print, Spooler records progress & Table Release
+  const handleExecuteNcBillPrint = () => {
+    setPosPrintBillModalOpen(false);
+    setPrintingRecordsModalOpen(true);
+
+    setTimeout(() => {
+      setPrintingRecordsModalOpen(false);
+      setNcBillPrintModalOpen(false);
+
+      const targetTable = ncPrintTable || '10';
+      setSavedKots(prev => prev.map(k => {
+        if (k.tableNo === targetTable && k.isNc) {
+          return { ...k, ncBillPrinted: true, settled: true, settledAt: new Date().toISOString() };
+        }
+        return k;
+      }));
+
+      // Release Table in Table Status matrix from Occupied/Billed to Vacant (Green)
+      setBilledTables(prev => prev.filter(t => t !== targetTable));
+      setSettledTables(prev => [...prev, targetTable]);
+
+      // Launch Crystal Report Viewer for pos-nc-bill
+      if (onOpenCrystalReport) {
+        onOpenCrystalReport({
+          reportType: 'pos-nc-bill',
+          data: {
+            voucherNo: activeNcKotForPrint?.kotNo ? `NC-${activeNcKotForPrint.kotNo}` : 'NC-107',
+            tableNo: targetTable,
+            server: activeNcKotForPrint?.server || server || 'Biren',
+            guestName: activeNcKotForPrint?.guestName || 'MANAGER.IT',
+            department: activeNcKotForPrint?.department || 'Managers (MGR)',
+            deptCode: activeNcKotForPrint?.ncDeptCode || 'MGR',
+            accountingDate: accountingDate || '03-FEB-2022',
+            outlet: selectedOutlet || 'RESTAURANT',
+            session: selectedSession || 'General',
+            printer: ncPrintReportPrinter,
+            items: activeNcKotForPrint?.items || [
+              { name: 'MILK SHAKE WITH ICE CREAM', quantity: 1, rate: 150.0, costRate: 45.0, value: 45.0 },
+              { name: 'BLUEBERRY COLD CHEESE CAKE', quantity: 1, rate: 165.0, costRate: 49.5, value: 49.5 }
+            ],
+            totalCost: 94.50,
+            menuTotal: 315.00
+          }
+        });
+      }
+
+      setSaveSuccessMsg(`NC Bill Printed Successfully for Table ${targetTable} (KOT #${activeNcKotForPrint?.kotNo || '107'})! Table ${targetTable} Released to Vacant.`);
+      setTimeout(() => setSaveSuccessMsg(null), 4000);
+    }, 800);
+  };
 
   // Financial calculations matching Video 01 Frame 025 & Video 07 Frame 030
   const calculations = useMemo(() => {
@@ -598,8 +755,20 @@ export default function IdsOrderEntryModal({
               <FileText size={16} color={isNcMode ? '#008000' : '#000080'} />
               <span style={{ fontSize: '10px' }}>{isNcMode ? 'NC Kot' : 'NC KOT'}</span>
             </button>
-            <button className="ids-btn" title="Room / Guest Info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Building size={16} />
+            <button 
+              className="ids-btn" 
+              title="Click on Options Icon (Video 08 Frame 011)" 
+              onClick={() => setOptionsModalOpen(true)} 
+              style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                minWidth: '42px', 
+                padding: '2px 4px',
+                background: optionsModalOpen ? '#C1D2EE' : undefined
+              }}
+            >
+              <SlidersHorizontal size={16} color="#0A246A" />
             </button>
             <button className="ids-btn" title="HotKey Help" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <HelpCircle size={16} />
@@ -1484,6 +1653,365 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
+      {/* 5E. WIN32 OPTIONS DIALOG (Video 08 Frame 013 - Frame 014) */}
+      {optionsModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1370 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '180px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 14px rgba(0,0,0,0.65)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Options</span>
+              <button className="ids-win-btn close" onClick={() => setOptionsModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  setOptionsModalOpen(false);
+                  setNcBillPrintModalOpen(true);
+                }}
+                title="Print NC Bill (Video 08 Frame 013)"
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  padding: '8px 4px', 
+                  background: '#ECE9D8',
+                  border: '2px outset #FFF',
+                  cursor: 'pointer'
+                }}
+              >
+                <Printer size={22} color="#000080" />
+                <span style={{ fontSize: '11px', fontWeight: 700, marginTop: '4px', color: '#000' }}>NC Bill Print</span>
+              </button>
+
+              <button 
+                className="ids-btn" 
+                onClick={handleDrawerKickOut}
+                title="POS Cash Drawer Kick Out Pulse (Video 08 Frame 013)"
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  padding: '8px 4px', 
+                  background: '#ECE9D8',
+                  border: '2px outset #FFF',
+                  cursor: 'pointer'
+                }}
+              >
+                <Archive size={22} color="#806000" />
+                <span style={{ fontSize: '11px', fontWeight: 700, marginTop: '4px', color: '#000' }}>Drawer Kick out</span>
+              </button>
+
+              <button 
+                className="ids-btn" 
+                onClick={() => setOptionsModalOpen(false)}
+                title="Exit Options"
+                style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  padding: '8px 4px', 
+                  background: '#ECE9D8',
+                  border: '2px outset #FFF',
+                  cursor: 'pointer'
+                }}
+              >
+                <LogOut size={22} color="#C00000" />
+                <span style={{ fontSize: '11px', fontWeight: 700, marginTop: '4px', color: '#000' }}>Exit</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5F. WIN32 NC BILL PRINT DIALOG (Video 08 Frame 015 - Frame 021) */}
+      {ncBillPrintModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1380 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '560px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>NC Bill Print</span>
+              <button className="ids-win-btn close" onClick={() => setNcBillPrintModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            
+            {/* Modal Body */}
+            <div style={{ padding: '8px 10px', fontSize: '11px' }}>
+              {/* Type / Table lookup header (Video 08 Frame 015 & Frame 018) */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <label style={{ fontWeight: 700, width: '40px' }}>Type</label>
+                <input 
+                  type="text" 
+                  value={ncPrintTable} 
+                  onChange={e => setNcPrintTable(e.target.value)}
+                  placeholder="e.g. 10"
+                  style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                />
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setPendingNcTablesModalOpen(true)}
+                  title="Lookup Pending NC Tables (Video 08 Frame 016)"
+                  style={{ padding: '2px 6px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  (?)
+                </button>
+                {activeNcKotForPrint && (
+                  <span style={{ color: '#000080', fontWeight: 600, marginLeft: '6px' }}>
+                    {activeNcKotForPrint.server || 'Biren'} - {activeNcKotForPrint.guestName || 'MANAGER.IT'} [{activeNcKotForPrint.department || 'Managers'}]
+                  </span>
+                )}
+              </div>
+
+              {/* Items Grid matching Video 08 Frame 018 */}
+              <div style={{ height: '180px', background: '#FFF', border: '1px solid #7F9DB9', overflowY: 'auto', marginBottom: '10px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #999', zIndex: 1 }}>
+                    <tr>
+                      <th style={{ width: '38px', padding: '3px 4px', borderRight: '1px solid #DDD', textAlign: 'center' }}>Type</th>
+                      <th style={{ width: '48px', padding: '3px 4px', borderRight: '1px solid #DDD', textAlign: 'center' }}>KOT#</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'left' }}>Item Name</th>
+                      <th style={{ width: '55px', padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'right' }}>Qty</th>
+                      <th style={{ width: '65px', padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'right' }}>Value</th>
+                      <th style={{ width: '75px', padding: '3px 6px', textAlign: 'left' }}>Department</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activeNcKotForPrint && activeNcKotForPrint.items && activeNcKotForPrint.items.length > 0 ? (
+                      activeNcKotForPrint.items.map((it, idx) => (
+                        <tr key={idx} style={{ background: '#D9E8FB', borderBottom: '1px solid #E0E0E0' }}>
+                          <td style={{ textAlign: 'center', padding: '3px 4px', borderRight: '1px solid #DDD' }}>{it.type || '2'}</td>
+                          <td style={{ textAlign: 'center', padding: '3px 4px', borderRight: '1px solid #DDD', fontWeight: 600 }}>{it.kotNo || activeNcKotForPrint.kotNo || '107'}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #DDD', fontWeight: 600, color: '#000080' }}>{it.name}</td>
+                          <td style={{ textAlign: 'right', padding: '3px 6px', borderRight: '1px solid #DDD' }}>{Number(it.quantity || 1).toFixed(3)}</td>
+                          <td style={{ textAlign: 'right', padding: '3px 6px', borderRight: '1px solid #DDD', fontWeight: 700 }}>{Number(it.value || it.costRate || 45).toFixed(2)}</td>
+                          <td style={{ padding: '3px 6px', fontWeight: 600, color: '#800000' }}>{it.department || activeNcKotForPrint.ncDeptCode || 'MGR'}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#888', fontStyle: 'italic' }}>
+                          {ncPrintTable ? `No Pending NC KOT found on Table ${ncPrintTable}. Click (?) to select a pending table.` : 'Enter or select a Table # with pending NC orders.'}
+                        </td>
+                      </tr>
+                    )}
+                    {/* Filler blank rows for authentic Win32 look */}
+                    {Array.from({ length: Math.max(0, 6 - (activeNcKotForPrint?.items?.length || 0)) }).map((_, i) => (
+                      <tr key={`blank-${i}`} style={{ height: '20px', borderBottom: '1px solid #F0F0F0' }}>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Total Bar */}
+              {activeNcKotForPrint && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 6px', background: '#EAE6D6', border: '1px solid #999', marginBottom: '8px', fontSize: '11px', fontWeight: 700 }}>
+                  <span>Total Non-Chargeable Cost Valuation:</span>
+                  <span style={{ color: '#800000' }}>
+                    ₹{activeNcKotForPrint.items?.reduce((s, it) => s + Number(it.value || it.costRate || 0), 0).toFixed(2) || '94.50'}
+                  </span>
+                </div>
+              )}
+
+              {/* Action Buttons: [ Print ] [ Clear ] [ Exit ] (Video 08 Frame 018) */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    if (!activeNcKotForPrint || !activeNcKotForPrint.items?.length) {
+                      alert("Please select a pending NC Table with order items first!");
+                      return;
+                    }
+                    setPosPrintBillModalOpen(true);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  Print
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setNcPrintTable('')}
+                  style={{ minWidth: '60px' }}
+                >
+                  Clear
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setNcBillPrintModalOpen(false)}
+                  style={{ minWidth: '60px' }}
+                >
+                  Exit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5G. WIN32 PENDING TABLES LOOKUP DIALOG (Video 08 Frame 016 - Frame 017) */}
+      {pendingNcTablesModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '300px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Pending Tables</span>
+              <button className="ids-win-btn close" onClick={() => setPendingNcTablesModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '8px' }}>
+              <div style={{ height: '150px', background: '#FFF', border: '1px solid #7F9DB9', overflowY: 'auto', marginBottom: '8px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #999' }}>
+                    <tr>
+                      <th style={{ width: '70px', padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Table #</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left' }}>Server/Member Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingNcTables.map((p, idx) => {
+                      const isSelected = selectedPendingNcTableIdx === idx;
+                      return (
+                        <tr 
+                          key={p.tableNo}
+                          onClick={() => setSelectedPendingNcTableIdx(idx)}
+                          onDoubleClick={() => {
+                            setNcPrintTable(p.tableNo);
+                            setPendingNcTablesModalOpen(false);
+                          }}
+                          style={{ 
+                            background: isSelected ? '#316AC5' : '#FFF', 
+                            color: isSelected ? '#FFF' : '#000',
+                            cursor: 'pointer',
+                            borderBottom: '1px solid #EEE'
+                          }}
+                        >
+                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #DDD' }}>{p.tableNo}</td>
+                          <td style={{ padding: '3px 6px' }}>{p.serverMember}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    const sel = pendingNcTables[selectedPendingNcTableIdx];
+                    if (sel) setNcPrintTable(sel.tableNo);
+                    setPendingNcTablesModalOpen(false);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  Select
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setPendingNcTablesModalOpen(false)}
+                  style={{ minWidth: '60px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5H. WIN32 POS PRINT BILL MODAL (Video 08 Frame 019) */}
+      {posPrintBillModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1420 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '320px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS Print Bill</span>
+              <button className="ids-win-btn close" onClick={() => setPosPrintBillModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '12px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontWeight: 600 }}>Description</label>
+                <select 
+                  value={ncPrintReportDesc} 
+                  onChange={e => setNcPrintReportDesc(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 600 }}
+                >
+                  <option value="RES/NC">RES/NC</option>
+                  <option value="RES/STANDARD">RES/STANDARD</option>
+                  <option value="BAR/NC">BAR/NC</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontWeight: 600 }}>Printer</label>
+                <select 
+                  value={ncPrintReportPrinter} 
+                  onChange={e => setNcPrintReportPrinter(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="Microsoft Print to PDF">Microsoft Print to PDF</option>
+                  <option value="POS Receipt Printer (EPSON TM-T88V)">POS Receipt Printer (EPSON TM-T88V)</option>
+                  <option value="Direct Thermal Spooler">Direct Thermal Spooler</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleExecuteNcBillPrint}
+                  style={{ minWidth: '65px', fontWeight: 700 }}
+                >
+                  Print
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5I. WIN32 PRINTING RECORDS PROGRESS DIALOG (Video 08 Frame 024) */}
+      {printingRecordsModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '250px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Printing Records</span>
+              <button className="ids-win-btn close" onClick={() => setPrintingRecordsModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '14px 12px', fontSize: '11px', textAlign: 'center' }}>
+              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '10px', marginBottom: '12px' }}>
+                <div style={{ fontWeight: 700, color: '#333' }}>Copy: 1</div>
+                <div style={{ color: '#000080', fontWeight: 700, marginTop: '4px' }}>Printing Page 1</div>
+              </div>
+              <button 
+                className="ids-btn" 
+                onClick={() => setPrintingRecordsModalOpen(false)}
+                style={{ minWidth: '95px' }}
+              >
+                Cancel Printing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 6. TABLE STATUS 4x5 MATRIX MODAL (Video 01 Frame 048) */}
       {tableStatusOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1280 }}>
@@ -1499,7 +2027,7 @@ export default function IdsOrderEntryModal({
               {/* 4x5 Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', background: '#DDD', padding: '8px', border: '1px solid #808080' }}>
                 {POS_TABLES.map(t => {
-                  const matchingKot = savedKots.find(k => k.tableNo === t);
+                  const matchingKot = savedKots.find(k => k.tableNo === t && !k.settled && !k.ncBillPrinted);
                   const isSettled = settledTables.includes(t);
                   const isBilled = !isSettled && billedTables.includes(t);
                   const isOccupied = isBilled || isSettled ? false : Boolean(matchingKot);

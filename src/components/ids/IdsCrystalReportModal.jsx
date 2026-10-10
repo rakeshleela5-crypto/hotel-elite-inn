@@ -25,6 +25,7 @@ export default function IdsCrystalReportModal({
       case 'laundry-bill': return 'Laundry & Dry Cleaning Statutory Tax Invoice (SAC 999791)';
       case 'room-verification': return 'Housekeeping Room Verification & Discrepancy Audit Report';
       case 'pos-bill': return 'Restaurant / Bar POS Guest Tax Invoice (SAC 996331)';
+      case 'pos-nc-bill': return 'Non-Chargeable (NC) F&B Departmental Cost Voucher (SAC 996331)';
       case 'rule46-bill':
       default: return 'Rule 46 Statutory GST Tax Invoice';
     }
@@ -534,13 +535,90 @@ export default function IdsCrystalReportModal({
               </div>
             )}
 
+            {/* POS Non-Chargeable (NC) Bill / Departmental Cost Voucher (Video 08 Frames 018-026) */}
+            {reportType === 'pos-nc-bill' && (
+              <div style={{ marginTop: '10px', fontSize: '11px' }}>
+                <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '13px', color: '#800000', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                  NON-CHARGEABLE (NC) BILL / DEPARTMENTAL COST DEBIT VOUCHER
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', borderBottom: '1px solid #000', paddingBottom: '8px', marginBottom: '10px' }}>
+                  <div>
+                    <div><strong>Voucher No:</strong> {data.voucherNo || 'NC-107'}</div>
+                    <div><strong>Table No:</strong> {data.tableNo || '10'}</div>
+                    <div><strong>Department:</strong> {data.department || 'Managers (MGR)'}</div>
+                    <div><strong>Guest / Requisitioner:</strong> {data.guestName || 'MANAGER.IT'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div><strong>Date:</strong> {data.accountingDate || '03-FEB-2022'}</div>
+                    <div><strong>Outlet / Session:</strong> {data.outlet || 'RESTAURANT'} / {data.session || 'General'}</div>
+                    <div><strong>Steward:</strong> {data.server || 'Biren'}</div>
+                    <div><strong>SAC / HSN Code:</strong> 996331 (F&B Internal Requisition)</div>
+                  </div>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', marginBottom: '15px' }}>
+                  <thead>
+                    <tr style={{ background: '#EAEAEA', borderBottom: '1px solid #000' }}>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Item Description</th>
+                      <th style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000', width: '50px' }}>Qty</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>Menu Rate (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>Cost Rate (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'right', width: '80px' }}>Dept Debit (₹)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(data.items || [
+                      { name: 'MILK SHAKE WITH ICE CREAM', quantity: 1, rate: 150.0, costRate: 45.0, value: 45.0 },
+                      { name: 'BLUEBERRY COLD CHEESE CAKE', quantity: 1, rate: 165.0, costRate: 49.5, value: 49.5 }
+                    ]).map((it, idx) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid #DDD' }}>
+                        <td style={{ padding: '4px', borderRight: '1px solid #000' }}>{it.name}</td>
+                        <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>{Number(it.quantity || 1).toFixed(0)}</td>
+                        <td style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>{Number(it.rate || 0).toFixed(2)}</td>
+                        <td style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>{Number(it.costRate || it.value || 0).toFixed(2)}</td>
+                        <td style={{ padding: '4px', textAlign: 'right' }}>{Number(it.value || (it.quantity * (it.costRate || it.rate)) || 0).toFixed(2)}</td>
+                      </tr>
+                    ))}
+                    <tr style={{ borderTop: '1px solid #000', fontWeight: 'bold', background: '#F8F8F8' }}>
+                      <td colSpan={4} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>Total Standard Menu Valuation</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{Number(data.menuTotal || 315.0).toFixed(2)}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={4} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>Central GST (0.00% - Rule 28/31 Internal Transfer)</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={4} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000' }}>State GST (0.00% - Rule 28/31 Internal Transfer)</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
+                    </tr>
+                    <tr style={{ borderTop: '2px solid #000', background: '#F0F0F0', fontSize: '13px', fontWeight: 'bold' }}>
+                      <td colSpan={4} style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>TOTAL COST DEBITED TO DEPARTMENT [{data.deptCode || 'MGR'}]</td>
+                      <td style={{ padding: '6px', textAlign: 'right', color: '#800000' }}>₹{Number(data.totalCost || 94.50).toFixed(2)}</td>
+                    </tr>
+                    <tr style={{ background: '#FFF8E7', fontSize: '12px', fontWeight: 'bold' }}>
+                      <td colSpan={4} style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', color: '#008000' }}>NET PAYABLE BY GUEST</td>
+                      <td style={{ padding: '4px', textAlign: 'right', color: '#008000' }}>₹0.00 (COMPLIMENTARY)</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style={{ fontSize: '9px', fontStyle: 'italic', color: '#555', border: '1px dashed #999', padding: '6px', background: '#FAFAFA', marginBottom: '10px' }}>
+                  <strong>Statutory & Accounting Compliance Note:</strong> This voucher records Non-Chargeable internal F&B consumption under IDS Fortune NEXT 6.5/7.0 protocol. Debited to Department Cost Center [{data.department || 'Managers (MGR)'}]. Excluded from outward commercial tax invoice turnover under CGST Act 2017.
+                </div>
+              </div>
+            )}
+
             {/* Signature Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', paddingTop: '10px' }}>
-              <div style={{ textAlign: 'center', width: '180px', borderTop: '1px solid #000' }}>
-                <div style={{ fontSize: '10px', paddingTop: '4px' }}>Guest Signature</div>
+              <div style={{ textAlign: 'center', width: '220px', borderTop: '1px solid #000' }}>
+                <div style={{ fontSize: '10px', paddingTop: '4px' }}>
+                  {reportType === 'pos-nc-bill' ? `Requisitioner (${data.guestName || 'MANAGER.IT'})` : 'Guest Signature'}
+                </div>
               </div>
-              <div style={{ textAlign: 'center', width: '180px', borderTop: '1px solid #000' }}>
-                <div style={{ fontSize: '10px', paddingTop: '4px' }}>Authorized Signatory / Cashier</div>
+              <div style={{ textAlign: 'center', width: '220px', borderTop: '1px solid #000' }}>
+                <div style={{ fontSize: '10px', paddingTop: '4px' }}>
+                  {reportType === 'pos-nc-bill' ? 'F&B Manager / Authorized Signatory' : 'Authorized Signatory / Cashier'}
+                </div>
               </div>
             </div>
 

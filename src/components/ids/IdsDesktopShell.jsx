@@ -914,7 +914,7 @@ export default function IdsDesktopShell({
       { label: 'Void KOTs', videoId: 'POS-06', action: () => setOrderEntryModalOpen(true) },
       { label: 'Chefs Recommendation', action: () => setOrderEntryModalOpen(true) },
       { label: 'Table Booking', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Update Covers', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Print NC Bill (Options -> NC Bill Print)', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
       { label: 'Delete NC KOT', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
       { label: 'Create POS MIS', action: () => showMessageBox("POS MIS Register Compiled.", "MIS Report") },
       { label: 'Restaurant Table View', videoId: 'POS-12', action: () => setOrderEntryModalOpen(true) },
