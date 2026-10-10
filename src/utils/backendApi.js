@@ -264,3 +264,150 @@ export async function getFastApiSampleThermalReceipt() {
   }
 }
 
+// -------------------------------------------------------------
+// GST GSTR-1 Statutory Filing Integration
+// -------------------------------------------------------------
+export async function getFastApiGstFilings(returnPeriod) {
+  try {
+    const url = returnPeriod 
+      ? `${FASTAPI_BASE_URL}/api/gst/filings?return_period=${encodeURIComponent(returnPeriod)}`
+      : `${FASTAPI_BASE_URL}/api/gst/filings`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GST filings fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiGstFiling(filingData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(filingData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create GST invoice failed:', err.message);
+    throw err;
+  }
+}
+
+export async function getFastApiGstr1Summary(returnPeriod = 'OCT-2026') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/summary/${encodeURIComponent(returnPeriod)}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GSTR-1 summary fetch failed:', err.message);
+    return null;
+  }
+}
+
+// -------------------------------------------------------------
+// Staff Roster & Attendance Integration
+// -------------------------------------------------------------
+export async function getFastApiStaffRoster() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/staff/roster`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Staff roster fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function getFastApiStaffAttendance(date) {
+  try {
+    const url = date 
+      ? `${FASTAPI_BASE_URL}/api/staff/attendance?attendance_date=${encodeURIComponent(date)}`
+      : `${FASTAPI_BASE_URL}/api/staff/attendance`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Staff attendance fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function punchFastApiStaffAttendance(punchData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/staff/attendance/punch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(punchData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Staff attendance punch failed:', err.message);
+    throw err;
+  }
+}
+
+// -------------------------------------------------------------
+// Laundry Orders & Service Integration
+// -------------------------------------------------------------
+export async function getFastApiLaundryRates() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/rates`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Laundry rates fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function getFastApiLaundryOrders(status, roomNumber) {
+  try {
+    const params = new URLSearchParams();
+    if (status) params.append('order_status', status);
+    if (roomNumber) params.append('room_number', roomNumber);
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders${qs}`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Laundry orders fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiLaundryOrder(orderData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create laundry order failed:', err.message);
+    throw err;
+  }
+}
+
+export async function updateFastApiLaundryStatus(orderId, newStatus) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ order_status: newStatus })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Update laundry status failed:', err.message);
+    throw err;
+  }
+}
+
