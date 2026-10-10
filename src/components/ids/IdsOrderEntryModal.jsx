@@ -214,18 +214,47 @@ export default function IdsOrderEntryModal({
   const [ncPrintReportDesc, setNcPrintReportDesc] = useState('RES/NC');
   const [ncPrintReportPrinter, setNcPrintReportPrinter] = useState('Microsoft Print to PDF');
 
+  // Video 12: Table Transfer V6.5.002.1 State (Frames 026–042)
+  const [tableTransferOpen, setTableTransferOpen] = useState(false);
+  const [transferSourceTable, setTransferSourceTable] = useState('10');
+  const [transferTargetTable, setTransferTargetTable] = useState('14');
+  const [transferSourceOutlet, setTransferSourceOutlet] = useState('RES');
+  const [transferTargetOutlet, setTransferTargetOutlet] = useState('RES');
+  const [transferSession, setTransferSession] = useState('GN');
+  const [transferGridItems, setTransferGridItems] = useState([]);
+  const [transferOutletsModalOpen, setTransferOutletsModalOpen] = useState(false);
+  const [transferNotice, setTransferNotice] = useState(null);
+
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
   const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
   const [billedTables, setBilledTables] = useState([]);
   const [settledTables, setSettledTables] = useState([]);
 
-  // Live Saved KOTs Registry (Videos 01, 02, 07 & Video 08 Frame 16/18)
+  // Live Saved KOTs Registry (Videos 01, 02, 07, 08, 10, 11 & Video 12 Frames 010–020)
   const [savedKots, setSavedKots] = useState([
+    {
+      kotNo: '1313',
+      accountingDate: '03-FEB-2022',
+      tableNo: '10',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      session: 'GN',
+      items: [
+        { res: 'RES', code: '1', kotNo: '1313', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 2.0, rate: 199.0, value: 398.0 },
+        { res: 'RES', code: '2', kotNo: '1313', name: 'RED BEANS PEANUT & DRY FRUIT S', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'RES', code: '3', kotNo: '1313', name: 'SPROUTED MOONG PEANUT DRY FR', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'RES', code: '4', kotNo: '1313', name: 'CAESAR SALAD (VEG) ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 245.0, value: 245.0 }
+      ],
+      totalAmount: 1041.0,
+      cgst: 26.04,
+      sgst: 26.04,
+      nettAmount: 1093.0
+    },
     {
       kotNo: '107',
       accountingDate: '03-FEB-2022',
-      tableNo: '10',
+      tableNo: '100',
       server: 'Biren',
       outlet: 'RESTAURANT',
       isNc: true,
@@ -241,40 +270,6 @@ export default function IdsOrderEntryModal({
       sgst: 0,
       nettAmount: 94.50,
       ncBillPrinted: false
-    },
-    {
-      kotNo: '1314',
-      accountingDate: '03-FEB-2022',
-      tableNo: '14',
-      server: 'Biren',
-      outlet: 'RESTAURANT',
-      items: [
-        { code: '1', kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 2.0, rate: 199.0, value: 398.0 },
-        { code: '2', kotNo: '1314', name: 'RED BEANS PEANUT & DRY FRUIT', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
-        { code: '3', kotNo: '1314', name: 'SPROUTED MOONG PEANUT DRY', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
-        { code: '4', kotNo: '1314', name: 'CAESAR SALAD (VEG)', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 245.0, value: 245.0 }
-      ],
-      totalAmount: 1041.0,
-      cgst: 26.04,
-      sgst: 26.04,
-      nettAmount: 1093.0
-    },
-    {
-      kotNo: '1318',
-      accountingDate: '03-FEB-2022',
-      tableNo: '14',
-      server: 'Biren',
-      outlet: 'RESTAURANT',
-      items: [
-        { res: 'RES', code: '1', kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
-        { res: 'RES', code: '2', kotNo: '1318', name: 'RED BEANS PEANUT & DRY FRUIT S...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
-        { res: 'CAR', code: '601', kotNo: '1318', name: 'BLENDERS PRIDE ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 135.0, value: 135.0 },
-        { res: 'CAR', code: '592', kotNo: '1318', name: 'JW BLACK LABEL ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 480.0, value: 480.0 }
-      ],
-      totalAmount: 1013.0,
-      cgst: 25.33,
-      sgst: 25.33,
-      nettAmount: 1064.0
     },
     {
       kotNo: '1315',
@@ -485,6 +480,244 @@ export default function IdsOrderEntryModal({
       setSaveSuccessMsg(`NC Bill Printed Successfully for Table ${targetTable} (KOT #${activeNcKotForPrint?.kotNo || '107'})! Table ${targetTable} Released to Vacant.`);
       setTimeout(() => setSaveSuccessMsg(null), 4000);
     }, 800);
+  };
+
+  // Video 12: Load source table items into transfer grid (Frames 028–033)
+  const handleLoadSourceTable = (srcTbl = null) => {
+    const tbl = String(srcTbl || transferSourceTable || '10').trim();
+    if (!tbl) {
+      setTransferNotice('Enter Occupied Table Number Which is going to be transferred.');
+      setTimeout(() => setTransferNotice(null), 3000);
+      return;
+    }
+    const matchingKots = savedKots.filter(k => k.tableNo === tbl && !k.settled);
+    if (matchingKots.length > 0) {
+      const items = matchingKots.flatMap(k => (k.items || []).map(it => ({
+        kotNo: it.kotNo || k.kotNo || '1313',
+        code: it.code || '1',
+        name: it.name || it.fullName || 'Item',
+        quantity: typeof it.quantity === 'number' ? it.quantity.toFixed(3) : String(it.quantity || '1.000'),
+        rate: it.rate || 0,
+        value: it.value || ((Number(it.quantity) || 1) * (it.rate || 0)),
+        selected: true,
+        sourceKotNo: k.kotNo
+      })));
+      setTransferGridItems(items);
+      setTransferNotice(`Loaded ${items.length} item(s) from Table ${tbl}.`);
+      setTimeout(() => setTransferNotice(null), 2500);
+    } else if (tbl === '10') {
+      // Fallback matching Video 12 Frame 033
+      const defaultT10Items = [
+        { kotNo: '1313', code: '1', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '2.000', rate: 199.00, value: 398.00, selected: true },
+        { kotNo: '1313', code: '2', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1.000', rate: 199.00, value: 199.00, selected: true },
+        { kotNo: '1313', code: '3', name: 'SPROUTED MOONG PEANUT DRY FR', quantity: '1.000', rate: 199.00, value: 199.00, selected: true },
+        { kotNo: '1313', code: '4', name: 'CAESAR SALAD (VEG) ...', quantity: '1.000', rate: 245.00, value: 245.00, selected: true }
+      ];
+      setTransferGridItems(defaultT10Items);
+      setTransferNotice(`Loaded 4 item(s) from Table 10.`);
+      setTimeout(() => setTransferNotice(null), 2500);
+    } else {
+      setTransferGridItems([]);
+      setTransferNotice(`No active running KOTs found on Table ${tbl}.`);
+      setTimeout(() => setTransferNotice(null), 3000);
+    }
+  };
+
+  // Video 12: Invert/Toggle selection of all loaded items (Frame 028 & 033)
+  const handleToggleTransferSelection = () => {
+    setTransferGridItems(prev => prev.map(it => ({ ...it, selected: !it.selected })));
+  };
+
+  // Video 12: Toggle single item selection
+  const handleToggleSingleItemSelection = (idx) => {
+    setTransferGridItems(prev => prev.map((it, i) => i === idx ? { ...it, selected: !it.selected } : it));
+  };
+
+  // Video 12: Execute Table Transfer routine (Frames 034–042)
+  const handleExecuteTableTransfer = () => {
+    const srcTbl = String(transferSourceTable).trim();
+    const tgtTbl = String(transferTargetTable).trim();
+
+    if (!srcTbl) {
+      alert('Please enter Source Table Number.');
+      return;
+    }
+    if (!tgtTbl) {
+      alert('Enter Vaccant Target Table Number.');
+      return;
+    }
+    if (srcTbl === tgtTbl) {
+      alert('Source Table and Target Table cannot be the same!');
+      return;
+    }
+    const selectedItems = transferGridItems.filter(it => it.selected);
+    if (selectedItems.length === 0) {
+      alert('Please select at least one item to transfer (Selected = YES).');
+      return;
+    }
+
+    setSavedKots(prev => {
+      const sourceKots = prev.filter(k => k.tableNo === srcTbl && !k.settled);
+      const otherKots = prev.filter(k => k.tableNo !== srcTbl);
+
+      // Transferred line items (KOT # 1314 on target table as shown in Frame 040)
+      const transferredLineItems = selectedItems.map(it => ({
+        res: transferTargetOutlet || 'RES',
+        code: it.code,
+        kotNo: '1314',
+        name: it.name,
+        quantity: Number(it.quantity) || 1,
+        rate: it.rate,
+        value: it.value
+      }));
+
+      const transferredTotal = transferredLineItems.reduce((acc, it) => acc + it.value, 0);
+      const transferredCgst = Number((transferredTotal * 0.025).toFixed(2));
+      const transferredSgst = Number((transferredTotal * 0.025).toFixed(2));
+      const transferredNett = Math.round(transferredTotal + transferredCgst + transferredSgst);
+
+      // Check if unselected items remain on source table
+      const remainingItems = transferGridItems.filter(it => !it.selected);
+      let updatedSourceKots = [];
+
+      if (remainingItems.length > 0) {
+        const remLineItems = remainingItems.map(it => ({
+          res: transferSourceOutlet || 'RES',
+          code: it.code,
+          kotNo: it.kotNo,
+          name: it.name,
+          quantity: Number(it.quantity) || 1,
+          rate: it.rate,
+          value: it.value
+        }));
+        const remTotal = remLineItems.reduce((acc, it) => acc + it.value, 0);
+        const remCgst = Number((remTotal * 0.025).toFixed(2));
+        const remSgst = Number((remTotal * 0.025).toFixed(2));
+        const remNett = Math.round(remTotal + remCgst + remSgst);
+
+        updatedSourceKots = [{
+          kotNo: sourceKots[0]?.kotNo || '1313',
+          accountingDate,
+          tableNo: srcTbl,
+          server: sourceKots[0]?.server || 'Biren',
+          outlet: transferSourceOutlet || 'RESTAURANT',
+          session: transferSession,
+          items: remLineItems,
+          totalAmount: remTotal,
+          cgst: remCgst,
+          sgst: remSgst,
+          nettAmount: remNett
+        }];
+      }
+
+      // Add to target table
+      const existingTargetKot = otherKots.find(k => k.tableNo === tgtTbl && !k.settled);
+      let updatedOtherKots = otherKots;
+
+      if (existingTargetKot) {
+        updatedOtherKots = otherKots.map(k => {
+          if (k.tableNo === tgtTbl && !k.settled) {
+            const merged = [...(k.items || []), ...transferredLineItems];
+            const mTotal = merged.reduce((acc, it) => acc + (it.value || (it.quantity * it.rate)), 0);
+            const mCgst = Number((mTotal * 0.025).toFixed(2));
+            const mSgst = Number((mTotal * 0.025).toFixed(2));
+            return {
+              ...k,
+              items: merged,
+              totalAmount: mTotal,
+              cgst: mCgst,
+              sgst: mSgst,
+              nettAmount: Math.round(mTotal + mCgst + mSgst)
+            };
+          }
+          return k;
+        });
+      } else {
+        const newTargetKot = {
+          kotNo: '1314',
+          accountingDate,
+          tableNo: tgtTbl,
+          server: sourceKots[0]?.server || 'Biren',
+          outlet: transferTargetOutlet || 'RESTAURANT',
+          session: transferSession,
+          items: transferredLineItems,
+          totalAmount: transferredTotal,
+          cgst: transferredCgst,
+          sgst: transferredSgst,
+          nettAmount: transferredNett
+        };
+        updatedOtherKots = [...otherKots, newTargetKot];
+      }
+
+      return [...updatedOtherKots, ...updatedSourceKots];
+    });
+
+    // Clean up settled/billed lists
+    setSettledTables(prev => prev.filter(t => t !== tgtTbl));
+    setBilledTables(prev => prev.filter(t => t !== srcTbl && t !== tgtTbl));
+
+    // Clear dialog inputs and grid (matching Frame 036)
+    setTransferSourceTable('');
+    setTransferTargetTable('');
+    setTransferGridItems([]);
+
+    setTransferNotice(`Table ${srcTbl} successfully transferred to Table ${tgtTbl}! Table ${srcTbl} is now Vacant, Table ${tgtTbl} is Occupied.`);
+    setSaveSuccessMsg(`Table Transfer V6.5.002.1 Complete: Table ${srcTbl} -> Table ${tgtTbl} (${selectedItems.length} items moved).`);
+    setTimeout(() => {
+      setTransferNotice(null);
+      setSaveSuccessMsg(null);
+    }, 4500);
+
+    broadcastKotChannel({
+      type: 'TABLE_TRANSFER',
+      sourceTable: srcTbl,
+      targetTable: tgtTbl,
+      itemCount: selectedItems.length,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Video 12 Preset: Initial Occupancy on Table 10 and Vacant on Table 14
+  const handleLoadVideo12Demo = () => {
+    const v12T10Kot = {
+      kotNo: '1313',
+      accountingDate: '03-FEB-2022',
+      tableNo: '10',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      session: 'GN',
+      items: [
+        { res: 'RES', code: '1', kotNo: '1313', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 2.0, rate: 199.0, value: 398.0 },
+        { res: 'RES', code: '2', kotNo: '1313', name: 'RED BEANS PEANUT & DRY FRUIT S', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'RES', code: '3', kotNo: '1313', name: 'SPROUTED MOONG PEANUT DRY FR', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'RES', code: '4', kotNo: '1313', name: 'CAESAR SALAD (VEG) ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 245.0, value: 245.0 }
+      ],
+      totalAmount: 1041.0,
+      cgst: 26.04,
+      sgst: 26.04,
+      nettAmount: 1093.0
+    };
+
+    setSavedKots(prev => [
+      ...prev.filter(k => k.tableNo !== '10' && k.tableNo !== '14'),
+      v12T10Kot
+    ]);
+    setSettledTables(prev => prev.filter(t => t !== '10' && t !== '14'));
+    setBilledTables(prev => prev.filter(t => t !== '10' && t !== '14'));
+    setTransferSourceTable('10');
+    setTransferTargetTable('14');
+    setTransferSourceOutlet('RES');
+    setTransferTargetOutlet('RES');
+    setTransferSession('GN');
+    setTransferGridItems([
+      { kotNo: '1313', code: '1', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '2.000', rate: 199.00, value: 398.00, selected: true },
+      { kotNo: '1313', code: '2', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1.000', rate: 199.00, value: 199.00, selected: true },
+      { kotNo: '1313', code: '3', name: 'SPROUTED MOONG PEANUT DRY FR', quantity: '1.000', rate: 199.00, value: 199.00, selected: true },
+      { kotNo: '1313', code: '4', name: 'CAESAR SALAD (VEG) ...', quantity: '1.000', rate: 245.00, value: 245.00, selected: true }
+    ]);
+    setTableTransferOpen(true);
+    setSaveSuccessMsg('Video 12 Initial State Loaded: Table 10 Occupied (KOT 1313), Table 14 Vacant. Ready to Transfer!');
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
   };
 
   // Financial calculations matching Video 01 Frame 025 & Video 07 Frame 030
@@ -866,7 +1099,7 @@ export default function IdsOrderEntryModal({
             <span>{accountingDate}</span>
           </div>
 
-          {/* 12-Icon Win32 Command Toolbar (Frame 015 & Video 07 Frame 011) */}
+          {/* 12-Icon Win32 Command Toolbar (Frame 015 & Video 07 Frame 011 & Video 12 Frame 026) */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '4px', alignItems: 'center' }}>
             <button className="ids-btn" title="Print Bill / Checkout (Video 03 Frame 018)" onClick={() => setPosBillModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Printer size={16} />
@@ -874,11 +1107,30 @@ export default function IdsOrderEntryModal({
             <button className="ids-btn" title="Bill Settlement V6.5.008.30 (Video 04 Frame 012)" onClick={() => setPosBillSettlementModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: posBillSettlementModalOpen ? '#C1D2EE' : undefined }}>
               <CreditCard size={16} color="#008000" />
             </button>
+            <button 
+              className="ids-btn" 
+              title="Table Status / Running Tables (Video 01 Frame 048 & Video 12 Frame 038)" 
+              onClick={() => setTableStatusOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '42px', padding: '2px 4px', background: tableStatusOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center', padding: '1px 0' }}>
+                <div style={{ width: '13px', height: '5px', background: '#008000', border: '1px solid #000' }}></div>
+                <div style={{ width: '13px', height: '5px', background: '#FF0000', border: '1px solid #000' }}></div>
+              </div>
+            </button>
+            <button 
+              className="ids-btn" 
+              title="Table Transfer V6.5.002.1 (Video 12 Frame 026)" 
+              onClick={() => {
+                setTableTransferOpen(true);
+                handleLoadSourceTable(transferSourceTable || '10');
+              }} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: tableTransferOpen ? '#C1D2EE' : undefined }}
+            >
+              <ArrowRightLeft size={16} color="#000080" />
+            </button>
             <button className="ids-btn" title="Modify KOT" onClick={() => setPendingKotOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Edit3 size={16} />
-            </button>
-            <button className="ids-btn" title="Table Status / Running Tables" onClick={() => setTableStatusOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: tableStatusOpen ? '#C1D2EE' : undefined }}>
-              <ArrowRightLeft size={16} color="#000080" />
             </button>
             <button className="ids-btn" title="Waiter Transfer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Users size={16} />
@@ -1464,6 +1716,25 @@ export default function IdsOrderEntryModal({
                 style={{ fontSize: '10px', background: '#F0F0F0' }}
               >
                 Table 11 Demo
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  setTableTransferOpen(true);
+                  handleLoadSourceTable(transferSourceTable || '10');
+                }}
+                title="Table Transfer V6.5.002.1 (Video 12 Frame 026)"
+                style={{ fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A', fontSize: '11px' }}
+              >
+                Table Transfer
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={handleLoadVideo12Demo}
+                title="Load Video 12 Initial State (Table 10 Occupied with KOT 1313, Table 14 Vacant)"
+                style={{ fontSize: '10px', background: '#E2F0D9', borderColor: '#385723', color: '#385723', fontWeight: 700 }}
+              >
+                Video 12 Demo (T10-&gt;T14)
               </button>
               <button className="ids-btn" onClick={() => setTableStatusOpen(true)}>
                 Table Matrix
@@ -2525,6 +2796,257 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
+      {/* 5J. WIN32 TABLE TRANSFER MODAL (Video 12 Frames 026–042) */}
+      {tableTransferOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1390 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '560px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Table Transfer V6.5.002.1</span>
+              <button className="ids-win-btn close" onClick={() => setTableTransferOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '8px 10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Top Outlet / Session / Date Header Section (Frames 028–030) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: '#F5F4EE', border: '1px solid #CCC', padding: '6px 10px' }}>
+                {/* Source Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Source Restaurant</span>
+                    <input type="text" readOnly value={transferSourceOutlet} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Session</span>
+                    <input type="text" readOnly value={transferSession} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Date</span>
+                    <input type="text" readOnly value={accountingDate} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                  </div>
+                </div>
+
+                {/* Target Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Target Restaurant</span>
+                    <input type="text" readOnly value={transferTargetOutlet} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Session</span>
+                    <input type="text" readOnly value={transferSession} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontWeight: 600 }}>Date</span>
+                    <input type="text" readOnly value={accountingDate} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Source & Target Table Controls (Frames 028–032) */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#DDD', padding: '6px 10px', border: '1px solid #BBB' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: 700 }}>Source Table #</span>
+                  <input 
+                    type="text" 
+                    value={transferSourceTable} 
+                    onChange={e => setTransferSourceTable(e.target.value)}
+                    placeholder="10"
+                    style={{ width: '55px', textAlign: 'center', fontWeight: 700, fontSize: '12px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px' }}
+                  />
+                </div>
+
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setTransferOutletsModalOpen(true)}
+                  style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px' }}
+                >
+                  Outlets
+                </button>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontWeight: 700 }}>Target Table #</span>
+                  <input 
+                    type="text" 
+                    value={transferTargetTable} 
+                    onChange={e => setTransferTargetTable(e.target.value)}
+                    placeholder="14"
+                    style={{ width: '55px', textAlign: 'center', fontWeight: 700, fontSize: '12px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Notice Banner */}
+              {transferNotice && (
+                <div style={{ background: '#FFF8E7', border: '1px solid #E0B86B', padding: '3px 8px', fontSize: '11px', color: '#856404', fontWeight: 600, textAlign: 'center' }}>
+                  {transferNotice}
+                </div>
+              )}
+
+              {/* Line Items Grid (Frames 028–035) */}
+              <div style={{ height: '175px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', width: '65px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Code</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Name</th>
+                      <th style={{ padding: '3px 6px', width: '65px', textAlign: 'right', borderRight: '1px solid #B0B0B0' }}>Quantity</th>
+                      <th style={{ padding: '3px 6px', width: '65px', textAlign: 'center' }}>Selected</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transferGridItems.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                          Enter Occupied Table # and click [ Load ] to fetch running KOT items.
+                        </td>
+                      </tr>
+                    ) : (
+                      transferGridItems.map((item, idx) => (
+                        <tr 
+                          key={idx} 
+                          onClick={() => handleToggleSingleItemSelection(idx)}
+                          style={{ 
+                            borderBottom: '1px solid #EEE', 
+                            background: item.selected ? '#F0F8FF' : '#FFF',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{item.kotNo}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{item.code}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', fontWeight: 600 }}>{item.name}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{item.quantity}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'center', fontWeight: 700, color: item.selected ? '#008000' : '#888' }}>
+                            {item.selected ? 'YES' : 'NO'}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Action Buttons (Frames 028, 033, 036) */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #BBB', paddingTop: '8px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => handleLoadSourceTable()} 
+                  style={{ minWidth: '60px', fontWeight: 600 }}
+                >
+                  Load
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleExecuteTableTransfer} 
+                  disabled={transferGridItems.length === 0}
+                  style={{ 
+                    minWidth: '65px', 
+                    fontWeight: 700, 
+                    color: transferGridItems.length > 0 ? '#000080' : '#888' 
+                  }}
+                >
+                  Transfer
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    setTransferSourceTable('');
+                    setTransferTargetTable('');
+                    setTransferGridItems([]);
+                  }} 
+                  style={{ minWidth: '55px' }}
+                >
+                  Clear
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleToggleTransferSelection} 
+                  disabled={transferGridItems.length === 0}
+                  style={{ minWidth: '105px' }}
+                >
+                  Toggle Selection
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setTableTransferOpen(false)} 
+                  style={{ minWidth: '55px' }}
+                >
+                  Exit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5K. WIN32 OUTLETS SELECTION POPUP */}
+      {transferOutletsModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '300px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 14px rgba(0,0,0,0.6)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Select Outlets &amp; Session</span>
+              <button className="ids-win-btn close" onClick={() => setTransferOutletsModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '10px 12px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontWeight: 600 }}>Source Outlet</label>
+                <select 
+                  value={transferSourceOutlet} 
+                  onChange={e => setTransferSourceOutlet(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="RES">RES - RESTAURANT</option>
+                  <option value="CAR">CAR - LIQUOR BAR</option>
+                  <option value="RS">RS - ROOM SERVICE</option>
+                  <option value="BNQ">BNQ - BANQUET</option>
+                </select>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontWeight: 600 }}>Target Outlet</label>
+                <select 
+                  value={transferTargetOutlet} 
+                  onChange={e => setTransferTargetOutlet(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="RES">RES - RESTAURANT</option>
+                  <option value="CAR">CAR - LIQUOR BAR</option>
+                  <option value="RS">RS - ROOM SERVICE</option>
+                  <option value="BNQ">BNQ - BANQUET</option>
+                </select>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', gap: '6px' }}>
+                <label style={{ fontWeight: 600 }}>Session</label>
+                <select 
+                  value={transferSession} 
+                  onChange={e => setTransferSession(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="GN">GN - General</option>
+                  <option value="BK">BK - Breakfast</option>
+                  <option value="LN">LN - Lunch</option>
+                  <option value="DN">DN - Dinner</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setTransferOutletsModalOpen(false)}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 6. TABLE STATUS 4x5 MATRIX MODAL (Video 01 Frame 048) */}
       {tableStatusOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1280 }}>
@@ -2592,11 +3114,23 @@ export default function IdsOrderEntryModal({
 
               {/* Bottom toolbar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', borderTop: '1px solid #BBB', paddingTop: '8px' }}>
-                <div style={{ display: 'flex', gap: '4px' }}>
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                   <button className="ids-btn" style={{ minWidth: '32px' }}>⬅️</button>
                   <button className="ids-btn" style={{ minWidth: '32px' }}>⬆️</button>
                   <button className="ids-btn" style={{ minWidth: '32px' }}>⬇️</button>
                   <button className="ids-btn" style={{ minWidth: '32px' }}>➡️</button>
+                  <button 
+                    className="ids-btn" 
+                    onClick={() => {
+                      setTableStatusOpen(false);
+                      setTableTransferOpen(true);
+                      handleLoadSourceTable('10');
+                    }}
+                    title="Transfer Table (Video 12)"
+                    style={{ fontWeight: 700, color: '#000080', fontSize: '11px', marginLeft: '6px' }}
+                  >
+                    Table Transfer
+                  </button>
                 </div>
                 <button className="ids-btn" onClick={() => setTableStatusOpen(false)} style={{ minWidth: '60px', fontWeight: 600 }}>
                   Exit
@@ -2607,22 +3141,15 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050, Video 02 Frame 034 & Video 11 Frame 038) */}
+      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050, Video 02 Frame 034, Video 11 Frame 038 & Video 12 Frame 040) */}
       {tableDetailsOpen && (() => {
-        const tableKots = savedKots.filter(k => k.tableNo === selectedTableForDetails);
+        const tableKots = savedKots.filter(k => k.tableNo === selectedTableForDetails && !k.settled);
         const activeTableKot = tableKots[0];
         const currentTableItems = tableKots.length > 0 
           ? tableKots.flatMap(k => (k.items || []).map(it => ({ ...it, kotNo: it.kotNo || k.kotNo })))
-          : (lineItems.length > 0 ? lineItems.map(it => ({ ...it, kotNo: kotNo === 'AUTO' ? '1318' : kotNo })) : [
-            { kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD ...', quantity: 2.0, value: 398.0 },
-            { kotNo: '1314', name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
-            { kotNo: '1314', name: 'SPROUTED MOONG PEANUT DRY FRUI...', quantity: 1.0, value: 199.0 },
-            { kotNo: '1314', name: 'CAESAR SALAD (VEG) ...', quantity: 1.0, value: 245.0 },
-            { kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', quantity: 1.0, value: 199.0 },
-            { kotNo: '1318', name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
-            { kotNo: '1318', name: 'BLENDERS PRIDE ...', quantity: 1.0, value: 135.0 },
-            { kotNo: '1318', name: 'JW BLACK LABEL ...', quantity: 1.0, value: 480.0 }
-          ]);
+          : (selectedTableForDetails === tableNo && lineItems.length > 0 
+              ? lineItems.map(it => ({ ...it, kotNo: kotNo === 'AUTO' ? '1318' : kotNo })) 
+              : []);
         const computedTableTotal = currentTableItems.reduce((acc, it) => acc + (it.value || ((it.quantity || 1) * (it.rate || 0))), 0);
         const computedTableCgst = Number((computedTableTotal * 0.025).toFixed(2));
         const computedTableSgst = Number((computedTableTotal * 0.025).toFixed(2));
@@ -2647,11 +3174,11 @@ export default function IdsOrderEntryModal({
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 600 }}>Steward Name</span>
-                    <input type="text" readOnly value={activeTableKot?.server || (selectedTableForDetails === '12' ? 'Biren' : server)} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
+                    <input type="text" readOnly value={activeTableKot?.server || (currentTableItems.length > 0 ? (selectedTableForDetails === '14' ? 'Biren' : server) : '(Vacant)')} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
                   </div>
                 </div>
 
-                {/* Items running on table matching Video 11 Frame 038 */}
+                {/* Items running on table matching Video 11 Frame 038 & Video 12 Frame 040 */}
                 <div style={{ height: '210px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
@@ -2663,14 +3190,22 @@ export default function IdsOrderEntryModal({
                       </tr>
                     </thead>
                     <tbody>
-                      {currentTableItems.map((it, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
-                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{it.kotNo || activeTableKot?.kotNo || '1314'}</td>
-                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
-                          <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{(it.quantity || 1).toFixed(3)}</td>
-                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(it.value || ((it.quantity || 1) * (it.rate || 0))).toFixed(2)}</td>
+                      {currentTableItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} style={{ padding: '24px 12px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                            Table {selectedTableForDetails} is currently Vacant. No active KOTs running.
+                          </td>
                         </tr>
-                      ))}
+                      ) : (
+                        currentTableItems.map((it, idx) => (
+                          <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
+                            <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{it.kotNo || activeTableKot?.kotNo || '1314'}</td>
+                            <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
+                            <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{Number(it.quantity || 1).toFixed(3)}</td>
+                            <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(it.value || ((it.quantity || 1) * (it.rate || 0))).toFixed(2)}</td>
+                          </tr>
+                        ))
+                      )}
                       <tr style={{ background: '#F5F5F5', fontWeight: 700, borderTop: '2px solid #808080' }}>
                         <td colSpan={3} style={{ padding: '4px 6px', textAlign: 'right' }}>Total ======&gt;</td>
                         <td style={{ padding: '4px 6px', textAlign: 'right' }}>{computedTableTotal.toFixed(2)}</td>
