@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Scale, Hotel, Phone, Clock, Layers, Utensils, Compass, Bot, 
-  ShieldCheck, Lock, Sparkles, Building2, Menu, X, ShoppingBag, 
+  Scale, Hotel, Phone, Clock, Layers, Compass, Bot, 
+  ShieldCheck, Lock, Sparkles, Menu, X, ShoppingBag, 
   MapPin, CheckCircle2, FileText, MessageCircle, LogOut, Database,
   FileSpreadsheet, UtensilsCrossed, Search
 } from 'lucide-react';
@@ -384,47 +384,6 @@ export default function Navbar({
               <Compass size={15} color="#f59e0b" /> 360° Tour
             </button>
 
-            <button 
-              onClick={onOpenDining}
-              style={{
-                color: 'var(--text-primary)',
-                fontSize: '0.9rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              title="Explore Satvik Dining & Restaurant Menu"
-            >
-              <Utensils size={15} color="#34d399" /> Satvik Dining
-            </button>
-
-            <button 
-              onClick={onOpenDarshan}
-              style={{
-                color: 'var(--gold-glow)',
-                fontSize: '0.9rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              title="Maa Majhighariani Temple Darshan Guide & Timings"
-            >
-              <Sparkles size={15} color="var(--gold-glow)" /> Sacred Darshan
-            </button>
-
-            <button 
-              onClick={onOpenCorporate}
-              style={{
-                color: 'var(--text-primary)',
-                fontSize: '0.9rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              title="Corporate Bookings & Direct Billing"
-            >
-              <Building2 size={15} color="#8b5cf6" /> Corporate Stays
-            </button>
           </div>
 
           {/* Action CTAs */}
@@ -606,15 +565,6 @@ export default function Navbar({
             </button>
             <button onClick={() => { onOpenVirtualTour?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#f59e0b', padding: '0.4rem 0', fontWeight: 600 }}>
               🌐 360° Panoramic Virtual Tour
-            </button>
-            <button onClick={() => { onOpenDining?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#34d399', padding: '0.4rem 0' }}>
-              🍳 Pure Satvik Dining & Restaurant
-            </button>
-            <button onClick={() => { onOpenDarshan?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: 'var(--gold-glow)', padding: '0.4rem 0' }}>
-              🛕 Maa Majhighariani Sacred Darshan
-            </button>
-            <button onClick={() => { onOpenCorporate?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#a78bfa', padding: '0.4rem 0' }}>
-              🏢 Corporate B2B Stays
             </button>
           </div>
         )}
