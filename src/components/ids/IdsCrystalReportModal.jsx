@@ -22,6 +22,7 @@ export default function IdsCrystalReportModal({
       case 'paid-out': return 'Front Office Paid-Out Cash Refund Voucher';
       case 'reg-card': return 'Guest Registration Card (Crystal Report)';
       case 'forex-cert': return 'Foreign Currency Encashment Certificate (Form FLM)';
+      case 'laundry-bill': return 'Laundry & Dry Cleaning Statutory Tax Invoice (SAC 999791)';
       case 'rule46-bill':
       default: return 'Rule 46 Statutory GST Tax Invoice';
     }
@@ -324,6 +325,50 @@ export default function IdsCrystalReportModal({
                   <div><strong>Reason:</strong> {data.reason || 'Advance deposit excess refund on checkout settlement'}</div>
                   <div><strong>Authorized By:</strong> {data.authorizedBy || 'DUTY MANAGER'}</div>
                 </div>
+              </div>
+            )}
+
+            {reportType === 'laundry-bill' && (
+              <div>
+                <div style={{ textAlign: 'center', fontWeight: 900, textDecoration: 'underline', marginBottom: '12px' }}>
+                  LAUNDRY & DRY CLEANING STATUTORY TAX INVOICE (SAC 999791)
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <div>
+                    <div><strong>Invoice No:</strong> {data.billNo || 'LAU-BL-205-2022'}</div>
+                    <div><strong>Date:</strong> {data.billDate || '27-JAN-2022'}</div>
+                    <div><strong>SAC Code:</strong> {data.sacCode || '999791'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div><strong>Room No:</strong> {data.roomNo || '205'}</div>
+                    <div><strong>Guest Name:</strong> {data.guestName || 'Mr Kumar Anil'}</div>
+                    <div><strong>Settlement:</strong> {data.payMode || 'Room Folio'}</div>
+                  </div>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', marginBottom: '12px' }}>
+                  <thead>
+                    <tr style={{ background: '#F0F0F0', borderBottom: '1px solid #000' }}>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Description</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '80px' }}>Gross</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>Disc</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>CGST 9%</th>
+                      <th style={{ padding: '4px', textAlign: 'right', borderRight: '1px solid #000', width: '70px' }}>SGST 9%</th>
+                      <th style={{ padding: '4px', textAlign: 'right', width: '90px' }}>Net Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #000' }}>
+                      <td style={{ padding: '6px', borderRight: '1px solid #000' }}>{data.serviceDesc || 'Laundry & Steam Press Services'}</td>
+                      <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.grossAmount || 200).toFixed(2)}</td>
+                      <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.discount || 0).toFixed(2)}</td>
+                      <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.cgstAmount || 18).toFixed(2)}</td>
+                      <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.sgstAmount || 18).toFixed(2)}</td>
+                      <td style={{ padding: '6px', textAlign: 'right', fontWeight: 700 }}>₹{Number(data.netTotal || 236).toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             )}
 

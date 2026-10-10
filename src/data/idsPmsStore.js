@@ -557,3 +557,268 @@ export function calculateGstBreakdown(taxableAmount, ratePct = 12) {
   const total = Number((taxableAmount + cgst + sgst).toFixed(2));
   return { cgst, sgst, ratePct, total };
 }
+
+// 11. Laundry Items Master (HK Video 01: V6.5.002.1)
+export const INITIAL_LAUNDRY_ITEMS = [
+  {
+    itemCode: '1',
+    itemName: 'SHIRT',
+    shortName: 'SHIRT',
+    discountAllowed: 'Yes',
+    costPct: '15',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:47'
+  },
+  {
+    itemCode: '2',
+    itemName: 'TROUSER',
+    shortName: 'TROUSER',
+    discountAllowed: 'Yes',
+    costPct: '15',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:48'
+  },
+  {
+    itemCode: '3',
+    itemName: 'SUIT (2 PC)',
+    shortName: 'SUIT',
+    discountAllowed: 'Yes',
+    costPct: '20',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:49'
+  },
+  {
+    itemCode: '4',
+    itemName: 'SAREE (SILK)',
+    shortName: 'SAREE',
+    discountAllowed: 'Yes',
+    costPct: '20',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:49'
+  },
+  {
+    itemCode: '5',
+    itemName: 'KURTA PAJAMA',
+    shortName: 'KURTA',
+    discountAllowed: 'Yes',
+    costPct: '15',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:50'
+  },
+  {
+    itemCode: '6',
+    itemName: 'BEDSHEET / LINEN',
+    shortName: 'BEDSHT',
+    discountAllowed: 'No',
+    costPct: '10',
+    printerDevice: 'LAU_PRT_01',
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:50'
+  }
+];
+
+// 12. Laundry Item Rate Master (HK Video 02: V6.5.002.1)
+export const INITIAL_LAUNDRY_RATES = [
+  {
+    itemCode: '1',
+    itemName: 'SHIRT',
+    applicableFrom: '27-JAN-2022',
+    serviceType: 'Washing',
+    category: 'Gentleman',
+    currency: 'Indian Rupees',
+    taxStructure: 'GST18_LAU',
+    standardCharge: 80,
+    expressCharge: 120,
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:50'
+  },
+  {
+    itemCode: '1',
+    itemName: 'SHIRT',
+    applicableFrom: '27-JAN-2022',
+    serviceType: 'Pressing',
+    category: 'Gentleman',
+    currency: 'Indian Rupees',
+    taxStructure: 'GST18_LAU',
+    standardCharge: 40,
+    expressCharge: 60,
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:50'
+  },
+  {
+    itemCode: '2',
+    itemName: 'TROUSER',
+    applicableFrom: '27-JAN-2022',
+    serviceType: 'Washing',
+    category: 'Gentleman',
+    currency: 'Indian Rupees',
+    taxStructure: 'GST18_LAU',
+    standardCharge: 90,
+    expressCharge: 135,
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:51'
+  },
+  {
+    itemCode: '2',
+    itemName: 'TROUSER',
+    applicableFrom: '27-JAN-2022',
+    serviceType: 'Pressing',
+    category: 'Gentleman',
+    currency: 'Indian Rupees',
+    taxStructure: 'GST18_LAU',
+    standardCharge: 50,
+    expressCharge: 75,
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:51'
+  },
+  {
+    itemCode: '3',
+    itemName: 'SUIT (2 PC)',
+    applicableFrom: '27-JAN-2022',
+    serviceType: 'Dry Cleaning',
+    category: 'Gentleman',
+    currency: 'Indian Rupees',
+    taxStructure: 'GST18_LAU',
+    standardCharge: 350,
+    expressCharge: 500,
+    status: 'Active',
+    user: 'MANAGER',
+    lastUpdated: '27-JAN-2022 19:52'
+  }
+];
+
+// 13. House Keeping Staff Master (HK Video 03: V6.5.002.1)
+export const INITIAL_HOUSEKEEPING_STAFF = [
+  { code: '001', name: 'Manoranjan Singh', designation: 'Room Attendant', status: 'Active' },
+  { code: '002', name: 'Dhonsing Terang', designation: 'Senior Room Attendant', status: 'Active' },
+  { code: '003', name: 'Jayanta Chetia', designation: 'Linen Runner', status: 'Active' },
+  { code: '004', name: 'Lakshyajit Changmai', designation: 'Laundry Operator', status: 'Active' },
+  { code: '005', name: 'Navajyoti Das', designation: 'Houseman', status: 'Active' },
+  { code: '006', name: 'Tajnul Borah', designation: 'Floor Supervisor', status: 'Active' },
+  { code: '007', name: 'Anjumoni Kashyap', designation: 'Lady Room Attendant', status: 'Active' },
+  { code: '008', name: 'Saraswati', designation: 'Public Area Cleaner', status: 'Active' },
+  { code: '009', name: 'Usha', designation: 'Linen Room Attendant', status: 'Active' }
+];
+
+// 14. Laundry Receipt Entry (HK Video 03: V6.5.002.1)
+export const INITIAL_LAUNDRY_ENTRIES = [
+  {
+    refNo: 'LND-2022-001',
+    billTo: 'Guest A/C',
+    roomNo: '205',
+    guestName: 'Mr Kumar Anil',
+    guestType: 'Regular',
+    guestStatus: 'In-House',
+    currency: 'Indian Rupees',
+    rcvDate: '27-JAN-2022',
+    rcvTime: '20:00',
+    deliveryDate: '28-JAN-2022',
+    deliveryTime: '18:00',
+    collectedBy: '002 Dhonsing Terang',
+    service: 'Pressing',
+    rateType: 'Standard',
+    remarks: 'Gentle steam press requested',
+    items: [
+      { itemNo: '1', code: '2', name: 'TROUSER', qty: 2, rate: 50, discount: 0, amount: 100, remarks: '' },
+      { itemNo: '2', code: '1', name: 'SHIRT', qty: 2, rate: 50, discount: 0, amount: 100, remarks: '' }
+    ],
+    grossAmount: 200,
+    discountAmount: 0,
+    taxAmount: 36, // 18% GST (SAC 999791)
+    netAmount: 236,
+    status: 'Pending Billing', // moves to Settled after Video 06
+    settlementBillNo: '',
+    tenderMode: ''
+  }
+];
+
+// 15. Housekeeping & Guest Complaints (HK Videos 05 & 07: V6.5.002.1)
+export const INITIAL_HOUSEKEEPING_COMPLAINTS = [
+  {
+    complaintId: 'CMP-2022-019',
+    scope: 'Room',
+    roomNo: '205',
+    guestName: 'Mr Kumar Anil',
+    arrival: '27-JAN-2022',
+    departure: '01-FEB-2022',
+    department: 'Housekeeping',
+    natureOfComplaint: 'Extra bath towels required & linen replacement for extra pillow',
+    receivedBy: 'MANAGER',
+    date: '27-JAN-2022',
+    time: '20:04',
+    status: 'Pending', // increments registered complaint count to 1
+    attendedBy: '',
+    actionTaken: '',
+    tatMinutes: '',
+    resolvedDate: '',
+    resolvedTime: ''
+  }
+];
+
+// 16. Lost and Found Register (HK Video 08: V6.5.002.1)
+export const INITIAL_LOST_AND_FOUND = [
+  {
+    refNo: 'LF-2022-014',
+    module: 'Front Office',
+    lostDate: '27-JAN-2022',
+    place: 'Room 205',
+    article: 'Black Leather Men Wallet with PAN & Driving License',
+    approxValue: 2500,
+    finder: 'Dhonsing Terang',
+    checkedBy: 'IT ADMIN',
+    foundDate: '27-JAN-2022',
+    foundTime: '14:15',
+    custodyLocker: 'HK-LOCKER-B04',
+    status: 'In Safe Custody',
+    returnedDate: '',
+    whom: '',
+    authorizedBy: '',
+    guestName: 'Mr Kumar Anil',
+    guestAddress: 'Plot 44, Saheed Nagar, Bhubaneswar, Odisha',
+    phone: '+91-9861023456'
+  }
+];
+
+// 17. Room Blocks Master (HK Videos 09 & 10: V6.5.002.1)
+export const INITIAL_ROOM_BLOCKS = [
+  {
+    blockId: 'BLK-2022-008',
+    roomNo: '206',
+    roomType: 'DLX',
+    floor: 'BA-FF02',
+    blockType: 'OOO', // OOO (Out of Order) or OOS (Out of Service)
+    fromDate: '27-JAN-2022',
+    toDate: '29-JAN-2022',
+    reasonCode: 'AC-REPAIR',
+    reasonDescription: 'AC cooling coil replacement & copper pipe leakage repair',
+    authorizedBy: 'DUTY MANAGER',
+    remarks: 'Scheduled for technician inspection on 28-JAN morning',
+    status: 'Active'
+  }
+];
+
+// Laundry SAC 999791 GST 18% (9% CGST + 9% SGST)
+export function calculateLaundryTax(grossAmount, discountAmount = 0) {
+  const taxable = Math.max(0, grossAmount - discountAmount);
+  const cgst = Number(((taxable * 9) / 100).toFixed(2));
+  const sgst = Number(((taxable * 9) / 100).toFixed(2));
+  const totalTax = Number((cgst + sgst).toFixed(2));
+  const netAmount = Number((taxable + totalTax).toFixed(2));
+  return { taxable, cgst, sgst, totalTax, netAmount };
+}
+

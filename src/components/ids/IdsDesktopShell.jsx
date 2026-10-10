@@ -65,6 +65,15 @@ import IdsMultiRateModal from './IdsMultiRateModal';
 import IdsForeignExchangeModal from './IdsForeignExchangeModal';
 import IdsGstnChangeModal from './IdsGstnChangeModal';
 import IdsPaidOutModal from './IdsPaidOutModal';
+import IdsLaundryItemMasterModal from './IdsLaundryItemMasterModal';
+import IdsLaundryRateMasterModal from './IdsLaundryRateMasterModal';
+import IdsLaundryEntryModal from './IdsLaundryEntryModal';
+import IdsLaundryReSettlementModal from './IdsLaundryReSettlementModal';
+import IdsGuestServicesModal from './IdsGuestServicesModal';
+import IdsLaundryBillPrintingModal from './IdsLaundryBillPrintingModal';
+import IdsLostAndFoundModal from './IdsLostAndFoundModal';
+import IdsRoomBlockModal from './IdsRoomBlockModal';
+import IdsHkRoomStatusModal from './IdsHkRoomStatusModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
 import { 
@@ -389,6 +398,19 @@ export default function IdsDesktopShell({
   // Video 44: Paid-out Excess Amount to Guest in IDS 6.5 & 7.0 (Frames 010–110)
   const [paidOutModalOpen, setPaidOutModalOpen] = useState(false);
 
+  // Housekeeping & Laundry Modules (HK Videos 01–11)
+  const [laundryItemMasterOpen, setLaundryItemMasterOpen] = useState(false);
+  const [laundryRateMasterOpen, setLaundryRateMasterOpen] = useState(false);
+  const [laundryEntryOpen, setLaundryEntryOpen] = useState(false);
+  const [laundryReSettlementOpen, setLaundryReSettlementOpen] = useState(false);
+  const [guestServicesOpen, setGuestServicesOpen] = useState(false);
+  const [guestServicesTab, setGuestServicesTab] = useState('log-complaints');
+  const [laundryBillPrintingOpen, setLaundryBillPrintingOpen] = useState(false);
+  const [lostAndFoundOpen, setLostAndFoundOpen] = useState(false);
+  const [roomBlockOpen, setRoomBlockOpen] = useState(false);
+  const [hkRoomStatusOpen, setHkRoomStatusOpen] = useState(false);
+  const [registeredComplaintsCount, setRegisteredComplaintsCount] = useState(0);
+
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
   const [msgBoxConfig, setMsgBoxConfig] = useState({
@@ -506,7 +528,7 @@ export default function IdsDesktopShell({
         checkInRooms: totalWalkInRooms,
         walkInRooms: totalWalkInRooms,
         roomsToSell: Math.max(0, 40 - totalWalkInRooms),
-        registeredComplaints: 0,
+        registeredComplaints: registeredComplaintsCount,
         inhouseRoomsGuests: `${34 + totalWalkInRooms}/${Math.max(0, 61 + totalWalkInPax - paxDeduction)}`,
         extraAdultChild: '0/0',
         inhouseForeigners: '0/0',
@@ -552,13 +574,13 @@ export default function IdsDesktopShell({
       checkInRooms,
       walkInRooms: 0,
       roomsToSell,
-      registeredComplaints: 0,
+      registeredComplaints: registeredComplaintsCount,
       inhouseRoomsGuests,
       extraAdultChild: '0/0',
       inhouseForeigners: '0/0',
       guestBlocks: has401CheckedIn ? 0 : 1
     };
-  }, [reservations, checkedInList, inhouseGuestsList, amendedDepartures]);
+  }, [reservations, checkedInList, inhouseGuestsList, amendedDepartures, registeredComplaintsCount]);
 
   // Master Menu Items (Frame 001 & 013)
   const masterMenuItems = [
@@ -816,24 +838,32 @@ export default function IdsDesktopShell({
       }
     ],
     'House Keeping..': [
-      { label: 'House Keeping Room Status', videoId: '09', action: () => setRoomRackConsoleOpen(true) },
+      { label: 'Laundry Item Master', videoId: 'HK-01', action: () => setLaundryItemMasterOpen(true) },
+      { label: 'Laundry Rate Master', videoId: 'HK-02', action: () => setLaundryRateMasterOpen(true) },
+      { label: 'Laundry Entry / Receipt Entry', videoId: 'HK-03', action: () => setLaundryEntryOpen(true) },
+      { label: 'Re-settlement of Laundry Bill', videoId: 'HK-04', action: () => setLaundryReSettlementOpen(true) },
+      { 
+        label: 'Register Complaint from Housekeeping', 
+        videoId: 'HK-05', 
+        action: () => {
+          setGuestServicesTab('log-complaints');
+          setGuestServicesOpen(true);
+        } 
+      },
+      { label: 'Print & Settle Laundry Bill (LACRYBL)', videoId: 'HK-06', action: () => setLaundryBillPrintingOpen(true) },
+      { 
+        label: 'Attend Registered Complaint', 
+        videoId: 'HK-07', 
+        action: () => {
+          setGuestServicesTab('attend-complaints');
+          setGuestServicesOpen(true);
+        } 
+      },
+      { label: 'Lost & Found Details', videoId: 'HK-08', action: () => setLostAndFoundOpen(true) },
+      { label: 'Room Block Option (OOO / OOS)', videoId: 'HK-09', action: () => setRoomBlockOpen(true) },
+      { label: 'Release Block Room', videoId: 'HK-10', action: () => setRoomBlockOpen(true) },
+      { label: 'House Keeping Room Status', videoId: 'HK-11', action: () => setHkRoomStatusOpen(true) },
       { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setClearRoomsModalOpen(true) },
-      { 
-        label: 'Change Guest Details In-House', 
-        videoId: '10', 
-        action: () => {
-          setSelectedGuestForEdit(inhouseGuestsList.find(g => g.roomNo === '301') || inhouseGuestsList[0]);
-          setChangeGuestInfoOpen(true);
-        } 
-      },
-      { 
-        label: 'Modify Guest Departure / Extension', 
-        videoId: '12', 
-        action: () => {
-          setSelectedRoomForAmendStay('301');
-          setAmendStayModalOpen(true);
-        } 
-      },
       { 
         label: 'Room Transfer / Shift', 
         videoId: '13', 
@@ -844,13 +874,6 @@ export default function IdsDesktopShell({
       },
       { 
         label: 'Add Room Numbers in Room Status', 
-        action: () => {
-          setSelectedRoomForMaster('202');
-          setRoomMasterModalOpen(true);
-        } 
-      },
-      { 
-        label: 'Modify Room Master', 
         action: () => {
           setSelectedRoomForMaster('202');
           setRoomMasterModalOpen(true);
@@ -2803,6 +2826,102 @@ export default function IdsDesktopShell({
         }}
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
+        }}
+      />
+
+      {/* Housekeeping Video 01: Laundry Item Master */}
+      <IdsLaundryItemMasterModal
+        isOpen={laundryItemMasterOpen}
+        onClose={() => setLaundryItemMasterOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Video 02: Laundry Item Rate Master */}
+      <IdsLaundryRateMasterModal
+        isOpen={laundryRateMasterOpen}
+        onClose={() => setLaundryRateMasterOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Video 03: Laundry Entry */}
+      <IdsLaundryEntryModal
+        isOpen={laundryEntryOpen}
+        onClose={() => setLaundryEntryOpen(false)}
+        accountingDate={accountingDate}
+        inhouseGuests={inhouseGuestsList}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Video 04: Re-settlement of Laundry Bill */}
+      <IdsLaundryReSettlementModal
+        isOpen={laundryReSettlementOpen}
+        onClose={() => setLaundryReSettlementOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Videos 05 & 07: Guest Services - Log & Attend Complaints */}
+      <IdsGuestServicesModal
+        isOpen={guestServicesOpen}
+        onClose={() => setGuestServicesOpen(false)}
+        initialTab={guestServicesTab}
+        accountingDate={accountingDate}
+        inhouseGuests={inhouseGuestsList}
+        onComplaintsCountChange={(cnt) => setRegisteredComplaintsCount(cnt)}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Video 06: Print & Settle Laundry Bill LACRYBL */}
+      <IdsLaundryBillPrintingModal
+        isOpen={laundryBillPrintingOpen}
+        onClose={() => setLaundryBillPrintingOpen(false)}
+        accountingDate={accountingDate}
+        onOpenCrystalReport={openCrystalReport}
+        onOpenMessageBox={showMessageBox}
+        onSettleBill={(settleData) => {
+          setInhouseGuestsList(prev => prev.map(g => {
+            if (g.roomNo === settleData.roomNo) {
+              return {
+                ...g,
+                balance: (g.balance || 0) + (settleData.amount || 236)
+              };
+            }
+            return g;
+          }));
+        }}
+      />
+
+      {/* Housekeeping Video 08: Lost and Found Details */}
+      <IdsLostAndFoundModal
+        isOpen={lostAndFoundOpen}
+        onClose={() => setLostAndFoundOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Videos 09 & 10: Room Block Option & Release Block */}
+      <IdsRoomBlockModal
+        isOpen={roomBlockOpen}
+        onClose={() => setRoomBlockOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+        onBlockChange={({ type, deltaSellable }) => {
+          console.log('Room block changed:', type, deltaSellable);
+        }}
+      />
+
+      {/* Housekeeping Video 11: House Keeping Room Status */}
+      <IdsHkRoomStatusModal
+        isOpen={hkRoomStatusOpen}
+        onClose={() => setHkRoomStatusOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+        onUpdateStatus={({ roomNo, status }) => {
+          if (status === 'Clean' || status === 'Inspected') {
+            setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
+          }
         }}
       />
 
