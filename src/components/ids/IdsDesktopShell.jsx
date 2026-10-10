@@ -84,6 +84,7 @@ import IdsOrderEntryModal from './IdsOrderEntryModal';
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import IdsMenuGroupsModal from './IdsMenuGroupsModal';
+import IdsTouchScreenGroupsModal from './IdsTouchScreenGroupsModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -429,6 +430,8 @@ export default function IdsDesktopShell({
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
   const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
   const [menuGroupsModalOpen, setMenuGroupsModalOpen] = useState(false);
+  const [touchScreenGroupsModalOpen, setTouchScreenGroupsModalOpen] = useState(false);
+  const [selectedMenuGroupForTs, setSelectedMenuGroupForTs] = useState(null);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -930,7 +933,7 @@ export default function IdsDesktopShell({
       { label: 'KOT Reprint V6.5.002.1 (Toolbar Reprint)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
       { label: 'Item Modifiers (<F1> @ Qty for Modifier)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
       { label: 'Menu Groups V6.5.002.1 (Setup -> Menu Groups)', videoId: 'POS-14', action: () => setMenuGroupsModalOpen(true) },
-      { label: 'Touch Screen Groups (Post Menu Group Setup)', videoId: 'POS-14', action: () => setMenuGroupsModalOpen(true) },
+      { label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', videoId: 'POS-15', action: () => setTouchScreenGroupsModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
     'Day End process..': [
@@ -1014,9 +1017,9 @@ export default function IdsDesktopShell({
         action: () => setMenuGroupsModalOpen(true) 
       },
       { 
-        label: 'Touch Screen Groups (Post Menu Group Setup)', 
-        videoId: 'POS-14', 
-        action: () => setMenuGroupsModalOpen(true) 
+        label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', 
+        videoId: 'POS-15', 
+        action: () => setTouchScreenGroupsModalOpen(true) 
       },
       { 
         label: 'Company Profile Setup (Corporate Master)', 
@@ -3103,12 +3106,30 @@ export default function IdsDesktopShell({
         }}
       />
 
-      {/* POS Video 14: Menu Groups V6.5.002.1 & Touch Screen Group Creation */}
+      {/* POS Video 14: Menu Groups V6.5.002.1 */}
       <IdsMenuGroupsModal
         isOpen={menuGroupsModalOpen}
         onClose={() => setMenuGroupsModalOpen(false)}
         accountingDate={accountingDate}
         currentUser="MANAGER"
+        onOpenTouchScreenGroups={(mgCode) => {
+          setSelectedMenuGroupForTs(mgCode);
+          setMenuGroupsModalOpen(false);
+          setTouchScreenGroupsModalOpen(true);
+        }}
+      />
+
+      {/* POS Video 15: Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration */}
+      <IdsTouchScreenGroupsModal
+        isOpen={touchScreenGroupsModalOpen}
+        onClose={() => setTouchScreenGroupsModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        initialMenuGroupCode={selectedMenuGroupForTs}
+        onOpenMenuGroups={() => {
+          setTouchScreenGroupsModalOpen(false);
+          setMenuGroupsModalOpen(true);
+        }}
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}

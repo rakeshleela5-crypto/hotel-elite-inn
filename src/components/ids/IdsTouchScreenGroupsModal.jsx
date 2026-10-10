@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { getStoredMenuGroups } from './IdsMenuGroupsModal';
 
 /**
- * IDS Fortune NEXT 6.5 & 7.0 - Menu Groups V6.5.002.1
- * Video 14 Implementation (POS_14_LOgYRe-1TtI.mp4)
- * Frames 001 - 053: Setup -> Menu Groups Creation & Touch Screen Group Linkage
+ * IDS Fortune NEXT 6.5 & 7.0 - Touch Screen Groups V6.5.002.1
+ * Video 15 Implementation (POS_15_5f1edu5Om_U.mp4)
+ * Frames 001 - 049: Setup -> Touch Screen Groups Creation & Terminal Tile Configuration
  */
 
-export const DEFAULT_MENU_GROUPS = [
-  { code: 1, applicableFrom: '08-FEB-2022', name: 'MAIN COURSE', shortName: 'MAIN', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 2, applicableFrom: '08-FEB-2022', name: 'TANDOOR ITEMS', shortName: 'TAND', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 3, applicableFrom: '08-FEB-2022', name: 'STARTERS', shortName: 'STARTERS', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 4, applicableFrom: '08-FEB-2022', name: 'SOUP', shortName: 'SOUP', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:47' },
-  { code: 5, applicableFrom: '08-FEB-2022', name: 'SALAD', shortName: 'SALAD', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:48' }
+export const DEFAULT_TOUCH_SCREEN_GROUPS = [
+  { code: 1, menuGroupCode: 1, applicableFrom: '08-FEB-2022', name: 'MAIN COURSE', shortName: 'MAIN C', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:51' },
+  { code: 2, menuGroupCode: 2, applicableFrom: '08-FEB-2022', name: 'TANDOOR ITEMS', shortName: 'TAND', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:51' },
+  { code: 3, menuGroupCode: 3, applicableFrom: '08-FEB-2022', name: 'STARTERS', shortName: 'STARTE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
+  { code: 4, menuGroupCode: 4, applicableFrom: '08-FEB-2022', name: 'SOUP', shortName: 'SOUP', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
+  { code: 5, menuGroupCode: 5, applicableFrom: '08-FEB-2022', name: 'SALAD', shortName: 'SALAD', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' },
+  { code: 6, menuGroupCode: 6, applicableFrom: '08-FEB-2022', name: 'APPETISERS', shortName: 'APPE', otherLangName: '', otherLangShort: '', status: 'Active', user: 'MANAGER', lastUpdated: '08-FEB-2022 18:52' }
 ];
 
-const STORAGE_KEY = 'ids_fortune_next_pos_menu_groups';
+const STORAGE_KEY = 'ids_fortune_next_pos_touch_screen_groups';
 
-export const getStoredMenuGroups = () => {
+export const getStoredTouchScreenGroups = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -24,64 +26,92 @@ export const getStoredMenuGroups = () => {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {
-    console.warn('Failed to parse menu groups', e);
+    console.warn('Failed to parse touch screen groups', e);
   }
-  return DEFAULT_MENU_GROUPS;
+  return DEFAULT_TOUCH_SCREEN_GROUPS;
 };
 
-export const saveStoredMenuGroups = (groups) => {
+export const saveStoredTouchScreenGroups = (groups) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
   } catch (e) {
-    console.warn('Failed to save menu groups', e);
+    console.warn('Failed to save touch screen groups', e);
   }
 };
 
-export default function IdsMenuGroupsModal({
+export default function IdsTouchScreenGroupsModal({
   isOpen,
   onClose,
   accountingDate = '08-FEB-2022',
   currentUser = 'MANAGER',
-  onSelectGroup,
-  onOpenTouchScreenGroups
+  initialMenuGroupCode = null,
+  onOpenMenuGroups
 }) {
-  const [groups, setGroups] = useState(() => getStoredMenuGroups());
+  const [groups, setGroups] = useState(() => getStoredTouchScreenGroups());
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Form Fields
+  // Form Fields (Frames 010–015)
   const [applicableFrom, setApplicableFrom] = useState(accountingDate);
-  const [groupCode, setGroupCode] = useState('1');
+  const [menuGrouping, setMenuGrouping] = useState('1');
   const [groupName, setGroupName] = useState('MAIN COURSE');
-  const [shortName, setShortName] = useState('MAIN');
+  const [otherLanguageName, setOtherLanguageName] = useState('');
+  const [shortName, setShortName] = useState('MAIN C');
+  const [otherLanguageShort, setOtherLanguageShort] = useState('');
   const [status, setStatus] = useState('Active');
   const [user, setUser] = useState(currentUser);
-  const [lastUpdated, setLastUpdated] = useState('08-FEB-2022 18:47');
+  const [lastUpdated, setLastUpdated] = useState('08-FEB-2022 18:51');
 
-  // Mode: 'VIEW' | 'ADD' | 'MODIFY'
+  // Form Mode: 'VIEW' | 'ADD' | 'MODIFY'
   const [formMode, setFormMode] = useState('VIEW');
   const [statusMsg, setStatusMsg] = useState(null);
 
-  // Browse / Lookup Popup (Video 14 Frame 040)
+  // Browse / Lookup Popup (Video 15 Browse button)
   const [browseOpen, setBrowseOpen] = useState(false);
   const [browseSearch, setBrowseSearch] = useState('');
   const [selectedBrowseIdx, setSelectedBrowseIdx] = useState(0);
 
-  // Touch Screen Group Notification / Modal State
-  const [touchGroupAlertOpen, setTouchGroupAlertOpen] = useState(false);
+  // Menu Groups Lookup Popup (when clicking (?) next to Menu Grouping)
+  const [menuGroupLookupOpen, setMenuGroupLookupOpen] = useState(false);
+  const [menuGroupSearch, setMenuGroupSearch] = useState('');
 
-  // Sync current record into form fields
+  // Touch Screen POS Terminal Visual Preview Dialog
+  const [previewTerminalOpen, setPreviewTerminalOpen] = useState(false);
+
+  // Initialize or handle preloaded menu group
+  useEffect(() => {
+    if (initialMenuGroupCode) {
+      const matchIdx = groups.findIndex(g => String(g.menuGroupCode) === String(initialMenuGroupCode));
+      if (matchIdx >= 0) {
+        setCurrentIndex(matchIdx);
+      } else {
+        // Pre-fill as new entry
+        handleAdd();
+        setMenuGrouping(String(initialMenuGroupCode));
+        const menuGroups = getStoredMenuGroups();
+        const foundMg = menuGroups.find(m => String(m.code) === String(initialMenuGroupCode));
+        if (foundMg) {
+          setGroupName(foundMg.name || '');
+          setShortName(foundMg.shortName || foundMg.name?.substring(0, 6) || '');
+        }
+      }
+    }
+  }, [initialMenuGroupCode, isOpen]);
+
+  // Sync current record into form fields in VIEW mode
   useEffect(() => {
     if (groups.length > 0 && formMode === 'VIEW') {
       const safeIdx = Math.min(Math.max(0, currentIndex), groups.length - 1);
       const curr = groups[safeIdx];
       if (curr) {
         setApplicableFrom(curr.applicableFrom || accountingDate);
-        setGroupCode(String(curr.code));
+        setMenuGrouping(String(curr.menuGroupCode ?? curr.code));
         setGroupName(curr.name || '');
+        setOtherLanguageName(curr.otherLangName || '');
         setShortName(curr.shortName || '');
+        setOtherLanguageShort(curr.otherLangShort || '');
         setStatus(curr.status || 'Active');
         setUser(curr.user || currentUser);
-        setLastUpdated(curr.lastUpdated || `${accountingDate} 18:47`);
+        setLastUpdated(curr.lastUpdated || `${accountingDate} 18:51`);
       }
     }
   }, [currentIndex, groups, formMode, accountingDate, currentUser]);
@@ -91,62 +121,67 @@ export default function IdsMenuGroupsModal({
     setTimeout(() => setStatusMsg(null), duration);
   };
 
-  // Action: Add (Frame 010 & Frame 020)
+  // Action: Add (Frames 010, 020, 030, 040)
   const handleAdd = () => {
     setFormMode('ADD');
     const nextCode = groups.length > 0 ? Math.max(...groups.map(g => Number(g.code) || 0)) + 1 : 1;
-    setGroupCode(String(nextCode));
+    setMenuGrouping(String(nextCode));
     setGroupName('');
+    setOtherLanguageName('');
     setShortName('');
+    setOtherLanguageShort('');
     setStatus('Active');
     setApplicableFrom(accountingDate);
     setUser(currentUser);
-    setLastUpdated(`${accountingDate} 18:48`);
-    showNotification(`New Menu Group #${nextCode} entry initiated.`);
+    setLastUpdated(`${accountingDate} 18:52`);
+    showNotification(`New Touch Screen Group #${nextCode} entry initiated.`);
   };
 
   // Action: Modify
   const handleModify = () => {
     if (groups.length === 0) return;
     setFormMode('MODIFY');
-    showNotification(`Editing Menu Group #${groupCode} (${groupName}).`);
+    showNotification(`Editing Touch Screen Group #${menuGrouping} (${groupName}).`);
   };
 
   // Action: Delete
   const handleDelete = () => {
     if (groups.length === 0) return;
-    const confirmDelete = window.confirm(`Are you sure you want to delete Menu Group #${groupCode} - "${groupName}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete Touch Screen Group #${menuGrouping} - "${groupName}"?`);
     if (!confirmDelete) return;
 
-    const filtered = groups.filter(g => String(g.code) !== String(groupCode));
+    const filtered = groups.filter(g => String(g.code) !== String(menuGrouping) && String(g.menuGroupCode) !== String(menuGrouping));
     setGroups(filtered);
-    saveStoredMenuGroups(filtered);
+    saveStoredTouchScreenGroups(filtered);
     const newIdx = Math.max(0, currentIndex - 1);
     setCurrentIndex(newIdx);
     setFormMode('VIEW');
-    showNotification(`Menu Group #${groupCode} successfully deleted.`);
+    showNotification(`Touch Screen Group #${menuGrouping} successfully removed.`);
   };
 
   // Action: Save (Frame 045)
   const handleSave = () => {
     if (!groupName.trim()) {
-      alert('Please enter a Menu Group Name!');
+      alert('Please enter a Touch Screen Group Name!');
       return;
     }
 
-    const codeNum = Number(groupCode) || (groups.length + 1);
+    const mgNum = Number(menuGrouping) || (groups.length + 1);
     const updatedRecord = {
-      code: codeNum,
+      code: mgNum,
+      menuGroupCode: mgNum,
       applicableFrom: applicableFrom || accountingDate,
       name: groupName.trim().toUpperCase(),
       shortName: shortName.trim().toUpperCase() || groupName.trim().substring(0, 6).toUpperCase(),
+      otherLangName: otherLanguageName.trim(),
+      otherLangShort: otherLanguageShort.trim(),
       status,
       user,
       lastUpdated: `${accountingDate} ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
     };
 
     let updatedList;
-    const existingIdx = groups.findIndex(g => Number(g.code) === codeNum);
+    const existingIdx = groups.findIndex(g => Number(g.code) === mgNum || Number(g.menuGroupCode) === mgNum);
 
     if (existingIdx >= 0) {
       updatedList = [...groups];
@@ -154,17 +189,14 @@ export default function IdsMenuGroupsModal({
       setCurrentIndex(existingIdx);
     } else {
       updatedList = [...groups, updatedRecord].sort((a, b) => Number(a.code) - Number(b.code));
-      const targetIdx = updatedList.findIndex(g => Number(g.code) === codeNum);
+      const targetIdx = updatedList.findIndex(g => Number(g.code) === mgNum);
       setCurrentIndex(targetIdx >= 0 ? targetIdx : 0);
     }
 
     setGroups(updatedList);
-    saveStoredMenuGroups(updatedList);
+    saveStoredTouchScreenGroups(updatedList);
     setFormMode('VIEW');
-
-    // Trigger Video 14 Note requirement: "Touch Screen Group also need to create after Menu Group Creation."
-    setTouchGroupAlertOpen(true);
-    showNotification(`Menu Group #${codeNum} ("${updatedRecord.name}") saved successfully!`);
+    showNotification(`Touch Screen Group #${mgNum} ("${updatedRecord.name}") saved & active on POS terminals!`);
   };
 
   // Navigation: Previous
@@ -183,7 +215,16 @@ export default function IdsMenuGroupsModal({
     }
   };
 
-  // Browse Selection Handler (Frame 040)
+  // Handle selecting from Menu Groups lookup popup
+  const handleSelectMenuGroup = (mg) => {
+    setMenuGrouping(String(mg.code));
+    setGroupName(mg.name || '');
+    setShortName(mg.shortName || mg.name?.substring(0, 6) || '');
+    setMenuGroupLookupOpen(false);
+    showNotification(`Linked to Menu Group #${mg.code} (${mg.name})`);
+  };
+
+  // Handle selecting from Browse popup
   const handleSelectBrowse = (idx) => {
     const item = filteredBrowseGroups[idx];
     if (item) {
@@ -193,21 +234,28 @@ export default function IdsMenuGroupsModal({
       }
       setBrowseOpen(false);
       setFormMode('VIEW');
-      if (onSelectGroup) onSelectGroup(item);
     }
   };
 
-  const filteredBrowseGroups = groups.filter(g => 
-    !browseSearch || 
-    g.name.toLowerCase().includes(browseSearch.toLowerCase()) || 
-    String(g.code).includes(browseSearch)
+  const filteredBrowseGroups = groups.filter(g =>
+    !browseSearch ||
+    g.name.toLowerCase().includes(browseSearch.toLowerCase()) ||
+    g.shortName.toLowerCase().includes(browseSearch.toLowerCase()) ||
+    String(g.code).includes(browseSearch) ||
+    String(g.menuGroupCode).includes(browseSearch)
+  );
+
+  const availableMenuGroups = getStoredMenuGroups().filter(mg =>
+    !menuGroupSearch ||
+    mg.name.toLowerCase().includes(menuGroupSearch.toLowerCase()) ||
+    String(mg.code).includes(menuGroupSearch)
   );
 
   if (!isOpen) return null;
 
   return (
-    <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
-      {/* Main Win32 Window: Menu Groups V6.5.002.1 */}
+    <div className="ids-modal-overlay" style={{ zIndex: 1260 }}>
+      {/* Main Win32 Dialog: Touch Screen Groups V6.5.002.1 */}
       <div 
         className="ids-modal-container" 
         style={{ width: '560px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
@@ -218,7 +266,7 @@ export default function IdsMenuGroupsModal({
           style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
           <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>
-            Menu Groups V6.5.002.1
+            Touch Screen Groups V6.5.002.1
           </span>
           <button 
             className="ids-win-btn close" 
@@ -238,7 +286,7 @@ export default function IdsMenuGroupsModal({
             </div>
           )}
 
-          {/* Inner Recessed Groupbox (Frames 010–014) */}
+          {/* Inner Recessed Groupbox (Frames 010–015) */}
           <div 
             style={{ 
               border: '2px groove #FFFFFF', 
@@ -278,14 +326,14 @@ export default function IdsMenuGroupsModal({
               </div>
             </div>
 
-            {/* 2. Menu Group Code */}
+            {/* 2. Menu Grouping (Links to Video 14 Menu Groups) */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 600, color: '#000' }}>Menu Group Code</span>
+              <span style={{ fontWeight: 600, color: '#000' }}>Menu Grouping</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <input 
                   type="text" 
-                  value={groupCode} 
-                  onChange={e => setGroupCode(e.target.value)}
+                  value={menuGrouping} 
+                  onChange={e => setMenuGrouping(e.target.value)}
                   disabled={formMode === 'VIEW'}
                   style={{ 
                     width: '60px', 
@@ -299,8 +347,8 @@ export default function IdsMenuGroupsModal({
                 />
                 <button 
                   className="ids-btn" 
-                  title="Browse Menu Groups (Video 14 Frame 040)" 
-                  onClick={() => setBrowseOpen(true)}
+                  title="Lookup Menu Groups (Video 14)" 
+                  onClick={() => setMenuGroupLookupOpen(true)}
                   style={{ padding: '0 5px', fontSize: '10px', fontWeight: 700 }}
                 >
                   ?
@@ -332,14 +380,53 @@ export default function IdsMenuGroupsModal({
               />
             </div>
 
-            {/* 4. Short Name */}
+            {/* 4. Other Language (Name) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 600, color: '#000' }}>Other Language</span>
+              <input 
+                type="text" 
+                value={otherLanguageName} 
+                onChange={e => setOtherLanguageName(e.target.value)}
+                placeholder="Optional Regional / Second Language"
+                disabled={formMode === 'VIEW'}
+                style={{ 
+                  width: '92%', 
+                  background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', 
+                  border: '1px solid #7F9DB9', 
+                  padding: '2px 6px', 
+                  fontSize: '11px' 
+                }}
+              />
+            </div>
+
+            {/* 5. Short Name (Terminal Button Tile Label) */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 600, color: '#000' }}>Short Name</span>
               <input 
                 type="text" 
                 value={shortName} 
                 onChange={e => setShortName(e.target.value)}
-                placeholder="MAIN / TAND / SOUP"
+                placeholder="MAIN C / TAND / APPE"
+                disabled={formMode === 'VIEW'}
+                style={{ 
+                  width: '140px', 
+                  background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', 
+                  border: '1px solid #7F9DB9', 
+                  padding: '2px 4px', 
+                  fontSize: '11px',
+                  fontWeight: 700
+                }}
+              />
+            </div>
+
+            {/* 6. Other Language (Short Name) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 600, color: '#000' }}>Other Language</span>
+              <input 
+                type="text" 
+                value={otherLanguageShort} 
+                onChange={e => setOtherLanguageShort(e.target.value)}
+                placeholder="Optional Short Label in Second Language"
                 disabled={formMode === 'VIEW'}
                 style={{ 
                   width: '140px', 
@@ -351,7 +438,7 @@ export default function IdsMenuGroupsModal({
               />
             </div>
 
-            {/* 5. Status */}
+            {/* 7. Status */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 600, color: '#000' }}>Status</span>
               <select 
@@ -372,7 +459,7 @@ export default function IdsMenuGroupsModal({
               </select>
             </div>
 
-            {/* 6. User */}
+            {/* 8. User */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 600, color: '#000' }}>User</span>
               <input 
@@ -390,7 +477,7 @@ export default function IdsMenuGroupsModal({
               />
             </div>
 
-            {/* 7. Last Updated */}
+            {/* 9. Last Updated */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 600, color: '#000' }}>Last Updated</span>
               <input 
@@ -486,8 +573,9 @@ export default function IdsMenuGroupsModal({
               </button>
               <button 
                 className="ids-btn" 
-                onClick={() => { setFormMode('VIEW'); showNotification('Panel refreshed.'); }}
-                style={{ minWidth: '45px' }}
+                onClick={() => setPreviewTerminalOpen(true)}
+                title="Preview Touch POS Buttons"
+                style={{ minWidth: '45px', background: '#FFF2CC', borderColor: '#D6B656', color: '#665200', fontWeight: 600 }}
               >
                 Panel
               </button>
@@ -501,7 +589,7 @@ export default function IdsMenuGroupsModal({
             </div>
           </div>
 
-          {/* Subtitle Red / Yellow Banner Note (Video 14 Frames 014–050) */}
+          {/* Subtitle Red / Yellow Banner Note (Video 15 Frames 015–045) */}
           <div 
             style={{ 
               background: '#FFFBE6', 
@@ -518,44 +606,39 @@ export default function IdsMenuGroupsModal({
                 Note:
               </span>
               <span style={{ color: '#D00', fontWeight: 700, fontSize: '11px' }}>
-                Touch Screen Group also need to create after Menu Group Creation.
+                Before adding Touch Screen Group First Create Menu Group.
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
               <span style={{ fontSize: '10px', color: '#666' }}>
-                In IDS POS, each Menu Group must be linked to a Touch Screen Group for terminal visibility.
+                Touch Screen Groups link directly to existing Menu Groups to generate terminal category tiles.
               </span>
-              <button 
-                className="ids-btn" 
-                onClick={() => {
-                  if (onOpenTouchScreenGroups) {
-                    onOpenTouchScreenGroups(groupCode);
-                  } else {
-                    setTouchGroupAlertOpen(true);
-                  }
-                }}
-                style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
-              >
-                Link TS Group →
-              </button>
+              {onOpenMenuGroups && (
+                <button 
+                  className="ids-btn" 
+                  onClick={onOpenMenuGroups}
+                  style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
+                >
+                  ← Open Menu Groups
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. BROWSE POPUP DIALOG (Video 14 Frame 040) */}
+      {/* 2. BROWSE POPUP (Touch Screen Groups V6.5.002.1) */}
       {browseOpen && (
-        <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
+        <div className="ids-modal-overlay" style={{ zIndex: 1360 }}>
           <div 
             className="ids-modal-container" 
-            style={{ width: '460px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.7)' }}
+            style={{ width: '520px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.7)' }}
           >
-            {/* Titlebar */}
             <div 
               className="ids-modal-titlebar" 
               style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Menu Groups V6.5.002.1</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Touch Screen Groups V6.5.002.1 - Browse</span>
               <button 
                 className="ids-win-btn close" 
                 onClick={() => setBrowseOpen(false)} 
@@ -566,35 +649,34 @@ export default function IdsMenuGroupsModal({
             </div>
 
             <div style={{ padding: '10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {/* Search Filter Box (Frame 040) */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 4px' }}>
-                <span style={{ fontWeight: 600 }}>Name</span>
+                <span style={{ fontWeight: 600 }}>Filter:</span>
                 <input 
                   type="text" 
                   autoFocus
                   value={browseSearch} 
                   onChange={e => setBrowseSearch(e.target.value)}
-                  placeholder="Filter menu groups..."
+                  placeholder="Search TS group name, short name or code..."
                   style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 6px', fontSize: '11px' }}
                 />
               </div>
 
-              {/* Browse Data Grid (Frame 040) */}
-              <div style={{ height: '180px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+              <div style={{ height: '190px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '75px' }}>Menu Group</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '100px' }}>Applicable From</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '60px' }}>Code</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '65px' }}>Menu Grp</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Name</th>
-                      <th style={{ padding: '3px 6px', textAlign: 'left', width: '60px' }}>Status</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '80px' }}>Short Name</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left', width: '55px' }}>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredBrowseGroups.length === 0 ? (
                       <tr>
-                        <td colSpan={4} style={{ padding: '20px 8px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
-                          No matching Menu Groups found.
+                        <td colSpan={5} style={{ padding: '20px 8px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                          No matching Touch Screen Groups found.
                         </td>
                       </tr>
                     ) : (
@@ -613,8 +695,9 @@ export default function IdsMenuGroupsModal({
                             }}
                           >
                             <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{grp.code}</td>
-                            <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{grp.applicableFrom}</td>
+                            <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{grp.menuGroupCode}</td>
                             <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', fontWeight: 600 }}>{grp.name}</td>
+                            <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{grp.shortName}</td>
                             <td style={{ padding: '3px 6px' }}>{grp.status}</td>
                           </tr>
                         );
@@ -624,7 +707,6 @@ export default function IdsMenuGroupsModal({
                 </table>
               </div>
 
-              {/* Bottom Buttons (Frame 040) */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '4px' }}>
                 <button 
                   className="ids-btn" 
@@ -646,9 +728,9 @@ export default function IdsMenuGroupsModal({
         </div>
       )}
 
-      {/* 3. TOUCH SCREEN GROUP LINKAGE DIALOG */}
-      {touchGroupAlertOpen && (
-        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+      {/* 3. MENU GROUP LOOKUP POPUP (Video 14 Integration) */}
+      {menuGroupLookupOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1370 }}>
           <div 
             className="ids-modal-container" 
             style={{ width: '440px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.7)' }}
@@ -657,39 +739,128 @@ export default function IdsMenuGroupsModal({
               className="ids-modal-titlebar" 
               style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Touch Screen Group Linkage</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Select Menu Group (Video 14 Master)</span>
               <button 
                 className="ids-win-btn close" 
-                onClick={() => setTouchGroupAlertOpen(false)} 
+                onClick={() => setMenuGroupLookupOpen(false)} 
                 style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
               >
                 ✕
               </button>
             </div>
 
-            <div style={{ padding: '12px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ fontWeight: 700, color: '#000080', fontSize: '12px' }}>
-                IDS POS Workflow Requirement (Video 14):
-              </div>
-              <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '8px 10px', lineHeight: '16px' }}>
-                <div>• Menu Group: <b>#{groupCode} - {groupName}</b></div>
-                <div>• Touch Screen Group Mapping: <b>TSG-{groupCode.padStart(2, '0')} ({groupName})</b></div>
-                <div>• Outlet: <b>RESTAURANT &amp; LIQUOR BAR</b></div>
-                <div style={{ color: '#008000', fontWeight: 700, marginTop: '4px' }}>
-                  ✓ Touch Screen Group successfully generated and linked to POS Order Entry terminals!
-                </div>
+            <div style={{ padding: '10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <input 
+                type="text" 
+                autoFocus
+                value={menuGroupSearch} 
+                onChange={e => setMenuGroupSearch(e.target.value)}
+                placeholder="Search Menu Groups..."
+                style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 6px', fontSize: '11px' }}
+              />
+
+              <div style={{ height: '160px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '50px' }}>Code</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Group Name</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left', width: '80px' }}>Short Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {availableMenuGroups.map((mg, idx) => (
+                      <tr 
+                        key={mg.code}
+                        onClick={() => handleSelectMenuGroup(mg)}
+                        style={{ cursor: 'pointer', borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#E5F1FB'}
+                        onMouseLeave={e => e.currentTarget.style.background = idx % 2 === 0 ? '#FFF' : '#F9F9F9'}
+                      >
+                        <td style={{ padding: '4px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{mg.code}</td>
+                        <td style={{ padding: '4px 6px', fontWeight: 600, borderRight: '1px solid #EEE' }}>{mg.name}</td>
+                        <td style={{ padding: '4px 6px' }}>{mg.shortName}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
                   className="ids-btn" 
-                  onClick={() => {
-                    setTouchGroupAlertOpen(false);
-                    showNotification(`Touch Screen Group TSG-${groupCode.padStart(2, '0')} activated on POS terminals!`);
-                  }} 
-                  style={{ minWidth: '70px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}
+                  onClick={() => setMenuGroupLookupOpen(false)} 
+                  style={{ minWidth: '60px' }}
                 >
-                  OK
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. TOUCH POS TERMINAL PREVIEW DIALOG */}
+      {previewTerminalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1380 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '580px', background: '#333', border: '3px solid #000', borderRadius: '4px', boxShadow: '6px 6px 24px rgba(0,0,0,0.8)', color: '#FFF' }}
+          >
+            <div style={{ background: '#111', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #444' }}>
+              <span style={{ fontWeight: 700, fontSize: '12px', color: '#4CAF50' }}>
+                🖥️ IDS Fortune NEXT Touch Screen POS Terminal View
+              </span>
+              <button 
+                className="ids-win-btn close" 
+                onClick={() => setPreviewTerminalOpen(false)}
+                style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ fontSize: '11px', color: '#BBB' }}>
+                Terminal Category Header Tiles configured by <b>Touch Screen Groups V6.5.002.1</b>:
+              </div>
+
+              {/* Touch Screen Tiles Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                {groups.map(g => (
+                  <div 
+                    key={g.code}
+                    style={{ 
+                      background: g.status === 'Active' ? 'linear-gradient(180deg, #3A6073 0%, #16222F 100%)' : '#444', 
+                      border: '2px solid #5C93B2', 
+                      borderRadius: '6px', 
+                      padding: '12px 8px', 
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.4)',
+                      opacity: g.status === 'Active' ? 1 : 0.5
+                    }}
+                  >
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#FFF', letterSpacing: '0.5px' }}>
+                      {g.shortName || g.name}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#8FD3FE', marginTop: '4px' }}>
+                      {g.name}
+                    </div>
+                    <div style={{ fontSize: '8px', color: '#AAA', marginTop: '2px' }}>
+                      Group #{g.menuGroupCode}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setPreviewTerminalOpen(false)} 
+                  style={{ minWidth: '70px', fontWeight: 700 }}
+                >
+                  Close Preview
                 </button>
               </div>
             </div>

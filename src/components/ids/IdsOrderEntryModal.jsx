@@ -14,6 +14,7 @@ import {
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
+import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -267,6 +268,7 @@ export default function IdsOrderEntryModal({
   const [modifierRate, setModifierRate] = useState('0.00');
   const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
   const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
+  const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -2153,6 +2155,14 @@ export default function IdsOrderEntryModal({
                 style={{ fontSize: '10px', background: '#D5E8D4', borderColor: '#82B366', color: '#274E13', fontWeight: 700 }}
               >
                 Menu Groups (POS-14)
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setTouchScreenGroupsOpen(true)}
+                title="Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)"
+                style={{ fontSize: '10px', background: '#CCE5FF', borderColor: '#66B2FF', color: '#004085', fontWeight: 700 }}
+              >
+                TS Groups (POS-15)
               </button>
               <button 
                 className="ids-btn" 
@@ -4155,7 +4165,8 @@ export default function IdsOrderEntryModal({
                       { key: '<F1>', name: 'Item Modifier', desc: '@ Qty column: Open Item Modifiers dialog (spicy, less spicy, jain)', action: () => { setHotKeyHelpOpen(false); handleOpenItemModifier(0); } },
                       { key: '<F5>', name: 'Delete Item', desc: 'Delete currently selected row from order entry grid', action: () => { setHotKeyHelpOpen(false); handleDeleteRow(0); } },
                       { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } },
-                      { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } }
+                      { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } },
+                      { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
@@ -4226,12 +4237,28 @@ export default function IdsOrderEntryModal({
         onOpenCrystalReport={onOpenCrystalReport}
       />
 
-      {/* POS Video 14: Menu Groups V6.5.002.1 & Touch Screen Groups Setup */}
+      {/* POS Video 14: Menu Groups V6.5.002.1 */}
       <IdsMenuGroupsModal
         isOpen={menuGroupsOpen}
         onClose={() => setMenuGroupsOpen(false)}
         accountingDate={accountingDate}
         currentUser="MANAGER"
+        onOpenTouchScreenGroups={() => {
+          setMenuGroupsOpen(false);
+          setTouchScreenGroupsOpen(true);
+        }}
+      />
+
+      {/* POS Video 15: Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration */}
+      <IdsTouchScreenGroupsModal
+        isOpen={touchScreenGroupsOpen}
+        onClose={() => setTouchScreenGroupsOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onOpenMenuGroups={() => {
+          setTouchScreenGroupsOpen(false);
+          setMenuGroupsOpen(true);
+        }}
       />
     </div>
   );
