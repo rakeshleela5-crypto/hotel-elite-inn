@@ -16,6 +16,7 @@ import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsRestaurantTableMasterModal';
+import IdsServersModal, { getStoredServers } from './IdsServersModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -91,8 +92,12 @@ export const POS_MENU_ITEMS = [
 ];
 
 export const POS_STEWARDS = [
-  'Manash',
+  'Kaushik',
+  'Ajay',
+  'Bijay',
+  'Rahul',
   'Biren',
+  'Manash',
   'Pulak',
   'Pranamika',
   'Kangkana',
@@ -271,6 +276,7 @@ export default function IdsOrderEntryModal({
   const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
   const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
   const [restaurantTableMasterOpen, setRestaurantTableMasterOpen] = useState(false);
+  const [serversMasterOpen, setServersMasterOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -1643,15 +1649,30 @@ export default function IdsOrderEntryModal({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <label style={{ width: '70px', fontWeight: 600 }}>Server</label>
-              <select 
-                value={server} 
-                onChange={e => setServer(e.target.value)}
-                style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
-              >
-                {POS_STEWARDS.map(st => (
-                  <option key={st} value={st}>{st}</option>
-                ))}
-              </select>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <select 
+                  value={server} 
+                  onChange={e => setServer(e.target.value)}
+                  style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  {getStoredServers().map(s => (
+                    <option key={s.serverCode} value={s.name}>
+                      [{s.serverCode}] {s.name}
+                    </option>
+                  ))}
+                  {POS_STEWARDS.filter(st => !getStoredServers().some(s => s.name.toLowerCase() === st.toLowerCase())).map(st => (
+                    <option key={st} value={st}>{st}</option>
+                  ))}
+                </select>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setServersMasterOpen(true)}
+                  title="Servers V6.5.002.1 - Stewards Master (Video 18)"
+                  style={{ padding: '1px 6px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  ?
+                </button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -4178,7 +4199,8 @@ export default function IdsOrderEntryModal({
                       { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } },
                       { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } },
                       { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
-                      { key: 'Setup', name: 'Delete Table', desc: 'Delete Restaurant Table & Alert Window V6.5.002.1 (Video 17)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } }
+                      { key: 'Setup', name: 'Delete Table', desc: 'Delete Restaurant Table & Alert Window V6.5.002.1 (Video 17)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
+                      { key: 'Setup', name: 'Servers Master', desc: 'Servers V6.5.002.1 & Stewards Setup (Video 18)', action: () => { setHotKeyHelpOpen(false); setServersMasterOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
@@ -4283,6 +4305,18 @@ export default function IdsOrderEntryModal({
         onSelectTableForOrder={(tbl) => {
           setTableNo(tbl);
           setRestaurantTableMasterOpen(false);
+        }}
+      />
+
+      {/* POS Video 18: Servers V6.5.002.1 - Stewards Master */}
+      <IdsServersModal
+        isOpen={serversMasterOpen}
+        onClose={() => setServersMasterOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onSelectServerForOrder={(srv) => {
+          setServer(srv.name);
+          setServersMasterOpen(false);
         }}
       />
     </div>

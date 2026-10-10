@@ -86,6 +86,7 @@ import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import IdsMenuGroupsModal from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal from './IdsRestaurantTableMasterModal';
+import IdsServersModal from './IdsServersModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -434,6 +435,7 @@ export default function IdsDesktopShell({
   const [touchScreenGroupsModalOpen, setTouchScreenGroupsModalOpen] = useState(false);
   const [selectedMenuGroupForTs, setSelectedMenuGroupForTs] = useState(null);
   const [restaurantTableMasterModalOpen, setRestaurantTableMasterModalOpen] = useState(false);
+  const [serversModalOpen, setServersModalOpen] = useState(false);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -938,6 +940,7 @@ export default function IdsDesktopShell({
       { label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', videoId: 'POS-15', action: () => setTouchScreenGroupsModalOpen(true) },
       { label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', videoId: 'POS-17', action: () => setRestaurantTableMasterModalOpen(true) },
+      { label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', videoId: 'POS-18', action: () => setServersModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1035,6 +1038,11 @@ export default function IdsDesktopShell({
         label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', 
         videoId: 'POS-17', 
         action: () => setRestaurantTableMasterModalOpen(true) 
+      },
+      { 
+        label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', 
+        videoId: 'POS-18', 
+        action: () => setServersModalOpen(true) 
       },
       { 
         label: 'Company Profile Setup (Corporate Master)', 
@@ -3155,6 +3163,18 @@ export default function IdsDesktopShell({
         currentUser="MANAGER"
         onSelectTableForOrder={() => {
           setRestaurantTableMasterModalOpen(false);
+          setOrderEntryModalOpen(true);
+        }}
+      />
+
+      {/* POS Video 18: Servers V6.5.002.1 (Setup -> Servers) */}
+      <IdsServersModal
+        isOpen={serversModalOpen}
+        onClose={() => setServersModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onSelectServerForOrder={() => {
+          setServersModalOpen(false);
           setOrderEntryModalOpen(true);
         }}
       />
