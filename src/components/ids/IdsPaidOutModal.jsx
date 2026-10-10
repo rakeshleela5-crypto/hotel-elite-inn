@@ -263,7 +263,12 @@ export default function IdsPaidOutModal({
                 >
                   <ArrowDownLeft size={12} /> Pay-Out Excess Amount (₹1,500)
                 </button>
-                <button className="ids-btn-classic" disabled title="Disabled because balance is negative!" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                <button 
+                  className="ids-btn-classic" 
+                  title="Disabled because balance is negative! Settle requires Paid-Out first." 
+                  style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                  onClick={() => alert("Bill Settle cannot proceed while folio balance is negative (-₹1,500.00). Process Paid-Out first.")}
+                >
                   Bill Settle
                 </button>
                 <button className="ids-btn-classic" onClick={onClose}>Back</button>

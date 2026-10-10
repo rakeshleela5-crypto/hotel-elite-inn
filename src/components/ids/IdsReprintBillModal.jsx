@@ -387,7 +387,11 @@ export default function IdsReprintBillModal({
               >
                 Quick Preview
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => alert("Bill Audit & Reprint Panel: Folio tax invoice registers active.")}
+              >Panel</button>
               <button 
                 className="ids-btn-classic" 
                 style={{ minWidth: '60px' }} 

@@ -5,6 +5,7 @@ import {
   HelpCircle, ChevronDown, ChevronRight, FileText, Bed, Key, DoorClosed, Printer
 } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 22: HOW TO CHECK-IN 2ND PAX LATER IN IDS 6.5 & 7.0 SOFTWARE
@@ -743,7 +744,7 @@ export default function IdsCheckInSecondPaxModal({
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ fontWeight: 600, width: '110px' }}>Name/Room#</span>
                   <input className="ids-input" readOnly value={selectedRoomNo} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
-                  <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }}>?</button>
+                  <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Selected Room: #${selectedRoomNo}`); }}>?</button>
                 </div>
 
                 {/* Video 22 Frame 088: Total Pax displays 2 (2/0) */}
@@ -838,13 +839,13 @@ export default function IdsCheckInSecondPaxModal({
 
               {/* Right Side Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px' }}>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>Rate Info</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>Check</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>History</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>Trace</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>Extra Charges</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }}>Deposit</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px', gridColumn: 'span 2' }}>Fixed Charges</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert(`Room #${selectedRoomNo} Rate: Executive King Rate (₹2,050.00)`); }}>Rate Info</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Bill Check: Both pax billing to single master folio."); }}>Check</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Guest History: Verified registered guest."); }}>History</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Trace Note: 2nd pax checked in later as expected."); }}>Trace</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Extra Charges: Nil. Standard 2-pax inclusion."); }}>Extra Charges</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Deposit: Paid ₹2,000.00 Advance on arrival."); }}>Deposit</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px', gridColumn: 'span 2' }} onClick={() => { playReceptionChime(); alert("Fixed Charges: Standard GST 12% applicable."); }}>Fixed Charges</button>
               </div>
             </div>
 

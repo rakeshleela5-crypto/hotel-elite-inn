@@ -4,6 +4,7 @@ import {
   Trash2, DollarSign, AlertCircle, CheckCircle2, 
   ArrowRight, ShieldCheck, UserX, LayoutGrid, Check, X, RefreshCw
 } from 'lucide-react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 39: HOW TO DELETE DEPOSIT BEFORE CANCEL CHECK IN IN IDS 6.5 & 7.0 SOFTWARE
@@ -252,9 +253,9 @@ export default function IdsDeleteDepositModal({
 
               {/* Payment Mode Selector Tabs */}
               <div style={{ display: 'flex', gap: '6px', margin: '8px 0', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
-                <button className="ids-btn-classic" style={{ background: '#316AC5', color: '#FFF', fontWeight: 700 }}>Cash</button>
-                <button className="ids-btn-classic">Credit Card</button>
-                <button className="ids-btn-classic">Cheque</button>
+                <button className="ids-btn-classic" style={{ background: '#316AC5', color: '#FFF', fontWeight: 700 }} onClick={() => { playReceptionChime(); }}>Cash</button>
+                <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Payment mode: Credit Card"); }}>Credit Card</button>
+                <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Payment mode: Cheque"); }}>Cheque</button>
               </div>
 
               {/* Currency & Received Amount matching Frame 052 */}
@@ -301,8 +302,8 @@ export default function IdsDeleteDepositModal({
               </div>
 
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Add</button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Modify</button>
+                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Add new deposit entry mode."); }}>Add</button>
+                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Modify deposit receipt mode."); }}>Modify</button>
                 <button 
                   className="ids-btn-classic" 
                   style={{ 
@@ -315,7 +316,7 @@ export default function IdsDeleteDepositModal({
                 >
                   Delete
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Browse</button>
+                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Browse deposit ledger transactions."); }}>Browse</button>
                 <button 
                   className="ids-btn-classic" 
                   style={{ fontWeight: 700, minWidth: '60px', background: '#DCE6F1' }}
@@ -323,7 +324,7 @@ export default function IdsDeleteDepositModal({
                 >
                   Save
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
+                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("PMS Navigation Panel: Cashier Deposit Manager."); }}>Panel</button>
                 <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Back</button>
               </div>
             </div>
@@ -405,7 +406,7 @@ export default function IdsDeleteDepositModal({
                 ← Back to Delete Deposit
               </button>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="ids-btn-classic">Panel</button>
+                <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("FortuneNext Panel Selector: Front Desk Cashier View."); }}>Panel</button>
                 <button className="ids-btn-classic" onClick={onClose}>Exit</button>
               </div>
             </div>

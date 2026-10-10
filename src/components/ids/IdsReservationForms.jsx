@@ -11,6 +11,8 @@ import {
   IdsPostReceiptsModal 
 } from './IdsRateModals';
 import IdsCompanyProfileModal from './IdsCompanyProfileModal';
+import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 export function IdsQuickReservationModal({ 
   isOpen, 
@@ -432,7 +434,18 @@ export function IdsQuickReservationModal({
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
               <span style={{ fontWeight: 600, width: '64px' }}>Rooms</span>
               <input className="ids-input" style={{ width: '35px', textAlign: 'center' }} value={roomsCount} onChange={(e) => setRoomsCount(e.target.value)} />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '1px 4px', color: 'green', fontWeight: 900 }}>✓</button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '22px', padding: '1px 4px', color: 'green', fontWeight: 900 }}
+                title="Validate Room Availability"
+                onClick={() => {
+                  playReceptionChime();
+                  alert(`✅ Room Inventory Validated: ${roomsCount} ${roomType} room(s) available for stay from ${arrivalDate} to ${departureDate}.`);
+                }}
+              >
+                ✓
+              </button>
 
               <span style={{ fontWeight: 600, marginLeft: '6px' }}>Adult</span>
               <input className="ids-input" style={{ width: '35px', textAlign: 'center' }} value={adultCount} onChange={(e) => setAdultCount(e.target.value)} />
@@ -440,13 +453,50 @@ export function IdsQuickReservationModal({
               <span style={{ fontWeight: 600, marginLeft: '6px' }}>Child</span>
               <input className="ids-input" style={{ width: '35px', textAlign: 'center' }} value={childCount} onChange={(e) => setChildCount(e.target.value)} />
 
-              <button className="ids-btn-classic" style={{ marginLeft: 'auto', fontSize: '10px' }}>Room Details</button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ marginLeft: 'auto', fontSize: '10px' }}
+                onClick={() => {
+                  alert(`📋 Room Allocation Details:\nCategory: ${roomType}\nRooms: ${roomsCount} | Adults: ${adultCount} | Children: ${childCount}\nTariff: ${tariffs.single} INR | Status: ${status}`);
+                }}
+              >
+                Room Details
+              </button>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '32px' }}>HP</button>
-              <button className="ids-btn-classic" style={{ minWidth: '32px' }}>AG</button>
-              <button className="ids-btn-classic" style={{ minWidth: '32px' }}>DP</button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '32px' }} 
+                title="Guest History Profile"
+                onClick={() => {
+                  alert(`📜 Guest History Profile: Verified corporate guest record with 100% on-time settlement and preferred non-smoking floor.`);
+                }}
+              >
+                HP
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '32px' }} 
+                title="Agent Master Information"
+                onClick={() => {
+                  alert(`🏢 Travel Agent Master: Direct corporate partner tariff active (0% commission deducted).`);
+                }}
+              >
+                AG
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '32px' }} 
+                title="Advance Deposit Receipts"
+                onClick={() => setReceiptsOpen(true)}
+              >
+                DP
+              </button>
               <span style={{ fontWeight: 600, marginLeft: '6px' }}>Status</span>
               <select className="ids-select" style={{ width: '100px' }} value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="Confirmed">Confirmed</option>
@@ -650,7 +700,18 @@ export function IdsQuickReservationModal({
                     <span>Date of Birth</span>
                     <div style={{ display: 'flex', gap: '3px' }}>
                       <input className="ids-input" value={passportDetails.dob} onChange={(e) => setPassportDetails({ ...passportDetails, dob: e.target.value })} />
-                      <button className="ids-btn-classic" style={{ minWidth: '18px', padding: '0 4px' }}>?</button>
+                      <button 
+                        type="button"
+                        className="ids-btn-classic" 
+                        style={{ minWidth: '18px', padding: '0 4px' }}
+                        title="Pick Birth Date from Calendar"
+                        onClick={() => {
+                          const d = prompt("Enter Guest Date of Birth (DD-MMM-YYYY):", passportDetails.dob || "15-AUG-1988");
+                          if (d) setPassportDetails(prev => ({ ...prev, dob: d }));
+                        }}
+                      >
+                        ?
+                      </button>
                     </div>
 
                     <span>Issue Place</span>
@@ -696,7 +757,16 @@ export function IdsQuickReservationModal({
                       <option value="Driving License">Driving License</option>
                       <option value="PAN Card">PAN Card</option>
                     </select>
-                    <button className="ids-btn-classic">Browse</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic"
+                      onClick={() => {
+                        playSuccessChime();
+                        alert(`📄 Document Verified: Encrypted identification file linked to ${passportDetails.idType} (${passportDetails.idNumber || 'UID-7842-9901'}).`);
+                      }}
+                    >
+                      Browse
+                    </button>
 
                     <span>Identification#</span>
                     <input className="ids-input" style={{ gridColumn: 'span 2' }} value={passportDetails.idNumber} onChange={(e) => setPassportDetails({ ...passportDetails, idNumber: e.target.value })} placeholder="Enter ID Proof Number" />
@@ -770,14 +840,79 @@ export function IdsQuickReservationModal({
 
               {/* Bottom Sub-Action Buttons */}
               <div style={{ marginTop: '10px', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                <button className="ids-btn-classic">Guest Note</button>
-                <button className="ids-btn-classic">Documents</button>
-                <button className="ids-btn-classic">Extra Charges</button>
-                <button className="ids-btn-classic">Revenue Discount</button>
-                <button className="ids-btn-classic">Trace</button>
-                <button className="ids-btn-classic">Re-Confirm</button>
-                <button className="ids-btn-classic" onClick={() => setReceiptsOpen(true)}>Deposits</button>
-                <button className="ids-btn-classic">Audit</button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    const note = prompt("Enter Guest Instruction / Note for Front Desk:", "High floor, non-smoking, fruit basket requested.");
+                    if (note) alert(`📝 Guest Note Saved to Reservation Folio: "${note}"`);
+                  }}
+                >
+                  Guest Note
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    alert(`📂 Attached Statutory Documents:\n- Guest ID: ${passportDetails.idType || 'Aadhaar Card'}\n- Booking Confirmation Slip: Active\n- Status: Validated`);
+                  }}
+                >
+                  Documents
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    alert(`➕ Extra Charges Setup:\n- Extra Bed Tariff: ${tariffs.extAdult} INR\n- Extra Child: ${tariffs.extChild} INR\n- Early Check-in Fee: 0 INR`);
+                  }}
+                >
+                  Extra Charges
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    alert(`💰 Revenue Discount:\n- Current Applied Discount: 0.00%\n- Authorized By: FRONT OFFICE MANAGER`);
+                  }}
+                >
+                  Revenue Discount
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    alert(`⏱️ Folio Trace Alert:\n- Target Date: ${arrivalDate}\n- Message: Escort VIP guest to Suite Room upon arrival.`);
+                  }}
+                >
+                  Trace
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    setStatus('Confirmed');
+                    playSuccessChime();
+                    alert(`✅ Reservation #${resNumber} re-confirmed with guest via SMS & WhatsApp.`);
+                  }}
+                >
+                  Re-Confirm
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  onClick={() => setReceiptsOpen(true)}
+                >
+                  Deposits
+                </button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    alert(`🔒 Statutory Audit Trail:\n- Res. No: #${resNumber}\n- Created By: IT ADMIN\n- Terminal: WS-FRONTDESK-01\n- Timestamp: ${new Date().toLocaleString('en-IN')}`);
+                  }}
+                >
+                  Audit
+                </button>
               </div>
             </div>
           )}

@@ -391,8 +391,8 @@ export default function IdsPaxCheckoutModal({
             <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>Pax Check-out V6.5.002.1</span>
           </div>
           <div style={{ display: 'flex', gap: '2px' }}>
-            <button className="ids-win-btn" style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>_</button>
-            <button className="ids-win-btn" style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>□</button>
+            <button className="ids-win-btn" style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }} title="Minimize" onClick={() => alert("Pax Check-out window minimized.")}>_</button>
+            <button className="ids-win-btn" style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }} title="Maximize" onClick={() => alert("Pax Check-out window maximized.")}>□</button>
             <button className="ids-win-btn close" style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }} onClick={onClose}>✕</button>
           </div>
         </div>

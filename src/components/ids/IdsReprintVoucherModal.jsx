@@ -327,7 +327,15 @@ export default function IdsReprintVoucherModal({
                 onChange={(e) => setFilterDate(e.target.value)}
                 style={{ width: '110px', fontWeight: 700 }}
               />
-              <button className="ids-btn-classic" style={{ width: '22px' }} title="Calendar">?</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ width: '22px' }} 
+                title="Calendar Lookup"
+                onClick={() => {
+                  const d = prompt("Enter Voucher Date (DD-MMM-YYYY):", filterDate);
+                  if (d) setFilterDate(d.toUpperCase());
+                }}
+              >?</button>
               <span style={{ color: '#666', fontSize: '10px', marginLeft: '6px' }}>
                 Showing <strong>{filteredVouchers.length}</strong> {selectedType} vouchers for {filterDate}
               </span>
@@ -462,7 +470,11 @@ export default function IdsReprintVoucherModal({
               >
                 Clear
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => alert("Voucher Reprint Panel: Cashier session vouchers audit complete.")}
+              >Panel</button>
               <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>

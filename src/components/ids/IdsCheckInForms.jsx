@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 05: RESERVATION CHECK-IN FOR SINGLE ROOM IN IDS FORTUNE NEXT 6.5 & 7.0
@@ -491,14 +492,14 @@ export function IdsCheckInRegistrationModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 60px 24px 35px', gap: '4px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600 }}>Guest Status</span>
                   <input className="ids-input" value={activeGuest.guestStatus} onChange={(e) => setActiveGuestField('guestStatus', e.target.value)} style={{ fontWeight: 700 }} />
-                  <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
-                  <button className="ids-btn-classic" style={{ padding: '0 2px', fontSize: '9px' }}>DW</button>
+                  <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); alert("IDS Guest Status Codes:\n- FIT: Free Independent Traveler\n- VIP: Very Important Person\n- CORP: Corporate Account\n- CIP: Commercial Important Person"); }}>?</button>
+                  <button className="ids-btn-classic" style={{ padding: '0 2px', fontSize: '9px' }} onClick={() => { playReceptionChime(); alert("Day-Wise Profile Details: Rate category active across all stay days."); }}>DW</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 60px 24px 50px', gap: '4px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600 }}>Nationality</span>
                   <input className="ids-input" value={activeGuest.nationality} onChange={(e) => setActiveGuestField('nationality', e.target.value)} style={{ fontWeight: 700 }} />
-                  <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
-                  <button className="ids-btn-classic" style={{ padding: '0 2px', fontSize: '10px' }}>More...</button>
+                  <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const nat = prompt("Enter Country / Nationality Code:", activeGuest.nationality || "IND"); if (nat) setActiveGuestField('nationality', nat.toUpperCase()); }}>?</button>
+                  <button className="ids-btn-classic" style={{ padding: '0 2px', fontSize: '10px' }} onClick={() => { playReceptionChime(); alert(`Guest Extended Profile:\nName: ${activeGuest.title} ${activeGuest.firstName} ${activeGuest.lastName}\nEmail: ${activeGuest.email || 'N/A'}\nPhone: ${activeGuest.phone || 'N/A'}\nPassport: ${activeGuest.passportNo || 'N/A'}`); }}>More...</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 80px 50px', gap: '4px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600 }}>Pax Type</span>
@@ -514,7 +515,7 @@ export function IdsCheckInRegistrationModal({
                     <option value="12 Noon">12 Noon</option>
                     <option value="11 AM">11 AM</option>
                   </select>
-                  <button className="ids-btn-classic">Trace</button>
+                  <button className="ids-btn-classic" onClick={() => { playReceptionChime(); const tr = prompt("Add Reservation Trace Note:", "Special attention on check-in. Preferred upper floor."); if (tr) setStatusMessage(`Trace note logged: "${tr}"`); }}>Trace</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 80px 1fr', gap: '4px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600 }}>Send SMS</span>
@@ -546,34 +547,34 @@ export function IdsCheckInRegistrationModal({
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 60px 70px 60px 24px 1fr', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Company</span>
                 <input className="ids-input" value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} style={{ fontWeight: 700 }} />
-                <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Details</button>
-                <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Bookers</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { playReceptionChime(); alert(`Company Master Details:\nCode: ${companyCode || 'SELF'}\nAccount: Corporate Billing Account\nCredit Limit: ₹50,000.00\nPayment Terms: 15 Days Direct Bill`); }}>Details</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { playReceptionChime(); alert("Booker Contact Info:\nPrimary Booker: Corporate Travel Desk / Direct\nContact Phone: +91 98765 43210"); }}>Bookers</button>
 
                 <span style={{ fontWeight: 600, textAlign: 'right' }}>Pay Mode</span>
                 <input className="ids-input" value={payMode} onChange={(e) => setPayMode(e.target.value)} style={{ fontWeight: 700 }} />
-                <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const pm = prompt("Select Pay Mode (CASH, CARD, UPI, BTC - Bill to Company, COMP):", payMode || "CARD"); if (pm) setPayMode(pm.toUpperCase()); }}>?</button>
                 <div style={{ display: 'flex', gap: '2px' }}>
-                  <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '1px 3px' }}>Revenue Discount</button>
-                  <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '1px 3px' }}>Extra Chg</button>
+                  <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '1px 3px' }} onClick={() => { playReceptionChime(); const disc = prompt("Enter Authorized Revenue Discount % (0 - 30):", "10"); if (disc) setStatusMessage(`Revenue discount applied: ${disc}%`); }}>Revenue Discount</button>
+                  <button className="ids-btn-classic" style={{ fontSize: '9px', padding: '1px 3px' }} onClick={() => { playReceptionChime(); const chg = prompt("Add Extra Charge Description & Amount:", "Extra Bed / Rollaway - 800 INR"); if (chg) setStatusMessage(`Extra Charge logged: ${chg}`); }}>Extra Chg</button>
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '70px 50px 24px 130px 70px 60px 24px 1fr', gap: '4px', alignItems: 'center', marginTop: '4px' }}>
                 <span style={{ fontWeight: 600 }}>Bill Inst</span>
                 <input className="ids-input" value={billInst} onChange={(e) => setBillInst(e.target.value)} style={{ textAlign: 'center' }} />
-                <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const bi = prompt("Select Billing Instruction Code:\n1: All Charges to Guest\n2: Room to Company, Extras to Guest\n3: All to Company", billInst || "1"); if (bi) setBillInst(bi); }}>?</button>
                 <div></div>
 
                 <span style={{ fontWeight: 600, textAlign: 'right' }}>Plan Code</span>
                 <input className="ids-input" value={planCode} onChange={(e) => setPlanCode(e.target.value)} style={{ fontWeight: 700 }} />
-                <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const pc = prompt("Select Plan Code (EP - Room Only, CP - Bed & Breakfast, MAP - Half Board, AP - Full Board):", planCode || "CP"); if (pc) setPlanCode(pc.toUpperCase()); }}>?</button>
                 <div></div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '70px 50px 24px 130px 70px 90px 1fr', gap: '4px', alignItems: 'center', marginTop: '4px' }}>
                 <span style={{ fontWeight: 600 }}>Business Source</span>
                 <input className="ids-input" value={businessSource} onChange={(e) => setBusinessSource(e.target.value)} style={{ fontWeight: 700 }} />
-                <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const bs = prompt("Select Business Source (FIT, OTA, CORP, DIR - Direct Walkin, AGT - Travel Agent):", businessSource || "DIR"); if (bs) setBusinessSource(bs.toUpperCase()); }}>?</button>
                 <div></div>
 
                 <span style={{ fontWeight: 600, textAlign: 'right' }}>Rate</span>
@@ -588,7 +589,7 @@ export function IdsCheckInRegistrationModal({
               <div style={{ display: 'grid', gridTemplateColumns: '70px 50px 24px 1fr 90px 60px 80px', gap: '4px', alignItems: 'center', marginTop: '4px' }}>
                 <span style={{ fontWeight: 600 }}>Market Segment</span>
                 <input className="ids-input" value={marketSegment} onChange={(e) => setMarketSegment(e.target.value)} style={{ fontWeight: 700 }} />
-                <button className="ids-btn-classic" style={{ padding: '0 2px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 2px' }} onClick={() => { playReceptionChime(); const ms = prompt("Select Market Segment (COMM - Commercial, LEIS - Leisure, CONF - Conference, GOVT - Government):", marketSegment || "COMM"); if (ms) setMarketSegment(ms.toUpperCase()); }}>?</button>
                 <div style={{ fontSize: '10px', color: '#555', fontStyle: 'italic' }}>{statusMessage}</div>
 
                 <span style={{ fontWeight: 600, textAlign: 'right' }}>Scanty Baggage</span>
@@ -596,7 +597,7 @@ export function IdsCheckInRegistrationModal({
                   <option value="No">No</option>
                   <option value="Yes">Yes</option>
                 </select>
-                <button className="ids-btn-classic" style={{ fontSize: '10px' }}>Guest Details</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { playReceptionChime(); alert(`Guest Details Sheet:\nGuest: ${activeGuest.title} ${activeGuest.firstName} ${activeGuest.lastName}\nNationality: ${activeGuest.nationality || 'IND'}\nVIP Status: ${activeGuest.classification}\nRoom: ${booking.roomNo}`); }}>Guest Details</button>
               </div>
             </div>
 
@@ -613,9 +614,9 @@ export function IdsCheckInRegistrationModal({
 
             {/* Bottom Button Toolbar from Frame 012 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid #D0CDC0', paddingTop: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Spl. Inst...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Local Add</button>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Others...</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const inst = prompt("Special Instructions / Guest Notes:", "Airport drop required at 08:00 AM."); if (inst) setStatusMessage(`Special Instruction saved: "${inst}"`); }}>Spl. Inst...</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const addr = prompt("Local Address / Stay Location in City:", "Dilsukhnagar, Hyderabad, Telangana"); if (addr) setStatusMessage(`Local Address: ${addr}`); }}>Local Add</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); alert("Additional PMS Parameters:\nWake-up Call: Not set\nNewspaper: Times of India\nKeycard Count: 2 Issued\nRegistration Form: Signed & Filed"); }}>Others...</button>
               <button 
                 className="ids-btn-classic" 
                 style={{ minWidth: '65px', fontWeight: 700, color: '#0A246A' }}
@@ -623,12 +624,12 @@ export function IdsCheckInRegistrationModal({
               >
                 <u>S</u>ave
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Clear</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
+              <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); if (confirm("Clear current form inputs?")) { setRegNo(Math.floor(10000 + Math.random() * 90000).toString()); setStatusMessage("Registration form fields refreshed."); } }}>Clear</button>
+              <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Navigator: Showing active check-in transaction pane."); }}>Panel</button>
               <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '35px' }}>GI</button>
-                <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Load Pgm</button>
+                <button className="ids-btn-classic" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI):\nHotel Elite Inn - Unit 01\nProperty Tax No: 36AAACH1234F1Z5\nNight Audit Cutoff: 02:00 AM"); }}>GI</button>
+                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playSuccessChime(); setStatusMessage("Loaded PMS FortuneNext Check-In Program V6.5002.5 successfully."); }}>Load Pgm</button>
               </div>
             </div>
           </div>
@@ -1092,9 +1093,9 @@ export function IdsRoomRackConsoleModal({
 
           {/* Bottom buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Print</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Previous</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Next</button>
+            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); window.print(); }}>Print</button>
+            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '3' : (prev === '1' ? 'All' : String(Number(prev) - 1))); }}>Previous</button>
+            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '1' : (prev === '3' ? 'All' : String(Number(prev) + 1))); }}>Next</button>
             <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
           </div>
         </div>

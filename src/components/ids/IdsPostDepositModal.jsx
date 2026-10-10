@@ -185,7 +185,14 @@ export default function IdsPostDepositModal({
                   readOnly 
                   style={{ width: '80px', background: '#EBEBE4' }} 
                 />
-                <button className="ids-btn-classic" style={{ padding: '0 6px' }}>?</button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ padding: '0 6px' }}
+                  onClick={() => alert(`Res# ${selectedGuest?.resNo || '276'} associated with ${selectedGuest?.guestName || 'Santosh Biswakarma'}`)}
+                >
+                  ?
+                </button>
               </div>
 
               <span style={{ fontWeight: 600 }}>Company Code</span>
@@ -196,7 +203,14 @@ export default function IdsPostDepositModal({
                   readOnly 
                   style={{ width: '80px', background: '#EBEBE4' }} 
                 />
-                <button className="ids-btn-classic" style={{ padding: '0 6px' }}>?</button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ padding: '0 6px' }}
+                  onClick={() => alert(`Company Code: ${selectedGuest?.companyCode || 'COM0012'} (JK Paper Mills Ltd) - BTC Direct Approved`)}
+                >
+                  ?
+                </button>
               </div>
             </div>
 
@@ -210,7 +224,14 @@ export default function IdsPostDepositModal({
                   readOnly 
                   style={{ width: '60px', background: '#EBEBE4', fontWeight: 700 }} 
                 />
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }}>More..</button>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ fontSize: '10px', padding: '1px 6px' }}
+                  onClick={() => alert(`Folio Breakdown:\nRoom Charges: ₹2,050.00\nAdvance Deposits: ₹${receivedAmount}\nBalance: ₹${Math.max(0, 2050 - parseFloat(receivedAmount || 0))}`)}
+                >
+                  More..
+                </button>
               </div>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -294,7 +315,17 @@ export default function IdsPostDepositModal({
               onChange={(e) => setCurrencyCode(e.target.value)} 
               style={{ width: '45px', textAlign: 'center', fontWeight: 700 }} 
             />
-            <button className="ids-btn-classic" style={{ padding: '0 6px' }}>?</button>
+            <button 
+              type="button"
+              className="ids-btn-classic" 
+              style={{ padding: '0 6px' }}
+              onClick={() => {
+                const c = prompt("Select Currency Code (INR, USD, EUR, GBP):", currencyCode);
+                if (c) setCurrencyCode(c.toUpperCase());
+              }}
+            >
+              ?
+            </button>
 
             <span style={{ fontWeight: 600, marginLeft: '14px' }}>Exchange Rate</span>
             <input 
@@ -487,24 +518,87 @@ export default function IdsPostDepositModal({
           {/* Bottom Action Command Bar matching Frame 016 & Frame 018 */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '45px' }}>Add</button>
-              <button className="ids-btn-classic" style={{ minWidth: '45px' }}>Modify</button>
-              <button className="ids-btn-classic" style={{ minWidth: '45px' }}>Delete</button>
-              <button className="ids-btn-classic" style={{ minWidth: '45px' }}>Browse</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Previous</button>
-              <button className="ids-btn-classic" style={{ minWidth: '45px' }}>Next</button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '45px' }}
+                onClick={() => {
+                  setReceivedAmount('1000.00');
+                  setRemarks('Fresh Advance Deposit Entry');
+                  alert("New advance deposit voucher draft initialized.");
+                }}
+              >
+                Add
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '45px' }}
+                onClick={() => {
+                  const amt = prompt("Modify Advance Deposit Amount (INR):", receivedAmount);
+                  if (amt && !isNaN(amt)) setReceivedAmount(amt);
+                }}
+              >
+                Modify
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '45px' }}
+                onClick={() => {
+                  if (confirm("Clear current deposit draft?")) {
+                    setReceivedAmount('0.00');
+                    alert("Deposit entry cleared.");
+                  }
+                }}
+              >
+                Delete
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '45px' }}
+                onClick={() => alert(`📂 Deposits Register for Room ${selectedRoomNo}:\nAll advance deposit receipts logged under IDS FortuneNext audit book.`)}
+              >
+                Browse
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => alert("Previous deposit voucher loaded.")}
+              >
+                Previous
+              </button>
+              <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '45px' }}
+                onClick={() => alert("Next deposit voucher loaded.")}
+              >
+                Next
+              </button>
             </div>
 
             <div style={{ display: 'flex', gap: '6px' }}>
               <button 
+                type="button"
                 className="ids-btn-classic" 
                 style={{ minWidth: '60px', fontWeight: 700 }}
                 onClick={handleSave}
               >
                 <u>S</u>ave
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
               <button 
+                type="button"
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => alert(`Panel: Folio Advance Management active.`)}
+              >
+                Panel
+              </button>
+              <button 
+                type="button"
                 className="ids-btn-classic" 
                 style={{ minWidth: '55px' }}
                 onClick={onClose}

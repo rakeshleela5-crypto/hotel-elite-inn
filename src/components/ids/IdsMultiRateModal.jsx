@@ -422,7 +422,10 @@ export default function IdsMultiRateModal({
               >
                 Confirm
               </button>
-              <button className="ids-btn-classic">Package Incl</button>
+              <button 
+                className="ids-btn-classic"
+                onClick={() => alert("Package Inclusions for Multi-Rate Stay:\n• Complimentary Buffet Breakfast\n• 2 Bottles Mineral Water Daily\n• High-speed Wi-Fi Access")}
+              >Package Incl</button>
               <button className="ids-btn-classic" onClick={onClose}>Back</button>
             </div>
 

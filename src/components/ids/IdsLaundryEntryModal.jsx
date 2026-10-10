@@ -269,7 +269,14 @@ export default function IdsLaundryEntryModal({
                     onChange={(e) => setFormData({ ...formData, refNo: e.target.value })}
                     style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: isFormLocked ? '#EBE9ED' : '#FFF', fontWeight: 'bold' }}
                   />
-                  <button style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}>?</button>
+                  <button 
+                    style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
+                    title="Reference No Lookup"
+                    onClick={() => {
+                      const ref = prompt("Enter Laundry Reference #:", formData.refNo);
+                      if (ref) setFormData({ ...formData, refNo: ref });
+                    }}
+                  >?</button>
                 </div>
               </div>
 

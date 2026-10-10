@@ -444,7 +444,12 @@ export default function IdsPosBillModal({
                 onChange={e => setCovers(e.target.value)}
                 style={{ width: '40px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
               />
-              <button className="ids-btn" style={{ padding: '1px 4px', fontSize: '10px', fontWeight: 600 }}>RD</button>
+              <button 
+                className="ids-btn" 
+                style={{ padding: '1px 4px', fontSize: '10px', fontWeight: 600 }}
+                title="Room / Dine-In Details"
+                onClick={() => alert(`Covers & Dine-in Details:\n• Table / Room: ${activeKot?.roomNo || activeKot?.tableNo || 'Table 10'}\n• Covers: ${covers}\n• Guest: ${activeKot?.guestName || 'In-House Guest'}`)}
+              >RD</button>
             </div>
             <div style={{ background: '#FFF', border: '1px solid #7F9DB9', height: '20px', padding: '2px 6px', fontSize: '11px', color: '#555' }}>
               {activeKot?.guestName || ''}

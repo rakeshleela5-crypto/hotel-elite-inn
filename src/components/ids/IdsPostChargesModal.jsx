@@ -288,7 +288,18 @@ export default function IdsPostChargesModal({
                   value={roomNo}
                   onChange={(e) => setRoomNo(e.target.value)}
                 />
-                <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} title="Lookup Room">?</button>
+                <button 
+                  type="button" 
+                  className="ids-btn-classic" 
+                  style={{ padding: '0 4px' }} 
+                  title="Lookup Room"
+                  onClick={() => {
+                    const r = prompt("Select In-House Room (101, 102, 105, 201, 203, 301):", roomNo);
+                    if (r) setRoomNo(r);
+                  }}
+                >
+                  ?
+                </button>
 
                 <button 
                   type="button" 
@@ -309,7 +320,14 @@ export default function IdsPostChargesModal({
                 />
 
                 <div>
-                  <button type="button" className="ids-btn-classic" style={{ padding: '1px 8px' }}>More...</button>
+                  <button 
+                    type="button" 
+                    className="ids-btn-classic" 
+                    style={{ padding: '1px 8px' }}
+                    onClick={() => alert(`📋 Folio Details for Room ${roomNo}:\nFolio: ${folioNo}\nGuest: ${guestName}\nStatus: Verified In-House`)}
+                  >
+                    More...
+                  </button>
                 </div>
               </div>
 
@@ -370,7 +388,15 @@ export default function IdsPostChargesModal({
                     <option key={r.code} value={r.code}>{r.code}</option>
                   ))}
                 </select>
-                <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+                <button 
+                  type="button" 
+                  className="ids-btn-classic" 
+                  style={{ padding: '0 4px' }}
+                  title="Revenue Code Guide"
+                  onClick={() => alert(`💡 Revenue Codes:\nTRV = Travel Desk\nLND = Laundry\nFNB = Food & Beverage\nMNB = Minibar / Confectionery\nSPA = Wellness & Spa\nTEL = Telecom`)}
+                >
+                  ?
+                </button>
                 <div />
 
                 <label style={{ fontWeight: 600, textAlign: 'right' }}>Description</label>
@@ -588,19 +614,60 @@ export default function IdsPostChargesModal({
               <button type="button" className="ids-btn-classic" onClick={handleAddNew} style={{ minWidth: '55px' }}>
                 Add
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  const amt = prompt("Modify Charge Amount (INR):", baseAmount);
+                  if (amt && !isNaN(amt)) setBaseAmount(parseFloat(amt));
+                }}
+              >
                 Modify
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  if (confirm(`Remove charge (${revenueCode} - ₹${netAmount}) from posting queue?`)) {
+                    setBaseAmount(0);
+                    alert("Charge entry cleared.");
+                  }
+                }}
+              >
                 Delete
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => alert(`📂 Browsing posted charges journal for Room ${roomNo}: All vouchers synchronized.`)}
+              >
                 Browse
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  const codes = REVENUE_CODES_DATA.map(r => r.code);
+                  const currIdx = codes.indexOf(revenueCode);
+                  if (currIdx > 0) handleSelectRevenueCode(codes[currIdx - 1]);
+                }}
+              >
                 Previous
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  const codes = REVENUE_CODES_DATA.map(r => r.code);
+                  const currIdx = codes.indexOf(revenueCode);
+                  if (currIdx < codes.length - 1) handleSelectRevenueCode(codes[currIdx + 1]);
+                }}
+              >
                 Next
               </button>
               <button 
@@ -611,7 +678,12 @@ export default function IdsPostChargesModal({
               >
                 Save
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => setCurrentView(currentView === 'post-charges' ? 'quick-balances' : 'post-charges')}
+              >
                 Panel
               </button>
               <button 
@@ -674,7 +746,17 @@ export default function IdsPostChargesModal({
                 value={roomNo}
                 readOnly
               />
-              <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ padding: '0 4px' }}
+                onClick={() => {
+                  const r = prompt("Lookup In-House Room:", roomNo);
+                  if (r) setRoomNo(r);
+                }}
+              >
+                ?
+              </button>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <span style={{ fontWeight: 700, color: '#0A246A' }}>MR. RAJESH SHARMA</span>
@@ -829,13 +911,32 @@ export default function IdsPostChargesModal({
               >
                 ◀ Post Another Room Charge
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '70px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '70px' }}
+                onClick={() => alert(`🧾 Bill Summary for Room ${roomNo}:\nTotal Debits: ₹${(2050 + (savedPostings.length > 0 ? netAmount : 0)).toFixed(2)}\nDeposits: ₹2,000.00\nNet Outstanding: ₹${Math.max(0, 2050 + (savedPostings.length > 0 ? netAmount : 0) - 2000).toFixed(2)}`)}
+              >
                 Bill Details
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => {
+                  setBaseAmount(0);
+                  setRemarks('');
+                  alert("Post charge entry reset.");
+                }}
+              >
                 Clear
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }}>
+              <button 
+                type="button" 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => setCurrentView('post-charges')}
+              >
                 Panel
               </button>
               <button 

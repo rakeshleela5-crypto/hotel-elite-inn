@@ -235,7 +235,11 @@ export default function IdsAmendStayModal({
             >
               Change
             </button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+            <button 
+              className="ids-btn-classic" 
+              style={{ minWidth: '60px' }}
+              onClick={() => alert("Amend Stay Control Panel: Departure schedule verified against room rack.")}
+            >Panel</button>
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '60px' }}

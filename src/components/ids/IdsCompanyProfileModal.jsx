@@ -524,7 +524,15 @@ export default function IdsCompanyProfileModal({
                       onChange={(e) => handleChange('marSeg', e.target.value)}
                       style={{ width: '70px', fontWeight: 700 }} 
                     />
-                    <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
+                    <button 
+                      className="ids-btn-classic" 
+                      style={{ width: '22px' }}
+                      title="Market Segment Lookup"
+                      onClick={() => {
+                        const seg = prompt("Select Market Segment (OTA, CORP, FIT, GROUP):", formData.marSeg);
+                        if (seg) handleChange('marSeg', seg.toUpperCase());
+                      }}
+                    >?</button>
                     <span style={{ fontSize: '10px', color: '#666', lineHeight: '20px' }}>OTA (Online)</span>
                   </div>
 

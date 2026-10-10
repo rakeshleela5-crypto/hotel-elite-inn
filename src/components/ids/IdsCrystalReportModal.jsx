@@ -143,11 +143,11 @@ export default function IdsCrystalReportModal({
 
           <div style={{ width: '1px', height: '18px', background: '#999', margin: '0 4px' }} />
 
-          <button type="button" className="ids-btn-classic" disabled style={{ padding: '1px 6px', color: '#888' }}>⏮</button>
-          <button type="button" className="ids-btn-classic" disabled style={{ padding: '1px 6px', color: '#888' }}>◀</button>
+          <button type="button" className="ids-btn-classic" style={{ padding: '1px 6px' }} title="First Page" onClick={() => alert("Already on page 1")}>⏮</button>
+          <button type="button" className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Previous Page" onClick={() => alert("Already on first page")}>◀</button>
           <span style={{ fontSize: '10.5px' }}>Page 1 of 1</span>
-          <button type="button" className="ids-btn-classic" disabled style={{ padding: '1px 6px', color: '#888' }}>▶</button>
-          <button type="button" className="ids-btn-classic" disabled style={{ padding: '1px 6px', color: '#888' }}>⏭</button>
+          <button type="button" className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Next Page" onClick={() => alert("Already on last page")}>▶</button>
+          <button type="button" className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Last Page" onClick={() => alert("Already on last page")}>⏭</button>
 
           <button 
             type="button"

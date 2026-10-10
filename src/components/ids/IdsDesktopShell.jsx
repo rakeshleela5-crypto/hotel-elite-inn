@@ -1478,8 +1478,8 @@ export default function IdsDesktopShell({
             <span>FORTUNE NEXT V6.5.002.2 - {HOTEL_CONFIG.name}</span>
           </div>
           <div className="ids-titlebar-buttons">
-            <button className="ids-win-btn" title="Minimize">_</button>
-            <button className="ids-win-btn" title="Maximize">□</button>
+            <button className="ids-win-btn" title="Minimize" onClick={() => alert("IDS Fortune NEXT minimized to Windows taskbar.")}>_</button>
+            <button className="ids-win-btn" title="Maximize" onClick={() => alert("IDS Fortune NEXT maximized to full desktop.")}>□</button>
             <button className="ids-win-btn close" title="Exit PMS" onClick={onExitPMS}>✕</button>
           </div>
         </div>

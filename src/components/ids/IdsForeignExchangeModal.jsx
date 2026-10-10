@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './idsFortuneNext.css';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   Globe, DollarSign, Printer, CheckCircle2, 
   Search, ShieldCheck, ArrowRight, RefreshCw, 
@@ -436,9 +437,30 @@ export default function IdsForeignExchangeModal({
             </button>
 
             <div style={{ display: 'flex', gap: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Add</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Modify</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Delete</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Ready to enter new Foreign Exchange Encashment transaction.");
+                }}
+              >Add</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Foreign Currency Exchange Record loaded for modification.");
+                }}
+              >Modify</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Selected Foreign Exchange entry deleted from cashier session.");
+                }}
+              >Delete</button>
               <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => setBrowseModalOpen(true)}>Browse</button>
               <button 
                 className="ids-btn-classic" 
@@ -447,7 +469,14 @@ export default function IdsForeignExchangeModal({
               >
                 Save
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '55px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Forex Cashier Control Panel: Total USD $2,000.00 encashed today.");
+                }}
+              >Panel</button>
               <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
             </div>
           </div>

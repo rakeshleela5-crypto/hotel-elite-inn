@@ -5,6 +5,7 @@ import {
   HelpCircle, ChevronDown, ChevronRight, Layers, FileText, ArrowRight
 } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 20: HOW TO USE ADDITIONAL ROOM RATE OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -290,7 +291,7 @@ export default function IdsAdditionalRoomRateModal({
                     value={roomNo}
                     onChange={(e) => setRoomNo(e.target.value)}
                   />
-                  <button type="button" className="ids-btn-classic" style={{ padding: '0 6px' }} title="Lookup Room">?</button>
+                  <button type="button" className="ids-btn-classic" style={{ padding: '0 6px' }} title="Lookup Room" onClick={() => { playReceptionChime(); const r = prompt("Select Room Number:", roomNo); if (r) setRoomNo(r); }}>?</button>
                 </div>
 
                 <label style={{ fontWeight: 600 }}>Folio #</label>
@@ -302,7 +303,7 @@ export default function IdsAdditionalRoomRateModal({
                     value={folioNo}
                     onChange={(e) => setFolioNo(e.target.value)}
                   />
-                  <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} title="Lookup Folio">?</button>
+                  <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} title="Lookup Folio" onClick={() => { playReceptionChime(); const f = prompt("Select Folio Number (1: Master, 2: Extras):", folioNo); if (f) setFolioNo(f); }}>?</button>
                 </div>
 
                 <label style={{ fontWeight: 600 }}>Reg #</label>
@@ -538,19 +539,19 @@ export default function IdsAdditionalRoomRateModal({
               <button type="button" className="ids-btn-classic" onClick={handleAddNew} style={{ minWidth: '55px' }}>
                 Add
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Modify enabled: Adjust Rate or Amount and click Save."); }}>
                 Modify
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); if (confirm("Delete this posted room rate item?")) alert("Item removed."); }}>
                 Delete
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Browse Room Tariffs: Showing active tariff schedule."); }}>
                 Browse
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to previous room rate entry."); }}>
                 Previous
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to next room rate entry."); }}>
                 Next
               </button>
               <button 
@@ -561,7 +562,7 @@ export default function IdsAdditionalRoomRateModal({
               >
                 Save
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Panel Selector: Additional Room Rate Controller active."); }}>
                 Panel
               </button>
               <button 
@@ -624,7 +625,7 @@ export default function IdsAdditionalRoomRateModal({
                 value={roomNo}
                 readOnly
               />
-              <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+              <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); const r = prompt("Lookup Quick Balance by Room #:", roomNo); if (r) setRoomNo(r); }}>?</button>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <span style={{ fontWeight: 700, color: '#0A246A' }}>{guestName}</span>
@@ -844,13 +845,13 @@ export default function IdsAdditionalRoomRateModal({
               >
                 ◀ Post Another Rate
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '70px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => { playReceptionChime(); alert(`Bill Details for Room #${roomNo} (${guestName}):\nBalance: ₹12,850.00\nFolio: 1`); }}>
                 Bill Details
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); alert("Quick Balances matrix refreshed."); }}>
                 Clear
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Selector: Front Office Audit View."); }}>
                 Panel
               </button>
               <button 

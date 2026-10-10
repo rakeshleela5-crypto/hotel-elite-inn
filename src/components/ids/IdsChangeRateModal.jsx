@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 11: HOW TO CHANGE ROOM RATE / CHANGE TARIFF IN IDS 6.5 & 7.0
@@ -246,7 +247,7 @@ export function IdsRateDetailsModal({
               <span>Rate / Rack ID</span>
               <div style={{ display: 'flex', gap: '2px' }}>
                 <input className="ids-input" defaultValue="1" style={{ width: '35px' }} />
-                <button className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Rate / Rack ID master lookup: 1 - Standard Executive Rack"); }}>?</button>
               </div>
 
               <span>Total Pax</span>
@@ -275,7 +276,7 @@ export function IdsRateDetailsModal({
               >
                 Discount
               </button>
-              <button className="ids-btn-classic" style={{ width: '90px', padding: '4px' }}>
+              <button className="ids-btn-classic" style={{ width: '90px', padding: '4px' }} onClick={() => { playReceptionChime(); setNewCharge('3,500.00'); alert("Revenue category rate ₹3,500.00 loaded."); }}>
                 Revenue
               </button>
             </div>
@@ -345,7 +346,7 @@ export function IdsRateDetailsModal({
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}>Rate Tax</td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
                     <span style={{ fontWeight: 600 }}>798</span>
-                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }}>?</button>
+                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }} onClick={() => { playReceptionChime(); alert("Tax Slab 798:\nCGST: 6%\nSGST: 6%\nTotal GST: 12%"); }}>?</button>
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', color: '#0A246A', fontWeight: 600 }}>Oct New Tax Slab</td>
@@ -354,7 +355,7 @@ export function IdsRateDetailsModal({
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}>Plan Tax</td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
                     <span style={{ fontWeight: 600 }}>804</span>
-                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }}>?</button>
+                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }} onClick={() => { playReceptionChime(); alert("Tax Slab 804 (Food & Beverage Plan):\nCGST: 2.5%\nSGST: 2.5%\nTotal GST: 5%"); }}>?</button>
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', color: '#0A246A' }}>SGST_CGST 12%</td>
@@ -363,7 +364,7 @@ export function IdsRateDetailsModal({
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}>Extra Bed Rate Tax</td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
                     <span style={{ fontWeight: 600 }}>804</span>
-                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }}>?</button>
+                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }} onClick={() => { playReceptionChime(); alert("Extra Bed Tax Slab 804:\nCGST: 6%\nSGST: 6%\nTotal GST: 12%"); }}>?</button>
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', color: '#0A246A' }}>SGST_CGST 12%</td>
@@ -372,7 +373,7 @@ export function IdsRateDetailsModal({
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}>Extra Bed Plan Tax</td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
                     <span style={{ fontWeight: 600 }}>804</span>
-                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }}>?</button>
+                    <button className="ids-btn-classic" style={{ marginLeft: '4px', padding: '0 3px' }} onClick={() => { playReceptionChime(); alert("Extra Bed Plan Tax Slab 804:\nCGST: 2.5%\nSGST: 2.5%\nTotal GST: 5%"); }}>?</button>
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', color: '#0A246A' }}>SGST_CGST 12%</td>
@@ -583,13 +584,13 @@ export default function IdsChangeRateModal({
               <span>Company</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                 <input className="ids-input" value={tariffData.companyCode || ''} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
-                <button className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Company details: ${tariffData.companyName || 'Corporate Account'}`); }}>?</button>
               </div>
 
               <span>Currency</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                 <input className="ids-input" value={tariffData.currency} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
-                <button className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Currency: INR (Indian Rupee)"); }}>?</button>
               </div>
 
               <span>Guest Classification</span>
@@ -615,12 +616,12 @@ export default function IdsChangeRateModal({
               <input className="ids-input" value={tariffData.companyName || ''} readOnly style={{ background: '#EBEBE4' }} />
 
               <span></span>
-              <button className="ids-btn-classic" style={{ width: '85px', fontSize: '10px' }}>Pax Details</button>
+              <button className="ids-btn-classic" style={{ width: '85px', fontSize: '10px' }} onClick={() => { playReceptionChime(); alert(`Pax Details:\nPrimary: ${tariffData.guestName}\nTotal Pax: 2 Adult(s)`); }}>Pax Details</button>
 
               <span>Plan</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                 <input className="ids-input" value={tariffData.plan} readOnly style={{ width: '45px', background: '#EBEBE4' }} />
-                <button className="ids-btn-classic" style={{ padding: '0 4px' }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Plan details: ${tariffData.plan} (Continental Plan / Bed & Breakfast)`); }}>?</button>
               </div>
 
               <span>Rate</span>
@@ -686,7 +687,7 @@ export default function IdsChangeRateModal({
             >
               Package
             </button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Clear</button>
+            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); alert("Tariff form fields reset to current booking values."); }}>Clear</button>
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '60px' }}

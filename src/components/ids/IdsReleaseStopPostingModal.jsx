@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './idsFortuneNext.css';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   Lock, Unlock, ShieldAlert, Check, X, AlertTriangle, 
   HelpCircle, ChevronDown, FileText, Printer, RefreshCw, 
@@ -416,7 +417,16 @@ export default function IdsReleaseStopPostingModal({
                   <span style={{ fontWeight: 600 }}>Room#</span>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <input className="ids-input" value={selectedRoom} readOnly style={{ width: '80px', fontWeight: 700 }} />
-                    <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
+                    <button 
+                      className="ids-btn-classic" 
+                      style={{ width: '22px' }}
+                      title="Select Room"
+                      onClick={() => {
+                        playReceptionChime();
+                        const r = prompt("Select Room (201, 202, 105):", selectedRoom);
+                        if (r && roomsList.find(x => x.roomNo === r)) setSelectedRoom(r);
+                      }}
+                    >?</button>
                   </div>
 
                   <span style={{ fontWeight: 600 }}>Folio #</span>
@@ -449,7 +459,16 @@ export default function IdsReleaseStopPostingModal({
                       <option value="MIN">MIN - Minibar</option>
                       <option value="TRV">TRV - Travel Desk</option>
                     </select>
-                    <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
+                    <button 
+                      className="ids-btn-classic" 
+                      style={{ width: '22px' }}
+                      title="Select Revenue Outlet"
+                      onClick={() => {
+                        playReceptionChime();
+                        const rev = prompt("Enter Revenue Outlet Code (LAU, POS, MIN, TRV):", simRevenueCode);
+                        if (rev) setSimRevenueCode(rev.toUpperCase());
+                      }}
+                    >?</button>
                   </div>
 
                   <span style={{ fontWeight: 600 }}>Description</span>

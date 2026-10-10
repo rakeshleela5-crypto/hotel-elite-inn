@@ -602,7 +602,11 @@ export default function IdsRegularGuestWalkInModal({
                   Save
                 </button>
                 <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setCurrentStep('roomRack')}>Clear</button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }}
+                  onClick={() => alert("Walk-In Control Panel: Regular Guest profile and tariff codes synced.")}
+                >Panel</button>
                 <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setCurrentStep('roomRack')}>Back</button>
               </div>
             </div>

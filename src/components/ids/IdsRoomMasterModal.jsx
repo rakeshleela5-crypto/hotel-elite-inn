@@ -336,7 +336,15 @@ export default function IdsRoomMasterModal({
                   onChange={(e) => handleFieldChange('rateTable', e.target.value)}
                   style={{ width: '80px', fontWeight: 700 }}
                 />
-                <button className="ids-btn-classic" style={{ width: '22px' }}>?</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '22px' }}
+                  title="Rate Table Lookup"
+                  onClick={() => {
+                    const rt = prompt("Select Default Rate Table Code (100, 200, 300):", formData.rateTable || '100');
+                    if (rt) handleFieldChange('rateTable', rt);
+                  }}
+                >?</button>
               </div>
 
               <span style={{ fontWeight: 600 }}>Room Type</span>

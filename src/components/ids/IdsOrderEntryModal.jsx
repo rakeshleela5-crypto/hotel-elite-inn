@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './idsFortuneNext.css';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   Printer, Edit3, ArrowRightLeft, Users, BookOpen, Scissors, 
   Trash2, XOctagon, ToggleLeft, ToggleRight, Building, HelpCircle, 
@@ -3876,10 +3877,10 @@ export default function IdsOrderEntryModal({
               {/* Bottom toolbar */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', borderTop: '1px solid #BBB', paddingTop: '8px' }}>
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                  <button className="ids-btn" style={{ minWidth: '32px' }}>⬅️</button>
-                  <button className="ids-btn" style={{ minWidth: '32px' }}>⬆️</button>
-                  <button className="ids-btn" style={{ minWidth: '32px' }}>⬇️</button>
-                  <button className="ids-btn" style={{ minWidth: '32px' }}>➡️</button>
+                  <button className="ids-btn" style={{ minWidth: '32px' }} title="Previous Page" onClick={() => { playReceptionChime(); alert("Navigating to previous tables grid page."); }}>⬅️</button>
+                  <button className="ids-btn" style={{ minWidth: '32px' }} title="Top of List" onClick={() => { playReceptionChime(); alert("Scrolled table list to top."); }}>⬆️</button>
+                  <button className="ids-btn" style={{ minWidth: '32px' }} title="Bottom of List" onClick={() => { playReceptionChime(); alert("Scrolled table list to bottom."); }}>⬇️</button>
+                  <button className="ids-btn" style={{ minWidth: '32px' }} title="Next Page" onClick={() => { playReceptionChime(); alert("Navigating to next tables grid page."); }}>➡️</button>
                   <button 
                     className="ids-btn" 
                     onClick={() => {
@@ -4026,7 +4027,7 @@ export default function IdsOrderEntryModal({
                   <span style={{ fontWeight: 600 }}>Date</span>
                   <div style={{ display: 'flex', gap: '2px' }}>
                     <input type="text" value={sessionTransferDate} onChange={e => setSessionTransferDate(e.target.value)} style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
-                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }}>?</button>
+                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }} title="Calendar Lookup" onClick={() => { playReceptionChime(); const d = prompt("Enter Transfer Date (DD/MM/YYYY):", sessionTransferDate); if (d) setSessionTransferDate(d); }}>?</button>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -4042,7 +4043,7 @@ export default function IdsOrderEntryModal({
                       <option value="Dinner">Dinner</option>
                       <option value="General">General</option>
                     </select>
-                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }}>?</button>
+                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }} title="Session Lookup" onClick={() => { playReceptionChime(); const s = prompt("Select POS Session (Breakfast / Lunch / Dinner / General):", sessionNewSession); if (s) setSessionNewSession(s); }}>?</button>
                   </div>
                 </div>
               </div>

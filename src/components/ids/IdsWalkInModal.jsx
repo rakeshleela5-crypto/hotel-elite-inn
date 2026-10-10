@@ -274,9 +274,36 @@ export default function IdsWalkInModal({
 
                   {/* 3 Authentic Icons matching Frame 015 */}
                   <div style={{ display: 'flex', gap: '4px', marginLeft: '12px' }}>
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Gate / Room Status">⛩️</button>
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Room Transfer">⇆</button>
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px' }} title="Bedding Type">🛏️</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px' }} 
+                      title="Gate / Room Status"
+                      onClick={() => alert(`⛩️ Room ${selectedRoom} Status: Vacant Clean. RFID key encoder ready.`)}
+                    >
+                      ⛩️
+                    </button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px' }} 
+                      title="Room Transfer"
+                      onClick={() => {
+                        const target = prompt("Enter Target Room to switch:", "205");
+                        if (target) setSelectedRoom(target);
+                      }}
+                    >
+                      ⇆
+                    </button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px' }} 
+                      title="Bedding Type"
+                      onClick={() => alert(`🛏️ Bedding Configuration: King Bed (Extra Cot Available on Demand)`)}
+                    >
+                      🛏️
+                    </button>
                   </div>
                 </div>
 
@@ -627,14 +654,51 @@ export default function IdsWalkInModal({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '85px' }}>Guest Status</span>
                   <input className="ids-input" style={{ width: '60px', fontWeight: 700 }} value={guestStatus} onChange={(e) => setGuestStatus(e.target.value)} />
-                  <button className="ids-btn-classic" style={{ width: '20px', height: '20px', padding: 0 }}>?</button>
-                  <button className="ids-btn-classic" style={{ padding: '1px 8px', marginLeft: '6px' }}>DW</button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ width: '20px', height: '20px', padding: 0 }}
+                    title="Lookup Guest Status"
+                    onClick={() => {
+                      const s = prompt("Select Guest Status Code (WLK/FIT/VIP/CORP):", guestStatus);
+                      if (s) setGuestStatus(s.toUpperCase());
+                    }}
+                  >
+                    ?
+                  </button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ padding: '1px 8px', marginLeft: '6px' }}
+                    title="Day-Wise Breakdown"
+                    onClick={() => alert(`📅 Day-Wise Breakdown:\n${rackDepDate}: Room ${selectedRoom} - Standard Nightly Tariff: ₹${rateAmount.toLocaleString('en-IN')}`)}
+                  >
+                    DW
+                  </button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '85px' }}>Nationality</span>
                   <input className="ids-input" style={{ width: '60px' }} value={nationality} onChange={(e) => setNationality(e.target.value)} />
-                  <button className="ids-btn-classic" style={{ width: '20px', height: '20px', padding: 0 }}>?</button>
-                  <button className="ids-btn-classic" style={{ padding: '1px 6px', marginLeft: '6px' }}>More...</button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ width: '20px', height: '20px', padding: 0 }}
+                    title="Lookup Country Code"
+                    onClick={() => {
+                      const n = prompt("Enter Country / Nationality Code (IND/USA/GBR/DEU):", nationality);
+                      if (n) setNationality(n.toUpperCase());
+                    }}
+                  >
+                    ?
+                  </button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ padding: '1px 6px', marginLeft: '6px' }}
+                    onClick={() => alert(`🌍 International Guest Profile & Visa Tracking Mode Enabled.`)}
+                  >
+                    More...
+                  </button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '85px' }}>Pax Type</span>
@@ -643,6 +707,7 @@ export default function IdsWalkInModal({
                     <option value="Child">Child</option>
                   </select>
                   <button 
+                    type="button"
                     className="ids-btn-classic" 
                     style={{ padding: '1px 10px', marginLeft: '6px', fontWeight: 700, background: '#FFF7CC' }}
                     onClick={() => setRateDetailsOpen(true)}
@@ -657,7 +722,17 @@ export default function IdsWalkInModal({
                     <option value="12 Noon">12 Noon</option>
                     <option value="24 Hours">24 Hours</option>
                   </select>
-                  <button className="ids-btn-classic" style={{ padding: '1px 8px', marginLeft: '6px' }}>Trace</button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ padding: '1px 8px', marginLeft: '6px' }}
+                    onClick={() => {
+                      const tr = prompt("Add Guest Folio Trace Alert:", "Late check-out requested / Wakeup call at 6:00 AM");
+                      if (tr) alert(`⏱️ Trace Recorded: "${tr}"`);
+                    }}
+                  >
+                    Trace
+                  </button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '85px' }}>Send SMS</span>
@@ -689,23 +764,70 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Company</span>
                     <input className="ids-input" style={{ width: '90px', fontWeight: 700 }} value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px' }}>Details</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px' }}
+                      onClick={() => alert(`🏢 Company Details:\nCode: ${companyCode}\nName: ${DEFAULT_WALK_IN_ROOM.guest1.companyName}\nCredit Terms: 30 Days BTC\nBilling Instructions: Room Charges to Company`)}
+                    >
+                      Details
+                    </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Bill Inst</span>
                     <input className="ids-input" style={{ width: '40px' }} value={billInst} onChange={(e) => setBillInst(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px', marginLeft: '6px' }}>Bookers</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      title="Billing Instructions"
+                      onClick={() => {
+                        const b = prompt("Billing Instructions:\n1 = All to Guest\n2 = Room to Company, Extras to Guest\n3 = All to Company (BTC)", billInst);
+                        if (b) setBillInst(b);
+                      }}
+                    >
+                      ?
+                    </button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px', marginLeft: '6px' }}
+                      onClick={() => alert(`👤 Corporate Booker: Mr. Sunil Mohapatra (Travel Desk Officer)`)}
+                    >
+                      Bookers
+                    </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Business Source</span>
                     <input className="ids-input" style={{ width: '60px' }} value={businessSource} onChange={(e) => setBusinessSource(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      title="Business Source Selector"
+                      onClick={() => {
+                        const bs = prompt("Business Source (WKN = Walk-in, OTA = Online, CORP = Corporate, DIR = Direct):", businessSource);
+                        if (bs) setBusinessSource(bs.toUpperCase());
+                      }}
+                    >
+                      ?
+                    </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Market Segment</span>
                     <input className="ids-input" style={{ width: '60px' }} value={marketSegment} onChange={(e) => setMarketSegment(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      title="Market Segment Selector"
+                      onClick={() => {
+                        const ms = prompt("Market Segment (FIT = Free Independent, CVG = Corporate Visitor, GRP = Group, GOV = Government):", marketSegment);
+                        if (ms) setMarketSegment(ms.toUpperCase());
+                      }}
+                    >
+                      ?
+                    </button>
                   </div>
                 </div>
 
@@ -714,13 +836,49 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Pay Mode</span>
                     <input className="ids-input" style={{ width: '50px' }} value={payMode} onChange={(e) => setPayMode(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
-                    <button className="ids-btn-classic" style={{ padding: '1px 6px', marginLeft: '12px' }}>Revenue Discount</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      title="Payment Mode Selector"
+                      onClick={() => {
+                        const pm = prompt("Payment Mode (CAS = Cash, CC = Card, UPI = QR Code, BTC = Bill to Company):", payMode);
+                        if (pm) setPayMode(pm.toUpperCase());
+                      }}
+                    >
+                      ?
+                    </button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '1px 6px', marginLeft: '12px' }}
+                      onClick={() => {
+                        const d = prompt("Enter Manager Override Discount % (0-20%):", "10");
+                        if (d) {
+                          const pct = parseFloat(d) || 0;
+                          setRateAmount(Math.round(2500 * (1 - pct/100)));
+                          alert(`✅ ${pct}% discount applied! New Rate: ₹${Math.round(2500 * (1 - pct/100))}`);
+                        }
+                      }}
+                    >
+                      Revenue Discount
+                    </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Plan Code</span>
                     <input className="ids-input" style={{ width: '50px' }} value={planCode} onChange={(e) => setPlanCode(e.target.value)} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      title="Meal Plan Selector"
+                      onClick={() => {
+                        const p = prompt("Select Plan Code (CP = Continental, EP = European, MAP = Half Board, AP = Full Board):", planCode);
+                        if (p) setPlanCode(p.toUpperCase());
+                      }}
+                    >
+                      ?
+                    </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '90px' }}>Rate</span>
@@ -762,8 +920,19 @@ export default function IdsWalkInModal({
                 >
                   Spl. Inst...
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '75px' }}>Local Add</button>
                 <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '75px' }}
+                  onClick={() => {
+                    const loc = prompt("Local / Emergency Contact Address in Rayagada:", "Transit Guest House, Near JK Puram");
+                    if (loc) alert(`📍 Local contact address recorded.`);
+                  }}
+                >
+                  Local Add
+                </button>
+                <button 
+                  type="button"
                   className="ids-btn-classic" 
                   style={{ minWidth: '75px' }}
                   onClick={() => setOtherDetailsOpen(true)}
@@ -775,6 +944,7 @@ export default function IdsWalkInModal({
 
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button 
+                  type="button"
                   className="ids-btn-classic" 
                   style={{ minWidth: '70px', fontWeight: 700, background: '#D1E7DD', color: '#0F5132' }}
                   onClick={handleSaveRegistration}
@@ -782,13 +952,29 @@ export default function IdsWalkInModal({
                 >
                   <u>S</u>ave
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => alert('Form cleared')}>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }} 
+                  onClick={() => alert('Form fields cleared to default.')}
+                >
                   Clear
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }}>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }}
+                  onClick={() => setActiveStep('guest-info')}
+                  title="Toggle Detailed Registration Panel"
+                >
                   Panel
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setActiveStep('rack')}>
+                <button 
+                  type="button"
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }} 
+                  onClick={() => setActiveStep('rack')}
+                >
                   Exit
                 </button>
               </div>
@@ -971,7 +1157,14 @@ export default function IdsWalkInModal({
                   <span style={{ textAlign: 'right' }}>Departure Flight</span>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <input className="ids-input" placeholder="6E-201" style={{ flex: 1 }} />
-                    <button className="ids-btn-classic" style={{ padding: '0 6px' }}>Drop</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ padding: '0 6px' }}
+                      onClick={() => alert(`✈️ Connecting Flight details synchronized with Biju Patnaik Int'l Airport (BBI).`)}
+                    >
+                      Drop
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1005,7 +1198,16 @@ export default function IdsWalkInModal({
                     <option value="Passport">Passport</option>
                     <option value="Driving License">Driving License</option>
                   </select>
-                  <button className="ids-btn-classic" style={{ width: '60px' }}>Browse</button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ width: '60px' }}
+                    onClick={() => {
+                      alert(`📂 Identification Document (${identificationType}) Verified and Encrypted under DPDP Act.`);
+                    }}
+                  >
+                    Browse
+                  </button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', alignItems: 'center' }}>
                   <span>Identification#</span>
@@ -1195,7 +1397,14 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Name/Room#</span>
                     <input className="ids-input" readOnly value={selectedRoom} style={{ width: '60px', fontWeight: 700, background: '#F5F5F5' }} />
-                    <button className="ids-btn-classic" style={{ width: '18px', height: '18px', padding: 0 }}>?</button>
+                    <button 
+                      type="button"
+                      className="ids-btn-classic" 
+                      style={{ width: '18px', height: '18px', padding: 0 }}
+                      onClick={() => alert(`Room ${selectedRoom} assigned to ${rackTitle} ${rackFirstName} ${rackLastName} (Status: In-House)`)}
+                    >
+                      ?
+                    </button>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1307,9 +1516,24 @@ export default function IdsWalkInModal({
                 {/* Bottom Action buttons matching Frame 110 */}
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => alert('Printing Guest Registration Card...')}>Print</button>
-                  <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Previous</button>
-                  <button className="ids-btn-classic" style={{ minWidth: '65px' }}>Next</button>
                   <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ minWidth: '65px' }}
+                    onClick={() => setActiveStep('registration')}
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    type="button"
+                    className="ids-btn-classic" 
+                    style={{ minWidth: '65px' }}
+                    onClick={() => alert(`Next Pax: No additional pax registered for Room ${selectedRoom}.`)}
+                  >
+                    Next
+                  </button>
+                  <button 
+                    type="button"
                     className="ids-btn-classic" 
                     style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
                     onClick={handleFinishWalkIn}

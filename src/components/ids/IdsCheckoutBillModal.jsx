@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { Printer, Search, Scissors, DollarSign, X, Check, FileText, Users } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 15 & 16: CHECKOUT & SETTLE FRONT OFFICE BILL & BULK CHECK OUT
@@ -576,7 +577,7 @@ export default function IdsCheckoutBillModal({
               </div>
 
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '85px' }}>Cut Off Date</button>
+                <button className="ids-btn-classic" style={{ minWidth: '85px' }} onClick={() => { playReceptionChime(); alert("Cut Off Date: Accounting cutoff is 12:00 Noon."); }}>Cut Off Date</button>
                 <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => { setSearchRoomInput(''); setFilterGroup('ALL'); setFilterCompany('ALL'); setIsGroupMode(false); }}>Refresh</button>
                 <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
               </div>
@@ -620,7 +621,7 @@ export default function IdsCheckoutBillModal({
               <div style={{ display: 'grid', gridTemplateColumns: '70px 220px 24px 70px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Billing</span>
                 <input className="ids-input" readOnly value={billData.billing} style={{ background: '#F5F5F5' }} />
-                <button className="ids-btn-classic" style={{ padding: '0', height: '20px', width: '20px', fontWeight: 700 }}>?</button>
+                <button className="ids-btn-classic" style={{ padding: '0', height: '20px', width: '20px', fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Billing Details: ${billData.billing}\nPay Mode: ${billData.payMode}`); }}>?</button>
                 <span style={{ color: '#000', textAlign: 'right' }}>Pay Mode</span>
                 <input className="ids-input" readOnly value={billData.payMode} style={{ background: '#F5F5F5' }} />
               </div>
@@ -812,7 +813,14 @@ export default function IdsCheckoutBillModal({
 
             {/* Bottom Buttons matching Frame 013 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #CCC', paddingTop: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }}>GST FB</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '65px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("GST Folio Balance Breakdown:\n• CGST (6%): ₹" + ((billData?.taxAmount || 0) / 2).toFixed(2) + "\n• SGST (6%): ₹" + ((billData?.taxAmount || 0) / 2).toFixed(2) + "\n• Net Taxable: ₹" + ((billData?.totalCharges || 0) - (billData?.taxAmount || 0)).toFixed(2));
+                }}
+              >GST FB</button>
               
               <div style={{ display: 'flex', gap: '5px' }}>
                 <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setViewBillOpen(true)}>Details</button>
@@ -1469,8 +1477,22 @@ export default function IdsCheckoutBillModal({
 
               {/* Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '110px' }}>Reprint POS Bill</button>
-                <button className="ids-btn-classic" style={{ minWidth: '85px' }}>Calculator</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '110px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Reprinting POS Outlet Bill voucher for Room " + (billData?.roomNo || '101') + "...");
+                  }}
+                >Reprint POS Bill</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '85px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("IDS Calculator launched.\nCurrent Folio Balance: ₹" + (billData?.balance || 0).toFixed(2));
+                  }}
+                >Calculator</button>
                 <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setViewBillOpen(false)}>Back</button>
               </div>
             </div>
@@ -1754,7 +1776,15 @@ export default function IdsCheckoutBillModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                 <span style={{ width: '100px' }}>Credit Card Type</span>
                 <input className="ids-input" style={{ width: '160px' }} value={cardType} onChange={(e) => setCardType(e.target.value)} />
-                <button className="ids-btn-classic" style={{ width: '20px', height: '20px', padding: 0 }}>?</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '20px', height: '20px', padding: 0 }}
+                  onClick={() => {
+                    playReceptionChime();
+                    const ct = prompt("Select Credit Card Type (VISA, MASTERCARD, AMEX, RUPAY):", cardType || "VISA");
+                    if (ct) setCardType(ct.toUpperCase());
+                  }}
+                >?</button>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
@@ -1826,7 +1856,18 @@ export default function IdsCheckoutBillModal({
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                 <span style={{ width: '70px' }}>Company...</span>
                 <input className="ids-input" style={{ width: '120px' }} value={companyCodeInput} onChange={(e) => setCompanyCodeInput(e.target.value)} />
-                <button className="ids-btn-classic" style={{ width: '20px', height: '20px', padding: 0 }}>?</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ width: '20px', height: '20px', padding: 0 }}
+                  onClick={() => {
+                    playReceptionChime();
+                    const cc = prompt("Select Corporate BTC Account (TCS, INFOSYS, RELIANCE, WIPRO):", companyCodeInput || "CORP001");
+                    if (cc) {
+                      setCompanyCodeInput(cc.toUpperCase());
+                      setCompanyNameInput(cc.toUpperCase() + " TECHNOLOGIES LTD");
+                    }
+                  }}
+                >?</button>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>

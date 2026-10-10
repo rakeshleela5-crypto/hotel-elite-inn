@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 
 /* =========================================================================
@@ -274,7 +275,14 @@ export default function IdsRoomTransferModal({
               >
                 <u>S</u>ave
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Room Transfer Operations Panel: Ready for Live Room shifting & Folio migration.");
+                }}
+              >Panel</button>
               <button 
                 className="ids-btn-classic" 
                 style={{ minWidth: '60px' }}
@@ -322,9 +330,9 @@ export default function IdsRoomTransferModal({
                   <input className="ids-input" style={{ width: '80px' }} placeholder="Filter..." />
                   
                   <div style={{ display: 'flex', gap: '4px', marginLeft: '6px' }}>
-                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Bridge">🌉</button>
-                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Transfer">🔄</button>
-                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Beds">🛏️</button>
+                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Bridge Mode" onClick={() => { playReceptionChime(); alert("Bridge Mode activated: Linking source and destination room blocks."); }}>🌉</button>
+                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Transfer Mode" onClick={() => { playReceptionChime(); alert("Room Transfer Mode enabled."); }}>🔄</button>
+                    <button className="ids-btn-classic" style={{ padding: '2px 6px' }} title="Bedding Status" onClick={() => { playReceptionChime(); alert("Bed Configuration: King Size / Twin Bed availability verified."); }}>🛏️</button>
                     <button className="ids-btn-classic" style={{ padding: '2px 8px' }} onClick={() => setShowRoomRackPicker(false)}>Exit</button>
                   </div>
                 </div>

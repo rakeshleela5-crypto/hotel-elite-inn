@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { HelpCircle, Check, X, FileText, Printer, CreditCard, DollarSign } from 'lucide-react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* 1. RATE INFORMATION MODAL (Frame 004) */
 export function IdsRateInformationModal({ 
@@ -60,7 +61,7 @@ export function IdsRateInformationModal({
             <span style={{ fontWeight: 600 }}>Rate / Rack ID</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <input className="ids-input" style={{ width: '60px' }} value={rackId} onChange={(e) => setRackId(e.target.value)} />
-              <button className="ids-btn-classic" style={{ minWidth: '24px', padding: '2px 6px' }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '24px', padding: '2px 6px' }} onClick={() => { playReceptionChime(); const r = prompt("Select Rate / Rack ID (1: Rack, 2: Corporate, 3: Promotional):", rackId); if (r) setRackId(r); }}>?</button>
               <input className="ids-input" style={{ width: '60px' }} defaultValue="1" readOnly />
             </div>
 
@@ -340,19 +341,19 @@ export function IdsPostReceiptsModal({
             <span style={{ fontWeight: 600 }}>Room#</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '80px' }} value={roomNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Room Look-up: Room #${roomNo} currently assigned to ${guestName}.`); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Folio #</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '100px' }} defaultValue="" />
-              <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }}>More..</button>
+              <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }} onClick={() => { playReceptionChime(); alert("Folio Detail View:\nMaster Folio: 1\nIncidentals Folio: 2"); }}>More..</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Reservation #</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '80px', fontWeight: 700 }} value={reservationNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Reservation Record #${reservationNo}\nStatus: Confirmed Deposit Transaction`); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -361,7 +362,7 @@ export function IdsPostReceiptsModal({
             <span style={{ fontWeight: 600 }}>Company Code</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '80px' }} defaultValue="" />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const c = prompt("Enter Corporate Client Code:", companyCode || "CORP01"); if (c) setCompanyCode(c.toUpperCase()); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Company Name</span>
@@ -397,7 +398,7 @@ export function IdsPostReceiptsModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
             <span>Currency Code</span>
             <input className="ids-input" style={{ width: '50px' }} defaultValue="INR" readOnly />
-            <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+            <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Currency Master:\nINR - Indian Rupee (Base: 1.0)\nUSD - US Dollar (Exg: 86.50)\nEUR - Euro (Exg: 92.20)"); }}>?</button>
             <span style={{ marginLeft: '12px' }}>Exchange Rate</span>
             <input className="ids-input" style={{ width: '70px' }} defaultValue="1.000000" readOnly />
             <span style={{ marginLeft: '12px' }}>Exg. Amt.</span>
@@ -412,13 +413,13 @@ export function IdsPostReceiptsModal({
                 <span>Credit Card Type</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input className="ids-input" style={{ width: '90px' }} value={cardType} onChange={(e) => setCardType(e.target.value)} />
-                  <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+                  <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const ct = prompt("Select Card Type (VISA, MASTER, AMEX, RUPAY, UPI):", cardType); if (ct) setCardType(ct.toUpperCase()); }}>?</button>
                 </div>
 
                 <span>Company Code</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input className="ids-input" style={{ width: '90px' }} value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} />
-                  <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }}>?</button>
+                  <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const cc = prompt("Enter Corporate Company Code:", companyCode); if (cc) setCompanyCode(cc.toUpperCase()); }}>?</button>
                 </div>
 
                 <span>Credit Card # / Ref</span>
@@ -457,16 +458,16 @@ export function IdsPostReceiptsModal({
 
           {/* Action Button Row */}
           <div style={{ marginTop: '14px', display: 'flex', gap: '4px', justifyContent: 'center', background: '#DFDBC9', padding: '6px', borderTop: '1px solid #B0AB9A' }}>
-            <button className="ids-btn-classic">Add</button>
-            <button className="ids-btn-classic">Modify</button>
-            <button className="ids-btn-classic">Delete</button>
-            <button className="ids-btn-classic">Browse</button>
-            <button className="ids-btn-classic">Previous</button>
-            <button className="ids-btn-classic">Next</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); setAmount("5000.00"); alert("Add new payment entry prepared."); }}>Add</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Modify mode enabled. Update particulars or amount then press Save."); }}>Modify</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); if (confirm("Delete this receipt entry?")) { setAmount("0.00"); alert("Receipt entry voided."); } }}>Delete</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Browse Payments: Displaying ledger receipts for folio."); }}>Browse</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Displaying previous receipt transaction."); }}>Previous</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("Displaying next receipt transaction."); }}>Next</button>
             <button className="ids-btn-classic" style={{ fontWeight: 800, color: '#0A246A' }} onClick={() => onSave({ payMode, amount, receiptNo, cardRefNo })}>
               Save
             </button>
-            <button className="ids-btn-classic">Panel</button>
+            <button className="ids-btn-classic" onClick={() => { playReceptionChime(); alert("PMS Navigation Panel: Cashier Folio Terminal."); }}>Panel</button>
             <button className="ids-btn-classic" onClick={onClose}>Back</button>
           </div>
         </div>

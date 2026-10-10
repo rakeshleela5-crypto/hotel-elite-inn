@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import './idsFortuneNext.css';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   Package, Sparkles, DollarSign, Calendar, Check, 
   X, Plus, Trash2, Search, CheckCircle2, ShieldCheck, 
@@ -425,9 +426,30 @@ export default function IdsPackageRatesModal({
               </button>
 
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Add</button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Modify</button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Delete</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '55px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Ready to configure new Room Package Rate in Master.");
+                  }}
+                >Add</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '55px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Selected Room Package Rate loaded for modification.");
+                  }}
+                >Modify</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '55px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Package Rate definition deleted from Rate Master.");
+                  }}
+                >Delete</button>
                 <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => setPackageLookupOpen(true)}>Browse</button>
                 <button 
                   className="ids-btn-classic" 
@@ -436,7 +458,14 @@ export default function IdsPackageRatesModal({
                 >
                   Save
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '55px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Package Rates Control Panel: 4 active packages configured.");
+                  }}
+                >Panel</button>
                 <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
               </div>
             </div>

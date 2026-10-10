@@ -445,7 +445,15 @@ export default function IdsSalesPromotionMasterModal({
                   disabled={formMode === 'VIEW'}
                   style={{ width: '85px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 4px', fontSize: '10px' }}>?</button>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 4px', fontSize: '10px' }}
+                  title="Calendar Lookup"
+                  onClick={() => {
+                    const d = prompt("Enter Applicable From Date (DD-MMM-YYYY):", applicableFrom);
+                    if (d) setApplicableFrom(d.toUpperCase());
+                  }}
+                >?</button>
               </div>
 
               {/* Restaurant */}

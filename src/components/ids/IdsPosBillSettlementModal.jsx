@@ -416,7 +416,11 @@ export default function IdsPosBillSettlementModal({
                   onChange={e => setActiveRegNo(e.target.value)}
                   style={{ width: '85px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 8px', fontSize: '10px', fontWeight: 600 }}>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 8px', fontSize: '10px', fontWeight: 600 }}
+                  onClick={() => alert(`Loaded registration profile for Reg #${activeRegNo || '585'}`)}
+                >
                   GO
                 </button>
               </div>
@@ -621,10 +625,18 @@ export default function IdsPosBillSettlementModal({
         {/* Mid Navigation & Action Row (Video 04 Frame 016 & Frame 029) */}
         <div style={{ padding: '6px 14px', background: '#ECE9D8', borderTop: '1px solid #CCC', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '6px' }}>
-            <button className="ids-btn" style={{ padding: '2px 8px', fontSize: '11px' }}>
+            <button 
+              className="ids-btn" 
+              style={{ padding: '2px 8px', fontSize: '11px' }}
+              onClick={() => alert("Navigated to Previous settled POS Bill.")}
+            >
               Previous
             </button>
-            <button className="ids-btn" style={{ padding: '2px 8px', fontSize: '11px', fontWeight: 600 }}>
+            <button 
+              className="ids-btn" 
+              style={{ padding: '2px 8px', fontSize: '11px', fontWeight: 600 }}
+              onClick={() => alert("Navigated to Current active POS Bill.")}
+            >
               Current
             </button>
           </div>

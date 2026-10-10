@@ -346,7 +346,14 @@ export default function IdsGuestServicesModal({
                         onChange={(e) => handleRoomSelect(e.target.value)}
                         style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9', fontWeight: 'bold' }} 
                       />
-                      <button style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}>?</button>
+                      <button 
+                        style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
+                        title="Room Lookup"
+                        onClick={() => {
+                          const r = prompt("Select Room (101, 102, 201, 202):", logFormData.roomNo);
+                          if (r) handleRoomSelect(r);
+                        }}
+                      >?</button>
                     </div>
                   </div>
 

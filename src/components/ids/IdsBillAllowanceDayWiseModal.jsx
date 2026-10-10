@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   DollarSign, Calendar, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw
@@ -361,7 +362,14 @@ export default function IdsBillAllowanceDayWiseModal({
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '65px', fontWeight: 600 }}>Folio #</span>
                   <input className="ids-input" readOnly value={activeRoom.folioNo} style={{ width: '70px', background: '#F5F5F5' }} />
-                  <button className="ids-btn-classic" style={{ fontSize: '10px', height: '20px', padding: '1px 6px' }}>More...</button>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ fontSize: '10px', height: '20px', padding: '1px 6px' }}
+                    onClick={() => {
+                      playReceptionChime();
+                      alert(`Folio #${activeRoom.folioNo} Details:\nGuest: ${activeRoom.guestName}\nRoom: ${activeRoom.roomNo}\nReg #: ${activeRoom.regNo}\nBalance: ₹${activeRoom.balance || '0.00'}`);
+                    }}
+                  >More...</button>
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
@@ -536,7 +544,14 @@ export default function IdsBillAllowanceDayWiseModal({
                 {statusNotice || 'Click [ Save ] to enter reason & authorized by credentials.'}
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '70px' }}>F&B Break</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '70px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("F&B Allowance Breakdown:\nFood Discount: ₹0.00\nBeverage Discount: ₹0.00\nService Charge Rebate: ₹0.00");
+                  }}
+                >F&B Break</button>
                 <button 
                   className="ids-btn-classic" 
                   onClick={handleOpenSelectRevenue}
@@ -559,7 +574,14 @@ export default function IdsBillAllowanceDayWiseModal({
                 >
                   Clear
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '60px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Bill Allowance Control Panel: All posted allowances reconciled.");
+                  }}
+                >Panel</button>
                 <button className="ids-btn-classic" onClick={onClose} style={{ minWidth: '60px', color: '#800' }}>Exit</button>
               </div>
             </div>

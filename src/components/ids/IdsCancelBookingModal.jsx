@@ -3,6 +3,7 @@ import {
   AlertTriangle, HelpCircle, Check, X, Printer, 
   DollarSign, FileText, ArrowRight, ShieldCheck, UserCheck 
 } from 'lucide-react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 /* =========================================================================
    VIDEO 04: HOW TO CANCEL ROOM BOOKING IN IDS FORTUNE NEXT 6.5 & 7.0
@@ -223,7 +224,7 @@ export function IdsDepositRefundModal({
                 value={booking.resNo || '270'} 
                 readOnly 
               />
-              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }} onClick={() => { playReceptionChime(); alert(`Lookup Reservation: #${booking.resNo || '270'} (${booking.guestName})`); }}>?</button>
             </div>
           </div>
 
@@ -237,7 +238,7 @@ export function IdsDepositRefundModal({
                 readOnly 
                 style={{ fontWeight: 600 }}
               />
-              <button className="ids-btn-classic" style={{ padding: '2px 6px' }}>Details...</button>
+              <button className="ids-btn-classic" style={{ padding: '2px 6px' }} onClick={() => { playReceptionChime(); alert(`Booking Details:\nGuest: ${booking.guestName}\nCompany: ${booking.companyName || 'N/A'}\nArrival: ${booking.arrivalDate}\nDeparture: ${booking.departureDate}`); }}>Details...</button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 80px 1fr', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
@@ -381,12 +382,12 @@ export function IdsDepositRefundModal({
 
           {/* Bottom Action Ribbon from Frame 022 & 028 */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #D0CDC0' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Add</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Modify</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Delete</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Browse</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} disabled>Previous</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} disabled>Next</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancel reason entry added to queue."); }}>Add</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancellation reasons unlocked for edit."); }}>Modify</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cleared cancellation reason."); }}>Delete</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Browse cancellation archive."); }}>Browse</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to previous cancellation record."); }}>Previous</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to next cancellation record."); }}>Next</button>
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '65px', fontWeight: 700, color: '#0A246A' }}
@@ -394,7 +395,7 @@ export function IdsDepositRefundModal({
             >
               <u>S</u>ave
             </button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }}>Panel</button>
+            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("PMS Navigation Panel: Cancellation Journal."); }}>Panel</button>
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '55px' }}
@@ -403,8 +404,8 @@ export function IdsDepositRefundModal({
               <u>E</u>xit
             </button>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '35px' }}>GI</button>
-              <button className="ids-btn-classic" style={{ minWidth: '70px' }}>Load Pgm</button>
+              <button className="ids-btn-classic" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI): Cancellation Policy & Retention Audit Rules active."); }}>GI</button>
+              <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => { playSuccessChime(); alert("Reloaded Cancel Booking Module V6.5002.5."); }}>Load Pgm</button>
             </div>
           </div>
         </div>

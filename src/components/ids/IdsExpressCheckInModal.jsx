@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
   Building2, Users, Check, X, Calendar, DollarSign, 
   Search, RefreshCw, Printer, FileText, ChevronRight, BedDouble, Sparkles, ArrowRightLeft
@@ -485,8 +486,23 @@ export default function IdsExpressCheckInModal({
                     <input className="ids-input" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} placeholder="First Name" style={{ width: '100%' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', marginTop: '3px' }}>
-                    <button className="ids-btn-classic" style={{ minWidth: '40px', padding: '1px 6px', fontSize: '10px' }}>Ok</button>
-                    <button className="ids-btn-classic" style={{ minWidth: '40px', padding: '1px 6px', fontSize: '10px' }}>Clear</button>
+                    <button 
+                      className="ids-btn-classic" 
+                      style={{ minWidth: '40px', padding: '1px 6px', fontSize: '10px' }}
+                      onClick={() => {
+                        playReceptionChime();
+                        alert(`Guest profile updated for Pax ${editGuestNo || '1'}: ${editTitle} ${editFirstName} ${editLastName}`);
+                      }}
+                    >Ok</button>
+                    <button 
+                      className="ids-btn-classic" 
+                      style={{ minWidth: '40px', padding: '1px 6px', fontSize: '10px' }}
+                      onClick={() => {
+                        playReceptionChime();
+                        setEditFirstName('');
+                        setEditLastName('');
+                      }}
+                    >Clear</button>
                   </div>
                 </div>
 
@@ -852,7 +868,14 @@ export default function IdsExpressCheckInModal({
             BOTTOM COMMAND BUTTONS (Frame 012 & Frame 044)
             ========================================================================= */}
         <div style={{ background: '#ECE9D8', borderTop: '1px solid #716F64', padding: '6px 12px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-          <button className="ids-btn-classic" style={{ minWidth: '90px' }}>
+          <button 
+            className="ids-btn-classic" 
+            style={{ minWidth: '90px' }}
+            onClick={() => {
+              playReceptionChime();
+              alert("Hotel Room Position Summary:\n• Total Rooms: 30\n• Occupied: 14\n• Expected Arrivals: 6\n• Expected Departures: 4\n• Available: 10\n• Housekeeping Clean: 22, Dirty: 8");
+            }}
+          >
             Hotel Position
           </button>
           <button 
@@ -1024,8 +1047,23 @@ export default function IdsExpressCheckInModal({
 
               {/* Action Buttons matching Frame 056 */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '80px' }}>Gst Profile</button>
-                <button className="ids-btn-classic" style={{ minWidth: '75px' }}>Gst Cmt</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '80px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    alert("Guest GST Profile Lookup:\nBilled to: Anil Kumar Group\nGSTIN: 27AABCT2345Q1ZX\nState Code: 27 (Maharashtra)\nReverse Charge: No");
+                  }}
+                >Gst Profile</button>
+                <button 
+                  className="ids-btn-classic" 
+                  style={{ minWidth: '75px' }}
+                  onClick={() => {
+                    playReceptionChime();
+                    const comment = prompt("Enter Guest Billing / Stay Comment:", "VIP Group - Complimentary welcome drinks");
+                    if (comment) alert("Guest Comment Saved: " + comment);
+                  }}
+                >Gst Cmt</button>
                 <button 
                   className="ids-btn-classic" 
                   style={{ minWidth: '70px', fontWeight: 700 }}

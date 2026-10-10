@@ -129,8 +129,8 @@ export default function IdsClearRoomsModal({
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, fontSize: '11px' }}>Clear Rooms V6.5.002.1</span>
           <div style={{ display: 'flex', gap: '3px' }}>
-            <button className="ids-win-btn" style={{ padding: '0 4px', fontSize: '9px' }}>_</button>
-            <button className="ids-win-btn" style={{ padding: '0 4px', fontSize: '9px' }}>□</button>
+            <button className="ids-win-btn" style={{ padding: '0 4px', fontSize: '9px' }} title="Minimize" onClick={() => alert("Clear Rooms window minimized.")}>_</button>
+            <button className="ids-win-btn" style={{ padding: '0 4px', fontSize: '9px' }} title="Maximize" onClick={() => alert("Clear Rooms window maximized.")}>□</button>
             <button className="ids-win-btn close" onClick={onClose}>✕</button>
           </div>
         </div>
@@ -284,6 +284,7 @@ export default function IdsClearRoomsModal({
             <button 
               className="ids-btn-classic" 
               style={{ minWidth: '65px' }}
+              onClick={() => alert("Housekeeping Room Clear Panel: Verified clean status updated across rooms.")}
             >
               Panel
             </button>

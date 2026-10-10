@@ -570,7 +570,11 @@ export default function IdsBillAllowanceOptionModal({
                     value={activeRoom.folioNo} 
                     style={{ width: '50px', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
-                  <button className="ids-btn-classic" style={{ padding: '0 6px', fontSize: '10px' }}>
+                  <button 
+                    className="ids-btn-classic" 
+                    style={{ padding: '0 6px', fontSize: '10px' }}
+                    onClick={() => alert(`Folio #${activeRoom.folioNo} Allowance Info: Applicable across Master & Split Sub-folios.`)}
+                  >
                     How..
                   </button>
                 </div>

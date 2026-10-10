@@ -292,7 +292,11 @@ export default function IdsCancelCheckInModal({
             </div>
 
             <div style={{ display: 'flex', gap: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }}>Panel</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '60px' }}
+                onClick={() => alert("Cancel Check-in Control Panel: Room status and key card access revocation verified.")}
+              >Panel</button>
               <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>

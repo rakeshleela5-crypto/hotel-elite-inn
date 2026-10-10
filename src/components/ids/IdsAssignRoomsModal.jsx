@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { Search, X, Check, Calendar, ArrowRightLeft, User, Building, ShieldCheck } from 'lucide-react';
 
 /* 1. SCAN BOOKING MODAL (Frame 004) */
@@ -264,7 +265,14 @@ export function IdsAssignGuestRoomsModal({
             <span style={{ fontWeight: 600 }}>Resv. #</span>
             <div style={{ display: 'flex', gap: '2px' }}>
               <input className="ids-input" style={{ width: '55px', fontWeight: 700 }} value={booking.resNo || '270'} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '18px', padding: '1px 4px' }}>?</button>
+              <button 
+                className="ids-btn-classic" 
+                style={{ minWidth: '18px', padding: '1px 4px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  alert(`Reservation #${booking.resNo || '270'} details:\nGuest: ${booking.guestName || 'Mr Sharma'}\nType: ${booking.type || 'EXECUTIVE'}\nArrival: ${booking.arrivalDate || '14-JAN-2026'}`);
+                }}
+              >?</button>
             </div>
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Room Type</span>
@@ -298,7 +306,13 @@ export function IdsAssignGuestRoomsModal({
             </select>
 
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '6px' }}>
-              <button className="ids-btn-classic">Feature</button>
+              <button 
+                className="ids-btn-classic"
+                onClick={() => {
+                  playReceptionChime();
+                  alert("Room Features Filter: Non-Smoking, Pool Facing, King Bed, Quiet Zone.");
+                }}
+              >Feature</button>
               <button className="ids-btn-classic" style={{ fontWeight: 700, color: '#0A246A' }} onClick={handleAssignClick}>
                 Assign
               </button>
@@ -455,7 +469,13 @@ export function IdsAssignGuestRoomsModal({
             <button className="ids-btn-classic" onClick={() => setAssignedRoom('')}>
               Clear
             </button>
-            <button className="ids-btn-classic">Panel</button>
+            <button 
+              className="ids-btn-classic"
+              onClick={() => {
+                playReceptionChime();
+                alert("Room Allocation Control Panel: All tape chart room blocks synchronized.");
+              }}
+            >Panel</button>
             <button className="ids-btn-classic" onClick={onClose}>Exit</button>
           </div>
         </div>

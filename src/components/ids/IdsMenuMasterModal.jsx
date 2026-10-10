@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 import { getStoredMenuGroups } from './IdsMenuGroupsModal';
 
@@ -544,7 +545,16 @@ export default function IdsMenuMasterModal({
                 disabled={formMode === 'VIEW'}
                 style={{ width: '85px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
               />
-              <button className="ids-btn" title="Calendar" style={{ padding: '1px 4px', fontSize: '10px' }}>?</button>
+              <button 
+                className="ids-btn" 
+                title="Calendar" 
+                style={{ padding: '1px 4px', fontSize: '10px' }}
+                onClick={() => {
+                  playReceptionChime();
+                  const d = prompt("Enter Applicable From Date (DD-MMM-YYYY):", applicableFrom);
+                  if (d) setApplicableFrom(d.toUpperCase());
+                }}
+              >?</button>
             </div>
 
             <div>
@@ -616,7 +626,16 @@ export default function IdsMenuMasterModal({
                   disabled={formMode === 'VIEW'}
                   style={{ width: '60px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 5px', fontSize: '10px' }}>?</button>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 5px', fontSize: '10px' }}
+                  title="KOT Print Group Lookup"
+                  onClick={() => {
+                    playReceptionChime();
+                    const g = prompt("Enter KOT Print Group (KOT1, KOT2, BAR1, PANTRY):", kotPrintGroup || "KOT1");
+                    if (g) setKotPrintGroup(g.toUpperCase());
+                  }}
+                >?</button>
               </div>
 
               {/* Classification (Touch Screen Group Frame 020 & 105) */}
@@ -669,7 +688,16 @@ export default function IdsMenuMasterModal({
                   disabled={formMode === 'VIEW'}
                   style={{ width: '60px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 5px', fontSize: '10px' }}>?</button>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 5px', fontSize: '10px' }}
+                  title="Sub Store Lookup"
+                  onClick={() => {
+                    playReceptionChime();
+                    const s = prompt("Enter Sub Store Code (STR01, KIT01, BAR01):", subStoreCode || "KIT01");
+                    if (s) setSubStoreCode(s.toUpperCase());
+                  }}
+                >?</button>
               </div>
 
               {/* KOT Printer */}
@@ -753,7 +781,16 @@ export default function IdsMenuMasterModal({
                   disabled={formMode === 'VIEW'}
                   style={{ width: '50px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 5px', fontSize: '10px' }}>?</button>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 5px', fontSize: '10px' }}
+                  title="Menu Group Lookup"
+                  onClick={() => {
+                    playReceptionChime();
+                    const mg = prompt("Enter Menu Group Code (FD - Food, BV - Beverage, SM - Smokes):", menuGroup || "FD");
+                    if (mg) setMenuGroup(mg.toUpperCase());
+                  }}
+                >?</button>
               </div>
 
               {/* Cost % */}
@@ -902,7 +939,16 @@ export default function IdsMenuMasterModal({
                   disabled={formMode === 'VIEW'}
                   style={{ width: '60px', background: formMode === 'VIEW' ? '#F0F0F0' : '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
-                <button className="ids-btn" style={{ padding: '1px 5px', fontSize: '10px' }}>?</button>
+                <button 
+                  className="ids-btn" 
+                  style={{ padding: '1px 5px', fontSize: '10px' }}
+                  title="GL Code Lookup"
+                  onClick={() => {
+                    playReceptionChime();
+                    const gl = prompt("Enter General Ledger Revenue Code (4010, 4020, 4030):", glCode || "4010");
+                    if (gl) setGlCode(gl);
+                  }}
+                >?</button>
               </div>
 
               {/* Levels (Pricing Tiers) */}

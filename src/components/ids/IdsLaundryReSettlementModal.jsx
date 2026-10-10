@@ -344,7 +344,14 @@ export default function IdsLaundryReSettlementModal({
                         onChange={(e) => setCardData({ ...cardData, company: e.target.value })}
                         style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9' }} 
                       />
-                      <button style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}>?</button>
+                      <button 
+                        style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
+                        title="Credit Card Company Lookup"
+                        onClick={() => {
+                          const comp = prompt("Select Credit Card Issuer (VISA, MASTERCARD, AMEX, HDFC, SBI):", cardData.company);
+                          if (comp) setCardData({ ...cardData, company: comp.toUpperCase() });
+                        }}
+                      >?</button>
                     </div>
                   </div>
 

@@ -339,6 +339,11 @@ export default function IdsLaundryRateMasterModal({
                   <button 
                     disabled={isFormLocked}
                     style={{ padding: '1px 5px', fontSize: '11px', cursor: 'pointer', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
+                    title="Tax Structure Lookup"
+                    onClick={() => {
+                      const tax = prompt("Select Laundry Tax Structure (GST 12%, GST 18%, ZERO):", formData.taxStructure);
+                      if (tax) setFormData({ ...formData, taxStructure: tax });
+                    }}
                   >
                     ?
                   </button>
