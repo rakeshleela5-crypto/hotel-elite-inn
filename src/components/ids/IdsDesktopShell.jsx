@@ -87,6 +87,7 @@ import IdsMenuGroupsModal from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal from './IdsRestaurantTableMasterModal';
 import IdsServersModal from './IdsServersModal';
+import IdsMenuMasterModal from './IdsMenuMasterModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -436,6 +437,7 @@ export default function IdsDesktopShell({
   const [selectedMenuGroupForTs, setSelectedMenuGroupForTs] = useState(null);
   const [restaurantTableMasterModalOpen, setRestaurantTableMasterModalOpen] = useState(false);
   const [serversModalOpen, setServersModalOpen] = useState(false);
+  const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -942,6 +944,7 @@ export default function IdsDesktopShell({
       { label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', videoId: 'POS-17', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', videoId: 'POS-18', action: () => setServersModalOpen(true) },
       { label: 'Deactivate Server / Passive Status (Setup -> Servers)', videoId: 'POS-19', action: () => setServersModalOpen(true) },
+      { label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', videoId: 'POS-20', action: () => setMenuMasterModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1049,6 +1052,11 @@ export default function IdsDesktopShell({
         label: 'Deactivate Server / Passive Status (Setup -> Servers)', 
         videoId: 'POS-19', 
         action: () => setServersModalOpen(true) 
+      },
+      { 
+        label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', 
+        videoId: 'POS-20', 
+        action: () => setMenuMasterModalOpen(true) 
       },
       { 
         label: 'Company Profile Setup (Corporate Master)', 
@@ -3183,6 +3191,14 @@ export default function IdsDesktopShell({
           setServersModalOpen(false);
           setOrderEntryModalOpen(true);
         }}
+      />
+
+      {/* POS Video 20: Menu Master V6.5.002.3 */}
+      <IdsMenuMasterModal
+        isOpen={menuMasterModalOpen}
+        onClose={() => setMenuMasterModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}

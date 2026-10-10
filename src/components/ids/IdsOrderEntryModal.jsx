@@ -17,6 +17,7 @@ import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsRestaurantTableMasterModal';
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
+import IdsMenuMasterModal, { getStoredMenuItems } from './IdsMenuMasterModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -277,6 +278,11 @@ export default function IdsOrderEntryModal({
   const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
   const [restaurantTableMasterOpen, setRestaurantTableMasterOpen] = useState(false);
   const [serversMasterOpen, setServersMasterOpen] = useState(false);
+  const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
+  const [selectOutletModalOpen, setSelectOutletModalOpen] = useState(false);
+  const [selectOutletRestaurant, setSelectOutletRestaurant] = useState('RESTAURANT');
+  const [selectOutletAccountingDate, setSelectOutletAccountingDate] = useState('22-FEB-2022');
+  const [selectOutletSession, setSelectOutletSession] = useState('General');
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -1015,9 +1021,25 @@ export default function IdsOrderEntryModal({
     return { totalAmount, cgst, sgst, nettAmount };
   }, [lineItems]);
 
-  // Filtered menu search list for Item Help dialog (Video 01 Frame 021, Video 11 Frame 025-027)
+  // Filtered menu search list for Item Help dialog (Video 01 Frame 021, Video 11 Frame 025-027, Video 20 Frame 120)
   const filteredMenuItems = useMemo(() => {
-    let list = POS_MENU_ITEMS;
+    const storedMaster = getStoredMenuItems().map(m => {
+      const defP = (m.portions && m.portions[0]) ? m.portions[0] : null;
+      return {
+        code: m.itemCode,
+        name: m.name.toUpperCase(),
+        fullName: m.name,
+        category: m.classificationName || 'FOOD',
+        outlet: m.outletName === 'LIQUOR BAR' ? 'CAR' : 'RES',
+        outletName: m.outletName || 'RESTAURANT',
+        rate: defP ? Number(defP.rate) : 100.00,
+        portions: m.portions,
+        taxStructure: m.taxStructure
+      };
+    });
+    const masterCodes = new Set(storedMaster.map(m => m.code));
+    let list = [...storedMaster, ...POS_MENU_ITEMS.filter(it => !masterCodes.has(it.code))];
+
     if (itemHelpFilterOutlet && itemHelpFilterOutlet !== 'ALL') {
       list = list.filter(m => (m.outlet || 'RES') === itemHelpFilterOutlet);
     }
@@ -1029,7 +1051,7 @@ export default function IdsOrderEntryModal({
       m.code.includes(q) ||
       (m.category && m.category.toLowerCase().includes(q))
     );
-  }, [itemSearchText, itemHelpFilterOutlet]);
+  }, [itemSearchText, itemHelpFilterOutlet, menuMasterModalOpen]);
 
   // Video 11: Supplying Restaurant / Other Outlets Handler (Frames 019–024)
   const handleOpenSupRestaurant = (targetIdx = null) => {
@@ -1551,6 +1573,32 @@ export default function IdsOrderEntryModal({
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '38px', padding: '2px 4px', background: hotKeyHelpOpen ? '#C1D2EE' : undefined }}
             >
               <HelpCircle size={15} color="#0A246A" />
+            </button>
+
+            {/* Menu Master (Video 20: Menu Master V6.5.002.3 & Item Setup) */}
+            <button 
+              className="ids-btn" 
+              title="Menu Master V6.5.002.3 — Item Master, Pricing & Portions Setup (Video 20)" 
+              onClick={() => setMenuMasterModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: menuMasterModalOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>🍽️</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#000080' }}>MENU</span>
+              </div>
+            </button>
+
+            {/* Select Outlet (Video 20 Frame 130: Loading items: RES/3) */}
+            <button 
+              className="ids-btn" 
+              title="Select Outlet — Accounting Date & Loading items: RES/3 (Video 20 Frame 130)" 
+              onClick={() => setSelectOutletModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>🏪</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#006400' }}>OUTLET</span>
+              </div>
             </button>
 
             {/* Reprint Button (Video 13 Frame 099 - Frame 108) */}
@@ -4207,7 +4255,9 @@ export default function IdsOrderEntryModal({
                       { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } },
                       { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
                       { key: 'Setup', name: 'Delete Table', desc: 'Delete Restaurant Table & Alert Window V6.5.002.1 (Video 17)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
-                      { key: 'Setup', name: 'Servers Master', desc: 'Servers V6.5.002.1 & Deactivation (Active/Passive) (Videos 18 & 19)', action: () => { setHotKeyHelpOpen(false); setServersMasterOpen(true); } }
+                      { key: 'Setup', name: 'Servers Master', desc: 'Servers V6.5.002.1 & Deactivation (Active/Passive) (Videos 18 & 19)', action: () => { setHotKeyHelpOpen(false); setServersMasterOpen(true); } },
+                      { key: 'Setup', name: 'Menu Master', desc: 'Menu Master V6.5.002.3 & Items Setup (Video 20)', action: () => { setHotKeyHelpOpen(false); setMenuMasterModalOpen(true); } },
+                      { key: 'Outlet', name: 'Select Outlet', desc: 'Outlet & Session Selector — Loading items: RES/3 (Video 20 Frame 130)', action: () => { setHotKeyHelpOpen(false); setSelectOutletModalOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
@@ -4326,6 +4376,96 @@ export default function IdsOrderEntryModal({
           setServersMasterOpen(false);
         }}
       />
+
+      {/* POS Video 20: Menu Master V6.5.002.3 */}
+      <IdsMenuMasterModal
+        isOpen={menuMasterModalOpen}
+        onClose={() => setMenuMasterModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+      />
+
+      {/* POS Video 20 Frame 130: Select Outlet Modal */}
+      {selectOutletModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1360 }}>
+          <div 
+            className="ids-modal-container"
+            style={{ width: '380px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.7)', fontFamily: 'Tahoma, Arial, sans-serif', fontSize: '11px' }}
+          >
+            <div 
+              className="ids-modal-titlebar"
+              style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Select Outlet</span>
+              <button className="ids-win-btn close" onClick={() => setSelectOutletModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#F5F4EC' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontWeight: 600 }}>Restaurant</span>
+                <select 
+                  value={selectOutletRestaurant} 
+                  onChange={e => setSelectOutletRestaurant(e.target.value)}
+                  style={{ border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', background: '#FFF' }}
+                >
+                  <option value="RESTAURANT">RESTAURANT</option>
+                  <option value="LIQUOR BAR">LIQUOR BAR</option>
+                  <option value="ROOM SERVICE">ROOM SERVICE</option>
+                  <option value="BANQUET">BANQUET</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontWeight: 600 }}>Accounting Date</span>
+                <input 
+                  type="text" 
+                  value={selectOutletAccountingDate} 
+                  onChange={e => setSelectOutletAccountingDate(e.target.value)}
+                  style={{ border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', background: '#FFF' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontWeight: 600 }}>Session</span>
+                <input 
+                  type="text" 
+                  value={selectOutletSession} 
+                  onChange={e => setSelectOutletSession(e.target.value)}
+                  style={{ border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', background: '#FFF' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                <span style={{ fontWeight: 600 }}>Loading items</span>
+                <span style={{ fontWeight: 700, color: '#0A246A' }}>
+                  RES/{getStoredMenuItems().filter(i => i.outletName === selectOutletRestaurant || selectOutletRestaurant === 'RESTAURANT').length}
+                </span>
+              </div>
+
+              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    setResOutlet(selectOutletRestaurant === 'LIQUOR BAR' ? 'BAR' : 'RES');
+                    setSelectOutletModalOpen(false);
+                    setSaveSuccessMsg(`Outlet: ${selectOutletRestaurant} loaded with RES/${getStoredMenuItems().length} items from Menu Master!`);
+                    setTimeout(() => setSaveSuccessMsg(null), 3000);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setSelectOutletModalOpen(false)}
+                  style={{ minWidth: '60px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
