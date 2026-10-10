@@ -133,6 +133,19 @@ export const POS_DELETION_REASONS = [
   'Travel Agnt Spl rate'
 ];
 
+// Authentic Item Modifiers Catalog (Video 13 Frame 119 & 124)
+export const POS_STANDARD_MODIFIERS = [
+  { code: '99', name: 'OPEN MODIFIER', charge: 0.00 },
+  { code: '01', name: 'spicy', charge: 0.00 },
+  { code: '02', name: 'less spicy', charge: 0.00 },
+  { code: '03', name: 'no onion no garlic', charge: 0.00 },
+  { code: '04', name: 'extra cheese', charge: 30.00 },
+  { code: '05', name: 'separate gravy', charge: 0.00 },
+  { code: '06', name: 'well done / crispy', charge: 0.00 },
+  { code: '07', name: 'jain preparation', charge: 0.00 },
+  { code: '08', name: 'without sugar / sweet', charge: 0.00 }
+];
+
 export default function IdsOrderEntryModal({
   isOpen,
   onClose,
@@ -224,6 +237,34 @@ export default function IdsOrderEntryModal({
   const [transferGridItems, setTransferGridItems] = useState([]);
   const [transferOutletsModalOpen, setTransferOutletsModalOpen] = useState(false);
   const [transferNotice, setTransferNotice] = useState(null);
+
+  // Video 13: Master Shortcut Keys & Toolbars State (Shift+F1 to Shift+F10, F1 @ Qty, Reprint)
+  const [sessionTransferOpen, setSessionTransferOpen] = useState(false);
+  const [sessionSourceSession, setSessionSourceSession] = useState('General');
+  const [sessionNewSession, setSessionNewSession] = useState('Breakfast');
+  const [sessionTransferDate, setSessionTransferDate] = useState('08-FEB-2022');
+  const [sessionGridItems, setSessionGridItems] = useState([]);
+  const [sessionNotice, setSessionNotice] = useState(null);
+
+  const [tableLinkOpen, setTableLinkOpen] = useState(false);
+  const [linkSourceTable, setLinkSourceTable] = useState('T-1');
+  const [availableLinkTables] = useState(['T-10', 'T-11', 'T-2', 'T-3', 'T-4', 'T-5', 'T-6', 'T-7', 'T-8', 'T-9']);
+  const [selectedLinkTables, setSelectedLinkTables] = useState(['T-10', 'T-11', 'T-2']);
+  const [tableLinks, setTableLinks] = useState({ 'T-1': ['T-10', 'T-11', 'T-2'] });
+
+  const [multiOutletOpen, setMultiOutletOpen] = useState(false);
+  const [multiOutletChoice, setMultiOutletChoice] = useState('LIQUOR BAR');
+
+  const [kotReprintOpen, setKotReprintOpen] = useState(false);
+  const [reprintGridItems, setReprintGridItems] = useState([]);
+  const [reprintNotice, setReprintNotice] = useState(null);
+
+  const [itemModifierOpen, setItemModifierOpen] = useState(false);
+  const [modifierTargetRowIdx, setModifierTargetRowIdx] = useState(null);
+  const [modifierCode, setModifierCode] = useState('99');
+  const [modifierName, setModifierName] = useState('OPEN MODIFIER');
+  const [modifierRate, setModifierRate] = useState('0.00');
+  const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -324,28 +365,76 @@ export default function IdsOrderEntryModal({
     }
   ]);
 
-  // Video 10 & Video 11: Global Hotkey Listener for Shift + F11 (Dual Functionality) & F5 (Delete Item)
-  // Subtitle (Video 11 Frame 019): "To import Items from Other outlet click on Code press Shift + F11 and select Item."
-  // Subtitle (Video 10 Frame 021): "Click on quantity field and press Shift + F11 to rename the Item"
+  // Video 13: Global Hotkey Listener for Master POS Shortcut Keys (Shift+F1 to Shift+F10, F1 @ Qty, F5)
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
-      if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
-        e.preventDefault();
-        if (focusedColumn === 'quantity') {
-          // Video 10: Rename Item when focused on Quantity field
-          const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
-          if (lineItems[targetIdx]) {
-            setSelectedRowIdx(targetIdx);
-            setRenamingRowIdx(targetIdx);
-            setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
-            setTimeout(() => setSaveSuccessMsg(null), 3500);
+      if (e.shiftKey) {
+        if (e.key === 'F1' || e.code === 'F1') {
+          // Shift + F1: Print Bill (Video 13 Frame 011)
+          e.preventDefault();
+          setPosBillModalOpen(true);
+        } else if (e.key === 'F2' || e.code === 'F2') {
+          // Shift + F2: Bill Settlement (Video 13 Frame 016)
+          e.preventDefault();
+          setPosBillSettlementModalOpen(true);
+        } else if (e.key === 'F3' || e.code === 'F3') {
+          // Shift + F3: Table Status (Video 13 Frame 021)
+          e.preventDefault();
+          setTableStatusOpen(true);
+        } else if (e.key === 'F4' || e.code === 'F4') {
+          // Shift + F4: Table Transfer (Video 13 Frame 031)
+          e.preventDefault();
+          setTableTransferOpen(true);
+          handleLoadSourceTable(transferSourceTable || '10');
+        } else if (e.key === 'F5' || e.code === 'F5') {
+          // Shift + F5: Session Transfer (Video 13 Frame 046)
+          e.preventDefault();
+          setSessionTransferOpen(true);
+          handleLoadSessionTransfer();
+        } else if (e.key === 'F6' || e.code === 'F6') {
+          // Shift + F6: Table Link (Video 13 Frame 055)
+          e.preventDefault();
+          setTableLinkOpen(true);
+        } else if (e.key === 'F7' || e.code === 'F7') {
+          // Shift + F7: Multi-Restaurant (Video 13 Frame 064)
+          e.preventDefault();
+          setMultiOutletOpen(true);
+        } else if (e.key === 'F8' || e.code === 'F8') {
+          // Shift + F8: NC KOT (Video 13 Frame 076)
+          e.preventDefault();
+          setIsNcMode(prev => !prev);
+          setSaveSuccessMsg(`Shift+F8: Toggled NC KOT mode (${!isNcMode ? 'ON' : 'OFF'}).`);
+          setTimeout(() => setSaveSuccessMsg(null), 3000);
+        } else if (e.key === 'F9' || e.code === 'F9') {
+          // Shift + F9: Bill and Settle (Video 13 Frame 088)
+          e.preventDefault();
+          handleOneClickBillAndSettle();
+        } else if (e.key === 'F10' || e.code === 'F10') {
+          // Shift + F10: Options (Video 13 Frame 093)
+          e.preventDefault();
+          setOptionsModalOpen(true);
+        } else if (e.key === 'F11' || e.code === 'F11') {
+          // Shift + F11: Rename Item (@ Qty) / Import Items (@ Code) (Videos 10 & 11)
+          e.preventDefault();
+          if (focusedColumn === 'quantity') {
+            const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
+            if (lineItems[targetIdx]) {
+              setSelectedRowIdx(targetIdx);
+              setRenamingRowIdx(targetIdx);
+              setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
+              setTimeout(() => setSaveSuccessMsg(null), 3500);
+            }
+          } else {
+            const targetIdx = selectedRowIdx !== null ? selectedRowIdx : lineItems.length;
+            handleOpenSupRestaurant(targetIdx);
           }
-        } else {
-          // Video 11: Import Items from Other Outlet when focused on Code field (or default)
-          const targetIdx = selectedRowIdx !== null ? selectedRowIdx : lineItems.length;
-          handleOpenSupRestaurant(targetIdx);
         }
+      } else if (e.key === 'F1' || e.code === 'F1') {
+        // <F1> @ Qty for Modifier (Video 13 Frame 109 & Frame 115)
+        e.preventDefault();
+        const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
+        handleOpenItemModifier(targetIdx);
       } else if (e.key === 'F5' || e.code === 'F5') {
         if (selectedRowIdx !== null && lineItems[selectedRowIdx]) {
           e.preventDefault();
@@ -355,7 +444,7 @@ export default function IdsOrderEntryModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedRowIdx, activeRowIdx, lineItems, focusedColumn]);
+  }, [isOpen, selectedRowIdx, activeRowIdx, lineItems, focusedColumn, isNcMode, transferSourceTable, sessionSourceSession]);
 
   // Video 08: Computed Pending NC Tables for lookup modal (Video 08 Frame 016)
   const pendingNcTables = useMemo(() => {
@@ -717,6 +806,191 @@ export default function IdsOrderEntryModal({
     ]);
     setTableTransferOpen(true);
     setSaveSuccessMsg('Video 12 Initial State Loaded: Table 10 Occupied (KOT 1313), Table 14 Vacant. Ready to Transfer!');
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
+  // Video 13: Item Modifiers Handlers (Frames 109–126)
+  const handleOpenItemModifier = (idx) => {
+    const target = idx !== undefined && idx !== null ? idx : (selectedRowIdx !== null ? selectedRowIdx : 0);
+    if (!lineItems[target]) return;
+    setModifierTargetRowIdx(target);
+    const curMod = lineItems[target].modifier;
+    if (curMod && typeof curMod === 'object') {
+      setModifierCode(curMod.code || '99');
+      setModifierName(curMod.name || 'spicy');
+      setModifierRate(String(curMod.charge !== undefined ? curMod.charge : '0.00'));
+    } else if (typeof curMod === 'string' && curMod.trim()) {
+      setModifierCode('99');
+      setModifierName(curMod);
+      setModifierRate('0.00');
+    } else {
+      setModifierCode('99');
+      setModifierName('spicy');
+      setModifierRate('0.00');
+    }
+    setItemModifierOpen(true);
+  };
+
+  const handleSaveItemModifier = () => {
+    if (modifierTargetRowIdx === null || !lineItems[modifierTargetRowIdx]) return;
+    const modObj = {
+      code: modifierCode || '99',
+      name: modifierName || 'OPEN MODIFIER',
+      charge: parseFloat(modifierRate) || 0
+    };
+    setLineItems(prev => {
+      const copy = [...prev];
+      copy[modifierTargetRowIdx] = {
+        ...copy[modifierTargetRowIdx],
+        modifier: modObj
+      };
+      return copy;
+    });
+    setSaveSuccessMsg(`Modifier "${modObj.name}" attached to ${lineItems[modifierTargetRowIdx].name}.`);
+    setItemModifierOpen(false);
+    setTimeout(() => setSaveSuccessMsg(null), 3000);
+  };
+
+  const handleDeleteItemModifier = () => {
+    if (modifierTargetRowIdx === null || !lineItems[modifierTargetRowIdx]) return;
+    setLineItems(prev => {
+      const copy = [...prev];
+      copy[modifierTargetRowIdx] = {
+        ...copy[modifierTargetRowIdx],
+        modifier: null
+      };
+      return copy;
+    });
+    setSaveSuccessMsg(`Modifier removed from ${lineItems[modifierTargetRowIdx].name}.`);
+    setItemModifierOpen(false);
+    setTimeout(() => setSaveSuccessMsg(null), 3000);
+  };
+
+  // Video 13: Session Transfer Handlers (Frames 046–054)
+  const handleLoadSessionTransfer = () => {
+    const loaded = [];
+    savedKots.forEach(k => {
+      k.items?.forEach(it => {
+        loaded.push({
+          kotNo: k.kotNo,
+          name: it.name,
+          quantity: typeof it.quantity === 'number' ? it.quantity.toFixed(3) : String(it.quantity || 1),
+          server: k.server || 'Biren',
+          selected: true
+        });
+      });
+    });
+    if (loaded.length === 0) {
+      loaded.push(
+        { kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '2.000', server: 'Biren', selected: true },
+        { kotNo: '1314', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1.000', server: 'Biren', selected: true },
+        { kotNo: '1318', name: 'BLENDERS PRIDE ...', quantity: '1.000', server: 'Biren', selected: true },
+        { kotNo: '1319', name: 'CREAM OF TOMATO ...', quantity: '1.000', server: 'Manash', selected: true }
+      );
+    }
+    setSessionGridItems(loaded);
+    setSessionNotice(`Loaded ${loaded.length} item(s) from Source Session: ${sessionSourceSession}.`);
+    setTimeout(() => setSessionNotice(null), 3000);
+  };
+
+  const handleExecuteSessionTransfer = () => {
+    if (!sessionNewSession) {
+      alert('Please select a New Session.');
+      return;
+    }
+    setSavedKots(prev => prev.map(k => ({ ...k, session: sessionNewSession })));
+    setSelectedSession(sessionNewSession);
+    setSaveSuccessMsg(`Session Transfer Complete: Session changed from ${sessionSourceSession} to ${sessionNewSession}.`);
+    setSessionTransferOpen(false);
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
+  // Video 13: Table Link Handlers (Frames 055–063)
+  const handleSaveTableLink = () => {
+    setTableLinks(prev => ({ ...prev, [linkSourceTable]: selectedLinkTables }));
+    setSaveSuccessMsg(`Table Link: ${linkSourceTable} linked with ${selectedLinkTables.join(', ')} for consolidated billing.`);
+    setTableLinkOpen(false);
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
+  const handleToggleLinkTable = (tbl) => {
+    setSelectedLinkTables(prev => 
+      prev.includes(tbl) ? prev.filter(t => t !== tbl) : [...prev, tbl]
+    );
+  };
+
+  // Video 13: Multi-Restaurant Switcher Handler (Frames 064–075)
+  const handleApplyMultiOutlet = (outletName) => {
+    setSelectedOutlet(outletName);
+    const code = outletName === 'LIQUOR BAR' ? 'BAR' : 'RES';
+    setLineItems(prev => prev.map(it => ({ ...it, res: code })));
+    setSaveSuccessMsg(`Outlet switched to ${outletName}. Default item outlet set to ${code}.`);
+    setMultiOutletOpen(false);
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
+  // Video 13: One-Click Bill and Settle (Shift+F9 - Frames 088–092)
+  const handleOneClickBillAndSettle = () => {
+    const itemsToSettle = lineItems.length > 0 ? lineItems : [
+      { res: 'BAR', code: '585', name: 'KINGFISHER PREMIUM (650ML)', quantity: 1.0, rate: 180.00, modifier: '' },
+      { res: 'BAR', code: '186', name: 'MINERAL WATER(58)', quantity: 1.0, rate: 120.00, modifier: '' }
+    ];
+    const total = itemsToSettle.reduce((acc, it) => acc + (it.quantity * it.rate), 0);
+    const cgst = Number((total * 0.025).toFixed(2));
+    const sgst = Number((total * 0.025).toFixed(2));
+    const nett = Math.round(total + cgst + sgst);
+    const newKotNo = String(Math.floor(1320 + Math.random() * 80));
+    const newBillNo = String(Math.floor(20 + Math.random() * 80));
+
+    handleDrawerKickOut();
+
+    setBilledTables(prev => prev.filter(t => t !== tableNo));
+    setSettledTables(prev => Array.from(new Set([...prev, tableNo])));
+    setLineItems([]);
+    setSaveSuccessMsg(`Shift+F9 [Bill and Settle]: Mini Bar KOT #${newKotNo} Punched, Bill #${newBillNo} (₹${nett}) Settled in 1-Click! Table ${tableNo} Cleared.`);
+    setTimeout(() => setSaveSuccessMsg(null), 5000);
+  };
+
+  // Video 13: KOT Reprint Handlers (Frames 099–108)
+  const handleOpenKotReprint = () => {
+    const demoReprintList = [
+      { tableNo: '14', kotNo: '1314', kotTime: '13:09', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '2', selected: false },
+      { tableNo: '14', kotNo: '1314', kotTime: '13:09', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1314', kotTime: '13:09', name: 'SPROUTED MOONG PEANUT DRY FR', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1314', kotTime: '13:09', name: 'CAESAR SALAD (VEG) ...', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1318', kotTime: '13:33', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1318', kotTime: '13:33', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1318', kotTime: '13:33', name: 'BLENDERS PRIDE ...', quantity: '1', selected: false },
+      { tableNo: '14', kotNo: '1318', kotTime: '13:33', name: 'JW BLACK LABEL ...', quantity: '1', selected: false },
+      { tableNo: 'T-1', kotNo: '1321', kotTime: '13:29', name: 'CLASSIC RUSSIAN SALAD ...', quantity: '1', selected: false },
+      { tableNo: 'T-1', kotNo: '1321', kotTime: '13:29', name: 'RED BEANS PEANUT & DRY FRUIT S', quantity: '1', selected: false },
+      { tableNo: 'T-10', kotNo: '1319', kotTime: '09:43', name: 'CREAM OF TOMATO ...', quantity: '1', selected: false }
+    ];
+    setReprintGridItems(demoReprintList);
+    setKotReprintOpen(true);
+  };
+
+  const handleToggleReprintRow = (idx) => {
+    setReprintGridItems(prev => prev.map((it, i) => i === idx ? { ...it, selected: !it.selected } : it));
+  };
+
+  const handleDblClickReprintTable = (tblNo) => {
+    setReprintGridItems(prev => prev.map(it => it.tableNo === tblNo ? { ...it, selected: true } : it));
+  };
+
+  const handleDblClickReprintKot = (kNo) => {
+    setReprintGridItems(prev => prev.map(it => it.kotNo === kNo ? { ...it, selected: true } : it));
+  };
+
+  const handleExecuteKotReprint = () => {
+    const selectedCount = reprintGridItems.filter(it => it.selected).length;
+    if (selectedCount === 0) {
+      alert('Please select at least one item to reprint (Select = Y).');
+      return;
+    }
+    handleDrawerKickOut();
+    setSaveSuccessMsg(`KOT Reprint V6.5.002.1: ${selectedCount} item(s) re-sent to Kitchen Printer.`);
+    setKotReprintOpen(false);
     setTimeout(() => setSaveSuccessMsg(null), 4000);
   };
 
@@ -1099,92 +1373,171 @@ export default function IdsOrderEntryModal({
             <span>{accountingDate}</span>
           </div>
 
-          {/* 12-Icon Win32 Command Toolbar (Frame 015 & Video 07 Frame 011 & Video 12 Frame 026) */}
-          <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '4px', alignItems: 'center' }}>
-            <button className="ids-btn" title="Print Bill / Checkout (Video 03 Frame 018)" onClick={() => setPosBillModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Printer size={16} />
-            </button>
-            <button className="ids-btn" title="Bill Settlement V6.5.008.30 (Video 04 Frame 012)" onClick={() => setPosBillSettlementModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: posBillSettlementModalOpen ? '#C1D2EE' : undefined }}>
-              <CreditCard size={16} color="#008000" />
-            </button>
+          {/* 12-Icon Win32 Command Toolbar Strictly Matching Video 13 (Frames 015, 040, 070, 090, 102) */}
+          <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '3px', alignItems: 'center' }}>
+            {/* 1. Shift+F1: Print Bill (Video 13 Frame 011) */}
             <button 
               className="ids-btn" 
-              title="Table Status / Running Tables (Video 01 Frame 048 & Video 12 Frame 038)" 
+              title="1. Print Bill (Short Key: Shift + F1) — To Print bill after KOT punch" 
+              onClick={() => setPosBillModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px' }}
+            >
+              <Printer size={16} color="#000080" />
+            </button>
+
+            {/* 2. Shift+F2: Bill Settlement (Video 13 Frame 016) */}
+            <button 
+              className="ids-btn" 
+              title="2. Bill Settlement (Short Key: Shift + F2) — Settle Bill via Cash / Card / Room Folio" 
+              onClick={() => setPosBillSettlementModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: posBillSettlementModalOpen ? '#C1D2EE' : undefined }}
+            >
+              <CreditCard size={16} color="#008000" />
+            </button>
+
+            {/* 3. Shift+F3: Table Status (Video 13 Frame 021) */}
+            <button 
+              className="ids-btn" 
+              title="3. Table Status (Short Key: Shift + F3) — Used to check Occupied/Vacant/Billed Status of a Table" 
               onClick={() => setTableStatusOpen(true)} 
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '42px', padding: '2px 4px', background: tableStatusOpen ? '#C1D2EE' : undefined }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '40px', padding: '2px 4px', background: tableStatusOpen ? '#C1D2EE' : undefined }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', alignItems: 'center', padding: '1px 0' }}>
                 <div style={{ width: '13px', height: '5px', background: '#008000', border: '1px solid #000' }}></div>
                 <div style={{ width: '13px', height: '5px', background: '#FF0000', border: '1px solid #000' }}></div>
               </div>
             </button>
+
+            {/* 4. Shift+F4: Table Transfer (Video 13 Frame 031) */}
             <button 
               className="ids-btn" 
-              title="Table Transfer V6.5.002.1 (Video 12 Frame 026)" 
+              title="4. Table Transfer (Short Key: Shift + F4) — Used to transfer a running table to a different table" 
               onClick={() => {
                 setTableTransferOpen(true);
                 handleLoadSourceTable(transferSourceTable || '10');
               }} 
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: tableTransferOpen ? '#C1D2EE' : undefined }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: tableTransferOpen ? '#C1D2EE' : undefined }}
             >
               <ArrowRightLeft size={16} color="#000080" />
             </button>
-            <button className="ids-btn" title="Modify KOT" onClick={() => setPendingKotOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Edit3 size={16} />
-            </button>
-            <button className="ids-btn" title="Waiter Transfer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Users size={16} />
-            </button>
-            <button className="ids-btn" title="Menu Group / TS Group" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <BookOpen size={16} color="#D9822B" />
-            </button>
-            <button className="ids-btn" title="Split KOT" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Scissors size={16} />
-            </button>
-            <button className="ids-btn" title="Delete Item & Quantity" onClick={() => { if (lineItems.length > 0) setLineItems(lineItems.slice(0, -1)); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <Trash2 size={16} />
-            </button>
-            <button className="ids-btn" title="Delete Entire KOT" onClick={() => setLineItems([])} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <XOctagon size={16} color="#C00" />
-            </button>
+
+            {/* 5. Shift+F5: Session Transfer (Video 13 Frame 046 - Frame 050) */}
             <button 
               className="ids-btn" 
-              title="Click on NC KOT Icon (Video 07 Frame 011)" 
-              onClick={() => setNcModalOpen(true)} 
+              title="5. Session Transfer (Short Key: Shift + F5) — Used to change session from Breakfast to Lunch & Lunch to Dinner" 
+              onClick={() => {
+                setSessionTransferOpen(true);
+                handleLoadSessionTransfer();
+              }} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: sessionTransferOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', gap: '1px', alignItems: 'center' }}>
+                <div style={{ width: '8px', height: '14px', background: '#0000FF', border: '1px solid #000', color: '#FFF', fontSize: '7px', fontWeight: 900, textAlign: 'center', lineHeight: '14px' }}>B</div>
+                <div style={{ width: '8px', height: '14px', background: '#FFD700', border: '1px solid #000', color: '#000', fontSize: '7px', fontWeight: 900, textAlign: 'center', lineHeight: '14px' }}>S</div>
+              </div>
+            </button>
+
+            {/* 6. Shift+F6: Table Link (Video 13 Frame 055 - Frame 060) */}
+            <button 
+              className="ids-btn" 
+              title="6. Table Link (Short Key: Shift + F6) — Used to link 3-4 tables in one table for billing" 
+              onClick={() => setTableLinkOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: tableLinkOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1px' }}>
+                <div style={{ width: '6px', height: '10px', background: '#316AC5', border: '1px solid #000' }}></div>
+                <div style={{ width: '4px', height: '2px', background: '#000' }}></div>
+                <div style={{ width: '6px', height: '10px', background: '#316AC5', border: '1px solid #000' }}></div>
+              </div>
+            </button>
+
+            {/* 7. Shift+F7: Multi-Restaurant (Video 13 Frame 064 - Frame 072) */}
+            <button 
+              className="ids-btn" 
+              title="7. Multi-Restaurant (Short Key: Shift + F7) — Used to change Multiple Outlets at once inside order entry" 
+              onClick={() => setMultiOutletOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: multiOutletOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ position: 'relative', width: '16px', height: '14px' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '11px', height: '11px', background: '#FFF', border: '1px solid #666', fontSize: '7px', fontWeight: 700, textAlign: 'center', lineHeight: '11px' }}>R</div>
+                <div style={{ position: 'absolute', bottom: 0, right: 0, width: '11px', height: '11px', background: '#C1D2EE', border: '1px solid #0A246A', fontSize: '7px', fontWeight: 700, textAlign: 'center', lineHeight: '11px' }}>B</div>
+              </div>
+            </button>
+
+            {/* 8. Shift+F8: NC KOT (Video 13 Frame 076 - Frame 084) */}
+            <button 
+              className="ids-btn" 
+              title="8. NC KOT (Short Key: Shift + F8) — Used to Make Non-Chargeable KOT" 
+              onClick={() => {
+                setIsNcMode(prev => !prev);
+                setSaveSuccessMsg(`Shift+F8: Toggled NC KOT mode (${!isNcMode ? 'ON' : 'OFF'}).`);
+                setTimeout(() => setSaveSuccessMsg(null), 3000);
+              }} 
               style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '4px', 
-                minWidth: '68px', 
-                padding: '2px 6px', 
+                gap: '2px', 
+                minWidth: '55px', 
+                padding: '2px 4px', 
                 color: isNcMode ? '#008000' : '#444', 
                 fontWeight: 700,
                 background: isNcMode ? '#DFF0D8' : undefined,
                 border: isNcMode ? '2px inset #FFF' : undefined
               }}
             >
-              <FileText size={16} color={isNcMode ? '#008000' : '#000080'} />
-              <span style={{ fontSize: '10px' }}>{isNcMode ? 'NC Kot' : 'NC KOT'}</span>
+              <FileText size={14} color={isNcMode ? '#008000' : '#000080'} />
+              <span style={{ fontSize: '9px', background: isNcMode ? '#008000' : '#C00', color: '#FFF', padding: '0 2px', borderRadius: '1px' }}>
+                {isNcMode ? 'ON' : 'OFF'}
+              </span>
             </button>
+
+            {/* 9. Shift+F9: Bill and Settle (Video 13 Frame 088 - Frame 092) */}
             <button 
               className="ids-btn" 
-              title="Click on Options Icon (Video 08 Frame 011)" 
+              title="9. Bill and Settle (Short Key: Shift + F9) — Used in MINI BAR billing for KOT-BILLING-SETTLEMENT at 1 click" 
+              onClick={handleOneClickBillAndSettle} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: '11px', fontWeight: 900, color: '#008000' }}>⚡</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#000080' }}>1-CLK</span>
+              </div>
+            </button>
+
+            {/* 10. Shift+F10: Options (Video 13 Frame 093 - Frame 098) */}
+            <button 
+              className="ids-btn" 
+              title="10. Options (Short Key: Shift + F10) — For NC Bill Printing, or to Open Cash Drawer" 
               onClick={() => setOptionsModalOpen(true)} 
               style={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
                 alignItems: 'center', 
-                minWidth: '42px', 
+                minWidth: '40px', 
                 padding: '2px 4px',
                 background: optionsModalOpen ? '#C1D2EE' : undefined
               }}
             >
-              <SlidersHorizontal size={16} color="#0A246A" />
+              <SlidersHorizontal size={15} color="#0A246A" />
             </button>
-            <button className="ids-btn" title="HotKey Help" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
-              <HelpCircle size={16} />
+
+            {/* HotKey Help (Shift+F1 to Shift+F10 Quick Reference) */}
+            <button 
+              className="ids-btn" 
+              title="HotKey Help — View All IDS Fortune NEXT POS Shortcut Keys (Shift+F1 to Shift+F10)" 
+              onClick={() => setHotKeyHelpOpen(true)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '38px', padding: '2px 4px', background: hotKeyHelpOpen ? '#C1D2EE' : undefined }}
+            >
+              <HelpCircle size={15} color="#0A246A" />
             </button>
-            <button className="ids-btn" title="Reprint Last Bill / KOT" onClick={() => setPendingKotOpen(true)} style={{ marginLeft: 'auto', padding: '2px 10px', fontSize: '11px', fontWeight: 600 }}>
+
+            {/* Reprint Button (Video 13 Frame 099 - Frame 108) */}
+            <button 
+              className="ids-btn" 
+              title="Reprint — To Re-print KOT if it is not printed in first attempt (KOT Reprint V6.5.002.1)" 
+              onClick={handleOpenKotReprint} 
+              style={{ marginLeft: 'auto', padding: '2px 10px', fontSize: '11px', fontWeight: 700, background: kotReprintOpen ? '#C1D2EE' : '#ECE9D8', color: '#000080' }}
+            >
               Reprint
             </button>
           </div>
@@ -1490,6 +1843,10 @@ export default function IdsOrderEntryModal({
                                 setRenamingRowIdx(idx);
                                 setSaveSuccessMsg(`Shift+F11: Renaming Item "${item.name}". Type custom name and press Enter.`);
                                 setTimeout(() => setSaveSuccessMsg(null), 3500);
+                              } else if (e.key === 'F1' || e.code === 'F1') {
+                                // Video 13 Frame 109 & 115: <F1> @ Qty for Modifier
+                                e.preventDefault();
+                                handleOpenItemModifier(idx);
                               }
                             }}
                             onChange={e => {
@@ -1500,7 +1857,7 @@ export default function IdsOrderEntryModal({
                                 return copy;
                               });
                             }}
-                            title="Click on Quantity Field & Press Shift+F11 to Rename Item (Video 10)"
+                            title="Click on Quantity Field & Press Shift+F11 to Rename Item | Press <F1> for Modifier (Video 13)"
                             style={{ 
                               width: '46px', 
                               textAlign: 'right', 
@@ -1521,9 +1878,17 @@ export default function IdsOrderEntryModal({
                             className="ids-btn" 
                             onClick={(e) => {
                               e.stopPropagation();
-                              alert(`Modifier for ${item.name} (e.g. Less Spicy, Jain)`);
+                              handleOpenItemModifier(idx);
                             }}
-                            style={{ fontSize: '10px', padding: '1px 4px', background: '#F0E6D2', color: '#000' }}
+                            title="Attach Item Modifier (or press <F1> on Quantity) - Video 13 Frame 109 & Frame 115"
+                            style={{ 
+                              fontSize: '10px', 
+                              padding: '1px 4px', 
+                              background: item.modifier ? '#FFA500' : '#F0E6D2', 
+                              color: '#000',
+                              fontWeight: item.modifier ? 700 : 400,
+                              border: item.modifier ? '1px solid #CC7A00' : undefined
+                            }}
                           >
                             Modifier
                           </button>
@@ -1577,20 +1942,34 @@ export default function IdsOrderEntryModal({
                   </thead>
                   <tbody>
                     {lineItems.map((item, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #EFEFEF' }}>
-                        <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EFEFEF' }}>{item.quantity.toFixed(3)}</td>
-                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EFEFEF' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
-                            <span>{item.name}</span>
-                            {item.res && item.res !== 'RES' && (
-                              <span style={{ fontSize: '9px', background: '#F8D7DA', color: '#721C24', padding: '0 3px', border: '1px solid #F5C6CB', borderRadius: '2px', fontWeight: 700 }}>
-                                {item.res}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(item.quantity * item.rate).toFixed(2)}</td>
-                      </tr>
+                      <React.Fragment key={idx}>
+                        <tr style={{ borderBottom: '1px solid #EFEFEF' }}>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EFEFEF' }}>{item.quantity.toFixed(3)}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EFEFEF' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+                              <span>{item.name}</span>
+                              {item.res && item.res !== 'RES' && (
+                                <span style={{ fontSize: '9px', background: '#F8D7DA', color: '#721C24', padding: '0 3px', border: '1px solid #F5C6CB', borderRadius: '2px', fontWeight: 700 }}>
+                                  {item.res}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(item.quantity * item.rate).toFixed(2)}</td>
+                        </tr>
+                        {/* Video 13 Frame 124: Indented Modifier Row below parent item */}
+                        {item.modifier && (
+                          <tr style={{ borderBottom: '1px solid #EFEFEF', background: '#FFFDF5' }}>
+                            <td style={{ padding: '2px 6px', textAlign: 'right', borderRight: '1px solid #EFEFEF' }}></td>
+                            <td style={{ padding: '2px 6px 2px 22px', borderRight: '1px solid #EFEFEF', fontStyle: 'italic', color: '#B35900', fontWeight: 600 }}>
+                              {typeof item.modifier === 'object' ? item.modifier.name : item.modifier}
+                            </td>
+                            <td style={{ padding: '2px 6px', textAlign: 'right', color: '#B35900', fontWeight: 500 }}>
+                              {typeof item.modifier === 'object' ? Number(item.modifier.charge || 0).toFixed(2) : '0.00'}
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
@@ -1735,6 +2114,33 @@ export default function IdsOrderEntryModal({
                 style={{ fontSize: '10px', background: '#E2F0D9', borderColor: '#385723', color: '#385723', fontWeight: 700 }}
               >
                 Video 12 Demo (T10-&gt;T14)
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  setSessionTransferOpen(true);
+                  handleLoadSessionTransfer();
+                }}
+                title="Session Transfer (Shift + F5)"
+                style={{ fontSize: '10px', background: '#FFF2CC', borderColor: '#D6B656', color: '#665200', fontWeight: 600 }}
+              >
+                Session Transfer
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setTableLinkOpen(true)}
+                title="Table Link (Shift + F6)"
+                style={{ fontSize: '10px', background: '#F8CECC', borderColor: '#B85450', color: '#6B1B18', fontWeight: 600 }}
+              >
+                Table Link
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setHotKeyHelpOpen(true)}
+                title="View All POS Shortcut Keys (Shift+F1 to Shift+F10)"
+                style={{ fontSize: '10px', background: '#E1D5E7', borderColor: '#9673A6', color: '#4B2A5B', fontWeight: 700 }}
+              >
+                HotKey Help
               </button>
               <button className="ids-btn" onClick={() => setTableStatusOpen(true)}>
                 Table Matrix
@@ -3236,6 +3642,524 @@ export default function IdsOrderEntryModal({
           </div>
         );
       })()}
+
+      {/* 5K. WIN32 SESSION TRANSFER MODAL (Video 13 Frames 048–054) */}
+      {sessionTransferOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '580px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Session Transfer - RESTAURANT</span>
+              <button className="ids-win-btn close" onClick={() => setSessionTransferOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Form Fields (Frame 050) */}
+              <div style={{ background: '#F5F4EE', border: '1px solid #CCC', padding: '8px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>Accounting Date</span>
+                  <input type="text" readOnly value={accountingDate} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>Source Session</span>
+                  <input type="text" readOnly value={sessionSourceSession} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>Date</span>
+                  <div style={{ display: 'flex', gap: '2px' }}>
+                    <input type="text" value={sessionTransferDate} onChange={e => setSessionTransferDate(e.target.value)} style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }}>?</button>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600 }}>New Session</span>
+                  <div style={{ display: 'flex', gap: '2px' }}>
+                    <select 
+                      value={sessionNewSession} 
+                      onChange={e => setSessionNewSession(e.target.value)} 
+                      style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 2px', fontSize: '11px', fontWeight: 600 }}
+                    >
+                      <option value="Breakfast">Breakfast</option>
+                      <option value="Lunch">Lunch</option>
+                      <option value="Dinner">Dinner</option>
+                      <option value="General">General</option>
+                    </select>
+                    <button className="ids-btn" style={{ padding: '0 4px', fontSize: '10px', fontWeight: 700 }}>?</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subtitle description matching Video 13 Frame 050 */}
+              <div style={{ fontStyle: 'italic', color: '#A00', fontSize: '10px', padding: '0 2px' }}>
+                * Session transfer is used to change session from Breakfast to Lunch &amp; Lunch to Dinner.
+              </div>
+
+              {/* Notice */}
+              {sessionNotice && (
+                <div style={{ background: '#D4EDDA', border: '1px solid #C3E6CB', color: '#155724', padding: '3px 8px', fontSize: '10px', fontWeight: 700 }}>
+                  {sessionNotice}
+                </div>
+              )}
+
+              {/* Grid (Frame 050) */}
+              <div style={{ height: '170px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '65px' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Item Name</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'right', width: '65px' }}>Quantity</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left', width: '80px' }}>Server</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sessionGridItems.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} style={{ padding: '24px 12px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
+                          Click &quot;Load&quot; to fetch running KOT items from current session.
+                        </td>
+                      </tr>
+                    ) : (
+                      sessionGridItems.map((it, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
+                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{it.kotNo}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{it.quantity}</td>
+                          <td style={{ padding: '3px 6px' }}>{it.server}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Actions (Frame 050) */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '6px' }}>
+                <button className="ids-btn" onClick={handleLoadSessionTransfer} style={{ minWidth: '65px', fontWeight: 600 }}>
+                  Load
+                </button>
+                <button className="ids-btn" onClick={handleExecuteSessionTransfer} style={{ minWidth: '65px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}>
+                  Transfer
+                </button>
+                <button className="ids-btn" onClick={() => setSessionGridItems([])} style={{ minWidth: '65px' }}>
+                  Clear
+                </button>
+                <button className="ids-btn" onClick={() => setSessionTransferOpen(false)} style={{ minWidth: '65px' }}>
+                  Exit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5L. WIN32 TABLE LINK MODAL (Video 13 Frames 056–063) */}
+      {tableLinkOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '360px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Table Link</span>
+              <button className="ids-win-btn close" onClick={() => setTableLinkOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            {/* Header Banner (Frame 058) */}
+            <div style={{ background: '#D4D0C8', borderBottom: '1px solid #808080', padding: '3px 8px', fontSize: '11px', fontWeight: 700, color: '#000080', textAlign: 'center' }}>
+              {selectedOutlet || 'RESTAURANT'}
+            </div>
+
+            <div style={{ padding: '12px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Source Table Input */}
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 700 }}>Source Table #</span>
+                <input 
+                  type="text" 
+                  value={linkSourceTable} 
+                  onChange={e => setLinkSourceTable(e.target.value)} 
+                  placeholder="T-1"
+                  style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 6px', fontSize: '11px', fontWeight: 700 }}
+                />
+              </div>
+
+              {/* Multi-Select Link Table(s) Listbox (Frame 058) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '8px' }}>
+                <span style={{ fontWeight: 700 }}>Link Table(s)</span>
+                <div style={{ height: '140px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px' }}>
+                  {availableLinkTables.map(tbl => {
+                    const isSelected = selectedLinkTables.includes(tbl);
+                    return (
+                      <div 
+                        key={tbl}
+                        onClick={() => handleToggleLinkTable(tbl)}
+                        style={{
+                          padding: '2px 8px',
+                          cursor: 'pointer',
+                          background: isSelected ? '#316AC5' : '#FFF',
+                          color: isSelected ? '#FFF' : '#000',
+                          fontWeight: isSelected ? 700 : 400,
+                          userSelect: 'none'
+                        }}
+                      >
+                        {tbl}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Subtitle description matching Video 13 Frame 058 */}
+              <div style={{ fontStyle: 'italic', color: '#A00', fontSize: '10px', lineHeight: '13px' }}>
+                * Table Link option is used to link 3-4 table in one table for billing. (Not Mandatory)
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '8px', marginTop: '6px' }}>
+                <button className="ids-btn" onClick={handleSaveTableLink} style={{ minWidth: '65px', fontWeight: 700 }}>
+                  Save
+                </button>
+                <button className="ids-btn" onClick={() => setTableLinkOpen(false)} style={{ minWidth: '65px' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5M. WIN32 MULTI-RESTAURANT SELECT OUTLET MODAL (Video 13 Frames 068–075) */}
+      {multiOutletOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '400px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Select Outlet</span>
+              <button className="ids-win-btn close" onClick={() => setMultiOutletOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '14px 16px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Restaurant</span>
+                <select 
+                  value={multiOutletChoice} 
+                  onChange={e => setMultiOutletChoice(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  <option value="LIQUOR BAR">LIQUOR BAR</option>
+                  <option value="RESTAURANT">RESTAURANT</option>
+                  <option value="ROOM SERVICE">ROOM SERVICE</option>
+                  <option value="BANQUET">BANQUET</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Accounting Date</span>
+                <input type="text" readOnly value={accountingDate} style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Session</span>
+                <input type="text" readOnly value={selectedSession} style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
+              </div>
+
+              {/* Subtitle description matching Video 13 Frame 070 */}
+              <div style={{ fontStyle: 'italic', color: '#A00', fontSize: '10px' }}>
+                * This option is used to change Multiple Outlets at once, Inside order entry screen.
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '6px' }}>
+                <button className="ids-btn" onClick={() => handleApplyMultiOutlet(multiOutletChoice)} style={{ minWidth: '65px', fontWeight: 700 }}>
+                  Ok
+                </button>
+                <button className="ids-btn" onClick={() => setMultiOutletOpen(false)} style={{ minWidth: '65px' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5N. WIN32 KOT REPRINT MODAL V6.5.002.1 (Video 13 Frames 101–108) */}
+      {kotReprintOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '640px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>KOT Reprint V6.5.002.1</span>
+              <button className="ids-win-btn close" onClick={() => setKotReprintOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '8px 10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {/* Grid (Frame 103) */}
+              <div style={{ height: '240px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>Table #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '65px', textAlign: 'left' }}>KOT Time</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Item Name</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'right' }}>Quantity</th>
+                      <th style={{ padding: '3px 6px', width: '45px', textAlign: 'center' }}>Select</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reprintGridItems.map((it, idx) => (
+                      <tr 
+                        key={idx} 
+                        onClick={() => handleToggleReprintRow(idx)}
+                        style={{ 
+                          borderBottom: '1px solid #EEE', 
+                          background: it.selected ? '#E6F0FA' : (idx % 2 === 0 ? '#FFF' : '#F9F9F9'),
+                          cursor: 'pointer' 
+                        }}
+                      >
+                        <td 
+                          style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE', color: '#000080' }}
+                          onDoubleClick={(e) => { e.stopPropagation(); handleDblClickReprintTable(it.tableNo); }}
+                          title="Double-click to select all KOTs for Table"
+                        >
+                          {it.tableNo}
+                        </td>
+                        <td 
+                          style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}
+                          onDoubleClick={(e) => { e.stopPropagation(); handleDblClickReprintKot(it.kotNo); }}
+                          title="Double-click to select all items of this KOT"
+                        >
+                          {it.kotNo}
+                        </td>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', color: '#555' }}>{it.kotTime}</td>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
+                        <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{it.quantity}</td>
+                        <td style={{ padding: '3px 6px', textAlign: 'center', fontWeight: 800, color: it.selected ? '#008000' : '#888' }}>
+                          {it.selected ? 'Y' : 'N'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Footnote shortcuts matching Frame 103 */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#333', background: '#E6E4DC', padding: '3px 8px', border: '1px solid #CCC' }}>
+                <span>Dbl Click on Tbl# to select all the KOTs</span>
+                <span>Dbl Click on KOT # to select all items of that KOT</span>
+              </div>
+
+              {/* Subtitle description matching Video 13 Frame 103 */}
+              <div style={{ fontStyle: 'italic', color: '#A00', fontSize: '10px' }}>
+                * To Re-print KOT if it is not printed in first attempt.
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '4px' }}>
+                <button className="ids-btn" onClick={() => setReprintGridItems(prev => prev.map(it => ({ ...it, selected: false })))} style={{ minWidth: '65px' }}>
+                  Clear
+                </button>
+                <button className="ids-btn" onClick={handleExecuteKotReprint} style={{ minWidth: '65px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}>
+                  Print
+                </button>
+                <button className="ids-btn" onClick={() => setKotReprintOpen(false)} style={{ minWidth: '65px' }}>
+                  Exit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5O. WIN32 ITEM MODIFIERS MODAL (Video 13 Frames 118–126) */}
+      {itemModifierOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '450px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Item Modifiers</span>
+              <button className="ids-win-btn close" onClick={() => setItemModifierOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '10px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {/* Target Item Name Label */}
+              <div style={{ fontWeight: 700, color: '#000080', borderBottom: '1px solid #CCC', paddingBottom: '3px' }}>
+                Target: {modifierTargetRowIdx !== null ? lineItems[modifierTargetRowIdx]?.name : 'Selected Item'}
+              </div>
+
+              {/* Form Input Block (Frame 119) */}
+              <div style={{ background: '#F5F4EE', border: '1px solid #CCC', padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 600 }}>Item Code</span>
+                  <input 
+                    type="text" 
+                    value={modifierCode} 
+                    onChange={e => setModifierCode(e.target.value)} 
+                    style={{ width: '60px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 600 }}>Item Name</span>
+                  <input 
+                    type="text" 
+                    value={modifierName} 
+                    onChange={e => setModifierName(e.target.value)} 
+                    placeholder="e.g. spicy, less spicy, no onion"
+                    style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 600, color: '#000080' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontWeight: 600 }}>Rate</span>
+                  <input 
+                    type="text" 
+                    value={modifierRate} 
+                    onChange={e => setModifierRate(e.target.value)} 
+                    style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '4px' }}>
+                  <button className="ids-btn" onClick={handleSaveItemModifier} style={{ minWidth: '60px', fontWeight: 700 }}>
+                    Ok
+                  </button>
+                  <button className="ids-btn" onClick={handleDeleteItemModifier} style={{ minWidth: '60px', color: '#A00' }}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              {/* Standard Modifier Catalog Grid (Frame 119) */}
+              <div style={{ height: '120px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '70px', textAlign: 'left' }}>Item Code</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Item Name</th>
+                      <th style={{ padding: '3px 6px', width: '60px', textAlign: 'right' }}>Charge</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {POS_STANDARD_MODIFIERS.map(mod => {
+                      const isSelected = modifierName.toLowerCase() === mod.name.toLowerCase();
+                      return (
+                        <tr 
+                          key={mod.code}
+                          onClick={() => {
+                            setModifierCode(mod.code);
+                            setModifierName(mod.name);
+                            setModifierRate(mod.charge.toFixed(2));
+                          }}
+                          style={{
+                            borderBottom: '1px solid #EEE',
+                            background: isSelected ? '#316AC5' : '#FFF',
+                            color: isSelected ? '#FFF' : '#000',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <td style={{ padding: '2px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{mod.code}</td>
+                          <td style={{ padding: '2px 6px', borderRight: '1px solid #EEE' }}>{mod.name}</td>
+                          <td style={{ padding: '2px 6px', textAlign: 'right' }}>{mod.charge.toFixed(2)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom Actions */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '4px' }}>
+                <button className="ids-btn" onClick={handleSaveItemModifier} style={{ minWidth: '65px', fontWeight: 700 }}>
+                  Select
+                </button>
+                <button className="ids-btn" onClick={() => setItemModifierOpen(false)} style={{ minWidth: '65px' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5P. WIN32 POS SHORTCUT KEYS HELP MODAL (Video 13 Master Reference) */}
+      {hotKeyHelpOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '680px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '5px 5px 20px rgba(0,0,0,0.7)' }}
+          >
+            {/* Titlebar */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS Shortcut Keys Help - IDS Fortune NEXT 6.5 &amp; 7.0 (Video 13)</span>
+              <button className="ids-win-btn close" onClick={() => setHotKeyHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '10px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ fontWeight: 700, color: '#000080', fontSize: '12px' }}>
+                Master Keyboard Shortcuts &amp; Toolbar Commands
+              </div>
+
+              <div style={{ height: '300px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                    <tr>
+                      <th style={{ padding: '4px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '90px' }}>Short Key</th>
+                      <th style={{ padding: '4px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '120px' }}>Command</th>
+                      <th style={{ padding: '4px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Description (Video 13)</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'center', width: '70px' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { key: 'Shift + F1', name: 'Print Bill', desc: 'To Print bill after KOT punch', action: () => { setHotKeyHelpOpen(false); setPosBillModalOpen(true); } },
+                      { key: 'Shift + F2', name: 'Bill Settlement', desc: 'Settle bill via Cash / Card / Room Folio / Ledger', action: () => { setHotKeyHelpOpen(false); setPosBillSettlementModalOpen(true); } },
+                      { key: 'Shift + F3', name: 'Table Status', desc: 'Check Occupied / Vacant / Billed status matrix', action: () => { setHotKeyHelpOpen(false); setTableStatusOpen(true); } },
+                      { key: 'Shift + F4', name: 'Table Transfer', desc: 'Transfer running table to another table', action: () => { setHotKeyHelpOpen(false); setTableTransferOpen(true); handleLoadSourceTable(transferSourceTable || '10'); } },
+                      { key: 'Shift + F5', name: 'Session Transfer', desc: 'Change session from Breakfast to Lunch & Lunch to Dinner', action: () => { setHotKeyHelpOpen(false); setSessionTransferOpen(true); handleLoadSessionTransfer(); } },
+                      { key: 'Shift + F6', name: 'Table Link', desc: 'Link 3-4 tables in one table for billing (Not Mandatory)', action: () => { setHotKeyHelpOpen(false); setTableLinkOpen(true); } },
+                      { key: 'Shift + F7', name: 'Multi-Restaurant', desc: 'Change Multiple Outlets at once inside order entry (RES / BAR)', action: () => { setHotKeyHelpOpen(false); setMultiOutletOpen(true); } },
+                      { key: 'Shift + F8', name: 'NC KOT', desc: 'Make Non-Chargeable KOT (Managers / Directors / Complimentary)', action: () => { setHotKeyHelpOpen(false); setIsNcMode(prev => !prev); } },
+                      { key: 'Shift + F9', name: 'Bill & Settle', desc: 'Used in MINI BAR billing for KOT-BILLING-SETTLEMENT at 1 click', action: () => { setHotKeyHelpOpen(false); handleOneClickBillAndSettle(); } },
+                      { key: 'Shift + F10', name: 'Options', desc: 'For NC Bill Printing or Cash Drawer Kick Out', action: () => { setHotKeyHelpOpen(false); setOptionsModalOpen(true); } },
+                      { key: 'Shift + F11', name: 'Rename / Import', desc: '@ Qty: Rename Item | @ Code: Import items from other outlet', action: () => { setHotKeyHelpOpen(false); handleOpenSupRestaurant(0); } },
+                      { key: '<F1>', name: 'Item Modifier', desc: '@ Qty column: Open Item Modifiers dialog (spicy, less spicy, jain)', action: () => { setHotKeyHelpOpen(false); handleOpenItemModifier(0); } },
+                      { key: '<F5>', name: 'Delete Item', desc: 'Delete currently selected row from order entry grid', action: () => { setHotKeyHelpOpen(false); handleDeleteRow(0); } },
+                      { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } }
+                    ].map((row, idx) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
+                        <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
+                        <td style={{ padding: '3px 6px', fontWeight: 600, borderRight: '1px solid #EEE' }}>{row.name}</td>
+                        <td style={{ padding: '3px 6px', color: '#444', borderRight: '1px solid #EEE' }}>{row.desc}</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                          <button className="ids-btn" onClick={row.action} style={{ fontSize: '10px', padding: '1px 5px' }}>
+                            Run
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                <button className="ids-btn" onClick={() => setHotKeyHelpOpen(false)} style={{ minWidth: '70px', fontWeight: 600 }}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 8. POS BILL PRINTING MODAL (Video 03 Frame 018 - Frame 036) */}
       <IdsPosBillModal

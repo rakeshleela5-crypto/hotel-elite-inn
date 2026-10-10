@@ -921,6 +921,12 @@ export default function IdsDesktopShell({
       { label: 'Delete NC KOT', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
       { label: 'Create POS MIS', action: () => showMessageBox("POS MIS Register Compiled.", "MIS Report") },
       { label: 'Table Transfer V6.5.002.1 (Table 10 -> Table 14)', videoId: 'POS-12', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Short Keys & Toolbars in Order Entry (Shift+F1 to Shift+F10)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Session Transfer (Shift+F5 - Breakfast / Lunch / Dinner)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Table Link (Shift+F6 - Link Multiple Tables in 1)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Multi-Restaurant Switch (Shift+F7 - RES / BAR)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'KOT Reprint V6.5.002.1 (Toolbar Reprint)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Item Modifiers (<F1> @ Qty for Modifier)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
     'Day End process..': [
