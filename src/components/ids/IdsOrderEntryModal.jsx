@@ -65,6 +65,35 @@ export const POS_TABLES = [
   '34', '35', '40', '41'
 ];
 
+// Authentic Statutory KOT Item Deletion / Void Reasons (Video 05 Frame 30 & 32)
+export const POS_DELETION_REASONS = [
+  'Guest Requested',
+  'Cancelled by Guest',
+  'Double Entry',
+  'Wrongly Made',
+  'Food Quality Issue',
+  'Long Waiting Time',
+  'Complimentary',
+  'Corporate Discount',
+  'GM Guest',
+  'MD Guest',
+  'MIXER WITH VODKA',
+  'REF MR.DEEP CHANGMAI',
+  'MD IPSHITA MAAM,',
+  'RD FILLING STATION',
+  'RD 119',
+  'STAFF TAKE AWAY DISCOUNT',
+  'PARTHA SIR',
+  'CERTICY GUEST',
+  'REF GM SIR',
+  'ROOM GUEST DICOUNT',
+  'KFC Tax Exemption',
+  'More Order',
+  'Staff Discount',
+  'Travel Agnt Discount',
+  'Travel Agnt Spl rate'
+];
+
 export default function IdsOrderEntryModal({
   isOpen,
   onClose,
@@ -108,10 +137,14 @@ export default function IdsOrderEntryModal({
   const [selectedTableForDetails, setSelectedTableForDetails] = useState('10');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
 
-  // KOT Modification State (Video 02 Frame 020 - Frame 032)
+  // KOT Modification & Line Deletion State (Video 02 & Video 05 Frame 16 - Frame 32)
   const [editingKotNo, setEditingKotNo] = useState(null);
   const [stagedKotToModify, setStagedKotToModify] = useState(null);
+  const [originalKotSnapshot, setOriginalKotSnapshot] = useState(null);
   const [updateConfirmModalOpen, setUpdateConfirmModalOpen] = useState(false);
+  const [selectedRowIdx, setSelectedRowIdx] = useState(null);
+  const [reasonModalOpen, setReasonModalOpen] = useState(false);
+  const [selectedReason, setSelectedReason] = useState('Guest Requested');
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -119,7 +152,7 @@ export default function IdsOrderEntryModal({
   const [billedTables, setBilledTables] = useState(['10']);
   const [settledTables, setSettledTables] = useState([]);
 
-  // Live Saved KOTs Registry (Videos 01 & 02)
+  // Live Saved KOTs Registry (Videos 01, 02 & Video 05 Frame 16)
   const [savedKots, setSavedKots] = useState([
     {
       kotNo: '1314',
@@ -145,12 +178,14 @@ export default function IdsOrderEntryModal({
       items: [
         { code: '1', name: 'CLASSIC RUSSIAN SALAD', quantity: 1.0, rate: 199.0, value: 199.0 },
         { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', quantity: 1.0, rate: 199.0, value: 199.0 },
-        { code: '3', name: 'SPROUTED MOONG PEANUT DRY', quantity: 1.0, rate: 199.0, value: 199.0 }
+        { code: '3', name: 'SPROUTED MOONG PEANUT DRY', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { code: '4', name: 'CAESAR SALAD VEG', quantity: 1.0, rate: 245.0, value: 245.0 },
+        { code: '5', name: 'CAESAR SALAD CHICKEN', quantity: 1.0, rate: 295.0, value: 295.0 }
       ],
-      totalAmount: 597.0,
-      cgst: 14.93,
-      sgst: 14.93,
-      nettAmount: 627.0
+      totalAmount: 1137.0,
+      cgst: 28.43,
+      sgst: 28.43,
+      nettAmount: 1194.0
     },
     {
       kotNo: '1311',
@@ -223,10 +258,67 @@ export default function IdsOrderEntryModal({
     setItemSearchText('');
   };
 
-  // Handler to Save or Update KOT (Video 01 Frame 038 & Video 02 Frame 028 -> Frame 032)
-  const handleSaveKOT = () => {
+  // Delete item row via <F5> or Delete button (Video 05 Frame 20-22)
+  const handleDeleteRow = (targetIdx = selectedRowIdx) => {
+    let indexToDelete = targetIdx;
+    if (indexToDelete === null || indexToDelete === undefined) {
+      if (lineItems.length > 0) {
+        indexToDelete = lineItems.length - 1;
+      } else {
+        return;
+      }
+    }
+    if (indexToDelete >= 0 && indexToDelete < lineItems.length) {
+      const removedItem = lineItems[indexToDelete];
+      setLineItems(prev => prev.filter((_, idx) => idx !== indexToDelete));
+      setSelectedRowIdx(null);
+      setSaveSuccessMsg(`Item '${removedItem.name}' removed (<F5>). Click Save to log statutory reason.`);
+      setTimeout(() => setSaveSuccessMsg(null), 3500);
+    }
+  };
+
+  // Win32 Keyboard shortcuts matching Video 05: <F5> Deletes selected item row
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'F5') {
+        e.preventDefault();
+        e.stopPropagation();
+        handleDeleteRow();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, selectedRowIdx, lineItems]);
+
+  // Handler to Save or Update KOT (Video 01 Frame 038 & Video 05 Frame 30 -> Frame 33)
+  const handleSaveKOT = (forcedReason = null) => {
     if (lineItems.length === 0) return;
     const isUpdate = Boolean(editingKotNo);
+
+    // Video 05 Check: Did we delete or reduce items from an already printed KOT?
+    if (isUpdate && originalKotSnapshot && !forcedReason) {
+      const originalCodes = originalKotSnapshot.items.map(it => it.code);
+      const currentCodes = lineItems.map(it => it.code);
+      const itemDeleted = originalCodes.some(c => !currentCodes.includes(c));
+      
+      const qtyReduced = originalKotSnapshot.items.some(orig => {
+        const cur = lineItems.find(it => it.code === orig.code);
+        return cur && cur.quantity < orig.quantity;
+      });
+
+      const totalQtyReduced = lineItems.reduce((acc, it) => acc + it.quantity, 0) < originalKotSnapshot.totalQty;
+
+      if (itemDeleted || qtyReduced || totalQtyReduced) {
+        // Must prompt Win32 Statutory Reason dialog (Video 05 Frame 30 & 32)
+        setReasonModalOpen(true);
+        return;
+      }
+    }
+
+    const appliedReason = forcedReason || (editingKotNo ? 'Modified' : 'New Order');
     const targetKotNo = isUpdate ? editingKotNo : (kotNo === 'AUTO' ? `13${Math.floor(10 + Math.random() * 89)}` : kotNo);
 
     const updatedKotRecord = {
@@ -235,6 +327,7 @@ export default function IdsOrderEntryModal({
       tableNo: tableNo,
       server: server,
       outlet: selectedOutlet,
+      deletionReason: appliedReason,
       items: lineItems.map(it => ({
         ...it,
         value: it.quantity * it.rate
@@ -247,7 +340,7 @@ export default function IdsOrderEntryModal({
 
     if (isUpdate) {
       setSavedKots(prev => prev.map(k => k.kotNo === targetKotNo ? updatedKotRecord : k));
-      setSaveSuccessMsg(`KOT #${targetKotNo} on Table ${tableNo} Modified & Updated Successfully!`);
+      setSaveSuccessMsg(`KOT #${targetKotNo} on Table ${tableNo} Updated! [Reason: ${appliedReason}]`);
     } else {
       setSavedKots(prev => [updatedKotRecord, ...prev]);
       setSaveSuccessMsg(`KOT #${targetKotNo} Generated Successfully on Table ${tableNo}!`);
@@ -275,10 +368,19 @@ export default function IdsOrderEntryModal({
 
     setTimeout(() => setSaveSuccessMsg(null), 3000);
 
-    // Reset line items for next entry (Video 01 Frame 040 & Video 02 Frame 032)
+    // Reset line items and state for next entry (Video 05 Frame 33)
     setLineItems([]);
     setKotNo('AUTO');
+    setTableNo('');
+    setCovers('');
     setEditingKotNo(null);
+    setOriginalKotSnapshot(null);
+    setSelectedRowIdx(null);
+  };
+
+  const handleConfirmReason = () => {
+    setReasonModalOpen(false);
+    handleSaveKOT(selectedReason);
   };
 
   if (!isOpen) return null;
@@ -551,47 +653,101 @@ export default function IdsOrderEntryModal({
                   </tr>
                 </thead>
                 <tbody>
-                  {lineItems.map((item, idx) => (
-                    <tr key={idx} style={{ background: idx % 2 === 0 ? '#FFF' : '#F9F9F9', borderBottom: '1px solid #E0E0E0' }}>
-                      <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', color: '#666' }}>{item.res}</td>
-                      <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', fontWeight: 600 }}>{item.code}</td>
-                      <td 
-                        style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', cursor: 'pointer', color: '#000080' }}
-                        onClick={() => { setActiveRowIdx(idx); setItemHelpOpen(true); }}
-                        title="Click to search / replace item"
+                  {lineItems.map((item, idx) => {
+                    const isSelected = selectedRowIdx === idx;
+                    return (
+                      <tr 
+                        key={idx} 
+                        onClick={() => setSelectedRowIdx(idx)}
+                        style={{ 
+                          background: isSelected ? '#316AC5' : (idx % 2 === 0 ? '#FFF' : '#F9F9F9'), 
+                          color: isSelected ? '#FFF' : '#000',
+                          borderBottom: '1px solid #E0E0E0',
+                          cursor: 'pointer'
+                        }}
                       >
-                        {item.name}
-                      </td>
-                      <td style={{ padding: '2px 4px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
-                        <input 
-                          type="number" 
-                          step="0.5" 
-                          value={item.quantity} 
-                          onChange={e => {
-                            const val = parseFloat(e.target.value) || 0;
-                            setLineItems(prev => {
-                              const copy = [...prev];
-                              copy[idx] = { ...copy[idx], quantity: val };
-                              return copy;
-                            });
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', color: isSelected ? '#FFF' : '#666' }}>{item.res}</td>
+                        <td 
+                          style={{ 
+                            padding: '3px 6px', 
+                            borderRight: '1px solid #E0E0E0', 
+                            fontWeight: 700, 
+                            cursor: 'pointer',
+                            background: isSelected ? '#0A246A' : undefined,
+                            color: isSelected ? '#FFF' : '#000',
+                            textDecoration: isSelected ? 'underline' : 'none'
                           }}
-                          style={{ width: '42px', textAlign: 'right', border: '1px solid #BBB', fontSize: '11px', padding: '1px 2px' }}
-                        />
-                      </td>
-                      <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
-                        {item.rate.toFixed(2)}
-                      </td>
-                      <td style={{ padding: '2px 4px', textAlign: 'center' }}>
-                        <button 
-                          className="ids-btn" 
-                          onClick={() => alert(`Modifier for ${item.name} (e.g. Less Spicy, Jain)`)}
-                          style={{ fontSize: '10px', padding: '1px 4px', background: '#F0E6D2' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRowIdx(idx);
+                          }}
+                          title="Click on Item Code to delete item (Press <F5>)"
                         >
-                          Modifier
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                          {item.code}
+                        </td>
+                        <td 
+                          style={{ 
+                            padding: '3px 6px', 
+                            borderRight: '1px solid #E0E0E0', 
+                            cursor: 'pointer', 
+                            color: isSelected ? '#FFF' : '#000080',
+                            fontWeight: 500
+                          }}
+                          onClick={(e) => { 
+                            e.stopPropagation();
+                            setActiveRowIdx(idx); 
+                            setItemHelpOpen(true); 
+                          }}
+                          title="Click to search / replace item"
+                        >
+                          {item.name}
+                        </td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
+                          <input 
+                            type="number" 
+                            step="1" 
+                            min="0"
+                            value={item.quantity} 
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={e => {
+                              const val = parseFloat(e.target.value) || 0;
+                              setLineItems(prev => {
+                                const copy = [...prev];
+                                copy[idx] = { ...copy[idx], quantity: val };
+                                return copy;
+                              });
+                            }}
+                            title="Click on Quantity Field to Change Item Quantity"
+                            style={{ 
+                              width: '46px', 
+                              textAlign: 'right', 
+                              border: '1px solid #7F9DB9', 
+                              fontSize: '11px', 
+                              padding: '1px 2px',
+                              fontWeight: 600,
+                              background: '#FFF',
+                              color: '#000'
+                            }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
+                          {item.rate.toFixed(2)}
+                        </td>
+                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                          <button 
+                            className="ids-btn" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              alert(`Modifier for ${item.name} (e.g. Less Spicy, Jain)`);
+                            }}
+                            style={{ fontSize: '10px', padding: '1px 4px', background: '#F0E6D2', color: '#000' }}
+                          >
+                            Modifier
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {/* Empty rows to maintain authentic Win32 grid height */}
                   {Array.from({ length: Math.max(0, 10 - lineItems.length) }).map((_, i) => (
                     <tr key={`empty-${i}`} style={{ height: '22px', borderBottom: '1px solid #F0F0F0' }}>
@@ -657,10 +813,14 @@ export default function IdsOrderEntryModal({
             </div>
           </div>
 
-          {/* Bottom Status Bar matching Video 01 Frame 015 & Frame 025 */}
+          {/* Bottom Status Bar matching Video 01 & Video 05 Frame 20-28 */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 10px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#333' }}>
             <span>&lt;F1&gt; @ Qty for Modifier</span>
-            <span>Type item code or name to search</span>
+            <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : '#000080' }}>
+              {selectedRowIdx !== null 
+                ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
+                : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity'}
+            </span>
             <span>&lt;F10&gt; @ MemberCode for Help</span>
           </div>
 
@@ -677,24 +837,29 @@ export default function IdsOrderEntryModal({
             <div style={{ display: 'flex', gap: '6px' }}>
               <button 
                 className="ids-btn" 
-                onClick={handleSaveKOT} 
+                onClick={() => handleSaveKOT()} 
                 style={{ fontWeight: 700, minWidth: '65px', background: '#DFF0D8', borderColor: '#3C763D' }}
               >
                 Save
               </button>
               <button 
                 className="ids-btn" 
-                onClick={() => setLineItems([])}
+                onClick={() => { setLineItems([]); setSelectedRowIdx(null); }}
                 style={{ minWidth: '60px' }}
               >
                 Clear
               </button>
               <button 
                 className="ids-btn" 
-                onClick={() => { if (lineItems.length > 0) setLineItems(lineItems.slice(0, -1)); }}
-                style={{ minWidth: '60px' }}
+                onClick={() => handleDeleteRow(selectedRowIdx)}
+                title="Delete item (<F5>)"
+                style={{ 
+                  minWidth: '60px', 
+                  fontWeight: selectedRowIdx !== null ? 700 : 400, 
+                  color: selectedRowIdx !== null ? '#C00000' : '#000' 
+                }}
               >
-                Delete
+                Delete {selectedRowIdx !== null && lineItems[selectedRowIdx] ? `(${lineItems[selectedRowIdx].code})` : ''}
               </button>
               <button 
                 className="ids-btn" 
@@ -923,6 +1088,13 @@ export default function IdsOrderEntryModal({
                       setKotNo(stagedKotToModify.kotNo);
                       setTableNo(stagedKotToModify.tableNo);
                       setServer(stagedKotToModify.server);
+                      setCovers(stagedKotToModify.covers || '2');
+                      setOriginalKotSnapshot({
+                        kotNo: stagedKotToModify.kotNo,
+                        items: JSON.parse(JSON.stringify(stagedKotToModify.items)),
+                        totalQty: stagedKotToModify.items.reduce((s, it) => s + (it.quantity || 1), 0),
+                        totalAmount: stagedKotToModify.totalAmount
+                      });
                       setLineItems(stagedKotToModify.items.map(it => ({
                         res: 'RES',
                         code: it.code,
@@ -931,6 +1103,7 @@ export default function IdsOrderEntryModal({
                         rate: it.rate,
                         modifier: it.modifier || ''
                       })));
+                      setSelectedRowIdx(null);
                     }
                     setUpdateConfirmModalOpen(false);
                     setPendingKotOpen(false);
@@ -945,6 +1118,85 @@ export default function IdsOrderEntryModal({
                   style={{ minWidth: '60px' }}
                 >
                   No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5C. WIN32 STATUTORY REASON DIALOG (Video 05 Frame 30 & Frame 32) */}
+      {reasonModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '280px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 14px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar matching Video 05 Frame 30 */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Reason</span>
+              <button className="ids-win-btn close" onClick={() => setReasonModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            {/* Modal Body */}
+            <div style={{ padding: '8px', fontSize: '11px' }}>
+              <div style={{ marginBottom: '4px', color: '#333', fontSize: '10px', fontWeight: 600 }}>
+                Select Statutory Reason for Item Cancellation / Reduction:
+              </div>
+              {/* Listbox */}
+              <div 
+                style={{ 
+                  height: '240px', 
+                  overflowY: 'auto', 
+                  background: '#FFF', 
+                  border: '1px solid #7F9DB9',
+                  marginBottom: '8px'
+                }}
+              >
+                {POS_DELETION_REASONS.map(reason => {
+                  const isSelected = selectedReason === reason;
+                  return (
+                    <div 
+                      key={reason}
+                      onClick={() => setSelectedReason(reason)}
+                      onDoubleClick={handleConfirmReason}
+                      style={{ 
+                        padding: '3px 6px', 
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        background: isSelected ? '#316AC5' : 'transparent',
+                        color: isSelected ? '#FFF' : '#000',
+                        userSelect: 'none',
+                        fontFamily: 'Tahoma, Arial, sans-serif'
+                      }}
+                    >
+                      {reason}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons: [...] [ Ok ] [ Cancel ] matching Video 05 Frame 32 */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => alert(`Reason details: ${selectedReason}`)}
+                  style={{ minWidth: '28px', padding: '2px 4px' }}
+                >
+                  ...
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleConfirmReason}
+                  style={{ minWidth: '55px', fontWeight: 700 }}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setReasonModalOpen(false)}
+                  style={{ minWidth: '55px' }}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
