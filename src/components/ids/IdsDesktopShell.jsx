@@ -88,6 +88,7 @@ import IdsTouchScreenGroupsModal from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal from './IdsRestaurantTableMasterModal';
 import IdsServersModal from './IdsServersModal';
 import IdsMenuMasterModal from './IdsMenuMasterModal';
+import IdsSalesPromotionMasterModal from './IdsSalesPromotionMasterModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -438,6 +439,7 @@ export default function IdsDesktopShell({
   const [restaurantTableMasterModalOpen, setRestaurantTableMasterModalOpen] = useState(false);
   const [serversModalOpen, setServersModalOpen] = useState(false);
   const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
+  const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -945,6 +947,8 @@ export default function IdsDesktopShell({
       { label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', videoId: 'POS-18', action: () => setServersModalOpen(true) },
       { label: 'Deactivate Server / Passive Status (Setup -> Servers)', videoId: 'POS-19', action: () => setServersModalOpen(true) },
       { label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', videoId: 'POS-20', action: () => setMenuMasterModalOpen(true) },
+      { label: 'Sales Promotion Master V6.5.002.1 (Combos & Buy 2 Get 1 Free)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
+      { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setOrderEntryModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1057,6 +1061,11 @@ export default function IdsDesktopShell({
         label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', 
         videoId: 'POS-20', 
         action: () => setMenuMasterModalOpen(true) 
+      },
+      { 
+        label: 'Sales Promotion Master V6.5.002.1 (Setup -> Packages & Promos)', 
+        videoId: 'POS-21', 
+        action: () => setSalesPromotionModalOpen(true) 
       },
       { 
         label: 'Company Profile Setup (Corporate Master)', 
@@ -3197,6 +3206,14 @@ export default function IdsDesktopShell({
       <IdsMenuMasterModal
         isOpen={menuMasterModalOpen}
         onClose={() => setMenuMasterModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+      />
+
+      {/* POS Video 21: Sales Promotion Master V6.5.002.1 */}
+      <IdsSalesPromotionMasterModal
+        isOpen={salesPromotionModalOpen}
+        onClose={() => setSalesPromotionModalOpen(false)}
         accountingDate={accountingDate}
         currentUser="MANAGER"
       />

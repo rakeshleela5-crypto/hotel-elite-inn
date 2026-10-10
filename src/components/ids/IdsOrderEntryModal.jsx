@@ -18,6 +18,7 @@ import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouc
 import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsRestaurantTableMasterModal';
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
 import IdsMenuMasterModal, { getStoredMenuItems } from './IdsMenuMasterModal';
+import IdsSalesPromotionMasterModal, { getStoredPromotions } from './IdsSalesPromotionMasterModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -283,6 +284,9 @@ export default function IdsOrderEntryModal({
   const [selectOutletRestaurant, setSelectOutletRestaurant] = useState('RESTAURANT');
   const [selectOutletAccountingDate, setSelectOutletAccountingDate] = useState('22-FEB-2022');
   const [selectOutletSession, setSelectOutletSession] = useState('General');
+  const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
+  const [eatAsULikeModalOpen, setEatAsULikeModalOpen] = useState(false);
+  const [activeEatPromoIdx, setActiveEatPromoIdx] = useState(0);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -401,6 +405,12 @@ export default function IdsOrderEntryModal({
           e.preventDefault();
           setTableStatusOpen(true);
         } else if (e.key === 'F4' || e.code === 'F4') {
+          if (e.ctrlKey) {
+            // Ctrl + Shift + F4: EAT AS U LIKE Package Item Selector (Video 21 Frame 045)
+            e.preventDefault();
+            setEatAsULikeModalOpen(true);
+            return;
+          }
           // Shift + F4: Table Transfer (Video 13 Frame 031)
           e.preventDefault();
           setTableTransferOpen(true);
@@ -1012,9 +1022,56 @@ export default function IdsOrderEntryModal({
     setTimeout(() => setSaveSuccessMsg(null), 4000);
   };
 
-  // Financial calculations matching Video 01 Frame 025 & Video 07 Frame 030
+  // Video 21 Frames 045–055: Punch Sales Promotion / EAT AS U LIKE package
+  const handlePunchPromotion = (promo) => {
+    if (!promo) return;
+    const pkgItem = {
+      res: promo.restaurant === 'LIQUOR BAR' ? 'BAR' : (resOutlet || 'RES'),
+      code: promo.promotionCode || '1',
+      name: promo.promotionName || 'Buy 2 Get 1 Free',
+      quantity: 1.0,
+      rate: Number(promo.promotionValue) || 280.0,
+      isPromoPackage: true
+    };
+
+    const constituentItems = [];
+    if (Array.isArray(promo.mainItems)) {
+      promo.mainItems.forEach(item => {
+        constituentItems.push({
+          res: promo.restaurant === 'LIQUOR BAR' ? 'BAR' : (resOutlet || 'RES'),
+          code: item.itemCode || '1',
+          name: item.itemName,
+          quantity: Number(item.quantity) || 1.0,
+          rate: Number(item.rate) || 0.0,
+          isPromoConstituent: true
+        });
+      });
+    }
+    if (Array.isArray(promo.complimentaryItems)) {
+      promo.complimentaryItems.forEach(item => {
+        constituentItems.push({
+          res: promo.restaurant === 'LIQUOR BAR' ? 'BAR' : (resOutlet || 'RES'),
+          code: item.itemCode || '1',
+          name: item.itemName,
+          quantity: Number(item.quantity) || 1.0,
+          rate: 0.0,
+          isPromoConstituent: true
+        });
+      });
+    }
+
+    setLineItems(prev => [...prev, pkgItem, ...constituentItems]);
+    setEatAsULikeModalOpen(false);
+    setSaveSuccessMsg(`Punched Package: "${promo.promotionName}" (Value: INR ${promo.promotionValue}) with ${constituentItems.length} items!`);
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
+  // Financial calculations matching Video 01 Frame 025, Video 07 Frame 030, Video 21 Frame 055
   const calculations = useMemo(() => {
-    const totalAmount = lineItems.reduce((acc, it) => acc + (it.quantity * it.rate), 0);
+    const totalAmount = lineItems.reduce((acc, it) => {
+      if (it.isPromoConstituent) return acc;
+      return acc + (it.quantity * it.rate);
+    }, 0);
     const cgst = Number((totalAmount * 0.025).toFixed(2));
     const sgst = Number((totalAmount * 0.025).toFixed(2));
     const nettAmount = Math.round(totalAmount + cgst + sgst);
@@ -1601,6 +1658,32 @@ export default function IdsOrderEntryModal({
               </div>
             </button>
 
+            {/* EAT AS U LIKE (Video 21 Frame 045 & Frame 050: Ctrl + Shift + F4) */}
+            <button 
+              className="ids-btn" 
+              title="EAT AS U LIKE — Package / Combo Item Selector (Ctrl + Shift + F4) (Video 21)" 
+              onClick={() => setEatAsULikeModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: eatAsULikeModalOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>🎁</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#C00000' }}>PROMO</span>
+              </div>
+            </button>
+
+            {/* Sales Promotion Master (Video 21: Setup -> Sales Promotion Master) */}
+            <button 
+              className="ids-btn" 
+              title="Sales Promotion Master V6.5.002.1 — Packages, Combos & Buy 2 Get 1 Free (Video 21)" 
+              onClick={() => setSalesPromotionModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: salesPromotionModalOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>🏷️</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#000080' }}>SETUP</span>
+              </div>
+            </button>
+
             {/* Reprint Button (Video 13 Frame 099 - Frame 108) */}
             <button 
               className="ids-btn" 
@@ -1773,7 +1856,7 @@ export default function IdsOrderEntryModal({
                         key={idx} 
                         onClick={() => setSelectedRowIdx(idx)}
                         style={{ 
-                          background: isSelected ? '#316AC5' : (idx % 2 === 0 ? '#FFF' : '#F9F9F9'), 
+                          background: isSelected ? '#316AC5' : (item.isPromoConstituent ? '#FFFF00' : (idx % 2 === 0 ? '#FFF' : '#F9F9F9')), 
                           color: isSelected ? '#FFF' : '#000',
                           borderBottom: '1px solid #E0E0E0',
                           cursor: 'pointer'
@@ -2047,7 +2130,9 @@ export default function IdsOrderEntryModal({
                               )}
                             </div>
                           </td>
-                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(item.quantity * item.rate).toFixed(2)}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>
+                            {item.isPromoConstituent ? '0.00' : (item.quantity * item.rate).toFixed(2)}
+                          </td>
                         </tr>
                         {/* Video 13 Frame 124: Indented Modifier Row below parent item */}
                         {item.modifier && (
@@ -2098,6 +2183,9 @@ export default function IdsOrderEntryModal({
               </span>
               <span style={{ background: '#FFF8E7', border: '1px solid #E0B86B', color: '#856404', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
                 Qty + Shift+F11: Rename Item
+              </span>
+              <span style={{ background: '#FCE8E6', border: '1px solid #D93025', color: '#B22222', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
+                Ctrl+Shift+F4: EAT AS U LIKE Promo (Video 21)
               </span>
               <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
                 {editingKotNo 
@@ -4466,6 +4554,184 @@ export default function IdsOrderEntryModal({
           </div>
         </div>
       )}
+
+      {/* POS Video 21: Sales Promotion Master V6.5.002.1 */}
+      <IdsSalesPromotionMasterModal
+        isOpen={salesPromotionModalOpen}
+        onClose={() => setSalesPromotionModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onSelectPromotionForOrder={(promo) => {
+          handlePunchPromotion(promo);
+          setSalesPromotionModalOpen(false);
+        }}
+      />
+
+      {/* POS Video 21 Frame 050: EAT AS U LIKE Package Selector Modal */}
+      {eatAsULikeModalOpen && (() => {
+        const storedPromos = getStoredPromotions();
+        const activePromo = storedPromos[activeEatPromoIdx] || storedPromos[0];
+        return (
+          <div className="ids-modal-overlay" style={{ zIndex: 1360 }}>
+            <div 
+              className="ids-modal-container"
+              style={{
+                width: '450px',
+                background: '#ECE9D8',
+                border: '2px solid #808080',
+                boxShadow: '4px 4px 16px rgba(0,0,0,0.7)',
+                fontFamily: 'Tahoma, Arial, sans-serif',
+                fontSize: '11px'
+              }}
+            >
+              {/* Titlebar */}
+              <div 
+                className="ids-modal-titlebar"
+                style={{
+                  background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)',
+                  color: '#FFF',
+                  padding: '3px 6px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>EAT AS U LIKE</span>
+                <button 
+                  className="ids-win-btn close" 
+                  onClick={() => setEatAsULikeModalOpen(false)} 
+                  style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Body */}
+              <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {/* Active Promo Header / Selector */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCC', paddingBottom: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 700, color: '#0A246A', fontSize: '12px' }}>
+                      {activePromo?.promotionName || 'Buy 2 Get 1 Free'}
+                    </span>
+                    <span style={{ background: '#E6F0FA', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '10px', fontWeight: 600, color: '#006400' }}>
+                      INR {activePromo?.promotionValue || '280.00'}
+                    </span>
+                  </div>
+
+                  {storedPromos.length > 1 && (
+                    <select 
+                      value={activeEatPromoIdx} 
+                      onChange={e => setActiveEatPromoIdx(Number(e.target.value))}
+                      style={{ fontSize: '10px', border: '1px solid #7F9DB9', padding: '1px 3px' }}
+                    >
+                      {storedPromos.map((p, idx) => (
+                        <option key={idx} value={idx}>{p.promotionName}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                {/* Two Columns: Main Items & Complimentary Items (Frame 050) */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  {/* Left Column: Main Items */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <span style={{ fontWeight: 600, fontSize: '10px', color: '#333' }}>
+                      Main Items ({activePromo?.mainItems?.length || 0})
+                    </span>
+                    <div 
+                      style={{ 
+                        height: '110px', 
+                        background: '#A6B695', 
+                        border: '2px inset #FFF', 
+                        padding: '2px', 
+                        overflowY: 'auto' 
+                      }}
+                    >
+                      {(activePromo?.mainItems || []).map((m, idx) => (
+                        <div 
+                          key={idx}
+                          style={{
+                            background: '#B22222',
+                            color: '#FFF',
+                            padding: '3px 6px',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            marginBottom: '2px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          {m.itemName} ({m.quantity} Qty)
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Complimentary Items */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    <span style={{ fontWeight: 600, fontSize: '10px', color: '#333' }}>
+                      Complimentary Items ({activePromo?.complimentaryItems?.length || 0})
+                    </span>
+                    <div 
+                      style={{ 
+                        height: '110px', 
+                        background: '#A6B695', 
+                        border: '2px inset #FFF', 
+                        padding: '2px', 
+                        overflowY: 'auto' 
+                      }}
+                    >
+                      {(activePromo?.complimentaryItems || []).map((c, idx) => (
+                        <div 
+                          key={idx}
+                          style={{
+                            background: '#B22222',
+                            color: '#FFF',
+                            padding: '3px 6px',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                            marginBottom: '2px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          {c.itemName} ({c.quantity} Free)
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subtitle Message (Frame 050) */}
+                <div style={{ textAlign: 'center', color: '#B22222', fontStyle: 'italic', fontSize: '11px', fontWeight: 700, marginTop: '2px' }}>
+                  Press Enter to Select the Item.
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '4px' }}>
+                  <button 
+                    className="ids-btn" 
+                    onClick={() => handlePunchPromotion(activePromo)}
+                    style={{ minWidth: '70px', fontWeight: 700, color: '#006400' }}
+                  >
+                    Select
+                  </button>
+                  <button 
+                    className="ids-btn" 
+                    onClick={() => setEatAsULikeModalOpen(false)}
+                    style={{ minWidth: '70px' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
