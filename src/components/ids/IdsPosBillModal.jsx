@@ -29,6 +29,25 @@ export const DEFAULT_BILL_KOTS = [
     nettAmount: 1093.0
   },
   {
+    tableNo: '14',
+    kotNo: '1318',
+    server: 'Biren',
+    outlet: 'RESTAURANT',
+    session: 'General',
+    accountingDate: '03-FEB-2022',
+    covers: '1',
+    items: [
+      { res: 'RES', code: '1', kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+      { res: 'RES', code: '2', kotNo: '1318', name: 'RED BEANS PEANUT & DRY FRUIT S...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+      { res: 'CAR', code: '601', kotNo: '1318', name: 'BLENDERS PRIDE ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 135.0, value: 135.0 },
+      { res: 'CAR', code: '592', kotNo: '1318', name: 'JW BLACK LABEL ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 480.0, value: 480.0 }
+    ],
+    totalAmount: 1013.0,
+    cgst: 25.33,
+    sgst: 25.33,
+    nettAmount: 1064.0
+  },
+  {
     tableNo: '11',
     kotNo: '1315',
     server: 'Biren',

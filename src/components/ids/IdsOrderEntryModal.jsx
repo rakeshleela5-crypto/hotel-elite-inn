@@ -26,39 +26,63 @@ export const POS_NC_DEPARTMENTS = [
   'F&B Production'
 ];
 
-// Authentic Menu Database from Videos 01, 02, 07 and Hotel Elite Inn
+// Authentic Supplying Outlets (Video 11 Frame 021 & Frame 023)
+export const POS_SUPPLYING_OUTLETS = [
+  { code: 'CAR', name: 'LIQUOR BAR', label: 'LIQUOR BAR', type: 'BAR' },
+  { code: 'RES', name: 'RESTAURANT', label: 'RESTAURANT', type: 'RESTAURANT' },
+  { code: 'RS', name: 'ROOM SERVICE', label: 'ROOM SERVICE', type: 'ROOM SERVICE' },
+  { code: 'BNQ', name: 'BANQUET', label: 'BANQUET', type: 'BANQUET' }
+];
+
+// Authentic Menu Database from Videos 01, 02, 07, 10, 11 and Hotel Elite Inn
 export const POS_MENU_ITEMS = [
-  { code: '1', name: 'CLASSIC RUSSIAN SALAD', category: 'SALAD', rate: 199.00 },
-  { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', category: 'SALAD', rate: 199.00 },
-  { code: '3', name: 'SPROUTED MOONG PEANUT DRY', category: 'SALAD', rate: 199.00 },
-  { code: '4', name: 'CAESAR SALAD (VEG)', category: 'SALAD', rate: 245.00 },
-  { code: '5', name: 'CAESAR SALAD (CHICKEN)', category: 'SALAD', rate: 295.00 },
-  { code: '189', name: 'MILK SHAKE WITH ICE CREAM(SB)', category: 'BEVERAGE', rate: 150.00 },
-  { code: '155', name: 'BLUEBERRY COLD CHEESE CAKE(MC)', category: 'DESSERT', rate: 165.00 },
-  { code: '82', name: 'STEAMED RICE', category: 'RICE', rate: 145.00 },
-  { code: '54', name: 'DAL MAHARANI', category: 'MAIN COURSE', rate: 200.00 },
-  { code: '175', name: 'CHICKEN SHAWARMA', category: 'SNACKS', rate: 150.00 },
-  { code: '186', name: 'MINERAL WATER(58)', category: 'BEVERAGE', rate: 120.00 },
-  { code: '87', name: 'PAPAD (2 PIECE ROASTED OR FRIE', category: 'APPETIZER', rate: 40.00 },
-  { code: '93', name: 'KOLIWADA FISH CURRY WITH MINI', category: 'SEAFOOD', rate: 320.00 },
-  { code: '149', name: 'CHICKEN FRIED RICE/NOODLES', category: 'CHINESE', rate: 210.00 },
-  { code: '146', name: 'EGG FRIED RICE', category: 'CHINESE', rate: 180.00 },
-  { code: '83', name: 'JEERA RICE', category: 'RICE', rate: 160.00 },
-  { code: '147', name: 'MIX FRIED RICE/NOODLES (CHICKE', category: 'CHINESE', rate: 240.00 },
-  { code: '148', name: 'PRAWN FRIED RICE/NOODLES', category: 'CHINESE', rate: 260.00 },
-  { code: '145', name: 'VEGETABLE FRIED RICE/NOODLES', category: 'CHINESE', rate: 170.00 },
-  { code: '150', name: 'BAKED GULAB JAMUN PISTACHIO', category: 'DESSERT', rate: 130.00 },
-  { code: '169', name: 'BUTTER CHICKEN BURGER', category: 'SNACKS', rate: 190.00 },
-  { code: '125', name: 'CHICKEN A LA KING(OINV)', category: 'CONTINENTAL', rate: 280.00 },
-  { code: '140', name: 'CHICKEN CHILLI (BONE/BONELESS)', category: 'CHINESE', rate: 230.00 },
-  { code: '132', name: 'CHICKEN DIM SUM (FRIED/STEAMED', category: 'CHINESE', rate: 195.00 },
-  { code: '60', name: 'CHICKEN MAJEDAR BHARTA', category: 'MAIN COURSE', rate: 250.00 },
-  { code: '120', name: 'CHICKEN SHASHLIK(OINV)', category: 'CONTINENTAL', rate: 275.00 },
+  { code: '1', name: 'CLASSIC RUSSIAN SALAD', category: 'SALAD', outlet: 'RES', outletName: 'RESTAURANT', rate: 199.00 },
+  { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', category: 'SALAD', outlet: 'RES', outletName: 'RESTAURANT', rate: 199.00 },
+  { code: '3', name: 'SPROUTED MOONG PEANUT DRY', category: 'SALAD', outlet: 'RES', outletName: 'RESTAURANT', rate: 199.00 },
+  { code: '4', name: 'CAESAR SALAD (VEG)', category: 'SALAD', outlet: 'RES', outletName: 'RESTAURANT', rate: 245.00 },
+  { code: '5', name: 'CAESAR SALAD (CHICKEN)', category: 'SALAD', outlet: 'RES', outletName: 'RESTAURANT', rate: 295.00 },
+  { code: '189', name: 'MILK SHAKE WITH ICE CREAM(SB)', category: 'BEVERAGE', outlet: 'RES', outletName: 'RESTAURANT', rate: 150.00 },
+  { code: '155', name: 'BLUEBERRY COLD CHEESE CAKE(MC)', category: 'DESSERT', outlet: 'RES', outletName: 'RESTAURANT', rate: 165.00 },
+  { code: '82', name: 'STEAMED RICE', category: 'RICE', outlet: 'RES', outletName: 'RESTAURANT', rate: 145.00 },
+  { code: '54', name: 'DAL MAHARANI', category: 'MAIN COURSE', outlet: 'RES', outletName: 'RESTAURANT', rate: 200.00 },
+  { code: '175', name: 'CHICKEN SHAWARMA', category: 'SNACKS', outlet: 'RES', outletName: 'RESTAURANT', rate: 150.00 },
+  { code: '186', name: 'MINERAL WATER(58)', category: 'BEVERAGE', outlet: 'RES', outletName: 'RESTAURANT', rate: 120.00 },
+  { code: '87', name: 'PAPAD (2 PIECE ROASTED OR FRIE', category: 'APPETIZER', outlet: 'RES', outletName: 'RESTAURANT', rate: 40.00 },
+  { code: '93', name: 'KOLIWADA FISH CURRY WITH MINI', category: 'SEAFOOD', outlet: 'RES', outletName: 'RESTAURANT', rate: 320.00 },
+  { code: '149', name: 'CHICKEN FRIED RICE/NOODLES', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 210.00 },
+  { code: '146', name: 'EGG FRIED RICE', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 180.00 },
+  { code: '83', name: 'JEERA RICE', category: 'RICE', outlet: 'RES', outletName: 'RESTAURANT', rate: 160.00 },
+  { code: '147', name: 'MIX FRIED RICE/NOODLES (CHICKE', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 240.00 },
+  { code: '148', name: 'PRAWN FRIED RICE/NOODLES', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 260.00 },
+  { code: '145', name: 'VEGETABLE FRIED RICE/NOODLES', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 170.00 },
+  { code: '150', name: 'BAKED GULAB JAMUN PISTACHIO', category: 'DESSERT', outlet: 'RES', outletName: 'RESTAURANT', rate: 130.00 },
+  { code: '169', name: 'BUTTER CHICKEN BURGER', category: 'SNACKS', outlet: 'RES', outletName: 'RESTAURANT', rate: 190.00 },
+  { code: '125', name: 'CHICKEN A LA KING(OINV)', category: 'CONTINENTAL', outlet: 'RES', outletName: 'RESTAURANT', rate: 280.00 },
+  { code: '140', name: 'CHICKEN CHILLI (BONE/BONELESS)', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 230.00 },
+  { code: '132', name: 'CHICKEN DIM SUM (FRIED/STEAMED', category: 'CHINESE', outlet: 'RES', outletName: 'RESTAURANT', rate: 195.00 },
+  { code: '60', name: 'CHICKEN MAJEDAR BHARTA', category: 'MAIN COURSE', outlet: 'RES', outletName: 'RESTAURANT', rate: 250.00 },
+  { code: '120', name: 'CHICKEN SHASHLIK(OINV)', category: 'CONTINENTAL', outlet: 'RES', outletName: 'RESTAURANT', rate: 275.00 },
+  
+  // Video 11 Authentic Bar Items (LIQUOR BAR, Outlet Code CAR / BAR - Frame 028, 033)
+  { code: '601', name: 'BLENDERS PRIDE ...', fullName: 'BLENDERS PRIDE (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 135.00 },
+  { code: '592', name: 'JW BLACK LABEL ...', fullName: 'JW BLACK LABEL (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 480.00 },
+  { code: '599', name: 'BLENDERS PRIDE RESERVE', fullName: 'BLENDERS PRIDE RESERVE (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 150.00 },
+  { code: '597', name: 'TEACHERS HIGHLAND CREAM', fullName: 'TEACHERS HIGHLAND CREAM (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 220.00 },
+  { code: '585', name: 'KINGFISHER PREMIUM (650ML)', fullName: 'KINGFISHER PREMIUM BEER', category: 'BEER', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 180.00 },
+  { code: '586', name: 'CORONA EXTRA (330ML)', fullName: 'CORONA EXTRA BEER', category: 'BEER', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 280.00 },
+  { code: '590', name: 'BACARDI WHITE RUM (60ML)', fullName: 'BACARDI SUPERIOR WHITE RUM', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 140.00 },
+  { code: '594', name: 'CHIVAS REGAL 12 YRS (60ML)', fullName: 'CHIVAS REGAL 12 YEARS', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 420.00 },
+  { code: '595', name: 'GLENFIDDICH 12 YRS (60ML)', fullName: 'GLENFIDDICH 12 YRS SINGLE MALT', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 550.00 },
+  { code: '605', name: 'SMIRNOFF VODKA (60ML)', fullName: 'SMIRNOFF TRIPLE DISTILLED', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 130.00 },
+  { code: '610', name: 'SULA SAUVIGNON BLANC (GLASS)', fullName: 'SULA WHITE WINE GLASS', category: 'WINE', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 290.00 },
+
   // Merge in the Elite Inn 204 item catalog
   ...RESTAURANT_MENU.map(m => ({
     code: m.itemCode || String(m.id).replace('m-', ''),
     name: m.name,
     category: m.category || 'GENERAL',
+    outlet: 'RES',
+    outletName: 'RESTAURANT',
     rate: Number(m.dineInPrice || m.price || 100)
   }))
 ];
@@ -167,6 +191,13 @@ export default function IdsOrderEntryModal({
   // Video 10: Shift + F11 Item Renaming in Order Entry Grid (Frames 021–047)
   const [renamingRowIdx, setRenamingRowIdx] = useState(null);
 
+  // Video 11: Supplying Restaurant / Other Outlets Modal & Item Import (Shift+F11 on Code - Frame 019 & 021)
+  const [supRestaurantModalOpen, setSupRestaurantModalOpen] = useState(false);
+  const [selectedSupOutletIndex, setSelectedSupOutletIndex] = useState(0); // 0 = LIQUOR BAR (CAR)
+  const [supTargetRowIdx, setSupTargetRowIdx] = useState(null);
+  const [itemHelpFilterOutlet, setItemHelpFilterOutlet] = useState('ALL');
+  const [focusedColumn, setFocusedColumn] = useState('code'); // 'code' | 'quantity' | 'name'
+
   // NC KOT State (Video 07 Frame 016 & Frame 020)
   const [ncModalOpen, setNcModalOpen] = useState(false);
   const [selectedNcDept, setSelectedNcDept] = useState('Managers');
@@ -229,6 +260,23 @@ export default function IdsOrderEntryModal({
       nettAmount: 1093.0
     },
     {
+      kotNo: '1318',
+      accountingDate: '03-FEB-2022',
+      tableNo: '14',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      items: [
+        { res: 'RES', code: '1', kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'RES', code: '2', kotNo: '1318', name: 'RED BEANS PEANUT & DRY FRUIT S...', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { res: 'CAR', code: '601', kotNo: '1318', name: 'BLENDERS PRIDE ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 135.0, value: 135.0 },
+        { res: 'CAR', code: '592', kotNo: '1318', name: 'JW BLACK LABEL ...', type: 'Beverage', group: 'LIQUOR BAR', quantity: 1.0, rate: 480.0, value: 480.0 }
+      ],
+      totalAmount: 1013.0,
+      cgst: 25.33,
+      sgst: 25.33,
+      nettAmount: 1064.0
+    },
+    {
       kotNo: '1315',
       accountingDate: '03-FEB-2022',
       tableNo: '11',
@@ -281,18 +329,27 @@ export default function IdsOrderEntryModal({
     }
   ]);
 
-  // Video 10: Global Hotkey Listener for Shift + F11 (Rename Item) & F5 (Delete Item)
+  // Video 10 & Video 11: Global Hotkey Listener for Shift + F11 (Dual Functionality) & F5 (Delete Item)
+  // Subtitle (Video 11 Frame 019): "To import Items from Other outlet click on Code press Shift + F11 and select Item."
+  // Subtitle (Video 10 Frame 021): "Click on quantity field and press Shift + F11 to rename the Item"
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
       if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
         e.preventDefault();
-        const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
-        if (lineItems[targetIdx]) {
-          setSelectedRowIdx(targetIdx);
-          setRenamingRowIdx(targetIdx);
-          setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
-          setTimeout(() => setSaveSuccessMsg(null), 3500);
+        if (focusedColumn === 'quantity') {
+          // Video 10: Rename Item when focused on Quantity field
+          const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
+          if (lineItems[targetIdx]) {
+            setSelectedRowIdx(targetIdx);
+            setRenamingRowIdx(targetIdx);
+            setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
+            setTimeout(() => setSaveSuccessMsg(null), 3500);
+          }
+        } else {
+          // Video 11: Import Items from Other Outlet when focused on Code field (or default)
+          const targetIdx = selectedRowIdx !== null ? selectedRowIdx : lineItems.length;
+          handleOpenSupRestaurant(targetIdx);
         }
       } else if (e.key === 'F5' || e.code === 'F5') {
         if (selectedRowIdx !== null && lineItems[selectedRowIdx]) {
@@ -303,7 +360,7 @@ export default function IdsOrderEntryModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, selectedRowIdx, activeRowIdx, lineItems]);
+  }, [isOpen, selectedRowIdx, activeRowIdx, lineItems, focusedColumn]);
 
   // Video 08: Computed Pending NC Tables for lookup modal (Video 08 Frame 016)
   const pendingNcTables = useMemo(() => {
@@ -439,36 +496,93 @@ export default function IdsOrderEntryModal({
     return { totalAmount, cgst, sgst, nettAmount };
   }, [lineItems]);
 
-  // Filtered menu search list for Item Help dialog (Video 01 Frame 021 & Frame 032)
+  // Filtered menu search list for Item Help dialog (Video 01 Frame 021, Video 11 Frame 025-027)
   const filteredMenuItems = useMemo(() => {
-    if (!itemSearchText.trim()) return POS_MENU_ITEMS.slice(0, 50);
+    let list = POS_MENU_ITEMS;
+    if (itemHelpFilterOutlet && itemHelpFilterOutlet !== 'ALL') {
+      list = list.filter(m => (m.outlet || 'RES') === itemHelpFilterOutlet);
+    }
+    if (!itemSearchText.trim()) return list.slice(0, 50);
     const q = itemSearchText.toLowerCase();
-    return POS_MENU_ITEMS.filter(m => 
+    return list.filter(m => 
       m.name.toLowerCase().includes(q) || 
+      (m.fullName && m.fullName.toLowerCase().includes(q)) ||
       m.code.includes(q) ||
-      m.category.toLowerCase().includes(q)
+      (m.category && m.category.toLowerCase().includes(q))
     );
-  }, [itemSearchText]);
+  }, [itemSearchText, itemHelpFilterOutlet]);
 
-  // Handler to add item from Item Help dialog
-  const handleSelectItem = (item) => {
-    if (activeRowIdx !== null && activeRowIdx < lineItems.length) {
+  // Video 11: Supplying Restaurant / Other Outlets Handler (Frames 019–024)
+  const handleOpenSupRestaurant = (targetIdx = null) => {
+    const idx = targetIdx !== null ? targetIdx : (selectedRowIdx !== null ? selectedRowIdx : lineItems.length);
+    setSupTargetRowIdx(idx);
+    setSelectedSupOutletIndex(0); // 0 = LIQUOR BAR (CAR)
+    setSupRestaurantModalOpen(true);
+  };
+
+  const handleConfirmSupRestaurant = () => {
+    const chosenOutlet = POS_SUPPLYING_OUTLETS[selectedSupOutletIndex] || POS_SUPPLYING_OUTLETS[0];
+    const targetIdx = supTargetRowIdx !== null ? supTargetRowIdx : lineItems.length;
+
+    if (targetIdx < lineItems.length) {
       setLineItems(prev => {
         const copy = [...prev];
-        copy[activeRowIdx] = {
-          ...copy[activeRowIdx],
-          code: item.code,
-          name: item.name,
-          rate: item.rate,
-          quantity: copy[activeRowIdx].quantity || 1.0
+        copy[targetIdx] = {
+          ...copy[targetIdx],
+          res: chosenOutlet.code
         };
         return copy;
       });
+      setSelectedRowIdx(targetIdx);
+      setActiveRowIdx(targetIdx);
+    } else {
+      // Append new empty row with chosen supplying outlet
+      setLineItems(prev => [
+        ...prev,
+        {
+          res: chosenOutlet.code,
+          code: '',
+          name: '',
+          quantity: 1.0,
+          rate: 0.0,
+          modifier: ''
+        }
+      ]);
+      setSelectedRowIdx(lineItems.length);
+      setActiveRowIdx(lineItems.length);
+    }
+
+    setSupRestaurantModalOpen(false);
+    setSaveSuccessMsg(`Here you can see Bar outlet code is showing (${chosenOutlet.code}). Select item from ${chosenOutlet.name}.`);
+    setTimeout(() => setSaveSuccessMsg(null), 3500);
+
+    // Open Item Help filtered to this supplying outlet
+    setItemHelpFilterOutlet(chosenOutlet.code);
+    setItemHelpOpen(true);
+  };
+
+  // Handler to add item from Item Help dialog
+  const handleSelectItem = (item) => {
+    const targetIdx = activeRowIdx !== null ? activeRowIdx : (selectedRowIdx !== null ? selectedRowIdx : lineItems.length);
+    if (targetIdx < lineItems.length) {
+      setLineItems(prev => {
+        const copy = [...prev];
+        copy[targetIdx] = {
+          ...copy[targetIdx],
+          res: copy[targetIdx].res || item.outlet || 'RES',
+          code: item.code,
+          name: item.name,
+          rate: item.rate,
+          quantity: copy[targetIdx].quantity || 1.0
+        };
+        return copy;
+      });
+      setSelectedRowIdx(targetIdx);
     } else {
       setLineItems(prev => [
         ...prev,
         {
-          res: 'RES',
+          res: item.outlet || 'RES',
           code: item.code,
           name: item.name,
           quantity: 1.0,
@@ -476,6 +590,7 @@ export default function IdsOrderEntryModal({
           modifier: ''
         }
       ]);
+      setSelectedRowIdx(lineItems.length);
     }
     setItemHelpOpen(false);
     setItemSearchText('');
@@ -967,7 +1082,34 @@ export default function IdsOrderEntryModal({
                           cursor: 'pointer'
                         }}
                       >
-                        <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0', color: isSelected ? '#FFF' : '#666' }}>{item.res}</td>
+                        <td 
+                          style={{ 
+                            padding: '3px 6px', 
+                            borderRight: '1px solid #E0E0E0', 
+                            color: isSelected ? '#FFF' : (item.res === 'CAR' || item.res === 'BAR' ? '#8B0000' : '#444'),
+                            fontWeight: item.res === 'CAR' || item.res === 'BAR' ? 700 : 500,
+                            cursor: 'pointer'
+                          }}
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRowIdx(idx);
+                            setFocusedColumn('code');
+                          }}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenSupRestaurant(idx);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
+                              e.preventDefault();
+                              handleOpenSupRestaurant(idx);
+                            }
+                          }}
+                          title="Supplying Outlet: Double-click or press Shift+F11 on Code to change outlet (Video 11)"
+                        >
+                          {item.res || 'RES'}
+                        </td>
                         <td 
                           style={{ 
                             padding: '3px 6px', 
@@ -978,11 +1120,30 @@ export default function IdsOrderEntryModal({
                             color: isSelected ? '#FFF' : '#000',
                             textDecoration: isSelected ? 'underline' : 'none'
                           }}
+                          tabIndex={0}
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedRowIdx(idx);
+                            setFocusedColumn('code');
                           }}
-                          title="Click on Item Code to delete item (Press <F5>)"
+                          onFocus={() => {
+                            setSelectedRowIdx(idx);
+                            setFocusedColumn('code');
+                          }}
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenSupRestaurant(idx);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
+                              e.preventDefault();
+                              handleOpenSupRestaurant(idx);
+                            } else if (e.key === 'F5' || e.code === 'F5') {
+                              e.preventDefault();
+                              handleDeleteRow(idx);
+                            }
+                          }}
+                          title="Click on Item Code | Press Shift+F11 to import items from other outlet (Video 11) | Press <F5> to delete"
                         >
                           {item.code}
                         </td>
@@ -1064,8 +1225,12 @@ export default function IdsOrderEntryModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedRowIdx(idx);
+                              setFocusedColumn('quantity');
                             }}
-                            onFocus={() => setSelectedRowIdx(idx)}
+                            onFocus={() => {
+                              setSelectedRowIdx(idx);
+                              setFocusedColumn('quantity');
+                            }}
                             onKeyDown={(e) => {
                               if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
                                 e.preventDefault();
@@ -1115,21 +1280,34 @@ export default function IdsOrderEntryModal({
                     );
                   })}
                   {/* Empty rows to maintain authentic Win32 grid height */}
-                  {Array.from({ length: Math.max(0, 10 - lineItems.length) }).map((_, i) => (
-                    <tr key={`empty-${i}`} style={{ height: '22px', borderBottom: '1px solid #F0F0F0' }}>
-                      <td style={{ padding: '3px 6px', borderRight: '1px solid #F0F0F0', color: '#BBB' }}>RES</td>
-                      <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
-                      <td 
-                        style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer' }}
-                        onClick={() => { setActiveRowIdx(lineItems.length); setItemHelpOpen(true); }}
-                      >
-                        <span style={{ color: '#AAA', fontStyle: 'italic', paddingLeft: '4px' }}>Click to add item...</span>
-                      </td>
-                      <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
-                      <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
-                      <td></td>
-                    </tr>
-                  ))}
+                  {Array.from({ length: Math.max(0, 10 - lineItems.length) }).map((_, i) => {
+                    const emptyRowIdx = lineItems.length + i;
+                    return (
+                      <tr key={`empty-${i}`} style={{ height: '22px', borderBottom: '1px solid #F0F0F0' }}>
+                        <td 
+                          style={{ padding: '3px 6px', borderRight: '1px solid #F0F0F0', color: '#888', cursor: 'pointer' }}
+                          onClick={() => handleOpenSupRestaurant(emptyRowIdx)}
+                          title="Click to select Supplying Outlet (Shift+F11)"
+                        >
+                          RES
+                        </td>
+                        <td 
+                          style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer' }}
+                          onClick={() => handleOpenSupRestaurant(emptyRowIdx)}
+                          title="Click on Code: Press Shift+F11 to import item from other outlet"
+                        ></td>
+                        <td 
+                          style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer' }}
+                          onClick={() => { setActiveRowIdx(emptyRowIdx); setItemHelpOpen(true); }}
+                        >
+                          <span style={{ color: '#AAA', fontStyle: 'italic', paddingLeft: '4px' }}>Click to add item...</span>
+                        </td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td style={{ borderRight: '1px solid #F0F0F0' }}></td>
+                        <td></td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -1149,7 +1327,16 @@ export default function IdsOrderEntryModal({
                     {lineItems.map((item, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EFEFEF' }}>
                         <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EFEFEF' }}>{item.quantity.toFixed(3)}</td>
-                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EFEFEF' }}>{item.name}</td>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EFEFEF' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+                            <span>{item.name}</span>
+                            {item.res && item.res !== 'RES' && (
+                              <span style={{ fontSize: '9px', background: '#F8D7DA', color: '#721C24', padding: '0 3px', border: '1px solid #F5C6CB', borderRadius: '2px', fontWeight: 700 }}>
+                                {item.res}
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(item.quantity * item.rate).toFixed(2)}</td>
                       </tr>
                     ))}
@@ -1179,12 +1366,15 @@ export default function IdsOrderEntryModal({
             </div>
           </div>
 
-          {/* Bottom Status Bar matching Video 01, Video 05/06 & Video 10 Frame 021 - Frame 047 */}
+          {/* Bottom Status Bar matching Video 01, Video 05/06, Video 10 & Video 11 */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#333' }}>
             <span>&lt;F1&gt; @ Qty for Modifier</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ background: '#FFF8E7', border: '1px solid #E0B86B', color: '#C00000', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
-                Shift + F11: Click on quantity field and press Shift + F11 to rename the Item
+              <span style={{ background: '#E6F0FA', border: '1px solid #7F9DB9', color: '#0A246A', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
+                Code + Shift+F11: Import Items from Other Outlet (LIQUOR BAR)
+              </span>
+              <span style={{ background: '#FFF8E7', border: '1px solid #E0B86B', color: '#856404', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
+                Qty + Shift+F11: Rename Item
               </span>
               <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
                 {editingKotNo 
@@ -1192,7 +1382,7 @@ export default function IdsOrderEntryModal({
                       ? `Row #${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT #${editingKotNo}`
                       : `Editing KOT #${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
                   : (selectedRowIdx !== null 
-                      ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
+                      ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name || 'Item'}) Selected — Press <F5> from keyboard to delete item`
                       : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity')}
               </span>
             </div>
@@ -1208,6 +1398,41 @@ export default function IdsOrderEntryModal({
               <button 
                 className="ids-btn" 
                 onClick={() => {
+                  const targetIdx = selectedRowIdx !== null ? selectedRowIdx : lineItems.length;
+                  handleOpenSupRestaurant(targetIdx);
+                }}
+                title="Shift + F11 on Code to Import Items from Other Outlet (Video 11)"
+                style={{ fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
+              >
+                Shift+F11 Other Outlet
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  setTableNo('14');
+                  setServer('Biren');
+                  setCovers('1');
+                  setCurrency('INR');
+                  setKotNo('AUTO');
+                  setLineItems([
+                    { res: 'RES', code: '1', name: 'CLASSIC RUSSIAN SALAD', quantity: 1.0, rate: 199.0, modifier: '' },
+                    { res: 'RES', code: '2', name: 'RED BEANS PEANUT & DF', quantity: 1.0, rate: 199.0, modifier: '' },
+                    { res: 'CAR', code: '601', name: 'BLENDERS PRIDE ...', quantity: 1.0, rate: 135.0, modifier: '' },
+                    { res: 'CAR', code: '592', name: 'JW BLACK LABEL ...', quantity: 1.0, rate: 480.0, modifier: '' }
+                  ]);
+                  setSelectedRowIdx(2);
+                  setFocusedColumn('code');
+                  setSaveSuccessMsg('Table 14 Multi-Outlet Order Loaded (RES Food + CAR Bar Items)! Press Shift+F11 on Code to import from other outlets.');
+                  setTimeout(() => setSaveSuccessMsg(null), 4000);
+                }}
+                title="Load Table 14 Multi-Outlet Video 11 Demo state"
+                style={{ fontSize: '10px', background: '#FFF3CD', borderColor: '#856404', color: '#856404', fontWeight: 600 }}
+              >
+                Table 14 Demo
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
                   const targetIdx = selectedRowIdx !== null ? selectedRowIdx : 0;
                   if (lineItems[targetIdx]) {
                     setSelectedRowIdx(targetIdx);
@@ -1216,8 +1441,8 @@ export default function IdsOrderEntryModal({
                     setTimeout(() => setSaveSuccessMsg(null), 3500);
                   }
                 }}
-                title="Shift + F11 to Rename Item (Video 10)"
-                style={{ fontWeight: 700, background: '#FFF3CD', borderColor: '#856404', color: '#856404' }}
+                title="Shift + F11 on Quantity to Rename Item (Video 10)"
+                style={{ fontWeight: 600, background: '#F8F9FA', color: '#555' }}
               >
                 Shift+F11 Rename
               </button>
@@ -1236,7 +1461,7 @@ export default function IdsOrderEntryModal({
                   setTimeout(() => setSaveSuccessMsg(null), 4000);
                 }}
                 title="Load Table 11 Video 10 Demo state"
-                style={{ fontSize: '10px', background: '#E6F0FA' }}
+                style={{ fontSize: '10px', background: '#F0F0F0' }}
               >
                 Table 11 Demo
               </button>
@@ -1352,18 +1577,155 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 4. ITEM HELP SEARCH MODAL (Video 01 Frame 021 & Frame 032) */}
+      {/* 3.1 WIN32 SUP.RESTAURANT (OTHER OUTLETS) MODAL (Video 11 Frame 021) */}
+      {supRestaurantModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1280 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ 
+              width: '260px', 
+              background: '#ECE9D8', 
+              border: '2px outset #ECE9D8', 
+              boxShadow: '4px 4px 15px rgba(0,0,0,0.5)',
+              fontFamily: 'Tahoma, Arial, sans-serif'
+            }}
+          >
+            <div 
+              className="ids-modal-titlebar" 
+              style={{ 
+                background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', 
+                color: '#FFF', 
+                padding: '2px 5px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                height: '20px'
+              }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Sup.Restaurant</span>
+              <button 
+                className="ids-win-btn close" 
+                onClick={() => setSupRestaurantModalOpen(false)} 
+                style={{ fontSize: '10px', height: '14px', width: '14px', lineHeight: '12px' }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{ padding: '10px', fontSize: '11px' }}>
+              <div 
+                style={{ 
+                  background: '#FFF', 
+                  border: '2px inset #FFF', 
+                  height: '95px', 
+                  overflowY: 'auto',
+                  outline: 'none'
+                }}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedSupOutletIndex(prev => Math.min(POS_SUPPLYING_OUTLETS.length - 1, prev + 1));
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedSupOutletIndex(prev => Math.max(0, prev - 1));
+                  } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirmSupRestaurant();
+                  } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setSupRestaurantModalOpen(false);
+                  }
+                }}
+              >
+                {POS_SUPPLYING_OUTLETS.map((outlet, idx) => {
+                  const isSelected = selectedSupOutletIndex === idx;
+                  return (
+                    <div 
+                      key={outlet.code}
+                      onClick={() => setSelectedSupOutletIndex(idx)}
+                      onDoubleClick={() => {
+                        setSelectedSupOutletIndex(idx);
+                        handleConfirmSupRestaurant();
+                      }}
+                      style={{ 
+                        padding: '2px 6px', 
+                        cursor: 'pointer',
+                        background: isSelected ? '#0A246A' : 'transparent',
+                        color: isSelected ? '#FFF' : '#000',
+                        fontWeight: isSelected ? 700 : 400,
+                        fontSize: '11px',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <span>{outlet.name}</span>
+                      <span style={{ opacity: isSelected ? 0.9 : 0.6, fontSize: '10px' }}>({outlet.code})</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleConfirmSupRestaurant}
+                  style={{ minWidth: '65px', fontWeight: 700, padding: '2px 8px' }}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setSupRestaurantModalOpen(false)} 
+                  style={{ minWidth: '65px', padding: '2px 8px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. ITEM HELP SEARCH MODAL (Video 01 Frame 021 & Frame 032, Video 11 Frame 025-027) */}
       {itemHelpOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1260 }}>
           <div 
             className="ids-modal-container" 
-            style={{ width: '480px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' }}
+            style={{ width: '510px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' }}
           >
             <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Item Help</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>
+                Item Help {itemHelpFilterOutlet && itemHelpFilterOutlet !== 'ALL' ? `— [${itemHelpFilterOutlet}]` : ''}
+              </span>
               <button className="ids-win-btn close" onClick={() => setItemHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
             </div>
             <div style={{ padding: '10px', fontSize: '11px' }}>
+              {/* Outlet Filter Tabs matching Video 11 Frame 023-025 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 600, fontSize: '10px' }}>Filter Outlet:</span>
+                {[
+                  { code: 'ALL', label: 'All Items' },
+                  { code: 'RES', label: 'RESTAURANT (RES)' },
+                  { code: 'CAR', label: 'LIQUOR BAR (CAR)' }
+                ].map(tab => (
+                  <button
+                    key={tab.code}
+                    className="ids-btn"
+                    onClick={() => setItemHelpFilterOutlet(tab.code)}
+                    style={{
+                      fontSize: '10px',
+                      padding: '1px 6px',
+                      background: itemHelpFilterOutlet === tab.code ? '#0A246A' : '#ECE9D8',
+                      color: itemHelpFilterOutlet === tab.code ? '#FFF' : '#000',
+                      fontWeight: itemHelpFilterOutlet === tab.code ? 700 : 400
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                 <label style={{ fontWeight: 600 }}>Item Name</label>
                 <input 
@@ -1371,14 +1733,15 @@ export default function IdsOrderEntryModal({
                   autoFocus 
                   value={itemSearchText} 
                   onChange={e => setItemSearchText(e.target.value)}
-                  placeholder="Type item name (e.g. Rice, Dal, Chicken)..."
+                  placeholder="Type item name (e.g. Blenders, Russian Salad)..."
                   style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '3px 6px', fontSize: '11px' }}
                 />
               </div>
-              <div style={{ height: '240px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+              <div style={{ height: '230px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #AAA' }}>
                     <tr>
+                      <th style={{ padding: '3px 6px', width: '38px', textAlign: 'left', borderRight: '1px solid #CCC' }}>Res.</th>
                       <th style={{ padding: '3px 6px', width: '50px', textAlign: 'left', borderRight: '1px solid #CCC' }}>Code</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #CCC' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', width: '70px', textAlign: 'right' }}>Rate</th>
@@ -1393,6 +1756,7 @@ export default function IdsOrderEntryModal({
                         onMouseEnter={e => e.currentTarget.style.background = '#E5F1FB'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
+                        <td style={{ padding: '3px 6px', fontWeight: 600, color: m.outlet === 'CAR' ? '#8B0000' : '#444', borderRight: '1px solid #EEE' }}>{m.outlet || 'RES'}</td>
                         <td style={{ padding: '3px 6px', fontWeight: 600, borderRight: '1px solid #EEE' }}>{m.code}</td>
                         <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{m.name}</td>
                         <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>₹{m.rate.toFixed(2)}</td>
@@ -2243,16 +2607,22 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050 & Video 02 Frame 034) */}
+      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050, Video 02 Frame 034 & Video 11 Frame 038) */}
       {tableDetailsOpen && (() => {
-        const activeTableKot = savedKots.find(k => k.tableNo === selectedTableForDetails);
-        const currentTableItems = activeTableKot ? activeTableKot.items : (lineItems.length > 0 ? lineItems : [
-          { name: 'CLASSIC RUSSIAN SALAD ...', quantity: 1.0, value: 199.0 },
-          { name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
-          { name: 'SPROUTED MOONG PEANUT DRY FRUI...', quantity: 1.0, value: 199.0 },
-          { name: 'CAESAR SALAD (VEG) ...', quantity: 1.0, value: 245.0 },
-          { name: 'CAESAR SALAD (CHICKEN) ...', quantity: 1.0, value: 295.0 }
-        ]);
+        const tableKots = savedKots.filter(k => k.tableNo === selectedTableForDetails);
+        const activeTableKot = tableKots[0];
+        const currentTableItems = tableKots.length > 0 
+          ? tableKots.flatMap(k => (k.items || []).map(it => ({ ...it, kotNo: it.kotNo || k.kotNo })))
+          : (lineItems.length > 0 ? lineItems.map(it => ({ ...it, kotNo: kotNo === 'AUTO' ? '1318' : kotNo })) : [
+            { kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD ...', quantity: 2.0, value: 398.0 },
+            { kotNo: '1314', name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
+            { kotNo: '1314', name: 'SPROUTED MOONG PEANUT DRY FRUI...', quantity: 1.0, value: 199.0 },
+            { kotNo: '1314', name: 'CAESAR SALAD (VEG) ...', quantity: 1.0, value: 245.0 },
+            { kotNo: '1318', name: 'CLASSIC RUSSIAN SALAD ...', quantity: 1.0, value: 199.0 },
+            { kotNo: '1318', name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
+            { kotNo: '1318', name: 'BLENDERS PRIDE ...', quantity: 1.0, value: 135.0 },
+            { kotNo: '1318', name: 'JW BLACK LABEL ...', quantity: 1.0, value: 480.0 }
+          ]);
         const computedTableTotal = currentTableItems.reduce((acc, it) => acc + (it.value || ((it.quantity || 1) * (it.rate || 0))), 0);
         const computedTableCgst = Number((computedTableTotal * 0.025).toFixed(2));
         const computedTableSgst = Number((computedTableTotal * 0.025).toFixed(2));
@@ -2281,7 +2651,7 @@ export default function IdsOrderEntryModal({
                   </div>
                 </div>
 
-                {/* Items running on table */}
+                {/* Items running on table matching Video 11 Frame 038 */}
                 <div style={{ height: '210px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
@@ -2295,7 +2665,7 @@ export default function IdsOrderEntryModal({
                     <tbody>
                       {currentTableItems.map((it, idx) => (
                         <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
-                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{activeTableKot?.kotNo || '1316'}</td>
+                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{it.kotNo || activeTableKot?.kotNo || '1314'}</td>
                           <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
                           <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{(it.quantity || 1).toFixed(3)}</td>
                           <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(it.value || ((it.quantity || 1) * (it.rate || 0))).toFixed(2)}</td>
