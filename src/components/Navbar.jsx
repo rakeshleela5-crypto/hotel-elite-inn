@@ -462,6 +462,30 @@ export default function Navbar({
               <span className="hide-on-mobile">Manager Ops</span>
             </button>
 
+            {/* FastAPI Interactive Swagger Docs */}
+            <a
+              href="https://hotel-elite-inn-backend-api-production-0dc9.up.railway.app/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(14, 165, 233, 0.15)',
+                border: '1px solid rgba(14, 165, 233, 0.45)',
+                color: '#38bdf8',
+                padding: '0.45rem 0.75rem',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+              title="Interactive FastAPI Swagger API Documentation"
+            >
+              <span>⚡</span>
+              <span className="hide-on-mobile">FastAPI /docs</span>
+            </a>
+
             {/* Staff / Front Desk PMS Access */}
             <button 
               onClick={handleAdminAccess}
@@ -553,6 +577,27 @@ export default function Navbar({
             <button onClick={() => { onOpenManagerMobilePortal?.(); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fef08a', padding: '0.55rem 0.75rem', background: 'rgba(212, 175, 55, 0.18)', border: '1px solid rgba(212, 175, 55, 0.5)', borderRadius: '8px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span>📱</span> Manager Mobile Ops &amp; Billing (Audio 4)
             </button>
+            <a
+              href="https://hotel-elite-inn-backend-api-production-0dc9.up.railway.app/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                textAlign: 'left',
+                color: '#38bdf8',
+                padding: '0.55rem 0.75rem',
+                background: 'rgba(14, 165, 233, 0.15)',
+                border: '1px solid rgba(14, 165, 233, 0.4)',
+                borderRadius: '8px',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                textDecoration: 'none'
+              }}
+            >
+              <span>⚡</span> FastAPI Swagger Docs (/docs) ↗
+            </a>
             <button onClick={() => { setCurrentView('guest'); setMobileMenuOpen(false); }} style={{ textAlign: 'left', color: '#fff', padding: '0.4rem 0' }}>
               🏨 27-Room Inventory Catalog
             </button>
