@@ -137,14 +137,17 @@ export default function IdsOrderEntryModal({
   const [selectedTableForDetails, setSelectedTableForDetails] = useState('10');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
 
-  // KOT Modification & Line Deletion State (Video 02 & Video 05 Frame 16 - Frame 32)
+  // KOT Modification, Line Deletion & Entire KOT Deletion State (Videos 02, 05 & Video 06)
   const [editingKotNo, setEditingKotNo] = useState(null);
   const [stagedKotToModify, setStagedKotToModify] = useState(null);
   const [originalKotSnapshot, setOriginalKotSnapshot] = useState(null);
   const [updateConfirmModalOpen, setUpdateConfirmModalOpen] = useState(false);
+  const [deleteKotConfirmOpen, setDeleteKotConfirmOpen] = useState(false);
   const [selectedRowIdx, setSelectedRowIdx] = useState(null);
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
-  const [selectedReason, setSelectedReason] = useState('Guest Requested');
+  const [reasonModalAction, setReasonModalAction] = useState('SAVE_KOT'); // 'SAVE_KOT' | 'DELETE_KOT'
+  const [selectedReason, setSelectedReason] = useState('Double Entry');
+  const [integrityCheckOpen, setIntegrityCheckOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -380,7 +383,42 @@ export default function IdsOrderEntryModal({
 
   const handleConfirmReason = () => {
     setReasonModalOpen(false);
-    handleSaveKOT(selectedReason);
+    if (reasonModalAction === 'DELETE_KOT') {
+      // Video 06 Frame 26 - 30: Delete entire KOT from database
+      const kotToDelete = editingKotNo;
+      const targetTable = tableNo;
+
+      setSavedKots(prev => prev.filter(k => k.kotNo !== kotToDelete));
+
+      // Notify KDS of KOT cancellation
+      const cancelKot = normalizeKotOrder({
+        id: `IDS-${kotToDelete}`,
+        tableNumber: targetTable,
+        steward: server,
+        outlet: selectedOutlet,
+        status: 'CANCELLED',
+        totalAmount: 0,
+        items: []
+      });
+      const existing = getLiveKots().filter(k => k.id !== `IDS-${kotToDelete}`);
+      saveLiveKots(existing);
+      broadcastKotChannel(cancelKot);
+
+      setSaveSuccessMsg(`KOT #${kotToDelete} on Table ${targetTable} Deleted / Voided! [Reason: ${selectedReason}]`);
+      setTimeout(() => setSaveSuccessMsg(null), 3500);
+
+      // Reset Order Entry form back to clean state (Video 06 Frame 28)
+      setLineItems([]);
+      setKotNo('AUTO');
+      setTableNo('');
+      setCovers('');
+      setEditingKotNo(null);
+      setOriginalKotSnapshot(null);
+      setSelectedRowIdx(null);
+      setReasonModalAction('SAVE_KOT');
+    } else {
+      handleSaveKOT(selectedReason);
+    }
   };
 
   if (!isOpen) return null;
@@ -436,7 +474,13 @@ export default function IdsOrderEntryModal({
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px', borderTop: '1px solid #D0D0D0', paddingTop: '10px' }}>
               <button 
-                onClick={() => setOutletConfirmed(true)}
+                onClick={() => {
+                  setIntegrityCheckOpen(true);
+                  setTimeout(() => {
+                    setIntegrityCheckOpen(false);
+                    setOutletConfirmed(true);
+                  }, 600);
+                }}
                 className="ids-btn"
                 style={{ minWidth: '60px', fontWeight: 600 }}
               >
@@ -813,18 +857,22 @@ export default function IdsOrderEntryModal({
             </div>
           </div>
 
-          {/* Bottom Status Bar matching Video 01 & Video 05 Frame 20-28 */}
+          {/* Bottom Status Bar matching Video 01 & Video 05/06 */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 10px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#333' }}>
             <span>&lt;F1&gt; @ Qty for Modifier</span>
-            <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : '#000080' }}>
-              {selectedRowIdx !== null 
-                ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
-                : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity'}
+            <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
+              {editingKotNo 
+                ? (selectedRowIdx !== null
+                    ? `Row #${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT #${editingKotNo}`
+                    : `Editing KOT #${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
+                : (selectedRowIdx !== null 
+                    ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
+                    : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity')}
             </span>
             <span>&lt;F10&gt; @ MemberCode for Help</span>
           </div>
 
-          {/* Footer Action Buttons matching Video 01 Frame 015 & Frame 038 */}
+          {/* Footer Action Buttons matching Video 01 Frame 015 & Video 06 Frame 020 */}
           <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ECE9D8' }}>
             <div style={{ display: 'flex', gap: '6px' }}>
               <button className="ids-btn" onClick={() => setItemHelpOpen(true)} style={{ fontWeight: 600 }}>
@@ -851,15 +899,24 @@ export default function IdsOrderEntryModal({
               </button>
               <button 
                 className="ids-btn" 
-                onClick={() => handleDeleteRow(selectedRowIdx)}
-                title="Delete item (<F5>)"
+                onClick={() => {
+                  if (editingKotNo) {
+                    // Video 06 Frame 020: Delete entire KOT
+                    setDeleteKotConfirmOpen(true);
+                  } else if (selectedRowIdx !== null) {
+                    handleDeleteRow(selectedRowIdx);
+                  } else if (lineItems.length > 0) {
+                    handleDeleteRow(lineItems.length - 1);
+                  }
+                }}
+                title={editingKotNo ? `Delete entire KOT #${editingKotNo}` : "Delete item (<F5>)"}
                 style={{ 
                   minWidth: '60px', 
-                  fontWeight: selectedRowIdx !== null ? 700 : 400, 
-                  color: selectedRowIdx !== null ? '#C00000' : '#000' 
+                  fontWeight: (editingKotNo || selectedRowIdx !== null) ? 700 : 400, 
+                  color: (editingKotNo || selectedRowIdx !== null) ? '#C00000' : '#000' 
                 }}
               >
-                Delete {selectedRowIdx !== null && lineItems[selectedRowIdx] ? `(${lineItems[selectedRowIdx].code})` : ''}
+                Delete {editingKotNo ? '' : (selectedRowIdx !== null && lineItems[selectedRowIdx] ? `(${lineItems[selectedRowIdx].code})` : '')}
               </button>
               <button 
                 className="ids-btn" 
@@ -1125,7 +1182,69 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 5C. WIN32 STATUTORY REASON DIALOG (Video 05 Frame 30 & Frame 32) */}
+      {/* 5B-2. WIN32 CONFIRM DELETE ENTIRE KOT (Video 06 Frame 021 - Frame 022) */}
+      {deleteKotConfirmOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1340 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '320px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 12px rgba(0,0,0,0.6)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Message</span>
+              <button className="ids-win-btn close" onClick={() => setDeleteKotConfirmOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '16px', fontSize: '12px' }}>
+              <div style={{ marginBottom: '16px', color: '#000', fontWeight: 500 }}>
+                Do you want to delete this KOT?
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    setDeleteKotConfirmOpen(false);
+                    setReasonModalAction('DELETE_KOT');
+                    setSelectedReason('Double Entry'); // Video 06 Frame 026 default
+                    setReasonModalOpen(true);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 600 }}
+                >
+                  Yes
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setDeleteKotConfirmOpen(false)}
+                  style={{ minWidth: '60px' }}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* POS INTEGRITY CHECK MODAL (Video 06 Frame 010) */}
+      {integrityCheckOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1290 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '380px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 12px rgba(0,0,0,0.6)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS integrity Check...</span>
+              <button className="ids-win-btn close" onClick={() => { setIntegrityCheckOpen(false); setOutletConfirmed(true); }} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '20px 16px', textAlign: 'center', fontSize: '11px', fontWeight: 600, color: '#000' }}>
+              PLEASE WAIT... CHECKING TAX STRUCTURE PASSIVE CASES...
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '12px' }}>
+              <button className="ids-btn" onClick={() => { setIntegrityCheckOpen(false); setOutletConfirmed(true); }} style={{ minWidth: '60px', fontWeight: 600 }}>Ok</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5C. WIN32 STATUTORY REASON DIALOG (Video 05 Frame 30 & Video 06 Frame 24 & 26) */}
       {reasonModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
           <div 
@@ -1140,7 +1259,9 @@ export default function IdsOrderEntryModal({
             {/* Modal Body */}
             <div style={{ padding: '8px', fontSize: '11px' }}>
               <div style={{ marginBottom: '4px', color: '#333', fontSize: '10px', fontWeight: 600 }}>
-                Select Statutory Reason for Item Cancellation / Reduction:
+                {reasonModalAction === 'DELETE_KOT' 
+                  ? 'Select Reason for deleting KOT.' 
+                  : 'Select Statutory Reason for Item Cancellation / Reduction:'}
               </div>
               {/* Listbox */}
               <div 
@@ -1222,7 +1343,7 @@ export default function IdsOrderEntryModal({
                   const matchingKot = savedKots.find(k => k.tableNo === t);
                   const isSettled = settledTables.includes(t);
                   const isBilled = !isSettled && billedTables.includes(t);
-                  const isOccupied = isBilled || isSettled ? false : (Boolean(matchingKot) || (t === '12' && !settledTables.includes('12')) || (t === '15' && !settledTables.includes('15')));
+                  const isOccupied = isBilled || isSettled ? false : Boolean(matchingKot);
                   const statusLetter = isBilled ? 'B' : (isOccupied ? 'O' : 'V');
                   const bgColor = isBilled ? '#0000FF' : (isOccupied ? '#FF0000' : '#008000');
                   return (
