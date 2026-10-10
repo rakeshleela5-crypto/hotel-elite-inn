@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../../data/hotelData';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
+import IdsPosDiscountModal from './IdsPosDiscountModal';
 
 // Authentic Pending KOTs Registry for Bill Printing (Videos 03 & 09)
 export const DEFAULT_BILL_KOTS = [
@@ -146,6 +147,8 @@ export default function IdsPosBillModal({
   const [splitQtyModalOpen, setSplitQtyModalOpen] = useState(false);
   const [splitEqualModalOpen, setSplitEqualModalOpen] = useState(false);
   const [equalSplitCount, setEqualSplitCount] = useState(2);
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
+  const [billDiscounts, setBillDiscounts] = useState({});
 
   // Determine active KOT based on selected table
   const activeKot = useMemo(() => {
@@ -200,8 +203,11 @@ export default function IdsPosBillModal({
     return sortedGroupKeys.map((splitId, index) => {
       const g = groups[splitId];
       const rawValue = g.value;
-      const tax = Number((rawValue * 0.05).toFixed(2)); // 5% GST (2.5% CGST + 2.5% SGST)
-      const exactNett = rawValue + tax;
+      const appliedDisc = billDiscounts[splitId] || { amount: 0, percent: 0, reason: '' };
+      const discAmt = appliedDisc.amount || 0;
+      const taxableVal = Math.max(0, rawValue - discAmt);
+      const tax = Number((taxableVal * 0.05).toFixed(2)); // 5% GST (2.5% CGST + 2.5% SGST)
+      const exactNett = taxableVal + tax;
       const roundedNett = Math.round(exactNett);
       const roundOff = Number((roundedNett - exactNett).toFixed(2));
       const displayBillNo = splitBillNumbers[splitId] || (billNumber ? `${billNumber}${sortedGroupKeys.length > 1 ? `-${splitId}` : ''}` : '');
@@ -212,7 +218,7 @@ export default function IdsPosBillModal({
         items: g.items,
         totalQty: g.totalQty,
         value: rawValue,
-        discount: '0.00 / 0.00%',
+        discount: discAmt > 0 ? `${discAmt.toFixed(2)} / ${appliedDisc.percent.toFixed(1)}%` : '0.00 / 0.00%',
         tax,
         cgst: Number((tax / 2).toFixed(2)),
         sgst: Number((tax / 2).toFixed(2)),
@@ -221,7 +227,7 @@ export default function IdsPosBillModal({
         billNo: displayBillNo
       };
     });
-  }, [activeKot, itemSplitAssignments, splitBillNumbers, billNumber]);
+  }, [activeKot, itemSplitAssignments, splitBillNumbers, billNumber, billDiscounts]);
 
   // Ensure active bill index is within bounds
   const currentActiveBill = useMemo(() => {
@@ -668,7 +674,11 @@ export default function IdsPosBillModal({
           >
             Split Equal
           </button>
-          <button className="ids-btn" onClick={() => alert("Discount Option")} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button 
+            className="ids-btn" 
+            onClick={() => setDiscountModalOpen(true)} 
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 600, background: '#E6F0FA' }}
+          >
             Discount
           </button>
           <button className="ids-btn" onClick={() => alert("Tax Exemption Routine")} style={{ fontSize: '10px', padding: '3px 6px' }}>
@@ -1345,6 +1355,25 @@ export default function IdsPosBillModal({
           onClose();
         }}
         onOpenCrystalReport={onOpenCrystalReport}
+      />
+
+      {/* Bill Discount & Allowance Manager Override (Video 03 & Manager Allowance) */}
+      <IdsPosDiscountModal
+        isOpen={discountModalOpen}
+        onClose={() => setDiscountModalOpen(false)}
+        billNo={currentActiveBill?.billNo || billNumber || '1'}
+        tableNo={tableNo}
+        grossTotal={currentActiveBill?.value || 0}
+        currentUser="MANAGER"
+        onApplyDiscount={(disc) => {
+          const activeSplitId = currentActiveBill?.splitId || 1;
+          setBillDiscounts(prev => ({
+            ...prev,
+            [activeSplitId]: { amount: disc.discountAmount, percent: disc.discountPercent, reason: disc.reason }
+          }));
+          setPrintSuccessMsg(`Discount of ₹${disc.discountAmount.toFixed(2)} (${disc.reason}) applied!`);
+          setTimeout(() => setPrintSuccessMsg(''), 4000);
+        }}
       />
     </div>
   );

@@ -89,6 +89,9 @@ import IdsRestaurantTableMasterModal from './IdsRestaurantTableMasterModal';
 import IdsServersModal from './IdsServersModal';
 import IdsMenuMasterModal from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal from './IdsSalesPromotionMasterModal';
+import IdsPosReportsModal from './IdsPosReportsModal';
+import IdsPosDiscountModal from './IdsPosDiscountModal';
+import IdsTouchPosTerminalModal from './IdsTouchPosTerminalModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -440,6 +443,10 @@ export default function IdsDesktopShell({
   const [serversModalOpen, setServersModalOpen] = useState(false);
   const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
   const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
+  const [posReportsModalOpen, setPosReportsModalOpen] = useState(false);
+  const [posReportsInitialTab, setPosReportsInitialTab] = useState('shift-sales');
+  const [posDiscountModalOpen, setPosDiscountModalOpen] = useState(false);
+  const [touchPosTerminalModalOpen, setTouchPosTerminalModalOpen] = useState(false);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -951,6 +958,24 @@ export default function IdsDesktopShell({
       { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setOrderEntryModalOpen(true) },
       { label: 'Open Item Punching & Custom Modifiers (Code 9999 / Table 10)', videoId: 'POS-22', action: () => setOrderEntryModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
+      { 
+        label: 'POS Reports & Cashier Audit Register', 
+        videoId: 'POS-04', 
+        action: () => {
+          setPosReportsInitialTab('shift-sales');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Touch POS Terminal (Quick Service & Bar Mode)', 
+        videoId: 'POS-15', 
+        action: () => setTouchPosTerminalModalOpen(true) 
+      },
+      { 
+        label: 'Bill Discount & Allowance (Manager Override)', 
+        videoId: 'POS-03', 
+        action: () => setPosDiscountModalOpen(true) 
+      },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
     'Day End process..': [
@@ -1025,7 +1050,47 @@ export default function IdsDesktopShell({
     'Reports..': [
       { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
       { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => setReprintBillModalOpen(true) },
-      { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => setForeignExchangeModalOpen(true) }
+      { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => setForeignExchangeModalOpen(true) },
+      { 
+        label: 'POS Shift Sales & Cashier Collection Register', 
+        videoId: 'POS-04', 
+        action: () => {
+          setPosReportsInitialTab('shift-sales');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { 
+        label: 'KOT Void & Cancellation Audit Report', 
+        videoId: 'POS-06', 
+        action: () => {
+          setPosReportsInitialTab('void-audit');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { 
+        label: 'NC Department Cost & Internal Consumption Ledger', 
+        videoId: 'POS-08', 
+        action: () => {
+          setPosReportsInitialTab('nc-ledger');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Server / Steward Sales & Commission Report', 
+        videoId: 'POS-18', 
+        action: () => {
+          setPosReportsInitialTab('server-perf');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { 
+        label: 'Menu Group & Item Engineering Sales Register', 
+        videoId: 'POS-20', 
+        action: () => {
+          setPosReportsInitialTab('menu-sales');
+          setPosReportsModalOpen(true);
+        } 
+      }
     ],
     'Setup..': [
       { 
@@ -3222,6 +3287,42 @@ export default function IdsDesktopShell({
         onClose={() => setSalesPromotionModalOpen(false)}
         accountingDate={accountingDate}
         currentUser="MANAGER"
+      />
+
+      {/* POS Statutory & Management Reports Suite V6.5.004.2 */}
+      <IdsPosReportsModal
+        isOpen={posReportsModalOpen}
+        onClose={() => setPosReportsModalOpen(false)}
+        initialTab={posReportsInitialTab}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+      />
+
+      {/* POS Bill Discount & Allowance Manager Override Modal */}
+      <IdsPosDiscountModal
+        isOpen={posDiscountModalOpen}
+        onClose={() => setPosDiscountModalOpen(false)}
+        billNo="RES-B-00101"
+        tableNo="10"
+        grossTotal={1100.00}
+        currentUser="MANAGER"
+        onApplyDiscount={(disc) => {
+          showMessageBox(`Discount of ₹${disc.discountAmount.toFixed(2)} applied for ${disc.reason}. Revised Net: ₹${disc.revisedGrandTotal.toFixed(2)}`, "Bill Discount V6.5.002.1", "info");
+        }}
+      />
+
+      {/* Touch Screen POS Terminal V7.0 */}
+      <IdsTouchPosTerminalModal
+        isOpen={touchPosTerminalModalOpen}
+        onClose={() => setTouchPosTerminalModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onKotPunched={(res) => {
+          showMessageBox(`Touch POS KOT #${res.kotId} for Table ${res.tableNo} punched to kitchen!`, "Touch POS V7.0", "info");
+        }}
+        onBillSettled={(res) => {
+          showMessageBox(`Touch POS Bill #${res.billNo} for ₹${res.amount} settled via ${res.mode}!`, "Touch POS Settlement", "info");
+        }}
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}
