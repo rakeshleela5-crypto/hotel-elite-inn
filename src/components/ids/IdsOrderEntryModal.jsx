@@ -1655,19 +1655,26 @@ export default function IdsOrderEntryModal({
                   onChange={e => setServer(e.target.value)}
                   style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 >
-                  {getStoredServers().map(s => (
-                    <option key={s.serverCode} value={s.name}>
-                      [{s.serverCode}] {s.name}
-                    </option>
+                  {/* Video 19: Exclude Passive servers from Order Entry */}
+                  {getStoredServers()
+                    .filter(s => s.status !== 'Passive')
+                    .map(s => (
+                      <option key={s.serverCode} value={s.name}>
+                        [{s.serverCode}] {s.name}
+                      </option>
                   ))}
-                  {POS_STEWARDS.filter(st => !getStoredServers().some(s => s.name.toLowerCase() === st.toLowerCase())).map(st => (
+                  {POS_STEWARDS.filter(st => {
+                    const matched = getStoredServers().find(s => s.name.toLowerCase() === st.toLowerCase());
+                    if (matched && matched.status === 'Passive') return false;
+                    return !matched;
+                  }).map(st => (
                     <option key={st} value={st}>{st}</option>
                   ))}
                 </select>
                 <button 
                   className="ids-btn" 
                   onClick={() => setServersMasterOpen(true)}
-                  title="Servers V6.5.002.1 - Stewards Master (Video 18)"
+                  title="Servers V6.5.002.1 - Stewards Master & Deactivation (Videos 18 & 19)"
                   style={{ padding: '1px 6px', fontSize: '11px', fontWeight: 700 }}
                 >
                   ?
@@ -4200,7 +4207,7 @@ export default function IdsOrderEntryModal({
                       { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } },
                       { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
                       { key: 'Setup', name: 'Delete Table', desc: 'Delete Restaurant Table & Alert Window V6.5.002.1 (Video 17)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
-                      { key: 'Setup', name: 'Servers Master', desc: 'Servers V6.5.002.1 & Stewards Setup (Video 18)', action: () => { setHotKeyHelpOpen(false); setServersMasterOpen(true); } }
+                      { key: 'Setup', name: 'Servers Master', desc: 'Servers V6.5.002.1 & Deactivation (Active/Passive) (Videos 18 & 19)', action: () => { setHotKeyHelpOpen(false); setServersMasterOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>

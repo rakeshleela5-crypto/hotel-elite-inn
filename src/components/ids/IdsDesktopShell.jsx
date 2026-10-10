@@ -941,6 +941,7 @@ export default function IdsDesktopShell({
       { label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', videoId: 'POS-17', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', videoId: 'POS-18', action: () => setServersModalOpen(true) },
+      { label: 'Deactivate Server / Passive Status (Setup -> Servers)', videoId: 'POS-19', action: () => setServersModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1042,6 +1043,11 @@ export default function IdsDesktopShell({
       { 
         label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', 
         videoId: 'POS-18', 
+        action: () => setServersModalOpen(true) 
+      },
+      { 
+        label: 'Deactivate Server / Passive Status (Setup -> Servers)', 
+        videoId: 'POS-19', 
         action: () => setServersModalOpen(true) 
       },
       { 

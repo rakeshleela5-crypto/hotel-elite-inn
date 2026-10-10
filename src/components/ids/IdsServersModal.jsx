@@ -156,11 +156,30 @@ export default function IdsServersModal({
     showNotification(`New Server mode active. Fill details and click Save.`);
   };
 
-  // Action: Modify
+  // Action: Modify (Video 19 Frames 010 & 012 - Select Waiter/Waitress to remove)
   const handleModify = () => {
     if (servers.length === 0) return;
     setFormMode('MODIFY');
-    showNotification(`Editing Server ${serverCode} (${name}).`);
+    setBrowseOpen(true);
+    showNotification(`Select Waiter/Waitress Name to remove / set status to Passive (Video 19).`);
+  };
+
+  // Quick Deactivate / Toggle for Video 19
+  const handleToggleRahulPassive = () => {
+    const rahul = servers.find(s => s.serverCode === '004' || s.name.toLowerCase() === 'rahul');
+    const newStatus = rahul?.status === 'Passive' ? 'Active' : 'Passive';
+    const updated = servers.map(s => {
+      if (s.serverCode === '004' || s.name.toLowerCase() === 'rahul') {
+        return { ...s, status: newStatus, lastUpdated: `${accountingDate} 19:02` };
+      }
+      return s;
+    });
+    setServers(updated);
+    saveStoredServers(updated);
+    const idx = updated.findIndex(s => s.serverCode === '004' || s.name.toLowerCase() === 'rahul');
+    if (idx !== -1) setCurrentIndex(idx);
+    setFormMode('VIEW');
+    showNotification(`Server 004 (Rahul) status set to ${newStatus}. ${newStatus === 'Passive' ? 'Rahul will not be visible in Order Entry screen.' : 'Rahul is now visible in Order Entry screen.'}`);
   };
 
   // Action: Delete (Alert Window V6.5.002.1)
@@ -184,7 +203,7 @@ export default function IdsServersModal({
     showNotification(`Server Code "${code}" deleted successfully.`);
   };
 
-  // Action: Save (Video 18 Frame 030)
+  // Action: Save (Video 18 Frame 030 & Video 19 Frame 018)
   const handleSave = () => {
     if (!serverCode.trim() || !name.trim()) {
       alert('Please enter both Server Code and Server Name!');
@@ -200,7 +219,7 @@ export default function IdsServersModal({
       employeeNo: employeeNo.trim() || `EMP-${cleanCode}`,
       status: status || 'Active',
       user: currentUser,
-      lastUpdated: `${accountingDate} 18:55`
+      lastUpdated: `${accountingDate} 19:02`
     };
 
     let nextServers;
@@ -219,7 +238,7 @@ export default function IdsServersModal({
       nextServers = servers.map(s => s.serverCode === cleanCode ? updatedRecord : s);
       setServers(nextServers);
       saveStoredServers(nextServers);
-      showNotification(`Server ${cleanCode} updated successfully.`);
+      showNotification(`Server ${cleanCode} (${name}) updated to ${status}. ${status === 'Passive' ? 'Passive names will not be visible in Order Entry Screen.' : ''}`);
     }
 
     setFormMode('VIEW');
@@ -238,7 +257,7 @@ export default function IdsServersModal({
     setCurrentIndex(prev => (prev < servers.length - 1 ? prev + 1 : 0));
   };
 
-  // Select from Browse
+  // Select from Browse (Video 19 Frame 012 & 016)
   const handleSelectBrowse = (idx) => {
     const filtered = getFilteredBrowse();
     const item = filtered[idx];
@@ -246,9 +265,23 @@ export default function IdsServersModal({
       const realIdx = servers.findIndex(s => s.serverCode === item.serverCode);
       if (realIdx !== -1) {
         setCurrentIndex(realIdx);
-        setFormMode('VIEW');
-        if (onSelectServerForOrder) {
-          onSelectServerForOrder(item);
+        const s = servers[realIdx];
+        setApplicableFrom(s.applicableFrom || accountingDate);
+        setServerCode(s.serverCode || '');
+        setName(s.name || '');
+        setShortName(s.shortName || '');
+        setEmployeeNo(s.employeeNo || '');
+        setStatus(s.status || 'Active');
+        setUser(s.user || currentUser);
+        setLastUpdated(s.lastUpdated || `${accountingDate} 19:02`);
+
+        if (formMode === 'MODIFY') {
+          showNotification(`Modifying ${s.serverCode} (${s.name}). Set Status to Passive to deactivate.`);
+        } else {
+          setFormMode('VIEW');
+          if (onSelectServerForOrder) {
+            onSelectServerForOrder(item);
+          }
         }
       }
     }
@@ -468,7 +501,7 @@ export default function IdsServersModal({
                 }}
               >
                 <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="Passive">Passive</option>
               </select>
             </div>
 
@@ -596,7 +629,7 @@ export default function IdsServersModal({
             </div>
           </div>
 
-          {/* Subtitle Red / Yellow Banner Note */}
+          {/* Subtitle Red / Yellow Banner Note (Video 18 & Video 19) */}
           <div 
             style={{ 
               background: '#FFFBE6', 
@@ -605,21 +638,37 @@ export default function IdsServersModal({
               borderRadius: '2px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '4px'
+              gap: '6px'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ color: '#0A246A', fontWeight: 700, fontSize: '12px' }}>
-                Server / Steward Master Configuration (Video 18)
+                Server / Steward Master & Deactivation (Video 18 & Video 19)
               </span>
               <span style={{ fontSize: '10px', color: '#888', fontStyle: 'italic' }}>
                 Kaushik (001), Ajay (002), Bijay (003), Rahul (004)
               </span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-              <span style={{ fontSize: '10px', color: '#444' }}>
-                Servers configured here are assigned during KOT punching, order entry, and settlement billing.
-              </span>
+            <div style={{ fontSize: '10px', color: '#444', lineHeight: '1.4' }}>
+              <strong>Video 19 Deactivation Protocol:</strong> Click <strong>Modify</strong> &rarr; Select Waiter &rarr; Change Status to <strong style={{ color: '#8B0000' }}>Passive</strong> &rarr; Click <strong>Save</strong>. In IDS Fortune NEXT, Passive servers remain in historical audit logs but are strictly excluded from live Order Entry.
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+              <button 
+                className="ids-btn" 
+                onClick={handleToggleRahulPassive}
+                style={{
+                  fontSize: '10px',
+                  padding: '2px 8px',
+                  fontWeight: 700,
+                  background: servers.find(s => s.serverCode === '004')?.status === 'Passive' ? '#DFF0D8' : '#F2DEDE',
+                  borderColor: servers.find(s => s.serverCode === '004')?.status === 'Passive' ? '#3C763D' : '#A94442',
+                  color: servers.find(s => s.serverCode === '004')?.status === 'Passive' ? '#3C763D' : '#A94442'
+                }}
+              >
+                {servers.find(s => s.serverCode === '004')?.status === 'Passive'
+                  ? '✅ Rahul (004) is PASSIVE — Click to Restore Active'
+                  : '⚠️ Deactivate Rahul (004) to PASSIVE (Video 19 Demo)'}
+              </button>
               <button 
                 className="ids-btn" 
                 onClick={() => setBrowseOpen(true)}
