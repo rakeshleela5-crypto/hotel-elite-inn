@@ -247,3 +247,20 @@ export async function syncFastApiMasterData() {
   }
 }
 
+/**
+ * Fetch authentic sample thermal receipt (Photo 2 - R.S/2913)
+ */
+export async function getFastApiSampleThermalReceipt() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/thermal-receipt/sample`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Thermal receipt fetch failed:', err.message);
+    return null;
+  }
+}
+

@@ -5249,39 +5249,143 @@ export default function IdsOrderEntryModal({
                 maxHeight: '260px',
                 overflowY: 'auto'
               }}>
-                <div style={{ textAlign: 'center', fontWeight: 'bold' }}>HOTEL ELITE INN - RAYAGADA</div>
-                <div style={{ textAlign: 'center', fontSize: '9px' }}>KITCHEN ORDER TICKET (KOT) - ESC/POS 80mm</div>
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>Table: T-{tableNo || '10'}</span>
-                  <span>KOT #: {kotNo === 'AUTO' ? '1312' : kotNo}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>Server: {server || 'Biren'}</span>
-                  <span>Covers: {covers || '2'}</span>
-                </div>
-                <div style={{ fontSize: '9px' }}>
-                  Target: {thermalDestination === 'kitchen' ? 'PRINTER 1: KITCHEN DISPLAY / THERMAL' : 'PRINTER 2: RESTAURANT CASHIER'}
-                </div>
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-                {lineItems.map((it, idx) => (
-                  <div key={idx} style={{ margin: '2px 0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>{it.quantity} x {it.name}</span>
-                      <span>₹{(it.quantity * it.rate).toFixed(2)}</span>
+                {thermalDestination === 'kitchen' ? (
+                  /* Kitchen KOT Slip */
+                  <>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold' }}>HOTEL ELITE INN - RAYAGADA</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>KITCHEN ORDER TICKET (KOT) - ESC/POS 80mm</div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                      <span>Table: T-{tableNo || '10'}</span>
+                      <span>KOT #: {kotNo === 'AUTO' ? '1312' : kotNo}</span>
                     </div>
-                    {it.modifier && (
-                      <div style={{ fontSize: '9px', fontStyle: 'italic', paddingLeft: '8px' }}>
-                        * Mod: {typeof it.modifier === 'object' ? it.modifier.name : it.modifier}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                      <span>Server: {server || 'Biren'}</span>
+                      <span>Covers: {covers || '2'}</span>
+                    </div>
+                    <div style={{ fontSize: '9px' }}>
+                      Target: PRINTER 1: KITCHEN DISPLAY / THERMAL
+                    </div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    {lineItems.map((it, idx) => (
+                      <div key={idx} style={{ margin: '2px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>{it.quantity} x {it.name}</span>
+                          <span>₹{(it.quantity * it.rate).toFixed(2)}</span>
+                        </div>
+                        {it.modifier && (
+                          <div style={{ fontSize: '9px', fontStyle: 'italic', paddingLeft: '8px' }}>
+                            * Mod: {typeof it.modifier === 'object' ? it.modifier.name : it.modifier}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                      <span>TOTAL ESTIMATE:</span>
+                      <span>₹{calculations.totalAmount.toFixed(2)}</span>
+                    </div>
+                  </>
+                ) : (
+                  /* 100% Authentic Photo 2 Tax Invoice POS Receipt */
+                  <div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '11px' }}>TAX INVOICE</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>ORIGINAL FOR RECIPIENT</div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '12px', margin: '2px 0' }}>HOTEL ELITE INN</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>POS 5- ROOM SERVICE</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>Opposite Railway Station Main Road Muniguda</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>GSTIN NO: - 21AEWFS9433F1ZN</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>SAC CODE - 996332</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>FSSAI NO: - 10523016000047</div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>+91-6370757541</div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    <div style={{ fontSize: '9px' }}>Guest Name: - {tableNo === '106' || !tableNo ? 'Mr. KHAGESWARA SAHU' : `Guest Table ${tableNo}`}</div>
+                    <div style={{ fontSize: '9px' }}>Guest Name: - </div>
+                    <div style={{ fontSize: '9px' }}>Company GST No: - </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                      <span>Room No: - {tableNo || '106'}</span>
+                      <span>Bill no: - R.S/2913</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                      <span>Cover - {covers || '1'}</span>
+                      <span>Date - 28/09/26</span>
+                    </div>
+                    <div style={{ textAlign: 'right', fontSize: '9px' }}>Time - 22:29:04</div>
+                    <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Day Session DINNER</div>
+                    <div style={{ fontSize: '9px' }}>First KOT Time : - 22:14</div>
+                    <div style={{ fontSize: '9px', fontWeight: 'bold' }}>KOT NO. : {kotNo === 'AUTO' ? '2056' : kotNo}</div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '3px 0' }}></div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '16px 1fr 40px 20px 45px', fontSize: '9px', fontWeight: 'bold' }}>
+                      <span>No.</span>
+                      <span>Dish Name</span>
+                      <span style={{ textAlign: 'right' }}>Rate</span>
+                      <span style={{ textAlign: 'right' }}>Qty</span>
+                      <span style={{ textAlign: 'right' }}>Total</span>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '2px 0' }}></div>
+                    {(lineItems.length > 0 ? lineItems : [
+                      { name: 'Dal Fry', rate: 130, quantity: 1 },
+                      { name: 'Tawa Roti', rate: 25, quantity: 4 }
+                    ]).map((it, idx) => {
+                      const baseRate = Number((it.rate / 1.05).toFixed(2));
+                      const lineTot = Number((baseRate * it.quantity).toFixed(2));
+                      return (
+                        <div key={idx} style={{ display: 'grid', gridTemplateColumns: '16px 1fr 40px 20px 45px', fontSize: '9px', margin: '1px 0' }}>
+                          <span>{idx + 1}</span>
+                          <span>{it.name}</span>
+                          <span style={{ textAlign: 'right' }}>{baseRate.toFixed(2)}</span>
+                          <span style={{ textAlign: 'right' }}>{it.quantity}</span>
+                          <span style={{ textAlign: 'right' }}>{lineTot.toFixed(2)}</span>
+                        </div>
+                      );
+                    })}
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    {(() => {
+                      const items = lineItems.length > 0 ? lineItems : [
+                        { name: 'Dal Fry', rate: 130, quantity: 1 },
+                        { name: 'Tawa Roti', rate: 25, quantity: 4 }
+                      ];
+                      const totalQty = items.reduce((acc, it) => acc + it.quantity, 0);
+                      const baseTotal = items.reduce((acc, it) => acc + Number(((it.rate / 1.05) * it.quantity).toFixed(2)), 0);
+                      const cgst = Number((baseTotal * 0.025).toFixed(2));
+                      const sgst = Number((baseTotal * 0.025).toFixed(2));
+                      const grandTotal = Math.round(baseTotal + cgst + sgst);
+                      return (
+                        <>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                            <span>Total Qty : {totalQty}</span>
+                            <span>Total            {baseTotal.toFixed(2)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                            <span>CGST @ 2.5 %</span>
+                            <span>{cgst.toFixed(2)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                            <span>SGST @ 2.5 %</span>
+                            <span>{sgst.toFixed(2)}</span>
+                          </div>
+                          <div style={{ borderTop: '1px dashed #000', margin: '3px 0' }}></div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '10px', fontWeight: 'bold', gap: '8px' }}>
+                            <span>Grand Total</span>
+                            <span>{grandTotal.toFixed(2)}</span>
+                          </div>
+                          <div style={{ fontSize: '8px', fontStyle: 'italic', margin: '2px 0' }}>
+                            {grandTotal === 230 ? 'Two hundred Thirty Rs Only' : 'Amount in Indian Rupees'}
+                          </div>
+                        </>
+                      );
+                    })()}
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '8px' }}>------PLEASE DONOT PAY CASH------</div>
+                    <div style={{ fontSize: '8px', margin: '1px 0' }}>Cashier : - Bikram26</div>
+                    <div style={{ textAlign: 'center', fontSize: '8px' }}>Allow Us To Serve You Again</div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '8px' }}>Thank You, Visit Again !</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '7px', marginTop: '3px' }}>
+                      <span>E & O E</span>
+                      <span style={{ fontWeight: 'bold' }}>PLACE OF SUPPLY 'O.D'</span>
+                    </div>
                   </div>
-                ))}
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                  <span>TOTAL ESTIMATE:</span>
-                  <span>₹{calculations.totalAmount.toFixed(2)}</span>
-                </div>
+                )}
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '4px' }}>

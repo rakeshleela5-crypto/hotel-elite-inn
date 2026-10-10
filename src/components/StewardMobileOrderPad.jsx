@@ -1232,9 +1232,10 @@ export default function StewardMobileOrderPad({
                 {/* Bill Header */}
                 <div style={{ textAlign: 'center', borderBottom: '2px dashed #000', paddingBottom: '8px', marginBottom: '8px' }}>
                   <div style={{ fontSize: '1.15rem', fontWeight: 900 }}>HOTEL ELITE INN</div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 800 }}>CANNON RESTAURANT &amp; BAR</div>
-                  <div style={{ fontSize: '0.72rem' }}>GSTIN: 21AABCH1234F1Z5 • FSSAI: 12022001000145</div>
-                  <div style={{ fontSize: '0.72rem', marginTop: '2px' }}>PROVISIONAL TABLE FOLIO</div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800 }}>POS 1- RESTAURANT / ROOM SERVICE</div>
+                  <div style={{ fontSize: '0.72rem' }}>Opposite Railway Station Main Road Muniguda</div>
+                  <div style={{ fontSize: '0.72rem' }}>GSTIN: 21AEWFS9433F1ZN • SAC: 996332 • FSSAI: 10523016000047</div>
+                  <div style={{ fontSize: '0.72rem', marginTop: '2px', fontWeight: 700 }}>TAX INVOICE / PROVISIONAL TABLE FOLIO</div>
                 </div>
 
                 {/* Table Info */}
@@ -1292,10 +1293,15 @@ export default function StewardMobileOrderPad({
                   </div>
                 </div>
 
-                {/* Footer */}
+                {/* Footer matching Photo 2 */}
                 <div style={{ textAlign: 'center', fontSize: '0.7rem', color: '#444' }}>
-                  Thank you for dining at Hotel Elite Inn!<br />
-                  For tax invoice &amp; settlement, request front desk.
+                  <div style={{ fontWeight: 800, margin: '2px 0' }}>------PLEASE DONOT PAY CASH------</div>
+                  <div>Cashier : - Bikram26</div>
+                  <div>Allow Us To Serve You Again • Thank You, Visit Again !</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.65rem', marginTop: '4px' }}>
+                    <span>E &amp; O E</span>
+                    <span style={{ fontWeight: 800 }}>PLACE OF SUPPLY 'O.D'</span>
+                  </div>
                 </div>
               </div>
             ) : (

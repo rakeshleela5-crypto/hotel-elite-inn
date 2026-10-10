@@ -20,8 +20,28 @@ import {
   getFastApiRoomDefects,
   getFastApiPropertyInfo,
   getFastApiMenu,
+  getFastApiSampleThermalReceipt,
   syncFastApiMasterData
 } from '../utils/backendApi';
+
+export function amountToWords(amount) {
+  const rounded = Math.round(Number(amount) || 0);
+  if (rounded === 0) return 'Zero Rs Only';
+  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  
+  function convert(n) {
+    if (n < 20) return ones[n];
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + ones[n % 10] : '');
+    if (n < 1000) return ones[Math.floor(n / 100)] + ' hundred' + (n % 100 !== 0 ? ' ' + convert(n % 100) : '');
+    if (n < 100000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 !== 0 ? ' ' + convert(n % 1000) : '');
+    if (n < 10000000) return convert(Math.floor(n / 100000)) + ' Lakh' + (n % 100000 !== 0 ? ' ' + convert(n % 100000) : '');
+    return convert(Math.floor(n / 10000000)) + ' Crore' + (n % 10000000 !== 0 ? ' ' + convert(n % 10000000) : '');
+  }
+  
+  const words = convert(rounded);
+  return `${words.charAt(0).toUpperCase() + words.slice(1)} Rs Only`;
+}
 
 export default function ManagerMobilePortal({
   isOpen,
@@ -36,7 +56,8 @@ export default function ManagerMobilePortal({
 }) {
   const [activeTab, setActiveTab] = useState('tables'); // 'tables' | 'thermal' | 'inventory' | 'corporate' | 'defects'
   const [selectedTable, setSelectedTable] = useState('10');
-  const [printerDestination, setPrinterDestination] = useState('kitchen'); // 'kitchen' | 'restaurant'
+  const [printerDestination, setPrinterDestination] = useState('restaurant'); // 'kitchen' | 'restaurant'
+  const [thermalSlipSource, setThermalSlipSource] = useState('photo2'); // 'photo2' | 'liveTable'
   const [toastMessage, setToastMessage] = useState(null);
   const [showVoidModal, setShowVoidModal] = useState(false);
   const [voidItemTarget, setVoidItemTarget] = useState(null);
@@ -728,131 +749,369 @@ export default function ManagerMobilePortal({
                 </span>
               </div>
 
-              {/* Destination Radio */}
-              <div style={{
-                display: 'flex',
-                gap: '8px',
-                background: 'rgba(255,255,255,0.03)',
-                padding: '6px',
-                borderRadius: '8px',
-                border: '1px solid rgba(255,255,255,0.08)'
-              }}>
-                <button
-                  onClick={() => setPrinterDestination('kitchen')}
-                  style={{
-                    flex: 1,
-                    padding: '6px',
+              {/* Destination Radio & Source Toggle */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{
+                  display: 'flex',
+                  gap: '6px',
+                  background: 'rgba(255,255,255,0.03)',
+                  padding: '4px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255,255,255,0.08)'
+                }}>
+                  <button
+                    onClick={() => setPrinterDestination('restaurant')}
+                    style={{
+                      flex: 1,
+                      padding: '6px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: printerDestination === 'restaurant' ? '#d4af37' : 'transparent',
+                      color: printerDestination === 'restaurant' ? '#000' : '#94a3b8',
+                      fontWeight: 700,
+                      fontSize: '11px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🧾 Tax Invoice POS Slip (Photo 2)
+                  </button>
+                  <button
+                    onClick={() => setPrinterDestination('kitchen')}
+                    style={{
+                      flex: 1,
+                      padding: '6px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      background: printerDestination === 'kitchen' ? '#d4af37' : 'transparent',
+                      color: printerDestination === 'kitchen' ? '#000' : '#94a3b8',
+                      fontWeight: 700,
+                      fontSize: '11px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🍳 Kitchen KOT Slip
+                  </button>
+                </div>
+
+                {printerDestination === 'restaurant' && (
+                  <div style={{
+                    display: 'flex',
+                    gap: '6px',
+                    background: 'rgba(0,0,0,0.3)',
+                    padding: '4px',
                     borderRadius: '6px',
-                    border: 'none',
-                    background: printerDestination === 'kitchen' ? '#d4af37' : 'transparent',
-                    color: printerDestination === 'kitchen' ? '#000' : '#94a3b8',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  🍳 Kitchen KOT Printer
-                </button>
-                <button
-                  onClick={() => setPrinterDestination('restaurant')}
-                  style={{
-                    flex: 1,
-                    padding: '6px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    background: printerDestination === 'restaurant' ? '#d4af37' : 'transparent',
-                    color: printerDestination === 'restaurant' ? '#000' : '#94a3b8',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  🧾 Cashier Guest Slip
-                </button>
+                    fontSize: '10px'
+                  }}>
+                    <button
+                      onClick={() => setThermalSlipSource('photo2')}
+                      style={{
+                        flex: 1,
+                        padding: '4px 6px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: thermalSlipSource === 'photo2' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                        color: thermalSlipSource === 'photo2' ? '#38bdf8' : '#94a3b8',
+                        fontWeight: thermalSlipSource === 'photo2' ? 700 : 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      📸 Photo 2 Receipt (R.S/2913 • Room 106)
+                    </button>
+                    <button
+                      onClick={() => setThermalSlipSource('liveTable')}
+                      style={{
+                        flex: 1,
+                        padding: '4px 6px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        background: thermalSlipSource === 'liveTable' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                        color: thermalSlipSource === 'liveTable' ? '#38bdf8' : '#94a3b8',
+                        fontWeight: thermalSlipSource === 'liveTable' ? 700 : 500,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🔴 Live Selected Table (T-{selectedTable})
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Authentic ESC/POS Monospace Thermal Preview Container */}
-              <div style={{
-                background: '#fff',
-                color: '#000',
-                fontFamily: '"Courier New", Courier, monospace',
-                fontSize: '11px',
-                lineHeight: '1.25',
-                padding: '14px 12px',
-                borderRadius: '4px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                margin: '0 auto',
-                width: '100%',
-                maxWidth: '320px'
-              }}>
-                <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                  HOTEL ELITE INN
-                </div>
-                <div style={{ textAlign: 'center', fontSize: '9px' }}>
-                  STATION ROAD, RAYAGADA, ODISHA - 765001
-                </div>
-                <div style={{ textAlign: 'center', fontSize: '9px' }}>
-                  GSTIN: 21AAACJ4321E1Z1 | PH: 06856-222777
-                </div>
-                <div style={{ textAlign: 'center', margin: '4px 0', borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '2px 0', fontWeight: 'bold' }}>
-                  {printerDestination === 'kitchen' ? '--- KITCHEN ORDER TICKET (KOT) ---' : '--- RESTAURANT BILL SLIP ---'}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>Table: T-{selectedTable}</span>
-                  <span>KOT #: {activeTableData?.kotNo || '1312'}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>Server: {activeTableData?.server || 'Biren'}</span>
-                  <span>Covers: {activeTableData?.covers || 2}</span>
-                </div>
-                <div style={{ fontSize: '9px', margin: '2px 0' }}>
-                  Date: {new Date().toLocaleDateString()} {activeTableData?.startTime || '12:45 PM'}
-                </div>
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-
-                {/* Items */}
-                {(activeTableData?.items || [
-                  { name: 'ANDHRA CHICKEN CURRY', quantity: 1, rate: 280, modifier: 'Extra Spicy' },
-                  { name: 'STEAMED RICE', quantity: 1, rate: 145 },
-                  { name: 'MINERAL WATER', quantity: 2, rate: 60 }
-                ]).map((it, idx) => (
-                  <div key={idx} style={{ margin: '3px 0' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>{it.quantity} x {it.name}</span>
-                      <span>₹{(it.quantity * it.rate).toFixed(2)}</span>
+              <div 
+                id="thermal-slip-print-area"
+                style={{
+                  background: '#fff',
+                  color: '#000',
+                  fontFamily: '"Courier New", Courier, monospace',
+                  fontSize: '10px',
+                  lineHeight: '1.2',
+                  padding: '16px 12px',
+                  borderRadius: '4px',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.6)',
+                  margin: '0 auto',
+                  width: '100%',
+                  maxWidth: '320px',
+                  border: '1px solid #ddd'
+                }}
+              >
+                {printerDestination === 'kitchen' ? (
+                  /* Authentic Kitchen Order Ticket (KOT) Slip */
+                  <div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                      HOTEL ELITE INN
                     </div>
-                    {it.modifier && (
-                      <div style={{ fontSize: '9px', paddingLeft: '10px', fontStyle: 'italic' }}>
-                        * MOD: {it.modifier}
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>
+                      STATION ROAD, MUNIGUDA, RAYAGADA
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '8px' }}>
+                      GSTIN: 21AEWFS9433F1ZN | PH: +91-6370757541
+                    </div>
+                    <div style={{ textAlign: 'center', margin: '4px 0', borderTop: '1px dashed #000', borderBottom: '1px dashed #000', padding: '2px 0', fontWeight: 'bold' }}>
+                      *** KITCHEN ORDER TICKET (KOT) ***
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                      <span>Table: T-{selectedTable}</span>
+                      <span>KOT #: {activeTableData?.kotNo || '1312'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
+                      <span>Server: {activeTableData?.server || 'Biren'}</span>
+                      <span>Covers: {activeTableData?.covers || 2}</span>
+                    </div>
+                    <div style={{ fontSize: '9px', margin: '2px 0' }}>
+                      Date: {new Date().toLocaleDateString('en-GB')} {activeTableData?.startTime || '12:45 PM'}
+                    </div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
+                    <div style={{ fontWeight: 'bold', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Qty  Item Name</span>
+                      <span>Type</span>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #000', margin: '3px 0' }}></div>
+                    {(activeTableData?.items || [
+                      { name: 'ANDHRA CHICKEN CURRY', quantity: 1, modifier: 'Extra Spicy' },
+                      { name: 'STEAMED RICE', quantity: 1 },
+                      { name: 'MINERAL WATER(58)', quantity: 2 }
+                    ]).map((it, idx) => (
+                      <div key={idx} style={{ margin: '3px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span style={{ fontWeight: 'bold' }}>{it.quantity} x  {it.name}</span>
+                          <span>FOOD</span>
+                        </div>
+                        {it.modifier && (
+                          <div style={{ fontSize: '9px', paddingLeft: '14px', fontStyle: 'italic' }}>
+                            * MOD: {it.modifier}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
+                    <div style={{ borderTop: '1px dashed #000', margin: '6px 0 3px' }}></div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>
+                      ** CHEF COPY - SPEED OF SERVICE **
+                    </div>
                   </div>
-                ))}
+                ) : (
+                  /* 100% Authentic Photo 2 Tax Invoice POS Receipt */
+                  <div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                      TAX INVOICE
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', letterSpacing: '0.5px' }}>
+                      ORIGINAL FOR RECIPIENT
+                    </div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '13px', margin: '2px 0' }}>
+                      HOTEL ELITE INN
+                    </div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '10px' }}>
+                      {thermalSlipSource === 'photo2' ? 'POS 5- ROOM SERVICE' : `POS 1- RESTAURANT (T-${selectedTable})`}
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>
+                      Opposite Railway Station Main Road Muniguda
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', fontWeight: 'bold' }}>
+                      GSTIN NO: - 21AEWFS9433F1ZN
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>
+                      SAC CODE - 996332
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>
+                      FSSAI NO: - 10523016000047
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px' }}>
+                      +91-6370757541
+                    </div>
 
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>SUBTOTAL:</span>
-                  <span>₹{activeTableTotals.subtotal.toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>CGST @ 2.5%:</span>
-                  <span>₹{activeTableTotals.cgst.toFixed(2)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
-                  <span>SGST @ 2.5%:</span>
-                  <span>₹{activeTableTotals.sgst.toFixed(2)}</span>
-                </div>
-                <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '12px' }}>
-                  <span>NET TOTAL:</span>
-                  <span>₹{activeTableTotals.net.toFixed(2)}</span>
-                </div>
-                <div style={{ borderTop: '1px dashed #000', margin: '6px 0 2px' }}></div>
-                <div style={{ textAlign: 'center', fontSize: '8px' }}>
-                  {printerDestination === 'kitchen' 
-                    ? '** CHEF COPY - SPEED OF SERVICE **' 
-                    : 'THANK YOU! VISIT HOTEL ELITE INN AGAIN'}
-                </div>
+                    <div style={{ margin: '6px 0 2px', borderTop: '1px dashed #000' }}></div>
+
+                    {/* Metadata block matching Photo 2 */}
+                    {thermalSlipSource === 'photo2' ? (
+                      <>
+                        <div style={{ fontSize: '9px' }}>Guest Name: - Mr. KHAGESWARA SAHU</div>
+                        <div style={{ fontSize: '9px' }}>Guest Name: - </div>
+                        <div style={{ fontSize: '9px' }}>Company GST No: - </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                          <span>Room No: - 106</span>
+                          <span>Bill no: - R.S/2913</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                          <span>Cover - 1</span>
+                          <span>Date - 28/09/26</span>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '9px' }}>
+                          Time - 22:29:04
+                        </div>
+                        <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Day Session DINNER</div>
+                        <div style={{ fontSize: '9px' }}>First KOT Time : - 22:14</div>
+                        <div style={{ fontSize: '9px', fontWeight: 'bold' }}>KOT NO. : 2056</div>
+                      </>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: '9px' }}>Guest Name: - {activeTableData?.server ? `Table Guest (${activeTableData.server})` : 'Walk-in Guest'}</div>
+                        <div style={{ fontSize: '9px' }}>Guest Name: - </div>
+                        <div style={{ fontSize: '9px' }}>Company GST No: - </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                          <span>Table No: - T-{selectedTable}</span>
+                          <span>Bill no: - RES/{activeTableData?.billNo || '4182'}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                          <span>Cover - {activeTableData?.covers || 2}</span>
+                          <span>Date - {new Date().toLocaleDateString('en-GB')}</span>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: '9px' }}>
+                          Time - {activeTableData?.startTime || '13:10:00'}
+                        </div>
+                        <div style={{ fontSize: '9px', fontWeight: 'bold' }}>Day Session LUNCH</div>
+                        <div style={{ fontSize: '9px' }}>First KOT Time : - {activeTableData?.startTime || '12:45'}</div>
+                        <div style={{ fontSize: '9px', fontWeight: 'bold' }}>KOT NO. : {activeTableData?.kotNo || '1312'}</div>
+                      </>
+                    )}
+
+                    <div style={{ margin: '4px 0', borderTop: '1px dashed #000' }}></div>
+
+                    {/* Table Headers */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '20px 1fr 48px 24px 50px', fontSize: '9px', fontWeight: 'bold' }}>
+                      <span>No.</span>
+                      <span>Dish Name</span>
+                      <span style={{ textAlign: 'right' }}>Rate</span>
+                      <span style={{ textAlign: 'right' }}>Qty</span>
+                      <span style={{ textAlign: 'right' }}>Total</span>
+                    </div>
+
+                    <div style={{ margin: '2px 0', borderTop: '1px dashed #000' }}></div>
+
+                    {/* Line Items */}
+                    {thermalSlipSource === 'photo2' ? (
+                      <>
+                        <div style={{ display: 'grid', gridTemplateColumns: '20px 1fr 48px 24px 50px', fontSize: '9px', margin: '2px 0' }}>
+                          <span>1</span>
+                          <span>Dal Fry</span>
+                          <span style={{ textAlign: 'right' }}>123.81</span>
+                          <span style={{ textAlign: 'right' }}>1</span>
+                          <span style={{ textAlign: 'right' }}>123.81</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '20px 1fr 48px 24px 50px', fontSize: '9px', margin: '2px 0' }}>
+                          <span>2</span>
+                          <span>Tawa Roti</span>
+                          <span style={{ textAlign: 'right' }}>23.81</span>
+                          <span style={{ textAlign: 'right' }}>4</span>
+                          <span style={{ textAlign: 'right' }}>95.24</span>
+                        </div>
+                      </>
+                    ) : (
+                      (activeTableData?.items || [
+                        { name: 'DAL FRY', quantity: 1, rate: 130 },
+                        { name: 'TAWA ROTI', quantity: 4, rate: 25 }
+                      ]).map((it, idx) => {
+                        const baseRate = Number((it.rate / 1.05).toFixed(2));
+                        const lineTotal = Number((baseRate * it.quantity).toFixed(2));
+                        return (
+                          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '20px 1fr 48px 24px 50px', fontSize: '9px', margin: '2px 0' }}>
+                            <span>{idx + 1}</span>
+                            <span>{it.name}</span>
+                            <span style={{ textAlign: 'right' }}>{baseRate.toFixed(2)}</span>
+                            <span style={{ textAlign: 'right' }}>{it.quantity}</span>
+                            <span style={{ textAlign: 'right' }}>{lineTotal.toFixed(2)}</span>
+                          </div>
+                        );
+                      })
+                    )}
+
+                    <div style={{ margin: '4px 0', borderTop: '1px dashed #000' }}></div>
+
+                    {/* Totals Section */}
+                    {thermalSlipSource === 'photo2' ? (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                          <span>Total Qty : 5</span>
+                          <span>Total            219.01</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                          <span>CGST @ 2.5 %</span>
+                          <span>5.48</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                          <span>SGST @ 2.5 %</span>
+                          <span>5.48</span>
+                        </div>
+                        <div style={{ margin: '4px 0', borderTop: '1px dashed #000' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '11px', fontWeight: 'bold', gap: '10px' }}>
+                          <span>Grand Total</span>
+                          <span>230.00</span>
+                        </div>
+                        <div style={{ fontSize: '9px', fontStyle: 'italic', marginTop: '2px' }}>
+                          Two hundred Thirty Rs Only
+                        </div>
+                      </>
+                    ) : (() => {
+                      const items = activeTableData?.items || [{ name: 'DAL FRY', quantity: 1, rate: 130 }, { name: 'TAWA ROTI', quantity: 4, rate: 25 }];
+                      const totQty = items.reduce((acc, it) => acc + it.quantity, 0);
+                      const baseTot = items.reduce((acc, it) => acc + Number(((it.rate / 1.05) * it.quantity).toFixed(2)), 0);
+                      const cgst = Number((baseTot * 0.025).toFixed(2));
+                      const sgst = Number((baseTot * 0.025).toFixed(2));
+                      const grand = Math.round(baseTot + cgst + sgst);
+                      return (
+                        <>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px' }}>
+                            <span>Total Qty : {totQty}</span>
+                            <span>Total            {baseTot.toFixed(2)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                            <span>CGST @ 2.5 %</span>
+                            <span>{cgst.toFixed(2)}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '9px', gap: '8px' }}>
+                            <span>SGST @ 2.5 %</span>
+                            <span>{sgst.toFixed(2)}</span>
+                          </div>
+                          <div style={{ margin: '4px 0', borderTop: '1px dashed #000' }}></div>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '11px', fontWeight: 'bold', gap: '10px' }}>
+                            <span>Grand Total</span>
+                            <span>{grand.toFixed(2)}</span>
+                          </div>
+                          <div style={{ fontSize: '9px', fontStyle: 'italic', marginTop: '2px' }}>
+                            {amountToWords(grand)}
+                          </div>
+                        </>
+                      );
+                    })()}
+
+                    <div style={{ margin: '8px 0 4px', borderTop: '1px dashed #000' }}></div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '9px' }}>
+                      ------PLEASE DONOT PAY CASH------
+                    </div>
+                    <div style={{ fontSize: '9px', margin: '2px 0' }}>
+                      Cashier : - Bikram26
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '9px', marginTop: '4px' }}>
+                      Allow Us To Serve You Again
+                    </div>
+                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '9px' }}>
+                      Thank You, Visit Again !
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '8px', marginTop: '6px' }}>
+                      <span>E & O E</span>
+                      <span style={{ fontWeight: 'bold' }}>PLACE OF SUPPLY 'O.D'</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Action */}
@@ -1364,6 +1623,21 @@ export default function ManagerMobilePortal({
                     }}
                   >
                     GET /api/menu
+                  </button>
+                  <button
+                    onClick={() => handleTestEndpoint('/api/pos/thermal-receipt/sample', getFastApiSampleThermalReceipt)}
+                    style={{
+                      padding: '6px 4px',
+                      background: activeEndpointName === '/api/pos/thermal-receipt/sample' ? 'rgba(212, 175, 55, 0.3)' : 'rgba(255,255,255,0.05)',
+                      border: activeEndpointName === '/api/pos/thermal-receipt/sample' ? '1px solid #d4af37' : '1px solid rgba(255,255,255,0.1)',
+                      color: '#fef08a',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🧾 GET Photo 2 Slip
                   </button>
                   <button
                     onClick={() => handleTestEndpoint('/api/system/sync-master-data', syncFastApiMasterData)}
