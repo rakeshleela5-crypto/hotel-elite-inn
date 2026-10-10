@@ -909,6 +909,7 @@ export default function IdsDesktopShell({
       { label: 'Order Entry', videoId: 'POS-01', action: () => setOrderEntryModalOpen(true) },
       { label: 'POS Bill Printing (Rule 46 / SAC 996331)', videoId: 'POS-03', action: () => setPosBillModalOpen(true) },
       { label: 'Split POS Bill Item Wise (Table 14)', videoId: 'POS-09', action: () => setPosBillModalOpen(true) },
+      { label: 'Rename Item in Order Entry (Shift+F11 / Table 11)', videoId: 'POS-10', action: () => setOrderEntryModalOpen(true) },
       { label: 'Bill Settlement V6.5.008.30 (Cash/Card/Folio Settle)', videoId: 'POS-04', action: () => setPosBillSettlementModalOpen(true) },
       { label: 'Close Shift', videoId: 'POS-01', action: () => showMessageBox("Current Shift Closed & Audited.", "POS Shift Control") },
       { label: 'Close Outlet', videoId: 'POS-01', action: () => showMessageBox("Outlet Closed for Operations.", "Outlet Control") },

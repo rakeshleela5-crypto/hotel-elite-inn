@@ -164,6 +164,9 @@ export default function IdsOrderEntryModal({
   const [selectedReason, setSelectedReason] = useState('Double Entry');
   const [integrityCheckOpen, setIntegrityCheckOpen] = useState(false);
 
+  // Video 10: Shift + F11 Item Renaming in Order Entry Grid (Frames 021–047)
+  const [renamingRowIdx, setRenamingRowIdx] = useState(null);
+
   // NC KOT State (Video 07 Frame 016 & Frame 020)
   const [ncModalOpen, setNcModalOpen] = useState(false);
   const [selectedNcDept, setSelectedNcDept] = useState('Managers');
@@ -226,6 +229,21 @@ export default function IdsOrderEntryModal({
       nettAmount: 1093.0
     },
     {
+      kotNo: '1315',
+      accountingDate: '03-FEB-2022',
+      tableNo: '11',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      items: [
+        { code: '1', kotNo: '1315', name: 'Russian Salad', originalName: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0, isRenamed: true },
+        { code: '2', kotNo: '1315', name: 'Peanut', originalName: 'RED BEANS PEANUT & DRY FRUIT', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0, isRenamed: true }
+      ],
+      totalAmount: 398.0,
+      cgst: 9.96,
+      sgst: 9.96,
+      nettAmount: 418.0
+    },
+    {
       kotNo: '1316',
       accountingDate: '03-FEB-2022',
       tableNo: '12',
@@ -262,6 +280,30 @@ export default function IdsOrderEntryModal({
       nettAmount: 688.0
     }
   ]);
+
+  // Video 10: Global Hotkey Listener for Shift + F11 (Rename Item) & F5 (Delete Item)
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
+        e.preventDefault();
+        const targetIdx = selectedRowIdx !== null ? selectedRowIdx : (activeRowIdx !== null ? activeRowIdx : 0);
+        if (lineItems[targetIdx]) {
+          setSelectedRowIdx(targetIdx);
+          setRenamingRowIdx(targetIdx);
+          setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
+          setTimeout(() => setSaveSuccessMsg(null), 3500);
+        }
+      } else if (e.key === 'F5' || e.code === 'F5') {
+        if (selectedRowIdx !== null && lineItems[selectedRowIdx]) {
+          e.preventDefault();
+          handleDeleteRow(selectedRowIdx);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, selectedRowIdx, activeRowIdx, lineItems]);
 
   // Video 08: Computed Pending NC Tables for lookup modal (Video 08 Frame 016)
   const pendingNcTables = useMemo(() => {
@@ -946,20 +988,72 @@ export default function IdsOrderEntryModal({
                         </td>
                         <td 
                           style={{ 
-                            padding: '3px 6px', 
+                            padding: renamingRowIdx === idx ? '1px 2px' : '3px 6px', 
                             borderRight: '1px solid #E0E0E0', 
                             cursor: 'pointer', 
                             color: isSelected ? '#FFF' : '#000080',
-                            fontWeight: 500
+                            fontWeight: 500,
+                            background: renamingRowIdx === idx ? '#FFF' : undefined
                           }}
                           onClick={(e) => { 
                             e.stopPropagation();
-                            setActiveRowIdx(idx); 
-                            setItemHelpOpen(true); 
+                            setSelectedRowIdx(idx);
                           }}
-                          title="Click to search / replace item"
+                          onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRowIdx(idx);
+                            setRenamingRowIdx(idx);
+                          }}
+                          title="Double-click or press Shift+F11 on Quantity to rename item"
                         >
-                          {item.name}
+                          {renamingRowIdx === idx ? (
+                            <input 
+                              type="text" 
+                              autoFocus
+                              value={item.name} 
+                              onChange={e => {
+                                const val = e.target.value;
+                                setLineItems(prev => {
+                                  const copy = [...prev];
+                                  copy[idx] = { ...copy[idx], name: val, isRenamed: true };
+                                  return copy;
+                                });
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              onBlur={() => setRenamingRowIdx(null)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  setRenamingRowIdx(null);
+                                  setSaveSuccessMsg(`Item #${item.code} renamed to "${item.name}"`);
+                                  setTimeout(() => setSaveSuccessMsg(null), 3000);
+                                } else if (e.key === 'Escape') {
+                                  e.preventDefault();
+                                  setRenamingRowIdx(null);
+                                }
+                              }}
+                              style={{ 
+                                width: '98%', 
+                                background: '#FFF', 
+                                border: '2px solid #0A246A', 
+                                color: '#000080', 
+                                fontWeight: 700, 
+                                fontSize: '11px', 
+                                padding: '1px 3px',
+                                outline: 'none'
+                              }}
+                              title="Type custom name and press Enter to commit"
+                            />
+                          ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px' }}>
+                              <span>{item.name}</span>
+                              {item.isRenamed && (
+                                <span style={{ fontSize: '9px', background: '#FFF3CD', color: '#856404', padding: '0 3px', border: '1px solid #FFEEBA', borderRadius: '2px', fontWeight: 700 }}>
+                                  Renamed
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: '2px 4px', borderRight: '1px solid #E0E0E0', textAlign: 'right' }}>
                           <input 
@@ -967,7 +1061,20 @@ export default function IdsOrderEntryModal({
                             step="1" 
                             min="0"
                             value={item.quantity} 
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedRowIdx(idx);
+                            }}
+                            onFocus={() => setSelectedRowIdx(idx)}
+                            onKeyDown={(e) => {
+                              if (e.shiftKey && (e.key === 'F11' || e.code === 'F11')) {
+                                e.preventDefault();
+                                setSelectedRowIdx(idx);
+                                setRenamingRowIdx(idx);
+                                setSaveSuccessMsg(`Shift+F11: Renaming Item "${item.name}". Type custom name and press Enter.`);
+                                setTimeout(() => setSaveSuccessMsg(null), 3500);
+                              }
+                            }}
                             onChange={e => {
                               const val = parseFloat(e.target.value) || 0;
                               setLineItems(prev => {
@@ -976,7 +1083,7 @@ export default function IdsOrderEntryModal({
                                 return copy;
                               });
                             }}
-                            title="Click on Quantity Field to Change Item Quantity"
+                            title="Click on Quantity Field & Press Shift+F11 to Rename Item (Video 10)"
                             style={{ 
                               width: '46px', 
                               textAlign: 'right', 
@@ -1072,18 +1179,23 @@ export default function IdsOrderEntryModal({
             </div>
           </div>
 
-          {/* Bottom Status Bar matching Video 01 & Video 05/06 */}
-          <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 10px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#333' }}>
+          {/* Bottom Status Bar matching Video 01, Video 05/06 & Video 10 Frame 021 - Frame 047 */}
+          <div style={{ background: '#ECE9D8', borderBottom: '1px solid #BBB', padding: '3px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#333' }}>
             <span>&lt;F1&gt; @ Qty for Modifier</span>
-            <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
-              {editingKotNo 
-                ? (selectedRowIdx !== null
-                    ? `Row #${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT #${editingKotNo}`
-                    : `Editing KOT #${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
-                : (selectedRowIdx !== null 
-                    ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
-                    : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity')}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ background: '#FFF8E7', border: '1px solid #E0B86B', color: '#C00000', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
+                Shift + F11: Click on quantity field and press Shift + F11 to rename the Item
+              </span>
+              <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
+                {editingKotNo 
+                  ? (selectedRowIdx !== null
+                      ? `Row #${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT #${editingKotNo}`
+                      : `Editing KOT #${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
+                  : (selectedRowIdx !== null 
+                      ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name}) Selected — Press <F5> from keyboard to delete item`
+                      : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity')}
+              </span>
+            </div>
             <span>&lt;F10&gt; @ MemberCode for Help</span>
           </div>
 
@@ -1092,6 +1204,41 @@ export default function IdsOrderEntryModal({
             <div style={{ display: 'flex', gap: '6px' }}>
               <button className="ids-btn" onClick={() => setItemHelpOpen(true)} style={{ fontWeight: 600 }}>
                 + Add Item
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  const targetIdx = selectedRowIdx !== null ? selectedRowIdx : 0;
+                  if (lineItems[targetIdx]) {
+                    setSelectedRowIdx(targetIdx);
+                    setRenamingRowIdx(targetIdx);
+                    setSaveSuccessMsg(`Shift+F11: Renaming Item "${lineItems[targetIdx].name}". Type custom name and press Enter.`);
+                    setTimeout(() => setSaveSuccessMsg(null), 3500);
+                  }
+                }}
+                title="Shift + F11 to Rename Item (Video 10)"
+                style={{ fontWeight: 700, background: '#FFF3CD', borderColor: '#856404', color: '#856404' }}
+              >
+                Shift+F11 Rename
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => {
+                  setTableNo('11');
+                  setServer('Biren');
+                  setCovers('1');
+                  setLineItems([
+                    { res: 'RES', code: '1', name: 'CLASSIC RUSSIAN SALAD', quantity: 1.0, rate: 199.0, modifier: '' },
+                    { res: 'RES', code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', quantity: 1.0, rate: 199.0, modifier: '' }
+                  ]);
+                  setSelectedRowIdx(0);
+                  setSaveSuccessMsg('Table 11 loaded with Video 10 Items! Focus quantity and press Shift+F11 to rename.');
+                  setTimeout(() => setSaveSuccessMsg(null), 4000);
+                }}
+                title="Load Table 11 Video 10 Demo state"
+                style={{ fontSize: '10px', background: '#E6F0FA' }}
+              >
+                Table 11 Demo
               </button>
               <button className="ids-btn" onClick={() => setTableStatusOpen(true)}>
                 Table Matrix

@@ -29,6 +29,23 @@ export const DEFAULT_BILL_KOTS = [
     nettAmount: 1093.0
   },
   {
+    tableNo: '11',
+    kotNo: '1315',
+    server: 'Biren',
+    outlet: 'RESTAURANT',
+    session: 'General',
+    accountingDate: '03-FEB-2022',
+    covers: '1',
+    items: [
+      { code: '1', kotNo: '1315', name: 'Russian Salad', originalName: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0, isRenamed: true },
+      { code: '2', kotNo: '1315', name: 'Peanut', originalName: 'RED BEANS PEANUT & DRY FRUIT', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0, isRenamed: true }
+    ],
+    totalAmount: 398.0,
+    cgst: 9.96,
+    sgst: 9.96,
+    nettAmount: 418.0
+  },
+  {
     tableNo: '10',
     kotNo: '1312',
     server: 'Manash',
