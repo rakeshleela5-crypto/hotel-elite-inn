@@ -17,7 +17,10 @@ import {
   getFastApiTables,
   getFastApiInventory,
   getFastApiCorporateAccounts,
-  getFastApiRoomDefects
+  getFastApiRoomDefects,
+  getFastApiPropertyInfo,
+  getFastApiMenu,
+  syncFastApiMasterData
 } from '../utils/backendApi';
 
 export default function ManagerMobilePortal({
@@ -1331,6 +1334,51 @@ export default function ManagerMobilePortal({
                     }}
                   >
                     GET /api/corporate
+                  </button>
+                  <button
+                    onClick={() => handleTestEndpoint('/api/property/info', getFastApiPropertyInfo)}
+                    style={{
+                      padding: '6px 4px',
+                      background: activeEndpointName === '/api/property/info' ? 'rgba(14, 165, 233, 0.3)' : 'rgba(255,255,255,0.05)',
+                      border: activeEndpointName === '/api/property/info' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                      color: '#fff',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    GET /api/property
+                  </button>
+                  <button
+                    onClick={() => handleTestEndpoint('/api/restaurant/menu', getFastApiMenu)}
+                    style={{
+                      padding: '6px 4px',
+                      background: activeEndpointName === '/api/restaurant/menu' ? 'rgba(14, 165, 233, 0.3)' : 'rgba(255,255,255,0.05)',
+                      border: activeEndpointName === '/api/restaurant/menu' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                      color: '#fff',
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    GET /api/menu
+                  </button>
+                  <button
+                    onClick={() => handleTestEndpoint('/api/system/sync-master-data', syncFastApiMasterData)}
+                    style={{
+                      padding: '6px 4px',
+                      background: activeEndpointName === '/api/system/sync-master-data' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(34, 197, 94, 0.15)',
+                      border: activeEndpointName === '/api/system/sync-master-data' ? '1px solid #4ade80' : '1px solid rgba(34, 197, 94, 0.3)',
+                      color: '#86efac',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🔄 Sync 27 Rooms
                   </button>
                 </div>
 

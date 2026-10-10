@@ -192,3 +192,58 @@ export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = 
     throw err;
   }
 }
+
+/**
+ * Fetch official property profile, tariffs, wifi, and intercom directory
+ */
+export async function getFastApiPropertyInfo() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/property/info`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Property info fetch failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch official F&B restaurant menu items
+ */
+export async function getFastApiMenu(category = null) {
+  try {
+    const url = category 
+      ? `${FASTAPI_BASE_URL}/api/restaurant/menu?category=${encodeURIComponent(category)}`
+      : `${FASTAPI_BASE_URL}/api/restaurant/menu`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Menu fetch failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Trigger master data sync on PostgreSQL
+ */
+export async function syncFastApiMasterData() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/sync-master-data`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Master data sync failed:', err.message);
+    throw err;
+  }
+}
+
