@@ -123,8 +123,8 @@
 
   /* Text Colors */
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
   --text-gold: #f3c64c;
   --text-gold-light: #fef08a;
 
@@ -186,6 +186,61 @@ body {
   overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
+}
+
+/* ==========================================================================
+   UNIVERSAL SELECT & OPTION CONTRAST ENFORCEMENT
+   Prevents washed-out / inverted / dark-mode collision text across all browser engines
+   ========================================================================== */
+select {
+  color: #f8fafc;
+  background-color: #0c182b;
+}
+
+select option {
+  color: #f8fafc;
+  background-color: #0c182b;
+}
+
+/* Light Background Controls Override */
+select.bg-white,
+select[style*="background: #FFF"],
+select[style*="background: #fff"],
+select[style*="background: #FFFFFF"],
+select[style*="background: #ffffff"],
+select[style*="background: rgb(255, 255, 255)"],
+select[style*="background-color: #FFF"],
+select[style*="background-color: #fff"],
+select[style*="background-color: #FFFFFF"],
+select[style*="background-color: #ffffff"],
+select[style*="background-color: rgb(255, 255, 255)"],
+select[style*="background: #ECE9D8"],
+select[style*="background: #ece9d8"],
+select[style*="background-color: #ECE9D8"],
+select[style*="background-color: #ece9d8"] {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+select.bg-white option,
+select[style*="background: #FFF"] option,
+select[style*="background: #fff"] option,
+select[style*="background: #FFFFFF"] option,
+select[style*="background: #ffffff"] option,
+select[style*="background: rgb(255, 255, 255)"] option,
+select[style*="background-color: #FFF"] option,
+select[style*="background-color: #fff"] option,
+select[style*="background-color: #FFFFFF"] option,
+select[style*="background-color: #ffffff"] option,
+select[style*="background-color: rgb(255, 255, 255)"] option,
+select[style*="background: #ECE9D8"] option,
+select[style*="background: #ece9d8"] option,
+select[style*="background-color: #ECE9D8"] option,
+select[style*="background-color: #ece9d8"] option {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #ffffff !important;
 }
 
 /* Background Atmosphere */

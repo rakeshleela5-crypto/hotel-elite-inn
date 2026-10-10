@@ -1007,17 +1007,22 @@ export default function IdsMenuMasterModal({
           {/* Currency Tabs & Portions Grid (Frame 055) */}
           <div style={{ border: '1px solid #7F9DB9', background: '#ECE9D8', padding: '4px' }}>
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #7F9DB9', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', gap: '3px', borderBottom: '1px solid #7F9DB9', marginBottom: '4px' }}>
               <button 
                 onClick={() => setActiveTab('LOCAL')}
                 style={{
-                  background: activeTab === 'LOCAL' ? '#FFF' : '#E0DFE3',
+                  background: activeTab === 'LOCAL' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                  color: activeTab === 'LOCAL' ? '#0A246A' : '#1A1A1A',
                   border: '1px solid #7F9DB9',
-                  borderBottom: activeTab === 'LOCAL' ? '1px solid #FFF' : '1px solid #7F9DB9',
-                  padding: '3px 12px',
+                  borderBottom: activeTab === 'LOCAL' ? '2px solid #FFFFFF' : '1px solid #7F9DB9',
+                  marginBottom: activeTab === 'LOCAL' ? '-1px' : '0px',
+                  boxShadow: activeTab === 'LOCAL' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
+                  padding: '4px 12px',
                   fontSize: '11px',
-                  fontWeight: activeTab === 'LOCAL' ? 700 : 400,
-                  cursor: 'pointer'
+                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  fontWeight: activeTab === 'LOCAL' ? 700 : 600,
+                  cursor: 'pointer',
+                  borderRadius: '3px 3px 0 0'
                 }}
               >
                 Local Currency
@@ -1025,13 +1030,18 @@ export default function IdsMenuMasterModal({
               <button 
                 onClick={() => setActiveTab('FOREIGN')}
                 style={{
-                  background: activeTab === 'FOREIGN' ? '#FFF' : '#E0DFE3',
+                  background: activeTab === 'FOREIGN' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                  color: activeTab === 'FOREIGN' ? '#0A246A' : '#1A1A1A',
                   border: '1px solid #7F9DB9',
-                  borderBottom: activeTab === 'FOREIGN' ? '1px solid #FFF' : '1px solid #7F9DB9',
-                  padding: '3px 12px',
+                  borderBottom: activeTab === 'FOREIGN' ? '2px solid #FFFFFF' : '1px solid #7F9DB9',
+                  marginBottom: activeTab === 'FOREIGN' ? '-1px' : '0px',
+                  boxShadow: activeTab === 'FOREIGN' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
+                  padding: '4px 12px',
                   fontSize: '11px',
-                  fontWeight: activeTab === 'FOREIGN' ? 700 : 400,
-                  cursor: 'pointer'
+                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  fontWeight: activeTab === 'FOREIGN' ? 700 : 600,
+                  cursor: 'pointer',
+                  borderRadius: '3px 3px 0 0'
                 }}
               >
                 Foreign Currency

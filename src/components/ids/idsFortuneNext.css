@@ -516,3 +516,165 @@
   box-sizing: border-box;
 }
 
+/* ==========================================================================
+   AUTHENTIC HIGH-CONTRAST SYSTEM OVERRIDE FOR ALL IDS WINDOWS & MODALS
+   Eliminates washed-out, disturbed, white-on-white text across the entire PMS
+   ========================================================================== */
+
+/* 1. Universal Theme and Color-Scheme Isolation */
+.ids-desktop-container,
+.ids-modal-overlay,
+.ids-modal-backdrop,
+.ids-modal-container,
+.ids-modal-window,
+.ids-dialog-window,
+.ids-window {
+  color-scheme: light !important;
+  color: #000000 !important;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif !important;
+}
+
+/* 2. Global Text & Button Contrast */
+.ids-desktop-container button,
+.ids-modal-overlay button,
+.ids-modal-backdrop button,
+.ids-modal-container button,
+.ids-modal-window button,
+.ids-dialog-window button,
+.ids-window button,
+.ids-btn,
+.ids-btn-classic {
+  color: #000000;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  text-shadow: none !important;
+}
+
+/* 3. Form Inputs, Selects, and Textareas */
+.ids-desktop-container input,
+.ids-modal-overlay input,
+.ids-modal-backdrop input,
+.ids-modal-container input,
+.ids-modal-window input,
+.ids-dialog-window input,
+.ids-window input,
+.ids-input {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+}
+
+.ids-desktop-container select,
+.ids-modal-overlay select,
+.ids-modal-backdrop select,
+.ids-modal-container select,
+.ids-modal-window select,
+.ids-dialog-window select,
+.ids-window select,
+.ids-select {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+}
+
+.ids-desktop-container select option,
+.ids-modal-overlay select option,
+.ids-modal-backdrop select option,
+.ids-modal-container select option,
+.ids-modal-window select option,
+.ids-dialog-window select option,
+.ids-window select option,
+.ids-select option {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+}
+
+/* 4. Standardized High-Contrast Tabs System */
+.ids-tab-bar {
+  display: flex;
+  gap: 3px;
+  background: #ECE9D8;
+  border-bottom: 2px solid #716F64;
+  padding: 6px 8px 0 8px;
+  overflow-x: auto;
+}
+
+.ids-tab-btn {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  font-weight: 600;
+  color: #1A1A1A !important;
+  background: linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%);
+  border: 1px solid #716F64;
+  border-bottom: 1px solid #716F64;
+  margin-bottom: 0px;
+  cursor: pointer;
+  border-radius: 3px 3px 0 0;
+  box-shadow: inset 0 1px 0 #FFFFFF;
+  white-space: nowrap;
+  text-shadow: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.1s ease;
+}
+
+.ids-tab-btn:hover {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E8E5DA 100%);
+  color: #0A246A !important;
+}
+
+.ids-tab-btn.active,
+.ids-tab-btn[data-active="true"] {
+  font-weight: 700;
+  color: #0A246A !important;
+  background: #FFFFFF !important;
+  border: 1px solid #716F64 !important;
+  border-bottom: 2px solid #FFFFFF !important;
+  margin-bottom: -2px !important;
+  box-shadow: inset 0 2px 0 #316AC5 !important;
+}
+
+/* 5. Inactive vs Active button fallbacks */
+.ids-desktop-container button[style*="background: #FFF"],
+.ids-desktop-container button[style*="background: #fff"],
+.ids-desktop-container button[style*="background: #FFFFFF"],
+.ids-desktop-container button[style*="background: #ffffff"],
+.ids-desktop-container button[style*="background: rgb(255, 255, 255)"],
+.ids-modal-overlay button[style*="background: #FFF"],
+.ids-modal-overlay button[style*="background: #fff"],
+.ids-modal-overlay button[style*="background: #FFFFFF"],
+.ids-modal-overlay button[style*="background: #ffffff"],
+.ids-modal-overlay button[style*="background: rgb(255, 255, 255)"],
+.ids-modal-backdrop button[style*="background: #FFF"],
+.ids-modal-backdrop button[style*="background: #fff"],
+.ids-modal-backdrop button[style*="background: #FFFFFF"],
+.ids-modal-backdrop button[style*="background: #ffffff"],
+.ids-modal-backdrop button[style*="background: rgb(255, 255, 255)"],
+.ids-modal-container button[style*="background: #FFF"],
+.ids-modal-container button[style*="background: #fff"],
+.ids-modal-container button[style*="background: #FFFFFF"],
+.ids-modal-container button[style*="background: #ffffff"],
+.ids-modal-container button[style*="background: rgb(255, 255, 255)"],
+.ids-dialog-window button[style*="background: #FFF"],
+.ids-dialog-window button[style*="background: #fff"],
+.ids-dialog-window button[style*="background: #FFFFFF"],
+.ids-dialog-window button[style*="background: #ffffff"],
+.ids-dialog-window button[style*="background: rgb(255, 255, 255)"] {
+  color: #0A246A !important;
+}
+
+/* 6. Form labels, legends, and table contents */
+.ids-dialog-window label,
+.ids-modal-container label,
+.ids-modal-window label,
+.ids-window label,
+.ids-desktop-container label {
+  color: #000000 !important;
+}
+
+

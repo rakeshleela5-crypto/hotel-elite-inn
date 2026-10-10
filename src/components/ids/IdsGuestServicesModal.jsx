@@ -178,125 +178,51 @@ export default function IdsGuestServicesModal({
         <div 
           style={{ 
             display: 'flex', 
-            background: '#D4D0C8', 
-            borderBottom: '1px solid #7F9DB9',
-            padding: '4px 6px 0 6px',
-            gap: '3px'
+            background: '#ECE9D8', 
+            borderBottom: '2px solid #716F64',
+            padding: '6px 8px 0 8px',
+            gap: '3px',
+            overflowX: 'auto'
           }}
         >
-          <button 
-            onClick={() => setActiveTab('messages')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              background: activeTab === 'messages' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'messages' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <MessageSquare size={14} /> Messages
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('locator')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              background: activeTab === 'locator' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'locator' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <Compass size={14} /> Locator
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('likes')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              background: activeTab === 'likes' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'likes' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <ThumbsUp size={14} /> Likes/Dislikes
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('wakeups')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              background: activeTab === 'wakeups' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'wakeups' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <PhoneCall size={14} /> Wakeup Calls
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('log-complaints')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              fontWeight: activeTab === 'log-complaints' ? 'bold' : 'normal',
-              background: activeTab === 'log-complaints' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'log-complaints' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <AlertCircle size={14} color="#C00" /> Log Complaints
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('attend-complaints')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              fontWeight: activeTab === 'attend-complaints' ? 'bold' : 'normal',
-              background: activeTab === 'attend-complaints' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'attend-complaints' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <CheckSquare size={14} color="#008000" /> Attend Complaints
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('browse-complaints')}
-            className="ids-tab-btn" 
-            style={{ 
-              padding: '4px 10px', 
-              fontSize: '11px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              background: activeTab === 'browse-complaints' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'browse-complaints' ? '2px solid #ECE9D8' : '1px solid #7F9DB9'
-            }}
-          >
-            <Search size={14} /> Browse Complaints
-          </button>
+          {[
+            { id: 'messages', label: 'Messages', icon: <MessageSquare size={14} /> },
+            { id: 'locator', label: 'Locator', icon: <Compass size={14} /> },
+            { id: 'likes', label: 'Likes/Dislikes', icon: <ThumbsUp size={14} /> },
+            { id: 'wakeups', label: 'Wakeup Calls', icon: <PhoneCall size={14} /> },
+            { id: 'log-complaints', label: 'Log Complaints', icon: <AlertCircle size={14} color="#C00" /> },
+            { id: 'attend-complaints', label: 'Attend Complaints', icon: <CheckSquare size={14} color="#008000" /> },
+            { id: 'browse-complaints', label: 'Browse Complaints', icon: <Search size={14} /> }
+          ].map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button 
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="ids-tab-btn" 
+                style={{ 
+                  padding: '5px 12px', 
+                  fontSize: '11px', 
+                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  fontWeight: isActive ? 700 : 600,
+                  color: isActive ? '#0A246A' : '#1A1A1A',
+                  background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                  border: '1px solid #716F64',
+                  borderBottom: isActive ? '2px solid #FFFFFF' : '1px solid #716F64',
+                  marginBottom: isActive ? '-2px' : '0px',
+                  boxShadow: isActive ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  borderRadius: '3px 3px 0 0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                {tab.icon} {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab 5: Log Complaints Body (Video 05 Frame 019) */}

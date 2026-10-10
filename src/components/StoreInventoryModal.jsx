@@ -373,9 +373,9 @@ export default function StoreInventoryModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: activeTab === 'purchases' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-              color: activeTab === 'purchases' ? '#34d399' : 'var(--text-muted)',
-              border: activeTab === 'purchases' ? '1px solid #34d399' : '1px solid transparent'
+              background: activeTab === 'purchases' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'purchases' ? '#34d399' : '#cbd5e1',
+              border: activeTab === 'purchases' ? '1px solid #34d399' : '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
             <ShoppingCart size={15} /> Inward Purchases Register ({purchases.length})
@@ -392,9 +392,9 @@ export default function StoreInventoryModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: activeTab === 'requisitions' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-              color: activeTab === 'requisitions' ? '#38bdf8' : 'var(--text-muted)',
-              border: activeTab === 'requisitions' ? '1px solid #38bdf8' : '1px solid transparent'
+              background: activeTab === 'requisitions' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'requisitions' ? '#38bdf8' : '#cbd5e1',
+              border: activeTab === 'requisitions' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
             <Package size={15} /> Kitchen Issue Requisitions ({requisitions.length})
@@ -411,9 +411,9 @@ export default function StoreInventoryModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: activeTab === 'vendor-payables' ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
-              color: activeTab === 'vendor-payables' ? '#fbbf24' : 'var(--text-muted)',
-              border: activeTab === 'vendor-payables' ? '1px solid #fbbf24' : '1px solid transparent'
+              background: activeTab === 'vendor-payables' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'vendor-payables' ? '#fbbf24' : '#cbd5e1',
+              border: activeTab === 'vendor-payables' ? '1px solid #fbbf24' : '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
             <DollarSign size={15} /> 🏪 Rayagada Vendor Credit Ledger (₹48,650)
@@ -430,9 +430,9 @@ export default function StoreInventoryModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: activeTab === 'recipe-bom' ? 'rgba(168, 85, 247, 0.25)' : 'transparent',
-              color: activeTab === 'recipe-bom' ? '#c084fc' : 'var(--text-muted)',
-              border: activeTab === 'recipe-bom' ? '1px solid #c084fc' : '1px solid transparent'
+              background: activeTab === 'recipe-bom' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'recipe-bom' ? '#c084fc' : '#cbd5e1',
+              border: activeTab === 'recipe-bom' ? '1px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.12)'
             }}
           >
             <UtensilsCrossed size={15} /> Recipe BOM &amp; Depletion Engine (InvenTree)

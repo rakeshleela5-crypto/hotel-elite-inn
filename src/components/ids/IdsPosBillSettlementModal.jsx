@@ -920,23 +920,33 @@ export default function IdsPosBillSettlementModal({
 
             <div style={{ padding: '10px', fontSize: '11px' }}>
               {/* Tab Bar: 1 2 3 4 5 */}
-              <div style={{ display: 'flex', gap: '2px', borderBottom: '1px solid #7F9DB9', paddingBottom: '2px', marginBottom: '8px' }}>
-                {[1, 2, 3, 4, 5].map(t => (
-                  <button 
-                    key={t}
-                    onClick={() => setCardActiveTab(t)}
-                    className="ids-btn"
-                    style={{ 
-                      padding: '1px 8px', 
-                      fontSize: '11px', 
-                      fontWeight: cardActiveTab === t ? 700 : 400,
-                      background: cardActiveTab === t ? '#FFF' : '#ECE9D8',
-                      borderBottom: cardActiveTab === t ? 'none' : '1px solid #7F9DB9'
-                    }}
-                  >
-                    {t}
-                  </button>
-                ))}
+              <div style={{ display: 'flex', gap: '3px', borderBottom: '1px solid #7F9DB9', paddingBottom: '0px', marginBottom: '8px' }}>
+                {[1, 2, 3, 4, 5].map(t => {
+                  const isActive = cardActiveTab === t;
+                  return (
+                    <button 
+                      key={t}
+                      onClick={() => setCardActiveTab(t)}
+                      className="ids-btn"
+                      style={{ 
+                        padding: '3px 10px', 
+                        fontSize: '11px', 
+                        fontFamily: 'Tahoma, Arial, sans-serif',
+                        fontWeight: isActive ? 700 : 600,
+                        color: isActive ? '#0A246A' : '#1A1A1A',
+                        background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                        border: '1px solid #7F9DB9',
+                        borderBottom: isActive ? '2px solid #FFFFFF' : '1px solid #7F9DB9',
+                        marginBottom: isActive ? '-1px' : '0px',
+                        cursor: 'pointer',
+                        borderRadius: '3px 3px 0 0',
+                        boxShadow: isActive ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF'
+                      }}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Form Fields */}

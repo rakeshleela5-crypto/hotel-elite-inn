@@ -275,24 +275,32 @@ export default function IdsPackageRatesModal({
         )}
 
         {/* Main Mode Navigation Bar matching Frame 018 Tabs */}
-        <div style={{ display: 'flex', gap: '4px', padding: '6px 12px 0 12px', background: '#D4D0C8', borderBottom: '1px solid #999' }}>
+        <div style={{ display: 'flex', gap: '4px', padding: '6px 12px 0 12px', background: '#ECE9D8', borderBottom: '2px solid #716F64' }}>
           <button 
-            className="ids-btn-classic" 
+            className="ids-tab-btn" 
             style={{ 
-              fontWeight: 700, 
-              background: activeTab === 'packageMaster' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'packageMaster' ? '2px solid #ECE9D8' : '1px solid #808080'
+              fontWeight: activeTab === 'packageMaster' ? 700 : 600, 
+              color: activeTab === 'packageMaster' ? '#0A246A' : '#1A1A1A',
+              background: activeTab === 'packageMaster' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+              border: '1px solid #716F64',
+              borderBottom: activeTab === 'packageMaster' ? '2px solid #FFFFFF' : '1px solid #716F64',
+              marginBottom: activeTab === 'packageMaster' ? '-2px' : '0px',
+              boxShadow: activeTab === 'packageMaster' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF'
             }}
             onClick={() => setActiveTab('packageMaster')}
           >
             Package Rate Master (Setup)
           </button>
           <button 
-            className="ids-btn-classic" 
+            className="ids-tab-btn" 
             style={{ 
-              fontWeight: 700, 
-              background: activeTab === 'sellPackage' ? '#ECE9D8' : '#D4D0C8',
-              borderBottom: activeTab === 'sellPackage' ? '2px solid #ECE9D8' : '1px solid #808080'
+              fontWeight: activeTab === 'sellPackage' ? 700 : 600, 
+              color: activeTab === 'sellPackage' ? '#0A246A' : '#1A1A1A',
+              background: activeTab === 'sellPackage' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+              border: '1px solid #716F64',
+              borderBottom: activeTab === 'sellPackage' ? '2px solid #FFFFFF' : '1px solid #716F64',
+              marginBottom: activeTab === 'sellPackage' ? '-2px' : '0px',
+              boxShadow: activeTab === 'sellPackage' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF'
             }}
             onClick={() => setActiveTab('sellPackage')}
           >

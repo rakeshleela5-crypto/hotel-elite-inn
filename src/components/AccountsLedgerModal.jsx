@@ -1411,9 +1411,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'reconciliation-audit' ? 'rgba(52, 211, 153, 0.25)' : 'transparent',
-              color: activeTab === 'reconciliation-audit' ? '#34d399' : 'var(--text-muted)',
-              border: activeTab === 'reconciliation-audit' ? '1px solid #34d399' : '1px solid transparent',
+              background: activeTab === 'reconciliation-audit' ? 'rgba(52, 211, 153, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'reconciliation-audit' ? '#34d399' : '#cbd5e1',
+              border: activeTab === 'reconciliation-audit' ? '1px solid #34d399' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1431,9 +1431,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'gst-fom-report' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
-              color: activeTab === 'gst-fom-report' ? '#38bdf8' : 'var(--text-muted)',
-              border: activeTab === 'gst-fom-report' ? '1px solid #38bdf8' : '1px solid transparent',
+              background: activeTab === 'gst-fom-report' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'gst-fom-report' ? '#38bdf8' : '#cbd5e1',
+              border: activeTab === 'gst-fom-report' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1451,9 +1451,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'flash-report' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
-              color: activeTab === 'flash-report' ? 'var(--gold-glow)' : 'var(--text-muted)',
-              border: activeTab === 'flash-report' ? '1px solid var(--gold-glow)' : '1px solid transparent',
+              background: activeTab === 'flash-report' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'flash-report' ? 'var(--gold-glow)' : '#cbd5e1',
+              border: activeTab === 'flash-report' ? '1px solid var(--gold-glow)' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1471,9 +1471,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'sales-summary' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-              color: activeTab === 'sales-summary' ? '#38bdf8' : 'var(--text-muted)',
-              border: activeTab === 'sales-summary' ? '1px solid #38bdf8' : '1px solid transparent',
+              background: activeTab === 'sales-summary' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'sales-summary' ? '#38bdf8' : '#cbd5e1',
+              border: activeTab === 'sales-summary' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1491,9 +1491,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'item-sales' ? 'rgba(248, 113, 113, 0.2)' : 'transparent',
-              color: activeTab === 'item-sales' ? '#f87171' : 'var(--text-muted)',
-              border: activeTab === 'item-sales' ? '1px solid #f87171' : '1px solid transparent',
+              background: activeTab === 'item-sales' ? 'rgba(248, 113, 113, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'item-sales' ? '#f87171' : '#cbd5e1',
+              border: activeTab === 'item-sales' ? '1px solid #f87171' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1511,9 +1511,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'day-book' ? 'rgba(52, 211, 153, 0.2)' : 'transparent',
-              color: activeTab === 'day-book' ? '#34d399' : 'var(--text-muted)',
-              border: activeTab === 'day-book' ? '1px solid #34d399' : '1px solid transparent',
+              background: activeTab === 'day-book' ? 'rgba(52, 211, 153, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'day-book' ? '#34d399' : '#cbd5e1',
+              border: activeTab === 'day-book' ? '1px solid #34d399' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1531,9 +1531,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'corp-ledger' ? 'rgba(245, 158, 11, 0.2)' : 'transparent',
-              color: activeTab === 'corp-ledger' ? '#fbbf24' : 'var(--text-muted)',
-              border: activeTab === 'corp-ledger' ? '1px solid #fbbf24' : '1px solid transparent',
+              background: activeTab === 'corp-ledger' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'corp-ledger' ? '#fbbf24' : '#cbd5e1',
+              border: activeTab === 'corp-ledger' ? '1px solid #fbbf24' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1551,9 +1551,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'corp-gst' ? 'rgba(168, 85, 247, 0.25)' : 'transparent',
-              color: activeTab === 'corp-gst' ? '#c084fc' : 'var(--text-muted)',
-              border: activeTab === 'corp-gst' ? '1px solid #c084fc' : '1px solid transparent',
+              background: activeTab === 'corp-gst' ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'corp-gst' ? '#c084fc' : '#cbd5e1',
+              border: activeTab === 'corp-gst' ? '1px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >
@@ -1571,9 +1571,9 @@ export default function AccountsLedgerModal({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.45rem',
-              background: activeTab === 'outstanding' ? 'rgba(244, 114, 182, 0.2)' : 'transparent',
-              color: activeTab === 'outstanding' ? '#f472b6' : 'var(--text-muted)',
-              border: activeTab === 'outstanding' ? '1px solid #f472b6' : '1px solid transparent',
+              background: activeTab === 'outstanding' ? 'rgba(244, 114, 182, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+              color: activeTab === 'outstanding' ? '#f472b6' : '#cbd5e1',
+              border: activeTab === 'outstanding' ? '1px solid #f472b6' : '1px solid rgba(255, 255, 255, 0.12)',
               whiteSpace: 'nowrap'
             }}
           >

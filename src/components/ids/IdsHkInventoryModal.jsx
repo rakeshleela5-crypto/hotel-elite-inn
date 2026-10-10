@@ -161,49 +161,37 @@ export default function IdsHkInventoryModal({
         </div>
 
         {/* 3 Departmental Sub-Tabs matching Menu Hierarchy */}
-        <div style={{ display: 'flex', background: '#ECE9D8', borderBottom: '1px solid #716F64', padding: '6px 12px 0 12px', gap: '4px' }}>
-          <button 
-            onClick={() => setActiveTab('master')}
-            style={{ 
-              padding: '4px 14px', 
-              fontSize: '11px', 
-              fontWeight: activeTab === 'master' ? 'bold' : 'normal',
-              background: activeTab === 'master' ? '#FFF' : '#ECE9D8',
-              border: '1px solid #716F64',
-              borderBottom: activeTab === 'master' ? '1px solid #FFF' : '1px solid #716F64',
-              cursor: 'pointer'
-            }}
-          >
-            📦 HK Inventory Master
-          </button>
-          <button 
-            onClick={() => setActiveTab('issue')}
-            style={{ 
-              padding: '4px 14px', 
-              fontSize: '11px', 
-              fontWeight: activeTab === 'issue' ? 'bold' : 'normal',
-              background: activeTab === 'issue' ? '#FFF' : '#ECE9D8',
-              border: '1px solid #716F64',
-              borderBottom: activeTab === 'issue' ? '1px solid #FFF' : '1px solid #716F64',
-              cursor: 'pointer'
-            }}
-          >
-            📋 HK Issue Entry
-          </button>
-          <button 
-            onClick={() => setActiveTab('return')}
-            style={{ 
-              padding: '4px 14px', 
-              fontSize: '11px', 
-              fontWeight: activeTab === 'return' ? 'bold' : 'normal',
-              background: activeTab === 'return' ? '#FFF' : '#ECE9D8',
-              border: '1px solid #716F64',
-              borderBottom: activeTab === 'return' ? '1px solid #FFF' : '1px solid #716F64',
-              cursor: 'pointer'
-            }}
-          >
-            🔄 HK Issue Return
-          </button>
+        <div style={{ display: 'flex', background: '#ECE9D8', borderBottom: '2px solid #716F64', padding: '6px 12px 0 12px', gap: '3px' }}>
+          {[
+            { id: 'master', label: '📦 HK Inventory Master' },
+            { id: 'issue', label: '📋 HK Issue Entry' },
+            { id: 'return', label: '🔄 HK Issue Return' }
+          ].map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button 
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="ids-tab-btn"
+                style={{ 
+                  padding: '5px 14px', 
+                  fontSize: '11px', 
+                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  fontWeight: isActive ? 700 : 600,
+                  color: isActive ? '#0A246A' : '#1A1A1A',
+                  background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+                  border: '1px solid #716F64',
+                  borderBottom: isActive ? '2px solid #FFFFFF' : '1px solid #716F64',
+                  marginBottom: isActive ? '-2px' : '0px',
+                  boxShadow: isActive ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
+                  cursor: 'pointer',
+                  borderRadius: '3px 3px 0 0'
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab 1: Inventory Master */}
