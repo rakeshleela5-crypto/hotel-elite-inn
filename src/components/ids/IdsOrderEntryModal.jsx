@@ -215,13 +215,15 @@ export default function IdsOrderEntryModal({
       server: 'Biren',
       outlet: 'RESTAURANT',
       items: [
-        { code: '82', name: 'STEAMED RICE', quantity: 2.0, rate: 145.0, value: 290.0 },
-        { code: '54', name: 'DAL MAHARANI', quantity: 1.0, rate: 200.0, value: 200.0 }
+        { code: '1', kotNo: '1314', name: 'CLASSIC RUSSIAN SALAD', type: 'Food', group: 'SALAD BAR', quantity: 2.0, rate: 199.0, value: 398.0 },
+        { code: '2', kotNo: '1314', name: 'RED BEANS PEANUT & DRY FRUIT', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { code: '3', kotNo: '1314', name: 'SPROUTED MOONG PEANUT DRY', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { code: '4', kotNo: '1314', name: 'CAESAR SALAD (VEG)', type: 'Food', group: 'SALAD BAR', quantity: 1.0, rate: 245.0, value: 245.0 }
       ],
-      totalAmount: 490.0,
-      cgst: 12.25,
-      sgst: 12.25,
-      nettAmount: 515.0
+      totalAmount: 1041.0,
+      cgst: 26.04,
+      sgst: 26.04,
+      nettAmount: 1093.0
     },
     {
       kotNo: '1316',

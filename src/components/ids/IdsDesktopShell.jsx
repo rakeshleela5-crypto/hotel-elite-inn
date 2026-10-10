@@ -908,6 +908,7 @@ export default function IdsDesktopShell({
       { label: 'Open Outlets', videoId: 'POS-01', action: () => showMessageBox("All Outlets (Restaurant, Bar, Room Service, Banquet) Opened.", "Outlet Control") },
       { label: 'Order Entry', videoId: 'POS-01', action: () => setOrderEntryModalOpen(true) },
       { label: 'POS Bill Printing (Rule 46 / SAC 996331)', videoId: 'POS-03', action: () => setPosBillModalOpen(true) },
+      { label: 'Split POS Bill Item Wise (Table 14)', videoId: 'POS-09', action: () => setPosBillModalOpen(true) },
       { label: 'Bill Settlement V6.5.008.30 (Cash/Card/Folio Settle)', videoId: 'POS-04', action: () => setPosBillSettlementModalOpen(true) },
       { label: 'Close Shift', videoId: 'POS-01', action: () => showMessageBox("Current Shift Closed & Audited.", "POS Shift Control") },
       { label: 'Close Outlet', videoId: 'POS-01', action: () => showMessageBox("Outlet Closed for Operations.", "Outlet Control") },
@@ -3047,18 +3048,18 @@ export default function IdsDesktopShell({
       <IdsPosBillModal
         isOpen={posBillModalOpen}
         onClose={() => setPosBillModalOpen(false)}
-        initialTableNo="10"
+        initialTableNo="14"
         accountingDate={accountingDate}
         outlet="RESTAURANT"
         session="General"
-        steward="Manash"
+        steward="Biren"
         onOpenCrystalReport={({ reportType: rType, data }) => {
           setCrystalReportType(rType || 'pos-bill');
           setCrystalReportData(data || {});
           setCrystalReportModalOpen(true);
         }}
         onBillSettled={() => {
-          showMessageBox("POS Bill Settled Successfully. Table 10 released to Vacant.", "IDS POS Settlement", "info");
+          showMessageBox("POS Bill Settled Successfully. Table released to Vacant.", "IDS POS Settlement", "info");
         }}
       />
 
