@@ -15,6 +15,7 @@ import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
+import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsRestaurantTableMasterModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -269,6 +270,7 @@ export default function IdsOrderEntryModal({
   const [hotKeyHelpOpen, setHotKeyHelpOpen] = useState(false);
   const [menuGroupsOpen, setMenuGroupsOpen] = useState(false);
   const [touchScreenGroupsOpen, setTouchScreenGroupsOpen] = useState(false);
+  const [restaurantTableMasterOpen, setRestaurantTableMasterOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -1581,8 +1583,8 @@ export default function IdsOrderEntryModal({
               />
               <button 
                 className="ids-btn" 
-                onClick={() => setTableHelpOpen(true)}
-                title="Lookup Table"
+                onClick={() => setRestaurantTableMasterOpen(true)}
+                title="Restaurant Table Master V6.5.002.1 - Lookup & Capacity (Video 16)"
                 style={{ padding: '1px 6px', fontSize: '11px', fontWeight: 700 }}
               >
                 ?
@@ -2163,6 +2165,14 @@ export default function IdsOrderEntryModal({
                 style={{ fontSize: '10px', background: '#CCE5FF', borderColor: '#66B2FF', color: '#004085', fontWeight: 700 }}
               >
                 TS Groups (POS-15)
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setRestaurantTableMasterOpen(true)}
+                title="Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)"
+                style={{ fontSize: '10px', background: '#FFF2CC', borderColor: '#D6B656', color: '#665200', fontWeight: 700 }}
+              >
+                Tables (POS-16)
               </button>
               <button 
                 className="ids-btn" 
@@ -4166,7 +4176,8 @@ export default function IdsOrderEntryModal({
                       { key: '<F5>', name: 'Delete Item', desc: 'Delete currently selected row from order entry grid', action: () => { setHotKeyHelpOpen(false); handleDeleteRow(0); } },
                       { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } },
                       { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } },
-                      { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } }
+                      { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } },
+                      { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
@@ -4258,6 +4269,19 @@ export default function IdsOrderEntryModal({
         onOpenMenuGroups={() => {
           setTouchScreenGroupsOpen(false);
           setMenuGroupsOpen(true);
+        }}
+      />
+
+      {/* POS Video 16: Restaurant Table Master V6.5.002.1 & Floor Plan Matrix */}
+      <IdsRestaurantTableMasterModal
+        isOpen={restaurantTableMasterOpen}
+        onClose={() => setRestaurantTableMasterOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        initialOutlet={resOutlet === 'BAR' ? 'LIQUOR BAR' : 'RESTAURANT'}
+        onSelectTableForOrder={(tbl) => {
+          setTableNo(tbl);
+          setRestaurantTableMasterOpen(false);
         }}
       />
     </div>
