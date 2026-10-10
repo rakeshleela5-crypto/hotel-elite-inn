@@ -11,8 +11,13 @@ import {
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
 } from '../../utils/kotDataSync';
 
-// Authentic Menu Database from Video 01 and Hotel Elite Inn
+// Authentic Menu Database from Videos 01, 02 and Hotel Elite Inn
 export const POS_MENU_ITEMS = [
+  { code: '1', name: 'CLASSIC RUSSIAN SALAD', category: 'SALAD', rate: 199.00 },
+  { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', category: 'SALAD', rate: 199.00 },
+  { code: '3', name: 'SPROUTED MOONG PEANUT DRY', category: 'SALAD', rate: 199.00 },
+  { code: '4', name: 'CAESAR SALAD (VEG)', category: 'SALAD', rate: 245.00 },
+  { code: '5', name: 'CAESAR SALAD (CHICKEN)', category: 'SALAD', rate: 295.00 },
   { code: '82', name: 'STEAMED RICE', category: 'RICE', rate: 145.00 },
   { code: '54', name: 'DAL MAHARANI', category: 'MAIN COURSE', rate: 200.00 },
   { code: '175', name: 'CHICKEN SHAWARMA', category: 'SNACKS', rate: 150.00 },
@@ -27,7 +32,6 @@ export const POS_MENU_ITEMS = [
   { code: '145', name: 'VEGETABLE FRIED RICE/NOODLES', category: 'CHINESE', rate: 170.00 },
   { code: '150', name: 'BAKED GULAB JAMUN PISTACHIO', category: 'DESSERT', rate: 130.00 },
   { code: '169', name: 'BUTTER CHICKEN BURGER', category: 'SNACKS', rate: 190.00 },
-  { code: '5', name: 'CAESAR SALAD (CHICKEN)', category: 'SALAD', rate: 165.00 },
   { code: '125', name: 'CHICKEN A LA KING(OINV)', category: 'CONTINENTAL', rate: 280.00 },
   { code: '140', name: 'CHICKEN CHILLI (BONE/BONELESS)', category: 'CHINESE', rate: 230.00 },
   { code: '132', name: 'CHICKEN DIM SUM (FRIED/STEAMED', category: 'CHINESE', rate: 195.00 },
@@ -98,11 +102,47 @@ export default function IdsOrderEntryModal({
   const [pendingKotOpen, setPendingKotOpen] = useState(false);
   const [tableStatusOpen, setTableStatusOpen] = useState(false);
   const [tableDetailsOpen, setTableDetailsOpen] = useState(false);
-  const [selectedTableForDetails, setSelectedTableForDetails] = useState('15');
+  const [selectedTableForDetails, setSelectedTableForDetails] = useState('12');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(null);
 
-  // Live Saved KOTs Registry (Video 01 Frame 043 & Frame 050)
+  // KOT Modification State (Video 02 Frame 020 - Frame 032)
+  const [editingKotNo, setEditingKotNo] = useState(null);
+  const [stagedKotToModify, setStagedKotToModify] = useState(null);
+  const [updateConfirmModalOpen, setUpdateConfirmModalOpen] = useState(false);
+
+  // Live Saved KOTs Registry (Videos 01 & 02)
   const [savedKots, setSavedKots] = useState([
+    {
+      kotNo: '1314',
+      accountingDate: '03-FEB-2022',
+      tableNo: '14',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      items: [
+        { code: '82', name: 'STEAMED RICE', quantity: 2.0, rate: 145.0, value: 290.0 },
+        { code: '54', name: 'DAL MAHARANI', quantity: 1.0, rate: 200.0, value: 200.0 }
+      ],
+      totalAmount: 490.0,
+      cgst: 12.25,
+      sgst: 12.25,
+      nettAmount: 515.0
+    },
+    {
+      kotNo: '1316',
+      accountingDate: '03-FEB-2022',
+      tableNo: '12',
+      server: 'Biren',
+      outlet: 'RESTAURANT',
+      items: [
+        { code: '1', name: 'CLASSIC RUSSIAN SALAD', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', quantity: 1.0, rate: 199.0, value: 199.0 },
+        { code: '3', name: 'SPROUTED MOONG PEANUT DRY', quantity: 1.0, rate: 199.0, value: 199.0 }
+      ],
+      totalAmount: 597.0,
+      cgst: 14.93,
+      sgst: 14.93,
+      nettAmount: 627.0
+    },
     {
       kotNo: '1311',
       accountingDate: '03-FEB-2022',
@@ -174,13 +214,14 @@ export default function IdsOrderEntryModal({
     setItemSearchText('');
   };
 
-  // Handler to Save KOT (Video 01 Frame 038 -> Frame 041)
+  // Handler to Save or Update KOT (Video 01 Frame 038 & Video 02 Frame 028 -> Frame 032)
   const handleSaveKOT = () => {
     if (lineItems.length === 0) return;
-    const generatedKotNo = kotNo === 'AUTO' ? `13${Math.floor(10 + Math.random() * 89)}` : kotNo;
+    const isUpdate = Boolean(editingKotNo);
+    const targetKotNo = isUpdate ? editingKotNo : (kotNo === 'AUTO' ? `13${Math.floor(10 + Math.random() * 89)}` : kotNo);
 
-    const newKotRecord = {
-      kotNo: generatedKotNo,
+    const updatedKotRecord = {
+      kotNo: targetKotNo,
       accountingDate: accountingDate,
       tableNo: tableNo,
       server: server,
@@ -195,11 +236,17 @@ export default function IdsOrderEntryModal({
       nettAmount: calculations.nettAmount
     };
 
-    setSavedKots(prev => [newKotRecord, ...prev]);
+    if (isUpdate) {
+      setSavedKots(prev => prev.map(k => k.kotNo === targetKotNo ? updatedKotRecord : k));
+      setSaveSuccessMsg(`KOT #${targetKotNo} on Table ${tableNo} Modified & Updated Successfully!`);
+    } else {
+      setSavedKots(prev => [updatedKotRecord, ...prev]);
+      setSaveSuccessMsg(`KOT #${targetKotNo} Generated Successfully on Table ${tableNo}!`);
+    }
 
     // Broadcast into global KDS sync bus
     const syncKot = normalizeKotOrder({
-      id: `IDS-${generatedKotNo}`,
+      id: `IDS-${targetKotNo}`,
       tableNumber: tableNo,
       steward: server,
       outlet: selectedOutlet,
@@ -215,14 +262,14 @@ export default function IdsOrderEntryModal({
     saveLiveKots([syncKot, ...existing]);
     broadcastKotChannel(syncKot);
 
-    if (onKOTCreated) onKOTCreated(newKotRecord);
+    if (onKOTCreated) onKOTCreated(updatedKotRecord);
 
-    setSaveSuccessMsg(`KOT #${generatedKotNo} Generated Successfully on Table ${tableNo}!`);
     setTimeout(() => setSaveSuccessMsg(null), 3000);
 
-    // Reset line items for next entry (Video 01 Frame 040)
+    // Reset line items for next entry (Video 01 Frame 040 & Video 02 Frame 032)
     setLineItems([]);
     setKotNo('AUTO');
+    setEditingKotNo(null);
   };
 
   if (!isOpen) return null;
@@ -248,6 +295,7 @@ export default function IdsOrderEntryModal({
                 style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
               >
                 <option value="RESTAURANT">RESTAURANT</option>
+                <option value="LIQUOR BAR">LIQUOR BAR</option>
                 <option value="ROOM SERVICE">ROOM SERVICE</option>
                 <option value="BANQUET">BANQUET</option>
                 <option value="BAR / LOUNGE">BAR / LOUNGE</option>
@@ -803,18 +851,8 @@ export default function IdsOrderEntryModal({
                       <tr 
                         key={k.kotNo}
                         onClick={() => {
-                          setTableNo(k.tableNo);
-                          setServer(k.server);
-                          setKotNo(k.kotNo);
-                          setLineItems(k.items.map(it => ({
-                            res: 'RES',
-                            code: it.code,
-                            name: it.name,
-                            quantity: it.quantity,
-                            rate: it.rate,
-                            modifier: ''
-                          })));
-                          setPendingKotOpen(false);
+                          setStagedKotToModify(k);
+                          setUpdateConfirmModalOpen(true);
                         }}
                         style={{ cursor: 'pointer', borderBottom: '1px solid #EEE' }}
                         onMouseEnter={e => e.currentTarget.style.background = '#E5F1FB'}
@@ -830,8 +868,72 @@ export default function IdsOrderEntryModal({
                 </table>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
-                <button className="ids-btn" onClick={() => setPendingKotOpen(false)} style={{ minWidth: '60px', fontWeight: 600 }}>Select</button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    if (savedKots.length > 0) {
+                      setStagedKotToModify(savedKots[0]);
+                      setUpdateConfirmModalOpen(true);
+                    }
+                  }} 
+                  style={{ minWidth: '60px', fontWeight: 600 }}
+                >
+                  Select
+                </button>
                 <button className="ids-btn" onClick={() => setPendingKotOpen(false)} style={{ minWidth: '60px' }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5B. WIN32 CONFIRMATION DIALOG (Video 02 Frame 024) */}
+      {updateConfirmModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1300 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '320px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 12px rgba(0,0,0,0.6)' }}
+          >
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Message</span>
+              <button className="ids-win-btn close" onClick={() => setUpdateConfirmModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '16px', fontSize: '12px' }}>
+              <div style={{ marginBottom: '16px', color: '#000', fontWeight: 500 }}>
+                Do you want to update this KOT?
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    if (stagedKotToModify) {
+                      setEditingKotNo(stagedKotToModify.kotNo);
+                      setKotNo(stagedKotToModify.kotNo);
+                      setTableNo(stagedKotToModify.tableNo);
+                      setServer(stagedKotToModify.server);
+                      setLineItems(stagedKotToModify.items.map(it => ({
+                        res: 'RES',
+                        code: it.code,
+                        name: it.name,
+                        quantity: it.quantity,
+                        rate: it.rate,
+                        modifier: it.modifier || ''
+                      })));
+                    }
+                    setUpdateConfirmModalOpen(false);
+                    setPendingKotOpen(false);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 600 }}
+                >
+                  Yes
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setUpdateConfirmModalOpen(false)}
+                  style={{ minWidth: '60px' }}
+                >
+                  No
+                </button>
               </div>
             </div>
           </div>
@@ -853,8 +955,11 @@ export default function IdsOrderEntryModal({
               {/* 4x5 Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', background: '#DDD', padding: '8px', border: '1px solid #808080' }}>
                 {POS_TABLES.map(t => {
-                  const hasKot = savedKots.some(k => k.tableNo === t);
-                  const isOccupied = hasKot || (t === '15');
+                  const matchingKot = savedKots.find(k => k.tableNo === t);
+                  const isBilled = t === '10';
+                  const isOccupied = isBilled ? false : (Boolean(matchingKot) || t === '12' || t === '15');
+                  const statusLetter = isBilled ? 'B' : (isOccupied ? 'O' : 'V');
+                  const bgColor = isBilled ? '#0000FF' : (isOccupied ? '#FF0000' : '#008000');
                   return (
                     <button
                       key={t}
@@ -863,7 +968,7 @@ export default function IdsOrderEntryModal({
                         setTableDetailsOpen(true);
                       }}
                       style={{
-                        background: isOccupied ? '#FF0000' : '#008000',
+                        background: bgColor,
                         color: '#FFF',
                         height: '42px',
                         fontWeight: 700,
@@ -877,13 +982,13 @@ export default function IdsOrderEntryModal({
                         textShadow: '1px 1px 1px rgba(0,0,0,0.6)'
                       }}
                     >
-                      {t}/{isOccupied ? 'O' : 'V'}
+                      {t}/{statusLetter}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Status Legend matching Video 01 Frame 048 */}
+              {/* Status Legend matching Video 01 Frame 048 & Video 02 Frame 034 */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px', marginTop: '10px', fontSize: '11px', fontWeight: 700 }}>
                 <div style={{ background: '#0000FF', color: '#FFF', padding: '3px 6px', border: '1px solid #000' }}>
                   B :- Billed
@@ -916,79 +1021,94 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050) */}
-      {tableDetailsOpen && (
-        <div className="ids-modal-overlay" style={{ zIndex: 1290 }}>
-          <div 
-            className="ids-modal-container" 
-            style={{ width: '520px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' }}
-          >
-            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Table Details</span>
-              <button className="ids-win-btn close" onClick={() => setTableDetailsOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
-            </div>
-            <div style={{ padding: '10px', fontSize: '11px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', background: '#DDD', padding: '6px', border: '1px solid #BBB' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontWeight: 600 }}>Table #</span>
-                  <input type="text" readOnly value={selectedTableForDetails} style={{ width: '45px', fontWeight: 700, textAlign: 'center', background: '#FFF', border: '1px solid #7F9DB9' }} />
-                  <span style={{ fontWeight: 700 }}>?</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontWeight: 600 }}>Steward Name</span>
-                  <input type="text" readOnly value={server} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
-                </div>
-              </div>
+      {/* 7. TABLE DETAILS DIALOG (Video 01 Frame 050 & Video 02 Frame 034) */}
+      {tableDetailsOpen && (() => {
+        const activeTableKot = savedKots.find(k => k.tableNo === selectedTableForDetails);
+        const currentTableItems = activeTableKot ? activeTableKot.items : (lineItems.length > 0 ? lineItems : [
+          { name: 'CLASSIC RUSSIAN SALAD ...', quantity: 1.0, value: 199.0 },
+          { name: 'RED BEANS PEANUT & DRY FRUIT S...', quantity: 1.0, value: 199.0 },
+          { name: 'SPROUTED MOONG PEANUT DRY FRUI...', quantity: 1.0, value: 199.0 },
+          { name: 'CAESAR SALAD (VEG) ...', quantity: 1.0, value: 245.0 },
+          { name: 'CAESAR SALAD (CHICKEN) ...', quantity: 1.0, value: 295.0 }
+        ]);
+        const computedTableTotal = currentTableItems.reduce((acc, it) => acc + (it.value || ((it.quantity || 1) * (it.rate || 0))), 0);
+        const computedTableCgst = Number((computedTableTotal * 0.025).toFixed(2));
+        const computedTableSgst = Number((computedTableTotal * 0.025).toFixed(2));
+        const computedTableNett = Math.round(computedTableTotal + computedTableCgst + computedTableSgst);
 
-              {/* Items running on table */}
-              <div style={{ height: '210px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-                  <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
-                    <tr>
-                      <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT #</th>
-                      <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Name</th>
-                      <th style={{ padding: '3px 6px', width: '60px', textAlign: 'right', borderRight: '1px solid #B0B0B0' }}>Quantity</th>
-                      <th style={{ padding: '3px 6px', width: '70px', textAlign: 'right' }}>Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(savedKots.find(k => k.tableNo === selectedTableForDetails)?.items || lineItems).map((it, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
-                        <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>1311</td>
-                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
-                        <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{(it.quantity || 1).toFixed(3)}</td>
-                        <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(it.value || it.rate || 0).toFixed(2)}</td>
+        return (
+          <div className="ids-modal-overlay" style={{ zIndex: 1290 }}>
+            <div 
+              className="ids-modal-container" 
+              style={{ width: '520px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' }}
+            >
+              <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>Table Details</span>
+                <button className="ids-win-btn close" onClick={() => setTableDetailsOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+              </div>
+              <div style={{ padding: '10px', fontSize: '11px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', background: '#DDD', padding: '6px', border: '1px solid #BBB' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 600 }}>Table #</span>
+                    <input type="text" readOnly value={selectedTableForDetails} style={{ width: '45px', fontWeight: 700, textAlign: 'center', background: '#FFF', border: '1px solid #7F9DB9' }} />
+                    <span style={{ fontWeight: 700 }}>?</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 600 }}>Steward Name</span>
+                    <input type="text" readOnly value={activeTableKot?.server || (selectedTableForDetails === '12' ? 'Biren' : server)} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
+                  </div>
+                </div>
+
+                {/* Items running on table */}
+                <div style={{ height: '210px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                    <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
+                      <tr>
+                        <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Name</th>
+                        <th style={{ padding: '3px 6px', width: '60px', textAlign: 'right', borderRight: '1px solid #B0B0B0' }}>Quantity</th>
+                        <th style={{ padding: '3px 6px', width: '70px', textAlign: 'right' }}>Value</th>
                       </tr>
-                    ))}
-                    <tr style={{ background: '#F5F5F5', fontWeight: 700, borderTop: '2px solid #808080' }}>
-                      <td colSpan={3} style={{ padding: '4px 6px', textAlign: 'right' }}>Total ======&gt;</td>
-                      <td style={{ padding: '4px 6px', textAlign: 'right' }}>655.00</td>
-                    </tr>
-                    <tr style={{ background: '#F5F5F5', color: '#555' }}>
-                      <td colSpan={3} style={{ padding: '2px 6px', textAlign: 'right' }}>CGST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>16.38</td>
-                    </tr>
-                    <tr style={{ background: '#F5F5F5', color: '#555' }}>
-                      <td colSpan={3} style={{ padding: '2px 6px', textAlign: 'right' }}>SGST</td>
-                      <td style={{ padding: '2px 6px', textAlign: 'right' }}>16.38</td>
-                    </tr>
-                    <tr style={{ background: '#E8E8E8', fontWeight: 800, color: '#000080' }}>
-                      <td colSpan={3} style={{ padding: '4px 6px', textAlign: 'right' }}>Nett Amount</td>
-                      <td style={{ padding: '4px 6px', textAlign: 'right' }}>688.00</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {currentTableItems.map((it, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
+                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #EEE' }}>{activeTableKot?.kotNo || '1316'}</td>
+                          <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>{it.name}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #EEE' }}>{(it.quantity || 1).toFixed(3)}</td>
+                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>{(it.value || ((it.quantity || 1) * (it.rate || 0))).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                      <tr style={{ background: '#F5F5F5', fontWeight: 700, borderTop: '2px solid #808080' }}>
+                        <td colSpan={3} style={{ padding: '4px 6px', textAlign: 'right' }}>Total ======&gt;</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right' }}>{computedTableTotal.toFixed(2)}</td>
+                      </tr>
+                      <tr style={{ background: '#F5F5F5', color: '#555' }}>
+                        <td colSpan={3} style={{ padding: '2px 6px', textAlign: 'right' }}>CGST</td>
+                        <td style={{ padding: '2px 6px', textAlign: 'right' }}>{computedTableCgst.toFixed(2)}</td>
+                      </tr>
+                      <tr style={{ background: '#F5F5F5', color: '#555' }}>
+                        <td colSpan={3} style={{ padding: '2px 6px', textAlign: 'right' }}>SGST</td>
+                        <td style={{ padding: '2px 6px', textAlign: 'right' }}>{computedTableSgst.toFixed(2)}</td>
+                      </tr>
+                      <tr style={{ background: '#E8E8E8', fontWeight: 800, color: '#000080' }}>
+                        <td colSpan={3} style={{ padding: '4px 6px', textAlign: 'right' }}>Nett Amount</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right' }}>{computedTableNett.toFixed(2)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button className="ids-btn" onClick={() => setTableDetailsOpen(false)} style={{ minWidth: '60px', fontWeight: 600 }}>
-                  Exit
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                  <button className="ids-btn" onClick={() => setTableDetailsOpen(false)} style={{ minWidth: '60px', fontWeight: 600 }}>
+                    Exit
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
