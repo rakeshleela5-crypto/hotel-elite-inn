@@ -23,6 +23,7 @@ export default function IdsCrystalReportModal({
       case 'reg-card': return 'Guest Registration Card (Crystal Report)';
       case 'forex-cert': return 'Foreign Currency Encashment Certificate (Form FLM)';
       case 'laundry-bill': return 'Laundry & Dry Cleaning Statutory Tax Invoice (SAC 999791)';
+      case 'room-verification': return 'Housekeeping Room Verification & Discrepancy Audit Report';
       case 'rule46-bill':
       default: return 'Rule 46 Statutory GST Tax Invoice';
     }
@@ -366,6 +367,105 @@ export default function IdsCrystalReportModal({
                       <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.cgstAmount || 18).toFixed(2)}</td>
                       <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #000' }}>₹{Number(data.sgstAmount || 18).toFixed(2)}</td>
                       <td style={{ padding: '6px', textAlign: 'right', fontWeight: 700 }}>₹{Number(data.netTotal || 236).toFixed(2)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {reportType === 'room-verification' && (
+              <div>
+                <div style={{ textAlign: 'center', fontWeight: 900, textDecoration: 'underline', marginBottom: '8px' }}>
+                  HOUSEKEEPING ROOM VERIFICATION & DISCREPANCY AUDIT REPORT
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '10px' }}>
+                  <div>
+                    <div><strong>Audit Date:</strong> {data.auditDate || '27-JAN-2022'}</div>
+                    <div><strong>Audit Shift:</strong> {data.shift || 'Morning Shift (07:00 - 15:30)'}</div>
+                    <div><strong>Audited By:</strong> {data.auditor || 'Executive Housekeeper / Floor Supervisor'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div><strong>Total Inspected Rooms:</strong> 55</div>
+                    <div><strong>Matched Rooms:</strong> 54</div>
+                    <div><strong>Discrepancies Flagged:</strong> <span style={{ color: '#C00', fontWeight: 'bold' }}>1</span></div>
+                  </div>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', fontSize: '10px', marginBottom: '12px' }}>
+                  <thead>
+                    <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #000', fontWeight: 'bold' }}>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Room#</th>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Type</th>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Front Office Status</th>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Housekeeping Status</th>
+                      <th style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>FO Pax</th>
+                      <th style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>HK Pax</th>
+                      <th style={{ padding: '4px', textAlign: 'left' }}>Variance / Audit Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>201</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>EXE</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Occupied (Sharma Raj)</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Do Not Disturb (DND)</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>2+0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
+                      <td style={{ padding: '4px', color: '#008000', fontWeight: 'bold' }}>MATCH (Verified via Call)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>203</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>DLX</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Vacant</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Vacant Dirty</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', color: '#008000' }}>MATCH (Pending Cleaning)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>204</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>DLX</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Vacant</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Vacant Clean</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', color: '#008000' }}>MATCH</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>205</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>DLX</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Occupied (Kumar Anil)</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Occupied Clean</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>2+0</td>
+                      <td style={{ padding: '4px', color: '#C00', fontWeight: 'bold' }}>DISCREPANCY: +1 EXTRA PAX (2 Pax in Room)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>206</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>DLX</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Out of Order (OOO)</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Out of Order (AC Repair)</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', color: '#008000' }}>MATCH (Blocked by Maintenance)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #DDD' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>207</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>DLX</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Vacant</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Inspected Ready</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>0</td>
+                      <td style={{ padding: '4px', color: '#008000' }}>MATCH (Available for Sale)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #000' }}>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000', fontWeight: 'bold' }}>301</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>EXE</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Occupied (Biswakarma)</td>
+                      <td style={{ padding: '4px', borderRight: '1px solid #000' }}>Occupied Clean</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
+                      <td style={{ padding: '4px', textAlign: 'center', borderRight: '1px solid #000' }}>1+0</td>
+                      <td style={{ padding: '4px', color: '#008000' }}>MATCH</td>
                     </tr>
                   </tbody>
                 </table>

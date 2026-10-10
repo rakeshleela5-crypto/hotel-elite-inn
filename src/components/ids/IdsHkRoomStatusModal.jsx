@@ -6,7 +6,8 @@ export default function IdsHkRoomStatusModal({
   onClose,
   accountingDate = '27-JAN-2022',
   onUpdateStatus,
-  onOpenMessageBox
+  onOpenMessageBox,
+  onOpenRoomVerificationReport
 }) {
   const [roomsList, setRoomsList] = useState([
     { roomNo: '201', status: 'Do not Disturb', adult: '1', child: '0', infant: '0' },
@@ -183,7 +184,19 @@ export default function IdsHkRoomStatusModal({
           {/* Bottom Command Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
             <button onClick={() => {}} className="ids-btn" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Refresh</button>
-            <button onClick={() => {}} className="ids-btn" style={{ minWidth: '160px', padding: '3px 12px', fontSize: '11px' }}>Room Verification Report</button>
+            <button 
+              onClick={() => {
+                if (onOpenRoomVerificationReport) {
+                  onOpenRoomVerificationReport();
+                } else {
+                  alert("Opening Room Verification Report...");
+                }
+              }} 
+              className="ids-btn" 
+              style={{ minWidth: '160px', padding: '3px 12px', fontSize: '11px', fontWeight: 'bold', color: '#0A246A' }}
+            >
+              📄 Room Verification Report
+            </button>
             <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Exit</button>
           </div>
         </div>

@@ -74,6 +74,10 @@ import IdsLaundryBillPrintingModal from './IdsLaundryBillPrintingModal';
 import IdsLostAndFoundModal from './IdsLostAndFoundModal';
 import IdsRoomBlockModal from './IdsRoomBlockModal';
 import IdsHkRoomStatusModal from './IdsHkRoomStatusModal';
+import IdsLaundryHolidayTableModal from './IdsLaundryHolidayTableModal';
+import IdsHoldLaundryModal from './IdsHoldLaundryModal';
+import IdsHkInventoryModal from './IdsHkInventoryModal';
+import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
 import { 
@@ -409,6 +413,11 @@ export default function IdsDesktopShell({
   const [lostAndFoundOpen, setLostAndFoundOpen] = useState(false);
   const [roomBlockOpen, setRoomBlockOpen] = useState(false);
   const [hkRoomStatusOpen, setHkRoomStatusOpen] = useState(false);
+  const [laundryHolidayTableOpen, setLaundryHolidayTableOpen] = useState(false);
+  const [holdLaundryOpen, setHoldLaundryOpen] = useState(false);
+  const [hkInventoryOpen, setHkInventoryOpen] = useState(false);
+  const [hkInventoryTab, setHkInventoryTab] = useState('master');
+  const [laundryPlantOpen, setLaundryPlantOpen] = useState(false);
   const [registeredComplaintsCount, setRegisteredComplaintsCount] = useState(0);
 
   // Windows MessageBox System Dialog State
@@ -838,10 +847,21 @@ export default function IdsDesktopShell({
       }
     ],
     'House Keeping..': [
+      { label: 'Room Block', videoId: 'HK-09', action: () => setRoomBlockOpen(true) },
+      { label: 'Clear Rooms', videoId: '09', action: () => setClearRoomsModalOpen(true) },
+      { label: 'House Keeping Room Status', videoId: 'HK-11', action: () => setHkRoomStatusOpen(true) },
       { label: 'Laundry Item Master', videoId: 'HK-01', action: () => setLaundryItemMasterOpen(true) },
       { label: 'Laundry Rate Master', videoId: 'HK-02', action: () => setLaundryRateMasterOpen(true) },
-      { label: 'Laundry Entry / Receipt Entry', videoId: 'HK-03', action: () => setLaundryEntryOpen(true) },
-      { label: 'Re-settlement of Laundry Bill', videoId: 'HK-04', action: () => setLaundryReSettlementOpen(true) },
+      { label: 'Laundry Holiday table', videoId: 'HK-06', action: () => setLaundryHolidayTableOpen(true) },
+      { label: 'Laundry Entry', videoId: 'HK-03', action: () => setLaundryEntryOpen(true) },
+      { label: 'Laundry Bill Printing', videoId: 'HK-06', action: () => setLaundryBillPrintingOpen(true) },
+      { label: 'Settle Laundry Bill', videoId: 'HK-04', action: () => setLaundryReSettlementOpen(true) },
+      { label: 'Hold Laundry', videoId: 'HK-06', action: () => setHoldLaundryOpen(true) },
+      { label: 'Lost and Found', videoId: 'HK-08', action: () => setLostAndFoundOpen(true) },
+      { label: 'HK Inventory Master', videoId: 'HK-06', action: () => { setHkInventoryTab('master'); setHkInventoryOpen(true); } },
+      { label: 'HK Issue Entry', videoId: 'HK-06', action: () => { setHkInventoryTab('issue'); setHkInventoryOpen(true); } },
+      { label: 'HK Issue Return', videoId: 'HK-06', action: () => { setHkInventoryTab('return'); setHkInventoryOpen(true); } },
+      { label: 'User Defined Plnt (LAU)', videoId: 'HK-06', action: () => setLaundryPlantOpen(true) },
       { 
         label: 'Register Complaint from Housekeeping', 
         videoId: 'HK-05', 
@@ -850,7 +870,6 @@ export default function IdsDesktopShell({
           setGuestServicesOpen(true);
         } 
       },
-      { label: 'Print & Settle Laundry Bill (LACRYBL)', videoId: 'HK-06', action: () => setLaundryBillPrintingOpen(true) },
       { 
         label: 'Attend Registered Complaint', 
         videoId: 'HK-07', 
@@ -859,11 +878,6 @@ export default function IdsDesktopShell({
           setGuestServicesOpen(true);
         } 
       },
-      { label: 'Lost & Found Details', videoId: 'HK-08', action: () => setLostAndFoundOpen(true) },
-      { label: 'Room Block Option (OOO / OOS)', videoId: 'HK-09', action: () => setRoomBlockOpen(true) },
-      { label: 'Release Block Room', videoId: 'HK-10', action: () => setRoomBlockOpen(true) },
-      { label: 'House Keeping Room Status', videoId: 'HK-11', action: () => setHkRoomStatusOpen(true) },
-      { label: 'Clear Dirty Room from Room Status', videoId: '09', action: () => setClearRoomsModalOpen(true) },
       { 
         label: 'Room Transfer / Shift', 
         videoId: '13', 
@@ -2944,11 +2958,52 @@ export default function IdsDesktopShell({
         onClose={() => setHkRoomStatusOpen(false)}
         accountingDate={accountingDate}
         onOpenMessageBox={showMessageBox}
+        onOpenRoomVerificationReport={() => {
+          setCrystalReportType('room-verification');
+          setCrystalReportData({
+            asOnDate: accountingDate || '27/01/2022',
+            asOnTime: '15:28:44'
+          });
+          setCrystalReportModalOpen(true);
+        }}
         onUpdateStatus={({ roomNo, status }) => {
           if (status === 'Clean' || status === 'Inspected') {
             setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
           }
         }}
+      />
+
+      {/* Housekeeping Menu 6: Laundry Holiday Table */}
+      <IdsLaundryHolidayTableModal
+        isOpen={laundryHolidayTableOpen}
+        onClose={() => setLaundryHolidayTableOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Menu 10: Hold Laundry */}
+      <IdsHoldLaundryModal
+        isOpen={holdLaundryOpen}
+        onClose={() => setHoldLaundryOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Menus 12, 13, 14: HK Inventory Master / Issue Entry / Issue Return */}
+      <IdsHkInventoryModal
+        isOpen={hkInventoryOpen}
+        initialTab={hkInventoryTab}
+        onClose={() => setHkInventoryOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
+      />
+
+      {/* Housekeeping Menu 15: User Defined Plnt (LAU) */}
+      <IdsLaundryPlantModal
+        isOpen={laundryPlantOpen}
+        onClose={() => setLaundryPlantOpen(false)}
+        accountingDate={accountingDate}
+        onOpenMessageBox={showMessageBox}
       />
 
       {/* Windows 98/2000/XP System Message Dialog */}

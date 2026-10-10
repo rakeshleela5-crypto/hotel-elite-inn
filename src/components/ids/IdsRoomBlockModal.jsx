@@ -22,6 +22,7 @@ export default function IdsRoomBlockModal({
   const [releasePromptOpen, setReleasePromptOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState(null);
   const [progressVisible, setProgressVisible] = useState(false);
+  const [saveSuccessMsgOpen, setSaveSuccessMsgOpen] = useState(false);
 
   // Form for New Block
   const [blockForm, setBlockForm] = useState({
@@ -433,7 +434,7 @@ export default function IdsRoomBlockModal({
             {/* Buttons */}
             <div style={{ display: 'flex', gap: '6px' }}>
               <button onClick={() => {}} className="ids-btn" style={{ padding: '3px 12px', fontSize: '11px' }}>Refresh</button>
-              <button onClick={() => {}} className="ids-btn" style={{ padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}>Save</button>
+              <button onClick={() => setSaveSuccessMsgOpen(true)} className="ids-btn" style={{ padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}>Save</button>
               <button onClick={onClose} className="ids-btn" style={{ padding: '3px 12px', fontSize: '11px' }}>Exit</button>
             </div>
           </div>
@@ -530,6 +531,40 @@ export default function IdsRoomBlockModal({
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
                   <button onClick={handleConfirmRelease} className="ids-btn" style={{ padding: '3px 14px', fontSize: '11px', fontWeight: 'bold' }}>Confirm Release</button>
                   <button onClick={() => setReleasePromptOpen(false)} className="ids-btn" style={{ padding: '3px 14px', fontSize: '11px' }}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Authentic Win32 MessageBox on Save (HK Video 09 Frame 030 Exactly) */}
+        {saveSuccessMsgOpen && (
+          <div className="ids-modal-backdrop" style={{ zIndex: 1400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: '420px', background: '#ECE9D8', border: '2px solid #FFF', borderRightColor: '#716F64', borderBottomColor: '#716F64', boxShadow: '4px 4px 14px rgba(0,0,0,0.6)', fontFamily: 'Tahoma, Arial, sans-serif' }}>
+              <div style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 8px', fontWeight: 'bold', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Room Block V6.5.002.1</span>
+                <button onClick={() => { setSaveSuccessMsgOpen(false); onClose(); }} style={{ background: 'none', border: 'none', color: '#FFF', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+              </div>
+              <div style={{ padding: '20px 16px', background: '#ECE9D8' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+                  <div style={{ fontSize: '32px', color: '#E65100', lineHeight: 1 }}>⚠️</div>
+                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#000' }}>
+                    All Records Saved Successfully! Exiting the Routine.
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #CCC', paddingTop: '10px', fontSize: '10px', color: '#555' }}>
+                  <span><strong>ID:</strong> FOMK010</span>
+                  <span><strong>MSG CODE:</strong> 2056</span>
+                  <button 
+                    onClick={() => {
+                      setSaveSuccessMsgOpen(false);
+                      onClose();
+                    }} 
+                    className="ids-btn" 
+                    style={{ minWidth: '70px', padding: '3px 14px', fontSize: '11px', fontWeight: 'bold' }}
+                  >
+                    Exit
+                  </button>
                 </div>
               </div>
             </div>
