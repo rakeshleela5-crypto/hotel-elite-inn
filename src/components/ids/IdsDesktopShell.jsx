@@ -81,6 +81,8 @@ import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
 import IdsOrderEntryModal from './IdsOrderEntryModal';
+import IdsPosBillModal from './IdsPosBillModal';
+import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -421,8 +423,10 @@ export default function IdsDesktopShell({
   const [laundryPlantOpen, setLaundryPlantOpen] = useState(false);
   const [registeredComplaintsCount, setRegisteredComplaintsCount] = useState(0);
 
-  // POS Order Entry & F&B Suite (POS Videos 01–22)
+  // POS Order Entry, Bill Printing & Settlement Suite (POS Videos 01–22)
   const [orderEntryModalOpen, setOrderEntryModalOpen] = useState(false);
+  const [posBillModalOpen, setPosBillModalOpen] = useState(false);
+  const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -903,6 +907,8 @@ export default function IdsDesktopShell({
       { label: 'Open Shift', videoId: 'POS-01', action: () => showMessageBox("Shift Opened for RESTAURANT Outlet on " + accountingDate, "POS Shift Control") },
       { label: 'Open Outlets', videoId: 'POS-01', action: () => showMessageBox("All Outlets (Restaurant, Bar, Room Service, Banquet) Opened.", "Outlet Control") },
       { label: 'Order Entry', videoId: 'POS-01', action: () => setOrderEntryModalOpen(true) },
+      { label: 'POS Bill Printing (Rule 46 / SAC 996331)', videoId: 'POS-03', action: () => setPosBillModalOpen(true) },
+      { label: 'Bill Settlement V6.5.008.30 (Cash/Card/Folio Settle)', videoId: 'POS-04', action: () => setPosBillSettlementModalOpen(true) },
       { label: 'Close Shift', videoId: 'POS-01', action: () => showMessageBox("Current Shift Closed & Audited.", "POS Shift Control") },
       { label: 'Close Outlet', videoId: 'POS-01', action: () => showMessageBox("Outlet Closed for Operations.", "Outlet Control") },
       { label: 'Void KOTs', videoId: 'POS-06', action: () => setOrderEntryModalOpen(true) },
@@ -3026,11 +3032,47 @@ export default function IdsDesktopShell({
         onOpenMessageBox={showMessageBox}
       />
 
-      {/* POS Videos 01-03: Order Entry & POS Bill Printing */}
+      {/* POS Videos 01-04: Order Entry, Bill Printing & Settlement Suite */}
       <IdsOrderEntryModal
         isOpen={orderEntryModalOpen}
         onClose={() => setOrderEntryModalOpen(false)}
         accountingDate={accountingDate}
+        onOpenCrystalReport={({ reportType: rType, data }) => {
+          setCrystalReportType(rType || 'pos-bill');
+          setCrystalReportData(data || {});
+          setCrystalReportModalOpen(true);
+        }}
+      />
+
+      <IdsPosBillModal
+        isOpen={posBillModalOpen}
+        onClose={() => setPosBillModalOpen(false)}
+        initialTableNo="10"
+        accountingDate={accountingDate}
+        outlet="RESTAURANT"
+        session="General"
+        steward="Manash"
+        onOpenCrystalReport={({ reportType: rType, data }) => {
+          setCrystalReportType(rType || 'pos-bill');
+          setCrystalReportData(data || {});
+          setCrystalReportModalOpen(true);
+        }}
+        onBillSettled={() => {
+          showMessageBox("POS Bill Settled Successfully. Table 10 released to Vacant.", "IDS POS Settlement", "info");
+        }}
+      />
+
+      <IdsPosBillSettlementModal
+        isOpen={posBillSettlementModalOpen}
+        onClose={() => setPosBillSettlementModalOpen(false)}
+        initialBillNo="4"
+        accountingDate={accountingDate}
+        outlet="RESTAURANT"
+        session="General"
+        steward="Manash"
+        onBillSettled={(record) => {
+          showMessageBox(`Bill #${record.billNo} on Table ${record.tableNo} Settled Successfully! Amount: ₹${record.nettAmount.toFixed(2)}`, "Bill Settlement V6.5.008.30", "info");
+        }}
         onOpenCrystalReport={({ reportType: rType, data }) => {
           setCrystalReportType(rType || 'pos-bill');
           setCrystalReportData(data || {});

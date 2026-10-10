@@ -4,6 +4,7 @@ import {
   Printer, Check, X, Search, FileText, ChevronRight, AlertCircle, ArrowRight
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../../data/hotelData';
+import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 
 export default function IdsPosBillModal({
   isOpen,
@@ -15,6 +16,7 @@ export default function IdsPosBillModal({
   steward = 'Manash',
   kots = [],
   onBillPrinted,
+  onBillSettled,
   onOpenCrystalReport
 }) {
   const [tableNo, setTableNo] = useState(initialTableNo);
@@ -24,6 +26,7 @@ export default function IdsPosBillModal({
   const [itemsViewVisible, setItemsViewVisible] = useState(true);
   const [billNumber, setBillNumber] = useState('');
   const [printSuccessMsg, setPrintSuccessMsg] = useState(null);
+  const [settleModalOpen, setSettleModalOpen] = useState(false);
 
   // Default sample KOT matching Video 03 if none provided
   const activeKot = useMemo(() => {
@@ -298,7 +301,27 @@ export default function IdsPosBillModal({
           <button className="ids-btn" onClick={() => handlePrintBill(false)} style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}>
             Print Bill
           </button>
-          <button className="ids-btn" onClick={() => alert(`Bill & Settle for Table ${tableNo}`)} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button 
+            className="ids-btn" 
+            onClick={() => {
+              const generatedBillNo = billNumber || `B-${Math.floor(1000 + Math.random() * 9000)}`;
+              setBillNumber(generatedBillNo);
+              if (onBillPrinted) {
+                onBillPrinted({
+                  billNo: generatedBillNo,
+                  tableNo: tableNo,
+                  outlet: outlet,
+                  steward: steward,
+                  items: activeKot.items,
+                  value: billCalculations.value,
+                  tax: billCalculations.tax,
+                  nettValue: billCalculations.nettValue
+                });
+              }
+              setSettleModalOpen(true);
+            }} 
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700, color: '#800080' }}
+          >
             Bill &amp; Settle
           </button>
           <button className="ids-btn" onClick={() => alert("Split Bill Routine")} style={{ fontSize: '10px', padding: '3px 6px' }}>
@@ -330,6 +353,23 @@ export default function IdsPosBillModal({
           </button>
         </div>
       </div>
+
+      {/* Bill Settlement V6.5.008.30 (Video 04) */}
+      <IdsPosBillSettlementModal
+        isOpen={settleModalOpen}
+        onClose={() => setSettleModalOpen(false)}
+        initialBillNo={billNumber || '4'}
+        accountingDate={accountingDate}
+        outlet={outlet}
+        session={session}
+        steward={steward}
+        onBillSettled={(settlementRecord) => {
+          if (onBillSettled) onBillSettled(settlementRecord);
+          setSettleModalOpen(false);
+          onClose();
+        }}
+        onOpenCrystalReport={onOpenCrystalReport}
+      />
     </div>
   );
 }

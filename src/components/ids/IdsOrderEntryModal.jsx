@@ -3,7 +3,7 @@ import './idsFortuneNext.css';
 import { 
   Printer, Edit3, ArrowRightLeft, Users, BookOpen, Scissors, 
   Trash2, XOctagon, ToggleLeft, ToggleRight, Building, HelpCircle, 
-  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft
+  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard
 } from 'lucide-react';
 import { RESTAURANT_MENU } from '../../data/hotelData';
 import { 
@@ -11,6 +11,7 @@ import {
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
 } from '../../utils/kotDataSync';
 import IdsPosBillModal from './IdsPosBillModal';
+import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 
 // Authentic Menu Database from Videos 01, 02 and Hotel Elite Inn
 export const POS_MENU_ITEMS = [
@@ -112,9 +113,11 @@ export default function IdsOrderEntryModal({
   const [stagedKotToModify, setStagedKotToModify] = useState(null);
   const [updateConfirmModalOpen, setUpdateConfirmModalOpen] = useState(false);
 
-  // POS Bill Printing State (Video 03 Frame 018 - Frame 036)
+  // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
+  const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
   const [billedTables, setBilledTables] = useState(['10']);
+  const [settledTables, setSettledTables] = useState([]);
 
   // Live Saved KOTs Registry (Videos 01 & 02)
   const [savedKots, setSavedKots] = useState([
@@ -371,6 +374,9 @@ export default function IdsOrderEntryModal({
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '4px', alignItems: 'center' }}>
             <button className="ids-btn" title="Print Bill / Checkout (Video 03 Frame 018)" onClick={() => setPosBillModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Printer size={16} />
+            </button>
+            <button className="ids-btn" title="Bill Settlement V6.5.008.30 (Video 04 Frame 012)" onClick={() => setPosBillSettlementModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px', background: posBillSettlementModalOpen ? '#C1D2EE' : undefined }}>
+              <CreditCard size={16} color="#008000" />
             </button>
             <button className="ids-btn" title="Modify KOT" onClick={() => setPendingKotOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Edit3 size={16} />
@@ -962,8 +968,9 @@ export default function IdsOrderEntryModal({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', background: '#DDD', padding: '8px', border: '1px solid #808080' }}>
                 {POS_TABLES.map(t => {
                   const matchingKot = savedKots.find(k => k.tableNo === t);
-                  const isBilled = t === '10';
-                  const isOccupied = isBilled ? false : (Boolean(matchingKot) || t === '12' || t === '15');
+                  const isSettled = settledTables.includes(t);
+                  const isBilled = !isSettled && billedTables.includes(t);
+                  const isOccupied = isBilled || isSettled ? false : (Boolean(matchingKot) || (t === '12' && !settledTables.includes('12')) || (t === '15' && !settledTables.includes('15')));
                   const statusLetter = isBilled ? 'B' : (isOccupied ? 'O' : 'V');
                   const bgColor = isBilled ? '#0000FF' : (isOccupied ? '#FF0000' : '#008000');
                   return (
@@ -1130,6 +1137,34 @@ export default function IdsOrderEntryModal({
         onBillPrinted={({ billNo, tableNo: bTableNo }) => {
           setBilledTables(prev => Array.from(new Set([...prev, bTableNo])));
         }}
+        onBillSettled={(settlementRecord) => {
+          const tNo = settlementRecord.tableNo;
+          setBilledTables(prev => prev.filter(t => t !== tNo));
+          setSettledTables(prev => Array.from(new Set([...prev, tNo])));
+          setSavedKots(prev => prev.filter(k => k.tableNo !== tNo));
+          setSaveSuccessMsg(`Bill #${settlementRecord.billNo} on Table ${tNo} Settled! Table is now Vacant.`);
+          setTimeout(() => setSaveSuccessMsg(null), 3000);
+        }}
+      />
+
+      {/* 9. BILL SETTLEMENT V6.5.008.30 (Video 04 Frame 016 - Frame 054) */}
+      <IdsPosBillSettlementModal
+        isOpen={posBillSettlementModalOpen}
+        onClose={() => setPosBillSettlementModalOpen(false)}
+        initialBillNo="4"
+        accountingDate={accountingDate}
+        outlet={selectedOutlet}
+        session={selectedSession}
+        steward={server}
+        onBillSettled={(settlementRecord) => {
+          const tNo = settlementRecord.tableNo;
+          setBilledTables(prev => prev.filter(t => t !== tNo));
+          setSettledTables(prev => Array.from(new Set([...prev, tNo])));
+          setSavedKots(prev => prev.filter(k => k.tableNo !== tNo));
+          setSaveSuccessMsg(`Bill #${settlementRecord.billNo} on Table ${tNo} Settled! Table ${tNo} is now Vacant.`);
+          setTimeout(() => setSaveSuccessMsg(null), 3000);
+        }}
+        onOpenCrystalReport={onOpenCrystalReport}
       />
     </div>
   );
