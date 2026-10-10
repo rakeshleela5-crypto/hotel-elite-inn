@@ -17,7 +17,7 @@ import IdsMenuGroupsModal, { getStoredMenuGroups } from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal, { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsRestaurantTableMasterModal';
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
-import IdsMenuMasterModal, { getStoredMenuItems } from './IdsMenuMasterModal';
+import IdsMenuMasterModal, { getStoredMenuItems, DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal, { getStoredPromotions } from './IdsSalesPromotionMasterModal';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
@@ -143,17 +143,20 @@ export const POS_DELETION_REASONS = [
   'Travel Agnt Spl rate'
 ];
 
-// Authentic Item Modifiers Catalog (Video 13 Frame 119 & 124)
+// Authentic Item Modifiers Catalog (Video 13 Frame 119 & Video 22 Frames 060-085)
 export const POS_STANDARD_MODIFIERS = [
   { code: '99', name: 'OPEN MODIFIER', charge: 0.00 },
   { code: '01', name: 'spicy', charge: 0.00 },
-  { code: '02', name: 'less spicy', charge: 0.00 },
-  { code: '03', name: 'no onion no garlic', charge: 0.00 },
-  { code: '04', name: 'extra cheese', charge: 30.00 },
-  { code: '05', name: 'separate gravy', charge: 0.00 },
-  { code: '06', name: 'well done / crispy', charge: 0.00 },
-  { code: '07', name: 'jain preparation', charge: 0.00 },
-  { code: '08', name: 'without sugar / sweet', charge: 0.00 }
+  { code: '02', name: 'Less Spicy', charge: 0.00 },
+  { code: '03', name: 'With Extra Cream', charge: 0.00 },
+  { code: '04', name: 'Sweet & Salt', charge: 0.00 },
+  { code: '05', name: 'Without Garlic', charge: 0.00 },
+  { code: '06', name: 'no onion no garlic', charge: 0.00 },
+  { code: '07', name: 'extra cheese', charge: 30.00 },
+  { code: '08', name: 'separate gravy', charge: 0.00 },
+  { code: '09', name: 'well done / crispy', charge: 0.00 },
+  { code: '10', name: 'jain preparation', charge: 0.00 },
+  { code: '11', name: 'without sugar / sweet', charge: 0.00 }
 ];
 
 export default function IdsOrderEntryModal({
@@ -287,6 +290,20 @@ export default function IdsOrderEntryModal({
   const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
   const [eatAsULikeModalOpen, setEatAsULikeModalOpen] = useState(false);
   const [activeEatPromoIdx, setActiveEatPromoIdx] = useState(0);
+
+  // POS Video 22: Open Item (Code 9999) & Menu Group Help State (Frames 015–050)
+  const [openItemModalOpen, setOpenItemModalOpen] = useState(false);
+  const [openItemKitchen, setOpenItemKitchen] = useState('Main Kitchen');
+  const [openItemName, setOpenItemName] = useState('Chicken Biryani');
+  const [openItemGroupCode, setOpenItemGroupCode] = useState('44');
+  const [openItemGroupName, setOpenItemGroupName] = useState('HotnCold Beverage');
+  const [openItemMenuType, setOpenItemMenuType] = useState('Food');
+  const [openItemTaxStructure, setOpenItemTaxStructure] = useState('902');
+  const [openItemTaxStructureName, setOpenItemTaxStructureName] = useState('SGST_CGST@5%');
+  const [openItemRate, setOpenItemRate] = useState('250.00');
+  const [openItemCostRate, setOpenItemCostRate] = useState('120.00');
+  const [openItemGroupHelpOpen, setOpenItemGroupHelpOpen] = useState(false);
+  const [openItemTaxHelpOpen, setOpenItemTaxHelpOpen] = useState(false);
 
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
@@ -1066,6 +1083,57 @@ export default function IdsOrderEntryModal({
     setTimeout(() => setSaveSuccessMsg(null), 4000);
   };
 
+  // POS Video 22 Frames 015–050: Add Open Item (Code 9999)
+  const handleAddOpenItem = () => {
+    if (!openItemName.trim()) {
+      alert('Please enter Item Name for Open Item!');
+      return;
+    }
+    const newItem = {
+      res: resOutlet || 'RES',
+      code: '9999',
+      name: openItemName.trim(),
+      quantity: 1.0,
+      rate: parseFloat(openItemRate) || 0.0,
+      kitchen: openItemKitchen || 'Main Kitchen',
+      groupCode: openItemGroupCode || '44',
+      groupName: openItemGroupName || 'Food',
+      menuType: openItemMenuType || 'Food',
+      taxStructure: openItemTaxStructure || '902',
+      costRate: parseFloat(openItemCostRate) || 0.0,
+      modifier: '',
+      isOpenItem: true
+    };
+
+    setLineItems(prev => [...prev, newItem]);
+    setSelectedRowIdx(lineItems.length);
+    setOpenItemModalOpen(false);
+    setSaveSuccessMsg(`Open Item (Code 9999) "${newItem.name}" added at INR ${newItem.rate.toFixed(2)}.`);
+    setTimeout(() => setSaveSuccessMsg(null), 3500);
+  };
+
+  // POS Video 22 Frame 090: Load Exact Complete Demo Table with Open Items & Modifiers
+  const handleLoadVideo22Demo = () => {
+    setTableNo('10');
+    setServer('RAVI');
+    setCovers(1);
+    setResOutlet('RES');
+    setSelectedOutlet('RESTAURANT');
+    setSelectedSession('Dinner');
+    setIsNcMode(false);
+
+    setLineItems([
+      { res: 'RES', code: '9999', name: 'Chicken Biryani', quantity: 1.0, rate: 250.00, modifier: '', isOpenItem: true },
+      { res: 'RES', code: '9999', name: 'Mineral Water', quantity: 1.0, rate: 20.00, modifier: '', isOpenItem: true },
+      { res: 'RES', code: '54', name: 'Butter Chicken ...', quantity: 1.0, rate: 399.00, modifier: 'Less Spicy' },
+      { res: 'RES', code: '49', name: 'Dal Makhani ...', quantity: 1.0, rate: 249.00, modifier: 'With Extra Cream' },
+      { res: 'RES', code: '592', name: 'Fresh Lime Soda/Water ...', quantity: 1.0, rate: 199.00, modifier: 'Sweet & Salt' }
+    ]);
+    setSelectedRowIdx(0);
+    setSaveSuccessMsg('Video 22 Frame 090 Demo Loaded: Table 10, Ravi, Biryani 9999 & Modifiers (Total: 1,117.00, Nett: 1,173.00)');
+    setTimeout(() => setSaveSuccessMsg(null), 4000);
+  };
+
   // Financial calculations matching Video 01 Frame 025, Video 07 Frame 030, Video 21 Frame 055
   const calculations = useMemo(() => {
     const totalAmount = lineItems.reduce((acc, it) => {
@@ -1684,6 +1752,19 @@ export default function IdsOrderEntryModal({
               </div>
             </button>
 
+            {/* Open Item (Code 9999) (Video 22 Frames 015–050) */}
+            <button 
+              className="ids-btn" 
+              title="Open Item (Code 9999) — Custom Dish, Kitchen & Rate (Video 22)" 
+              onClick={() => setOpenItemModalOpen(true)} 
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '40px', padding: '2px 4px', background: openItemModalOpen ? '#C1D2EE' : undefined }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '11px' }}>📝</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: '#1B5E20' }}>OPEN</span>
+              </div>
+            </button>
+
             {/* Reprint Button (Video 13 Frame 099 - Frame 108) */}
             <button 
               className="ids-btn" 
@@ -2084,10 +2165,12 @@ export default function IdsOrderEntryModal({
                           RES
                         </td>
                         <td 
-                          style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer' }}
-                          onClick={() => handleOpenSupRestaurant(emptyRowIdx)}
-                          title="Click on Code: Press Shift+F11 to import item from other outlet"
-                        ></td>
+                          style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer', textAlign: 'center' }}
+                          onClick={() => { setActiveRowIdx(emptyRowIdx); setOpenItemModalOpen(true); }}
+                          title="Click on Code: Enter Open Item (Code 9999) (Video 22)"
+                        >
+                          <span style={{ color: '#008000', fontSize: '9px', fontWeight: 600 }}>9999?</span>
+                        </td>
                         <td 
                           style={{ borderRight: '1px solid #F0F0F0', cursor: 'pointer' }}
                           onClick={() => { setActiveRowIdx(emptyRowIdx); setItemHelpOpen(true); }}
@@ -2186,6 +2269,9 @@ export default function IdsOrderEntryModal({
               </span>
               <span style={{ background: '#FCE8E6', border: '1px solid #D93025', color: '#B22222', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
                 Ctrl+Shift+F4: EAT AS U LIKE Promo (Video 21)
+              </span>
+              <span style={{ background: '#E8F5E9', border: '1px solid #2E7D32', color: '#1B5E20', padding: '1px 6px', borderRadius: '2px', fontWeight: 700, fontSize: '10px' }}>
+                Code 9999: Open Item Modal (Video 22)
               </span>
               <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
                 {editingKotNo 
@@ -2348,6 +2434,22 @@ export default function IdsOrderEntryModal({
               </button>
               <button className="ids-btn" onClick={() => setTableStatusOpen(true)}>
                 Table Matrix
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={() => setOpenItemModalOpen(true)}
+                title="Open Item (Code 9999) — Custom Dish, Kitchen & Rate (Video 22)"
+                style={{ fontSize: '10px', background: '#E8F5E9', borderColor: '#2E7D32', color: '#1B5E20', fontWeight: 700 }}
+              >
+                + Open Item (9999)
+              </button>
+              <button 
+                className="ids-btn" 
+                onClick={handleLoadVideo22Demo}
+                title="Load Exact Video 22 Frame 090 Demo: Table 10, Ravi, Biryani 9999, Mineral Water 9999 & Modifiers"
+                style={{ fontSize: '10px', background: '#FBE9E7', borderColor: '#D84315', color: '#BF360C', fontWeight: 700 }}
+              >
+                Video 22 Demo (Table 10)
               </button>
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
@@ -4732,6 +4834,300 @@ export default function IdsOrderEntryModal({
           </div>
         );
       })()}
+
+      {/* 5P. POS Video 22 Frame 020: WIN32 OPEN ITEM (CODE 9999) MODAL */}
+      {openItemModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container"
+            style={{
+              width: '420px',
+              background: '#ECE9D8',
+              border: '2px solid #808080',
+              boxShadow: '4px 4px 16px rgba(0,0,0,0.65)',
+              fontFamily: 'Tahoma, Arial, sans-serif',
+              fontSize: '11px'
+            }}
+          >
+            {/* Titlebar (Frame 020) */}
+            <div 
+              className="ids-modal-titlebar"
+              style={{
+                background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)',
+                color: '#FFF',
+                padding: '3px 6px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>📝</span>
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>Open Item</span>
+              </div>
+              <button 
+                className="ids-win-btn close"
+                onClick={() => setOpenItemModalOpen(false)}
+                style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body (Frame 020) */}
+            <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {/* Kitchen Name */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Kitchen Name</span>
+                <select 
+                  value={openItemKitchen}
+                  onChange={e => setOpenItemKitchen(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="Main Kitchen">Main Kitchen</option>
+                  <option value="Pantry">Pantry</option>
+                  <option value="Tandoor">Tandoor</option>
+                  <option value="Bar Counter">Bar Counter</option>
+                </select>
+              </div>
+
+              {/* Item Name */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Item Name</span>
+                <input 
+                  type="text"
+                  value={openItemName}
+                  onChange={e => setOpenItemName(e.target.value)}
+                  placeholder="e.g. Chicken Biryani, Mineral Water"
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 600, color: '#000080' }}
+                  autoFocus
+                />
+              </div>
+
+              {/* Group Code (Frame 040) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Group Code</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <input 
+                    type="text"
+                    value={openItemGroupCode}
+                    onChange={e => setOpenItemGroupCode(e.target.value)}
+                    style={{ width: '55px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                  />
+                  <button 
+                    className="ids-btn"
+                    onClick={() => setOpenItemGroupHelpOpen(true)}
+                    title="Menu Group Help (Frame 040)"
+                    style={{ padding: '1px 5px', fontSize: '10px' }}
+                  >
+                    ?
+                  </button>
+                  <span style={{ fontSize: '10px', color: '#666' }}>{openItemGroupName}</span>
+                </div>
+              </div>
+
+              {/* Menu Type */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Menu Type</span>
+                <select 
+                  value={openItemMenuType}
+                  onChange={e => setOpenItemMenuType(e.target.value)}
+                  style={{ width: '110px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                >
+                  <option value="Food">Food</option>
+                  <option value="Beverage">Beverage</option>
+                  <option value="Liquor">Liquor</option>
+                  <option value="Tobacco">Tobacco</option>
+                </select>
+              </div>
+
+              {/* Tax Structure */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Tax Structure</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <input 
+                    type="text"
+                    value={openItemTaxStructure}
+                    onChange={e => setOpenItemTaxStructure(e.target.value)}
+                    style={{ width: '55px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700, color: '#8B0000' }}
+                  />
+                  <button 
+                    className="ids-btn"
+                    onClick={() => setOpenItemTaxHelpOpen(true)}
+                    title="Tax Structure Lookup"
+                    style={{ padding: '1px 5px', fontSize: '10px' }}
+                  >
+                    ?
+                  </button>
+                  <span style={{ fontSize: '10px', color: '#666' }}>{openItemTaxStructureName}</span>
+                </div>
+              </div>
+
+              {/* Rate */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Rate</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <input 
+                    type="text"
+                    value={openItemRate}
+                    onChange={e => setOpenItemRate(e.target.value)}
+                    style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700, color: '#006400', textAlign: 'right' }}
+                  />
+                  <span style={{ fontSize: '10px', color: '#666' }}>INR</span>
+                </div>
+              </div>
+
+              {/* Cost Rate */}
+              <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontWeight: 600 }}>Cost Rate</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <input 
+                    type="text"
+                    value={openItemCostRate}
+                    onChange={e => setOpenItemCostRate(e.target.value)}
+                    style={{ width: '80px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'right' }}
+                  />
+                  <span style={{ fontSize: '10px', color: '#666' }}>INR</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '6px' }}>
+                <button 
+                  className="ids-btn"
+                  onClick={handleAddOpenItem}
+                  style={{ minWidth: '65px', fontWeight: 700, color: '#006400' }}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn"
+                  onClick={() => setOpenItemModalOpen(false)}
+                  style={{ minWidth: '65px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5Q. POS Video 22 Frame 040: WIN32 MENU GROUP HELP POPUP */}
+      {openItemGroupHelpOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-modal-container"
+            style={{ width: '380px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            <div 
+              className="ids-modal-titlebar"
+              style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Menu Group Help</span>
+              <button className="ids-win-btn close" onClick={() => setOpenItemGroupHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '8px' }}>
+              <div style={{ maxHeight: '180px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9' }}>
+                      <th style={{ width: '50px', padding: '2px 4px', textAlign: 'center', borderRight: '1px solid #CCC' }}>MGC</th>
+                      <th style={{ padding: '2px 4px', textAlign: 'left' }}>Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { code: '34', name: 'Beer' },
+                      { code: '35', name: 'Champagne' },
+                      { code: '36', name: 'Sparkling Wine' },
+                      { code: '37', name: 'White Wine' },
+                      { code: '38', name: 'Rose Wine' },
+                      { code: '39', name: 'Red Wine' },
+                      { code: '40', name: 'Classics' },
+                      { code: '41', name: 'Bartenders Special' },
+                      { code: '42', name: 'Quenchers' },
+                      { code: '44', name: 'HotnCold Beverage' },
+                      { code: '1', name: 'MAIN COURSE' },
+                      { code: '2', name: 'TANDOOR ITEMS' },
+                      { code: '3', name: 'STARTERS' },
+                      { code: '4', name: 'SOUP' },
+                      { code: '5', name: 'SALAD' }
+                    ].map((g, idx) => (
+                      <tr 
+                        key={idx}
+                        onClick={() => {
+                          setOpenItemGroupCode(g.code);
+                          setOpenItemGroupName(g.name);
+                          setOpenItemGroupHelpOpen(false);
+                        }}
+                        style={{ cursor: 'pointer', background: openItemGroupCode === g.code ? '#CCE8FF' : idx % 2 === 0 ? '#FFF' : '#F9F9F9', borderBottom: '1px solid #EEE' }}
+                      >
+                        <td style={{ padding: '2px 4px', textAlign: 'center', fontWeight: 700, color: '#0A246A', borderRight: '1px solid #EEE' }}>{g.code}</td>
+                        <td style={{ padding: '2px 4px' }}>{g.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button className="ids-btn" onClick={() => setOpenItemGroupHelpOpen(false)} style={{ minWidth: '60px' }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5R. POS Video 22: WIN32 TAX STRUCTURES LOOKUP POPUP */}
+      {openItemTaxHelpOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1450 }}>
+          <div 
+            className="ids-modal-container"
+            style={{ width: '420px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+          >
+            <div 
+              className="ids-modal-titlebar"
+              style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Tax Structures V6.5.002.1</span>
+              <button className="ids-win-btn close" onClick={() => setOpenItemTaxHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            <div style={{ padding: '8px' }}>
+              <div style={{ maxHeight: '180px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9' }}>
+                      <th style={{ width: '60px', padding: '2px 4px', textAlign: 'center', borderRight: '1px solid #CCC' }}>Code</th>
+                      <th style={{ padding: '2px 4px', textAlign: 'left', borderRight: '1px solid #CCC' }}>Description</th>
+                      <th style={{ width: '60px', padding: '2px 4px', textAlign: 'center' }}>Module</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(DEFAULT_TAX_STRUCTURES || []).map((t, idx) => (
+                      <tr 
+                        key={idx}
+                        onClick={() => {
+                          setOpenItemTaxStructure(t.code);
+                          setOpenItemTaxStructureName(t.name);
+                          setOpenItemTaxHelpOpen(false);
+                        }}
+                        style={{ cursor: 'pointer', background: openItemTaxStructure === t.code ? '#CCE8FF' : idx % 2 === 0 ? '#FFF' : '#F9F9F9', borderBottom: '1px solid #EEE' }}
+                      >
+                        <td style={{ padding: '2px 4px', textAlign: 'center', fontWeight: 700, color: '#8B0000', borderRight: '1px solid #EEE' }}>{t.code}</td>
+                        <td style={{ padding: '2px 4px', borderRight: '1px solid #EEE' }}>{t.name}</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>{t.module}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button className="ids-btn" onClick={() => setOpenItemTaxHelpOpen(false)} style={{ minWidth: '60px' }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

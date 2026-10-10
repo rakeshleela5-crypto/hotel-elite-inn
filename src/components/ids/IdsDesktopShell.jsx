@@ -949,6 +949,7 @@ export default function IdsDesktopShell({
       { label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', videoId: 'POS-20', action: () => setMenuMasterModalOpen(true) },
       { label: 'Sales Promotion Master V6.5.002.1 (Combos & Buy 2 Get 1 Free)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
       { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Open Item Punching & Custom Modifiers (Code 9999 / Table 10)', videoId: 'POS-22', action: () => setOrderEntryModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1066,6 +1067,11 @@ export default function IdsDesktopShell({
         label: 'Sales Promotion Master V6.5.002.1 (Setup -> Packages & Promos)', 
         videoId: 'POS-21', 
         action: () => setSalesPromotionModalOpen(true) 
+      },
+      { 
+        label: 'Open Item Configuration & Modifiers (Code 9999 / Modifiers)', 
+        videoId: 'POS-22', 
+        action: () => setOrderEntryModalOpen(true) 
       },
       { 
         label: 'Company Profile Setup (Corporate Master)', 
