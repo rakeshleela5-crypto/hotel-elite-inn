@@ -937,6 +937,7 @@ export default function IdsDesktopShell({
       { label: 'Menu Groups V6.5.002.1 (Setup -> Menu Groups)', videoId: 'POS-14', action: () => setMenuGroupsModalOpen(true) },
       { label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', videoId: 'POS-15', action: () => setTouchScreenGroupsModalOpen(true) },
       { label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
+      { label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', videoId: 'POS-17', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
@@ -1028,6 +1029,11 @@ export default function IdsDesktopShell({
       { 
         label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', 
         videoId: 'POS-16', 
+        action: () => setRestaurantTableMasterModalOpen(true) 
+      },
+      { 
+        label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', 
+        videoId: 'POS-17', 
         action: () => setRestaurantTableMasterModalOpen(true) 
       },
       { 

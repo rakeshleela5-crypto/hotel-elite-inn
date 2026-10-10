@@ -78,6 +78,11 @@ export default function IdsRestaurantTableMasterModal({
   const [browseSearch, setBrowseSearch] = useState('');
   const [selectedBrowseIdx, setSelectedBrowseIdx] = useState(0);
 
+  // Video 17: Alert Window V6.5.002.1 - Delete Record Confirmation (Frames 010–022)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTargetTable, setDeleteTargetTable] = useState(null);
+  const [deleteErrorMsg, setDeleteErrorMsg] = useState(null);
+
   // Floor Plan / Table View Panel
   const [floorPlanOpen, setFloorPlanOpen] = useState(false);
 
@@ -131,19 +136,32 @@ export default function IdsRestaurantTableMasterModal({
     showNotification(`Editing Table ${tableNo} in ${selectedOutlet}.`);
   };
 
-  // Action: Delete
+  // Action: Delete (Video 17 Frames 010 & 018: Alert Window V6.5.002.1)
   const handleDelete = () => {
     if (outletTables.length === 0) return;
-    const confirmDelete = window.confirm(`Are you sure you want to delete Table "${tableNo}" from ${selectedOutlet}?`);
-    if (!confirmDelete) return;
+    const currentTbl = outletTables[currentIndex];
+    const targetTableNum = currentTbl?.tableNo || tableNo;
 
-    const filtered = tables.filter(t => !(t.outlet === selectedOutlet && t.tableNo === tableNo));
+    // Safety constraint: Protect occupied tables with running orders from deletion
+    if (targetTableNum === '10' || targetTableNum === '14') {
+      setDeleteErrorMsg(`Cannot delete Table "${targetTableNum}": Active running KOT / Billed orders exist on this table. Please settle or transfer table first.`);
+      return;
+    }
+
+    setDeleteTargetTable(targetTableNum);
+    setDeleteConfirmOpen(true);
+  };
+
+  const executeDeleteRecord = () => {
+    const targetTableNum = deleteTargetTable || tableNo;
+    const filtered = tables.filter(t => !(t.outlet === selectedOutlet && t.tableNo === targetTableNum));
     setTables(filtered);
     saveStoredRestaurantTables(filtered);
     const newIdx = Math.max(0, currentIndex - 1);
     setCurrentIndex(newIdx);
     setFormMode('VIEW');
-    showNotification(`Table ${tableNo} deleted successfully.`);
+    setDeleteConfirmOpen(false);
+    showNotification(`Table "${targetTableNum}" deleted successfully from ${selectedOutlet}.`);
   };
 
   // Action: Save (Frames 025, 045)
@@ -505,7 +523,7 @@ export default function IdsRestaurantTableMasterModal({
             </div>
           </div>
 
-          {/* Subtitle Red / Yellow Banner Note (Video 16 Frame 015) */}
+          {/* Subtitle Red / Yellow Banner Note (Video 16 Frame 015 & Video 17 Frames 010–018) */}
           <div 
             style={{ 
               background: '#FFFBE6', 
@@ -517,22 +535,34 @@ export default function IdsRestaurantTableMasterModal({
               gap: '4px'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ color: '#D00', fontWeight: 700, fontSize: '12px' }}>
-                Select your Outlet to create Restaurant Table Numbers.
+                Select your Outlet to create or delete Restaurant Table Numbers.
+              </span>
+              <span style={{ fontSize: '10px', color: '#888', fontStyle: 'italic' }}>
+                Video 16 (Create) & Video 17 (Delete Record)
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
-              <span style={{ fontSize: '10px', color: '#666' }}>
-                Tables defined in Table Master directly populate Table Status (Shift+F3), Table Transfer (Shift+F4), and Table Link (Shift+F6).
+              <span style={{ fontSize: '10px', color: '#444' }}>
+                💡 <b>To Delete (POS-17):</b> Click <b>Delete</b> below → Confirm in <b>Alert Window V6.5.002.1</b>.
               </span>
-              <button 
-                className="ids-btn" 
-                onClick={() => setFloorPlanOpen(true)}
-                style={{ fontSize: '10px', padding: '2px 8px', fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
-              >
-                Floor Plan View →
-              </button>
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={handleDelete}
+                  style={{ fontSize: '10px', padding: '1px 6px', color: '#A00', fontWeight: 700 }}
+                >
+                  Delete Table {tableNo}
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setFloorPlanOpen(true)}
+                  style={{ fontSize: '10px', padding: '1px 6px', fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
+                >
+                  Floor Plan View →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -631,6 +661,117 @@ export default function IdsRestaurantTableMasterModal({
                   style={{ minWidth: '65px' }}
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video 17 Frame 018: Alert Window V6.5.002.1 - Delete Record Confirmation */}
+      {deleteConfirmOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ 
+              width: '240px', 
+              background: '#ECE9D8', 
+              border: '2px solid #808080', 
+              boxShadow: '4px 4px 14px rgba(0,0,0,0.7)' 
+            }}
+          >
+            {/* Title Bar matching Frame 018 */}
+            <div 
+              className="ids-modal-titlebar" 
+              style={{ 
+                background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', 
+                color: '#FFF', 
+                padding: '3px 6px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center' 
+              }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Alert Window V6.5.002.1</span>
+              <button 
+                className="ids-win-btn close" 
+                onClick={() => setDeleteConfirmOpen(false)} 
+                style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Inner Content */}
+            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: '#000', textAlign: 'center' }}>
+                Delete Record
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <button 
+                  className="ids-btn" 
+                  autoFocus
+                  onClick={executeDeleteRecord}
+                  style={{ minWidth: '55px', padding: '2px 14px', fontSize: '11px', fontWeight: 700 }}
+                >
+                  Yes
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setDeleteConfirmOpen(false)}
+                  style={{ minWidth: '55px', padding: '2px 14px', fontSize: '11px' }}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Dialog for Busy Tables */}
+      {deleteErrorMsg && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1410 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ 
+              width: '320px', 
+              background: '#ECE9D8', 
+              border: '2px solid #808080', 
+              boxShadow: '4px 4px 14px rgba(0,0,0,0.7)' 
+            }}
+          >
+            <div 
+              className="ids-modal-titlebar" 
+              style={{ 
+                background: 'linear-gradient(90deg, #8B0000 0%, #FFA07A 100%)', 
+                color: '#FFF', 
+                padding: '3px 6px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center' 
+              }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS Table Lock Error</span>
+              <button 
+                className="ids-win-btn close" 
+                onClick={() => setDeleteErrorMsg(null)} 
+                style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+            <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ fontSize: '11px', color: '#8B0000', fontWeight: 600 }}>
+                {deleteErrorMsg}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setDeleteErrorMsg(null)}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  OK
                 </button>
               </div>
             </div>

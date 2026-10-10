@@ -4177,7 +4177,8 @@ export default function IdsOrderEntryModal({
                       { key: 'Reprint', name: 'KOT Reprint', desc: 'To Re-print KOT if it is not printed in first attempt', action: () => { setHotKeyHelpOpen(false); handleOpenKotReprint(); } },
                       { key: 'Setup', name: 'Menu Groups', desc: 'Setup Menu Groups V6.5.002.1 & Touch Screen Groups (Video 14)', action: () => { setHotKeyHelpOpen(false); setMenuGroupsOpen(true); } },
                       { key: 'Setup', name: 'TS Groups', desc: 'Touch Screen Groups V6.5.002.1 & Terminal Tile Configuration (Video 15)', action: () => { setHotKeyHelpOpen(false); setTouchScreenGroupsOpen(true); } },
-                      { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } }
+                      { key: 'Setup', name: 'Table Master', desc: 'Restaurant Table Master V6.5.002.1 & Seating Capacities (Video 16)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } },
+                      { key: 'Setup', name: 'Delete Table', desc: 'Delete Restaurant Table & Alert Window V6.5.002.1 (Video 17)', action: () => { setHotKeyHelpOpen(false); setRestaurantTableMasterOpen(true); } }
                     ].map((row, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #EEE', background: idx % 2 === 0 ? '#FFF' : '#F9F9F9' }}>
                         <td style={{ padding: '3px 6px', fontWeight: 800, color: '#0A246A', borderRight: '1px solid #EEE' }}>{row.key}</td>
