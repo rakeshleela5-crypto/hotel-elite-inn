@@ -487,3 +487,32 @@
 .ids-icon-next-btn:active {
   border: 2px inset #716F64;
 }
+
+/* Authentic Win32 MDI Modal Backdrop & Centering System */
+.ids-modal-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1100;
+  overflow: auto;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.ids-modal-window {
+  position: relative !important;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+

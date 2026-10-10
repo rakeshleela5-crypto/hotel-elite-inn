@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 
 export default function IdsHkInventoryModal({
@@ -9,6 +9,12 @@ export default function IdsHkInventoryModal({
   onOpenMessageBox
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab, isOpen]);
 
   // 1. HK Inventory Master Catalog
   const [inventoryItems, setInventoryItems] = useState([
