@@ -3,7 +3,7 @@ import './idsFortuneNext.css';
 import { 
   Printer, Edit3, ArrowRightLeft, Users, BookOpen, Scissors, 
   Trash2, XOctagon, ToggleLeft, ToggleRight, Building, HelpCircle, 
-  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard
+  RotateCcw, Check, X, Search, ChevronRight, CornerDownLeft, CreditCard, FileText
 } from 'lucide-react';
 import { RESTAURANT_MENU } from '../../data/hotelData';
 import { 
@@ -13,13 +13,27 @@ import {
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
 
-// Authentic Menu Database from Videos 01, 02 and Hotel Elite Inn
+// Authentic NC Department Cost Centers (Video 07 Frame 016)
+export const POS_NC_DEPARTMENTS = [
+  'Admin & General',
+  'Complimentary',
+  'Director',
+  'Managers',
+  'Room Guest',
+  'Sales & Marketing',
+  'Staff Cafeteria',
+  'F&B Production'
+];
+
+// Authentic Menu Database from Videos 01, 02, 07 and Hotel Elite Inn
 export const POS_MENU_ITEMS = [
   { code: '1', name: 'CLASSIC RUSSIAN SALAD', category: 'SALAD', rate: 199.00 },
   { code: '2', name: 'RED BEANS PEANUT & DRY FRUIT', category: 'SALAD', rate: 199.00 },
   { code: '3', name: 'SPROUTED MOONG PEANUT DRY', category: 'SALAD', rate: 199.00 },
   { code: '4', name: 'CAESAR SALAD (VEG)', category: 'SALAD', rate: 245.00 },
   { code: '5', name: 'CAESAR SALAD (CHICKEN)', category: 'SALAD', rate: 295.00 },
+  { code: '189', name: 'MILK SHAKE WITH ICE CREAM(SB)', category: 'BEVERAGE', rate: 150.00 },
+  { code: '155', name: 'BLUEBERRY COLD CHEESE CAKE(MC)', category: 'DESSERT', rate: 165.00 },
   { code: '82', name: 'STEAMED RICE', category: 'RICE', rate: 145.00 },
   { code: '54', name: 'DAL MAHARANI', category: 'MAIN COURSE', rate: 200.00 },
   { code: '175', name: 'CHICKEN SHAWARMA', category: 'SNACKS', rate: 150.00 },
@@ -149,6 +163,11 @@ export default function IdsOrderEntryModal({
   const [selectedReason, setSelectedReason] = useState('Double Entry');
   const [integrityCheckOpen, setIntegrityCheckOpen] = useState(false);
 
+  // NC KOT State (Video 07 Frame 016 & Frame 020)
+  const [ncModalOpen, setNcModalOpen] = useState(false);
+  const [selectedNcDept, setSelectedNcDept] = useState('Managers');
+  const [ncGuestNameInput, setNcGuestNameInput] = useState('MANAGER IT');
+
   // POS Bill Printing & Settlement State (Videos 03 & 04)
   const [posBillModalOpen, setPosBillModalOpen] = useState(false);
   const [posBillSettlementModalOpen, setPosBillSettlementModalOpen] = useState(false);
@@ -210,14 +229,14 @@ export default function IdsOrderEntryModal({
     }
   ]);
 
-  // Financial calculations matching Video 01 Frame 025 & Frame 038
+  // Financial calculations matching Video 01 Frame 025 & Video 07 Frame 030
   const calculations = useMemo(() => {
     const totalAmount = lineItems.reduce((acc, it) => acc + (it.quantity * it.rate), 0);
-    const cgst = isNcMode ? 0 : Number((totalAmount * 0.025).toFixed(2));
-    const sgst = isNcMode ? 0 : Number((totalAmount * 0.025).toFixed(2));
-    const nettAmount = isNcMode ? 0 : Math.round(totalAmount + cgst + sgst);
+    const cgst = Number((totalAmount * 0.025).toFixed(2));
+    const sgst = Number((totalAmount * 0.025).toFixed(2));
+    const nettAmount = Math.round(totalAmount + cgst + sgst);
     return { totalAmount, cgst, sgst, nettAmount };
-  }, [lineItems, isNcMode]);
+  }, [lineItems]);
 
   // Filtered menu search list for Item Help dialog (Video 01 Frame 021 & Frame 032)
   const filteredMenuItems = useMemo(() => {
@@ -327,9 +346,13 @@ export default function IdsOrderEntryModal({
     const updatedKotRecord = {
       kotNo: targetKotNo,
       accountingDate: accountingDate,
-      tableNo: tableNo,
+      tableNo: tableNo || (isNcMode ? '10' : '10'),
       server: server,
       outlet: selectedOutlet,
+      isNc: isNcMode,
+      ncType: isNcMode ? (ncType || 'NC Kot') : '',
+      ncDept: isNcMode ? (ncDept || 'Managers') : '',
+      guestName: guestName || (isNcMode ? 'MANAGER IT' : 'Walk-In Guest'),
       deletionReason: appliedReason,
       items: lineItems.map(it => ({
         ...it,
@@ -346,16 +369,23 @@ export default function IdsOrderEntryModal({
       setSaveSuccessMsg(`KOT #${targetKotNo} on Table ${tableNo} Updated! [Reason: ${appliedReason}]`);
     } else {
       setSavedKots(prev => [updatedKotRecord, ...prev]);
-      setSaveSuccessMsg(`KOT #${targetKotNo} Generated Successfully on Table ${tableNo}!`);
+      if (isNcMode) {
+        setSaveSuccessMsg(`NC KOT #${targetKotNo} Generated for [${ncDept || 'Managers'}] (Guest: ${guestName || 'MANAGER IT'})!`);
+      } else {
+        setSaveSuccessMsg(`KOT #${targetKotNo} Generated Successfully on Table ${tableNo}!`);
+      }
     }
 
     // Broadcast into global KDS sync bus
     const syncKot = normalizeKotOrder({
       id: `IDS-${targetKotNo}`,
-      tableNumber: tableNo,
+      tableNumber: tableNo || (isNcMode ? '10' : '10'),
       steward: server,
       outlet: selectedOutlet,
-      totalAmount: calculations.nettAmount,
+      totalAmount: isNcMode ? 0 : calculations.nettAmount,
+      isNc: isNcMode,
+      ncDept: ncDept,
+      specialInstructions: isNcMode ? `[NC - ${ncDept || 'Managers'}] Guest: ${guestName || 'MANAGER IT'}` : '',
       items: lineItems.map((it, idx) => ({
         id: idx + 1,
         name: it.name,
@@ -371,11 +401,15 @@ export default function IdsOrderEntryModal({
 
     setTimeout(() => setSaveSuccessMsg(null), 3000);
 
-    // Reset line items and state for next entry (Video 05 Frame 33)
+    // Reset line items and state for next entry (Video 07 Frame 32)
     setLineItems([]);
     setKotNo('AUTO');
     setTableNo('');
     setCovers('');
+    setGuestName('');
+    setNcDept('');
+    setNcType('');
+    setIsNcMode(false);
     setEditingKotNo(null);
     setOriginalKotSnapshot(null);
     setSelectedRowIdx(null);
@@ -508,15 +542,15 @@ export default function IdsOrderEntryModal({
             <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
           </div>
 
-          {/* Subheader Banner (Frame 015) */}
+          {/* Subheader Banner (Frame 015 & Video 07 Frame 022) */}
           <div style={{ background: '#D4D0C8', borderBottom: '1px solid #808080', padding: '3px 12px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 700, color: '#000080' }}>
             <span>{selectedOutlet}</span>
             <span>{selectedSession}</span>
-            <span>Standard KOT</span>
+            <span style={{ color: isNcMode ? '#C00000' : '#000080' }}>{isNcMode ? 'NC Kot' : 'Standard KOT'}</span>
             <span>{accountingDate}</span>
           </div>
 
-          {/* 12-Icon Win32 Command Toolbar (Frame 015) */}
+          {/* 12-Icon Win32 Command Toolbar (Frame 015 & Video 07 Frame 011) */}
           <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', gap: '4px', alignItems: 'center' }}>
             <button className="ids-btn" title="Print Bill / Checkout (Video 03 Frame 018)" onClick={() => setPosBillModalOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Printer size={16} />
@@ -547,12 +581,22 @@ export default function IdsOrderEntryModal({
             </button>
             <button 
               className="ids-btn" 
-              title="Toggle Non-Chargeable (NC) Mode" 
-              onClick={() => setIsNcMode(!isNcMode)} 
-              style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '55px', padding: '2px 6px', color: isNcMode ? '#008000' : '#808080', fontWeight: 700 }}
+              title="Click on NC KOT Icon (Video 07 Frame 011)" 
+              onClick={() => setNcModalOpen(true)} 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '4px', 
+                minWidth: '68px', 
+                padding: '2px 6px', 
+                color: isNcMode ? '#008000' : '#444', 
+                fontWeight: 700,
+                background: isNcMode ? '#DFF0D8' : undefined,
+                border: isNcMode ? '2px inset #FFF' : undefined
+              }}
             >
-              {isNcMode ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-              <span>{isNcMode ? 'ON' : 'OFF'}</span>
+              <FileText size={16} color={isNcMode ? '#008000' : '#000080'} />
+              <span style={{ fontSize: '10px' }}>{isNcMode ? 'NC Kot' : 'NC KOT'}</span>
             </button>
             <button className="ids-btn" title="Room / Guest Info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '42px', padding: '2px 4px' }}>
               <Building size={16} />
@@ -1316,6 +1360,121 @@ export default function IdsOrderEntryModal({
                   className="ids-btn" 
                   onClick={() => setReasonModalOpen(false)}
                   style={{ minWidth: '55px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5D. WIN32 NC KOT DIALOG (Video 07 Frame 016 - Frame 020) */}
+      {ncModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1360 }}>
+          <div 
+            className="ids-modal-container" 
+            style={{ width: '380px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 14px rgba(0,0,0,0.65)' }}
+          >
+            {/* Titlebar matching Video 07 Frame 016 */}
+            <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>NC KOT</span>
+              <button className="ids-win-btn close" onClick={() => setNcModalOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
+            </div>
+            {/* Modal Body */}
+            <div style={{ padding: '10px', fontSize: '11px' }}>
+              <div style={{ color: '#800000', fontSize: '11px', fontWeight: 700, marginBottom: '6px' }}>
+                Select NC Department & Enter NC Guest name.
+              </div>
+
+              {/* Dual Column Table Container */}
+              <div 
+                style={{ 
+                  height: '140px', 
+                  background: '#FFF', 
+                  border: '1px solid #7F9DB9',
+                  display: 'grid',
+                  gridTemplateColumns: '40% 60%',
+                  marginBottom: '10px',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Left Column: NC KOT */}
+                <div style={{ borderRight: '1px solid #B0B0B0', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ background: '#ECE9D8', borderBottom: '1px solid #B0B0B0', padding: '3px 6px', fontWeight: 700, fontSize: '11px' }}>
+                    NC KOT
+                  </div>
+                  <div style={{ flex: 1, padding: '4px 6px', background: '#316AC5', color: '#FFF', fontWeight: 600 }}>
+                    NC Kot
+                  </div>
+                </div>
+
+                {/* Right Column: Department */}
+                <div style={{ display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+                  <div style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #B0B0B0', padding: '3px 6px', fontWeight: 700, fontSize: '11px' }}>
+                    Department
+                  </div>
+                  <div>
+                    {POS_NC_DEPARTMENTS.map(dept => {
+                      const isSelected = selectedNcDept === dept;
+                      return (
+                        <div 
+                          key={dept}
+                          onClick={() => setSelectedNcDept(dept)}
+                          style={{ 
+                            padding: '3px 6px', 
+                            cursor: 'pointer',
+                            background: isSelected ? '#316AC5' : 'transparent',
+                            color: isSelected ? '#FFF' : '#000',
+                            fontWeight: isSelected ? 700 : 400,
+                            userSelect: 'none'
+                          }}
+                        >
+                          {dept}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Guest Name input field matching Video 07 Frame 020 */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <label style={{ width: '75px', fontWeight: 600 }}>Guest Name</label>
+                <input 
+                  type="text" 
+                  autoFocus
+                  value={ncGuestNameInput}
+                  onChange={e => setNcGuestNameInput(e.target.value)}
+                  placeholder="e.g. MANAGER.IT"
+                  style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 6px', fontSize: '11px', fontWeight: 600 }}
+                />
+              </div>
+
+              {/* Action Buttons: [ Ok ] [ Cancel ] */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => {
+                    setIsNcMode(true);
+                    setNcType('NC Kot');
+                    setNcDept(selectedNcDept);
+                    setGuestName(ncGuestNameInput.trim() || 'MANAGER IT');
+                    if (!tableNo) setTableNo('10');
+                    if (!covers) setCovers('1');
+                    if (!server) setServer('Biren');
+                    setNcModalOpen(false);
+                    setSaveSuccessMsg(`NC Mode Active: [${selectedNcDept}] - Guest: ${ncGuestNameInput.trim() || 'MANAGER IT'}`);
+                    setTimeout(() => setSaveSuccessMsg(null), 3500);
+                  }}
+                  style={{ minWidth: '60px', fontWeight: 700 }}
+                >
+                  Ok
+                </button>
+                <button 
+                  className="ids-btn" 
+                  onClick={() => setNcModalOpen(false)}
+                  style={{ minWidth: '60px' }}
                 >
                   Cancel
                 </button>
