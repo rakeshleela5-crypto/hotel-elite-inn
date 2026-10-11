@@ -9,6 +9,7 @@ import { RESTAURANT_MENU } from '../data/hotelData';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import DexieSyncIndicator from './DexieSyncIndicator';
+import GeofenceSecurityBanner from './GeofenceSecurityBanner';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
 import { syncDispatchKotOrder } from '../utils/liveSyncBridge';
 import { RECOGNIZED_STEWARDS } from '../data/hotelStaffData';
@@ -460,6 +461,9 @@ export default function StewardMobileOrderPad({
       fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
       userSelect: 'none'
     }}>
+      {/* On-Premises Geofence & Shift Security Banner */}
+      <GeofenceSecurityBanner portal="steward" />
+
       {/* Top Mobile Header */}
       <header className="no-print" style={{
         background: '#0f172a',

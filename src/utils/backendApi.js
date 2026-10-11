@@ -1055,6 +1055,43 @@ export async function getFastApiVendorPayables() {
   }
 }
 
+/**
+ * Query current Hotel Wi-Fi IP restriction status
+ */
+export async function getHotelIpStatus() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/ip-status`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    return { client_ip: 'unknown', is_hotel_wifi: true, error: err.message };
+  }
+}
+
+/**
+ * Register or update Hotel Elite Inn Wi-Fi static IP
+ */
+export async function setHotelStaticIp(managerPin = '4321', targetIp = null, enableRestriction = true) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/set-hotel-ip`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        manager_pin: managerPin,
+        ip: targetIp,
+        enable_restriction: enableRestriction
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
 
 
 

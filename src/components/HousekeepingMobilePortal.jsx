@@ -9,6 +9,7 @@ import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY } from '../data/hotelData';
 import { playHousekeepingChime } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import { syncUpdateRoomStatus, subscribeToLiveSync } from '../utils/liveSyncBridge';
+import GeofenceSecurityBanner from './GeofenceSecurityBanner';
 
 // Housekeeping Staff Configuration
 const HOUSEKEEPING_STAFF = {
@@ -434,6 +435,9 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
           {toast}
         </div>
       )}
+
+      {/* On-Premises Geofence & Shift Security Banner */}
+      <GeofenceSecurityBanner portal="housekeeping" />
 
       {/* Header Bar */}
       <div style={{
