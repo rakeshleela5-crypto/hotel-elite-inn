@@ -193,7 +193,7 @@ export default function IdsPackageRatesModal({
     });
 
     setSelectedPackage(newPkg);
-    setStatusMessage(`Package #${packageId} ("${description}") saved successfully into Room Rate Master!`);
+    setStatusMessage(`Package ${packageId} ("${description}") saved successfully into Room Rate Master!`);
     setTimeout(() => setStatusMessage(''), 4000);
   };
 
@@ -488,19 +488,19 @@ export default function IdsPackageRatesModal({
           <div style={{ padding: '12px 16px', fontSize: '11px' }}>
             
             <div style={{ background: '#FFFDE6', border: '1px solid #E6D043', padding: '6px 10px', fontSize: '11px', color: '#7D5700', marginBottom: '10px' }}>
-              Select a guest and room number to attach package rate <strong>#{sellSelectedPkg.packageId} ({sellSelectedPkg.description})</strong>:
+              Select a guest and room number to attach package rate <strong>Pkg {sellSelectedPkg.packageId} ({sellSelectedPkg.description})</strong>:
             </div>
 
             {/* Guest & Room Assignment Fields */}
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px 14px', marginBottom: '10px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '90px 120px 90px 1fr', gap: '8px 10px', alignItems: 'center' }}>
                 
-                <span style={{ fontWeight: 600 }}>Room #</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={sellRoomNo} onChange={(e) => setSellRoomNo(e.target.value)} style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} />
 
                 <span style={{ fontWeight: 600 }}>Selected Package</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  <input className="ids-input" value={`#${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+                  <input className="ids-input" value={`${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
                   <button className="ids-btn-classic" onClick={() => setSellPkgLookupOpen(true)} title="Browse Packages">?</button>
                 </div>
 
@@ -510,7 +510,7 @@ export default function IdsPackageRatesModal({
                   <input className="ids-input" value={sellGuestName} onChange={(e) => setSellGuestName(e.target.value)} style={{ flex: 1, fontWeight: 700, background: '#FFF7CC' }} />
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Mobile #</span>
+                <span style={{ fontWeight: 600 }}>Mobile No.</span>
                 <input className="ids-input" value={sellMobile} onChange={(e) => setSellMobile(e.target.value)} style={{ width: '120px' }} />
 
                 <span style={{ fontWeight: 600 }}>Duration</span>
@@ -580,7 +580,7 @@ export default function IdsPackageRatesModal({
                 <div><strong>Guest Name:</strong></div>
                 <div>{sellGuestTitle} {sellGuestName}</div>
                 <div><strong>Package:</strong></div>
-                <div style={{ fontWeight: 700, color: '#0A246A' }}>#{sellSelectedPkg.packageId} — {sellSelectedPkg.description}</div>
+                <div style={{ fontWeight: 700, color: '#0A246A' }}>Pkg {sellSelectedPkg.packageId} — {sellSelectedPkg.description}</div>
                 <div><strong>Total Package Rate:</strong></div>
                 <div style={{ fontWeight: 700, color: '#137333' }}>₹{sellSelectedPkg.totalPackageAmount.toFixed(2)} (All inclusive)</div>
                 <div><strong>Room Status Rack:</strong></div>
@@ -632,7 +632,7 @@ export default function IdsPackageRatesModal({
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>PRPCOD</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Pkg #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Pkg No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Package Name</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '75px', borderRight: '1px solid #B0AB9A' }}>From</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Room</th>

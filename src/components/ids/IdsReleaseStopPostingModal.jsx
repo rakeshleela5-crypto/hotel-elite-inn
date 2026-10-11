@@ -286,9 +286,9 @@ export default function IdsReleaseStopPostingModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', fontFamily: 'Tahoma, Arial, sans-serif' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #808080', textAlign: 'left', fontWeight: 700 }}>
-                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Room #</th>
-                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '70px' }}>Fol #</th>
-                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Reg #</th>
+                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Room No.</th>
+                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '70px' }}>Folio No.</th>
+                      <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Reg. No.</th>
                       <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC' }}>Guest Name</th>
                       <th style={{ padding: '4px 8px', width: '120px', textAlign: 'center' }}>Release</th>
                     </tr>
@@ -366,7 +366,7 @@ export default function IdsReleaseStopPostingModal({
               <div style={{ marginTop: '12px', padding: '8px 12px', background: '#FFF', border: '1px solid #999', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <span style={{ fontWeight: 600 }}>Selected Room:</span> <strong>{currentRoomRecord.roomNo} ({currentRoomRecord.guestName})</strong>
-                  <span style={{ marginLeft: '16px', color: '#666' }}>Reg #: {currentRoomRecord.regNo} | Folio #: {currentRoomRecord.folNo}</span>
+                  <span style={{ marginLeft: '16px', color: '#666' }}>Reg. No.: {currentRoomRecord.regNo} | Folio No.: {currentRoomRecord.folNo}</span>
                 </div>
                 <div>
                   <span style={{ fontWeight: 600 }}>Current Status:</span>{' '}
@@ -410,11 +410,11 @@ export default function IdsReleaseStopPostingModal({
             <div>
               <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '12px', fontSize: '11px' }}>
                 <div style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, marginBottom: '10px' }}>
-                  Post Charges V6.5.002.1 — Room #{selectedRoom} ({currentRoomRecord.guestName})
+                  Post Charges V6.5.002.1 — Room No.{selectedRoom} ({currentRoomRecord.guestName})
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 100px 1fr', gap: '8px 12px', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 600 }}>Room#</span>
+                  <span style={{ fontWeight: 600 }}>Room No.</span>
                   <div style={{ display: 'flex', gap: '4px' }}>
                     <input className="ids-input" value={selectedRoom} readOnly style={{ width: '80px', fontWeight: 700 }} />
                     <button 
@@ -429,10 +429,10 @@ export default function IdsReleaseStopPostingModal({
                     >?</button>
                   </div>
 
-                  <span style={{ fontWeight: 600 }}>Folio #</span>
+                  <span style={{ fontWeight: 600 }}>Folio No.</span>
                   <input className="ids-input" value="1" readOnly style={{ width: '60px' }} />
 
-                  <span style={{ fontWeight: 600 }}>Registration #</span>
+                  <span style={{ fontWeight: 600 }}>Registration No.</span>
                   <input className="ids-input" value={currentRoomRecord.regNo} readOnly style={{ width: '120px' }} />
 
                   <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -559,10 +559,10 @@ export default function IdsReleaseStopPostingModal({
               <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px', fontSize: '11px' }}>
                 {/* Header */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '10px' }}>
-                  <div><strong>Room #:</strong> {selectedRoom}</div>
+                  <div><strong>Room No.: </strong> {selectedRoom}</div>
                   <div><strong>Guest Name:</strong> {currentRoomRecord.guestName}</div>
-                  <div><strong>Reg #:</strong> {currentRoomRecord.regNo}</div>
-                  <div><strong>Folio #:</strong> {currentRoomRecord.folNo}</div>
+                  <div><strong>Reg. No.:</strong> {currentRoomRecord.regNo}</div>
+                  <div><strong>Folio No.:</strong> {currentRoomRecord.folNo}</div>
                   <div><strong>Arrival:</strong> {currentRoomRecord.arrivalDate}</div>
                   <div><strong>Departure:</strong> {NEXT_ACCOUNTING_DATE}</div>
                   <div><strong>Accounting Date:</strong> {accountingDate}</div>
@@ -637,7 +637,7 @@ export default function IdsReleaseStopPostingModal({
 
               <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px', fontSize: '11px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div><strong>Room #:</strong> {selectedRoom} | <strong>Guest:</strong> {currentRoomRecord.guestName}</div>
+                  <div><strong>Room No.: </strong> {selectedRoom} | <strong>Guest:</strong> {currentRoomRecord.guestName}</div>
                   <div><strong>Net Payable:</strong> <strong style={{ fontSize: '13px', color: '#0A246A' }}>₹{netBalance.toFixed(2)}</strong></div>
                 </div>
 
@@ -647,7 +647,7 @@ export default function IdsReleaseStopPostingModal({
                     <thead>
                       <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #808080', fontWeight: 700 }}>
                         <th style={{ padding: '3px 6px', width: '40px', textAlign: 'center' }}>Select</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left' }}>Folio #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left' }}>Folio No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left' }}>Bill Details</th>
                         <th style={{ padding: '3px 6px', textAlign: 'right' }}>Amount</th>
                       </tr>

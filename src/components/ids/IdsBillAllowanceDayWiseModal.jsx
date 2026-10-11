@@ -348,7 +348,7 @@ export default function IdsBillAllowanceDayWiseModal({
               {/* Left Column */}
               <div>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ width: '65px', fontWeight: 600 }}>Room#</span>
+                  <span style={{ width: '65px', fontWeight: 600 }}>Room No.</span>
                   <input 
                     className="ids-input" 
                     value={selectedRoomNo} 
@@ -360,20 +360,20 @@ export default function IdsBillAllowanceDayWiseModal({
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ width: '65px', fontWeight: 600 }}>Folio #</span>
+                  <span style={{ width: '65px', fontWeight: 600 }}>Folio No.</span>
                   <input className="ids-input" readOnly value={activeRoom.folioNo} style={{ width: '70px', background: '#F5F5F5' }} />
                   <button 
                     className="ids-btn-classic" 
                     style={{ fontSize: '10px', height: '20px', padding: '1px 6px' }}
                     onClick={() => {
                       playReceptionChime();
-                      alert(`Folio #${activeRoom.folioNo} Details:\nGuest: ${activeRoom.guestName}\nRoom: ${activeRoom.roomNo}\nReg #: ${activeRoom.regNo}\nBalance: ₹${activeRoom.balance || '0.00'}`);
+                      alert(`Folio No.${activeRoom.folioNo} Details:\nGuest: ${activeRoom.guestName}\nRoom: ${activeRoom.roomNo}\nReg. No.: ${activeRoom.regNo}\nBalance: ₹${activeRoom.balance || '0.00'}`);
                     }}
                   >More...</button>
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ width: '65px', fontWeight: 600 }}>Reg. #</span>
+                  <span style={{ width: '65px', fontWeight: 600 }}>Reg. No.</span>
                   <input className="ids-input" readOnly value={activeRoom.regNo} style={{ width: '70px', background: '#F5F5F5' }} />
                 </div>
 
@@ -415,7 +415,7 @@ export default function IdsBillAllowanceDayWiseModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#E0DFE3', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '50px' }}>Ref. #</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '50px' }}>Ref. No.</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '90px' }}>Date</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '110px' }}>Description</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'right', width: '85px' }}>Amount</th>
@@ -815,7 +815,7 @@ export default function IdsBillAllowanceDayWiseModal({
                       borderRadius: '2px'
                     }}
                   >
-                    Will post credit entries totaling ₹{totalDeduction.toFixed(2)} to Room #{selectedRoomNo} folio.
+                    Will post credit entries totaling ₹{totalDeduction.toFixed(2)} to Room No.{selectedRoomNo} folio.
                   </div>
 
                   {/* Buttons matching Video 23 Frame 065 */}
@@ -873,7 +873,7 @@ export default function IdsBillAllowanceDayWiseModal({
             }}
           >
             <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>
-              Check out V6.5.002.8 - View Bill (Room #{selectedRoomNo} - {activeRoom.guestName})
+              Check out V6.5.002.8 - View Bill (Room No.{selectedRoomNo} - {activeRoom.guestName})
             </span>
             <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
           </div>
@@ -881,10 +881,10 @@ export default function IdsBillAllowanceDayWiseModal({
           <div style={{ padding: '8px 12px', fontSize: '11px' }}>
             {/* Header info */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', background: '#F5F3E9', border: '1px solid #716F64', padding: '6px 8px', marginBottom: '8px' }}>
-              <div>Room#: <strong>{selectedRoomNo}</strong></div>
-              <div>Folio#: <strong>{activeRoom.folioNo} / Direct</strong></div>
-              <div>Reg#: <strong>{activeRoom.regNo}</strong></div>
-              <div>Resv#: <strong>{activeRoom.resvNo}</strong></div>
+              <div>Room No.: <strong>{selectedRoomNo}</strong></div>
+              <div>Folio No.: <strong>{activeRoom.folioNo} / Direct</strong></div>
+              <div>Reg. No.: <strong>{activeRoom.regNo}</strong></div>
+              <div>Res. No.: <strong>{activeRoom.resvNo}</strong></div>
             </div>
 
             {/* View Bill Table Grid (Video 23 Frames 105 & 115) */}
@@ -893,13 +893,13 @@ export default function IdsBillAllowanceDayWiseModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#E0DFE3', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '30px' }}>Sl #</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '30px' }}>Sr. No.</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '110px' }}>Date</th>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Resv#</th>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Room#</th>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Reg#</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Res. No.</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Room No.</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '40px' }}>Reg. No.</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '50px' }}>RevCod</th>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '35px' }}>Bill #</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 4px', width: '35px' }}>Bill No.</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left' }}>Particulars</th>
                       <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'right', width: '75px' }}>Amount</th>
                     </tr>

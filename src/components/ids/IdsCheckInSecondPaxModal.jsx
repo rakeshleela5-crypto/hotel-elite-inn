@@ -252,13 +252,13 @@ export default function IdsCheckInSecondPaxModal({
           </div>
 
           <div style={{ padding: '8px 12px' }}>
-            {/* Top Row: Room# & Departure & Room Type Icons & Action Buttons */}
+            {/* Top Row: Room No. & Departure & Room Type Icons & Action Buttons */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'start', marginBottom: '8px' }}>
               {/* Left Details */}
               <div>
                 <div style={{ display: 'flex', gap: '14px', alignItems: 'center', marginBottom: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '11px' }}>Room#</span>
+                    <span style={{ fontWeight: 700, fontSize: '11px' }}>Room No.</span>
                     <input 
                       className="ids-input"
                       value={selectedRoomNo}
@@ -424,7 +424,7 @@ export default function IdsCheckInSecondPaxModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#E0DFE3', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '90px' }}>Room#</th>
+                      <th style={{ border: '1px solid #B0AB9A', padding: '3px 6px', textAlign: 'left', width: '90px' }}>Room No.</th>
                       {Array.from({ length: 10 }).map((_, i) => {
                         const d = new Date();
                         d.setDate(d.getDate() + i);
@@ -517,7 +517,7 @@ export default function IdsCheckInSecondPaxModal({
                 </span>
               </div>
               <div style={{ fontStyle: 'italic', color: '#0A246A', fontWeight: 600 }}>
-                {statusMessage || `Target: Room #${selectedRoomNo} currently occupied by ${activeRoomData.primaryGuest.name}`}
+                {statusMessage || `Target: Room ${selectedRoomNo} currently occupied by ${activeRoomData.primaryGuest.name}`}
               </div>
             </div>
           </div>
@@ -731,7 +731,7 @@ export default function IdsCheckInSecondPaxModal({
             }}
           >
             <span style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>
-              Guest Information V6.5002.2 - Room #{selectedRoomNo} (2 Pax Active)
+              Guest Information V6.5002.2 - Room No.{selectedRoomNo} (2 Pax Active)
             </span>
             <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
           </div>
@@ -742,9 +742,9 @@ export default function IdsCheckInSecondPaxModal({
               {/* Left Column Controls */}
               <div>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                  <span style={{ fontWeight: 600, width: '110px' }}>Name/Room#</span>
+                  <span style={{ fontWeight: 600, width: '110px' }}>Name/Room No.</span>
                   <input className="ids-input" readOnly value={selectedRoomNo} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
-                  <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Selected Room: #${selectedRoomNo}`); }}>?</button>
+                  <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Selected Room: ${selectedRoomNo}`); }}>?</button>
                 </div>
 
                 {/* Video 22 Frame 088: Total Pax displays 2 (2/0) */}
@@ -812,7 +812,7 @@ export default function IdsCheckInSecondPaxModal({
                     }}
                   >
                     <span>1. {activeRoomData.primaryGuest.name}</span>
-                    <span style={{ fontSize: '10px', opacity: 0.8 }}>Reg# {activeRoomData.primaryGuest.regNo}</span>
+                    <span style={{ fontSize: '10px', opacity: 0.8 }}>Reg. No. {activeRoomData.primaryGuest.regNo}</span>
                   </div>
 
                   {/* Pax 2 (Checked in later in Video 22) */}
@@ -832,14 +832,14 @@ export default function IdsCheckInSecondPaxModal({
                     }}
                   >
                     <span>2. {title} {lastName} {firstName} ⭐</span>
-                    <span style={{ fontSize: '10px', opacity: 0.8 }}>Reg# {regNo}</span>
+                    <span style={{ fontSize: '10px', opacity: 0.8 }}>Reg. No. {regNo}</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Side Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3px' }}>
-                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert(`Room #${selectedRoomNo} Rate: Executive King Rate (₹2,050.00)`); }}>Rate Info</button>
+                <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert(`Room ${selectedRoomNo} Rate: Executive King Rate (₹2,050.00)`); }}>Rate Info</button>
                 <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Bill Check: Both pax billing to single master folio."); }}>Check</button>
                 <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Guest History: Verified registered guest."); }}>History</button>
                 <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '2px 4px' }} onClick={() => { playReceptionChime(); alert("Trace Note: 2nd pax checked in later as expected."); }}>Trace</button>
@@ -861,7 +861,7 @@ export default function IdsCheckInSecondPaxModal({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', borderBottom: '1px solid #DDD', paddingBottom: '4px' }}>
                 <span style={{ fontWeight: 700, color: '#0A246A' }}>
-                  {selectedGuestTab === 1 ? `Second Pax Card: ${title} ${lastName} ${firstName} (Reg # ${regNo})` : `Primary Pax Card: ${activeRoomData.primaryGuest.name} (Reg # ${activeRoomData.primaryGuest.regNo})`}
+                  {selectedGuestTab === 1 ? `Second Pax Card: ${title} ${lastName} ${firstName} (Reg. No. ${regNo})` : `Primary Pax Card: ${activeRoomData.primaryGuest.name} (Reg. No. ${activeRoomData.primaryGuest.regNo})`}
                 </span>
                 <span style={{ fontSize: '10px', color: '#555' }}>
                   Arrival: {activeRoomData.primaryGuest.arrival} | Departure: {departureDate} {departureTime}

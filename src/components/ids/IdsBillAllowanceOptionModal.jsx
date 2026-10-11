@@ -14,7 +14,7 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
       - Room Status V6.5.002.1 Rack Console -> Right click 201 O/EXE Kumar -> Bill Allowance (Frames 015–022)
       - Cashiering.. -> Bill Allowance Option (Dispute Waiver / Multi-Day Discount)
    2. Bill Allowance V6.5.002.4 Primary Dialog (Frames 025–070):
-      - Header: Room# 201, Folio # 1, Reg. # 613, Outlet: TRF
+      - Header: Room No. 201, Folio No. 1, Reg. No. 613, Outlet: TRF
       - Name: Kumar Anil, Classification: Regular, Nationality: India
       - Arrival: 16-JAN-2026 12:02, Departure: 26-JAN-2026 12:00
    3. Select Revenue Dialog (Frames 025–038):
@@ -42,9 +42,9 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
    6. Integrated Folio Verification (Frames 075–100):
       - Check out V6.5.002.6 / View Bill for Room 201
       - 19 ledger rows showing 9 discount credit lines (Rows 11 to 19):
-        * Bill #2 (16-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
-        * Bill #3 (23-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
-        * Bill #4 (25-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
+        * Bill No.2 (16-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
+        * Bill No.3 (23-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
+        * Bill No.4 (25-JAN): TRF (-425.00), CGT (-25.50), SGT (-25.50)
       - Total Concession: ₹1,428.00 deducted from balance!
    ========================================================================= */
 
@@ -533,7 +533,7 @@ export default function IdsBillAllowanceOptionModal({
                 }}
               >
                 {/* Row 1 */}
-                <div style={{ fontWeight: 700, color: '#333' }}>Room#</div>
+                <div style={{ fontWeight: 700, color: '#333' }}>Room No.</div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
                     type="text" 
@@ -562,7 +562,7 @@ export default function IdsBillAllowanceOptionModal({
                 </div>
 
                 {/* Row 2 */}
-                <div style={{ fontWeight: 700, color: '#333' }}>Folio #</div>
+                <div style={{ fontWeight: 700, color: '#333' }}>Folio No.</div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
                     type="text" 
@@ -573,7 +573,7 @@ export default function IdsBillAllowanceOptionModal({
                   <button 
                     className="ids-btn-classic" 
                     style={{ padding: '0 6px', fontSize: '10px' }}
-                    onClick={() => alert(`Folio #${activeRoom.folioNo} Allowance Info: Applicable across Master & Split Sub-folios.`)}
+                    onClick={() => alert(`Folio No.${activeRoom.folioNo} Allowance Info: Applicable across Master & Split Sub-folios.`)}
                   >
                     How..
                   </button>
@@ -590,7 +590,7 @@ export default function IdsBillAllowanceOptionModal({
                 </div>
 
                 {/* Row 3 */}
-                <div style={{ fontWeight: 700, color: '#333' }}>Reg. #</div>
+                <div style={{ fontWeight: 700, color: '#333' }}>Reg. No.</div>
                 <div>
                   <input 
                     type="text" 
@@ -659,7 +659,7 @@ export default function IdsBillAllowanceOptionModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0, zIndex: 10 }}>
                     <tr style={{ borderBottom: '1px solid #ACA899' }}>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '45px' }}>Ref. #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '45px' }}>Ref. No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '90px' }}>Date</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8' }}>Description</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '90px', textAlign: 'right' }}>Amount</th>
@@ -738,7 +738,7 @@ export default function IdsBillAllowanceOptionModal({
                     ) : (
                       <tr>
                         <td colSpan="8" style={{ padding: '24px', textAlign: 'center', color: '#888' }}>
-                          No transactions loaded. Click <strong>[ ? ]</strong> near Room# to load date range.
+                          No transactions loaded. Click <strong>[ ? ]</strong> near Room No. to load date range.
                         </td>
                       </tr>
                     )}
@@ -880,7 +880,7 @@ export default function IdsBillAllowanceOptionModal({
                   <span>|</span>
                   <span>Floor: <strong>ALL</strong></span>
                   <span>|</span>
-                  <span>Room #: <strong style={{ color: '#0A246A' }}>201</strong></span>
+                  <span>Room No.: <strong style={{ color: '#0A246A' }}>201</strong></span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -912,7 +912,7 @@ export default function IdsBillAllowanceOptionModal({
                 }}
               >
                 <div>
-                  <div style={{ color: '#666' }}>Room# / Folio</div>
+                  <div style={{ color: '#666' }}>Room No. / Folio</div>
                   <strong>201 / Folio 1</strong>
                 </div>
                 <div>
@@ -948,13 +948,13 @@ export default function IdsBillAllowanceOptionModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0, zIndex: 5 }}>
                     <tr style={{ borderBottom: '1px solid #ACA899' }}>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '30px' }}>Sl #</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '30px' }}>Sr. No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '125px' }}>Date</th>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '40px' }}>Resv#</th>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '45px' }}>Room#</th>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '40px' }}>Reg#</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '40px' }}>Res. No.</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '45px' }}>Room No.</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '40px' }}>Reg. No.</th>
                       <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '50px' }}>RevCod</th>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '35px' }}>Bill #</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0C8B8', width: '35px' }}>Bill No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8' }}>Particulars</th>
                       <th style={{ padding: '3px 6px', width: '75px', textAlign: 'right' }}>Amount</th>
                     </tr>

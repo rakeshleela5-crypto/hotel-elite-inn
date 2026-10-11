@@ -498,7 +498,7 @@ export const TRI_PERIOD_FINANCIAL_DASHBOARD = {
 
 // ─── 10. Financial Intelligence & GST Compliance Engine (CA Filing Station) ───
 export const CA_FILING_STATION_METADATA = {
-  systemNumber: 'System #36',
+  systemNumber: 'System No. 36',
   systemName: 'CA Filing Station & Financial Intelligence Engine',
   proprietorship: {
     tradeName: HOTEL_CONFIG.name,

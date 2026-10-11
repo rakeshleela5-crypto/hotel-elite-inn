@@ -9,11 +9,11 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
    Replication of:
    1. Room Status Context Menu -> "Pax Check-Out" (Frame 020–025)
    2. Pax Checkout V6.5.002.1 Main Window (Frames 026–095)
-      - Top Section: Pax to Check Out (Room#, Reg #, Folio #, Guest Name, Arrival, Departure)
-      - "Main Folio" Group Box: Main Guest in-house details (Room#, Reg #, Folio #, Guest Name, Arrival, Departure)
+      - Top Section: Pax to Check Out (Room No., Reg. No., Folio No., Guest Name, Arrival, Departure)
+      - "Main Folio" Group Box: Main Guest in-house details (Room No., Reg. No., Folio No., Guest Name, Arrival, Departure)
       - [ Checkout ], [ Clear ], [ Panel ], [ Exit ]
    3. "Pax Checkout" Lookup Table Popup (Frame 028–030)
-      - Data Grid: Room#, Reg #, Folio #, Guest Name
+      - Data Grid: Room No., Reg. No., Folio No., Guest Name
       - Selectable Multi-Pax Rooms: 102 (MR RAJESH SHARMA), 203 (MR MANOJ KUMAR), 206 (MR DEEPAK MOHANTY), 301 (MR ANIL PATNAIK)
       - [ Select ], [ Cancel ]
    4. "Authorized By" Dialog (Frames 035–045 & 085–090)
@@ -409,8 +409,8 @@ export default function IdsPaxCheckoutModal({
             }}
           >
             <div style={{ display: 'grid', gridTemplateColumns: '70px 120px 30px 1fr 150px', rowGap: '6px', columnGap: '6px', alignItems: 'center' }}>
-              {/* Row 1: Room# and Arrival */}
-              <label style={{ fontWeight: 600 }}>Room#</label>
+              {/* Row 1: Room No. and Arrival */}
+              <label style={{ fontWeight: 600 }}>Room No.</label>
               <input 
                 className="ids-input" 
                 value={formRoomNo} 
@@ -434,8 +434,8 @@ export default function IdsPaxCheckoutModal({
                 style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
               />
 
-              {/* Row 2: Reg # and Departure */}
-              <label style={{ fontWeight: 600 }}>Reg #</label>
+              {/* Row 2: Reg. No. and Departure */}
+              <label style={{ fontWeight: 600 }}>Reg. No.</label>
               <input 
                 className="ids-input" 
                 value={formRegNo} 
@@ -451,8 +451,8 @@ export default function IdsPaxCheckoutModal({
                 style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
               />
 
-              {/* Row 3: Folio # */}
-              <label style={{ fontWeight: 600 }}>Folio #</label>
+              {/* Row 3: Folio No. */}
+              <label style={{ fontWeight: 600 }}>Folio No.</label>
               <input 
                 className="ids-input" 
                 value={formFolioNo} 
@@ -487,8 +487,8 @@ export default function IdsPaxCheckoutModal({
               Main Folio
             </legend>
             <div style={{ display: 'grid', gridTemplateColumns: '70px 120px 30px 1fr 150px', rowGap: '6px', columnGap: '6px', alignItems: 'center' }}>
-              {/* Row 1: Room# and Arrival */}
-              <label style={{ fontWeight: 600 }}>Room#</label>
+              {/* Row 1: Room No. and Arrival */}
+              <label style={{ fontWeight: 600 }}>Room No.</label>
               <input 
                 className="ids-input" 
                 value={mainRoomNo} 
@@ -504,8 +504,8 @@ export default function IdsPaxCheckoutModal({
                 style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
               />
 
-              {/* Row 2: Reg # and Departure */}
-              <label style={{ fontWeight: 600 }}>Reg #</label>
+              {/* Row 2: Reg. No. and Departure */}
+              <label style={{ fontWeight: 600 }}>Reg. No.</label>
               <input 
                 className="ids-input" 
                 value={mainRegNo} 
@@ -521,8 +521,8 @@ export default function IdsPaxCheckoutModal({
                 style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
               />
 
-              {/* Row 3: Folio # */}
-              <label style={{ fontWeight: 600 }}>Folio #</label>
+              {/* Row 3: Folio No. */}
+              <label style={{ fontWeight: 600 }}>Folio No.</label>
               <input 
                 className="ids-input" 
                 value={mainFolioNo} 
@@ -584,7 +584,7 @@ export default function IdsPaxCheckoutModal({
                 if (selectedPax && onOpenGuestInfo) {
                   onOpenGuestInfo(selectedPax.roomNo);
                 } else {
-                  alert(`Main Folio: ${mainGuestName} in Room #${mainRoomNo || formRoomNo}.`);
+                  alert(`Main Folio: ${mainGuestName} in Room ${mainRoomNo || formRoomNo}.`);
                 }
               }}
             >
@@ -658,9 +658,9 @@ export default function IdsPaxCheckoutModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #999', textAlign: 'left', fontWeight: 700 }}>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '55px' }}>Room#</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '55px' }}>Reg #</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '45px' }}>Folio #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '55px' }}>Room No.</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '55px' }}>Reg. No.</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '45px' }}>Folio No.</th>
                       <th style={{ padding: '3px 6px' }}>Guest Name</th>
                     </tr>
                   </thead>

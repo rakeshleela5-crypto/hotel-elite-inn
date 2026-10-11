@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
    VIDEO 12: HOW TO MODIFY GUEST DEPARTURE IN IDS 6.5 & 7.0 SOFTWARE
    Replication of:
    1. Amend Stay V6.5.002.1 Window (Video 12 Frames 018–020 & 035)
-   2. Room# lookup and in-house guest data auto-fill
+   2. Room No. lookup and in-house guest data auto-fill
    3. Departure Date / Time editor with extension presets (+3 days, +5 days)
    4. Recalculation of stay nights (13 or 15 nights) & guest balance
    5. Synchronization with Expected Departures (17 -> 16) & Rooms to sell (40 -> 39)
@@ -105,9 +105,9 @@ export default function IdsAmendStayModal({
             </div>
           )}
 
-          {/* Top Room# Input Box matching Frame 018 */}
+          {/* Top Room No. Input Box matching Frame 018 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', background: '#ECE9D8', padding: '4px' }}>
-            <span style={{ fontWeight: 600 }}>Room#</span>
+            <span style={{ fontWeight: 600 }}>Room No.</span>
             <input 
               className="ids-input" 
               value={selectedRoomNo} 
@@ -150,8 +150,8 @@ export default function IdsAmendStayModal({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
               <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0 }}>
                 <tr>
-                  <th style={{ width: '55px', border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Folio #</th>
-                  <th style={{ width: '60px', border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Reg #</th>
+                  <th style={{ width: '55px', border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Folio No.</th>
+                  <th style={{ width: '60px', border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Reg. No.</th>
                   <th style={{ width: '220px', border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Guest Name</th>
                   <th style={{ border: '1px solid #CCC', padding: '3px 4px', textAlign: 'left' }}>Departure Date/Time</th>
                 </tr>

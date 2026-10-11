@@ -273,7 +273,7 @@ export default function IdsLaundryEntryModal({
                     style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
                     title="Reference No Lookup"
                     onClick={() => {
-                      const ref = prompt("Enter Laundry Reference #:", formData.refNo);
+                      const ref = prompt("Enter Laundry Ref. No.:", formData.refNo);
                       if (ref) setFormData({ ...formData, refNo: ref });
                     }}
                   >?</button>
@@ -296,7 +296,7 @@ export default function IdsLaundryEntryModal({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label style={{ width: '100px' }}>Room#</label>
+                <label style={{ width: '100px' }}>Room No.</label>
                 <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
                   <input 
                     type="text" 
@@ -499,7 +499,7 @@ export default function IdsLaundryEntryModal({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
               <thead>
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                  <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '40px' }}>Item#</th>
+                  <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '40px' }}>Item No.</th>
                   <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Name</th>
                   <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px', textAlign: 'center' }}>Qty</th>
                   <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '70px', textAlign: 'right' }}>Rate</th>
@@ -670,7 +670,7 @@ export default function IdsLaundryEntryModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                        <th style={{ padding: '4px' }}>Room#</th>
+                        <th style={{ padding: '4px' }}>Room No.</th>
                         <th style={{ padding: '4px' }}>Guest Name</th>
                         <th style={{ padding: '4px' }}>Arrival</th>
                       </tr>

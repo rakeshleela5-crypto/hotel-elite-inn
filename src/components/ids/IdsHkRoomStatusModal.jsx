@@ -132,7 +132,7 @@ export default function IdsHkRoomStatusModal({
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '70px' }}>Room #</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '70px' }}>Room No.</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC' }}>Status</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '50px', textAlign: 'center' }}>Adult</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '50px', textAlign: 'center' }}>Child</th>
@@ -213,7 +213,7 @@ export default function IdsHkRoomStatusModal({
               <div style={{ padding: '14px', fontSize: '11px' }}>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '80px' }}>Room #</label>
+                    <label style={{ width: '80px' }}>Room No.</label>
                     <input 
                       type="text" 
                       value={detailsForm.roomNo} 

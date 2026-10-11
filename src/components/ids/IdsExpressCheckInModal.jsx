@@ -10,14 +10,14 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
    VIDEOS 06 & 07: EXPRESS CHECK-IN (SINGLE & GROUP MULTI-ROOM) IN IDS 6.5 & 7.0
    Replication of:
    1. Express Check-In Console Split Window (Video 06 & Video 07 Frames 012 & 044)
-   2. Single Room Express Check-In: Res # 274, Room 102 (Sharma Rajesh & Sharma Sunita)
-   3. Group Multi-Room Check-In: Res # 276 (Group 003: Anil Kumar Group, 5 Rooms, 13 Pax)
+   2. Single Room Express Check-In: Res. No. 274, Room 102 (Sharma Rajesh & Sharma Sunita)
+   3. Group Multi-Room Check-In: Res. No. 276 (Group 003: Anil Kumar Group, 5 Rooms, 13 Pax)
    4. Group Allocation Console with summary & room assigning grid (Video 07 Frame 048)
    5. Room Type filter to 'EXE' and Room Availability Tape Chart (Frame 048–052)
    6. Progress overlay "Check-in Progress, Please wait..." (Frame 022)
    7. Confirmation Tables:
-      - Single: Res # 274, Room 102, Reg # 585 & 586 (Video 06 Frame 024)
-      - Group: Res # 276, Rooms 201, 205, 207, Reg # 613–618 (Video 07 Frame 056)
+      - Single: Res. No. 274, Room 102, Reg. No. 585 & 586 (Video 06 Frame 024)
+      - Group: Res. No. 276, Rooms 201, 205, 207, Reg. No. 613–618 (Video 07 Frame 056)
    8. Live desktop statistics & Room Rack Console synchronization (Frame 060)
    ========================================================================= */
 
@@ -268,7 +268,7 @@ export default function IdsExpressCheckInModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontWeight: 700 }}>Express Check-in V6.5.002.4</span>
             <span style={{ fontSize: '11px', color: '#333' }}>
-              {groupAllocationMode ? '[Group Allocation Console - Res # 276]' : '[Front Desk Rapid Check-In]'}
+              {groupAllocationMode ? '[Group Allocation Console - Res. No. 276]' : '[Front Desk Rapid Check-In]'}
             </span>
           </div>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
@@ -354,7 +354,7 @@ export default function IdsExpressCheckInModal({
                   <table className="ids-grid-table">
                     <thead>
                       <tr>
-                        <th style={{ width: '42px' }}>Res.#</th>
+                        <th style={{ width: '42px' }}>Res. No.</th>
                         <th style={{ width: '38px' }}>Title</th>
                         <th>Guest Name</th>
                         <th style={{ width: '28px', textAlign: 'center' }}>☑</th>
@@ -434,7 +434,7 @@ export default function IdsExpressCheckInModal({
                 </div>
 
                 <div style={{ background: '#FFFDE8', border: '1px solid #C4BE82', padding: '4px 8px', fontSize: '10px', color: '#685D00' }}>
-                  💡 <strong>Tip:</strong> Click on <strong>Res # 276 (Group 003)</strong> to open the Group Multi-Room Allocation Console!
+                  💡 <strong>Tip:</strong> Click on <strong>Res. No. 276 (Group 003)</strong> to open the Group Multi-Room Allocation Console!
                 </div>
               </>
             ) : (
@@ -443,7 +443,7 @@ export default function IdsExpressCheckInModal({
                 {/* Header Information Strip */}
                 <div style={{ border: '1px solid #716F64', background: '#F8F7F0', padding: '4px 6px', fontSize: '10px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px', textAlign: 'center' }}>
                   <div><span style={{ color: '#666', display: 'block' }}>Reservation</span><strong>276</strong></div>
-                  <div><span style={{ color: '#666', display: 'block' }}>Serial #</span><strong>1</strong></div>
+                  <div><span style={{ color: '#666', display: 'block' }}>Sr. No.</span><strong>1</strong></div>
                   <div><span style={{ color: '#666', display: 'block' }}>Arrival</span><strong>16-JAN-22</strong></div>
                   <div><span style={{ color: '#666', display: 'block' }}>Departure</span><strong>18-JAN-22</strong></div>
                   <div><span style={{ color: '#666', display: 'block' }}>Type</span><strong>EXE</strong></div>
@@ -511,9 +511,9 @@ export default function IdsExpressCheckInModal({
                   <table className="ids-grid-table">
                     <thead>
                       <tr>
-                        <th style={{ width: '24px' }}>#</th>
+                        <th style={{ width: '24px' }}>Sr.</th>
                         <th>Guest Name</th>
-                        <th style={{ width: '70px', textAlign: 'center' }}>Room #</th>
+                        <th style={{ width: '70px', textAlign: 'center' }}>Room No.</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -602,7 +602,7 @@ export default function IdsExpressCheckInModal({
                   style={{ fontWeight: 700, color: '#A02020', fontSize: '11px', margin: '0 6px', background: '#F8F7F0', padding: '1px 6px', border: '1px solid #CCC' }}
                   title="Hovered / Target Room"
                 >
-                  Room #{hoveredRoomNo}
+                  Room No.{hoveredRoomNo}
                 </span>
               </div>
 
@@ -697,7 +697,7 @@ export default function IdsExpressCheckInModal({
                 <table className="ids-grid-table" style={{ fontSize: '10px', minWidth: '600px' }}>
                   <thead>
                     <tr>
-                      <th style={{ width: '90px' }}>Room #</th>
+                      <th style={{ width: '90px' }}>Room No.</th>
                       <th style={{ width: '70px', textAlign: 'center' }}>Sun-16-01</th>
                       <th style={{ width: '70px', textAlign: 'center' }}>Mon-17-01</th>
                       <th style={{ width: '70px', textAlign: 'center' }}>Tue-18-01</th>
@@ -939,11 +939,11 @@ export default function IdsExpressCheckInModal({
                 <table className="ids-grid-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '45px' }}>Res #</th>
-                      <th style={{ width: '40px' }}>Srl #</th>
-                      <th style={{ width: '55px' }}>Room #</th>
+                      <th style={{ width: '45px' }}>Res. No.</th>
+                      <th style={{ width: '40px' }}>Sr. No.</th>
+                      <th style={{ width: '55px' }}>Room No.</th>
                       <th>Guest Name</th>
-                      <th style={{ width: '60px', textAlign: 'center' }}>Reg #</th>
+                      <th style={{ width: '60px', textAlign: 'center' }}>Reg. No.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -982,7 +982,7 @@ export default function IdsExpressCheckInModal({
         <div className="ids-modal-overlay" style={{ zIndex: 1300 }}>
           <div className="ids-dialog-window" style={{ width: '580px', maxWidth: '98vw' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontWeight: 700 }}>Group Check-In Completed (Res # 276)</span>
+              <span style={{ fontWeight: 700 }}>Group Check-In Completed (Res. No. 276)</span>
               <button className="ids-win-btn close" onClick={() => setGroupSummaryOpen(false)}>✕</button>
             </div>
 
@@ -991,11 +991,11 @@ export default function IdsExpressCheckInModal({
                 <table className="ids-grid-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '45px' }}>Res.#</th>
-                      <th style={{ width: '35px' }}>Srl #</th>
-                      <th style={{ width: '55px' }}>Room #</th>
+                      <th style={{ width: '45px' }}>Res. No.</th>
+                      <th style={{ width: '35px' }}>Sr. No.</th>
+                      <th style={{ width: '55px' }}>Room No.</th>
                       <th>Guest Name</th>
-                      <th style={{ width: '60px', textAlign: 'center' }}>Reg #</th>
+                      <th style={{ width: '60px', textAlign: 'center' }}>Reg. No.</th>
                     </tr>
                   </thead>
                   <tbody>

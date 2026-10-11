@@ -261,10 +261,10 @@ export function IdsQuickReservationModal({
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>
             {isGroupBooking 
-              ? 'Quick Reservation / Group Make V6.5.002.20 [Group # 003: Anil Kumar Group]'
+              ? 'Quick Reservation / Group Make V6.5.002.20 [Group 003: Anil Kumar Group]'
               : detailedMode 
-                ? (isCancel ? `Detailed Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
-                : (isCancel ? `Quick Reservation / Cancel V6.5.002.20 [Res. # ${resNumber}]` : isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. # ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
+                ? (isCancel ? `Detailed Reservation / Cancel V6.5.002.20 [Res. No. ${resNumber}]` : isModify ? `Detailed Reservation / Modify V6.5.002.20 [Res. No. ${resNumber}]` : 'Detailed Reservation / Make V6.5.002.20') 
+                : (isCancel ? `Quick Reservation / Cancel V6.5.002.20 [Res. No. ${resNumber}]` : isModify ? `Quick Reservation / Modify V6.5.002.20 [Res. No. ${resNumber}]` : 'Quick Reservation / Make V6.5.002.20')}
           </span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
@@ -626,7 +626,7 @@ export function IdsQuickReservationModal({
                   <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 70px 1fr', rowGap: '6px', columnGap: '8px', alignItems: 'center' }}>
                     <span>Name</span>
                     <input className="ids-input" value={guestDetail.name} onChange={(e) => setGuestDetail({ ...guestDetail, name: e.target.value })} />
-                    <span>Room #</span>
+                    <span>Room No.</span>
                     <input className="ids-input" value={guestDetail.roomNo} onChange={(e) => setGuestDetail({ ...guestDetail, roomNo: e.target.value })} />
 
                     <span>Street</span>
@@ -690,7 +690,7 @@ export function IdsQuickReservationModal({
                     Passport Details
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '75px 1fr 75px 1fr', rowGap: '5px', columnGap: '8px', alignItems: 'center' }}>
-                    <span>Passport #</span>
+                    <span>Passport No.</span>
                     <input className="ids-input" value={passportDetails.passportNo} onChange={(e) => setPassportDetails({ ...passportDetails, passportNo: e.target.value })} />
                     <span>Stay Days</span>
                     <input className="ids-input" value={passportDetails.stayDays} onChange={(e) => setPassportDetails({ ...passportDetails, stayDays: e.target.value })} />
@@ -768,7 +768,7 @@ export function IdsQuickReservationModal({
                       Browse
                     </button>
 
-                    <span>Identification#</span>
+                    <span>Identification No.</span>
                     <input className="ids-input" style={{ gridColumn: 'span 2' }} value={passportDetails.idNumber} onChange={(e) => setPassportDetails({ ...passportDetails, idNumber: e.target.value })} placeholder="Enter ID Proof Number" />
                   </div>
                 </div>
@@ -892,7 +892,7 @@ export function IdsQuickReservationModal({
                   onClick={() => {
                     setStatus('Confirmed');
                     playSuccessChime();
-                    alert(`✅ Reservation #${resNumber} re-confirmed with guest via SMS & WhatsApp.`);
+                    alert(`✅ Reservation No.${resNumber} re-confirmed with guest via SMS & WhatsApp.`);
                   }}
                 >
                   Re-Confirm
@@ -908,7 +908,7 @@ export function IdsQuickReservationModal({
                   type="button"
                   className="ids-btn-classic"
                   onClick={() => {
-                    alert(`🔒 Statutory Audit Trail:\n- Res. No: #${resNumber}\n- Created By: IT ADMIN\n- Terminal: WS-FRONTDESK-01\n- Timestamp: ${new Date().toLocaleString('en-IN')}`);
+                    alert(`🔒 Statutory Audit Trail:\n- Res. No: ${resNumber}\n- Created By: IT ADMIN\n- Terminal: WS-FRONTDESK-01\n- Timestamp: ${new Date().toLocaleString('en-IN')}`);
                   }}
                 >
                   Audit

@@ -5,7 +5,7 @@ import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
    VIDEO 10: GUEST MANAGEMENT & CHANGE GUEST INFORMATION IN IDS 6.5 & 7.0
    Replication of:
    1. Guest Management V6.5.002.1 Hub (Video 10 Frame 012)
-   2. Room Help V6.5.002.1 / Room# Search & Selector (Video 10 Frame 016)
+   2. Room Help V6.5.002.1 / Room No. Search & Selector (Video 10 Frame 016)
    3. Change Guest Information V6.5.001.20 Full Editor (Frames 022–060)
    4. Company Information V6.5.002.1 Dialog (Frame 052)
    5. Other Details V6.5.002.2 Dialog (Frame 056)
@@ -466,7 +466,7 @@ export function IdsGuestManagementModal({
 }
 
 /* =========================================================================
-   2. ROOM HELP V6.5.002.1 / ROOM# SEARCH & SELECT DIALOG (Frame 016)
+   2. ROOM HELP V6.5.002.1 / ROOM NO. SEARCH & SELECT DIALOG (Frame 016)
    ========================================================================= */
 export function IdsRoomHelpLookupModal({
   isOpen,
@@ -474,7 +474,7 @@ export function IdsRoomHelpLookupModal({
   guests = INITIAL_INHOUSE_GUESTS,
   onSelectGuest
 }) {
-  const [selectedRadio, setSelectedRadio] = useState('Room#');
+  const [selectedRadio, setSelectedRadio] = useState('Room No.');
   const [filterQuery, setFilterQuery] = useState('');
   const [selectedRoomNo, setSelectedRoomNo] = useState('301');
 
@@ -483,10 +483,10 @@ export function IdsRoomHelpLookupModal({
   const filteredGuests = guests.filter(g => {
     if (!filterQuery) return true;
     const q = filterQuery.toLowerCase();
-    if (selectedRadio === 'Room#') return g.roomNo.toLowerCase().includes(q);
+    if (selectedRadio === 'Room No.') return g.roomNo.toLowerCase().includes(q);
     if (selectedRadio === 'Guest Name') return g.guestName.toLowerCase().includes(q);
     if (selectedRadio === 'Company Name') return (g.companyName || '').toLowerCase().includes(q);
-    if (selectedRadio === 'Reg.#') return g.regNo.toLowerCase().includes(q);
+    if (selectedRadio === 'Reg. No.') return g.regNo.toLowerCase().includes(q);
     return g.roomNo.toLowerCase().includes(q) || g.guestName.toLowerCase().includes(q);
   });
 
@@ -514,7 +514,7 @@ export function IdsRoomHelpLookupModal({
       >
         {/* Title Bar matching Frame 016 */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontWeight: 700, fontSize: '11px' }}>Room Help V6.5.002.1 / Room#</span>
+          <span style={{ fontWeight: 700, fontSize: '11px' }}>Room Help V6.5.002.1 / Room No.</span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
 
@@ -524,9 +524,9 @@ export function IdsRoomHelpLookupModal({
           {/* Left Radio Options matching Frame 016 */}
           <div style={{ width: '135px', display: 'flex', flexDirection: 'column', gap: '2px', fontSize: '11px', borderRight: '1px solid #B5B2AB', paddingRight: '6px' }}>
             {[
-              'Room#', 'Group Name', 'Company Name', 'Nationality',
-              'Room Type', 'Guest Name', 'Resv.#', 'Gst. Status',
-              'Gst. Clf.', 'Reg.#', 'Passport #', 'Visa #'
+              'Room No.', 'Group Name', 'Company Name', 'Nationality',
+              'Room Type', 'Guest Name', 'Res. No.', 'Gst. Status',
+              'Gst. Clf.', 'Reg. No.', 'Passport No.', 'Visa No.'
             ].map((opt) => (
               <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                 <input 
@@ -565,12 +565,12 @@ export function IdsRoomHelpLookupModal({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
               <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080', zIndex: 1 }}>
                 <tr>
-                  <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '55px' }}>Room#</th>
-                  <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '45px' }}>Reg.#</th>
+                  <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '55px' }}>Room No.</th>
+                  <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '45px' }}>Reg. No.</th>
                   <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '65px' }}>Room Type</th>
                   <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB', width: '160px' }}>Guest Name</th>
                   <th style={{ padding: '2px 4px', borderRight: '1px solid #B5B2AB' }}>Company Name</th>
-                  <th style={{ padding: '2px 4px', width: '45px' }}>Resv.#</th>
+                  <th style={{ padding: '2px 4px', width: '45px' }}>Res. No.</th>
                 </tr>
               </thead>
               <tbody>
@@ -722,7 +722,7 @@ export function IdsChangeGuestInfoModal({
               </div>
 
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                <span>Reg. #</span>
+                <span>Reg. No.</span>
                 <input className="ids-input" value={formData.regNo || '580'} readOnly style={{ width: '45px', fontWeight: 700, background: '#EBEBE4' }} />
               </div>
 
@@ -733,7 +733,7 @@ export function IdsChangeGuestInfoModal({
             </div>
 
             <div style={{ marginTop: '4px', display: 'flex', gap: '4px', alignItems: 'center' }}>
-              <span>Room# / Folio #</span>
+              <span>Room No. / Folio No.</span>
               <input className="ids-input" value={formData.folioNo || `${formData.roomNo} / 1`} readOnly style={{ width: '70px', fontWeight: 700, background: '#EBEBE4' }} />
             </div>
           </div>
@@ -759,7 +759,7 @@ export function IdsChangeGuestInfoModal({
                 <span>Zip</span>
                 <input className="ids-input" value={formData.zip || ''} onChange={(e) => handleChange('zip', e.target.value)} />
 
-                <span>Telephone #</span>
+                <span>Phone No.</span>
                 <input className="ids-input" value={formData.telephone || ''} onChange={(e) => handleChange('telephone', e.target.value)} />
 
                 <span>Mobile</span>
@@ -882,7 +882,7 @@ export function IdsChangeGuestInfoModal({
           {/* Success Banner */}
           {saveSuccess && (
             <div style={{ padding: '4px 8px', background: '#DFF0D8', border: '1px solid #D6E9C6', color: '#3C763D', textAlign: 'center', fontWeight: 700, marginBottom: '6px' }}>
-              ✓ Guest Information for Room #{formData.roomNo} ({formData.lastName || formData.guestName}) Updated Successfully!
+              ✓ Guest Information for Room No.{formData.roomNo} ({formData.lastName || formData.guestName}) Updated Successfully!
             </div>
           )}
 
@@ -995,7 +995,7 @@ export function IdsCompanyInfoModal({ isOpen, onClose, initialCompany = '' }) {
             <span>Zip</span>
             <input className="ids-input" value={zip} onChange={(e) => setZip(e.target.value)} />
 
-            <span>Phone #</span>
+            <span>Phone No.</span>
             <input className="ids-input" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
 
@@ -1099,7 +1099,7 @@ export function IdsOtherDetailsModal({ isOpen, onClose }) {
                   <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Credit Card Type</th>
                   <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Card Number</th>
                   <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Expiry Date</th>
-                  <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Authorization #</th>
+                  <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Auth No.</th>
                   <th style={{ border: '1px solid #999', padding: '2px 4px' }}>Amount</th>
                 </tr>
               </thead>
@@ -1198,19 +1198,19 @@ export function IdsGuestInformationModal({
         </div>
 
         <div style={{ padding: '8px 10px', fontSize: '11px', color: '#000' }}>
-          {/* Top Row: Name/Room#, Total Pax, and Multi-Pax Guest List (Frames 070 & 102) */}
+          {/* Top Row: Name/Room No., Total Pax, and Multi-Pax Guest List (Frames 070 & 102) */}
           <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr 130px', gap: '8px', marginBottom: '8px', alignItems: 'start' }}>
             {/* Left Top Inputs */}
             <div>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontWeight: 600, width: '90px' }}>Name/Room#</span>
+                <span style={{ fontWeight: 600, width: '90px' }}>Name/Room No.</span>
                 <input 
                   className="ids-input" 
                   value={searchRoom} 
                   onChange={(e) => setSearchRoom(e.target.value)} 
                   style={{ width: '80px', fontWeight: 700, background: '#FFF' }} 
                 />
-                <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); const r = prompt("Search In-House Guest by Room #:", searchRoom); if (r) setSearchRoom(r); }}>?</button>
+                <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); const r = prompt("Search In-House Guest by Room No.: ", searchRoom); if (r) setSearchRoom(r); }}>?</button>
               </div>
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
@@ -1305,7 +1305,7 @@ export function IdsGuestInformationModal({
               <span>Room Night(s)</span>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <input className="ids-input" value={selectedGuest?.roomNights || 10} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
-                <span style={{ fontWeight: 600 }}>Ref #</span>
+                <span style={{ fontWeight: 600 }}>Ref. No.</span>
                 <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
               </div>
 
@@ -1318,10 +1318,10 @@ export function IdsGuestInformationModal({
               <span>Group</span>
               <input className="ids-input" value={selectedGuest?.group || 'Anirudh'} readOnly style={{ background: '#EBEBE4' }} />
 
-              <span>Plan / Passport#</span>
+              <span>Plan / Passport No.</span>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <input className="ids-input" value={selectedGuest?.planCode || 'CP'} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
-                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} placeholder="Passport #" />
+                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} placeholder="Passport No." />
               </div>
 
               <span>Bill Inst</span>
@@ -1360,7 +1360,7 @@ export function IdsGuestInformationModal({
               <span>Credit Limit(No)</span>
               <input className="ids-input" value="0.00" readOnly style={{ background: '#EBEBE4' }} />
 
-              <span>Credit Card #</span>
+              <span>Card No.</span>
               <input className="ids-input" value="" readOnly style={{ background: '#EBEBE4' }} />
 
               <span>Expiry Date</span>

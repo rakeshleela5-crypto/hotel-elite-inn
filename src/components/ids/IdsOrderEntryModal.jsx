@@ -619,7 +619,7 @@ export default function IdsOrderEntryModal({
         });
       }
 
-      setSaveSuccessMsg(`NC Bill Printed Successfully for Table ${targetTable} (KOT #${activeNcKotForPrint?.kotNo || '107'})! Table ${targetTable} Released to Vacant.`);
+      setSaveSuccessMsg(`NC Bill Printed Successfully for Table ${targetTable} (KOT ${activeNcKotForPrint?.kotNo || '107'})! Table ${targetTable} Released to Vacant.`);
       setTimeout(() => setSaveSuccessMsg(null), 4000);
     }, 800);
   };
@@ -702,7 +702,7 @@ export default function IdsOrderEntryModal({
       const sourceKots = prev.filter(k => k.tableNo === srcTbl && !k.settled);
       const otherKots = prev.filter(k => k.tableNo !== srcTbl);
 
-      // Transferred line items (KOT # 1314 on target table as shown in Frame 040)
+      // Transferred line items (KOT No. 1314 on target table as shown in Frame 040)
       const transferredLineItems = selectedItems.map(it => ({
         res: transferTargetOutlet || 'RES',
         code: it.code,
@@ -1000,7 +1000,7 @@ export default function IdsOrderEntryModal({
     setBilledTables(prev => prev.filter(t => t !== tableNo));
     setSettledTables(prev => Array.from(new Set([...prev, tableNo])));
     setLineItems([]);
-    setSaveSuccessMsg(`Shift+F9 [Bill and Settle]: Mini Bar KOT #${newKotNo} Punched, Bill #${newBillNo} (₹${nett}) Settled in 1-Click! Table ${tableNo} Cleared.`);
+    setSaveSuccessMsg(`Shift+F9 [Bill and Settle]: Mini Bar KOT ${newKotNo} Punched, Bill No.${newBillNo} (₹${nett}) Settled in 1-Click! Table ${tableNo} Cleared.`);
     setTimeout(() => setSaveSuccessMsg(null), 5000);
   };
 
@@ -1356,13 +1356,13 @@ export default function IdsOrderEntryModal({
 
     if (isUpdate) {
       setSavedKots(prev => prev.map(k => k.kotNo === targetKotNo ? updatedKotRecord : k));
-      setSaveSuccessMsg(`KOT #${targetKotNo} on Table ${tableNo} Updated! [Reason: ${appliedReason}]`);
+      setSaveSuccessMsg(`KOT ${targetKotNo} on Table ${tableNo} Updated! [Reason: ${appliedReason}]`);
     } else {
       setSavedKots(prev => [updatedKotRecord, ...prev]);
       if (isNcMode) {
-        setSaveSuccessMsg(`NC KOT #${targetKotNo} Generated for [${ncDept || 'Managers'}] (Guest: ${guestName || 'MANAGER IT'})!`);
+        setSaveSuccessMsg(`NC KOT ${targetKotNo} Generated for [${ncDept || 'Managers'}] (Guest: ${guestName || 'MANAGER IT'})!`);
       } else {
-        setSaveSuccessMsg(`KOT #${targetKotNo} Generated Successfully on Table ${tableNo}!`);
+        setSaveSuccessMsg(`KOT ${targetKotNo} Generated Successfully on Table ${tableNo}!`);
       }
     }
 
@@ -1428,7 +1428,7 @@ export default function IdsOrderEntryModal({
       saveLiveKots(existing);
       broadcastKotChannel(cancelKot);
 
-      setSaveSuccessMsg(`KOT #${kotToDelete} on Table ${targetTable} Deleted / Voided! [Reason: ${selectedReason}]`);
+      setSaveSuccessMsg(`KOT ${kotToDelete} on Table ${targetTable} Deleted / Voided! [Reason: ${selectedReason}]`);
       setTimeout(() => setSaveSuccessMsg(null), 3500);
 
       // Reset Order Entry form back to clean state (Video 06 Frame 28)
@@ -1826,7 +1826,7 @@ export default function IdsOrderEntryModal({
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ width: '55px', fontWeight: 600 }}>Table #</label>
+              <label style={{ width: '55px', fontWeight: 600 }}>Table No.</label>
               <input 
                 type="text" 
                 value={tableNo} 
@@ -1866,7 +1866,7 @@ export default function IdsOrderEntryModal({
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ width: '45px', fontWeight: 600 }}>KOT #</label>
+              <label style={{ width: '45px', fontWeight: 600 }}>KOT No.</label>
               <input 
                 type="text" 
                 value={kotNo} 
@@ -2081,7 +2081,7 @@ export default function IdsOrderEntryModal({
                                 if (e.key === 'Enter') {
                                   e.preventDefault();
                                   setRenamingRowIdx(null);
-                                  setSaveSuccessMsg(`Item #${item.code} renamed to "${item.name}"`);
+                                  setSaveSuccessMsg(`Item ${item.code} renamed to "${item.name}"`);
                                   setTimeout(() => setSaveSuccessMsg(null), 3000);
                                 } else if (e.key === 'Escape') {
                                   e.preventDefault();
@@ -2331,10 +2331,10 @@ export default function IdsOrderEntryModal({
               <span style={{ fontWeight: 600, color: selectedRowIdx !== null ? '#A00000' : (editingKotNo ? '#C00000' : '#000080') }}>
                 {editingKotNo 
                   ? (selectedRowIdx !== null
-                      ? `Row #${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT #${editingKotNo}`
-                      : `Editing KOT #${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
+                      ? `Row ${selectedRowIdx + 1} Selected (<F5> to delete item) | Click Delete Button to delete entire KOT ${editingKotNo}`
+                      : `Editing KOT ${editingKotNo} on Table ${tableNo} — Click on Delete Button to delete entire KOT`)
                   : (selectedRowIdx !== null 
-                      ? `Row #${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name || 'Item'}) Selected — Press <F5> from keyboard to delete item`
+                      ? `Row ${selectedRowIdx + 1} (${lineItems[selectedRowIdx]?.name || 'Item'}) Selected — Press <F5> from keyboard to delete item`
                       : 'Click on Item Code to delete item (<F5>) | Click on Quantity Field to Change Item Quantity')}
               </span>
             </div>
@@ -2534,7 +2534,7 @@ export default function IdsOrderEntryModal({
                     handleDeleteRow(lineItems.length - 1);
                   }
                 }}
-                title={editingKotNo ? `Delete entire KOT #${editingKotNo}` : "Delete item (<F5>)"}
+                title={editingKotNo ? `Delete entire KOT ${editingKotNo}` : "Delete item (<F5>)"}
                 style={{ 
                   minWidth: '60px', 
                   fontWeight: (editingKotNo || selectedRowIdx !== null) ? 700 : 400, 
@@ -2576,7 +2576,7 @@ export default function IdsOrderEntryModal({
         </div>
       )}
 
-      {/* 3. TABLE # HELP MODAL (Video 01 Frame 015) */}
+      {/* 3. TABLE NO. HELP MODAL (Video 01 Frame 015) */}
       {tableHelpOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
           <div 
@@ -2584,7 +2584,7 @@ export default function IdsOrderEntryModal({
             style={{ width: '280px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '3px 3px 12px rgba(0,0,0,0.6)' }}
           >
             <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Table # Help</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Table No. Help</span>
               <button className="ids-win-btn close" onClick={() => setTableHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
             </div>
             <div style={{ padding: '8px' }}>
@@ -2838,9 +2838,9 @@ export default function IdsOrderEntryModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Accounting Date</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'center', width: '60px' }}>Table #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'center', width: '60px' }}>Table No.</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left' }}>Server</th>
                     </tr>
                   </thead>
@@ -3326,7 +3326,7 @@ export default function IdsOrderEntryModal({
                   <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #999', zIndex: 1 }}>
                     <tr>
                       <th style={{ width: '38px', padding: '3px 4px', borderRight: '1px solid #DDD', textAlign: 'center' }}>Type</th>
-                      <th style={{ width: '48px', padding: '3px 4px', borderRight: '1px solid #DDD', textAlign: 'center' }}>KOT#</th>
+                      <th style={{ width: '48px', padding: '3px 4px', borderRight: '1px solid #DDD', textAlign: 'center' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'left' }}>Item Name</th>
                       <th style={{ width: '55px', padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'right' }}>Qty</th>
                       <th style={{ width: '65px', padding: '3px 6px', borderRight: '1px solid #DDD', textAlign: 'right' }}>Value</th>
@@ -3348,7 +3348,7 @@ export default function IdsOrderEntryModal({
                     ) : (
                       <tr>
                         <td colSpan={6} style={{ textAlign: 'center', padding: '30px', color: '#888', fontStyle: 'italic' }}>
-                          {ncPrintTable ? `No Pending NC KOT found on Table ${ncPrintTable}. Click (?) to select a pending table.` : 'Enter or select a Table # with pending NC orders.'}
+                          {ncPrintTable ? `No Pending NC KOT found on Table ${ncPrintTable}. Click (?) to select a pending table.` : 'Enter or select a Table No. with pending NC orders.'}
                         </td>
                       </tr>
                     )}
@@ -3428,7 +3428,7 @@ export default function IdsOrderEntryModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ width: '70px', padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Table #</th>
+                      <th style={{ width: '70px', padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Table No.</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left' }}>Server/Member Name</th>
                     </tr>
                   </thead>
@@ -3615,7 +3615,7 @@ export default function IdsOrderEntryModal({
               {/* Source & Target Table Controls (Frames 028–032) */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#DDD', padding: '6px 10px', border: '1px solid #BBB' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontWeight: 700 }}>Source Table #</span>
+                  <span style={{ fontWeight: 700 }}>Source Table No.</span>
                   <input 
                     type="text" 
                     value={transferSourceTable} 
@@ -3634,7 +3634,7 @@ export default function IdsOrderEntryModal({
                 </button>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontWeight: 700 }}>Target Table #</span>
+                  <span style={{ fontWeight: 700 }}>Target Table No.</span>
                   <input 
                     type="text" 
                     value={transferTargetTable} 
@@ -3657,7 +3657,7 @@ export default function IdsOrderEntryModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', width: '65px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Code</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', width: '65px', textAlign: 'right', borderRight: '1px solid #B0B0B0' }}>Quantity</th>
@@ -3668,7 +3668,7 @@ export default function IdsOrderEntryModal({
                     {transferGridItems.length === 0 ? (
                       <tr>
                         <td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#888', fontStyle: 'italic' }}>
-                          Enter Occupied Table # and click [ Load ] to fetch running KOT items.
+                          Enter Occupied Table No. and click [ Load ] to fetch running KOT items.
                         </td>
                       </tr>
                     ) : (
@@ -3935,7 +3935,7 @@ export default function IdsOrderEntryModal({
               <div style={{ padding: '10px', fontSize: '11px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', background: '#DDD', padding: '6px', border: '1px solid #BBB' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 600 }}>Table #</span>
+                    <span style={{ fontWeight: 600 }}>Table No.</span>
                     <input type="text" readOnly value={selectedTableForDetails} style={{ width: '45px', fontWeight: 700, textAlign: 'center', background: '#FFF', border: '1px solid #7F9DB9' }} />
                     <span style={{ fontWeight: 700 }}>?</span>
                   </div>
@@ -3950,7 +3950,7 @@ export default function IdsOrderEntryModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT #</th>
+                        <th style={{ padding: '3px 6px', width: '55px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>KOT No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0B0B0' }}>Item Name</th>
                         <th style={{ padding: '3px 6px', width: '60px', textAlign: 'right', borderRight: '1px solid #B0B0B0' }}>Quantity</th>
                         <th style={{ padding: '3px 6px', width: '70px', textAlign: 'right' }}>Value</th>
@@ -4070,7 +4070,7 @@ export default function IdsOrderEntryModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '65px' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '65px' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'right', width: '65px' }}>Quantity</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left', width: '80px' }}>Server</th>
@@ -4138,7 +4138,7 @@ export default function IdsOrderEntryModal({
             <div style={{ padding: '12px 14px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {/* Source Table Input */}
               <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontWeight: 700 }}>Source Table #</span>
+                <span style={{ fontWeight: 700 }}>Source Table No.</span>
                 <input 
                   type="text" 
                   value={linkSourceTable} 
@@ -4268,8 +4268,8 @@ export default function IdsOrderEntryModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>Table #</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>KOT #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>Table No.</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'left' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '65px', textAlign: 'left' }}>KOT Time</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', width: '55px', textAlign: 'right' }}>Quantity</th>
@@ -4315,8 +4315,8 @@ export default function IdsOrderEntryModal({
 
               {/* Footnote shortcuts matching Frame 103 */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#333', background: '#E6E4DC', padding: '3px 8px', border: '1px solid #CCC' }}>
-                <span>Dbl Click on Tbl# to select all the KOTs</span>
-                <span>Dbl Click on KOT # to select all items of that KOT</span>
+                <span>Dbl Click on Table No. to select all the KOTs</span>
+                <span>Dbl Click on KOT No. to select all items of that KOT</span>
               </div>
 
               {/* Subtitle description matching Video 13 Frame 103 */}
@@ -4548,7 +4548,7 @@ export default function IdsOrderEntryModal({
           setBilledTables(prev => prev.filter(t => t !== tNo));
           setSettledTables(prev => Array.from(new Set([...prev, tNo])));
           setSavedKots(prev => prev.filter(k => k.tableNo !== tNo));
-          setSaveSuccessMsg(`Bill #${settlementRecord.billNo} on Table ${tNo} Settled! Table is now Vacant.`);
+          setSaveSuccessMsg(`Bill No.${settlementRecord.billNo} on Table ${tNo} Settled! Table is now Vacant.`);
           setTimeout(() => setSaveSuccessMsg(null), 3000);
         }}
       />
@@ -4567,7 +4567,7 @@ export default function IdsOrderEntryModal({
           setBilledTables(prev => prev.filter(t => t !== tNo));
           setSettledTables(prev => Array.from(new Set([...prev, tNo])));
           setSavedKots(prev => prev.filter(k => k.tableNo !== tNo));
-          setSaveSuccessMsg(`Bill #${settlementRecord.billNo} on Table ${tNo} Settled! Table ${tNo} is now Vacant.`);
+          setSaveSuccessMsg(`Bill No.${settlementRecord.billNo} on Table ${tNo} Settled! Table ${tNo} is now Vacant.`);
           setTimeout(() => setSaveSuccessMsg(null), 3000);
         }}
         onOpenCrystalReport={onOpenCrystalReport}
@@ -5248,7 +5248,7 @@ export default function IdsOrderEntryModal({
                     <div style={{ borderTop: '1px dashed #000', margin: '4px 0' }}></div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
                       <span>Table: T-{tableNo || '10'}</span>
-                      <span>KOT #: {kotNo === 'AUTO' ? '1312' : kotNo}</span>
+                      <span>KOT No.: {kotNo === 'AUTO' ? '1312' : kotNo}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px' }}>
                       <span>Server: {server || 'Biren'}</span>

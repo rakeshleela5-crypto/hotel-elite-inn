@@ -102,20 +102,20 @@ export default function IdsMenuGroupsModal({
     setApplicableFrom(accountingDate);
     setUser(currentUser);
     setLastUpdated(`${accountingDate} 18:48`);
-    showNotification(`New Menu Group #${nextCode} entry initiated.`);
+    showNotification(`New Menu Group ${nextCode} entry initiated.`);
   };
 
   // Action: Modify
   const handleModify = () => {
     if (groups.length === 0) return;
     setFormMode('MODIFY');
-    showNotification(`Editing Menu Group #${groupCode} (${groupName}).`);
+    showNotification(`Editing Menu Group ${groupCode} (${groupName}).`);
   };
 
   // Action: Delete
   const handleDelete = () => {
     if (groups.length === 0) return;
-    const confirmDelete = window.confirm(`Are you sure you want to delete Menu Group #${groupCode} - "${groupName}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete Menu Group ${groupCode} - "${groupName}"?`);
     if (!confirmDelete) return;
 
     const filtered = groups.filter(g => String(g.code) !== String(groupCode));
@@ -124,7 +124,7 @@ export default function IdsMenuGroupsModal({
     const newIdx = Math.max(0, currentIndex - 1);
     setCurrentIndex(newIdx);
     setFormMode('VIEW');
-    showNotification(`Menu Group #${groupCode} successfully deleted.`);
+    showNotification(`Menu Group ${groupCode} successfully deleted.`);
   };
 
   // Action: Save (Frame 045)
@@ -164,7 +164,7 @@ export default function IdsMenuGroupsModal({
 
     // Trigger Video 14 Note requirement: "Touch Screen Group also need to create after Menu Group Creation."
     setTouchGroupAlertOpen(true);
-    showNotification(`Menu Group #${codeNum} ("${updatedRecord.name}") saved successfully!`);
+    showNotification(`Menu Group ${codeNum} ("${updatedRecord.name}") saved successfully!`);
   };
 
   // Navigation: Previous
@@ -672,7 +672,7 @@ export default function IdsMenuGroupsModal({
                 IDS POS Workflow Requirement (Video 14):
               </div>
               <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '8px 10px', lineHeight: '16px' }}>
-                <div>• Menu Group: <b>#{groupCode} - {groupName}</b></div>
+                <div>• Menu Group: <b>Code {groupCode} - {groupName}</b></div>
                 <div>• Touch Screen Group Mapping: <b>TSG-{groupCode.padStart(2, '0')} ({groupName})</b></div>
                 <div>• Outlet: <b>RESTAURANT &amp; LIQUOR BAR</b></div>
                 <div style={{ color: '#008000', fontWeight: 700, marginTop: '4px' }}>

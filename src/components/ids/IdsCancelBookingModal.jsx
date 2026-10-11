@@ -206,7 +206,7 @@ export function IdsDepositRefundModal({
         </div>
 
         <div style={{ padding: '12px 14px' }}>
-          {/* Header Row: Type & Res.# */}
+          {/* Header Row: Type & Res. No. */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontWeight: 600 }}>Type</span>
@@ -217,14 +217,14 @@ export function IdsDepositRefundModal({
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ fontWeight: 600 }}>Res.#</span>
+              <span style={{ fontWeight: 600 }}>Res. No.</span>
               <input 
                 className="ids-input" 
                 style={{ width: '80px', fontWeight: 700, textAlign: 'center' }} 
                 value={booking.resNo || '270'} 
                 readOnly 
               />
-              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }} onClick={() => { playReceptionChime(); alert(`Lookup Reservation: #${booking.resNo || '270'} (${booking.guestName})`); }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }} onClick={() => { playReceptionChime(); alert(`Lookup Reservation: ${booking.resNo || '270'} (${booking.guestName})`); }}>?</button>
             </div>
           </div>
 
@@ -674,7 +674,7 @@ export function IdsCancellationVoucherModal({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '14px', fontSize: '11px' }}>
             <div><strong>Cancellation No:</strong> {cancelRecord.cancellationNo || 'CAN-2026-0270'}</div>
             <div><strong>Date & Time:</strong> {new Date().toLocaleString()}</div>
-            <div><strong>Original Res. #:</strong> {cancelRecord.resNo || '270'}</div>
+            <div><strong>Original Res. No.:</strong> {cancelRecord.resNo || '270'}</div>
             <div><strong>Status:</strong> <span style={{ color: '#A02020', fontWeight: 700 }}>CANCELLED</span></div>
           </div>
 
@@ -689,7 +689,7 @@ export function IdsCancellationVoucherModal({
             <span>{cancelRecord.companyName || 'QUALITY PHARMA PRODUCTS PVT LTD.'}</span>
 
             <span>Room Category:</span>
-            <span>{cancelRecord.type || 'EXECUTIVE'} (Room #{cancelRecord.roomNo || '515'} - Inventory Released)</span>
+            <span>{cancelRecord.type || 'EXECUTIVE'} (Room No.{cancelRecord.roomNo || '515'} - Inventory Released)</span>
 
             <span>Arrival Date:</span>
             <span>{cancelRecord.arrivalDate || '14-JAN-2026'}</span>

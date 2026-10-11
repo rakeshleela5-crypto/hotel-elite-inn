@@ -464,9 +464,9 @@ export default function IdsServersModal({
               />
             </div>
 
-            {/* 5. Employee # */}
+            {/* 5. Employee No. */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 600, color: '#000' }}>Employee #</span>
+              <span style={{ fontWeight: 600, color: '#000' }}>Employee No.</span>
               <input 
                 type="text" 
                 value={employeeNo} 

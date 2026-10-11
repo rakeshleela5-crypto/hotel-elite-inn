@@ -202,7 +202,7 @@ export default function IdsLaundryBillPrintingModal({
             {/* Room & Name & Departure */}
             <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <label style={{ width: '50px' }}>Room#</label>
+                <label style={{ width: '50px' }}>Room No.</label>
                 <input 
                   type="text" 
                   value={roomNo} 

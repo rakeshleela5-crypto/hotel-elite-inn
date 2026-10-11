@@ -377,7 +377,7 @@ export default function IdsTransferFolioModal({
                       />
                     </div>
 
-                    <div style={{ fontWeight: 600 }}>Folio #</div>
+                    <div style={{ fontWeight: 600 }}>Folio No.</div>
                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                       <input 
                         type="text" 
@@ -385,7 +385,7 @@ export default function IdsTransferFolioModal({
                         readOnly 
                         style={{ width: '50px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
                       />
-                      <span style={{ fontWeight: 600 }}>Reg. #</span>
+                      <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
                         value={sourceGuest.regNo} 
@@ -428,7 +428,7 @@ export default function IdsTransferFolioModal({
                       />
                     </div>
 
-                    <div style={{ fontWeight: 600 }}>Folio #</div>
+                    <div style={{ fontWeight: 600 }}>Folio No.</div>
                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                       <input 
                         type="text" 
@@ -436,7 +436,7 @@ export default function IdsTransferFolioModal({
                         readOnly 
                         style={{ width: '50px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
                       />
-                      <span style={{ fontWeight: 600 }}>Reg #</span>
+                      <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
                         value={targetGuest.regNo} 
@@ -564,7 +564,7 @@ export default function IdsTransferFolioModal({
                         <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '55px' }}>REV</th>
                         <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8' }}>Description</th>
                         <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '95px' }}>Date</th>
-                        <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '50px' }}>Bill #</th>
+                        <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '50px' }}>Bill No.</th>
                         <th style={{ padding: '3px 6px', width: '85px', textAlign: 'right' }}>Amount</th>
                       </tr>
                     </thead>
@@ -710,7 +710,7 @@ export default function IdsTransferFolioModal({
                   <span>|</span>
                   <span>Group: <strong>ALL</strong></span>
                   <span>|</span>
-                  <span>Room #: <strong style={{ color: '#0A246A' }}>{fromRoomNo}</strong></span>
+                  <span>Room No.: <strong style={{ color: '#0A246A' }}>{fromRoomNo}</strong></span>
                   <span>|</span>
                   <span>Guest: <strong>{sourceGuest.guestName}</strong></span>
                 </div>
@@ -727,13 +727,13 @@ export default function IdsTransferFolioModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ background: '#ECE9D8' }}>
                     <tr style={{ borderBottom: '1px solid #ACA899' }}>
-                      <th style={{ padding: '3px 4px', width: '30px' }}>Sl #</th>
+                      <th style={{ padding: '3px 4px', width: '30px' }}>Sr. No.</th>
                       <th style={{ padding: '3px 6px', width: '125px' }}>Date</th>
-                      <th style={{ padding: '3px 4px', width: '40px' }}>Resv#</th>
-                      <th style={{ padding: '3px 4px', width: '45px' }}>Room#</th>
-                      <th style={{ padding: '3px 4px', width: '40px' }}>Reg#</th>
+                      <th style={{ padding: '3px 4px', width: '40px' }}>Res. No.</th>
+                      <th style={{ padding: '3px 4px', width: '45px' }}>Room No.</th>
+                      <th style={{ padding: '3px 4px', width: '40px' }}>Reg. No.</th>
                       <th style={{ padding: '3px 4px', width: '50px' }}>RevCod</th>
-                      <th style={{ padding: '3px 4px', width: '35px' }}>Bill #</th>
+                      <th style={{ padding: '3px 4px', width: '35px' }}>Bill No.</th>
                       <th style={{ padding: '3px 6px' }}>Particulars</th>
                       <th style={{ padding: '3px 6px', width: '80px', textAlign: 'right' }}>Amount</th>
                     </tr>
@@ -794,7 +794,7 @@ export default function IdsTransferFolioModal({
                   <span>|</span>
                   <span>Group: <strong>ALL</strong></span>
                   <span>|</span>
-                  <span>Room #: <strong style={{ color: '#006600' }}>{toRoomNo}</strong></span>
+                  <span>Room No.: <strong style={{ color: '#006600' }}>{toRoomNo}</strong></span>
                   <span>|</span>
                   <span>Guest: <strong>{targetGuest.guestName}</strong></span>
                 </div>
@@ -811,13 +811,13 @@ export default function IdsTransferFolioModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ background: '#ECE9D8' }}>
                     <tr style={{ borderBottom: '1px solid #ACA899' }}>
-                      <th style={{ padding: '3px 4px', width: '30px' }}>Sl #</th>
+                      <th style={{ padding: '3px 4px', width: '30px' }}>Sr. No.</th>
                       <th style={{ padding: '3px 6px', width: '125px' }}>Date</th>
-                      <th style={{ padding: '3px 4px', width: '40px' }}>Resv#</th>
-                      <th style={{ padding: '3px 4px', width: '45px' }}>Room#</th>
-                      <th style={{ padding: '3px 4px', width: '40px' }}>Reg#</th>
+                      <th style={{ padding: '3px 4px', width: '40px' }}>Res. No.</th>
+                      <th style={{ padding: '3px 4px', width: '45px' }}>Room No.</th>
+                      <th style={{ padding: '3px 4px', width: '40px' }}>Reg. No.</th>
                       <th style={{ padding: '3px 4px', width: '50px' }}>RevCod</th>
-                      <th style={{ padding: '3px 4px', width: '35px' }}>Bill #</th>
+                      <th style={{ padding: '3px 4px', width: '35px' }}>Bill No.</th>
                       <th style={{ padding: '3px 6px' }}>Particulars</th>
                       <th style={{ padding: '3px 6px', width: '80px', textAlign: 'right' }}>Amount</th>
                     </tr>

@@ -21,8 +21,8 @@ import { INITIAL_RATE_TABLES } from './IdsCompanyContractRatesModal';
    3. Fields & Linked Data (Frames 012 & 024):
       - Company...: COM0002 with [ ? ] lookup
       - Com. Name: Tata Motors Limited
-      - Tel #: +91 22 6665 8282
-      - IATA #: 98765432
+      - Tel No.: +91 22 6665 8282
+      - IATA No.: 98765432
       - Rate Structure: 100 with [ ? ] lookup + [ Package ] button
       - Description: Rate for Tata Motors Limited
       - Amenities: WELCOM with [ ? ] lookup
@@ -205,7 +205,7 @@ export default function IdsLinkRatesToCompanyModal({
       }
     }));
     setRateTableLookupOpen(false);
-    setStatusMessage(`Linked Rate Table #${table.tableNo} "${table.description}"`);
+    setStatusMessage(`Linked Rate Table No.${table.tableNo} "${table.description}"`);
     setTimeout(() => setStatusMessage(''), 3500);
   };
 
@@ -410,7 +410,7 @@ export default function IdsLinkRatesToCompanyModal({
                   style={{ width: '100%', background: '#F0F0F0', fontWeight: 600 }} 
                 />
 
-                <span style={{ fontWeight: 600 }}>Tel #</span>
+                <span style={{ fontWeight: 600 }}>Tel No.</span>
                 <input 
                   className="ids-input" 
                   value={formData.tel || ''} 
@@ -418,7 +418,7 @@ export default function IdsLinkRatesToCompanyModal({
                   style={{ width: '100%' }} 
                 />
 
-                <span style={{ fontWeight: 600 }}>IATA #</span>
+                <span style={{ fontWeight: 600 }}>IATA No.</span>
                 <input 
                   className="ids-input" 
                   value={formData.iata || ''} 
@@ -804,7 +804,7 @@ export default function IdsLinkRatesToCompanyModal({
                     className="ids-input" 
                     value={searchRateTerm} 
                     onChange={(e) => setSearchRateTerm(e.target.value)} 
-                    placeholder="Search table # or description..."
+                    placeholder="Search table no. or description..."
                     style={{ flex: 1, padding: '2px 6px' }}
                     autoFocus
                   />
@@ -814,7 +814,7 @@ export default function IdsLinkRatesToCompanyModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Table #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Table No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Description</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '50px' }}>Plan</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '50px' }}>Curr</th>

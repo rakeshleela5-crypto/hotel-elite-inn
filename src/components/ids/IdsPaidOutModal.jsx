@@ -27,7 +27,7 @@ import {
       - [ Bill Settle ] button is locked until Paidout is executed.
    4. Paidouts V6.5.008.30 Window (Frame 085):
       - (o) Rooms | ( ) City Ledger
-      - Room#: 201 | Reg #: 1925 | Folio #: 1 | Guest: Mr Arnab Sharma
+      - Room No.: 201 | Reg. No.: 1925 | Folio No.: 1 | Guest: Mr Arnab Sharma
       - Mode: (o) Cash Paidout | ( ) Credit Card Paidout | ( ) Cheque Paidout
       - Currency: INR | Exchange Rate: 1.00
       - Paid out Amount: 1500.00 ("Enter the Negative amount noted on Check-out Screen")
@@ -86,7 +86,7 @@ export default function IdsPaidOutModal({
     }
 
     setPaidOutExecuted(true);
-    setStatusMessage(`Paid-Out Voucher #${voucherNo} for ₹${amt.toFixed(2)} saved! Folio balance is now ₹0.00.`);
+    setStatusMessage(`Paid-Out Voucher No.${voucherNo} for ₹${amt.toFixed(2)} saved! Folio balance is now ₹0.00.`);
     setCurrentStep('checkoutZero');
     setTimeout(() => setStatusMessage(''), 4000);
   };
@@ -177,10 +177,10 @@ export default function IdsPaidOutModal({
             {/* Header info */}
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '6px 10px', marginBottom: '8px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '70px 60px 50px 70px 60px 1fr 70px 90px', gap: '6px 8px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={roomNo} readOnly style={{ width: '50px', fontWeight: 700 }} />
 
-                <span style={{ fontWeight: 600 }}>Reg. #</span>
+                <span style={{ fontWeight: 600 }}>Reg. No.</span>
                 <input className="ids-input" value={regNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Guest</span>
@@ -197,8 +197,8 @@ export default function IdsPaidOutModal({
                 <thead style={{ background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                   <tr>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '35px' }}>Select</th>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '35px' }}>Srl #</th>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Room#</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '35px' }}>Sr. No.</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Room No.</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
                     <th style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #B0AB9A', width: '70px' }}>Rate</th>
                     <th style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #B0AB9A', width: '65px' }}>Charges</th>
@@ -296,15 +296,15 @@ export default function IdsPaidOutModal({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '85px 80px 80px 70px 1fr', gap: '6px 8px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={roomNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
 
-                <span style={{ fontWeight: 600 }}>Folio #</span>
+                <span style={{ fontWeight: 600 }}>Folio No.</span>
                 <input className="ids-input" value={folioNo} readOnly style={{ width: '40px' }} />
 
                 <div></div>
 
-                <span style={{ fontWeight: 600 }}>Registration #</span>
+                <span style={{ fontWeight: 600 }}>Registration No.</span>
                 <input className="ids-input" value={regNo} readOnly style={{ width: '80px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -408,7 +408,7 @@ export default function IdsPaidOutModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
                 <thead style={{ background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                   <tr>
-                    <th style={{ padding: '2px 4px', textAlign: 'left', width: '30px' }}>SL#</th>
+                    <th style={{ padding: '2px 4px', textAlign: 'left', width: '30px' }}>Sr. No.</th>
                     <th style={{ padding: '2px 4px', textAlign: 'left', width: '105px' }}>Date</th>
                     <th style={{ padding: '2px 4px', textAlign: 'left', width: '50px' }}>RevCod</th>
                     <th style={{ padding: '2px 4px', textAlign: 'left' }}>Particulars</th>
@@ -461,7 +461,7 @@ export default function IdsPaidOutModal({
                 <thead style={{ background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                   <tr>
                     <th style={{ padding: '3px 6px', textAlign: 'left', width: '35px' }}>Select</th>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', width: '55px' }}>Room#</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', width: '55px' }}>Room No.</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left' }}>Guest Name</th>
                     <th style={{ padding: '3px 6px', textAlign: 'right', width: '70px' }}>Rate</th>
                     <th style={{ padding: '3px 6px', textAlign: 'right', width: '65px' }}>Charges</th>
@@ -581,7 +581,7 @@ export default function IdsPaidOutModal({
                 className="ids-dialog-titlebar plain" 
                 style={{ background: '#0A246A', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
               >
-                <span>Paid-Out Voucher #{voucherNo}</span>
+                <span>Paid-Out Voucher No.{voucherNo}</span>
                 <button className="ids-win-btn close" onClick={() => setVoucherModalOpen(false)}>✕</button>
               </div>
 
@@ -592,7 +592,7 @@ export default function IdsPaidOutModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div><strong>Voucher #:</strong> {voucherNo}</div>
+                  <div><strong>Voucher No.:</strong> {voucherNo}</div>
                   <div><strong>Date:</strong> {accountingDate}</div>
                 </div>
 

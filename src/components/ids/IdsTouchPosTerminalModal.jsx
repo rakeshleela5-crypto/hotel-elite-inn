@@ -355,7 +355,7 @@ export default function IdsTouchPosTerminalModal({
                   {item.name}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                  <span style={{ fontSize: '10px', color: '#A0AEC0' }}>#{item.code}</span>
+                  <span style={{ fontSize: '10px', color: '#A0AEC0' }}>{item.code}</span>
                   <span style={{ fontSize: '12px', fontWeight: 800, color: '#48BB78' }}>
                     ₹{item.price.toFixed(0)}
                   </span>

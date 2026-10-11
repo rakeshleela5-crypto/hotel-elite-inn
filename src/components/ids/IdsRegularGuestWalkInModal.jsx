@@ -24,7 +24,7 @@ import {
       - Auto-filled Profile:
         * Address: ( LSR LOGISTICS )
         * City: PORK M... | State: ARUNACHAL PRADESH | Country: INDIA | Zip: 791113
-        * Mobile #: 09779330784 | Email ID: gurkanwar@lsrlogistics.com
+        * Mobile No.: 09779330784 | Email ID: gurkanwar@lsrlogistics.com
         * Gender: Male | GST No: 12AABCL7890Q1ZX | Classification: Regular | Status: REG
         * Company: TRA0001 | Plan: CP | Rate: Discount | PayMode: CAS
    5. Rate Details & Confirmation Dialog (Frame 026):
@@ -302,11 +302,11 @@ export default function IdsRegularGuestWalkInModal({
         {currentStep === 'roomRack' && (
           <div style={{ padding: '12px 16px', fontSize: '11px' }}>
             
-            {/* Top Controls: Room#, Departure, Name fields */}
+            {/* Top Controls: Room No., Departure, Name fields */}
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px 12px', marginBottom: '10px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '70px 100px 90px 120px 70px 1fr', gap: '8px 10px', alignItems: 'center', marginBottom: '10px' }}>
                 
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input 
                   className="ids-input" 
                   value={roomNo} 
@@ -405,7 +405,7 @@ export default function IdsRegularGuestWalkInModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '80px' }}>Room #</th>
+                      <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '80px' }}>Room No.</th>
                       <th style={{ padding: '3px 6px', textAlign: 'center', borderRight: '1px solid #B0AB9A', width: '70px' }}>FRI-25-02</th>
                       <th style={{ padding: '3px 6px', textAlign: 'center', borderRight: '1px solid #B0AB9A', width: '70px' }}>SAT-26-02</th>
                       <th style={{ padding: '3px 6px', textAlign: 'center', borderRight: '1px solid #B0AB9A', width: '70px' }}>SUN-27-02</th>
@@ -476,14 +476,14 @@ export default function IdsRegularGuestWalkInModal({
         {currentStep === 'walkInForm' && (
           <div style={{ padding: '12px 16px', fontSize: '11px' }}>
             
-            {/* Header: Registration for 202, Pax: 1, Folio #: 1 */}
+            {/* Header: Registration for 202, Pax: 1, Folio No.: 1 */}
             <div style={{ background: '#ECE9D8', border: '2px groove #ECE9D8', padding: '6px 10px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ fontWeight: 700, color: '#0A246A', fontSize: '12px' }}>
                 Registration for {roomNo} (Executive Room)
               </div>
               <div style={{ display: 'flex', gap: '14px', fontWeight: 700 }}>
                 <span>Pax: 1</span>
-                <span>Folio #: 1</span>
+                <span>Folio No.: 1</span>
                 <span style={{ color: '#137333' }}>Status: REGULAR GUEST (AUTO-FILLED)</span>
               </div>
             </div>
@@ -517,7 +517,7 @@ export default function IdsRegularGuestWalkInModal({
                     <span style={{ fontWeight: 600 }}>Zip</span>
                     <input className="ids-input" value={formData.zip} readOnly style={{ width: '100px', background: '#F0F0F0' }} />
 
-                    <span style={{ fontWeight: 600 }}>Mobile #</span>
+                    <span style={{ fontWeight: 600 }}>Mobile No.</span>
                     <input className="ids-input" value={formData.mobile} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
 
                     <span style={{ fontWeight: 600 }}>Email ID</span>
@@ -629,7 +629,7 @@ export default function IdsRegularGuestWalkInModal({
 
             <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '14px 18px', maxWidth: '480px', margin: '0 auto 16px auto', textAlign: 'left' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '6px' }}>
-                <div><strong>Registration #:</strong></div>
+                <div><strong>Registration No.: </strong></div>
                 <div style={{ fontWeight: 700, color: '#0A246A' }}>REG/2026/{assignedRegNo}</div>
                 <div><strong>Assigned Room:</strong></div>
                 <div style={{ fontWeight: 700, color: '#C5221F' }}>Room {roomNo} (Executive Room)</div>
@@ -702,7 +702,7 @@ export default function IdsRegularGuestWalkInModal({
                       <tr>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '70px' }}>Profile ID</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Full Name</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '100px' }}>Mobile #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '100px' }}>Mobile No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '90px' }}>City</th>
                         <th style={{ padding: '3px 6px', textAlign: 'center', width: '50px' }}>Visits</th>
                       </tr>

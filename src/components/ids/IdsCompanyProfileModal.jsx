@@ -17,9 +17,9 @@ import {
       - Classification: Companies (Companies, Travel Agent, Corporate FIT)
       - Watch List: No / Yes
       - Address: Kolkata, City: Kolkata, State: West Bengal, Country: India, Zip: 781225
-      - Phone #: 9128562985, Mobile #: 9128562985
+      - Phone: 9128562985, Mobile No.: 9128562985
       - Email: xyz@gmail.com, Web: www.makemytrip.com
-      - Status: Active, GSTIN #: 21AAAAAA12341ZT
+      - Status: Active, GSTIN: 21AAAAAA12341ZT
    3. Sales & Market Segments (Frames 050–065):
       - Bill Inst: 2
       - Mar.Seg: OTA (Online Travel Agent)
@@ -449,14 +449,14 @@ export default function IdsCompanyProfileModal({
                   onChange={(e) => handleChange('zip', e.target.value)} 
                 />
 
-                <span style={{ fontWeight: 600 }}>Phone #:</span>
+                <span style={{ fontWeight: 600 }}>Phone:</span>
                 <input 
                   className="ids-input" 
                   value={formData.phone} 
                   onChange={(e) => handleChange('phone', e.target.value)} 
                 />
 
-                <span style={{ fontWeight: 600 }}>Mobile #</span>
+                <span style={{ fontWeight: 600 }}>Mobile No.</span>
                 <input 
                   className="ids-input" 
                   value={formData.mobile} 
@@ -488,7 +488,7 @@ export default function IdsCompanyProfileModal({
                   <option value="Suspended">Suspended</option>
                 </select>
 
-                <span style={{ fontWeight: 600, color: '#0A246A' }}>GSTIN #</span>
+                <span style={{ fontWeight: 600, color: '#0A246A' }}>GSTIN</span>
                 <input 
                   className="ids-input" 
                   value={formData.gstin} 

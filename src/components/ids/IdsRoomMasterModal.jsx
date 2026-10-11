@@ -21,7 +21,7 @@ import {
       - 44-Video Tutorial Player -> Videos 33 & 34 -> Launch Interactive Feature Clone
    3. Fields & Controls (Video 34 Frame 016):
       - Property Code: DEMO / HOTEL ELITE INN
-      - Room#: 202 with [ ? ] lookup
+      - Room No.: 202 with [ ? ] lookup
       - Room Type: EXE / DLX / SUI / PNH with [ ? ] Room Types Lookup
       - Block: MAIN / TOWER / WING A / VILLAS
       - Floor: Basement 01 / 1st Floor / 2nd Floor / 3rd Floor / 4th Floor / 5th Floor / 6th Floor
@@ -168,7 +168,7 @@ export default function IdsRoomMasterModal({
       lastUpdated: `${accountingDate} 18:16`
     };
     setFormData(newRoom);
-    setStatusMessage('Enter new Room #, select Room Type and Floor, then click Save.');
+    setStatusMessage('Enter new Room No., select Room Type and Floor, then click Save.');
   };
 
   // Save Room Master
@@ -309,7 +309,7 @@ export default function IdsRoomMasterModal({
                 style={{ width: '60px', fontWeight: 700 }}
               />
 
-              <span style={{ fontWeight: 600 }}>Room#</span>
+              <span style={{ fontWeight: 600 }}>Room No.</span>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <input 
                   className="ids-input" 
@@ -659,7 +659,7 @@ export default function IdsRoomMasterModal({
                     className="ids-input" 
                     value={searchRoomTerm} 
                     onChange={(e) => setSearchRoomTerm(e.target.value)} 
-                    placeholder="Search by Room # or Type..."
+                    placeholder="Search by Room No. or Type..."
                     style={{ flex: 1, padding: '2px 6px' }}
                     autoFocus
                   />
@@ -669,7 +669,7 @@ export default function IdsRoomMasterModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Type</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Floor</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Features</th>

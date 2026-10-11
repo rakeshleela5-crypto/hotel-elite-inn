@@ -19,12 +19,12 @@ import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
       - Quick Scan (Load Pgm) -> Type "delete deposit" -> [ Load ]
       - 44-Video Tutorial Player -> Video 39 -> Launch Interactive Feature Clone
    3. Step 1: Post Receipts FOR GUESTS (Frames 036–054):
-      - Room# 1002 / 202 (Mr Sourab Raj / Mr Sharma Raj)
-      - Receipt # 1, Received Amount: 1,500.00 (or 5,000.00), Particulars: Room Advance
+      - Room No. 1002 / 202 (Mr Sourab Raj / Mr Sharma Raj)
+      - Receipt No. 1, Received Amount: 1,500.00 (or 5,000.00), Particulars: Room Advance
       - [ Delete ] -> Alert Window V6.5.002.1: "Delete Record? [ Yes ] [ No ]"
       - Click [ Save ] to confirm deletion of deposit
    4. Step 2: Cancel Check-Ins V6.5.002.1 (Frames 060–076):
-      - Reg # 2 | Room 1002 | Mr Sourab Raj | Arrival: 26-FEB-2026 | Departure: 27-FEB-2026
+      - Reg. No. 2 | Room 1002 | Mr Sourab Raj | Arrival: 26-FEB-2026 | Departure: 27-FEB-2026
       - Click ERASE (X)
       - Reason Entry: Reason: Guest Cancel | Authorized By: Manager -> [ Ok ]
    5. Step 3: Room Status Sync (Frames 070–076):
@@ -230,15 +230,15 @@ export default function IdsDeleteDepositModal({
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px 14px', marginBottom: '10px' }}>
               
               <div style={{ display: 'grid', gridTemplateColumns: '100px 120px 80px 140px 1fr', gap: '6px 10px', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={selectedItem.roomNo} readOnly style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} />
 
-                <span style={{ fontWeight: 600 }}>Folio #</span>
+                <span style={{ fontWeight: 600 }}>Folio No.</span>
                 <input className="ids-input" value="1" readOnly style={{ width: '60px' }} />
 
                 <div></div>
 
-                <span style={{ fontWeight: 600 }}>Reservation #</span>
+                <span style={{ fontWeight: 600 }}>Reservation No.</span>
                 <input className="ids-input" value="-" readOnly style={{ width: '80px' }} />
 
                 <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -274,7 +274,7 @@ export default function IdsDeleteDepositModal({
                   style={{ width: '120px', fontWeight: 900, color: depositMarkedForDelete ? '#999' : '#C5221F', background: '#FFF7CC', textDecoration: depositMarkedForDelete ? 'line-through' : 'none' }} 
                 />
 
-                <span style={{ fontWeight: 600 }}>Receipt #</span>
+                <span style={{ fontWeight: 600 }}>Receipt No.</span>
                 <input className="ids-input" value={selectedItem.depositReceiptNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Particulars</span>
@@ -347,8 +347,8 @@ export default function IdsDeleteDepositModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                   <tr>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Reg #</th>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room#</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Reg. No.</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room No.</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '120px' }}>Company</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '80px' }}>Arrival</th>

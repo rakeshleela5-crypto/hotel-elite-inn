@@ -295,7 +295,7 @@ export default function IdsRoomBlockModal({
               <thead>
                 {/* Month Row */}
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9' }}>
-                  <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '90px', textAlign: 'left' }}>Room #</th>
+                  <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '90px', textAlign: 'left' }}>Room No.</th>
                   <th colSpan={daysHeader.length} style={{ padding: '4px', textAlign: 'center', fontWeight: 'bold' }}>
                     JAN'2026 - FEB'2026
                   </th>

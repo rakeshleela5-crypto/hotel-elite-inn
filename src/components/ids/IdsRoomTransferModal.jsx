@@ -166,7 +166,7 @@ export default function IdsRoomTransferModal({
 
             {/* Room Transfer Fields Row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontWeight: 600 }}>Room#</span>
+              <span style={{ fontWeight: 600 }}>Room No.</span>
               <input 
                 className="ids-input" 
                 value={fromRoomNo} 
@@ -208,8 +208,8 @@ export default function IdsRoomTransferModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0 }}>
                   <tr>
-                    <th style={{ width: '50px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Folio #</th>
-                    <th style={{ width: '60px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Reg. #</th>
+                    <th style={{ width: '50px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Folio No.</th>
+                    <th style={{ width: '60px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Reg. No.</th>
                     <th style={{ width: '220px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Guest Name</th>
                     <th style={{ width: '130px', border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Arrival</th>
                     <th style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'left' }}>Departure</th>
@@ -326,7 +326,7 @@ export default function IdsRoomTransferModal({
               <div style={{ padding: '8px 10px', fontSize: '11px' }}>
                 {/* Header Controls */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span>Room#</span>
+                  <span>Room No.</span>
                   <input className="ids-input" style={{ width: '80px' }} placeholder="Filter..." />
                   
                   <div style={{ display: 'flex', gap: '4px', marginLeft: '6px' }}>
@@ -364,7 +364,7 @@ export default function IdsRoomTransferModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0 }}>
                       <tr>
-                        <th style={{ width: '100px', border: '1px solid #CCC', padding: '3px 6px', textAlign: 'left' }}>Room#</th>
+                        <th style={{ width: '100px', border: '1px solid #CCC', padding: '3px 6px', textAlign: 'left' }}>Room No.</th>
                         <th style={{ width: '60px', border: '1px solid #CCC', padding: '3px 6px', textAlign: 'left' }}>Type</th>
                         <th style={{ width: '80px', border: '1px solid #CCC', padding: '3px 6px', textAlign: 'left' }}>Block</th>
                         <th style={{ width: '60px', border: '1px solid #CCC', padding: '3px 6px', textAlign: 'left' }}>Floor</th>

@@ -280,9 +280,9 @@ export default function IdsAdditionalRoomRateModal({
 
             {/* Main Form Fields Container */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
-              {/* Row 1: Room#, Folio #, Reg #, Guest Info */}
+              {/* Row 1: Room No., Folio No., Reg. No., Guest Info */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 140px 50px 70px 45px 70px 1fr', alignItems: 'center', gap: '6px' }}>
-                <label style={{ fontWeight: 600 }}>Room#</label>
+                <label style={{ fontWeight: 600 }}>Room No.</label>
                 <div style={{ display: 'flex', gap: '2px' }}>
                   <input 
                     type="text" 
@@ -294,7 +294,7 @@ export default function IdsAdditionalRoomRateModal({
                   <button type="button" className="ids-btn-classic" style={{ padding: '0 6px' }} title="Lookup Room" onClick={() => { playReceptionChime(); const r = prompt("Select Room Number:", roomNo); if (r) setRoomNo(r); }}>?</button>
                 </div>
 
-                <label style={{ fontWeight: 600 }}>Folio #</label>
+                <label style={{ fontWeight: 600 }}>Folio No.</label>
                 <div style={{ display: 'flex', gap: '2px' }}>
                   <input 
                     type="text" 
@@ -306,7 +306,7 @@ export default function IdsAdditionalRoomRateModal({
                   <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} title="Lookup Folio" onClick={() => { playReceptionChime(); const f = prompt("Select Folio Number (1: Master, 2: Extras):", folioNo); if (f) setFolioNo(f); }}>?</button>
                 </div>
 
-                <label style={{ fontWeight: 600 }}>Reg #</label>
+                <label style={{ fontWeight: 600 }}>Reg. No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -320,7 +320,7 @@ export default function IdsAdditionalRoomRateModal({
                     type="button" 
                     className="ids-btn-classic" 
                     style={{ padding: '1px 10px', fontWeight: 600 }}
-                    onClick={() => alert(`Guest: ${guestName}\nRoom: ${roomNo}\nReg#: ${regNo}\nFolio: ${folioNo}`)}
+                    onClick={() => alert(`Guest: ${guestName}\nRoom: ${roomNo}\nReg. No.: ${regNo}\nFolio: ${folioNo}`)}
                   >
                     Guest Info...
                   </button>
@@ -415,7 +415,7 @@ export default function IdsAdditionalRoomRateModal({
                 />
               </div>
 
-              {/* Row 5: Description & Reference # */}
+              {/* Row 5: Description & Ref. No. */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 226px 1fr 90px 110px', alignItems: 'center', gap: '6px' }}>
                 <label style={{ fontWeight: 600 }}>Description</label>
                 <input 
@@ -427,7 +427,7 @@ export default function IdsAdditionalRoomRateModal({
                 />
                 <div />
 
-                <label style={{ fontWeight: 600, textAlign: 'right' }}>Reference #</label>
+                <label style={{ fontWeight: 600, textAlign: 'right' }}>Ref. No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -617,7 +617,7 @@ export default function IdsAdditionalRoomRateModal({
                 marginBottom: '4px'
               }}
             >
-              <span style={{ fontWeight: 600 }}>Room#</span>
+              <span style={{ fontWeight: 600 }}>Room No.</span>
               <input 
                 type="text" 
                 className="ids-input" 
@@ -625,15 +625,15 @@ export default function IdsAdditionalRoomRateModal({
                 value={roomNo}
                 readOnly
               />
-              <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); const r = prompt("Lookup Quick Balance by Room #:", roomNo); if (r) setRoomNo(r); }}>?</button>
+              <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); const r = prompt("Lookup Quick Balance by Room No.: ", roomNo); if (r) setRoomNo(r); }}>?</button>
 
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <span style={{ fontWeight: 700, color: '#0A246A' }}>{guestName}</span>
 
-              <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg.#</span>
+              <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg. No.</span>
               <span style={{ fontWeight: 700 }}>587</span>
 
-              <span style={{ fontWeight: 600, textAlign: 'right' }}>Folio #</span>
+              <span style={{ fontWeight: 600, textAlign: 'right' }}>Folio No.</span>
               <span style={{ fontWeight: 700 }}>1</span>
             </div>
 
@@ -845,7 +845,7 @@ export default function IdsAdditionalRoomRateModal({
               >
                 ◀ Post Another Rate
               </button>
-              <button type="button" className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => { playReceptionChime(); alert(`Bill Details for Room #${roomNo} (${guestName}):\nBalance: ₹12,850.00\nFolio: 1`); }}>
+              <button type="button" className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => { playReceptionChime(); alert(`Bill Details for Room ${roomNo} (${guestName}):\nBalance: ₹12,850.00\nFolio: 1`); }}>
                 Bill Details
               </button>
               <button type="button" className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); alert("Quick Balances matrix refreshed."); }}>

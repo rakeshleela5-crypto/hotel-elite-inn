@@ -517,7 +517,7 @@ export default function IdsChangeRateModal({
             
             {/* Left Column */}
             <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '3px', alignItems: 'center' }}>
-              <span>Room#/Type</span>
+              <span>Room No./Type</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
@@ -538,10 +538,10 @@ export default function IdsChangeRateModal({
                 <input className="ids-input" value={tariffData.roomType} readOnly style={{ width: '45px', background: '#EBEBE4', fontWeight: 600 }} />
               </div>
 
-              <span>Folio #</span>
+              <span>Folio No.</span>
               <input className="ids-input" value={tariffData.folioNo} readOnly style={{ width: '70px', background: '#EBEBE4' }} />
 
-              <span>Reg. #</span>
+              <span>Reg. No.</span>
               <input className="ids-input" value={tariffData.regNo} readOnly style={{ width: '70px', background: '#EBEBE4' }} />
 
               <span>Arrival</span>

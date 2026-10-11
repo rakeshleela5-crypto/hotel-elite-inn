@@ -16,9 +16,9 @@ import {
       - Quick Scan (Load Pgm) -> Type "cancel check" -> "Cancel Check-Ins" -> [ Load ]
       - 44-Video Tutorial Player -> Video 38 -> Launch Interactive Feature Clone
    3. In-House Check-In List Grid (Frame 028):
-      - Reg # | Room# | Guest Name | Company | Arrival | Departure | Group | ERASE
-      - Row 1: Reg # 627 | Room 202 | MR CHOWKHANI PRATICK | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
-      - Row 2: Reg # 626 | Room 202 | MR GURKANWAR SINGH BEDI | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
+      - Reg. No. | Room No. | Guest Name | Company | Arrival | Departure | Group | ERASE
+      - Row 1: Reg. No. 627 | Room 202 | MR CHOWKHANI PRATICK | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
+      - Row 2: Reg. No. 626 | Room 202 | MR GURKANWAR SINGH BEDI | 25-FEB-2026 | 26-FEB-2026 | ERASE (X)
    4. Reason Entry & Authorization Dialog (Frame 032):
       - Reason: Guest request / wrong room assigned / walkout
       - Authorized By: MANAGER
@@ -203,8 +203,8 @@ export default function IdsCancelCheckInModal({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
               <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                 <tr>
-                  <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Reg #</th>
-                  <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room#</th>
+                  <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Reg. No.</th>
+                  <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Room No.</th>
                   <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
                   <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '130px' }}>Company</th>
                   <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '85px' }}>Arrival</th>
@@ -324,7 +324,7 @@ export default function IdsCancelCheckInModal({
               <div style={{ padding: '14px 16px', fontSize: '11px' }}>
                 
                 <div style={{ marginBottom: '10px' }}>
-                  Are you sure you want to cancel check-in for <strong>{selectedRow.guestName}</strong> in <strong>Room {selectedRow.roomNo}</strong> (Reg #{selectedRow.regNo})?
+                  Are you sure you want to cancel check-in for <strong>{selectedRow.guestName}</strong> in <strong>Room {selectedRow.roomNo}</strong> (Reg. No.{selectedRow.regNo})?
                 </div>
 
                 <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '10px 12px', marginBottom: '10px' }}>

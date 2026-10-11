@@ -102,7 +102,7 @@ export default function IdsGuestServicesModal({
     if (onOpenMessageBox) {
       onOpenMessageBox({
         title: 'Guest Complaint Registered',
-        message: `Complaint #${newComplaint.complaintId} registered for Room ${newComplaint.roomNo} (${newComplaint.department}). Registered Complaints KPI count updated to ${pendingCount}.`,
+        message: `Complaint ${newComplaint.complaintId} registered for Room ${newComplaint.roomNo} (${newComplaint.department}). Registered Complaints KPI count updated to ${pendingCount}.`,
         type: 'info',
         onOk: () => setActiveTab('attend-complaints')
       });
@@ -138,7 +138,7 @@ export default function IdsGuestServicesModal({
     if (onOpenMessageBox) {
       onOpenMessageBox({
         title: 'Complaint Attended & Resolved',
-        message: `Complaint #${selectedComplaint.complaintId} marked as Resolved by ${attendData.attendedBy}. TAT: ${attendData.tatMinutes} mins. Active complaints count is now ${pendingCount}.`,
+        message: `Complaint ${selectedComplaint.complaintId} marked as Resolved by ${attendData.attendedBy}. TAT: ${attendData.tatMinutes} mins. Active complaints count is now ${pendingCount}.`,
         type: 'info'
       });
     }
@@ -264,7 +264,7 @@ export default function IdsGuestServicesModal({
                 {/* Left Column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Room #</label>
+                    <label style={{ width: '90px' }}>Room No.</label>
                     <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
                       <input 
                         type="text" 
@@ -388,7 +388,7 @@ export default function IdsGuestServicesModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px' }}>Room#</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px' }}>Room No.</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Guest Name</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Status</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '70px' }}>Complaints</th>

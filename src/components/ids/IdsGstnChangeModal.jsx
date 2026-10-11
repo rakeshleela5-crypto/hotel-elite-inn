@@ -19,14 +19,14 @@ import {
       - [ Front Office ] | [ Point Of Sale ] | [ Banquet ] | [ Laundry ] | [ Misc. Sales ]
    4. Search & Filter:
       - (o) Specific Date | ( ) Month/Year
-      - Date: 02-MAR-2026 | Bill #: 1429 with [ ? ] lookup
+      - Date: 02-MAR-2026 | Bill No.: 1429 with [ ? ] lookup
    5. Dual Comparison Columns (Frame 038):
       - OLD (Unregistered B2C Guest):
-        * GSTN #: [empty]
+        * GSTIN: [empty]
         * Name: SETHI KUMAR BINOD (Mrs Devi Sarala)
         * Address: WEST MANIPUR, IMPHAL, INDIA, 795001
       - NEW (Updated B2B Corporate Invoice):
-        * GSTN #: 20AAAAAA12341ZT (or 27AABCT3521R1Z8)
+        * GSTIN: 20AAAAAA12341ZT (or 27AABCT3521R1Z8)
         * Company Code: COM0001 (Tata Motors Limited) with [ ? ] lookup
         * Name: Tata Motors Limited
         * Address: Navi Mumbai, Mumbai, Maharashtra
@@ -170,7 +170,7 @@ export default function IdsGstnChangeModal({
       newCountry
     }));
 
-    setStatusMessage(`Bill #${selectedBill.billNo} successfully updated with Company "${newCompanyName}" & GSTIN ${newGstn}!`);
+    setStatusMessage(`Bill No.${selectedBill.billNo} successfully updated with Company "${newCompanyName}" & GSTIN ${newGstn}!`);
     setTimeout(() => setStatusMessage(''), 4500);
   };
 
@@ -268,7 +268,7 @@ export default function IdsGstnChangeModal({
                   <button className="ids-btn-classic" onClick={() => setBillLookupOpen(true)}>?</button>
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Bill #</span>
+                <span style={{ fontWeight: 600 }}>Bill No.</span>
                 <div style={{ display: 'flex', gap: '3px' }}>
                   <input className="ids-input" value={searchBillNo} onChange={(e) => setSearchBillNo(e.target.value)} style={{ width: '65px', fontWeight: 700, background: '#FFF7CC' }} />
                   <button className="ids-btn-classic" onClick={() => setBillLookupOpen(true)}>?</button>
@@ -287,7 +287,7 @@ export default function IdsGstnChangeModal({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr', gap: '4px 6px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>GSTN #</span>
+                <span style={{ fontWeight: 600 }}>GSTIN</span>
                 <input className="ids-input" value={selectedBill.oldGstn || '[ Not Provided ]'} readOnly style={{ width: '100%', color: '#999', fontStyle: 'italic' }} />
 
                 <span style={{ fontWeight: 600 }}>Name</span>
@@ -317,7 +317,7 @@ export default function IdsGstnChangeModal({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px 6px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>GSTN #</span>
+                <span style={{ fontWeight: 600 }}>GSTIN</span>
                 <input className="ids-input" value={newGstn} onChange={(e) => setNewGstn(e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF7CC' }} />
 
                 <span style={{ fontWeight: 600 }}>Company Code</span>
@@ -481,8 +481,8 @@ export default function IdsGstnChangeModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '55px', borderRight: '1px solid #B0AB9A' }}>Bill #</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Room#</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '55px', borderRight: '1px solid #B0AB9A' }}>Bill No.</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Room No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '80px', borderRight: '1px solid #B0AB9A' }}>Date</th>
                         <th style={{ padding: '3px 6px', textAlign: 'right', width: '75px' }}>Amount</th>
@@ -576,7 +576,7 @@ export default function IdsGstnChangeModal({
                       <th style={{ textAlign: 'left', padding: '3px 0' }}>Date</th>
                       <th style={{ textAlign: 'left', padding: '3px 0' }}>Ref. No</th>
                       <th style={{ textAlign: 'left', padding: '3px 0' }}>Description</th>
-                      <th style={{ textAlign: 'left', padding: '3px 0' }}>GST SAC No#</th>
+                      <th style={{ textAlign: 'left', padding: '3px 0' }}>GST SAC No.</th>
                       <th style={{ textAlign: 'right', padding: '3px 0' }}>Debit</th>
                       <th style={{ textAlign: 'right', padding: '3px 0' }}>Credit</th>
                       <th style={{ textAlign: 'right', padding: '3px 0' }}>Balance</th>

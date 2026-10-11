@@ -145,7 +145,7 @@ export default function IdsCheckoutBillModal({
   const [crystalPrinter, setCrystalPrinter] = useState('Microsoft Print to PDF');
   const [billLookupOpen, setBillLookupOpen] = useState(false);
   
-  // Video 16 Frame 070: Clear Room# Multi-Room Confirmation Popup
+  // Video 16 Frame 070: Clear Room No. Multi-Room Confirmation Popup
   const [clearRoomModalOpen, setClearRoomModalOpen] = useState(false);
   const [bulkClearedStatus, setBulkClearedStatus] = useState({});
 
@@ -175,7 +175,7 @@ export default function IdsCheckoutBillModal({
   const [cardAuth, setCardAuth] = useState('AUTH-782104');
   const [cardAmountInput, setCardAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4000.00');
   const [cardTipInput, setCardTipInput] = useState('0.00');
-  const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal #1');
+  const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal 1');
 
   const [companyCodeInput, setCompanyCodeInput] = useState(initialMode === 'bulk' ? 'COM0006' : 'COM0015');
   const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'JK Paper Mills Ltd');
@@ -314,7 +314,7 @@ export default function IdsCheckoutBillModal({
     }
 
     if (isGroupMode) {
-      // Video 16 Frame 070: Open Clear Room# dialog before executing bulk checkout!
+      // Video 16 Frame 070: Open Clear Room No. dialog before executing bulk checkout!
       setClearRoomModalOpen(true);
     } else {
       executeCheckoutExecution([currentRoom]);
@@ -446,7 +446,7 @@ export default function IdsCheckoutBillModal({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
-                <span style={{ fontWeight: 700 }}>Room #</span>
+                <span style={{ fontWeight: 700 }}>Room No.</span>
                 <input 
                   className="ids-input" 
                   style={{ width: '65px', fontWeight: 700, textAlign: 'center' }}
@@ -601,9 +601,9 @@ export default function IdsCheckoutBillModal({
             <div style={{ border: '1px solid #7F9DB9', padding: '6px 10px', background: '#FFF', fontSize: '11px', marginBottom: '8px' }}>
               {/* Row 1 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 80px 50px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ color: '#000' }}>Room#</span>
+                <span style={{ color: '#000' }}>Room No.</span>
                 <input className="ids-input" readOnly value={billData.roomNo} style={{ background: '#F5F5F5', fontWeight: 700 }} />
-                <span style={{ color: '#000', textAlign: 'right' }}>Reg. #</span>
+                <span style={{ color: '#000', textAlign: 'right' }}>Reg. No.</span>
                 <input className="ids-input" readOnly value={billData.regNo} style={{ background: '#F5F5F5' }} />
                 <span style={{ color: '#000', textAlign: 'right' }}>Guest</span>
                 <input className="ids-input" readOnly value={billData.guestName} style={{ background: '#F5F5F5', fontWeight: 700 }} />
@@ -611,7 +611,7 @@ export default function IdsCheckoutBillModal({
 
               {/* Row 2 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ color: '#000' }}>Folio #</span>
+                <span style={{ color: '#000' }}>Folio No.</span>
                 <input className="ids-input" readOnly value={billData.folioNo} style={{ background: '#F5F5F5' }} />
                 <span style={{ color: '#000', textAlign: 'right' }}>Company</span>
                 <input className="ids-input" readOnly value={`${billData.companyCode} / ${billData.companyName}`} style={{ background: '#F5F5F5' }} />
@@ -651,8 +651,8 @@ export default function IdsCheckoutBillModal({
                 <thead>
                   <tr style={{ background: '#ECE9D8', color: '#000' }}>
                     <th style={{ width: '45px', borderRight: '1px solid #BBB' }}>Select</th>
-                    <th style={{ width: '45px', borderRight: '1px solid #BBB' }}>Srl #</th>
-                    <th style={{ width: '55px', borderRight: '1px solid #BBB' }}>Room#</th>
+                    <th style={{ width: '45px', borderRight: '1px solid #BBB' }}>Sr. No.</th>
+                    <th style={{ width: '55px', borderRight: '1px solid #BBB' }}>Room No.</th>
                     <th style={{ borderRight: '1px solid #BBB' }}>Guest Name</th>
                     <th style={{ width: '70px', borderRight: '1px solid #BBB' }}>Billing</th>
                     <th style={{ width: '70px', borderRight: '1px solid #BBB' }}>Bill To</th>
@@ -832,7 +832,7 @@ export default function IdsCheckoutBillModal({
                     const targetBill = isGroupMode ? '502' : '501';
                     setStatusMessage(`Updating OTT Table ${ottTable}`);
                     setTimeout(() => {
-                      setStatusMessage(`Printing Bill # ${targetBill}`);
+                      setStatusMessage(`Printing Bill No. ${targetBill}`);
                       setPrintCrystalOpen(true);
                     }, 400);
                   }}
@@ -884,7 +884,7 @@ export default function IdsCheckoutBillModal({
               {/* Left Column */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ width: '70px' }}>Bill #</span>
+                  <span style={{ width: '70px' }}>Bill No.</span>
                   <input 
                     className="ids-input" 
                     style={{ width: '80px', fontWeight: 700 }}
@@ -923,17 +923,17 @@ export default function IdsCheckoutBillModal({
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ width: '70px' }}>Room#</span>
+                  <span style={{ width: '70px' }}>Room No.</span>
                   <input className="ids-input" readOnly value={settlementLoaded ? billData.roomNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ width: '70px' }}>Folio #</span>
+                  <span style={{ width: '70px' }}>Folio No.</span>
                   <input className="ids-input" readOnly value={settlementLoaded ? billData.folioNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                  <span style={{ width: '70px' }}>Reg. #</span>
+                  <span style={{ width: '70px' }}>Reg. No.</span>
                   <input className="ids-input" readOnly value={settlementLoaded ? billData.regNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
                 </div>
 
@@ -1179,13 +1179,13 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          POPUP: CLEAR ROOM# MULTI-ROOM CONFIRMATION POPUP (Video 16 Frame 070)
+          POPUP: CLEAR ROOM NO. MULTI-ROOM CONFIRMATION POPUP (Video 16 Frame 070)
           ========================================================================= */}
       {clearRoomModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
           <div className="ids-dialog-window" style={{ width: '480px', maxWidth: '95vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.6)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>Clear Room#</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>Clear Room No.</span>
               <button className="ids-win-btn close" onClick={() => setClearRoomModalOpen(false)}>✕</button>
             </div>
 
@@ -1194,9 +1194,9 @@ export default function IdsCheckoutBillModal({
                 <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', color: '#000' }}>
-                      <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Room#</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio #</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. #</th>
+                      <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Room No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. No.</th>
                       <th style={{ borderRight: '1px solid #BBB' }}>Guest Name</th>
                       <th style={{ width: '45px', textAlign: 'center' }}>Clear</th>
                     </tr>
@@ -1262,10 +1262,10 @@ export default function IdsCheckoutBillModal({
                   <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr style={{ background: '#F5F5F5' }}>
-                        <th style={{ width: '25px' }}>#</th>
+                        <th style={{ width: '25px' }}>Sr.</th>
                         <th style={{ width: '60px' }}>Date</th>
-                        <th style={{ width: '50px' }}>Room #</th>
-                        <th style={{ width: '45px' }}>Ref #</th>
+                        <th style={{ width: '50px' }}>Room No.</th>
+                        <th style={{ width: '45px' }}>Ref. No.</th>
                         <th>Description</th>
                         <th style={{ width: '25px', textAlign: 'center' }}>✂️</th>
                         <th style={{ width: '70px', textAlign: 'right' }}>Amount</th>
@@ -1337,13 +1337,13 @@ export default function IdsCheckoutBillModal({
                 <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', color: '#000' }}>
-                      <th style={{ width: '35px', borderRight: '1px solid #BBB' }}>Sl. #</th>
+                      <th style={{ width: '35px', borderRight: '1px solid #BBB' }}>Sr. No.</th>
                       <th style={{ width: '115px', borderRight: '1px solid #BBB' }}>Date</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Resv#</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Room#</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg#</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Res. No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Room No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. No.</th>
                       <th style={{ width: '55px', borderRight: '1px solid #BBB' }}>RevCod</th>
-                      <th style={{ width: '55px', borderRight: '1px solid #BBB' }}>Bill #</th>
+                      <th style={{ width: '55px', borderRight: '1px solid #BBB' }}>Bill No.</th>
                       <th style={{ borderRight: '1px solid #BBB' }}>Particulars</th>
                       <th style={{ width: '75px', textAlign: 'right', borderRight: '1px solid #BBB' }}>Amount</th>
                       <th style={{ width: '45px', textAlign: 'right' }}>$</th>
@@ -1542,7 +1542,7 @@ export default function IdsCheckoutBillModal({
 
               {crystalPrintSuccess && (
                 <div style={{ background: '#E8F5E9', border: '1px solid #81C784', padding: '8px', marginBottom: '12px', fontSize: '11px', color: '#2E7D32', borderRadius: '2px' }}>
-                  ✓ <b>Bill # {settlementBillNo}</b> sent to {crystalPrinter}. Crystal Report Detailed Bill rendered successfully.
+                  ✓ <b>Bill No. {settlementBillNo}</b> sent to {crystalPrinter}. Crystal Report Detailed Bill rendered successfully.
                 </div>
               )}
 
@@ -1552,7 +1552,7 @@ export default function IdsCheckoutBillModal({
                   style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
                   onClick={() => {
                     setCrystalPrintSuccess(true);
-                    setStatusMessage(`Bill # ${settlementBillNo} rendered in Crystal Reports 8.5/9.0.`);
+                    setStatusMessage(`Bill No. ${settlementBillNo} rendered in Crystal Reports 8.5/9.0.`);
                     if (onOpenCrystalReport) {
                       onOpenCrystalReport('rule46-bill', {
                         billNo: settlementBillNo,
@@ -1590,7 +1590,7 @@ export default function IdsCheckoutBillModal({
       )}
 
       {/* =========================================================================
-          SUB-POPUP 4: BILL # LOOKUP DIALOG (Video 15 Frame 036 & Video 16 Frame 055)
+          SUB-POPUP 4: BILL NO. LOOKUP DIALOG (Video 15 Frame 036 & Video 16 Frame 055)
           ========================================================================= */}
       {billLookupOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
@@ -1605,12 +1605,12 @@ export default function IdsCheckoutBillModal({
                 <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', color: '#000' }}>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Bill #</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Bill No.</th>
                       <th style={{ width: '80px', borderRight: '1px solid #BBB' }}>Bill Date</th>
                       <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Status</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Room#</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio #</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. #</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Room No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Reg. No.</th>
                       <th style={{ textAlign: 'right' }}>Net Amount</th>
                     </tr>
                   </thead>
@@ -1788,12 +1788,12 @@ export default function IdsCheckoutBillModal({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <span style={{ width: '100px' }}>Credit Card #</span>
+                <span style={{ width: '100px' }}>Card No.</span>
                 <input className="ids-input" style={{ flex: 1 }} value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                <span style={{ width: '100px' }}>Authorization #</span>
+                <span style={{ width: '100px' }}>Auth No.</span>
                 <input className="ids-input" style={{ flex: 1 }} value={cardAuth} onChange={(e) => setCardAuth(e.target.value)} />
               </div>
 

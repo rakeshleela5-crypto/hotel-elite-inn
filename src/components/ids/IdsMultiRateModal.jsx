@@ -444,7 +444,7 @@ export default function IdsMultiRateModal({
               </div>
               <div style={{ display: 'flex', gap: '12px', fontWeight: 700 }}>
                 <span>Pax: 1</span>
-                <span>Folio #: 1</span>
+                <span>Folio No.: 1</span>
                 <span style={{ color: '#137333' }}>Rate: Multi-Rate Dynamic (3 Nights)</span>
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function IdsMultiRateModal({
                     <input className="ids-input" value={guestName} onChange={(e) => setGuestName(e.target.value)} style={{ flex: 1, fontWeight: 700, background: '#FFF7CC' }} />
                   </div>
 
-                  <span style={{ fontWeight: 600 }}>Mobile #</span>
+                  <span style={{ fontWeight: 600 }}>Mobile No.</span>
                   <input className="ids-input" value={mobileNo} onChange={(e) => setMobileNo(e.target.value)} style={{ width: '100%', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Address</span>

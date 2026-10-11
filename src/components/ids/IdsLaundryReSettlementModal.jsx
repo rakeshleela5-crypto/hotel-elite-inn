@@ -143,7 +143,7 @@ export default function IdsLaundryReSettlementModal({
           >
             <div style={{ display: 'flex', gap: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label style={{ width: '60px', fontWeight: 'bold' }}>Bill #</label>
+                <label style={{ width: '60px', fontWeight: 'bold' }}>Bill No.</label>
                 <input 
                   type="text" 
                   value={billNo} 
@@ -153,7 +153,7 @@ export default function IdsLaundryReSettlementModal({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <label style={{ width: '60px', fontWeight: 'bold' }}>Room #</label>
+                <label style={{ width: '60px', fontWeight: 'bold' }}>Room No.</label>
                 <input 
                   type="text" 
                   value={roomNo} 
@@ -376,7 +376,7 @@ export default function IdsLaundryReSettlementModal({
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '100px' }}>Authorization #</label>
+                    <label style={{ width: '100px' }}>Auth No.</label>
                     <input 
                       type="text" 
                       value={cardData.authNo} 

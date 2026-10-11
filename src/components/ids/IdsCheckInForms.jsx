@@ -11,7 +11,7 @@ import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
    VIDEO 05: RESERVATION CHECK-IN FOR SINGLE ROOM IN IDS FORTUNE NEXT 6.5 & 7.0
    Replication of:
    1. Reservation Check-in Confirmation Dialog (Frame 008)
-   2. Guest Details Grid For Res # Rooms : 1 Pax : 2 (Frame 010)
+   2. Guest Details Grid For Res. No. Rooms : 1 Pax : 2 (Frame 010)
    3. Check-In V6.5002.5 Main Registration Modal (Frames 012–028)
    4. Rate Details Sub-Modal (Frame 022)
    5. Detailed Position - Already checked-in (Frame 032)
@@ -37,7 +37,7 @@ export function IdsReservationCheckinPromptModal({
 
         <div style={{ padding: '20px 24px', background: '#ECE9D8', textAlign: 'center' }}>
           <div style={{ fontSize: '12px', fontWeight: 600, color: '#000', marginBottom: '20px' }}>
-            Reservation Checkin for # {booking.resNo || '271'}
+            Reservation Check-in for Res. No. {booking.resNo || '271'}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
@@ -85,7 +85,7 @@ export function IdsCheckinGuestListModal({
         {/* Title Bar */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>
-            Guest Details For Res # {booking.resNo || '271'} Rooms : 1 Pax : {guests.length}
+            Guest Details For Res. No. {booking.resNo || '271'} Rooms : 1 Pax : {guests.length}
           </span>
           <button className="ids-win-btn close" onClick={onClose}>✕</button>
         </div>
@@ -99,7 +99,7 @@ export function IdsCheckinGuestListModal({
                   <th style={{ width: '180px' }}>Guest Name</th>
                   <th style={{ width: '90px', textAlign: 'center' }}>Room Number</th>
                   <th style={{ width: '80px', textAlign: 'center' }}>Check-in Flag</th>
-                  <th>Guest Ref#</th>
+                  <th>Guest Ref. No.</th>
                 </tr>
               </thead>
               <tbody>
@@ -396,7 +396,7 @@ export function IdsCheckInRegistrationModal({
                   <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value={currentGuestIdx + 1} readOnly />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontWeight: 600 }}>Folio #</span>
+                  <span style={{ fontWeight: 600 }}>Folio No.</span>
                   <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value="1" readOnly />
                 </div>
               </div>
@@ -447,11 +447,11 @@ export function IdsCheckInRegistrationModal({
                   <input className="ids-input" value={activeGuest.zip} onChange={(e) => setActiveGuestField('zip', e.target.value)} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600 }}>Telephone #</span>
+                  <span style={{ fontWeight: 600 }}>Phone No.</span>
                   <input className="ids-input" value={activeGuest.telephone} onChange={(e) => setActiveGuestField('telephone', e.target.value)} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600 }}>Mobile #</span>
+                  <span style={{ fontWeight: 600 }}>Mobile No.</span>
                   <input className="ids-input" value={activeGuest.mobile} onChange={(e) => setActiveGuestField('mobile', e.target.value)} style={{ fontWeight: 600 }} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '4px', alignItems: 'center' }}>
@@ -673,7 +673,7 @@ export function IdsCheckedInPositionModal({
               <thead>
                 <tr>
                   <th style={{ width: '50px' }}>Room</th>
-                  <th style={{ width: '55px' }}>Reg. #</th>
+                  <th style={{ width: '55px' }}>Reg. No.</th>
                   <th style={{ width: '45px' }}>Type</th>
                   <th>Guest Name</th>
                   <th style={{ width: '75px', textAlign: 'right' }}>Room Rate</th>
@@ -858,7 +858,7 @@ export function IdsRoomRackConsoleModal({
       status,
       category: cat,
       floor: r.floor,
-      tooltip: status === 'occupied' ? `ROOM #${no} IS OCCUPIED BY ${guestName} (DOUBLE CLICK FOR INFO)` : undefined
+      tooltip: status === 'occupied' ? `ROOM ${no} IS OCCUPIED BY ${guestName} (DOUBLE CLICK FOR INFO)` : undefined
     };
   });
 
@@ -976,7 +976,7 @@ export function IdsRoomRackConsoleModal({
               </select>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span>Room #</span>
+              <span>Room No.</span>
               <input className="ids-input" style={{ width: '50px' }} />
             </div>
 
@@ -1014,9 +1014,9 @@ export function IdsRoomRackConsoleModal({
                   onContextMenu={(e) => handleRoomClick(e, activeRoom)}
                   title={
                     isDirty 
-                      ? `Room #${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
+                      ? `Room ${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
                       : actualStatus === 'occupied'
-                        ? `Room #${r.no} is Occupied (${actualGuest || ''}). Right-click or click for Actions / Room Transfer (Video 13)`
+                        ? `Room ${r.no} is Occupied (${actualGuest || ''}). Right-click or click for Actions / Room Transfer (Video 13)`
                         : undefined
                   }
                   style={{
@@ -1126,7 +1126,7 @@ export function IdsRoomRackConsoleModal({
             >
               {/* Header: Room #312 */}
               <div style={{ padding: '3px 8px', background: '#316AC5', color: '#FFF', fontWeight: 700, fontSize: '10px' }}>
-                Room #{contextMenu.roomNo} {contextMenu.guest ? `(${contextMenu.guest})` : ''}
+                Room No.{contextMenu.roomNo} {contextMenu.guest ? `(${contextMenu.guest})` : ''}
               </div>
 
               {contextMenu.status === 'occupied' ? (
@@ -1545,7 +1545,7 @@ export function IdsRoomRackConsoleModal({
               {/* Form Content matching Frame 022/026 */}
               <div style={{ padding: '12px 14px', background: '#ECE9D8', fontSize: '11px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 600 }}>Room#</span>
+                  <span style={{ fontWeight: 600 }}>Room No.</span>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <input 
                       className="ids-input" 

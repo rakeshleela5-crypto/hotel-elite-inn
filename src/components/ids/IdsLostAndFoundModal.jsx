@@ -123,7 +123,7 @@ export default function IdsLostAndFoundModal({
     if (onOpenMessageBox) {
       onOpenMessageBox({
         title: 'Lost & Found Entry',
-        message: `Article '${payload.article}' (Ref #${payload.refNo}) saved in safe custody locker ${payload.custodyLocker}.`,
+        message: `Article '${payload.article}' (Ref. No.${payload.refNo}) saved in safe custody locker ${payload.custodyLocker}.`,
         type: 'info'
       });
     }
@@ -333,7 +333,7 @@ export default function IdsLostAndFoundModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                        <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Room#/Ref.#</th>
+                        <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Room No./Ref. No.</th>
                         <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Date</th>
                         <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px' }}>Time</th>
                         <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Place</th>
@@ -414,9 +414,9 @@ export default function IdsLostAndFoundModal({
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <label style={{ width: '100px' }}>Start Page #</label>
+                    <label style={{ width: '100px' }}>Start Page No.</label>
                     <input type="text" value={reportEngineConfig.startPage} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
-                    <label style={{ marginLeft: '12px' }}>End Page #</label>
+                    <label style={{ marginLeft: '12px' }}>End Page No.</label>
                     <input type="text" value={reportEngineConfig.endPage} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
                   </div>
 
@@ -528,7 +528,7 @@ export default function IdsLostAndFoundModal({
                         <td colSpan="2" style={{ padding: '4px 8px', fontWeight: 'bold', color: '#0A246A' }}>Guest Details</td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '4px 8px', width: '140px', fontWeight: 'bold', borderRight: '1px solid #DDD' }}>Room#</td>
+                        <td style={{ padding: '4px 8px', width: '140px', fontWeight: 'bold', borderRight: '1px solid #DDD' }}>Room No.</td>
                         <td style={{ padding: '4px 8px' }}>{formData.place || '201'}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px solid #EEE' }}>

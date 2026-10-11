@@ -396,7 +396,7 @@ export default function IdsCrystalReportModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000', fontSize: '10px', marginBottom: '12px' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #000', fontWeight: 'bold' }}>
-                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Room#</th>
+                      <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Room No.</th>
                       <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Type</th>
                       <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Front Office Status</th>
                       <th style={{ padding: '4px', textAlign: 'left', borderRight: '1px solid #000' }}>Housekeeping Status</th>

@@ -221,7 +221,7 @@ export function IdsDuplicateGuestModal({ isOpen, onClose, guestName = 'Biswakarm
           <table className="ids-grid-table" style={{ width: '100%', border: '1px solid #716F64' }}>
             <thead>
               <tr>
-                <th style={{ width: '60px' }}>Res #</th>
+                <th style={{ width: '60px' }}>Res. No.</th>
                 <th style={{ width: '60px' }}>Type</th>
                 <th>Name</th>
                 <th>Company/Segment</th>
@@ -272,7 +272,7 @@ export function IdsPostSaveDialog({ isOpen, onClose, onOk, reservationNo = '271'
 
         <div style={{ padding: '14px 18px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', rowGap: '8px', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600 }}>Reservation #</span>
+            <span style={{ fontWeight: 600 }}>Reservation No.</span>
             <input className="ids-input" value={reservationNo} readOnly style={{ fontWeight: 700, width: '100px' }} />
 
             <span style={{ fontWeight: 600 }}>Print Voucher?</span>
@@ -338,22 +338,22 @@ export function IdsPostReceiptsModal({
         <div style={{ padding: '12px 14px' }}>
           {/* Header Row */}
           <div style={{ display: 'grid', gridTemplateColumns: '90px 140px 80px 1fr', rowGap: '6px', columnGap: '8px', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600 }}>Room#</span>
+            <span style={{ fontWeight: 600 }}>Room No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '80px' }} value={roomNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Room Look-up: Room #${roomNo} currently assigned to ${guestName}.`); }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Room Look-up: Room ${roomNo} currently assigned to ${guestName}.`); }}>?</button>
             </div>
 
-            <span style={{ fontWeight: 600 }}>Folio #</span>
+            <span style={{ fontWeight: 600 }}>Folio No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '100px' }} defaultValue="" />
               <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }} onClick={() => { playReceptionChime(); alert("Folio Detail View:\nMaster Folio: 1\nIncidentals Folio: 2"); }}>More..</button>
             </div>
 
-            <span style={{ fontWeight: 600 }}>Reservation #</span>
+            <span style={{ fontWeight: 600 }}>Reservation No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
               <input className="ids-input" style={{ width: '80px', fontWeight: 700 }} value={reservationNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Reservation Record #${reservationNo}\nStatus: Confirmed Deposit Transaction`); }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Reservation Record ${reservationNo}\nStatus: Confirmed Deposit Transaction`); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Guest Name</span>
@@ -422,7 +422,7 @@ export function IdsPostReceiptsModal({
                   <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const cc = prompt("Enter Corporate Company Code:", companyCode); if (cc) setCompanyCode(cc.toUpperCase()); }}>?</button>
                 </div>
 
-                <span>Credit Card # / Ref</span>
+                <span>Card No. / Ref</span>
                 <input className="ids-input" value={cardRefNo} onChange={(e) => setCardRefNo(e.target.value)} />
 
                 <span>Particulars</span>
@@ -431,10 +431,10 @@ export function IdsPostReceiptsModal({
                 <span>Amount</span>
                 <input className="ids-input" style={{ fontWeight: 700, color: '#BD5317', fontSize: '12px' }} value={amount} onChange={(e) => setAmount(e.target.value)} />
 
-                <span>Authorization #</span>
+                <span>Auth No.</span>
                 <input className="ids-input" value={authNo} onChange={(e) => setAuthNo(e.target.value)} />
 
-                <span>Receipt #</span>
+                <span>Receipt No.</span>
                 <input className="ids-input" value={receiptNo} readOnly style={{ width: '100px', fontWeight: 700 }} />
               </div>
             </div>

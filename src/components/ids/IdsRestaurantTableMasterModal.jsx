@@ -317,9 +317,9 @@ export default function IdsRestaurantTableMasterModal({
               </select>
             </div>
 
-            {/* 2. Table # (Frames 015 & 020) */}
+            {/* 2. Table No. (Frames 015 & 020) */}
             <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontWeight: 600, color: '#000' }}>Table #</span>
+              <span style={{ fontWeight: 600, color: '#000' }}>Table No.</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <input 
                   type="text" 
@@ -597,7 +597,7 @@ export default function IdsRestaurantTableMasterModal({
                   autoFocus
                   value={browseSearch} 
                   onChange={e => setBrowseSearch(e.target.value)}
-                  placeholder="Filter by table #, outlet, or location..."
+                  placeholder="Filter by table no., outlet, or location..."
                   style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 6px', fontSize: '11px' }}
                 />
               </div>
@@ -608,7 +608,7 @@ export default function IdsRestaurantTableMasterModal({
                   <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #808080' }}>
                     <tr>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '90px' }}>Restaurant</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '70px' }}>Table #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'left', width: '70px' }}>Table No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #B0B0B0', textAlign: 'center', width: '100px' }}>Maximum Covers</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left' }}>User</th>
                     </tr>

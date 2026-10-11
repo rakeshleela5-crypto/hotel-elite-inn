@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
    2. Block & Floor filters (All)
    3. Checkbox "Show only Dirty Room" (checked)
    4. Checkbox "Clean All Rooms" (toggles Status from Dirty to Clean for all loaded rooms)
-   5. Interactive Grid Table with Room#, Type, Occupied, Status, HSK Staff, Authorized by,
+   5. Interactive Grid Table with Room No., Type, Occupied, Status, HSK Staff, Authorized by,
       Blocked Date & Time, Guest Name / Reason, Last Updated User ID
    6. Command Buttons: [ Load ], [ Save ], [ Clear ], [ Panel ], [ Exit ]
    ========================================================================= */
@@ -200,7 +200,7 @@ export default function IdsClearRoomsModal({
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
               <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', zIndex: 1, borderBottom: '1px solid #808080' }}>
                 <tr>
-                  <th style={{ padding: '3px 6px', borderRight: '1px solid #B5B2AB', fontWeight: 700, width: '55px' }}>Room#</th>
+                  <th style={{ padding: '3px 6px', borderRight: '1px solid #B5B2AB', fontWeight: 700, width: '55px' }}>Room No.</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #B5B2AB', fontWeight: 700, width: '45px' }}>Type</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #B5B2AB', fontWeight: 700, width: '60px' }}>Occupied</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #B5B2AB', fontWeight: 700, width: '60px' }}>Status</th>

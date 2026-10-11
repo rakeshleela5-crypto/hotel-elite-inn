@@ -189,7 +189,7 @@ export default function IdsPosBillSettlementModal({
       return;
     }
     const providerObj = CARD_PROVIDERS.find(c => c.code === cardProvider) || CARD_PROVIDERS[0];
-    const detailsStr = `${cardType}-${providerObj.code}-CARD # ${cardNo}`;
+    const detailsStr = `${cardType}-${providerObj.code}-CARD ${cardNo}`;
 
     const newPayment = {
       id: Date.now(),
@@ -314,7 +314,7 @@ export default function IdsPosBillSettlementModal({
       onBillSettled(settlementRecord);
     }
 
-    setSettleSuccessMsg(`Bill #${currentBill.billNo} on Table ${currentBill.tableNo} Settled Successfully! Table is now Vacant.`);
+    setSettleSuccessMsg(`Bill No.${currentBill.billNo} on Table ${currentBill.tableNo} Settled Successfully! Table is now Vacant.`);
     setTimeout(() => {
       setSettleSuccessMsg(null);
     }, 3500);
@@ -385,9 +385,9 @@ export default function IdsPosBillSettlementModal({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 24px' }}>
             {/* Left Column Controls */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {/* Bill # with Help ? Button */}
+              {/* Bill No. with Help ? Button */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <label style={{ width: '60px', fontWeight: 600 }}>Bill #</label>
+                <label style={{ width: '60px', fontWeight: 600 }}>Bill No.</label>
                 <input 
                   type="text" 
                   value={activeBillNo} 
@@ -407,9 +407,9 @@ export default function IdsPosBillSettlementModal({
                 </span>
               </div>
 
-              {/* Reg # + GO */}
+              {/* Reg. No. + GO */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <label style={{ width: '60px', fontWeight: 600 }}>Reg #</label>
+                <label style={{ width: '60px', fontWeight: 600 }}>Reg. No.</label>
                 <input 
                   type="text" 
                   value={activeRegNo} 
@@ -419,7 +419,7 @@ export default function IdsPosBillSettlementModal({
                 <button 
                   className="ids-btn" 
                   style={{ padding: '1px 8px', fontSize: '10px', fontWeight: 600 }}
-                  onClick={() => alert(`Loaded registration profile for Reg #${activeRegNo || '585'}`)}
+                  onClick={() => alert(`Loaded registration profile for Reg. No.${activeRegNo || '585'}`)}
                 >
                   GO
                 </button>
@@ -486,9 +486,9 @@ export default function IdsPosBillSettlementModal({
                 />
               </div>
 
-              {/* Table / Room # and Covers */}
+              {/* Table / Room No. and Covers */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <label style={{ width: '85px', fontWeight: 600 }}>Table/Room #</label>
+                <label style={{ width: '85px', fontWeight: 600 }}>Table/Room No.</label>
                 <input 
                   type="text" 
                   readOnly 
@@ -820,11 +820,11 @@ export default function IdsPosBillSettlementModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#EAE6D6', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '50px' }}>Bill #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '50px' }}>Bill No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '45px' }}>Outlet</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '85px' }}>Bill Date</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '50px' }}>Session</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '75px' }}>Table/Room #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '75px' }}>Table/Room No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #CCC', width: '70px', textAlign: 'right' }}>Amount</th>
                       <th style={{ padding: '3px 6px' }}>Status</th>
                     </tr>
@@ -994,7 +994,7 @@ export default function IdsPosBillSettlementModal({
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontWeight: 600 }}>Card #</label>
+                  <label style={{ fontWeight: 600 }}>Card No.</label>
                   <input 
                     type="text" 
                     value={cardNo} 
@@ -1240,7 +1240,7 @@ export default function IdsPosBillSettlementModal({
 
             <div style={{ padding: '12px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: '6px' }}>
-                <label style={{ fontWeight: 600 }}>Room #</label>
+                <label style={{ fontWeight: 600 }}>Room No.</label>
                 <select 
                   value={guestRoomNo} 
                   onChange={e => {
@@ -1271,7 +1271,7 @@ export default function IdsPosBillSettlementModal({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', alignItems: 'center', gap: '6px' }}>
-                <label style={{ fontWeight: 600 }}>Folio #</label>
+                <label style={{ fontWeight: 600 }}>Folio No.</label>
                 <input 
                   type="text" 
                   readOnly 

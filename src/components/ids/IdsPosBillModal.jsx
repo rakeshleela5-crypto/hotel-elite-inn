@@ -299,7 +299,7 @@ export default function IdsPosBillModal({
     setActiveBillIdx(0);
 
     if (uniqueSplits.length === 1) {
-      setPrintSuccessMsg('Bills Merged into Single Bill #1!');
+      setPrintSuccessMsg('Bills Merged into Single Bill No.1!');
     } else {
       setPrintSuccessMsg(`Bill successfully split into ${uniqueSplits.length} parts!`);
     }
@@ -375,7 +375,7 @@ export default function IdsPosBillModal({
       setBillNumber(printedBillNos[0]);
     }
 
-    setPrintSuccessMsg(`${isProvisional ? 'Provisional ' : ''}Bill(s) #${printedBillNos.join(', ')} Generated & Sent to Printer!`);
+    setPrintSuccessMsg(`${isProvisional ? 'Provisional ' : ''}Bill(s) ${printedBillNos.join(', ')} Generated & Sent to Printer!`);
     setTimeout(() => setPrintSuccessMsg(null), 4000);
   };
 
@@ -414,7 +414,7 @@ export default function IdsPosBillModal({
         <div style={{ padding: '8px 12px', background: '#ECE9D8', fontSize: '11px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 1fr 1fr', gap: '8px', alignItems: 'center', marginBottom: '6px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <label style={{ width: '50px', fontWeight: 600 }}>Table #</label>
+              <label style={{ width: '50px', fontWeight: 600 }}>Table No.</label>
               <input 
                 type="text" 
                 value={tableNo} 
@@ -495,7 +495,7 @@ export default function IdsPosBillModal({
                   </th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '38px' }}>RES</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '42px' }}>Cur.</th>
-                  <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '75px' }}>Bill #</th>
+                  <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '75px' }}>Bill No.</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '75px', textAlign: 'right' }}>Value</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '90px', textAlign: 'center' }}>Discount</th>
                   <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '65px', textAlign: 'right' }}>Tax</th>
@@ -627,7 +627,7 @@ export default function IdsPosBillModal({
               />
             </div>
             <div style={{ fontSize: '10px', color: '#666', fontStyle: 'italic' }}>
-              Double Click Bill # View the GST Info..
+              Double Click Bill No. View the GST Info..
             </div>
           </div>
         </div>
@@ -785,7 +785,7 @@ export default function IdsPosBillModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#FFE4B5', borderBottom: '1px solid #808080', zIndex: 1 }}>
                     <tr>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0D0D0', width: '45px', textAlign: 'center' }}>KOT #</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0D0D0', width: '45px', textAlign: 'center' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '220px', textAlign: 'left' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '55px', textAlign: 'left' }}>Type</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '85px', textAlign: 'left' }}>Group</th>
@@ -907,7 +907,7 @@ export default function IdsPosBillModal({
               }}
             >
               <span style={{ fontWeight: 700, fontSize: '12px' }}>
-                View KOT {viewKotDisplayItems.splitId ? `(Split Bill #${viewKotDisplayItems.splitId})` : ''}
+                View KOT {viewKotDisplayItems.splitId ? `(Split Bill No.${viewKotDisplayItems.splitId})` : ''}
               </span>
               <button className="ids-win-btn close" onClick={() => setViewKotModalOpen(false)} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
             </div>
@@ -921,7 +921,7 @@ export default function IdsPosBillModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#FFE4B5', borderBottom: '1px solid #808080', zIndex: 1 }}>
                     <tr>
-                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0D0D0', width: '45px', textAlign: 'center' }}>KOT #</th>
+                      <th style={{ padding: '3px 4px', borderRight: '1px solid #D0D0D0', width: '45px', textAlign: 'center' }}>KOT No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '220px', textAlign: 'left' }}>Item Name</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '55px', textAlign: 'left' }}>Type</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0D0D0', width: '85px', textAlign: 'left' }}>Group</th>
@@ -998,7 +998,7 @@ export default function IdsPosBillModal({
       )}
 
       {/* ========================================================================= */}
-      {/* 3. WIN32 GST BREAKDOWN MODAL ("Double Click Bill # View the GST Info..")    */}
+      {/* 3. WIN32 GST BREAKDOWN MODAL ("Double Click Bill No. View the GST Info..")    */}
       {/* ========================================================================= */}
       {gstInfoModalOpen && gstInfoBillData && (
         <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
@@ -1023,7 +1023,7 @@ export default function IdsPosBillModal({
               }}
             >
               <span style={{ fontWeight: 700, fontSize: '12px' }}>
-                GST Info - Bill #{gstInfoBillData.billNo || gstInfoBillData.billSeq}
+                GST Info - Bill No.{gstInfoBillData.billNo || gstInfoBillData.billSeq}
               </span>
               <button className="ids-win-btn close" onClick={() => setGstInfoModalOpen(false)} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
             </div>
@@ -1287,7 +1287,7 @@ export default function IdsPosBillModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead style={{ position: 'sticky', top: 0, background: '#ECE9D8', borderBottom: '1px solid #999' }}>
                     <tr>
-                      <th style={{ width: '65px', padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Table #</th>
+                      <th style={{ width: '65px', padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Table No.</th>
                       <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #DDD' }}>Server</th>
                       <th style={{ padding: '3px 6px', textAlign: 'right', width: '65px' }}>Amount</th>
                     </tr>

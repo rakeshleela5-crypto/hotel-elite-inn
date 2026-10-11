@@ -4,10 +4,10 @@ import React, { useState, useEffect } from 'react';
    VIDEO 14: HOW TO POST DEPOSIT OR ADVANCE IN A ROOM NUMBER IN IDS 6.5 & 7.0
    Replication of:
    1. Post Receipts FOR GUESTS V6.5.002.1 Window (Video 14 Frames 011–020)
-   2. Room# selector, [ ? ] help lookup, and guest autofill
+   2. Room No. selector, [ ? ] help lookup, and guest autofill
    3. Payment modes: Cash, Credit Card, Cheque
    4. Currency conversion row (INR, Exchange Rate 1.000000)
-   5. Cash Details / Particulars editor (Received Amount, Particulars, Receipt #)
+   5. Cash Details / Particulars editor (Received Amount, Particulars, Receipt No.)
    6. Accounting metadata: Date, User (MANAGER), Last Updated
    7. Confirmation prompt: "DO YOU WANT TO PRINT VOUCHER?" (Frame 018)
    8. Authentic printable Front Office Cashiering Deposit Voucher
@@ -151,7 +151,7 @@ export default function IdsPostDepositModal({
           
           {saveSuccessNotice && (
             <div style={{ background: '#E6FFE6', border: '1px solid #4CAF50', padding: '6px 8px', marginBottom: '8px', color: '#1B5E20', fontWeight: 700 }}>
-              ✓ Deposit Receipt #{receiptNo} of ₹{parseFloat(receivedAmount).toFixed(2)} posted successfully to Room {selectedGuest?.roomNo}!
+              ✓ Deposit Receipt No.{receiptNo} of ₹{parseFloat(receivedAmount).toFixed(2)} posted successfully to Room {selectedGuest?.roomNo}!
             </div>
           )}
 
@@ -159,7 +159,7 @@ export default function IdsPostDepositModal({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
             {/* Left Column */}
             <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '4px', alignItems: 'center' }}>
-              <span style={{ fontWeight: 600 }}>Room#</span>
+              <span style={{ fontWeight: 600 }}>Room No.</span>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <input 
                   className="ids-input" 
@@ -177,7 +177,7 @@ export default function IdsPostDepositModal({
                 </button>
               </div>
 
-              <span style={{ fontWeight: 600 }}>Reservation #</span>
+              <span style={{ fontWeight: 600 }}>Reservation No.</span>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <input 
                   className="ids-input" 
@@ -189,7 +189,7 @@ export default function IdsPostDepositModal({
                   type="button"
                   className="ids-btn-classic" 
                   style={{ padding: '0 6px' }}
-                  onClick={() => alert(`Res# ${selectedGuest?.resNo || '276'} associated with ${selectedGuest?.guestName || 'Santosh Biswakarma'}`)}
+                  onClick={() => alert(`Res${selectedGuest?.resNo || '276'} associated with ${selectedGuest?.guestName || 'Santosh Biswakarma'}`)}
                 >
                   ?
                 </button>
@@ -216,7 +216,7 @@ export default function IdsPostDepositModal({
 
             {/* Right Column */}
             <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '4px', alignItems: 'center' }}>
-              <span style={{ fontWeight: 600 }}>Folio #</span>
+              <span style={{ fontWeight: 600 }}>Folio No.</span>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
@@ -371,7 +371,7 @@ export default function IdsPostDepositModal({
                     style={{ width: '100%', background: '#FFF' }} 
                   />
 
-                  <span style={{ fontWeight: 600 }}>Encashment #</span>
+                  <span style={{ fontWeight: 600 }}>Encashment No.</span>
                   <input 
                     className="ids-input" 
                     value={encashmentNo} 
@@ -379,7 +379,7 @@ export default function IdsPostDepositModal({
                     style={{ width: '100%', background: '#FFF' }} 
                   />
 
-                  <span style={{ fontWeight: 600 }}>Receipt #</span>
+                  <span style={{ fontWeight: 600 }}>Receipt No.</span>
                   <input 
                     className="ids-input" 
                     value={receiptNo} 
@@ -420,7 +420,7 @@ export default function IdsPostDepositModal({
                     style={{ width: '100%', background: '#FFF' }} 
                   />
 
-                  <span style={{ fontWeight: 600 }}>Auth / Ref #</span>
+                  <span style={{ fontWeight: 600 }}>Auth / Ref. No.</span>
                   <input 
                     className="ids-input" 
                     value={cardAuthCode} 
@@ -660,7 +660,7 @@ export default function IdsPostDepositModal({
               style={{ width: '580px', maxWidth: '96vw', boxShadow: '0 10px 40px rgba(0,0,0,0.6)', background: '#FFF' }}
             >
               <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ECE9D8' }}>
-                <span style={{ fontWeight: 700, fontSize: '11px' }}>Deposit Voucher Preview - Receipt #{receiptNo}</span>
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>Deposit Voucher Preview - Receipt No.{receiptNo}</span>
                 <button className="ids-win-btn close" onClick={() => { setShowVoucherPreview(false); onClose(); }}>✕</button>
               </div>
 
@@ -678,7 +678,7 @@ export default function IdsPostDepositModal({
                 {/* Voucher Metadata */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '11px' }}>
                   <div>
-                    <div>Receipt No : <strong>#{receiptNo}</strong></div>
+                    <div>Receipt No.: <strong>{receiptNo}</strong></div>
                     <div>Date & Time: 17-JAN-2026 19:13</div>
                     <div>Room No    : <strong>{selectedGuest?.roomNo || selectedRoomNo}</strong></div>
                     <div>Folio No   : {selectedGuest?.folioNo || '1'}</div>

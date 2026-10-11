@@ -251,7 +251,7 @@ export default function IdsWalkInModal({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', background: '#ECE9D8', padding: '6px', border: '1px solid #CCC' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ width: '50px' }}>Room#</span>
+                  <span style={{ width: '50px' }}>Room No.</span>
                   <input 
                     className="ids-input" 
                     style={{ width: '80px', fontWeight: 700, background: '#FFF' }} 
@@ -403,7 +403,7 @@ export default function IdsWalkInModal({
               <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: '#ECE9D8', color: '#000' }}>
-                    <th style={{ width: '70px', borderRight: '1px solid #BBB' }}>Room#</th>
+                    <th style={{ width: '70px', borderRight: '1px solid #BBB' }}>Room No.</th>
                     {['SUN-23-01', 'MON-24-01', 'TUE-25-01', 'WED-26-01', 'THU-27-01', 'FRI-28-01', 'SAT-29-01', 'SUN-30-01', 'MON-31-01', 'TUE-01-02'].map((col) => (
                       <th key={col} style={{ borderRight: '1px solid #BBB', textAlign: 'center', width: '65px' }}>{col}</th>
                     ))}
@@ -529,7 +529,7 @@ export default function IdsWalkInModal({
                   <input className="ids-input" readOnly value={currentPax} style={{ width: '35px', textAlign: 'center', fontWeight: 700, background: '#F5F5F5' }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span>Folio #</span>
+                  <span>Folio No.</span>
                   <input className="ids-input" readOnly value={folioNo} style={{ width: '35px', textAlign: 'center', background: '#F5F5F5' }} />
                 </div>
               </div>
@@ -601,11 +601,11 @@ export default function IdsWalkInModal({
                   <input className="ids-input" style={{ width: '120px' }} value={zip} onChange={(e) => setZip(e.target.value)} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '80px' }}>Telephone #</span>
+                  <span style={{ width: '80px' }}>Phone No.</span>
                   <input className="ids-input" style={{ flex: 1 }} value={telephone} onChange={(e) => setTelephone(e.target.value)} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '80px' }}>Mobile #</span>
+                  <span style={{ width: '80px' }}>Mobile No.</span>
                   <input className="ids-input" style={{ flex: 1, fontWeight: 700 }} value={mobile} onChange={(e) => setMobile(e.target.value)} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1210,7 +1210,7 @@ export default function IdsWalkInModal({
                   </button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px', alignItems: 'center' }}>
-                  <span>Identification#</span>
+                  <span>Identification No.</span>
                   <input className="ids-input" value={identificationNo} onChange={(e) => setIdentificationNo(e.target.value)} />
                 </div>
               </fieldset>
@@ -1224,7 +1224,7 @@ export default function IdsWalkInModal({
                       <th>Credit Card Type</th>
                       <th>Card Number</th>
                       <th>Expiry Date</th>
-                      <th>Authorization #</th>
+                      <th>Auth No.</th>
                       <th>Amount</th>
                       <th>Card Holder Name</th>
                     </tr>
@@ -1279,8 +1279,8 @@ export default function IdsWalkInModal({
                 <table className="ids-table" style={{ width: '100%', fontSize: '10px', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: '#ECE9D8' }}>
-                      <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Reg. #</th>
-                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio #</th>
+                      <th style={{ width: '60px', borderRight: '1px solid #BBB' }}>Reg. No.</th>
+                      <th style={{ width: '50px', borderRight: '1px solid #BBB' }}>Folio No.</th>
                       <th style={{ width: '40px', borderRight: '1px solid #BBB' }}>Pax</th>
                       <th>Guest Name</th>
                     </tr>
@@ -1356,7 +1356,7 @@ export default function IdsWalkInModal({
                     setGuest2Title('Mrs');
                     setGuest2LastName('Sharma');
                     setGuest2Gender('Female');
-                    setStatusMessage('Entered 2nd Pax: Mrs. Sharma (Reg # 622). Click Save to confirm.');
+                    setStatusMessage('Entered 2nd Pax: Mrs. Sharma (Reg. No. 622). Click Save to confirm.');
                   }}
                 >
                   <u>Y</u>es
@@ -1395,7 +1395,7 @@ export default function IdsWalkInModal({
                 {/* Left Column: Room info & guest master fields */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ width: '130px' }}>Name/Room#</span>
+                    <span style={{ width: '130px' }}>Name/Room No.</span>
                     <input className="ids-input" readOnly value={selectedRoom} style={{ width: '60px', fontWeight: 700, background: '#F5F5F5' }} />
                     <button 
                       type="button"
@@ -1446,7 +1446,7 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Room Night(s)</span>
                     <input className="ids-input" readOnly value="1" style={{ width: '40px', textAlign: 'center', background: '#F5F5F5' }} />
-                    <span style={{ marginLeft: '12px' }}>Ref. #</span>
+                    <span style={{ marginLeft: '12px' }}>Ref. No.</span>
                     <input className="ids-input" readOnly value="" style={{ width: '80px', background: '#F5F5F5' }} />
                   </div>
 
@@ -1463,7 +1463,7 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Plan</span>
                     <input className="ids-input" readOnly value="CP" style={{ width: '50px', background: '#F5F5F5' }} />
-                    <span style={{ marginLeft: '12px' }}>Passport #</span>
+                    <span style={{ marginLeft: '12px' }}>Passport No.</span>
                     <input className="ids-input" readOnly value="" style={{ width: '100px', background: '#F5F5F5' }} />
                   </div>
                 </div>
@@ -1475,11 +1475,11 @@ export default function IdsWalkInModal({
                       Guest Name
                     </div>
                     <div style={{ background: '#316AC5', color: '#FFF', padding: '2px 4px', fontWeight: 700, fontSize: '11px', marginBottom: '2px' }}>
-                      Mr Sarkar Rajesh (Reg # 621)
+                      Mr Sarkar Rajesh (Reg. No. 621)
                     </div>
                     {isSecondPaxActive && (
                       <div style={{ background: '#FFF', color: '#000', padding: '2px 4px', fontSize: '11px' }}>
-                        Mrs Sharma (Reg # 622)
+                        Mrs Sharma (Reg. No. 622)
                       </div>
                     )}
                   </div>

@@ -69,7 +69,7 @@ export function IdsScanBookingModal({
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, auto)', gap: '6px 12px', fontSize: '11px' }}>
               {[
                 'Guest Name', 'Company Name', 'Group Name', 'Arrival Date', 'Departure Date', 'Length of Stay', 'Market Segment',
-                'Reserved On', 'Reservation #', 'Reference', 'CRS Link #', 'Arrival Flight', 'Pay Mode', 'Business Source'
+                'Reserved On', 'Reservation No.', 'Reference', 'CRS Link No.', 'Arrival Flight', 'Pay Mode', 'Business Source'
               ].map(opt => (
                 <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
                   <input 
@@ -107,11 +107,11 @@ export function IdsScanBookingModal({
             <table className="ids-grid-table">
               <thead>
                 <tr>
-                  <th style={{ width: '55px' }}>Res.#</th>
+                  <th style={{ width: '55px' }}>Res. No.</th>
                   <th style={{ width: '40px' }}>Title</th>
                   <th>Guest Name</th>
                   <th>Company Name</th>
-                  <th style={{ width: '55px' }}>Room #</th>
+                  <th style={{ width: '55px' }}>Room No.</th>
                   <th style={{ width: '45px' }}>Type</th>
                   <th style={{ width: '50px' }}>Confirm</th>
                   <th style={{ width: '60px' }}>Provisional</th>
@@ -246,7 +246,7 @@ export function IdsAssignGuestRoomsModal({
         guestName: booking.guestName
       });
     }
-    alert(`✅ Room #${assignedRoom || selectedCell} successfully assigned to ${booking.guestName}!`);
+    alert(`✅ Room ${assignedRoom || selectedCell} successfully assigned to ${booking.guestName}!`);
     onClose();
   };
 
@@ -262,7 +262,7 @@ export function IdsAssignGuestRoomsModal({
         <div style={{ padding: '12px 14px' }}>
           {/* Top Form Fields (Frame 006) */}
           <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 80px 110px 60px 140px 65px 140px 50px 1fr', gap: '4px', alignItems: 'center' }}>
-            <span style={{ fontWeight: 600 }}>Resv. #</span>
+            <span style={{ fontWeight: 600 }}>Res. No.</span>
             <div style={{ display: 'flex', gap: '2px' }}>
               <input className="ids-input" style={{ width: '55px', fontWeight: 700 }} value={booking.resNo || '270'} readOnly />
               <button 
@@ -270,7 +270,7 @@ export function IdsAssignGuestRoomsModal({
                 style={{ minWidth: '18px', padding: '1px 4px' }}
                 onClick={() => {
                   playReceptionChime();
-                  alert(`Reservation #${booking.resNo || '270'} details:\nGuest: ${booking.guestName || 'Mr Sharma'}\nType: ${booking.type || 'EXECUTIVE'}\nArrival: ${booking.arrivalDate || '14-JAN-2026'}`);
+                  alert(`Reservation No.${booking.resNo || '270'} details:\nGuest: ${booking.guestName || 'Mr Sharma'}\nType: ${booking.type || 'EXECUTIVE'}\nArrival: ${booking.arrivalDate || '14-JAN-2026'}`);
                 }}
               >?</button>
             </div>
@@ -362,7 +362,7 @@ export function IdsAssignGuestRoomsModal({
                   <thead>
                     <tr>
                       <th>Guest Name</th>
-                      <th style={{ width: '60px' }}>Room#</th>
+                      <th style={{ width: '60px' }}>Room No.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -390,7 +390,7 @@ export function IdsAssignGuestRoomsModal({
                 <thead>
                   {/* Days Row */}
                   <tr>
-                    <th style={{ width: '80px', background: '#DFDBC9' }}>Room#</th>
+                    <th style={{ width: '80px', background: '#DFDBC9' }}>Room No.</th>
                     {days.map((d, idx) => (
                       <th key={idx} style={{ textAlign: 'center', padding: '2px 4px', width: '26px', background: '#DFDBC9' }}>
                         <div>{d.day}</div>

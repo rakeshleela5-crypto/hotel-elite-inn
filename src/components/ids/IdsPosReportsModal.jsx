@@ -657,7 +657,7 @@ export default function IdsPosReportsModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead>
                     <tr style={{ background: '#0A246A', color: '#FFF', position: 'sticky', top: 0 }}>
-                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #4060A0' }}>Bill #</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #4060A0' }}>Bill No.</th>
                       <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>Tbl</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #4060A0' }}>Outlet</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #4060A0' }}>Server</th>
@@ -730,8 +730,8 @@ export default function IdsPosReportsModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead>
                     <tr style={{ background: '#8B0000', color: '#FFF', position: 'sticky', top: 0 }}>
-                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>Voucher #</th>
-                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>KOT #</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>Voucher No.</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>KOT No.</th>
                       <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #600' }}>Tbl</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>Time</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #600' }}>Cancelled Item</th>
@@ -793,8 +793,8 @@ export default function IdsPosReportsModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                   <thead>
                     <tr style={{ background: '#2E7D32', color: '#FFF', position: 'sticky', top: 0 }}>
-                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>NC KOT #</th>
-                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>NC Bill #</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>NC KOT No.</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>NC Bill No.</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>Time</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>Department</th>
                       <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #1B5E20' }}>Officer Name</th>

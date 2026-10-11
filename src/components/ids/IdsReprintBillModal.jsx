@@ -17,11 +17,11 @@ import {
       - 44-Video Tutorial Player -> Video 36 -> Launch Interactive Feature Clone
    3. Step 1 Window (Frame 022):
       - Month/Year: OCT-2026
-      - Bill #: 512 with [ ? ] lookup
+      - Bill No.: 512 with [ ? ] lookup
       - [ Continue ], [ Panel ], [ Exit ]
    4. Step 2 Details Window (Frame 026):
-      - Bill #: 512 | Bill Date: 24-OCT-2026
-      - Room#: 205 | Reg. #: 625 | Folio #: 1
+      - Bill No.: 512 | Bill Date: 24-OCT-2026
+      - Room No.: 205 | Reg. No.: 625 | Folio No.: 1
       - Guest Name: Mr Kumar Anil
       - Company: Mahindra & Mahindra Ltd
       - Arrival Date: 27-JAN-2026 19:07 | Group: FIT
@@ -148,10 +148,10 @@ export default function IdsReprintBillModal({
     if (found) {
       setActiveBill(found);
       setStage('details');
-      setStatusMessage(`Loaded Bill #${found.billNo} for Room ${found.roomNo} (${found.guestName})`);
+      setStatusMessage(`Loaded Bill No.${found.billNo} for Room ${found.roomNo} (${found.guestName})`);
       setTimeout(() => setStatusMessage(''), 3000);
     } else {
-      alert(`Bill #${billNoInput} not found. Please click [ ? ] to lookup available bills.`);
+      alert(`Bill No.${billNoInput} not found. Please click [ ? ] to lookup available bills.`);
     }
   };
 
@@ -218,7 +218,7 @@ export default function IdsReprintBillModal({
         )}
 
         {/* =========================================================================
-            STAGE 1: INPUT MONTH/YEAR & BILL # (Frame 022)
+            STAGE 1: INPUT MONTH/YEAR & BILL NO. (Frame 022)
             ========================================================================= */}
         {stage === 'input' && (
           <div style={{ padding: '16px 20px', fontSize: '11px' }}>
@@ -233,7 +233,7 @@ export default function IdsReprintBillModal({
                   style={{ width: '130px', fontWeight: 700 }}
                 />
 
-                <span style={{ fontWeight: 600 }}>Bill #</span>
+                <span style={{ fontWeight: 600 }}>Bill No.</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
                     className="ids-input" 
@@ -289,19 +289,19 @@ export default function IdsReprintBillModal({
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '12px 14px', marginBottom: '12px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '80px 140px 90px 1fr', gap: '8px 12px', alignItems: 'center' }}>
                 
-                <span style={{ fontWeight: 600 }}>Bill #</span>
+                <span style={{ fontWeight: 600 }}>Bill No.</span>
                 <input className="ids-input" value={activeBill.billNo} readOnly style={{ width: '100px', fontWeight: 700, background: '#F0F0F0' }} />
 
                 <span style={{ fontWeight: 600 }}>Bill Date</span>
                 <input className="ids-input" value={activeBill.billDate} readOnly style={{ width: '120px', background: '#F0F0F0' }} />
 
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={activeBill.roomNo} readOnly style={{ width: '80px', fontWeight: 700, color: '#0A246A', background: '#F0F0F0' }} />
 
-                <span style={{ fontWeight: 600 }}>Reg. #</span>
+                <span style={{ fontWeight: 600 }}>Reg. No.</span>
                 <input className="ids-input" value={activeBill.regNo} readOnly style={{ width: '100px', background: '#F0F0F0' }} />
 
-                <span style={{ fontWeight: 600 }}>Folio #</span>
+                <span style={{ fontWeight: 600 }}>Folio No.</span>
                 <input className="ids-input" value={activeBill.folioNo} readOnly style={{ width: '80px', background: '#F0F0F0' }} />
 
                 <span></span>
@@ -430,7 +430,7 @@ export default function IdsReprintBillModal({
                     className="ids-input" 
                     value={searchBillTerm} 
                     onChange={(e) => setSearchBillTerm(e.target.value)} 
-                    placeholder="Search by Bill #, Guest Name or Room #..."
+                    placeholder="Search by Bill No., Guest Name or Room No...."
                     style={{ flex: 1, padding: '2px 6px' }}
                     autoFocus
                   />
@@ -440,7 +440,7 @@ export default function IdsReprintBillModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Bill #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Bill No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '80px' }}>Bill Date</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Room</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
@@ -497,7 +497,7 @@ export default function IdsReprintBillModal({
                 className="ids-dialog-titlebar plain" 
                 style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
               >
-                <span>Bill Line Item Details — Bill #{activeBill.billNo}</span>
+                <span>Bill Line Item Details — Bill No.{activeBill.billNo}</span>
                 <button className="ids-win-btn close" onClick={() => setLineItemsDetailsOpen(false)}>✕</button>
               </div>
 
@@ -559,7 +559,7 @@ export default function IdsReprintBillModal({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '11px' }}>
                   <FileText size={13} />
-                  <span>GST Tax Invoice (Rule 46) — Bill #{activeBill.billNo} Reprint</span>
+                  <span>GST Tax Invoice (Rule 46) — Bill No.{activeBill.billNo} Reprint</span>
                 </div>
                 <button className="ids-win-btn close" onClick={() => setPrintPreviewOpen(false)}>✕</button>
               </div>
@@ -582,15 +582,15 @@ export default function IdsReprintBillModal({
 
                 {/* Bill & Guest Details Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 10px', marginBottom: '10px', fontSize: '10.5px' }}>
-                  <div><strong>Invoice / Bill #:</strong> {activeBill.billNo}</div>
+                  <div><strong>Invoice / Bill No.:</strong> {activeBill.billNo}</div>
                   <div><strong>Invoice Date:</strong> {activeBill.billDate}</div>
                   <div><strong>Guest Name:</strong> {activeBill.guestName}</div>
-                  <div><strong>Room #:</strong> {activeBill.roomNo} ({activeBill.roomType})</div>
+                  <div><strong>Room No.: </strong> {activeBill.roomNo} ({activeBill.roomType})</div>
                   <div><strong>Company:</strong> {activeBill.companyName || 'FIT Guest'}</div>
                   <div><strong>Guest GSTIN:</strong> {activeBill.gstin || 'UNREGISTERED'}</div>
                   <div><strong>Arrival:</strong> {activeBill.arrivalDate}</div>
                   <div><strong>Departure:</strong> {activeBill.departureDate}</div>
-                  <div><strong>Folio #:</strong> {activeBill.folioNo} / Reg #: {activeBill.regNo}</div>
+                  <div><strong>Folio No.:</strong> {activeBill.folioNo} / Reg. No.: {activeBill.regNo}</div>
                   <div><strong>Cashier:</strong> {activeBill.cashier}</div>
                 </div>
 

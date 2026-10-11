@@ -15,7 +15,7 @@ import {
       - [ Package ], [ Rate ], [ Non Rack ], [ Exit ]
    3. Main Header Fields (Frames 016 & 030):
       - Property: DEMO / ELITE INN
-      - Rate Table #: 100 with [ ? ] lookup
+      - Rate Table No.: 100 with [ ? ] lookup
       - Description: Rate for Tata Motors / Mahindra / Corporate Contract
       - Applicable From: 23-FEB-2026
       - Applicable To: 31-MAR-2026
@@ -290,7 +290,7 @@ export default function IdsCompanyContractRatesModal({
   // Commit Whole Rate Table to Database
   const handleSaveRateTable = () => {
     if (!selectedTable.tableNo.trim()) {
-      alert('Please enter Rate Table #.');
+      alert('Please enter Rate Table No..');
       return;
     }
     if (!selectedTable.description.trim()) {
@@ -306,7 +306,7 @@ export default function IdsCompanyContractRatesModal({
       return [...prev, selectedTable];
     });
 
-    setStatusMessage(`Rate Table #${selectedTable.tableNo} "${selectedTable.description}" saved successfully!`);
+    setStatusMessage(`Rate Table No.${selectedTable.tableNo} "${selectedTable.description}" saved successfully!`);
     if (onSaveContractRate) {
       onSaveContractRate(selectedTable);
     }
@@ -454,7 +454,7 @@ export default function IdsCompanyContractRatesModal({
                 style={{ width: '130px' }}
               />
 
-              <span style={{ fontWeight: 600 }}>Rate Table #</span>
+              <span style={{ fontWeight: 600 }}>Rate Table No.</span>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
@@ -976,7 +976,7 @@ export default function IdsCompanyContractRatesModal({
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Table #</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Table No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Description</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Prp. Code</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '80px' }}>Appli. Date</th>

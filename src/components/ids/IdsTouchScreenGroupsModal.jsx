@@ -134,20 +134,20 @@ export default function IdsTouchScreenGroupsModal({
     setApplicableFrom(accountingDate);
     setUser(currentUser);
     setLastUpdated(`${accountingDate} 18:52`);
-    showNotification(`New Touch Screen Group #${nextCode} entry initiated.`);
+    showNotification(`New Touch Screen Group ${nextCode} entry initiated.`);
   };
 
   // Action: Modify
   const handleModify = () => {
     if (groups.length === 0) return;
     setFormMode('MODIFY');
-    showNotification(`Editing Touch Screen Group #${menuGrouping} (${groupName}).`);
+    showNotification(`Editing Touch Screen Group ${menuGrouping} (${groupName}).`);
   };
 
   // Action: Delete
   const handleDelete = () => {
     if (groups.length === 0) return;
-    const confirmDelete = window.confirm(`Are you sure you want to delete Touch Screen Group #${menuGrouping} - "${groupName}"?`);
+    const confirmDelete = window.confirm(`Are you sure you want to delete Touch Screen Group ${menuGrouping} - "${groupName}"?`);
     if (!confirmDelete) return;
 
     const filtered = groups.filter(g => String(g.code) !== String(menuGrouping) && String(g.menuGroupCode) !== String(menuGrouping));
@@ -156,7 +156,7 @@ export default function IdsTouchScreenGroupsModal({
     const newIdx = Math.max(0, currentIndex - 1);
     setCurrentIndex(newIdx);
     setFormMode('VIEW');
-    showNotification(`Touch Screen Group #${menuGrouping} successfully removed.`);
+    showNotification(`Touch Screen Group ${menuGrouping} successfully removed.`);
   };
 
   // Action: Save (Frame 045)
@@ -196,7 +196,7 @@ export default function IdsTouchScreenGroupsModal({
     setGroups(updatedList);
     saveStoredTouchScreenGroups(updatedList);
     setFormMode('VIEW');
-    showNotification(`Touch Screen Group #${mgNum} ("${updatedRecord.name}") saved & active on POS terminals!`);
+    showNotification(`Touch Screen Group ${mgNum} ("${updatedRecord.name}") saved & active on POS terminals!`);
   };
 
   // Navigation: Previous
@@ -221,7 +221,7 @@ export default function IdsTouchScreenGroupsModal({
     setGroupName(mg.name || '');
     setShortName(mg.shortName || mg.name?.substring(0, 6) || '');
     setMenuGroupLookupOpen(false);
-    showNotification(`Linked to Menu Group #${mg.code} (${mg.name})`);
+    showNotification(`Linked to Menu Group ${mg.code} (${mg.name})`);
   };
 
   // Handle selecting from Browse popup
@@ -848,7 +848,7 @@ export default function IdsTouchScreenGroupsModal({
                       {g.name}
                     </div>
                     <div style={{ fontSize: '8px', color: '#AAA', marginTop: '2px' }}>
-                      Group #{g.menuGroupCode}
+                      Group {g.menuGroupCode}
                     </div>
                   </div>
                 ))}

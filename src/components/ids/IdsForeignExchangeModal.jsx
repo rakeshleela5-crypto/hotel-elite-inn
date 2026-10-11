@@ -21,10 +21,10 @@ import {
       - Currency: United States of Dollar (USD - 77.75), Euro (EUR - 85.50), GBP (99.20), AED (21.15)
       - Particulars: Money Exchange
       - Exg. Amount: 2,000.00 | Voucher: 3 with [ ? ] lookup
-      - Encashment #: ENC/2026/003 | Accounting Date: 17-MAR-2026
+      - Encashment No.: ENC/2026/003 | Accounting Date: 17-MAR-2026
       - [ Reprint ] button
    4. Guest KYC & Passport Profile (Frame 048):
-      - Room#: 1002 / 201 | Name: Mr Gomes | Passport #: S1234567
+      - Room No.: 1002 / 201 | Name: Mr Gomes | Passport No.: S1234567
       - Nationality: USA | Address: New York, USA
       - Outlet: FO | Bill Amount: 0.00 | Paid out: 0.00
    5. Denomination Breakdown Matrix (Frame 074):
@@ -198,7 +198,7 @@ export default function IdsForeignExchangeModal({
     });
 
     setSelectedVoucher(newRecord);
-    setStatusMessage(`Encashment Voucher #${voucherNo} for ${guestName} (${currentRateObj.symbol}${totalForeignAmount.toFixed(2)} = ₹${netPaidInr.toFixed(2)}) saved successfully!`);
+    setStatusMessage(`Encashment Voucher No.${voucherNo} for ${guestName} (${currentRateObj.symbol}${totalForeignAmount.toFixed(2)} = ₹${netPaidInr.toFixed(2)}) saved successfully!`);
     setTimeout(() => setStatusMessage(''), 4000);
   };
 
@@ -298,7 +298,7 @@ export default function IdsForeignExchangeModal({
               <span style={{ fontWeight: 600 }}>Particulars</span>
               <input className="ids-input" value={particulars} onChange={(e) => setParticulars(e.target.value)} style={{ width: '100%', fontWeight: 600 }} />
 
-              <span style={{ fontWeight: 600 }}>Encashment #</span>
+              <span style={{ fontWeight: 600 }}>Encashment No.</span>
               <input className="ids-input" value={encashmentNo} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
 
               <span style={{ fontWeight: 600 }}>Exg. Amount</span>
@@ -316,13 +316,13 @@ export default function IdsForeignExchangeModal({
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '75px 1fr', gap: '4px 6px', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>Room#</span>
+                <span style={{ fontWeight: 600 }}>Room No.</span>
                 <input className="ids-input" value={roomNo} onChange={(e) => setRoomNo(e.target.value)} style={{ width: '70px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Name</span>
                 <input className="ids-input" value={guestName} onChange={(e) => setGuestName(e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF7CC' }} />
 
-                <span style={{ fontWeight: 600 }}>Passport #</span>
+                <span style={{ fontWeight: 600 }}>Passport No.</span>
                 <input className="ids-input" value={passportNo} onChange={(e) => setPassportNo(e.target.value)} style={{ width: '100%', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Outlet</span>
@@ -514,7 +514,7 @@ export default function IdsForeignExchangeModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <div><strong>Encashment Slip #:</strong> {encashmentNo}</div>
+                  <div><strong>Encashment Slip No.: </strong> {encashmentNo}</div>
                   <div><strong>Date:</strong> {accountingDate}</div>
                 </div>
 
@@ -621,7 +621,7 @@ export default function IdsForeignExchangeModal({
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Voucher</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '70px', borderRight: '1px solid #B0AB9A' }}>Room#</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '70px', borderRight: '1px solid #B0AB9A' }}>Room No.</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Guest Name</th>
                         <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Cur</th>
                         <th style={{ padding: '3px 6px', textAlign: 'right', width: '70px', borderRight: '1px solid #B0AB9A' }}>Amount</th>

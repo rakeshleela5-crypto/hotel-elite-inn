@@ -130,7 +130,7 @@ export default function IdsNightAuditModal({
     setStep2SubLog('From Date: 25/01/22  To Date: 25/01/22');
 
     setTimeout(() => {
-      setStep2Log('Updating FOM Gst Number.. Invoice # : 503');
+      setStep2Log('Updating FOM Gst Number.. Invoice No.: 503');
     }, 700);
 
     setTimeout(() => {
@@ -508,7 +508,7 @@ export default function IdsNightAuditModal({
                   <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #999', textAlign: 'left', fontWeight: 700 }}>
                     <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '110px' }}>Restaurant</th>
                     <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '80px' }}>Session</th>
-                    <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Bill #</th>
+                    <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Bill No.</th>
                     <th style={{ padding: '4px 8px' }}>User</th>
                   </tr>
                 </thead>
@@ -780,7 +780,7 @@ export default function IdsNightAuditModal({
                   <div style={{ borderTop: '1px solid #EEE', marginTop: '6px', paddingTop: '6px' }}>
                     <div style={{ fontWeight: 700, color: '#555', marginBottom: '2px' }}>Help Desk:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr' }}>
-                      <span>Phone #</span>
+                      <span>Phone No.</span>
                       <span style={{ fontWeight: 600 }}>+91 80 6772 0000</span>
                       <span>Email Id</span>
                       <span style={{ color: '#0066CC' }}>techsupport@idsnext.com</span>

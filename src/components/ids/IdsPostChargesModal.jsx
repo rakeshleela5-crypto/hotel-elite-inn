@@ -14,8 +14,8 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
       - Cashiering.. -> Posting -> Post Charges (Video 21 Frame 008 & 012)
       - Room Status V6.5.002.1 Rack -> Right Click Occupied Room 102 -> Room Charges (Frames 020-025)
    2. Post Charges V6.5.002.1 Dialog (Frames 012–060):
-      - Room# 102, [ Guest Details ], Folio # 1, [ More... ]
-      - Registration # 587, Name: MR. RAJESH SHARMA
+      - Room No. 102, [ Guest Details ], Folio No. 1, [ More... ]
+      - Registration No. 587, Name: MR. RAJESH SHARMA
       - Reference Date: 26-JAN-2026, Accounting Date: 26-JAN-2026
       - Revenue Code Dropdown:
         * TRV: TRAVEL DESK (Airport Pickup Drop)
@@ -27,7 +27,7 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
         * BAR: BAR
         * RMS: ROOM SERVICE
       - Description auto-population
-      - Ref. #, Receipt # (225, 226)
+      - Ref. No., Receipt No. (225, 226)
       - Particulars: "Airport Pickup Drop", "Miscellenous Charges"
       - Currency: INR, Exchange Rate: 1.000000
       - Tax Inclusive: No / Yes
@@ -222,7 +222,7 @@ export default function IdsPostChargesModal({
     if (shouldPrint) {
       setShowVoucherPreview(true);
     } else {
-      setStatusNotice(`✓ Charge Voucher #${savedVoucherData?.receiptNo || receiptNo} posted successfully!`);
+      setStatusNotice(`✓ Charge Voucher No.${savedVoucherData?.receiptNo || receiptNo} posted successfully!`);
     }
   };
 
@@ -278,9 +278,9 @@ export default function IdsPostChargesModal({
 
             {/* Form Fields Container */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '8px' }}>
-              {/* Row 1: Room#, [ Guest Details ], Folio #, [ More... ] */}
+              {/* Row 1: Room No., [ Guest Details ], Folio No., [ More... ] */}
               <div style={{ display: 'grid', gridTemplateColumns: '90px 85px 22px 105px 50px 70px 1fr', alignItems: 'center', gap: '4px' }}>
-                <label style={{ fontWeight: 600 }}>Room#</label>
+                <label style={{ fontWeight: 600 }}>Room No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -305,12 +305,12 @@ export default function IdsPostChargesModal({
                   type="button" 
                   className="ids-btn-classic" 
                   style={{ padding: '1px 8px', fontWeight: 600 }}
-                  onClick={() => alert(`Guest: ${guestName}\nRoom: ${roomNo}\nReg#: ${regNo}\nFolio: ${folioNo}`)}
+                  onClick={() => alert(`Guest: ${guestName}\nRoom: ${roomNo}\nReg. No.: ${regNo}\nFolio: ${folioNo}`)}
                 >
                   Guest Details
                 </button>
 
-                <label style={{ fontWeight: 600, textAlign: 'right' }}>Folio #</label>
+                <label style={{ fontWeight: 600, textAlign: 'right' }}>Folio No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -331,9 +331,9 @@ export default function IdsPostChargesModal({
                 </div>
               </div>
 
-              {/* Row 2: Registration #, Name */}
+              {/* Row 2: Registration No., Name */}
               <div style={{ display: 'grid', gridTemplateColumns: '90px 110px 1fr 50px 190px', alignItems: 'center', gap: '4px' }}>
-                <label style={{ fontWeight: 600 }}>Registration #</label>
+                <label style={{ fontWeight: 600 }}>Registration No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -409,9 +409,9 @@ export default function IdsPostChargesModal({
                 />
               </div>
 
-              {/* Row 5: Ref. #, Receipt # */}
+              {/* Row 5: Ref. No., Receipt No. */}
               <div style={{ display: 'grid', gridTemplateColumns: '90px 110px 1fr 80px 110px', alignItems: 'center', gap: '4px' }}>
-                <label style={{ fontWeight: 600 }}>Ref. #</label>
+                <label style={{ fontWeight: 600 }}>Ref. No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -421,7 +421,7 @@ export default function IdsPostChargesModal({
                 />
                 <div />
 
-                <label style={{ fontWeight: 600, textAlign: 'right' }}>Receipt #</label>
+                <label style={{ fontWeight: 600, textAlign: 'right' }}>Receipt No.</label>
                 <input 
                   type="text" 
                   className="ids-input" 
@@ -738,7 +738,7 @@ export default function IdsPostChargesModal({
                 marginBottom: '4px'
               }}
             >
-              <span style={{ fontWeight: 600 }}>Room#</span>
+              <span style={{ fontWeight: 600 }}>Room No.</span>
               <input 
                 type="text" 
                 className="ids-input" 
@@ -761,10 +761,10 @@ export default function IdsPostChargesModal({
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <span style={{ fontWeight: 700, color: '#0A246A' }}>MR. RAJESH SHARMA</span>
 
-              <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg.#</span>
+              <span style={{ fontWeight: 600, textAlign: 'right' }}>Reg. No.</span>
               <span style={{ fontWeight: 700 }}>587</span>
 
-              <span style={{ fontWeight: 600, textAlign: 'right' }}>Folio #</span>
+              <span style={{ fontWeight: 600, textAlign: 'right' }}>Folio No.</span>
               <span style={{ fontWeight: 700 }}>1</span>
             </div>
 
@@ -1009,7 +1009,7 @@ export default function IdsPostChargesModal({
           >
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ECE9D8' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>
-                Charge Voucher Preview - Receipt #{savedVoucherData?.receiptNo || receiptNo}
+                Charge Voucher Preview - Receipt No.{savedVoucherData?.receiptNo || receiptNo}
               </span>
               <button className="ids-win-btn close" onClick={() => setShowVoucherPreview(false)}>✕</button>
             </div>
@@ -1028,14 +1028,14 @@ export default function IdsPostChargesModal({
               {/* Metadata */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '11px' }}>
                 <div>
-                  <div><strong>Voucher/Receipt #:</strong> {savedVoucherData?.receiptNo || receiptNo}</div>
+                  <div><strong>Voucher/Receipt No.:</strong> {savedVoucherData?.receiptNo || receiptNo}</div>
                   <div><strong>Date / Time:</strong> {savedVoucherData?.timestamp || `${acDate} 16:17`}</div>
-                  <div><strong>Room #:</strong> {roomNo}</div>
-                  <div><strong>Folio #:</strong> {folioNo}</div>
+                  <div><strong>Room No.: </strong> {roomNo}</div>
+                  <div><strong>Folio No.:</strong> {folioNo}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div><strong>Guest Name:</strong> {guestName}</div>
-                  <div><strong>Reg #:</strong> {regNo}</div>
+                  <div><strong>Reg. No.:</strong> {regNo}</div>
                   <div><strong>Revenue Code:</strong> {savedVoucherData?.revenueCode || revenueCode}</div>
                   <div><strong>Cashier / User:</strong> MANAGER</div>
                 </div>
@@ -1103,7 +1103,7 @@ export default function IdsPostChargesModal({
                 className="ids-btn-classic" 
                 style={{ fontWeight: 700, color: '#0A246A' }}
                 onClick={() => {
-                  alert(`🖨️ Voucher #${savedVoucherData?.receiptNo || receiptNo} printed to Front Desk thermal printer.`);
+                  alert(`🖨️ Voucher No.${savedVoucherData?.receiptNo || receiptNo} printed to Front Desk thermal printer.`);
                   setShowVoucherPreview(false);
                 }}
               >

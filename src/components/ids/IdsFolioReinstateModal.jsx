@@ -23,11 +23,11 @@ import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPms
       - Header Title: Folio Re-Instate
       - Re-Instate filter: Transaction (s)
       - Grid Columns:
-        Bill # | Room # | Reg # | Guest Name | Bill Amount | Settlement | C/O Bill #
+        Bill No. | Room No. | Reg. No. | Guest Name | Bill Amount | Settlement | C/O Bill No.
         Row 1: 511 | 201 | 624 | Mr Sharma Raj | 5190 | Cash | 511
       - Legend:
         [ ] In-house (Part Bill)  [ ] Room Occupied  [ ] Link Room Bill
-      - Note: Double click on Bill# to view room details
+      - Note: Double click on Bill No. to view room details
       - Buttons: [ Re-Instate ], [ Exit ]
    4. Execution & Room Status Restoration (Frames 060–080):
       - Clicking [ Re-Instate ]:
@@ -160,7 +160,7 @@ export default function IdsFolioReinstateModal({
 
     // Remove reinstated folio from checked out list
     setFoliosList(prev => prev.filter(f => f.billNo !== selectedFolio.billNo));
-    setStatusNotice(`Folio Bill #${selectedFolio.billNo} for Room ${selectedFolio.roomNo} (${selectedFolio.guestName}) has been successfully REINSTATED in-house!`);
+    setStatusNotice(`Folio Bill No.${selectedFolio.billNo} for Room ${selectedFolio.roomNo} (${selectedFolio.guestName}) has been successfully REINSTATED in-house!`);
   };
 
   return (
@@ -341,13 +341,13 @@ export default function IdsFolioReinstateModal({
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
                   <thead style={{ background: '#ECE9D8', position: 'sticky', top: 0, zIndex: 5 }}>
                     <tr style={{ borderBottom: '1px solid #ACA899' }}>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '55px' }}>Bill #</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '65px' }}>Room #</th>
-                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '55px' }}>Reg #</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '55px' }}>Bill No.</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '65px' }}>Room No.</th>
+                      <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '55px' }}>Reg. No.</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8' }}>Guest Name</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '85px', textAlign: 'right' }}>Bill Amount</th>
                       <th style={{ padding: '3px 6px', borderRight: '1px solid #D0C8B8', width: '85px' }}>Settlement</th>
-                      <th style={{ padding: '3px 6px', width: '70px', textAlign: 'center' }}>C/O Bill #</th>
+                      <th style={{ padding: '3px 6px', width: '70px', textAlign: 'center' }}>C/O Bill No.</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -413,7 +413,7 @@ export default function IdsFolioReinstateModal({
               >
                 {/* Note */}
                 <div style={{ color: '#555', fontStyle: 'italic', paddingTop: '4px' }}>
-                  Note: Double click on Bill# to view room details
+                  Note: Double click on Bill No. to view room details
                 </div>
 
                 {/* Legend matching Frame 055 */}
@@ -492,7 +492,7 @@ export default function IdsFolioReinstateModal({
                   marginBottom: '16px'
                 }}
               >
-                <div style={{ fontWeight: 600 }}>Room#</div>
+                <div style={{ fontWeight: 600 }}>Room No.</div>
                 <div>
                   <input type="text" readOnly value={selectedFolio.roomNo} style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700 }} />
                 </div>
@@ -618,7 +618,7 @@ export default function IdsFolioReinstateModal({
             <div style={{ padding: '16px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <HelpCircle size={30} color="#002D96" style={{ flexShrink: 0 }} />
               <div>
-                Do you want to Reinstate Bill #<strong>{selectedFolio.billNo}</strong> for Room #<strong>{selectedFolio.roomNo}</strong> ({selectedFolio.guestName})?
+                Do you want to Reinstate Bill No.<strong>{selectedFolio.billNo}</strong> for Room No.<strong>{selectedFolio.roomNo}</strong> ({selectedFolio.guestName})?
                 <div style={{ marginTop: '6px', color: '#666', fontSize: '10px' }}>
                   This will reopen the folio and restore Room {selectedFolio.roomNo} to In-House Occupied status.
                 </div>
@@ -685,7 +685,7 @@ export default function IdsFolioReinstateModal({
                 justifyContent: 'space-between'
               }}
             >
-              <span>Folio Details - Bill #{activeDetailFolio.billNo}</span>
+              <span>Folio Details - Bill No.{activeDetailFolio.billNo}</span>
               <button 
                 style={{ width: '16px', height: '16px', lineHeight: '12px', background: '#D4D0C8', border: '1px outset #FFF', cursor: 'pointer', fontSize: '10px' }}
                 onClick={() => setActiveDetailFolio(null)}
@@ -702,7 +702,7 @@ export default function IdsFolioReinstateModal({
                 <span style={{ fontWeight: 600 }}>Guest Name:</span>
                 <strong>{activeDetailFolio.guestName}</strong>
 
-                <span style={{ fontWeight: 600 }}>Registration #:</span>
+                <span style={{ fontWeight: 600 }}>Registration No.: </span>
                 <span>{activeDetailFolio.regNo}</span>
 
                 <span style={{ fontWeight: 600 }}>Settled Bill Amount:</span>

@@ -301,7 +301,7 @@ export default function IdsHkInventoryModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Issue#</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Issue No.</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Date</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Floor Trolley</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Attendant</th>
@@ -393,7 +393,7 @@ export default function IdsHkInventoryModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Return#</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Return No.</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Date</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Floor</th>
                     <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Item</th>

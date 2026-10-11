@@ -1853,7 +1853,7 @@ export default function IdsDesktopShell({
               },
               ...prev.filter(r => r.resNo !== (bookingData.reservationNo || '276'))
             ]);
-            alert(`✅ Group Reservation #${bookingData.reservationNo || '276'} (Group: ${bookingData.groupName || 'JK Paper Technical Delegation'}) confirmed with 3 Executive Rooms!`);
+            alert(`✅ Group Reservation No.${bookingData.reservationNo || '276'} (Group: ${bookingData.groupName || 'JK Paper Technical Delegation'}) confirmed with 3 Executive Rooms!`);
           } else {
             setReservations(prev => [
               {
@@ -1876,7 +1876,7 @@ export default function IdsDesktopShell({
               },
               ...prev
             ]);
-            alert(`✅ Reservation #${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
+            alert(`✅ Reservation No.${bookingData.reservationNo} confirmed for ${bookingData.guestName}!`);
           }
           if (onNewBooking) onNewBooking(bookingData);
         }}
@@ -1922,7 +1922,7 @@ export default function IdsDesktopShell({
           onSuccessBooking={(updated) => {
             setAmendBookingModalOpen(false);
             setReservations(prev => prev.map(r => r.resNo === updated.reservationNo ? { ...r, ...updated } : r));
-            alert(`✅ Reservation #${updated.reservationNo || '270'} successfully amended & updated!`);
+            alert(`✅ Reservation No.${updated.reservationNo || '270'} successfully amended & updated!`);
           }}
         />
       )}
@@ -3134,7 +3134,7 @@ export default function IdsDesktopShell({
         session="General"
         steward="Manash"
         onBillSettled={(record) => {
-          showMessageBox(`Bill #${record.billNo} on Table ${record.tableNo} Settled Successfully! Amount: ₹${record.nettAmount.toFixed(2)}`, "Bill Settlement V6.5.008.30", "info");
+          showMessageBox(`Bill No.${record.billNo} on Table ${record.tableNo} Settled Successfully! Amount: ₹${record.nettAmount.toFixed(2)}`, "Bill Settlement V6.5.008.30", "info");
         }}
         onOpenCrystalReport={({ reportType: rType, data }) => {
           setCrystalReportType(rType || 'pos-bill');
@@ -3238,10 +3238,10 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         currentUser="MANAGER"
         onKotPunched={(res) => {
-          showMessageBox(`Touch POS KOT #${res.kotId} for Table ${res.tableNo} punched to kitchen!`, "Touch POS V7.0", "info");
+          showMessageBox(`Touch POS KOT ${res.kotId} for Table ${res.tableNo} punched to kitchen!`, "Touch POS V7.0", "info");
         }}
         onBillSettled={(res) => {
-          showMessageBox(`Touch POS Bill #${res.billNo} for ₹${res.amount} settled via ${res.mode}!`, "Touch POS Settlement", "info");
+          showMessageBox(`Touch POS Bill No.${res.billNo} for ₹${res.amount} settled via ${res.mode}!`, "Touch POS Settlement", "info");
         }}
       />
 

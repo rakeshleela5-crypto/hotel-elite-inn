@@ -28,7 +28,7 @@ import {
    4. Filters (Frame 018):
       - Date: 24-FEB-2026 / 23-FEB-2026 with [ ? ] date picker
    5. Data Grid Columns (Frames 018 & 046):
-      - Reg # | Room # | Guest Name | Description | Company Name | Currency | Amount | Revenue
+      - Reg. No. | Room No. | Guest Name | Description | Company Name | Currency | Amount | Revenue
    6. Authentic Voucher Print Preview & PDF Export (Frames 030 & 054)
    ========================================================================= */
 
@@ -107,7 +107,7 @@ export const INITIAL_VOUCHERS_DATABASE = [
     revenue: 'Food & Beverage',
     payMode: 'Room Folio',
     cashier: 'MANAGER',
-    remarks: 'KOT # 4021'
+    remarks: 'KOT No. 4021'
   },
   {
     voucherNo: 'VOU-ALW-001',
@@ -348,8 +348,8 @@ export default function IdsReprintVoucherModal({
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                   <tr>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '50px' }}>Reg #</th>
-                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Room #</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '50px' }}>Reg. No.</th>
+                    <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '55px' }}>Room No.</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '130px' }}>Guest Name</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Description</th>
                     <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '130px' }}>Company Name</th>
@@ -525,10 +525,10 @@ export default function IdsReprintVoucherModal({
 
                 {/* Metadata Grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', marginBottom: '14px', fontSize: '11px' }}>
-                  <div><strong>Voucher #:</strong> {selectedVoucher.voucherNo}</div>
+                  <div><strong>Voucher No.:</strong> {selectedVoucher.voucherNo}</div>
                   <div><strong>Date / Time:</strong> {selectedVoucher.date} {selectedVoucher.time}</div>
-                  <div><strong>Registration #:</strong> {selectedVoucher.regNo}</div>
-                  <div><strong>Room #:</strong> {selectedVoucher.roomNo}</div>
+                  <div><strong>Registration No.: </strong> {selectedVoucher.regNo}</div>
+                  <div><strong>Room No.: </strong> {selectedVoucher.roomNo}</div>
                   <div><strong>Guest Name:</strong> {selectedVoucher.guestName}</div>
                   <div><strong>Company:</strong> {selectedVoucher.companyName || 'FIT Guest'}</div>
                   <div><strong>Pay Mode:</strong> {selectedVoucher.payMode}</div>
