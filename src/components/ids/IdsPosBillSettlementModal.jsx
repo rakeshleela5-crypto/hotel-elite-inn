@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { INITIAL_INHOUSE_GUESTS } from './IdsGuestManagementModal';
 import { settleFastApiOrder } from '../../utils/backendApi';
+import IdsSplitTenderModal from './IdsSplitTenderModal';
 
 // Authentic Bank / Card Codes in IDS Fortune NEXT
 export const CARD_PROVIDERS = [
@@ -103,6 +104,7 @@ export default function IdsPosBillSettlementModal({
   const [cashModalOpen, setCashModalOpen] = useState(false);
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
+  const [splitTenderModalOpen, setSplitTenderModalOpen] = useState(false);
 
   // Credit Card Modal Form State (Video 04 Frame 040 & 045)
   const [cardActiveTab, setCardActiveTab] = useState(1);
@@ -563,10 +565,11 @@ export default function IdsPosBillSettlementModal({
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Coupon / Voucher Settlement")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={() => setSplitTenderModalOpen(true)}
+              style={{ fontWeight: 800, padding: '5px 4px', fontSize: '11px', background: '#E8F5E9', color: '#1B5E20', border: '1px solid #81C784' }}
+              title="Split Tender Settlement (Multi-Pay: UPI + Card + Cash) - Audio 4"
             >
-              C<u>o</u>upon
+              ⚡ <u>S</u>plit Tender
             </button>
             <button 
               className="ids-btn" 
@@ -1411,6 +1414,34 @@ export default function IdsPosBillSettlementModal({
           </div>
         </div>
       )}
+
+      {/* Split-Tender Settlement Sub-Dialog (Audio 4: 57:31-68:45) */}
+      <IdsSplitTenderModal
+        isOpen={splitTenderModalOpen}
+        onClose={() => setSplitTenderModalOpen(false)}
+        billNo={currentBill?.billNo || '4'}
+        tableOrRoom={`Table ${currentBill?.tableNo || '10'}`}
+        totalBillAmount={currentNettAmount || 4500.00}
+        accountingDate={accountingDate}
+        onSettlementComplete={(res) => {
+          const formattedPayments = res.splits.map((s, i) => ({
+            id: Date.now() + i,
+            mode: s.mode,
+            cur: 'INR',
+            foreignAmt: '',
+            localAmt: Number(s.amount) || 0,
+            diffAmt: '',
+            tipsCur: '',
+            tipsAmount: 0,
+            details: s.mode === 'UPI' 
+              ? `${s.provider} (${s.ref})` 
+              : s.mode === 'Card' 
+                ? `${s.bank} ****${s.cardNo} (${s.ref})` 
+                : 'Cash Drawer Settlement'
+          }));
+          setPaymentsGrid(formattedPayments);
+        }}
+      />
     </div>
   );
 }

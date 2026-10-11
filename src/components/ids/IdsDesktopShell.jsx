@@ -99,6 +99,11 @@ import IdsSalesPromotionMasterModal from './IdsSalesPromotionMasterModal';
 import IdsPosReportsModal from './IdsPosReportsModal';
 import IdsPosDiscountModal from './IdsPosDiscountModal';
 import IdsTouchPosTerminalModal from './IdsTouchPosTerminalModal';
+import IdsPoliceThanaManifestModal from './IdsPoliceThanaManifestModal';
+import IdsCorporateSplitBillingModal from './IdsCorporateSplitBillingModal';
+import IdsSplitTenderModal from './IdsSplitTenderModal';
+import IdsTenderReclassificationModal from './IdsTenderReclassificationModal';
+import IdsTransitSlotModal from './IdsTransitSlotModal';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -492,6 +497,13 @@ export default function IdsDesktopShell({
     setAuditedSalesRegisterModalOpen(true);
   };
 
+  // 5 Client Audio Requirements Modals State (Muniguda Police, Corp Split, Multi-Pay, Manager PIN, 3-Hr Transit)
+  const [policeThanaManifestOpen, setPoliceThanaManifestOpen] = useState(false);
+  const [corporateSplitBillingOpen, setCorporateSplitBillingOpen] = useState(false);
+  const [splitTenderModalOpen, setSplitTenderModalOpen] = useState(false);
+  const [tenderReclassificationOpen, setTenderReclassificationOpen] = useState(false);
+  const [transitSlotModalOpen, setTransitSlotModalOpen] = useState(false);
+
   const showMessageBox = (message, title = 'IDS Fortune NEXT', type = 'info', buttons = 'ok', onOk = null) => {
     setMsgBoxConfig({
       title,
@@ -638,6 +650,11 @@ export default function IdsDesktopShell({
         } 
       },
       { 
+        label: 'Muniguda Jn 3-Hr Transit Slot (Daytime 6 AM - 6 PM)', 
+        videoId: 'AUDIO-04', 
+        action: () => setTransitSlotModalOpen(true) 
+      },
+      { 
         label: 'Walk In Regular Guest (Guest History)', 
         videoId: '37', 
         action: () => {
@@ -722,6 +739,21 @@ export default function IdsDesktopShell({
           setCheckoutInitialMode('settlement');
           setCheckoutBillModalOpen(true);
         } 
+      },
+      { 
+        label: 'Corporate Split Billing (Separate Room vs Food Invoices - Vedanta / JK Paper)', 
+        videoId: 'AUDIO-04', 
+        action: () => setCorporateSplitBillingOpen(true) 
+      },
+      { 
+        label: 'Split-Tender Settlement (Multi-Pay Mode: UPI + Card + Cash)', 
+        videoId: 'AUDIO-04', 
+        action: () => setSplitTenderModalOpen(true) 
+      },
+      { 
+        label: 'Audited Tender Re-Classification (Manager PIN Authorization)', 
+        videoId: 'AUDIO-04', 
+        action: () => setTenderReclassificationOpen(true) 
       },
       { 
         label: 'Bulk Check Out at Once (Group)', 
@@ -1002,6 +1034,11 @@ export default function IdsDesktopShell({
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => setGstnChangeModalOpen(true) }
     ],
     'Reports..': [
+      { 
+        label: 'Muniguda Police Station Daily Manifest (Form C / Sarai Act 1867)', 
+        videoId: 'AUDIO-04', 
+        action: () => setPoliceThanaManifestOpen(true) 
+      },
       { 
         label: 'Hotel Sales Register - Monthly (26 Columns - June Month Audit)', 
         videoId: 'AUDIT-01', 
@@ -1884,6 +1921,46 @@ export default function IdsDesktopShell({
             title="Quick Scan / Load Pgm (Video 09)"
           >
             Load Pgm
+          </button>
+          <button 
+            className="ids-btn-classic" 
+            style={{ background: '#FFF3E0', fontWeight: 700 }}
+            onClick={() => setTransitSlotModalOpen(true)}
+            title="3-Hour Daytime Transit Slot (Muniguda Jn 6 AM - 6 PM)"
+          >
+            🚆 3-Hr Transit
+          </button>
+          <button 
+            className="ids-btn-classic" 
+            style={{ background: '#E8F5E9', fontWeight: 700 }}
+            onClick={() => setPoliceThanaManifestOpen(true)}
+            title="Muniguda Police Station Daily Manifest (Form C)"
+          >
+            🚨 Thana Manifest
+          </button>
+          <button 
+            className="ids-btn-classic" 
+            style={{ background: '#E3F2FD', fontWeight: 700 }}
+            onClick={() => setCorporateSplitBillingOpen(true)}
+            title="Corporate Split Billing (Vedanta & JK Paper)"
+          >
+            🏢 Corp Split
+          </button>
+          <button 
+            className="ids-btn-classic" 
+            style={{ background: '#F3E5F5', fontWeight: 700 }}
+            onClick={() => setSplitTenderModalOpen(true)}
+            title="Split-Tender Settlement (Multi-Pay Mode: UPI + Card + Cash)"
+          >
+            ⚡ Multi-Pay
+          </button>
+          <button 
+            className="ids-btn-classic" 
+            style={{ background: '#FFEBEE', color: '#B71C1C', fontWeight: 700 }}
+            onClick={() => setTenderReclassificationOpen(true)}
+            title="Audited Payment Tender Re-Classification (Manager PIN Authorization)"
+          >
+            🔐 Tender Override
           </button>
           <button 
             className="ids-btn-classic" 
@@ -3406,6 +3483,60 @@ export default function IdsDesktopShell({
         initialTab={auditedSalesRegisterInitialTab}
         accountingDate={accountingDate}
         currentUser="MANAGER"
+      />
+
+      {/* 1. Daily Muniguda Police Thana Manifest (Form C) [Sarai Act 1867] */}
+      <IdsPoliceThanaManifestModal
+        isOpen={policeThanaManifestOpen}
+        onClose={() => setPoliceThanaManifestOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+      />
+
+      {/* 2. Corporate Split Billing (Separate Room vs Food Invoices - Vedanta / JK Paper) */}
+      <IdsCorporateSplitBillingModal
+        isOpen={corporateSplitBillingOpen}
+        onClose={() => setCorporateSplitBillingOpen(false)}
+        initialRoomNo="206"
+        guestName="Mr. P Jena"
+        accountingDate={accountingDate}
+        onInvoicesGenerated={(inv) => {
+          showMessageBox(`Corporate Split Folio Successful!\n• Room Bill: ${inv.roomInvoice.invoiceNo} (₹${inv.roomInvoice.total.toFixed(2)})\n• Food Bill: ${inv.restaurantInvoice.invoiceNo} (₹${inv.restaurantInvoice.total.toFixed(2)})`, "Corporate Split Billing", "info");
+        }}
+      />
+
+      {/* 3. Split-Tender Settlement (Multi-Pay Mode: UPI + Card + Cash) */}
+      <IdsSplitTenderModal
+        isOpen={splitTenderModalOpen}
+        onClose={() => setSplitTenderModalOpen(false)}
+        billNo="RES-B-4500"
+        tableOrRoom="Table 14 / Room 206"
+        guestName="Mr. Anil Kumar (JK Paper Technical Lead)"
+        totalBillAmount={4500.00}
+        accountingDate={accountingDate}
+        onSettlementComplete={(s) => {
+          showMessageBox(`Split-Tender Settlement Successful!\n• UPI: ₹${s.splits[0].amount}\n• Card: ₹${s.splits[1].amount}\n• Cash: ₹${s.splits[2].amount}\nTotal: ₹${s.totalBillAmount.toFixed(2)}`, "Split Tender Settled", "info");
+        }}
+      />
+
+      {/* 4. Audited Payment Tender Re-Classification (Manager PIN Authorization) */}
+      <IdsTenderReclassificationModal
+        isOpen={tenderReclassificationOpen}
+        onClose={() => setTenderReclassificationOpen(false)}
+        accountingDate={accountingDate}
+        onTenderReclassified={(log) => {
+          showMessageBox(`Tender Re-Classification Approved by Manager PIN!\nBill ${log.billNo}: ${log.oldTender} ➔ ${log.newTender}\nAudit ID: ${log.auditId}`, "Manager PIN Tender Override", "info");
+        }}
+      />
+
+      {/* 5. 3-Hour Daytime Transit Slot for Muniguda Junction (6 AM - 6 PM) */}
+      <IdsTransitSlotModal
+        isOpen={transitSlotModalOpen}
+        onClose={() => setTransitSlotModalOpen(false)}
+        accountingDate={accountingDate}
+        onTransitCheckInCompleted={(rec) => {
+          showMessageBox(`3-Hour Railway Transit Check-In Recorded for Room ${rec.roomNo}!\nPassenger: ${rec.guestName}\nTrain: ${rec.train}\nCheck-Out: ${rec.checkOutTime}`, "Muniguda Jn 3-Hr Transit", "info");
+        }}
       />
     </div>
   );
