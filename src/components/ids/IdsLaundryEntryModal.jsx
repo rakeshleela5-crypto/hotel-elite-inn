@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
+import { createFastApiLaundryOrder } from '../../utils/backendApi';
 import { 
   INITIAL_LAUNDRY_ITEMS, 
   INITIAL_LAUNDRY_RATES, 
@@ -202,6 +203,18 @@ export default function IdsLaundryEntryModal({
     if (onSaveEntry) {
       onSaveEntry(payload);
     }
+
+    // Persist laundry order to Railway PostgreSQL backend (Option A)
+    createFastApiLaundryOrder({
+      reference_number: payload.refNo || `LND-${Date.now()}`,
+      room_number: payload.roomNo,
+      guest_name: payload.guestName || 'In-House Guest',
+      service_type: payload.serviceType || 'Normal',
+      items_detail: lineItems.map(it => `${it.name || it.item || 'Item'} (${it.quantity || 1})`).join(', '),
+      total_pieces: lineItems.reduce((acc, it) => acc + (it.quantity || 1), 0),
+      net_amount: parseFloat(payload.netAmount) || 0.0,
+      attendant: payload.attendant || 'Sunil Mohapatra'
+    }).catch(err => console.warn('[FastAPI] Create laundry order error:', err));
 
     if (onOpenMessageBox) {
       onOpenMessageBox({

@@ -5,6 +5,7 @@ import {
   ArrowRight, AlertCircle, RotateCcw, DollarSign, Percent
 } from 'lucide-react';
 import { INITIAL_INHOUSE_GUESTS } from './IdsGuestManagementModal';
+import { settleFastApiOrder } from '../../utils/backendApi';
 
 // Authentic Bank / Card Codes in IDS Fortune NEXT
 export const CARD_PROVIDERS = [
@@ -313,6 +314,11 @@ export default function IdsPosBillSettlementModal({
     if (onBillSettled) {
       onBillSettled(settlementRecord);
     }
+
+    // Persist order settlement to Railway PostgreSQL backend (Option A)
+    const dominantPayment = paymentsGrid[0]?.paymentMode || 'CASH';
+    settleFastApiOrder(currentBill.billNo, dominantPayment, '4321')
+      .catch(err => console.warn('[FastAPI] Settle POS order error:', err));
 
     setSettleSuccessMsg(`Bill No.${currentBill.billNo} on Table ${currentBill.tableNo} Settled Successfully! Table is now Vacant.`);
     setTimeout(() => {

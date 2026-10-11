@@ -234,6 +234,41 @@ export async function getFastApiPosOrders(statusFilter = null) {
 /**
  * Fetch official property profile, tariffs, wifi, and intercom directory
  */
+/**
+ * Seal night audit and roll over business date on PostgreSQL
+ */
+export async function sealFastApiNightAudit(auditDate, managerPin = '4321', sealedBy = 'IT ADMIN') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/seal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ audit_date: auditDate, manager_pin: managerPin, sealed_by: sealedBy })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Seal night audit error:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch night audit historical run logs
+ */
+export async function getFastApiNightAuditLogs() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/logs`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get night audit logs error:', err.message);
+    return [];
+  }
+}
+
 export async function getFastApiPropertyInfo() {
   try {
     const res = await fetch(`${FASTAPI_BASE_URL}/api/property/info`, {

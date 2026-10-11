@@ -6,6 +6,7 @@ import {
   NEXT_ACCOUNTING_DATE, 
   getFormattedPmsDate 
 } from '../../data/idsPmsStore';
+import { sealFastApiNightAudit } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 19: NIGHT AUDIT PROCESS IN IDS 6.5 & 7.0 SOFTWARE
@@ -168,6 +169,10 @@ export default function IdsNightAuditModal({
       setStep4Activity('✓ Date Rollover Complete: New Business Date is ' + nextDate);
       setStep4Running(false);
       setStep4Done(true);
+
+      // Persist Night Audit Seal & GL Rollover to Railway PostgreSQL backend (Option A)
+      sealFastApiNightAudit(acDate, '4321', 'IT ADMIN')
+        .catch(err => console.warn('[FastAPI] Seal night audit error:', err));
 
       if (onCompleteNightAudit) {
         onCompleteNightAudit({
