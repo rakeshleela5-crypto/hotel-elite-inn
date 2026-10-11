@@ -8,6 +8,7 @@ import {
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY } from '../data/hotelData';
 import { playHousekeepingChime } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
+import { syncUpdateRoomStatus, subscribeToLiveSync } from '../utils/liveSyncBridge';
 
 // Housekeeping Staff Configuration
 const HOUSEKEEPING_STAFF = {
@@ -201,6 +202,23 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
     };
   }, [showToast]);
 
+  // Live Cloud & Network Sync for room statuses across separate smartphones, tablets & PCs
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync((event) => {
+      if (event.type === 'ROOM_STATUS_CHANGED' && event.roomNumber) {
+        const rNum = String(event.roomNumber);
+        const mappedStatus = (event.status === 'clean' || event.status === 'available')
+          ? 'Available'
+          : (event.status === 'cleaning' ? 'Cleaning' : (event.status === 'occupied' ? 'Occupied' : 'Dirty'));
+        setRoomStatuses(prev => {
+          if (prev[rNum] === mappedStatus) return prev;
+          return { ...prev, [rNum]: mappedStatus };
+        });
+      }
+    });
+    return unsubscribe;
+  }, []);
+
   // Polling heartbeat: Sync room statuses from localStorage (cross-tab fallback)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -230,58 +248,19 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
   const handleStartCleaning = (roomNum) => {
     setRoomStatuses(prev => ({ ...prev, [roomNum]: 'Cleaning' }));
 
-    // Broadcast to Reception
-    try {
-      const ch = new BroadcastChannel(HK_CHANNEL);
-      ch.postMessage({ type: 'ROOM_STATUS_UPDATE', payload: { roomNumber: roomNum, newStatus: 'Cleaning', updatedBy: staff.name } });
-      ch.close();
-    } catch {}
+    // Real-Time Multi-Device Sync: Updates Cloud PostgreSQL on Railway + Local BroadcastChannel
+    syncUpdateRoomStatus(roomNum, 'cleaning', staff.name).catch(err => console.warn('HK sync:', err));
 
-    // D1 Sync
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'update_housekeeping_status',
-        payload: { roomNumber: roomNum, newStatus: 'Under Cleaning', previousStatus: 'Dirty', attendantName: staff.name, notes: `Cleaning started by ${staff.name} (${staff.role})` }
-      })
-    }).catch(err => console.warn('HK offline sync:', err));
-
-    showToast(`\uD83E\uDDF9 Room ${roomNum} marked 'Under Cleaning' by ${staff.name}`);
+    showToast(`🧹 Room ${roomNum} marked 'Under Cleaning' by ${staff.name}`);
     setSelectedRoom(null);
   };
 
-  // Mark room as Clean (Available) -> This turns room GREEN on reception desktop
+  // Mark room as Clean (Available) -> This turns room GREEN on reception desktop & IDS Room Rack
   const handleMarkClean = (roomNum) => {
     setRoomStatuses(prev => ({ ...prev, [roomNum]: 'Available' }));
 
-    // Broadcast to ALL open tabs (reception, other housekeeping portals)
-    try {
-      const ch = new BroadcastChannel(HK_CHANNEL);
-      ch.postMessage({
-        type: 'ROOM_CLEANED',
-        payload: {
-          roomNumber: roomNum,
-          newStatus: 'Available',
-          cleanedBy: staff.name,
-          cleanedAt: new Date().toISOString(),
-          role: staff.role
-        }
-      });
-      ch.close();
-    } catch {}
-
-    // D1 Sync
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'update_housekeeping_status',
-        payload: { roomNumber: roomNum, newStatus: 'Clean & Inspected', previousStatus: 'Under Cleaning', attendantName: staff.name, notes: `Room inspected & cleaned by ${staff.name}. Ready for guest allocation.` }
-      })
-    }).catch(err => console.warn('HK offline sync:', err));
+    // Real-Time Multi-Device Sync: Updates Cloud PostgreSQL on Railway + Local BroadcastChannel
+    syncUpdateRoomStatus(roomNum, 'clean', staff.name).catch(err => console.warn('HK sync:', err));
 
     // Add to completion log
     setCompletionLog(prev => [{
@@ -291,7 +270,7 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
       role: staff.role
     }, ...prev.slice(0, 99)]);
 
-    showToast(`\u2705 Room ${roomNum} is now CLEAN & AVAILABLE! Reception will see it as GREEN.`);
+    showToast(`✅ Room ${roomNum} is now CLEAN & AVAILABLE! Reception and IDS Room Rack will see it as GREEN.`);
     setSelectedRoom(null);
   };
 

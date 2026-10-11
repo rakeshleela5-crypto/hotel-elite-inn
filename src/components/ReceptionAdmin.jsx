@@ -43,6 +43,7 @@ import {
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, updateKotStatusUnified, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
 } from '../utils/kotDataSync';
+import { subscribeToLiveSync } from '../utils/liveSyncBridge';
 
 // Frequent VIP & Corporate Guests for instant Walk-in auto-fill
 const FREQUENT_VIP_GUESTS = [
@@ -1459,17 +1460,13 @@ export default function ReceptionAdmin({
     setTimeout(() => setFeedbackToast(''), 4500);
   };
 
-  // Live KOT Real-Time Sync Listener from Steward Floor Mobiles
+  // Real-Time Multi-Device Sync for KOT Orders and Housekeeping (Cloud FastAPI + Local Broadcast)
   useEffect(() => {
-    let channel = null;
+    let localKdsChannel = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      channel = new BroadcastChannel('hotel_elite_inn_live_kds');
-      channel.onmessage = (event) => {
-        if (event.data?.type === 'NEW_KOT_ORDER' && event.data.order) {
-          const ord = event.data.order;
-          playOrderAlert();
-          showToast(`🔔 LIVE RESTAURANT ORDER: Steward ${ord.steward} punched KOT for Table ${ord.tableNumber}! (₹${ord.totalAmount})`);
-        } else if (event.data?.type === 'TABLE_SETTLED') {
+      localKdsChannel = new BroadcastChannel('hotel_elite_inn_live_kds');
+      localKdsChannel.onmessage = (event) => {
+        if (event.data?.type === 'TABLE_SETTLED') {
           const { settledTable, paymentMode, totalAmount, receipt } = event.data;
           if (paymentMode === 'cash' && totalAmount > 0) {
             setCashCollected(prev => prev + totalAmount);
@@ -1487,43 +1484,48 @@ export default function ReceptionAdmin({
         }
       };
     }
-    return () => {
-      if (channel) channel.close();
-    };
-  }, []);
 
-  // Live Housekeeping Real-Time Sync Listener from Mobile Portal
-  useEffect(() => {
-    let channel = null;
-    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
-      channel.onmessage = (event) => {
-        const { type, payload } = event.data || {};
-        if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
+    // Subscribe to Central LiveSyncBridge (Bridges Mobile Phones, Tablets & Reception PC)
+    const unsubscribeLiveSync = subscribeToLiveSync((event) => {
+      if (event.type === 'NEW_KOT_ORDER' && event.order) {
+        const ord = normalizeKotOrder(event.order);
+        setInternalFoodOrdersList(prev => {
+          const exists = prev.some(o => (o.id || o.orderId) === (ord.id || ord.orderId));
+          if (exists) return prev.map(o => (o.id || o.orderId) === (ord.id || ord.orderId) ? ord : o);
+          return [ord, ...prev];
+        });
+        playOrderAlert();
+        showToast(`🔔 LIVE RESTAURANT ORDER: Steward ${ord.steward || 'Staff'} punched KOT for ${ord.tableNumber ? 'Table ' + ord.tableNumber : (ord.roomNumber ? 'Room ' + ord.roomNumber : 'Takeaway')}! (₹${ord.totalAmount})`);
+      } else if (event.type === 'ROOM_STATUS_CHANGED' && event.roomNumber) {
+        const rNum = String(event.roomNumber);
+        const st = String(event.status).toLowerCase();
+        if (st === 'clean' || st === 'available') {
           if (onUpdateRoomStatus) {
-            onUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
+            onUpdateRoomStatus(rNum, 'Available', null, null);
           }
-          showToast(`✨ ROOM ${payload.roomNumber} IS AVAILABLE (GREEN)! Released to Front Desk.`);
-        } else if (type === 'ROOM_INSPECTED' && payload?.roomNumber) {
+          showToast(`✨ ROOM ${rNum} IS AVAILABLE (GREEN)! Housekeeping marked Clean & Ready for Guest.`);
+        } else if (st === 'cleaning' || st === 'under cleaning') {
           if (onUpdateRoomStatus) {
-            onUpdateRoomStatus(payload.roomNumber, 'Clean & Inspected', null, null);
+            onUpdateRoomStatus(rNum, 'Under Cleaning', null, null);
           }
-          showToast(`🔍 Room ${payload.roomNumber} inspected by Supervisor ${payload.inspectedBy || 'Staff'}`);
-        } else if (type === 'ROOM_STATUS_UPDATE' && payload?.roomNumber) {
-          if ((payload.newStatus === 'Cleaning' || payload.newStatus === 'Under Cleaning') && onUpdateRoomStatus) {
-            onUpdateRoomStatus(payload.roomNumber, 'Under Cleaning', null, null);
-            showToast(`🧹 Room ${payload.roomNumber} is now Under Cleaning by ${payload.updatedBy || 'Staff'}`);
-          }
-        } else if (type === 'ROOM_MAINTENANCE' && payload?.roomNumber) {
+          showToast(`🧹 Room ${rNum} is now Under Cleaning by Housekeeping`);
+        } else if (st === 'dirty' || st === 'vacant dirty') {
           if (onUpdateRoomStatus) {
-            onUpdateRoomStatus(payload.roomNumber, 'Maintenance', 'MAINTENANCE BLOCKED', null);
+            onUpdateRoomStatus(rNum, 'Vacant Dirty', null, null);
           }
-          showToast(`⚠️ Room ${payload.roomNumber} placed under Maintenance (${payload.category || 'Defect'})`);
+          showToast(`🚨 Room ${rNum} checkout completed -> marked Vacant Dirty for cleaning.`);
+        } else if (st === 'maintenance') {
+          if (onUpdateRoomStatus) {
+            onUpdateRoomStatus(rNum, 'Maintenance', 'MAINTENANCE BLOCKED', null);
+          }
+          showToast(`⚠️ Room ${rNum} placed under Maintenance`);
         }
-      };
-    }
+      }
+    });
+
     return () => {
-      if (channel) channel.close();
+      if (localKdsChannel) localKdsChannel.close();
+      unsubscribeLiveSync();
     };
   }, [onUpdateRoomStatus]);
 

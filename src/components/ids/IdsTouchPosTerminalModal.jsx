@@ -11,6 +11,7 @@ import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } fr
 import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
 import IdsPosDiscountModal from './IdsPosDiscountModal';
 import { getStewardsList } from '../../data/hotelStaffData';
+import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
 
 // Standard IDS Next Void & Cancellation Reason Codes
 export const KOT_VOID_REASONS = [
@@ -218,7 +219,10 @@ export default function IdsTouchPosTerminalModal({
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
   const [tableDiscounts, setTableDiscounts] = useState({});
 
-  // Sync with storage and BroadcastChannel in real-time
+  // Real-Time Incoming Mobile KOT Alert Banner State
+  const [incomingKotNotice, setIncomingKotNotice] = useState(null);
+
+  // Sync with storage, BroadcastChannel and Cloud FastAPI in real-time
   useEffect(() => {
     const handleStorage = () => {
       try {
@@ -245,9 +249,36 @@ export default function IdsTouchPosTerminalModal({
       };
     }
 
+    // Live Multi-Device Cloud & Local Bridge Subscription
+    const unsubscribeLiveSync = subscribeToLiveSync((event) => {
+      if (event.type === 'NEW_KOT_ORDER' && event.order) {
+        const ord = event.order;
+        playOrderAlert();
+        setIncomingKotNotice({
+          kotId: ord.id || ord.kotId,
+          kotNumber: ord.kotNumber || ord.runningKotIndex || '1',
+          tableNumber: ord.tableNumber || (ord.roomNumber ? `Room ${ord.roomNumber}` : 'T-01'),
+          steward: ord.steward || 'Floor Steward',
+          totalAmount: ord.totalAmount || 0,
+          itemsCount: (ord.items || []).length,
+          receivedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        });
+
+        if (event.tableSessions) {
+          setTableSessions(event.tableSessions);
+        } else {
+          try {
+            const saved = localStorage.getItem(TABLE_SESSIONS_KEY);
+            if (saved) setTableSessions(JSON.parse(saved));
+          } catch (e) {}
+        }
+      }
+    });
+
     return () => {
       window.removeEventListener('storage', handleStorage);
       if (channel) channel.close();
+      unsubscribeLiveSync();
     };
   }, []);
 
@@ -932,9 +963,84 @@ export default function IdsTouchPosTerminalModal({
           height: '730px', 
           display: 'flex', 
           flexDirection: 'column',
-          background: '#D4D0C8' 
+          background: '#D4D0C8',
+          position: 'relative' 
         }}
       >
+        {/* ================================================================= */}
+        {/* REAL-TIME INCOMING STEWARD KOT NOTIFICATION MODAL POPUP           */}
+        {/* ================================================================= */}
+        {incomingKotNotice && (
+          <div 
+            style={{
+              position: 'absolute',
+              top: '36px',
+              right: '16px',
+              zIndex: 9999,
+              width: '380px',
+              background: '#FFFBEB',
+              border: '2px solid #D97706',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+              borderRadius: '4px',
+              padding: '10px 12px',
+              fontFamily: 'Tahoma, Arial, sans-serif'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #FCD34D', paddingBottom: '4px', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 'bold', color: '#92400E', fontSize: '12px' }}>
+                <span style={{ fontSize: '16px' }}>🔔</span>
+                <span>NEW STEWARD KOT PUNCHED!</span>
+              </div>
+              <button 
+                onClick={() => setIncomingKotNotice(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', color: '#78350F', fontWeight: 'bold' }}
+              >✕</button>
+            </div>
+            <div style={{ fontSize: '11.5px', color: '#1F2937', lineHeight: '1.5' }}>
+              <div><strong>KOT Reference:</strong> #{incomingKotNotice.kotNumber}</div>
+              <div><strong>Table:</strong> <span style={{ color: '#B91C1C', fontWeight: 'bold', fontSize: '12px' }}>{incomingKotNotice.tableNumber}</span> &nbsp;|&nbsp; <strong>Steward:</strong> {incomingKotNotice.steward}</div>
+              <div><strong>Items:</strong> {incomingKotNotice.itemsCount} &nbsp;|&nbsp; <strong>Amount:</strong> ₹{incomingKotNotice.totalAmount} &nbsp;|&nbsp; <span style={{ color: '#6B7280', fontSize: '10.5px' }}>{incomingKotNotice.receivedAt}</span></div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
+              <button 
+                onClick={() => {
+                  if (incomingKotNotice.tableNumber) {
+                    const raw = incomingKotNotice.tableNumber.replace(/\D/g, '');
+                    setSelectedTable(raw || incomingKotNotice.tableNumber);
+                  }
+                  setIncomingKotNotice(null);
+                }}
+                style={{
+                  background: '#0A246A',
+                  color: '#FFFFFF',
+                  border: '1px solid #000',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  borderRadius: '2px'
+                }}
+              >
+                Open Table {incomingKotNotice.tableNumber}
+              </button>
+              <button 
+                onClick={() => setIncomingKotNotice(null)}
+                style={{
+                  background: '#E5E7EB',
+                  color: '#374151',
+                  border: '1px solid #9CA3AF',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  borderRadius: '2px'
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ================================================================= */}
         {/* WIN32 DIALOG TITLE BAR                                            */}
         {/* ================================================================= */}

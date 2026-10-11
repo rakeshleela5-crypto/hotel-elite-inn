@@ -109,6 +109,7 @@ import IdsTransitSlotModal from './IdsTransitSlotModal';
 import IdsCorporateBtcAgingModal from './IdsCorporateBtcAgingModal';
 import IdsCaGstr1ExportModal from './IdsCaGstr1ExportModal';
 import { sealFastApiNightAudit } from '../../utils/backendApi';
+import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -295,6 +296,22 @@ export default function IdsDesktopShell({
   const [clearRoomsModalOpen, setClearRoomsModalOpen] = useState(false);
   const [quickScanModalOpen, setQuickScanModalOpen] = useState(false);
   const [clearedDirtyRooms, setClearedDirtyRooms] = useState([]);
+
+  // Multi-Device Real-Time Sync for Room Statuses (Housekeeping Mobile -> IDS Room Rack)
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync((event) => {
+      if (event.type === 'ROOM_STATUS_CHANGED' && event.roomNumber) {
+        const rNum = String(event.roomNumber);
+        const st = String(event.status).toLowerCase();
+        if (st === 'clean' || st === 'available') {
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, rNum])));
+        } else if (st === 'dirty' || st === 'vacant dirty') {
+          setClearedDirtyRooms(prev => prev.filter(r => r !== rNum));
+        }
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // Video 10: Guest Management & Change Guest Details States (Frames 008–072)
   const [guestManagementOpen, setGuestManagementOpen] = useState(false);

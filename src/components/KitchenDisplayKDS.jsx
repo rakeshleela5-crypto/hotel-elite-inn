@@ -7,6 +7,7 @@ import {
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import { RESTAURANT_MENU } from '../data/hotelData';
+import { subscribeToLiveSync } from '../utils/liveSyncBridge';
 
 export default function KitchenDisplayKDS({ onClose }) {
   const [shiftSession, setShiftSession] = useState(() => getStaffSession('kds') || { staff_id: 'CHEF-01', staffName: 'Chef Basanta Swain', role: 'Executive Head Chef', shift: 'Morning' });
@@ -203,32 +204,19 @@ export default function KitchenDisplayKDS({ onClose }) {
     };
     window.addEventListener('storage', handleStorage);
 
-    // Fast polling fallback to Cloudflare D1
-    const pollInterval = setInterval(() => {
-      const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-      fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-        body: JSON.stringify({ action: 'get_live_kots' })
-      })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data?.kots && Array.isArray(data.kots)) {
-          data.kots.forEach(order => {
-            if (!seenOrderIds.current.has(order.id)) {
-              handleNewOrder(order);
-            }
-          });
-        }
-      })
-      .catch(() => {});
-    }, 4000);
+    // Multi-Device Cloud Sync Listener via Railway FastAPI & Local Broadcast
+    const unsubscribeLiveSync = subscribeToLiveSync((event) => {
+      if (event.type === 'NEW_KOT_ORDER' && event.order) {
+        handleNewOrder(event.order);
+        if (event.tableSessions) setTableSessions(event.tableSessions);
+      }
+    });
 
     return () => {
       if (channel) channel.close();
       if (channelKot) channelKot.close();
       window.removeEventListener('storage', handleStorage);
-      clearInterval(pollInterval);
+      unsubscribeLiveSync();
     };
   }, [isAudioMuted, autoPrintEnabled]);
 

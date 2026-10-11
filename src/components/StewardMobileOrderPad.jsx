@@ -10,6 +10,7 @@ import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import DexieSyncIndicator from './DexieSyncIndicator';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
+import { syncDispatchKotOrder } from '../utils/liveSyncBridge';
 import { RECOGNIZED_STEWARDS } from '../data/hotelStaffData';
 export { RECOGNIZED_STEWARDS };
 
@@ -414,40 +415,10 @@ export default function StewardMobileOrderPad({
       localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(updatedSessions));
       setRunningTableSessions(updatedSessions);
 
-      // 2. Dual Save to live KOTs list & Live Food Orders register
-      const existingKots = JSON.parse(localStorage.getItem('hotel_elite_inn_live_kots') || '[]');
-      const updatedKots = [newKotOrder, ...existingKots].slice(0, 100);
-      localStorage.setItem('hotel_elite_inn_live_kots', JSON.stringify(updatedKots));
-
-      const existingFoodOrders = JSON.parse(localStorage.getItem('hotel_elite_inn_food_orders') || '[]');
-      const updatedFoodOrders = [newKotOrder, ...existingFoodOrders].slice(0, 100);
-      localStorage.setItem('hotel_elite_inn_food_orders', JSON.stringify(updatedFoodOrders));
-
-      // 3. Dual Broadcast via BroadcastChannel (Kitchen KDS + Cannon Live Food Orders tab)
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        // Channel A: Live KDS Bus (KitchenDisplayKDS & FenugreekLiveFoodOrdersKDS)
-        const channelKds = new BroadcastChannel('hotel_elite_inn_live_kds');
-        channelKds.postMessage({
-          type: 'NEW_KOT_ORDER',
-          order: newKotOrder,
-          target: 'DUAL_KOT',
-          tableSessions: updatedSessions
-        });
-        channelKds.close();
-
-        // Channel B: Reception Admin Live Orders Bus
-        const channelKot = new BroadcastChannel('hotel_elite_inn_kot');
-        channelKot.postMessage({
-          type: 'NEW_KOT_ORDER',
-          order: newKotOrder,
-          tableSessions: updatedSessions
-        });
-        channelKot.close();
-      }
-
-      // 4. Dexie.js Persistent IndexedDB & Cloudflare D1 Outbox Background Sync
-      saveKotToDexie(newKotOrder).catch(err => console.warn('Dexie KOT save notice:', err));
-      saveTableSessionToDexie(tableNumber, tableSession).catch(err => console.warn('Dexie session save notice:', err));
+      // 2. Real-Time Multi-Device Cloud Sync via Railway FastAPI + PostgreSQL & Local Dexie/BroadcastChannel
+      syncDispatchKotOrder(newKotOrder, tableSession).catch(err => {
+        console.warn('Real-time sync dispatch notice:', err);
+      });
 
       playSuccessChime();
       if (typeof navigator !== 'undefined' && navigator.vibrate) {

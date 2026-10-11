@@ -63,6 +63,27 @@ export async function getFastApiRooms() {
 }
 
 /**
+ * Update room status (clean, dirty, occupied, maintenance) on Railway PostgreSQL
+ */
+export async function updateFastApiRoomStatus(roomId, newStatus) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/rooms/${roomId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ status: newStatus.toLowerCase() })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Update room status error:', err.message);
+    return null;
+  }
+}
+
+/**
  * Fetch all restaurant tables
  */
 export async function getFastApiTables() {
