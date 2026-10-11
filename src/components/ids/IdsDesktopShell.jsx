@@ -94,6 +94,7 @@ import IdsMenuGroupsModal from './IdsMenuGroupsModal';
 import IdsTouchScreenGroupsModal from './IdsTouchScreenGroupsModal';
 import IdsRestaurantTableMasterModal from './IdsRestaurantTableMasterModal';
 import IdsServersModal from './IdsServersModal';
+import IdsStaffMasterModal from './IdsStaffMasterModal';
 import IdsMenuMasterModal from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal from './IdsSalesPromotionMasterModal';
 import IdsPosReportsModal from './IdsPosReportsModal';
@@ -460,6 +461,7 @@ export default function IdsDesktopShell({
   const [selectedMenuGroupForTs, setSelectedMenuGroupForTs] = useState(null);
   const [restaurantTableMasterModalOpen, setRestaurantTableMasterModalOpen] = useState(false);
   const [serversModalOpen, setServersModalOpen] = useState(false);
+  const [staffMasterModalOpen, setStaffMasterModalOpen] = useState(false);
   const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
   const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
   const [posReportsModalOpen, setPosReportsModalOpen] = useState(false);
@@ -860,6 +862,7 @@ export default function IdsDesktopShell({
       { label: 'HK Inventory Master', videoId: 'HK-06', action: () => { setHkInventoryTab('master'); setHkInventoryOpen(true); } },
       { label: 'HK Issue Entry', videoId: 'HK-06', action: () => { setHkInventoryTab('issue'); setHkInventoryOpen(true); } },
       { label: 'HK Issue Return', videoId: 'HK-06', action: () => { setHkInventoryTab('return'); setHkInventoryOpen(true); } },
+      { label: 'Housekeeping Staff & Attendants Roster (9 Staff)', videoId: 'HK-ROSTER', action: () => setStaffMasterModalOpen(true) },
       { label: 'User Defined Plnt (LAU)', videoId: 'HK-06', action: () => setLaundryPlantOpen(true) },
       { 
         label: 'Register Complaint from Housekeeping', 
@@ -1141,6 +1144,11 @@ export default function IdsDesktopShell({
         label: 'Deactivate Server / Passive Status (Setup -> Servers)', 
         videoId: 'POS-19', 
         action: () => setServersModalOpen(true) 
+      },
+      { 
+        label: 'Staff Directory & HR Shift Rosters (All 31 Members)', 
+        videoId: 'HR-01', 
+        action: () => setStaffMasterModalOpen(true) 
       },
       { 
         label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', 
@@ -1710,8 +1718,8 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className={`ids-tool-btn ${activeTool === 'hr' ? 'active' : ''}`}
-            title="HR & Staff Register"
-            onClick={() => { setActiveTool('hr'); setSelectedMaster('Lookups..'); }}
+            title="HR & Staff Register (31 Members)"
+            onClick={() => { setActiveTool('hr'); setStaffMasterModalOpen(true); }}
           >
             <Clipboard size={20} />
           </button>
@@ -3537,6 +3545,15 @@ export default function IdsDesktopShell({
         onTransitCheckInCompleted={(rec) => {
           showMessageBox(`3-Hour Railway Transit Check-In Recorded for Room ${rec.roomNo}!\nPassenger: ${rec.guestName}\nTrain: ${rec.train}\nCheck-Out: ${rec.checkOutTime}`, "Muniguda Jn 3-Hr Transit", "info");
         }}
+      />
+
+      {/* 6. Authentic Staff Directory, Department Rosters & HR Shift Master (31 Members) */}
+      <IdsStaffMasterModal
+        isOpen={staffMasterModalOpen}
+        onClose={() => setStaffMasterModalOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        onOpenMessageBox={showMessageBox}
       />
     </div>
   );

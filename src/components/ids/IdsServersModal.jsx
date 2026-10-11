@@ -1,63 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import { HOTEL_STAFF_MEMBERS } from '../../data/hotelStaffData';
 
-// Default initial servers matching Video 18 Frame 032
-const DEFAULT_SERVERS = [
-  {
-    serverCode: '001',
+// Default initial servers matching authentic 7 Restaurant Staff (1 Manager + 6 Stewards)
+const DEFAULT_SERVERS = HOTEL_STAFF_MEMBERS
+  .filter(s => s.department === 'Restaurant')
+  .map(s => ({
+    serverCode: s.serverCode,
     applicableFrom: '08-FEB-2026',
-    name: 'Kaushik',
-    shortName: 'Kaushik',
-    employeeNo: 'EMP-001',
-    status: 'Active',
+    name: s.shortName,
+    fullName: s.name,
+    shortName: s.shortName,
+    employeeNo: s.id,
+    status: s.status,
+    role: s.role,
     user: 'MANAGER',
-    lastUpdated: '08-FEB-2026 18:53'
-  },
-  {
-    serverCode: '002',
-    applicableFrom: '08-FEB-2026',
-    name: 'Ajay',
-    shortName: 'Ajay',
-    employeeNo: 'EMP-002',
-    status: 'Active',
-    user: 'MANAGER',
-    lastUpdated: '08-FEB-2026 18:54'
-  },
-  {
-    serverCode: '003',
-    applicableFrom: '08-FEB-2026',
-    name: 'Bijay',
-    shortName: 'Bij',
-    employeeNo: 'EMP-003',
-    status: 'Active',
-    user: 'MANAGER',
-    lastUpdated: '08-FEB-2026 18:54'
-  },
-  {
-    serverCode: '004',
-    applicableFrom: '08-FEB-2026',
-    name: 'Rahul',
-    shortName: 'Rah',
-    employeeNo: 'EMP-004',
-    status: 'Active',
-    user: 'MANAGER',
-    lastUpdated: '08-FEB-2026 18:54'
-  },
-  {
-    serverCode: '101',
-    applicableFrom: '08-FEB-2026',
-    name: 'Biren',
-    shortName: 'Bir',
-    employeeNo: 'EMP-101',
-    status: 'Active',
-    user: 'MANAGER',
-    lastUpdated: '08-FEB-2026 19:10'
-  }
-];
+    lastUpdated: '08-FEB-2026 18:53',
+    badge: s.stewardBadge || s.serverCode,
+    phone: s.phone
+  }));
 
 export function getStoredServers() {
   try {
     const raw = localStorage.getItem('ids_pos_servers');
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length >= 7 && parsed.some(s => s.serverCode === '007')) {
+        return parsed;
+      }
+    }
   } catch (e) {
     console.error('Failed to load ids_pos_servers', e);
   }

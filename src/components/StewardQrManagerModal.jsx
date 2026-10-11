@@ -8,6 +8,7 @@ import {
 import { RECOGNIZED_STEWARDS } from './StewardMobileOrderPad';
 import { HOUSEKEEPING_STAFF } from './HousekeepingMobilePortal';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import { getHousekeepingCrew } from '../data/hotelStaffData';
 
 // All 27 rooms across 3 floors
 const ALL_ROOMS = [
@@ -217,7 +218,7 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
                 Hotel Elite Inn — Complete QR Code Hub
               </h3>
               <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                6 Steward Badges + 1 Kitchen KDS + 2 Housekeeping + 27 Room QR Codes — All in One Place
+                6 Steward Badges + 1 Kitchen KDS + {getHousekeepingCrew().length} Housekeeping Badges + 27 Room QR Codes — All in One Place
               </div>
             </div>
           </div>
@@ -307,7 +308,7 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
             }}
           >
             <Sparkles size={15} />
-            🧹 Housekeeping (2)
+            🧹 Housekeeping ({getHousekeepingCrew().length})
           </button>
 
           <button
@@ -413,7 +414,36 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
             </div>
           )}
 
-          {/* ========== TAB 3: ROOM QR CODES ========== */}
+          {/* ========== TAB 3: HOUSEKEEPING CREW QR BADGES ========== */}
+          {selectedTab === 'housekeeping' && (
+            <div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Sparkles size={14} />
+                HOUSEKEEPING & LAUNDRY CREW QR BADGES ({getHousekeepingCrew().length} Staff) — Staff scan their badge to open room checklists, trolley linen logs & inspection console
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: '1rem'
+              }}>
+                {getHousekeepingCrew().map(hk => (
+                  <QrBadgeCard
+                    key={hk.id}
+                    label={`${hk.shortName.toUpperCase()} (${hk.serverCode})`}
+                    sublabel={`${hk.role} • ${hk.shift} Shift`}
+                    url={`${origin}/?view=housekeeping&staff=${hk.id}`}
+                    colorAccent="#10b981"
+                    icon="🧹"
+                    badgeCode={hk.id}
+                    darkColor="#064e3b"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========== TAB 4: ROOM QR CODES ========== */}
           {selectedTab === 'rooms' && (
             <div>
               <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -546,7 +576,7 @@ export default function StewardQrManagerModal({ isOpen, onClose, rooms = [] }) {
           flexShrink: 0
         }}>
           <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-            <strong style={{ color: '#fbbf24' }}>{RECOGNIZED_STEWARDS.length} Steward</strong> + <strong style={{ color: '#ef4444' }}>1 Kitchen</strong> + <strong style={{ color: '#10b981' }}>2 Housekeeping</strong> + <strong style={{ color: '#38bdf8' }}>{ALL_ROOMS.length} Room</strong> QR Codes = <strong style={{ color: '#fff' }}>{RECOGNIZED_STEWARDS.length + 1 + 2 + ALL_ROOMS.length} Total</strong>
+            <strong style={{ color: '#fbbf24' }}>{RECOGNIZED_STEWARDS.length} Steward</strong> + <strong style={{ color: '#ef4444' }}>1 Kitchen</strong> + <strong style={{ color: '#10b981' }}>{getHousekeepingCrew().length} Housekeeping</strong> + <strong style={{ color: '#38bdf8' }}>{ALL_ROOMS.length} Room</strong> QR Codes = <strong style={{ color: '#fff' }}>{RECOGNIZED_STEWARDS.length + 1 + getHousekeepingCrew().length + ALL_ROOMS.length} Total</strong>
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem' }}>

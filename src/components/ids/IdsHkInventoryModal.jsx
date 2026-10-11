@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
+import { getHousekeepingCrew } from '../../data/hotelStaffData';
 
 export default function IdsHkInventoryModal({
   isOpen,
@@ -259,7 +260,17 @@ export default function IdsHkInventoryModal({
 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '90px' }}>Attendant</label>
-                  <input type="text" value={issueForm.attendant} onChange={(e) => setIssueForm({ ...issueForm, attendant: e.target.value })} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9' }} />
+                  <select 
+                    value={issueForm.attendant} 
+                    onChange={(e) => setIssueForm({ ...issueForm, attendant: e.target.value })} 
+                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                  >
+                    {getHousekeepingCrew().map(st => (
+                      <option key={st.id} value={`[${st.serverCode}] ${st.name}`}>
+                        [{st.serverCode}] {st.name} ({st.shortName}) — {st.role}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gridColumn: 'span 2' }}>
@@ -350,7 +361,17 @@ export default function IdsHkInventoryModal({
 
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '90px' }}>Attendant</label>
-                  <input type="text" value={returnForm.attendant} onChange={(e) => setReturnForm({ ...returnForm, attendant: e.target.value })} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9' }} />
+                  <select 
+                    value={returnForm.attendant} 
+                    onChange={(e) => setReturnForm({ ...returnForm, attendant: e.target.value })} 
+                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                  >
+                    {getHousekeepingCrew().map(st => (
+                      <option key={st.id} value={`[${st.serverCode}] ${st.name}`}>
+                        [{st.serverCode}] {st.name} ({st.shortName}) — {st.role}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gridColumn: 'span 2' }}>

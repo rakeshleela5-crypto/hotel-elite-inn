@@ -10,6 +10,7 @@ import {
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../../db/dexieDb';
 import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
 import IdsPosDiscountModal from './IdsPosDiscountModal';
+import { getStewardsList } from '../../data/hotelStaffData';
 
 // Standard IDS Next Void & Cancellation Reason Codes
 export const KOT_VOID_REASONS = [
@@ -1008,11 +1009,11 @@ export default function IdsTouchPosTerminalModal({
           <div>
             <strong>Steward:</strong>{' '}
             <select className="ids-select" value={selectedServer} onChange={e => setSelectedServer(e.target.value)}>
-              <option value="Sadananda">Sadananda (Captain)</option>
-              <option value="Koti">Koti</option>
-              <option value="Deepak">Deepak</option>
-              <option value="Bijay">Bijay</option>
-              <option value="Ramesh">Ramesh</option>
+              {getStewardsList().map(s => (
+                <option key={s.id} value={s.shortName}>
+                  [{s.serverCode}] {s.shortName} ({s.role})
+                </option>
+              ))}
             </select>
           </div>
 

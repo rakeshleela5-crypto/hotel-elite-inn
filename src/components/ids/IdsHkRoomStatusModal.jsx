@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './idsFortuneNext.css';
+import { getHousekeepingCrew } from '../../data/hotelStaffData';
 
 export default function IdsHkRoomStatusModal({
   isOpen,
@@ -9,23 +10,24 @@ export default function IdsHkRoomStatusModal({
   onOpenMessageBox,
   onOpenRoomVerificationReport
 }) {
+  const hkCrew = getHousekeepingCrew();
   const [roomsList, setRoomsList] = useState([
-    { roomNo: '201', status: 'Do not Disturb', adult: '1', child: '0', infant: '0' },
-    { roomNo: '203', status: 'Dirty', adult: '0', child: '0', infant: '0' },
-    { roomNo: '204', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '205', status: 'Occupied', adult: '2', child: '0', infant: '0' },
-    { roomNo: '206', status: 'Out of Order', adult: '0', child: '0', infant: '0' },
-    { roomNo: '207', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '208', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '209', status: 'Dirty', adult: '0', child: '0', infant: '0' },
-    { roomNo: '210', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '211', status: 'Inspected', adult: '0', child: '0', infant: '0' },
-    { roomNo: '301', status: 'Occupied', adult: '1', child: '0', infant: '0' },
-    { roomNo: '303', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '304', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '305', status: 'Dirty', adult: '0', child: '0', infant: '0' },
-    { roomNo: '306', status: 'Clean', adult: '0', child: '0', infant: '0' },
-    { roomNo: '307', status: 'Inspected', adult: '0', child: '0', infant: '0' }
+    { roomNo: '201', status: 'Do not Disturb', adult: '1', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '203', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '204', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '205', status: 'Occupied', adult: '2', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '206', status: 'Out of Order', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Subrat Patnaik' },
+    { roomNo: '207', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '208', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '209', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '210', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '211', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '301', status: 'Occupied', adult: '1', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '303', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '304', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '305', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '306', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+    { roomNo: '307', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' }
   ]);
 
   // Sub-Modal: Details (Video 11 Frame 022)
@@ -36,7 +38,9 @@ export default function IdsHkRoomStatusModal({
     status: 'Occupied',
     adult: '',
     child: '',
-    infant: ''
+    infant: '',
+    attendant: 'Mamata Nayak',
+    inspectedBy: 'Sunil Mohapatra'
   });
 
   if (!isOpen) return null;
@@ -48,7 +52,9 @@ export default function IdsHkRoomStatusModal({
       status: rm.status,
       adult: rm.adult,
       child: rm.child,
-      infant: rm.infant
+      infant: rm.infant,
+      attendant: rm.attendant || 'Mamata Nayak',
+      inspectedBy: rm.inspectedBy || 'Sunil Mohapatra'
     });
     setDetailsModalOpen(true);
   };
@@ -61,7 +67,9 @@ export default function IdsHkRoomStatusModal({
           status: detailsForm.status,
           adult: detailsForm.adult || '0',
           child: detailsForm.child || '0',
-          infant: detailsForm.infant || '0'
+          infant: detailsForm.infant || '0',
+          attendant: detailsForm.attendant,
+          inspectedBy: detailsForm.inspectedBy
         };
       }
       return rm;
@@ -132,11 +140,12 @@ export default function IdsHkRoomStatusModal({
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '70px' }}>Room No.</th>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC' }}>Status</th>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '50px', textAlign: 'center' }}>Adult</th>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '50px', textAlign: 'center' }}>Child</th>
-                  <th style={{ padding: '4px 8px', width: '50px', textAlign: 'center' }}>Infant</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '65px' }}>Room No.</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '95px' }}>Status</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '45px', textAlign: 'center' }}>Adult</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '45px', textAlign: 'center' }}>Child</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '120px' }}>HK Attendant</th>
+                  <th style={{ padding: '4px 8px', width: '110px' }}>Inspected By</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +177,8 @@ export default function IdsHkRoomStatusModal({
                       <td style={{ padding: '4px 8px', color: statusColor, fontWeight: 'bold' }}>{rm.status}</td>
                       <td style={{ padding: '4px 8px', textAlign: 'center' }}>{rm.adult}</td>
                       <td style={{ padding: '4px 8px', textAlign: 'center' }}>{rm.child}</td>
-                      <td style={{ padding: '4px 8px', textAlign: 'center' }}>{rm.infant}</td>
+                      <td style={{ padding: '4px 8px', fontSize: '10px' }}>🧹 {rm.attendant || '-'}</td>
+                      <td style={{ padding: '4px 8px', fontSize: '10px', color: '#0A246A', fontWeight: 600 }}>{rm.inspectedBy || '-'}</td>
                     </tr>
                   );
                 })}
@@ -266,6 +276,33 @@ export default function IdsHkRoomStatusModal({
                       onChange={(e) => setDetailsForm({ ...detailsForm, infant: e.target.value })}
                       style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9' }} 
                     />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ width: '80px' }}>Attendant</label>
+                    <select
+                      value={detailsForm.attendant}
+                      onChange={(e) => setDetailsForm({ ...detailsForm, attendant: e.target.value })}
+                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', fontSize: '10px' }}
+                    >
+                      {hkCrew.map(st => (
+                        <option key={st.id} value={st.shortName}>
+                          {st.shortName} ({st.role})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <label style={{ width: '80px' }}>Inspected By</label>
+                    <select
+                      value={detailsForm.inspectedBy}
+                      onChange={(e) => setDetailsForm({ ...detailsForm, inspectedBy: e.target.value })}
+                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', fontSize: '10px' }}
+                    >
+                      <option value="Sunil Mohapatra">Sunil Mohapatra (Floor Supervisor)</option>
+                      <option value="Subrat Patnaik">Subrat Patnaik (HK Manager)</option>
+                    </select>
                   </div>
                 </div>
 

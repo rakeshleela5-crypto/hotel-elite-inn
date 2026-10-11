@@ -10,15 +10,8 @@ import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import DexieSyncIndicator from './DexieSyncIndicator';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
-
-export const RECOGNIZED_STEWARDS = [
-  { id: 'SADANANDA', name: 'Sadananda', code: 'STW-01', phone: '94370 12001' },
-  { id: 'KOTI', name: 'Koti', code: 'STW-02', phone: '94370 12002' },
-  { id: 'DEEPAK', name: 'Deepak', code: 'STW-03', phone: '94370 12003' },
-  { id: 'BIJAY', name: 'Bijay', code: 'STW-04', phone: '94370 12004' },
-  { id: 'RAMESH', name: 'Ramesh', code: 'STW-05', phone: '94370 12005' },
-  { id: 'SANTOSH', name: 'Santosh', code: 'STW-06', phone: '94370 12006' }
-];
+import { RECOGNIZED_STEWARDS } from '../data/hotelStaffData';
+export { RECOGNIZED_STEWARDS };
 
 export const IN_HOUSE_ROOM_GUESTS = {
   '101': 'Mr. Amitav Roy',
