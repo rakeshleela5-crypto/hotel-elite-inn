@@ -59,10 +59,10 @@ export const INITIAL_CHECKED_OUT_BILLS = [
     isUpdated: false,
     newGstn: '20AAAAAA12341ZT',
     newCompanyCode: 'COM0001',
-    newCompanyName: 'Tata Motors Limited',
-    newAddress: 'Navi Mumbai, Mumbai, Maharashtra',
-    newCity: 'Mumbai',
-    newState: 'Maharashtra (27)',
+    newCompanyName: 'Ashok Leyland Ltd',
+    newAddress: 'Regional Transit Office, Rayagada Road',
+    newCity: 'Rayagada',
+    newState: 'Odisha (21)',
     newCountry: 'India'
   },
   {
@@ -83,21 +83,21 @@ export const INITIAL_CHECKED_OUT_BILLS = [
     cgst: 264.00,
     sgst: 264.00,
     isUpdated: false,
-    newGstn: '27AABCT3521R1Z8',
+    newGstn: '21AAACL2014M1Z2',
     newCompanyCode: 'COM0002',
-    newCompanyName: 'Tata Consultancy Services Ltd',
-    newAddress: 'TCS House, Raveline Street, Fort',
-    newCity: 'Mumbai',
-    newState: 'Maharashtra (27)',
+    newCompanyName: 'Linde India Ltd (Industrial Gases)',
+    newAddress: 'Oxygen Plant Division, Muniguda Industrial Zone',
+    newCity: 'Rayagada',
+    newState: 'Odisha (21)',
     newCountry: 'India'
   }
 ];
 
 export const COMPANY_LOOKUP_DATABASE = [
-  { code: 'COM0001', name: 'Tata Motors Limited', gstn: '20AAAAAA12341ZT', address: 'Navi Mumbai, Mumbai, Maharashtra', city: 'Mumbai', state: 'Maharashtra (27)' },
-  { code: 'COM0002', name: 'Tata Consultancy Services Ltd', gstn: '27AABCT3521R1Z8', address: 'TCS House, Raveline Street, Fort', city: 'Mumbai', state: 'Maharashtra (27)' },
-  { code: 'COM0003', name: 'Reliance Industries Limited', gstn: '27AAACR5055K1ZX', address: 'Maker Chambers IV, Nariman Point', city: 'Mumbai', state: 'Maharashtra (27)' },
-  { code: 'COM0004', name: 'Infosys BPM Limited', gstn: '29AAACI4798M1ZR', address: 'Electronics City, Hosur Road', city: 'Bengaluru', state: 'Karnataka (29)' }
+  { code: 'COM0001', name: 'Ashok Leyland Ltd', gstn: '21AAACA1028L1ZV', address: 'Regional Transit Office, Rayagada Road', city: 'Rayagada', state: 'Odisha (21)' },
+  { code: 'COM0002', name: 'Linde India Ltd (Industrial Gases)', gstn: '21AAACL2014M1Z2', address: 'Oxygen Plant Division, Muniguda Industrial Zone', city: 'Rayagada', state: 'Odisha (21)' },
+  { code: 'COM0003', name: 'Utkal Alumina International Ltd', gstn: '21AAACU4921K1ZP', address: 'Doraguda, Kucheipadar', city: 'Rayagada', state: 'Odisha (21)' },
+  { code: 'COM0004', name: 'JK Paper Mills Ltd (Rayagada)', gstn: '21AAACJ0118P1ZX', address: 'Jaykaypur Township', city: 'Rayagada', state: 'Odisha (21)' }
 ];
 
 export default function IdsGstnChangeModal({

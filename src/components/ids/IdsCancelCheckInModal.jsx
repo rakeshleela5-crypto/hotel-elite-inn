@@ -62,7 +62,7 @@ export const INITIAL_CHECKINS_DATABASE = [
     roomNo: '201',
     roomType: 'EXE',
     guestName: 'MR SHARMA RAJ',
-    company: 'Tata Motors Limited',
+    company: 'Ashok Leyland Ltd',
     arrival: '20-FEB-2026',
     departure: '23-FEB-2026',
     group: 'Corporate',

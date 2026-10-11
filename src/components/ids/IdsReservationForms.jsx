@@ -148,7 +148,7 @@ export function IdsQuickReservationModal({
     name: 'Rai',
     roomNo: '',
     street: 'Parayaganj',
-    city: 'Mumbai',
+    city: 'Rayagada',
     phone: '',
     state: 'Maharastra',
     mobile: '1234567890',

@@ -24,7 +24,7 @@ import {
       - Encashment No.: ENC/2026/003 | Accounting Date: 17-MAR-2026
       - [ Reprint ] button
    4. Guest KYC & Passport Profile (Frame 048):
-      - Room No.: 1002 / 201 | Name: Mr Gomes | Passport No.: S1234567
+      - Room No.: 201 | Name: Mr Gomes | Passport No.: S1234567
       - Nationality: USA | Address: New York, USA
       - Outlet: FO | Bill Amount: 0.00 | Paid out: 0.00
    5. Denomination Breakdown Matrix (Frame 074):
@@ -54,7 +54,7 @@ export const INITIAL_ENCASHMENTS_DATABASE = [
     accountingDate: '17-MAR-2026',
     currencyCode: 'USD',
     currencyName: 'United States of Dollar',
-    roomNo: '1002',
+    roomNo: '201',
     guestName: 'Mr Gomes',
     passportNo: 'S1234567',
     nationality: 'USA',

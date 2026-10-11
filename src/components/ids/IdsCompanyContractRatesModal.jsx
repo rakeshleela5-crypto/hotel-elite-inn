@@ -16,7 +16,7 @@ import {
    3. Main Header Fields (Frames 016 & 030):
       - Property: DEMO / ELITE INN
       - Rate Table No.: 100 with [ ? ] lookup
-      - Description: Rate for Tata Motors / Mahindra / Corporate Contract
+      - Description: Rate for Ashok Leyland / JK Paper / Utkal Alumina Corporate Contract
       - Applicable From: 23-FEB-2026
       - Applicable To: 31-MAR-2026
       - Currency: Indian Rupees (INR)
@@ -54,8 +54,8 @@ export const INITIAL_TAX_STRUCTURES = [
 export const INITIAL_RATE_TABLES = [
   {
     tableNo: '100',
-    description: 'Rate for Tata Motors Limited',
-    prpCode: 'DEMO',
+    description: 'Ashok Leyland & JK Paper Corporate Preferred Tariff',
+    prpCode: 'ELITE INN',
     applicableFrom: '23-FEB-2026',
     validUpto: '31-MAR-2026',
     mealPlan: 'Modified American Plan',
@@ -485,7 +485,7 @@ export default function IdsCompanyContractRatesModal({
                 className="ids-input" 
                 value={selectedTable.description} 
                 onChange={(e) => handleTableFieldChange('description', e.target.value)}
-                placeholder="e.g. Rate for Tata Motors Limited"
+                placeholder="e.g. Rate for Ashok Leyland Ltd"
                 style={{ width: '100%', fontWeight: 600 }}
               />
 

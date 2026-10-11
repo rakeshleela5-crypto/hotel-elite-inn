@@ -304,7 +304,7 @@ export function IdsCheckInRegistrationModal({
     middleName: '',
     firstName: 'Sangeeta',
     address: 'Parayaganj',
-    city: 'Mumbai',
+    city: 'Rayagada',
     state: 'Maharastra',
     country: 'India',
     zip: '741001',

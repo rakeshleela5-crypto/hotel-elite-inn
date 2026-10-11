@@ -1310,7 +1310,7 @@ export function IdsGuestInformationModal({
               </div>
 
               <span>Arrival From</span>
-              <input className="ids-input" value="Kolkata" readOnly style={{ background: '#EBEBE4' }} />
+              <input className="ids-input" value="Rayagada" readOnly style={{ background: '#EBEBE4' }} />
 
               <span>Proceeding To</span>
               <input className="ids-input" value="Bihar" readOnly style={{ background: '#EBEBE4' }} />

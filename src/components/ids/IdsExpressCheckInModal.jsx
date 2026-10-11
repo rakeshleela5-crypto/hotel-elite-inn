@@ -1052,7 +1052,7 @@ export default function IdsExpressCheckInModal({
                   style={{ minWidth: '80px' }}
                   onClick={() => {
                     playReceptionChime();
-                    alert("Guest GST Profile Lookup:\nBilled to: Anil Kumar Group\nGSTIN: 27AABCT2345Q1ZX\nState Code: 27 (Maharashtra)\nReverse Charge: No");
+                    alert("Guest GST Profile Lookup:\nBilled to: Anil Kumar Group\nGSTIN: 21AAACU4921K1ZP\nState Code: 21 (Odisha)\nReverse Charge: No");
                   }}
                 >Gst Profile</button>
                 <button 

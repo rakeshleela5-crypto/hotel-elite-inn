@@ -465,10 +465,10 @@ export default function IdsMultiRateModal({
                   <input className="ids-input" value={mobileNo} onChange={(e) => setMobileNo(e.target.value)} style={{ width: '100%', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Address</span>
-                  <input className="ids-input" value="Bandra West, Mumbai" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                  <input className="ids-input" value="Main Road, Muniguda" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
 
                   <span style={{ fontWeight: 600 }}>City / State</span>
-                  <input className="ids-input" value="Mumbai, Maharashtra" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                  <input className="ids-input" value="Rayagada, Odisha" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
                 </div>
 
                 {/* Right Column */}

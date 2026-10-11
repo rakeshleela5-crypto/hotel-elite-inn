@@ -19,21 +19,21 @@ import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
       - Quick Scan (Load Pgm) -> Type "delete deposit" -> [ Load ]
       - 44-Video Tutorial Player -> Video 39 -> Launch Interactive Feature Clone
    3. Step 1: Post Receipts FOR GUESTS (Frames 036–054):
-      - Room No. 1002 / 202 (Mr Sourab Raj / Mr Sharma Raj)
+      - Room No. 102 / 202 (Mr Sourab Raj / Mr Sharma Raj)
       - Receipt No. 1, Received Amount: 1,500.00 (or 5,000.00), Particulars: Room Advance
       - [ Delete ] -> Alert Window V6.5.002.1: "Delete Record? [ Yes ] [ No ]"
       - Click [ Save ] to confirm deletion of deposit
    4. Step 2: Cancel Check-Ins V6.5.002.1 (Frames 060–076):
-      - Reg. No. 2 | Room 1002 | Mr Sourab Raj | Arrival: 26-FEB-2026 | Departure: 27-FEB-2026
+      - Reg. No. 2 | Room 102 | Mr Sourab Raj | Arrival: 26-FEB-2026 | Departure: 27-FEB-2026
       - Click ERASE (X)
       - Reason Entry: Reason: Guest Cancel | Authorized By: Manager -> [ Ok ]
    5. Step 3: Room Status Sync (Frames 070–076):
-      - Room turns Vacant (Green: 1002 V/DLX), Occupied count decrements, Vacant count increments!
+      - Room turns Vacant (Green: 102 V/DLX), Occupied count decrements, Vacant count increments!
    ========================================================================= */
 
 export const INITIAL_DEPOSITS_CHECKIN_LIST = [
   {
-    roomNo: '1002',
+    roomNo: '102',
     roomType: 'DLX',
     regNo: '2',
     guestName: 'Mr Sourab Raj',
@@ -53,7 +53,7 @@ export const INITIAL_DEPOSITS_CHECKIN_LIST = [
     roomType: 'EXE',
     regNo: '624',
     guestName: 'Mr Sharma Raj',
-    company: 'Tata Motors Limited',
+    company: 'Ashok Leyland Ltd',
     arrival: '25-FEB-2026',
     departure: '26-FEB-2026',
     group: 'Corporate',

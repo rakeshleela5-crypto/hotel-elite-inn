@@ -33,7 +33,7 @@ export const DEFAULT_WALK_IN_ROOM = {
     zip: '874562',
     telephone: '',
     mobile: '1234567890',
-    email: 'xyz@gmail.com',
+    email: 'hotelelitinn2023@gmail.com',
     gender: 'Male',
     gstNo: '',
     designation: '',
@@ -102,7 +102,7 @@ export default function IdsWalkInModal({
   const [zip, setZip] = useState('874562');
   const [telephone, setTelephone] = useState('');
   const [mobile, setMobile] = useState('1234567890');
-  const [email, setEmail] = useState('xyz@gmail.com');
+  const [email, setEmail] = useState('hotelelitinn2023@gmail.com');
   const [gender, setGender] = useState('Male');
   const [gstNo, setGstNo] = useState('');
   const [designation, setDesignation] = useState('');
@@ -141,7 +141,7 @@ export default function IdsWalkInModal({
   const [specialInstText, setSpecialInstText] = useState('VIP Walk-in guest. Express check-in approved.');
 
   const [otherDetailsOpen, setOtherDetailsOpen] = useState(false);
-  const [arrivalFrom, setArrivalFrom] = useState('Kolkata');
+  const [arrivalFrom, setArrivalFrom] = useState('Rayagada');
   const [proceedingTo, setProceedingTo] = useState('Bihar');
   const [postHistory, setPostHistory] = useState('Yes');
   const [identificationType, setIdentificationType] = useState('Aadhar Card');
@@ -1452,7 +1452,7 @@ export default function IdsWalkInModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Arrival From</span>
-                    <input className="ids-input" readOnly value="Kolkata" style={{ width: '120px', background: '#F5F5F5' }} />
+                    <input className="ids-input" readOnly value="Rayagada" style={{ width: '120px', background: '#F5F5F5' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

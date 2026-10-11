@@ -21,10 +21,10 @@ import { INITIAL_RATE_TABLES } from './IdsCompanyContractRatesModal';
    3. Fields & Linked Data (Frames 012 & 024):
       - Company...: COM0002 with [ ? ] lookup
       - Com. Name: Tata Motors Limited
-      - Tel No.: +91 22 6665 8282
+      - Tel No.: 06856-224410
       - IATA No.: 98765432
       - Rate Structure: 100 with [ ? ] lookup + [ Package ] button
-      - Description: Rate for Tata Motors Limited
+      - Description: Ashok Leyland Corporate Preferred Tariff
       - Amenities: WELCOM with [ ? ] lookup
    4. Tables (Frame 024):
       - Left: Amenities for Rate Structure (WELCOM - WELCOM DRINKS, WIFI - HIGH SPEED WI-FI)
@@ -39,11 +39,11 @@ import { INITIAL_RATE_TABLES } from './IdsCompanyContractRatesModal';
 export const INITIAL_COMPANY_RATE_LINKS = [
   {
     companyCode: 'COM0002',
-    companyName: 'Tata Motors Limited',
-    tel: '+91 22 6665 8282',
+    companyName: 'Ashok Leyland Ltd',
+    tel: '06856-224410',
     iata: 'TATAMOT',
     rateStructure: '100',
-    rateDescription: 'Rate for Tata Motors Limited',
+    rateDescription: 'Ashok Leyland Corporate Preferred Tariff',
     planCode: 'MAP',
     currency: 'INR',
     roomType: 'DLX',
@@ -169,7 +169,7 @@ export default function IdsLinkRatesToCompanyModal({
       ...prev,
       companyCode: comp.code,
       companyName: comp.name,
-      tel: comp.phone || comp.mobile || '+91 22 6665 8282',
+      tel: comp.phone || comp.mobile || '06856-224410',
       iata: comp.iata || ''
     }));
     setCompanyLookupOpen(false);
@@ -762,7 +762,7 @@ export default function IdsLinkRatesToCompanyModal({
                           >
                             <td style={{ padding: '3px 6px', fontWeight: 700, color: '#0A246A', borderRight: '1px solid #E0E0E0' }}>{comp.code}</td>
                             <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{comp.name}</td>
-                            <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{comp.city || 'Mumbai'}</td>
+                            <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{comp.city || 'Rayagada'}</td>
                             <td style={{ padding: '3px 6px', fontWeight: 600, color: comp.status === 'Active' ? '#137333' : '#C5221F' }}>{comp.status}</td>
                           </tr>
                         ))}

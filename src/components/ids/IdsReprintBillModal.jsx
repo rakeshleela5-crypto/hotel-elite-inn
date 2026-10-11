@@ -71,8 +71,8 @@ export const INITIAL_BILLS_DATABASE = [
     regNo: '624',
     folioNo: '1',
     guestName: 'Mr Sharma Raj',
-    companyName: 'Tata Motors Limited',
-    gstin: '27AABCT3518Q1ZY',
+    companyName: 'Ashok Leyland Ltd',
+    gstin: '21AAACA1028L1ZV',
     arrivalDate: '20-OCT-2026 14:00',
     departureDate: '23-OCT-2026 12:00',
     group: 'Corporate',
@@ -572,9 +572,9 @@ export default function IdsReprintBillModal({
                   <div style={{ fontSize: '16px', fontWeight: 900, letterSpacing: '1px' }}>HOTEL ELITE INN & SUITES</div>
                   <div style={{ fontSize: '11px', fontWeight: 700 }}>TAX INVOICE (RULE 46 OF CGST RULES, 2017)</div>
                   <div style={{ fontSize: '10px', color: '#333' }}>
-                    Plot 12, CST Road, Santacruz East, Mumbai 400098 | GSTIN: 27AABCT3518Q1ZY
+                    Opposite Railway Station Main Road, Muniguda, Dist.-Rayagada (Odisha) - 765020 | GSTIN: 21AEWFS9433F1ZN
                   </div>
-                  <div style={{ fontSize: '10px', color: '#333' }}>State: 27 - Maharashtra | State Code: 27 | Email: accounts@hoteleliteinn.com</div>
+                  <div style={{ fontSize: '10px', color: '#333' }}>State: 21 - Odisha | State Code: 21 | Email: hotelelitinn2023@gmail.com | Phone: +91-6370757541</div>
                   <div style={{ marginTop: '4px', display: 'inline-block', border: '1px solid #000', padding: '1px 8px', fontWeight: 700, fontSize: '11px' }}>
                     ORIGINAL FOR RECIPIENT (DUPLICATE REPRINT)
                   </div>
