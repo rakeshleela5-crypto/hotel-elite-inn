@@ -55,31 +55,35 @@ export default function IdsAuditedSalesRegisterModal({
     setRestaurantSalesData(r);
     setRestaurantMgmData(m);
 
-    if (selectedMonth === 'JUNE-2026') {
-      let isMounted = true;
-      Promise.all([
-        getFastApiHotelSaleMonthlyReport('JUNE-2026').catch(() => null),
-        getFastApiRestaurantSaleMonthlyReport('JUNE-2026', 'ALL').catch(() => null),
-        getFastApiRestaurantMgmReport('JUNE-2026').catch(() => null)
-      ]).then(([hotelRes, restRes, mgmRes]) => {
-        if (!isMounted) return;
-        if (hotelRes && Array.isArray(hotelRes.records) && hotelRes.records.length > 0) {
-          setHotelSalesData(hotelRes.records);
-        }
-        if (restRes && Array.isArray(restRes.records) && restRes.records.length > 0) {
-          setRestaurantSalesData(restRes.records);
-        }
-        if (mgmRes && Array.isArray(mgmRes.records) && mgmRes.records.length > 0) {
-          setRestaurantMgmData(mgmRes.records);
-        }
-        setBackendSyncStatus('Connected to PostgreSQL (Railway API)');
-      }).catch(() => {
-        if (isMounted) setBackendSyncStatus('Using Verified Edge Seed Cache (Offline Mode)');
-      });
-      return () => { isMounted = false; };
-    } else {
-      setBackendSyncStatus(`Synchronized with Live IDS NEXT Ledger (${selectedMonth})`);
-    }
+    let isMounted = true;
+    Promise.all([
+      getFastApiHotelSaleMonthlyReport(selectedMonth).catch(() => null),
+      getFastApiRestaurantSaleMonthlyReport(selectedMonth, 'ALL').catch(() => null),
+      getFastApiRestaurantMgmReport(selectedMonth).catch(() => null)
+    ]).then(([hotelRes, restRes, mgmRes]) => {
+      if (!isMounted) return;
+      let hasData = false;
+      if (hotelRes && Array.isArray(hotelRes.records) && hotelRes.records.length > 0) {
+        setHotelSalesData(hotelRes.records);
+        hasData = true;
+      }
+      if (restRes && Array.isArray(restRes.records) && restRes.records.length > 0) {
+        setRestaurantSalesData(restRes.records);
+        hasData = true;
+      }
+      if (mgmRes && Array.isArray(mgmRes.records) && mgmRes.records.length > 0) {
+        setRestaurantMgmData(mgmRes.records);
+        hasData = true;
+      }
+      if (hasData) {
+        setBackendSyncStatus(`Connected to PostgreSQL (Railway API - ${selectedMonth})`);
+      } else {
+        setBackendSyncStatus(`Synchronized with Live IDS NEXT Ledger (${selectedMonth})`);
+      }
+    }).catch(() => {
+      if (isMounted) setBackendSyncStatus(`Using Verified Edge Seed Cache (${selectedMonth})`);
+    });
+    return () => { isMounted = false; };
   }, [selectedMonth]);
 
   // Real-time synchronization subscription across all 67 modals

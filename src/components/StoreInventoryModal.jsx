@@ -5,6 +5,7 @@ import {
   UtensilsCrossed, Sparkles, Scale, RefreshCw, Layers, Check
 } from 'lucide-react';
 import { INITIAL_STORE_PURCHASES, INITIAL_KITCHEN_REQUISITIONS } from '../data/hotelData';
+import { getFastApiStorePurchases, getFastApiKitchenRequisitions } from '../utils/backendApi';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 
@@ -119,9 +120,44 @@ export default function StoreInventoryModal({
     { id: 5, name: 'Rayagada Commercial Gas Agency', cat: 'Commercial 19kg LPG Cylinders', contact: 'Delivery Desk (+91 06856 22214)', supplies: 12450, paid: 7400 }
   ]);
 
-  // Sync live D1 store purchases and kitchen requisitions on open
+  // Sync live Railway PostgreSQL & Cloudflare store purchases and kitchen requisitions on open
   useEffect(() => {
     if (!isOpen) return;
+
+    // 1. Fetch from Railway FastAPI first
+    Promise.all([
+      getFastApiStorePurchases().catch(() => []),
+      getFastApiKitchenRequisitions().catch(() => [])
+    ]).then(([fastPurchases, fastReqs]) => {
+      if (Array.isArray(fastPurchases) && fastPurchases.length > 0) {
+        setPurchases(fastPurchases.map(p => ({
+          purchaseId: p.purchase_id || p.purchaseId,
+          vendorName: p.vendor_name || p.vendorName,
+          invoiceNo: p.invoice_no || p.invoiceNo,
+          date: p.purchase_date || p.date,
+          category: p.category,
+          itemsSummary: p.items_summary || p.itemsSummary,
+          totalAmount: p.total_amount !== undefined ? p.total_amount : p.totalAmount,
+          paymentStatus: p.payment_status || p.paymentStatus,
+          receivedBy: p.received_by || p.receivedBy
+        })));
+      }
+      if (Array.isArray(fastReqs) && fastReqs.length > 0) {
+        setRequisitions(fastReqs.map(r => ({
+          requisitionId: r.requisition_id || r.requisitionId,
+          issueDate: r.issue_date || r.issueDate,
+          targetOutlet: r.target_outlet || r.targetOutlet,
+          itemName: r.item_name || r.itemName,
+          quantityIssued: r.quantity_issued !== undefined ? r.quantity_issued : r.quantityIssued,
+          unit: r.unit,
+          approxCost: r.approx_cost !== undefined ? r.approx_cost : r.approxCost,
+          issuedTo: r.issued_to || r.issuedTo,
+          issuedBy: r.issued_by || r.issuedBy
+        })));
+      }
+    }).catch(err => console.warn('Railway store sync note:', err));
+
+    // 2. Also sync from local D1 if available
     const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
     fetch('/api/sync', {
       headers: { 'X-Admin-Key': adminPin }
@@ -141,7 +177,7 @@ export default function StoreInventoryModal({
               paymentStatus: p.payment_status || p.paymentStatus,
               receivedBy: p.received_by || p.receivedBy
             }));
-            setPurchases(mapped);
+            setPurchases(prev => mapped.length >= prev.length ? mapped : prev);
           }
           if (data.data.kitchenRequisitions && data.data.kitchenRequisitions.length > 0) {
             const mappedReq = data.data.kitchenRequisitions.map(r => ({
@@ -155,12 +191,13 @@ export default function StoreInventoryModal({
               issuedTo: r.issued_to || r.issuedTo,
               issuedBy: r.issued_by || r.issuedBy
             }));
-            setRequisitions(mappedReq);
+            setRequisitions(prev => mappedReq.length >= prev.length ? mappedReq : prev);
           }
         }
       })
       .catch(err => console.warn('Store inventory sync error:', err));
   }, [isOpen]);
+
 
   // Authentic Mysoft Universal Date Range Selector States
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);

@@ -175,12 +175,21 @@ export async function mergeFastApiTables(sourceTable, targetTable, pin = '4321')
 /**
  * Settle a POS order
  */
-export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = '4321') {
+export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = '4321', options = {}) {
   try {
     const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/settle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payment_method: paymentMethod, manager_pin: pin })
+      body: JSON.stringify({
+        payment_method: paymentMethod,
+        discount_amount: Number(options.discountAmount || 0),
+        room_number: options.roomNumber ? String(options.roomNumber) : null,
+        cost_center: options.costCenter ? String(options.costCenter) : null,
+        auth_officer: options.authOfficer ? String(options.authOfficer) : null,
+        reason: options.reason ? String(options.reason) : null,
+        is_management_nc: Boolean(options.isManagementNc || false),
+        month: options.month || 'OCTOBER-2026'
+      })
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
@@ -192,6 +201,7 @@ export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = 
     throw err;
   }
 }
+
 
 /**
  * Create a new POS / KOT order on PostgreSQL
@@ -931,6 +941,99 @@ export async function getFastApiGstr3bStatutorySummary(month = 'JUNE-2026') {
     return null;
   }
 }
+
+/**
+ * Check-out a guest on Railway PostgreSQL and auto-generate HotelSaleRecord
+ */
+export async function checkOutFastApiGuest(bookingId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-out`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Check-out guest failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Store Inventory & Procurement APIs
+ */
+export async function getFastApiStorePurchases() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get store purchases failed:', err.message);
+    return [];
+  }
+}
+
+export async function postFastApiStorePurchase(purchase) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(purchase)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Post store purchase failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiKitchenRequisitions() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get kitchen requisitions failed:', err.message);
+    return [];
+  }
+}
+
+export async function postFastApiKitchenRequisition(req) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(req)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Post kitchen requisition failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiVendorPayables() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get vendor payables failed:', err.message);
+    return [];
+  }
+}
+
 
 
 
