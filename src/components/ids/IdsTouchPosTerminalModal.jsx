@@ -9,6 +9,7 @@ import {
 } from '../../utils/kotDataSync';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../../db/dexieDb';
 import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
+import IdsPosDiscountModal from './IdsPosDiscountModal';
 
 // Standard IDS Next Void & Cancellation Reason Codes
 export const KOT_VOID_REASONS = [
@@ -212,6 +213,10 @@ export default function IdsTouchPosTerminalModal({
   const [voidError, setVoidError] = useState('');
   const [showPinMask, setShowPinMask] = useState(true);
 
+  // Bill Discount & Allowance State (V6.5.002.1 - Screenshot & 5% rule)
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
+  const [tableDiscounts, setTableDiscounts] = useState({});
+
   // Sync with storage and BroadcastChannel in real-time
   useEffect(() => {
     const handleStorage = () => {
@@ -280,27 +285,42 @@ export default function IdsTouchPosTerminalModal({
     return lines;
   }, [dispatchedKots, currentSession]);
 
-  // Financial Calculations: Combined Dispatched + Draft Items
+  // Financial Calculations: Combined Dispatched + Draft Items & Active Discount
   const financials = useMemo(() => {
     const dispatchedTotal = dispatchedLineItems.reduce((acc, it) => acc + it.amount, 0);
     const draftTotal = draftCart.reduce((acc, it) => acc + (it.price * it.qty), 0);
-    const subtotal = dispatchedTotal + draftTotal;
-    const cgst = Math.round(subtotal * 0.025 * 100) / 100;
-    const sgst = Math.round(subtotal * 0.025 * 100) / 100;
-    const grandTotal = Math.round(subtotal + cgst + sgst);
-    const roundOff = Math.round((grandTotal - (subtotal + cgst + sgst)) * 100) / 100;
+    const grossTotal = dispatchedTotal + draftTotal;
+
+    // Check if table has an active discount applied
+    const discountInfo = tableDiscounts[selectedTable] || currentSession?.discount || null;
+    const discountAmount = discountInfo?.discountAmount ? Math.min(grossTotal, Number(discountInfo.discountAmount)) : 0;
+    const discountPercent = discountInfo?.discountPercent ? Number(discountInfo.discountPercent) : (grossTotal > 0 ? (discountAmount / grossTotal) * 100 : 0);
+    const taxableAmount = Math.max(0, grossTotal - discountAmount);
+
+    const cgst = Math.round(taxableAmount * 0.025 * 100) / 100;
+    const sgst = Math.round(taxableAmount * 0.025 * 100) / 100;
+    const grandTotal = Math.round(taxableAmount + cgst + sgst);
+    const roundOff = Math.round((grandTotal - (taxableAmount + cgst + sgst)) * 100) / 100;
 
     return {
       dispatchedTotal,
       draftTotal,
-      subtotal,
+      subtotal: grossTotal, // Gross food subtotal
+      grossTotal,
+      discountAmount,
+      discountPercent,
+      discountReason: discountInfo?.reason || '',
+      discountRemarks: discountInfo?.remarks || '',
+      discountAuthBy: discountInfo?.authBy || '',
+      isDiscountApplied: discountAmount > 0,
+      taxableAmount,
       cgst,
       sgst,
       roundOff,
       grandTotal,
       totalItemCount: dispatchedLineItems.reduce((acc, it) => acc + it.quantity, 0) + draftCart.reduce((acc, it) => acc + it.qty, 0)
     };
-  }, [dispatchedLineItems, draftCart]);
+  }, [dispatchedLineItems, draftCart, tableDiscounts, selectedTable, currentSession]);
 
   // Item catalog filters
   const filteredItems = useMemo(() => {
@@ -332,6 +352,8 @@ export default function IdsTouchPosTerminalModal({
       setMergeTableModalOpen(true);
     } else if (initialMode === 'kot-reprint') {
       handleViewLatestKotSlip();
+    } else if (initialMode === 'discount' || initialMode === 'pos-discount') {
+      setDiscountModalOpen(true);
     }
   }, [isOpen, initialMode]);
 
@@ -345,6 +367,9 @@ export default function IdsTouchPosTerminalModal({
       } else if (e.key === 'F3') {
         e.preventDefault();
         handleViewLatestKotSlip();
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        setDiscountModalOpen(true);
       } else if (e.key === 'F5') {
         e.preventDefault();
         setMergeTableModalOpen(true);
@@ -366,7 +391,8 @@ export default function IdsTouchPosTerminalModal({
         setDraftCart([]);
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        if (voidModalOpen) setVoidModalOpen(false);
+        if (discountModalOpen) setDiscountModalOpen(false);
+        else if (voidModalOpen) setVoidModalOpen(false);
         else if (thermalKotModalOpen) setThermalKotModalOpen(false);
         else if (mergeTableModalOpen) setMergeTableModalOpen(false);
         else if (printBillModalOpen) setPrintBillModalOpen(false);
@@ -376,7 +402,54 @@ export default function IdsTouchPosTerminalModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, dispatchedLineItems, selectedTable]);
+  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, discountModalOpen, dispatchedLineItems, selectedTable]);
+
+  // Bill Discount & Allowance Handlers (5% Cashier Limit, > 5% Manager PIN)
+  const handleApplyDiscount = (disc) => {
+    setTableDiscounts(prev => ({
+      ...prev,
+      [selectedTable]: disc
+    }));
+
+    // Update running table session
+    const updatedSessions = { ...tableSessions };
+    const rawNum = selectedTable.replace(/\D/g, '');
+    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+    if (sess) {
+      sess.discount = disc;
+      setTableSessions(updatedSessions);
+      try {
+        localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
+      } catch (e) {}
+      saveTableSessionToDexie(selectedTable, sess).catch(() => {});
+    }
+
+    setDiscountModalOpen(false);
+    playSuccessChime();
+    setMessagePrompt(`🏷️ Discount of ₹${disc.discountAmount.toFixed(2)} (${disc.discountPercent.toFixed(1)}%) applied to Table ${selectedTable}. Reason: ${disc.reason}. Auth: ${disc.authBy}`);
+  };
+
+  const handleRemoveDiscount = () => {
+    setTableDiscounts(prev => {
+      const copy = { ...prev };
+      delete copy[selectedTable];
+      return copy;
+    });
+
+    const updatedSessions = { ...tableSessions };
+    const rawNum = selectedTable.replace(/\D/g, '');
+    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+    if (sess && sess.discount) {
+      delete sess.discount;
+      setTableSessions(updatedSessions);
+      try {
+        localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
+      } catch (e) {}
+      saveTableSessionToDexie(selectedTable, sess).catch(() => {});
+    }
+
+    setMessagePrompt(`🏷️ Discount removed for Table ${selectedTable}. Full gross bill restored.`);
+  };
 
   // Void Handler Functions
   const handleInitiateVoid = (row) => {
@@ -764,6 +837,10 @@ export default function IdsTouchPosTerminalModal({
       paymentMode: settlePayMode,
       roomNo: settlePayMode === 'ROOM' ? settleRoomNo : null,
       subtotal: financials.subtotal,
+      discountAmount: financials.discountAmount,
+      discountPercent: financials.discountPercent,
+      discountReason: financials.discountReason,
+      taxableAmount: financials.taxableAmount,
       cgst: financials.cgst,
       sgst: financials.sgst,
       roundOff: financials.roundOff,
@@ -786,15 +863,28 @@ export default function IdsTouchPosTerminalModal({
     settleTableSessionInDexie(selectedTable).catch(() => {});
     if (rawNum) settleTableSessionInDexie(rawNum).catch(() => {});
 
+    // Clear discount for settled table
+    setTableDiscounts(prev => {
+      const copy = { ...prev };
+      delete copy[selectedTable];
+      if (rawNum) delete copy[rawNum];
+      return copy;
+    });
+
     // 2. Record in Financial Register Bridge
     try {
+      const activeDisc = tableDiscounts[selectedTable];
       recordLiveRestaurantSale({
         billNo: billId,
         date: accountingDate,
         tableNo: selectedTable,
         steward: selectedServer,
         paymentMode: settlePayMode,
-        foodTotal: financials.subtotal,
+        foodTotal: financials.taxableAmount,
+        discount: financials.discountAmount,
+        discountPercent: financials.discountPercent,
+        discountReason: activeDisc?.reason || '',
+        discountAuthBy: activeDisc?.authBy || '',
         cgst: financials.cgst,
         sgst: financials.sgst,
         roundOff: financials.roundOff,
@@ -817,7 +907,7 @@ export default function IdsTouchPosTerminalModal({
     playSuccessChime();
     setSettlementModalOpen(false);
     setDraftCart([]);
-    setMessagePrompt(`💳 Bill #${billId} SETTLED (₹${financials.grandTotal.toFixed(2)} via ${settlePayMode}). Table ${selectedTable} is now VACANT!`);
+    setMessagePrompt(`💳 Bill #${billId} SETTLED (₹${financials.grandTotal.toFixed(2)} via ${settlePayMode}${financials.discountAmount > 0 ? ` [Discount: ₹${financials.discountAmount.toFixed(2)}]` : ''}). Table ${selectedTable} is now VACANT!`);
   };
 
   // Determine Table Badge Status
@@ -1152,12 +1242,43 @@ export default function IdsTouchPosTerminalModal({
                     <span>₹{financials.draftTotal.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
-                    <span>Food Subtotal:</span>
-                    <span>₹{financials.subtotal.toFixed(2)}</span>
+                    <span>Gross Subtotal:</span>
+                    <span>₹{financials.grossTotal.toFixed(2)}</span>
                   </div>
+                  {financials.isDiscountApplied ? (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B00', fontWeight: 700, marginTop: '2px', alignItems: 'center' }}>
+                      <span>Discount ({financials.discountPercent.toFixed(1)}%):</span>
+                      <span>
+                        - ₹{financials.discountAmount.toFixed(2)}
+                        <button
+                          onClick={handleRemoveDiscount}
+                          title="Remove discount"
+                          style={{ marginLeft: '4px', border: 'none', background: 'transparent', color: '#B00', cursor: 'pointer', fontWeight: 900, fontSize: '11px' }}
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A246A', marginTop: '2px', fontSize: '10.5px' }}>
+                      <span>Bill Discount:</span>
+                      <button
+                        onClick={() => setDiscountModalOpen(true)}
+                        style={{ border: 'none', background: 'transparent', color: '#0A246A', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700, padding: 0 }}
+                      >
+                        + Add Discount [F4]
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div>
+                  {financials.isDiscountApplied && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontWeight: 600 }}>
+                      <span>Taxable Amount:</span>
+                      <span>₹{financials.taxableAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#555' }}>
                     <span>CGST (2.5%):</span>
                     <span>₹{financials.cgst.toFixed(2)}</span>
@@ -1166,6 +1287,12 @@ export default function IdsTouchPosTerminalModal({
                     <span>SGST (2.5%):</span>
                     <span>₹{financials.sgst.toFixed(2)}</span>
                   </div>
+                  {financials.roundOff !== 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#777' }}>
+                      <span>Round Off:</span>
+                      <span>{financials.roundOff >= 0 ? `+₹${financials.roundOff.toFixed(2)}` : `-₹${Math.abs(financials.roundOff).toFixed(2)}`}</span>
+                    </div>
+                  )}
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '13px', color: '#0A246A', borderTop: '1px solid #999', paddingTop: '2px' }}>
                     <span>GRAND TOTAL:</span>
                     <span>₹{financials.grandTotal.toFixed(2)}</span>
@@ -1175,11 +1302,11 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* WIN32 BEVEL COMMAND TOOLBAR */}
-            <div style={{ padding: '6px 8px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px' }}>
+            <div style={{ padding: '6px 8px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
               <button 
                 onClick={handlePunchDeltaKot}
                 className="ids-btn-classic" 
-                style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F2: Dispatches ONLY draft items with new KOT # to kitchen"
               >
                 [F2] PUNCH KOT
@@ -1188,19 +1315,28 @@ export default function IdsTouchPosTerminalModal({
               <button 
                 onClick={handleViewLatestKotSlip}
                 className="ids-btn-classic" 
-                style={{ background: '#4A5568', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#4A5568', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F3: View or reprint 80mm thermal KOT slip"
               >
                 [F3] VIEW KOT
               </button>
 
               <button 
+                onClick={() => setDiscountModalOpen(true)}
+                className="ids-btn-classic" 
+                style={{ background: financials.isDiscountApplied ? '#B8860B' : '#3B82F6', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
+                title="F4: Apply food bill discount (≤ 5% Cashier, > 5% Manager PIN)"
+              >
+                {financials.isDiscountApplied ? `[F4] DISC ${financials.discountPercent.toFixed(0)}%` : '[F4] DISCOUNT'}
+              </button>
+
+              <button 
                 onClick={() => setMergeTableModalOpen(true)}
                 className="ids-btn-classic" 
-                style={{ background: '#7B1FA2', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#7B1FA2', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F5: Merge running KOTs from another table into this one"
               >
-                [F5] MERGE TABLE
+                [F5] MERGE
               </button>
 
               <button 
@@ -1212,16 +1348,16 @@ export default function IdsTouchPosTerminalModal({
                   }
                 }}
                 className="ids-btn-classic" 
-                style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F6: Void kitchen dish with Manager PIN & mandatory reason"
               >
-                [F6] VOID DISH
+                [F6] VOID
               </button>
 
               <button 
                 onClick={() => setPrintBillModalOpen(true)}
                 className="ids-btn-classic" 
-                style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F7: Print consolidated GST Tax Invoice for guest"
               >
                 [F7] PRINT BILL
@@ -1230,7 +1366,7 @@ export default function IdsTouchPosTerminalModal({
               <button 
                 onClick={() => setSettlementModalOpen(true)}
                 className="ids-btn-classic" 
-                style={{ background: '#B8860B', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                style={{ background: '#B8860B', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
                 title="F8: Settle payment (Cash, UPI QR, Card, Room Folio) and free table"
               >
                 [F8] SETTLE
@@ -1457,9 +1593,21 @@ export default function IdsTouchPosTerminalModal({
                 ))}
                 <div>--------------------------------</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>FOOD SUBTOTAL:</span>
-                  <span>₹{financials.subtotal.toFixed(2)}</span>
+                  <span>FOOD GROSS:</span>
+                  <span>₹{financials.grossTotal.toFixed(2)}</span>
                 </div>
+                {financials.isDiscountApplied && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B00' }}>
+                    <span>DISCOUNT ({financials.discountPercent.toFixed(1)}%):</span>
+                    <span>-₹{financials.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+                {financials.isDiscountApplied && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                    <span>TAXABLE VALUE:</span>
+                    <span>₹{financials.taxableAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#555' }}>
                   <span>CGST (2.5%):</span>
                   <span>₹{financials.cgst.toFixed(2)}</span>
@@ -1471,7 +1619,7 @@ export default function IdsTouchPosTerminalModal({
                 {financials.roundOff !== 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span>ROUND OFF:</span>
-                    <span>₹{financials.roundOff.toFixed(2)}</span>
+                    <span>{financials.roundOff >= 0 ? `+₹${financials.roundOff.toFixed(2)}` : `-₹${Math.abs(financials.roundOff).toFixed(2)}`}</span>
                   </div>
                 )}
                 <div>--------------------------------</div>
@@ -1524,6 +1672,28 @@ export default function IdsTouchPosTerminalModal({
                 <div style={{ fontSize: '11px', textTransform: 'uppercase' }}>Net Settling Amount</div>
                 <div style={{ fontSize: '24px', fontWeight: 900 }}>₹{financials.grandTotal.toFixed(2)}</div>
                 <div style={{ fontSize: '10px', color: '#DDD' }}>Table: {selectedTable} • {financials.totalItemCount} Total Items</div>
+                {financials.discountAmount > 0 ? (
+                  <div style={{ marginTop: '4px', fontSize: '10px', color: '#A5D6A7', fontWeight: 700 }}>
+                    Discount Deducted: ₹{financials.discountAmount.toFixed(2)} ({financials.discountPercent.toFixed(1)}%) • {tableDiscounts[selectedTable]?.reason || 'Allowed'}
+                  </div>
+                ) : (
+                  <div style={{ marginTop: '4px', fontSize: '10px', color: '#BBB' }}>
+                    Gross: ₹{financials.foodGross.toFixed(2)} (No Bill Discount Applied)
+                  </div>
+                )}
+                <div style={{ marginTop: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSettlementModalOpen(false);
+                      setDiscountModalOpen(true);
+                    }}
+                    className="ids-btn-classic"
+                    style={{ fontSize: '10px', padding: '3px 8px', background: '#ECE9D8', color: '#000', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    🏷️ {financials.discountAmount > 0 ? 'Modify / Remove Discount [F4]' : 'Apply Bill Discount [F4]'}
+                  </button>
+                </div>
               </div>
 
               {/* Payment Mode Selector */}
@@ -1799,6 +1969,22 @@ export default function IdsTouchPosTerminalModal({
           </div>
         </div>
       )}
+
+      {/* =================================================================== */}
+      {/* MODAL 6: WIN32 BILL DISCOUNT & ALLOWANCE DIALOG (5% CASHIER THRESHOLD) */}
+      {/* =================================================================== */}
+      <IdsPosDiscountModal
+        isOpen={discountModalOpen}
+        onClose={() => setDiscountModalOpen(false)}
+        billNo={`RES-B-${selectedTable.replace(/[^0-9]/g, '').padStart(5, '0') || '00101'}`}
+        tableNo={selectedTable}
+        grossTotal={financials.foodGross}
+        taxRate={5.0}
+        currentUser="CASHIER"
+        currentDiscount={tableDiscounts[selectedTable] || null}
+        onApplyDiscount={handleApplyDiscount}
+        onRemoveDiscount={handleRemoveDiscount}
+      />
 
     </div>
   );

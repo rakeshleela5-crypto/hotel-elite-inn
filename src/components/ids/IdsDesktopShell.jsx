@@ -926,9 +926,9 @@ export default function IdsDesktopShell({
         action: () => openTouchPosTerminal('pos') 
       },
       { 
-        label: 'Bill Discount & Allowance (Manager Override)', 
+        label: 'Bill Discount & Allowance (5% Cashier / Manager PIN [F4])', 
         videoId: 'POS-03', 
-        action: () => setPosDiscountModalOpen(true) 
+        action: () => openTouchPosTerminal('pos-discount') 
       },
       { label: 'Fortune Fidelio Mapping', action: () => showMessageBox("Interface Mapping Synchronized with Opera/Fidelio Bus.", "Interface Setup") }
     ],
