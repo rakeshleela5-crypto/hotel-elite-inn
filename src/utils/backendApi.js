@@ -841,4 +841,96 @@ export async function getFastApiRestaurantMgmReport(month = 'JUNE-2026') {
   }
 }
 
+export async function postFastApiHotelSaleRecord(record) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-record`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        serial_no: Number(record.sNo || record.serial_no || 1),
+        date: String(record.date || ''),
+        bill_no: String(record.billNo || record.bill_no || ''),
+        room_number: String(record.roomNo || record.room_number || ''),
+        rent: Number(record.rent || 0),
+        cgst: Number(record.cgst || 0),
+        sgst: Number(record.sgst || 0),
+        misc: Number(record.misc || 0),
+        laundry: Number(record.laundry || 0),
+        minibar: Number(record.minB || record.minibar || 0),
+        room_service: Number(record.rs || record.room_service || 0),
+        net_amount: Number(record.netAmt || record.net_amount || 0),
+        advance: Number(record.advanc || record.advance || 0),
+        discount: Number(record.discount || 0),
+        complimentary: Number(record.complt || record.complimentary || 0),
+        void_amount: Number(record.void || record.void_amount || 0),
+        allowances: Number(record.allowances || 0),
+        paid_out: Number(record.paidOut || record.paid_out || 0),
+        cash: Number(record.cash || 0),
+        btc: Number(record.btc || 0),
+        credit_card: Number(record.cc || record.credit_card || 0),
+        online: Number(record.online || 0),
+        remark: String(record.remark || ''),
+        guest_name: String(record.guestName || record.guest_name || ''),
+        company: String(record.company || 'FIT'),
+        gstin: record.gstin || null,
+        month: record.month || 'JUNE-2026'
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Post hotel sale record failed:', err.message);
+    return null;
+  }
+}
+
+export async function postFastApiRestaurantSaleRecord(record) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-sale-record`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        running_no: Number(record.no || record.running_no || 1),
+        date: String(record.date || ''),
+        bill_no: String(record.billNo || record.bill_no || ''),
+        amount: Number(record.amount || 0),
+        food: Number(record.food || 0),
+        beverage: Number(record.beverage || 0),
+        cgst: Number(record.cgst || 0),
+        sgst: Number(record.sgst || 0),
+        discount: Number(record.discount || 0),
+        total: Number(record.total || 0),
+        pos_outlet: String(record.pos || record.pos_outlet || 'RESTAURANT'),
+        table_room: String(record.tableRoom || record.table_room || ''),
+        cost_center: String(record.costCenter || record.cost_center || ''),
+        auth_officer: String(record.authOfficer || record.auth_officer || ''),
+        reason: String(record.reason || ''),
+        settlement_mode: String(record.settlementMode || record.settlement_mode || 'Cash'),
+        is_management_nc: Boolean(record.is_management_nc || record.pos === 'MANAGEMENT'),
+        month: record.month || 'JUNE-2026'
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Post restaurant sale record failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiGstr3bStatutorySummary(month = 'JUNE-2026') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/gstr3b-statutory-summary?month=${encodeURIComponent(month)}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GSTR-3B summary fetch failed:', err.message);
+    return null;
+  }
+}
+
+
 

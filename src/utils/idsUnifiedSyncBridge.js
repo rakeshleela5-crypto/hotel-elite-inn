@@ -10,6 +10,7 @@ import {
   getFormattedPmsMonthYear 
 } from '../data/idsPmsStore';
 import { OCTOBER_2026_SEEDED_PMS_DAILY_RECORDS } from './pmsMasterAuditLedger';
+import { postFastApiHotelSaleRecord, postFastApiRestaurantSaleRecord } from './backendApi';
 
 const STORAGE_KEY_HOTEL_LIVE = 'ids_unified_hotel_live_sales_v1';
 const STORAGE_KEY_REST_LIVE = 'ids_unified_restaurant_live_sales_v1';
@@ -332,6 +333,7 @@ export function recordLiveHotelSale(sale) {
   const updated = [newRecord, ...current];
   saveStoredItems(STORAGE_KEY_HOTEL_LIVE, updated);
   notifySyncListeners('HOTEL_SALE_RECORDED', newRecord);
+  postFastApiHotelSaleRecord(newRecord).catch(() => null);
   return newRecord;
 }
 
@@ -365,6 +367,7 @@ export function recordLiveRestaurantSale(posOrder) {
   const updated = [newRecord, ...current];
   saveStoredItems(STORAGE_KEY_REST_LIVE, updated);
   notifySyncListeners('REST_SALE_RECORDED', newRecord);
+  postFastApiRestaurantSaleRecord(newRecord).catch(() => null);
 
   // If charged to Room Folio, automatically update guest folio room service column!
   if (newRecord.settlementMode.toLowerCase().includes('room folio') || newRecord.pos === 'ROOM SERVICE') {
@@ -413,6 +416,7 @@ export function recordLiveNcDining(ncRecord) {
   const updated = [newRecord, ...current];
   saveStoredItems(STORAGE_KEY_NC_LIVE, updated);
   notifySyncListeners('NC_DINING_RECORDED', newRecord);
+  postFastApiRestaurantSaleRecord({ ...newRecord, is_management_nc: true }).catch(() => null);
   return newRecord;
 }
 
