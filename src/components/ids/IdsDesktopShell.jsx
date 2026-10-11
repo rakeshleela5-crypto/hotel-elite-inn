@@ -967,6 +967,29 @@ export default function IdsDesktopShell({
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => setGstnChangeModalOpen(true) }
     ],
     'Reports..': [
+      { 
+        label: 'Hotel Sales Register - Monthly (26 Columns - June Month Audit)', 
+        videoId: 'AUDIT-01', 
+        action: () => openCrystalReport('hotel-sale-monthly') 
+      },
+      { 
+        label: 'Restaurant & Bar Sales Register (12 Columns - June Month Audit)', 
+        videoId: 'AUDIT-02', 
+        action: () => openCrystalReport('restaurant-sale-monthly') 
+      },
+      { 
+        label: 'Management Non-Chargeable (NC) Dining Register (June Month Audit)', 
+        videoId: 'AUDIT-03', 
+        action: () => openCrystalReport('restaurant-mgm-monthly') 
+      },
+      { 
+        label: 'Monthly F&B Sales Register in POS Reports Suite (1,324 Orders)', 
+        videoId: 'POS-04', 
+        action: () => {
+          setPosReportsInitialTab('june-monthly-sales');
+          setPosReportsModalOpen(true);
+        } 
+      },
       { label: 'Reprint Front Office Module Voucher', videoId: '35', action: () => setReprintVoucherModalOpen(true) },
       { label: 'Reprint Front Office Bill (Rule 46 GST)', videoId: '36', action: () => setReprintBillModalOpen(true) },
       { label: 'Foreign Exchange Entry (RBI Encashment)', videoId: '42', action: () => setForeignExchangeModalOpen(true) },
@@ -2185,7 +2208,13 @@ export default function IdsDesktopShell({
         isOpen={quickScanModalOpen}
         onClose={() => setQuickScanModalOpen(false)}
         onSelectProgram={(programId) => {
-          if (programId === 'room-status' || programId === 'housekeeping-room-status') {
+          if (programId === 'hotel-sale-monthly') {
+            openCrystalReport('hotel-sale-monthly');
+          } else if (programId === 'restaurant-sale-monthly') {
+            openCrystalReport('restaurant-sale-monthly');
+          } else if (programId === 'restaurant-mgm-monthly') {
+            openCrystalReport('restaurant-mgm-monthly');
+          } else if (programId === 'room-status' || programId === 'housekeeping-room-status') {
             setRoomRackConsoleOpen(true);
           } else if (programId === 'clear-rooms') {
             setClearRoomsModalOpen(true);

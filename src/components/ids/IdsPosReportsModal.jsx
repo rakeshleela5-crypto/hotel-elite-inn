@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { HOTEL_CONFIG } from '../../data/hotelData';
+import { 
+  RESTAURANT_JUNE_SALES, 
+  RESTAURANT_JUNE_MGM_SALES, 
+  RESTAURANT_JUNE_SUMMARY 
+} from '../../data/restaurantSaleJuneReportData';
 
 // Mock/Initial POS Audit & Sales records reflecting operational data from Videos 01-22
 const INITIAL_SALES_RECORDS = [
@@ -348,6 +353,35 @@ export default function IdsPosReportsModal({
     return true;
   });
 
+  // Filter June F&B Register (1,324 Orders from Client Excel)
+  const filteredJuneSales = useMemo(() => {
+    return RESTAURANT_JUNE_SALES.filter(r => {
+      if (filterOutlet !== 'ALL' && r.pos !== filterOutlet) return false;
+      if (filterSearch) {
+        const q = filterSearch.toLowerCase();
+        const matches = (r.billNo && String(r.billNo).toLowerCase().includes(q)) ||
+          (r.pos && String(r.pos).toLowerCase().includes(q)) ||
+          (r.tableRoom && String(r.tableRoom).toLowerCase().includes(q));
+        if (!matches) return false;
+      }
+      return true;
+    });
+  }, [filterOutlet, filterSearch]);
+
+  // Filter June Management NC Register (68 Orders from Client Excel Sheet 2)
+  const filteredJuneMgm = useMemo(() => {
+    return RESTAURANT_JUNE_MGM_SALES.filter(r => {
+      if (filterSearch) {
+        const q = filterSearch.toLowerCase();
+        const matches = (r.billNo && String(r.billNo).toLowerCase().includes(q)) ||
+          (r.tableRoom && String(r.tableRoom).toLowerCase().includes(q)) ||
+          (r.date && String(r.date).toLowerCase().includes(q));
+        if (!matches) return false;
+      }
+      return true;
+    });
+  }, [filterSearch]);
+
   // Calculate totals
   const totalGross = filteredSales.reduce((acc, r) => acc + r.gross, 0);
   const totalTaxable = filteredSales.reduce((acc, r) => acc + r.taxable, 0);
@@ -386,6 +420,16 @@ export default function IdsPosReportsModal({
       csvContent += "Menu Group,Item Code,Item Name,Kitchen,Qty Sold,UOM,Price,Revenue,Cost,Margin Pct\n";
       INITIAL_MENU_SALES.forEach(r => {
         csvContent += `"${r.group}",${r.code},"${r.name}","${r.kitchen}",${r.qtySold},${r.uom},${r.price},${r.revenue},${r.cost},${r.marginPct}\n`;
+      });
+    } else if (activeTab === 'june-monthly-sales') {
+      csvContent += "No,Date,Bill No,Taxable Amount,Food,Beverage,CGST,SGST,Discount,Total,POS Outlet,Table\\Room\n";
+      filteredJuneSales.forEach(r => {
+        csvContent += `${r.no},"${r.date}","${r.billNo}",${r.amount},${r.food},${r.beverage},${r.cgst},${r.sgst},${r.discount},${r.total},"${r.pos}","${r.tableRoom}"\n`;
+      });
+    } else if (activeTab === 'june-monthly-mgm') {
+      csvContent += "No,Date,Bill No,Valuation Amount,Food,Beverage,CGST,SGST,Discount,Total,POS Outlet,Table\\Room,Status\n";
+      filteredJuneMgm.forEach(r => {
+        csvContent += `${r.no},"${r.date}","${r.billNo}",${r.amount},${r.food},${r.beverage},0,0,0,0,"${r.pos}","${r.tableRoom}","Management NC Cost Center Debit"\n`;
       });
     }
 
@@ -480,7 +524,9 @@ export default function IdsPosReportsModal({
             { id: 'void-audit', label: '2. KOT Void & Cancellation Audit' },
             { id: 'nc-ledger', label: '3. NC Department Cost Ledger' },
             { id: 'server-perf', label: '4. Server Sales & Commission' },
-            { id: 'menu-sales', label: '5. Menu Item Engineering Sales' }
+            { id: 'menu-sales', label: '5. Menu Item Engineering Sales' },
+            { id: 'june-monthly-sales', label: '6. June Monthly F&B Sales Register (1,324 Orders)' },
+            { id: 'june-monthly-mgm', label: '7. June Management NC Register (68 Orders)' }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -947,6 +993,166 @@ export default function IdsPosReportsModal({
                             INITIAL_MENU_SALES.reduce((a, b) => a + b.revenue, 0)) *
                           100
                         ).toFixed(1)}%
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: JUNE MONTHLY F&B COMMERCIAL SALES REGISTER */}
+          {activeTab === 'june-monthly-sales' && (
+            <div>
+              {/* KPI Summary Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginBottom: '8px' }}>
+                <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Food Sales Gross</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹8,28,328.53</div>
+                  <div style={{ fontSize: '9px', color: '#666' }}>Kitchen Production</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Beverage Sales</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹52,935.00</div>
+                  <div style={{ fontSize: '9px', color: '#666' }}>Pantry / Bar</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>CGST + SGST (5%)</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#006600' }}>₹39,536.12</div>
+                  <div style={{ fontSize: '9px', color: '#666' }}>₹19,768.06 ea</div>
+                </div>
+                <div style={{ background: '#EBF3EB', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#006600', fontWeight: 700 }}>Total F&B Production</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#006600' }}>₹9,20,739.00</div>
+                  <div style={{ fontSize: '9px', color: '#333' }}>Commercial + NC</div>
+                </div>
+                <div style={{ background: '#FFF8E7', border: '1px solid #D2B48C', padding: '4px 6px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#8B4513' }}>Management NC Value</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B4513' }}>₹90,478.00</div>
+                  <div style={{ fontSize: '9px', color: '#666' }}>Internal Cost Debit</div>
+                </div>
+              </div>
+
+              {/* Grid Table */}
+              <div style={{ background: '#FFF', border: '1px solid #7F9DB9', maxHeight: '410px', overflowY: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
+                  <thead>
+                    <tr style={{ background: '#0A246A', color: '#FFF', position: 'sticky', top: 0 }}>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>No.</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>Date</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>Bill No.</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>Amount</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>Food</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>Beverage</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>CGST</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>SGST</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>Discount</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #4060A0' }}>Total</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>P.O.S</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #4060A0' }}>Table\\Room</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredJuneSales.slice(0, 250).map((r, i) => (
+                      <tr key={i} style={{ background: i % 2 === 0 ? '#FFF' : '#F7F7F7', borderBottom: '1px solid #E0E0E0' }}>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.no}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.date}</td>
+                        <td style={{ padding: '3px 4px', fontWeight: 600, color: '#0A246A', textAlign: 'center' }}>{r.billNo}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.amount || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.food || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.beverage || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.cgst || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.sgst || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.discount || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700, color: '#006600' }}>{Number(r.total || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>
+                          <span style={{ 
+                            padding: '1px 4px', 
+                            borderRadius: '2px', 
+                            fontSize: '9px', 
+                            fontWeight: 600,
+                            background: r.pos === 'RESTAURANT' ? '#EBF3FB' : r.pos === 'ROOM SERVICE' ? '#FFF2E6' : '#EAF6EA',
+                            color: r.pos === 'RESTAURANT' ? '#0A246A' : r.pos === 'ROOM SERVICE' ? '#B85D00' : '#1D781D'
+                          }}>
+                            {r.pos}
+                          </span>
+                        </td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.tableRoom}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ background: '#ECE9D8', fontWeight: 700, borderTop: '2px solid #716F64' }}>
+                      <td colSpan="3" style={{ padding: '4px', textAlign: 'center' }}>
+                        Showing first 250 of {filteredJuneSales.length} records (Export CSV for all {RESTAURANT_JUNE_SALES.length})
+                      </td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹8,81,200.53</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹8,28,328.53</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹52,935.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹19,768.06</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹19,768.06</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹63.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right', color: '#006600' }}>₹9,20,739.00</td>
+                      <td colSpan="2" style={{ padding: '4px', textAlign: 'center', fontSize: '9px' }}>SAC 996331</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: JUNE MANAGEMENT NC DINING REGISTER */}
+          {activeTab === 'june-monthly-mgm' && (
+            <div>
+              {/* NC Header Banner */}
+              <div style={{ background: '#FFF8E7', border: '1px solid #D2B48C', padding: '6px 10px', marginBottom: '8px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <strong>Internal Management Non-Chargeable (NC) Dining:</strong> 68 Orders Recorded in June 2026.
+                </div>
+                <div style={{ fontWeight: 700, color: '#800000' }}>
+                  Total Kitchen Production Value: ₹90,478.00 (Zero GST Outward Supply)
+                </div>
+              </div>
+
+              {/* Grid Table */}
+              <div style={{ background: '#FFF', border: '1px solid #7F9DB9', maxHeight: '410px', overflowY: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
+                  <thead>
+                    <tr style={{ background: '#800000', color: '#FFF', position: 'sticky', top: 0 }}>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #A04040' }}>No.</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #A04040' }}>Date</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #A04040' }}>NC Bill No.</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #A04040' }}>Valuation (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #A04040' }}>Food (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'right', border: '1px solid #A04040' }}>Beverage (₹)</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #A04040' }}>Outlet</th>
+                      <th style={{ padding: '4px', textAlign: 'center', border: '1px solid #A04040' }}>Table / Location</th>
+                      <th style={{ padding: '4px', textAlign: 'left', border: '1px solid #A04040' }}>Cost Allocation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredJuneMgm.map((r, i) => (
+                      <tr key={i} style={{ background: i % 2 === 0 ? '#FFF' : '#FFFDF9', borderBottom: '1px solid #E0E0E0' }}>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.no}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.date}</td>
+                        <td style={{ padding: '3px 4px', fontWeight: 600, color: '#800000', textAlign: 'center' }}>{r.billNo}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700 }}>{Number(r.amount || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.food || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.beverage || 0).toFixed(2)}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.pos || 'MANAGEMENT'}</td>
+                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.tableRoom}</td>
+                        <td style={{ padding: '3px 4px', fontStyle: 'italic', color: '#555' }}>Debited to Department Cost Center</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ background: '#ECE9D8', fontWeight: 700, borderTop: '2px solid #716F64' }}>
+                      <td colSpan="3" style={{ padding: '4px', textAlign: 'center' }}>TOTAL MANAGEMENT NC COST (68 ORDERS)</td>
+                      <td style={{ padding: '4px', textAlign: 'right', color: '#800000' }}>₹90,478.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹90,478.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
+                      <td colSpan="3" style={{ padding: '4px', textAlign: 'center', fontSize: '9px' }}>
+                        Complimentary Dining & Kitchen Quality Sampling
                       </td>
                     </tr>
                   </tfoot>

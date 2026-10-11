@@ -793,3 +793,52 @@ export async function linkFastApiCorporateRate(rateData) {
   }
 }
 
+/**
+ * 8. Monthly Audited Sales Reports (June Month & Live Ledgers)
+ */
+export async function getFastApiHotelSaleMonthlyReport(month = 'JUNE-2026') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-monthly?month=${encodeURIComponent(month)}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Hotel sale report fetch failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiRestaurantSaleMonthlyReport(month = 'JUNE-2026', outlet = 'ALL') {
+  try {
+    const url = outlet && outlet !== 'ALL'
+      ? `${FASTAPI_BASE_URL}/api/reports/restaurant-sale-monthly?month=${encodeURIComponent(month)}&pos_outlet=${encodeURIComponent(outlet)}`
+      : `${FASTAPI_BASE_URL}/api/reports/restaurant-sale-monthly?month=${encodeURIComponent(month)}`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Restaurant sale report fetch failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiRestaurantMgmReport(month = 'JUNE-2026') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-mgm-monthly?month=${encodeURIComponent(month)}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Restaurant MGM report fetch failed:', err.message);
+    return null;
+  }
+}
+
+

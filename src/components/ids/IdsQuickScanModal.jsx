@@ -20,6 +20,9 @@ export default function IdsQuickScanModal({
   const inputRef = useRef(null);
 
   const programs = [
+    { id: 'hotel-sale-monthly', label: 'Hotel Sales Register - Monthly (June Month 26 Columns)', code: 'HSR01' },
+    { id: 'restaurant-sale-monthly', label: 'Restaurant & Bar Sales Register - Monthly (June Month 12 Columns)', code: 'RSR02' },
+    { id: 'restaurant-mgm-monthly', label: 'Restaurant Management NC Register (June Month 68 Orders)', code: 'MGM01' },
     { id: 'room-status', label: 'Room Status', code: 'RS01' },
     { id: 'clear-rooms', label: 'Clear Rooms', code: 'CR01' },
     { id: 'housekeeping-room-status', label: 'House Keeping Room Status', code: 'HK01' },
