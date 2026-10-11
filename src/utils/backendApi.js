@@ -411,3 +411,312 @@ export async function updateFastApiLaundryStatus(orderId, newStatus) {
   }
 }
 
+// =============================================================
+// IDS FortuneNext PMS Client Connectors (67 Modals Backend Support)
+// =============================================================
+
+/**
+ * 1. Folio Management, Post Charges & Settle
+ */
+export async function getFastApiRoomFolio(roomNumber, folioNumber = 1) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}?folio_number=${folioNumber}`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Get folio for Room ${roomNumber} failed:`, err.message);
+    return null;
+  }
+}
+
+export async function postFastApiFolioCharge(chargeData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/post-charge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(chargeData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Post folio charge failed:', err.message);
+    throw err;
+  }
+}
+
+export async function settleFastApiRoomFolio(roomNumber, folioNumber = 1, paymentMode = 'Cash', managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/settle?folio_number=${folioNumber}&payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Settle folio for Room ${roomNumber} failed:`, err.message);
+    throw err;
+  }
+}
+
+export async function reinstateFastApiRoomFolio(roomNumber, folioNumber = 1, managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/reinstate?folio_number=${folioNumber}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Reinstate folio for Room ${roomNumber} failed:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * 2. Advance Deposits
+ */
+export async function getFastApiAdvanceDeposits(roomNumber = null, status = null) {
+  try {
+    let url = `${FASTAPI_BASE_URL}/api/pms/deposits`;
+    const params = [];
+    if (roomNumber) params.push(`room_number=${encodeURIComponent(roomNumber)}`);
+    if (status) params.push(`status=${encodeURIComponent(status)}`);
+    if (params.length > 0) url += `?${params.join('&')}`;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get advance deposits failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiAdvanceDeposit(depositData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/deposits`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(depositData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create advance deposit failed:', err.message);
+    throw err;
+  }
+}
+
+export async function deleteFastApiAdvanceDeposit(receiptNumber, reason = 'Cancellation') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/deposits/${encodeURIComponent(receiptNumber)}?reason=${encodeURIComponent(reason)}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Delete deposit ${receiptNumber} failed:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * 3. Front Office Paid-Outs
+ */
+export async function getFastApiPaidOuts() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get paid outs failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiPaidOut(paidOutData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(paidOutData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create paid out failed:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * 4. Foreign Exchange Encashment (Form FLM)
+ */
+export async function getFastApiForexList() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get forex list failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiForex(forexData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(forexData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create forex encashment failed:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * 5. Housekeeping Lost & Found
+ */
+export async function getFastApiLostAndFound(status = null) {
+  try {
+    const url = status 
+      ? `${FASTAPI_BASE_URL}/api/pms/lost-found?status=${encodeURIComponent(status)}`
+      : `${FASTAPI_BASE_URL}/api/pms/lost-found`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get lost & found failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiLostAndFound(itemData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/lost-found`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(itemData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create lost & found item failed:', err.message);
+    throw err;
+  }
+}
+
+export async function claimFastApiLostAndFound(trackingNo, claimant) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/lost-found/${encodeURIComponent(trackingNo)}/claim`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ claimed_by: claimant, claim_date: new Date().toLocaleDateString() })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Claim lost & found item ${trackingNo} failed:`, err.message);
+    throw err;
+  }
+}
+
+/**
+ * 6. Front Desk Room Transfers & Stay Amendments
+ */
+export async function getFastApiRoomTransfers() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get room transfers failed:', err.message);
+    return [];
+  }
+}
+
+export async function transferFastApiRoom(transferData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(transferData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Transfer room failed:', err.message);
+    throw err;
+  }
+}
+
+export async function amendFastApiStay(amendData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/stay/amend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(amendData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Amend stay failed:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * 7. Corporate Contract Rates
+ */
+export async function getFastApiContractRates() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get contract rates failed:', err.message);
+    return [];
+  }
+}
+
+export async function linkFastApiCorporateRate(rateData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(rateData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Link corporate rate failed:', err.message);
+    throw err;
+  }
+}
+
