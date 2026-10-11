@@ -1,23 +1,175 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './idsFortuneNext.css';
+import QRCode from 'qrcode';
 import { 
   HOTEL_STAFF_MEMBERS, 
   DEPARTMENT_SUMMARY, 
   getStoredStaff, 
-  saveStoredStaff 
+  saveStoredStaff,
+  OPERATIONAL_QR_BADGES 
 } from '../../data/hotelStaffData';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+
+// Individual QR Badge Component with real QR generation and instant printing
+function IdsQrBadgeCard({ badge, origin }) {
+  const [qrUrl, setQrUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const fullUrl = `${origin || (typeof window !== 'undefined' ? window.location.origin : '')}${badge.urlPath}`;
+    QRCode.toDataURL(fullUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: badge.darkColor || '#000000', light: '#ffffff' },
+      errorCorrectionLevel: 'M'
+    }).then(setQrUrl).catch(console.error);
+  }, [badge, origin]);
+
+  const handleCopy = () => {
+    const fullUrl = `${origin || window.location.origin}${badge.urlPath}`;
+    navigator.clipboard.writeText(fullUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handlePrintBadge = () => {
+    const win = window.open('', '_blank', 'width=450,height=600');
+    if (!win) return;
+    const fullUrl = `${origin || window.location.origin}${badge.urlPath}`;
+    win.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Hotel Elite Inn - Operational Staff Badge: ${badge.name}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f8fafc; }
+            .badge { width: 320px; border: 2px solid #0f172a; border-radius: 8px; background: #fff; padding: 18px; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+            .hotel-name { font-size: 15px; font-weight: 900; letter-spacing: 1.5px; color: #0f172a; margin-bottom: 2px; }
+            .hotel-sub { font-size: 9px; font-weight: 700; color: #64748b; margin-bottom: 12px; letter-spacing: 0.5px; }
+            .qr-box { margin: 8px auto; width: 160px; height: 160px; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; padding: 4px; }
+            .name { font-size: 16px; font-weight: 800; margin-top: 10px; color: #0f172a; }
+            .role { font-size: 12px; font-weight: 600; color: #334155; margin-top: 2px; }
+            .code-pill { display: inline-block; margin-top: 8px; padding: 3px 10px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; font-weight: 800; color: #0a246a; }
+            .meta { font-size: 10px; color: #64748b; margin-top: 6px; font-weight: 600; }
+            .foot { margin-top: 12px; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-size: 9px; color: #94a3b8; }
+          </style>
+        </head>
+        <body>
+          <div class="badge">
+            <div class="hotel-name">HOTEL ELITE INN</div>
+            <div class="hotel-sub">AUTHORIZED OPERATIONAL STAFF ACCESS BADGE</div>
+            <div class="qr-box">
+              <img src="${qrUrl}" width="150" height="150" alt="QR Code" />
+            </div>
+            <div class="name">${badge.name}</div>
+            <div class="role">${badge.role}</div>
+            <div class="code-pill">BADGE: ${badge.code} • CODE: ${badge.serverCode}</div>
+            <div class="meta">Department: ${badge.department} | ${badge.shift}</div>
+            <div class="meta">${badge.phone}</div>
+            <div class="foot">Scan with mobile camera to open authorized floor portal / display.</div>
+          </div>
+          <script>window.onload = function() { window.print(); };</script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  };
+
+  return (
+    <div style={{
+      border: '1px solid #7F9DB9',
+      background: '#FFF',
+      borderRadius: '3px',
+      padding: '10px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      boxShadow: '1px 1px 4px rgba(0,0,0,0.08)'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderBottom: '1px solid #EEE', paddingBottom: '4px', marginBottom: '8px' }}>
+        <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#0A246A' }}>
+          {badge.icon} {badge.code}
+        </span>
+        <span style={{ 
+          fontSize: '9px', 
+          background: badge.colorAccent, 
+          color: '#000', 
+          padding: '1px 6px', 
+          borderRadius: '2px', 
+          fontWeight: 'bold',
+          letterSpacing: '0.5px'
+        }}>
+          {badge.badgeType.toUpperCase()}
+        </span>
+      </div>
+
+      <div style={{
+        background: '#FFF',
+        border: '1px solid #CBD5E1',
+        padding: '6px',
+        borderRadius: '4px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '130px',
+        minWidth: '130px'
+      }}>
+        {qrUrl ? (
+          <img src={qrUrl} alt={badge.name} width="125" height="125" style={{ display: 'block' }} />
+        ) : (
+          <span style={{ fontSize: '10px', color: '#888' }}>Generating QR...</span>
+        )}
+      </div>
+
+      <div style={{ marginTop: '8px', textAlign: 'center', width: '100%' }}>
+        <div style={{ fontWeight: 'bold', fontSize: '12px', color: '#0F172A' }}>{badge.name}</div>
+        <div style={{ fontSize: '10px', color: '#475569', marginTop: '1px', fontWeight: 600 }}>{badge.role}</div>
+        <div style={{ fontSize: '9px', color: '#0A246A', fontWeight: 700, marginTop: '2px' }}>Code: {badge.serverCode} • {badge.phone}</div>
+        <div style={{ fontSize: '9px', color: '#64748B', fontStyle: 'italic', marginTop: '4px', lineHeight: 1.25 }}>
+          {badge.description}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '6px', width: '100%', marginTop: '10px' }}>
+        <button
+          onClick={handlePrintBadge}
+          className="ids-btn"
+          style={{ flex: 1, padding: '3px 4px', fontSize: '10px', fontWeight: 'bold', background: '#F8FAFC' }}
+          title="Print official laminated paper badge"
+        >
+          🖨️ Print Badge
+        </button>
+        <button
+          onClick={handleCopy}
+          className="ids-btn"
+          style={{ flex: 1, padding: '3px 4px', fontSize: '10px' }}
+          title="Copy direct portal URL link"
+        >
+          {copied ? '✓ Copied' : '🔗 Link'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function IdsStaffMasterModal({
   isOpen,
   onClose,
   accountingDate = '11-OCT-2026',
   currentUser = 'MANAGER',
-  onOpenMessageBox
+  onOpenMessageBox,
+  initialTab = 'directory'
 }) {
   const [staffList, setStaffList] = useState(() => getStoredStaff());
   const [selectedDept, setSelectedDept] = useState('ALL');
-  const [activeTab, setActiveTab] = useState('directory'); // 'directory' | 'roster' | 'payroll' | 'badges'
+  const [activeTab, setActiveTab] = useState(initialTab); // 'directory' | 'roster' | 'payroll' | 'badges'
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab, isOpen]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStaff, setSelectedStaff] = useState(() => staffList[0] || HOTEL_STAFF_MEMBERS[0]);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -64,6 +216,17 @@ export default function IdsStaffMasterModal({
     return { totalPayroll, byDept };
   }, [staffList]);
 
+  // Check if selected staff has an operational QR badge
+  const matchingQrBadge = useMemo(() => {
+    if (!selectedStaff) return null;
+    return OPERATIONAL_QR_BADGES.find(b => 
+      b.serverCode === selectedStaff.serverCode || 
+      b.id === selectedStaff.id ||
+      b.code === selectedStaff.stewardBadge ||
+      b.name.toLowerCase() === selectedStaff.name.toLowerCase()
+    );
+  }, [selectedStaff]);
+
   if (!isOpen) return null;
 
   const handleEditClick = (member) => {
@@ -92,14 +255,70 @@ export default function IdsStaffMasterModal({
     }
   };
 
+  const handlePrintAllOperationalBadges = () => {
+    const win = window.open('', '_blank', 'width=900,height=750');
+    if (!win) return;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    
+    Promise.all(OPERATIONAL_QR_BADGES.map(async (b) => {
+      const fullUrl = `${origin}${b.urlPath}`;
+      const dataUrl = await QRCode.toDataURL(fullUrl, { width: 140, margin: 1 });
+      return { ...b, dataUrl };
+    })).then(badgesWithQr => {
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Hotel Elite Inn - Complete 9 Operational Staff Badges Sheet</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; background: #fff; }
+              .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
+              .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+              .card { border: 1.5px solid #000; border-radius: 6px; padding: 12px; text-align: center; background: #fff; page-break-inside: avoid; }
+              .title { font-size: 13px; font-weight: 900; }
+              .sub { font-size: 8px; color: #555; }
+              .name { font-size: 13px; font-weight: bold; margin-top: 6px; }
+              .role { font-size: 10px; color: #333; }
+              .code { font-size: 9px; font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 4px; }
+              @media print {
+                body { margin: 10px; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2 style="margin:0;">HOTEL ELITE INN — OPERATIONAL STAFF QR BADGES</h2>
+              <div style="font-size:11px; margin-top:4px;">Official Master Sheet: 6 Stewards + 2 Housekeeping Leads + 1 Kitchen Display KDS = 9 Badges</div>
+            </div>
+            <div class="grid">
+              ${badgesWithQr.map(b => `
+                <div class="card">
+                  <div class="title">HOTEL ELITE INN</div>
+                  <div class="sub">${b.category.toUpperCase()}</div>
+                  <div style="margin:6px 0;"><img src="${b.dataUrl}" width="120" height="120" /></div>
+                  <div class="name">${b.name}</div>
+                  <div class="role">${b.role}</div>
+                  <div class="code">BADGE: ${b.code} (${b.serverCode})</div>
+                  <div style="font-size:8px; color:#666; margin-top:4px;">${b.phone}</div>
+                </div>
+              `).join('')}
+            </div>
+            <script>window.onload = function() { window.print(); };</script>
+          </body>
+        </html>
+      `);
+      win.document.close();
+    });
+  };
+
   return (
     <div className="ids-modal-backdrop" style={{ zIndex: 1250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '1080px', 
+          width: '1120px', 
           maxWidth: '96vw', 
-          height: '720px', 
+          height: '730px', 
           maxHeight: '94vh',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
@@ -124,7 +343,7 @@ export default function IdsStaffMasterModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '11px' }}>
             <span style={{ background: '#A02020', padding: '1px 5px', borderRadius: '2px', fontSize: '9px', fontWeight: 900 }}>IDS NEXT</span>
-            <span>Staff Directory, Department Rosters & HR Shift Master — Total Staff: {staffList.length}</span>
+            <span>Staff Directory, Department Rosters & Operational QR Badges — Total Staff: {staffList.length}</span>
           </div>
           <div style={{ display: 'flex', gap: '4px' }}>
             <button 
@@ -148,7 +367,7 @@ export default function IdsStaffMasterModal({
 
         {/* Win32 Menu / Toolbar */}
         <div style={{ background: '#ECE9D8', borderBottom: '1px solid #999488', padding: '4px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button 
               onClick={() => setActiveTab('directory')}
               className={`ids-btn ${activeTab === 'directory' ? 'active' : ''}`}
@@ -171,9 +390,23 @@ export default function IdsStaffMasterModal({
               💰 HR & Payroll
             </button>
             <button 
+              onClick={() => setActiveTab('badges')}
+              className={`ids-btn ${activeTab === 'badges' ? 'active' : ''}`}
+              style={{ 
+                fontWeight: 'bold', 
+                minWidth: '145px', 
+                padding: '3px 10px', 
+                background: activeTab === 'badges' ? '#E6F4EA' : '#FFF', 
+                borderColor: activeTab === 'badges' ? '#34A853' : '#7F9DB9',
+                color: activeTab === 'badges' ? '#137333' : '#0A246A'
+              }}
+            >
+              📱 Operational QR Badges (9)
+            </button>
+            <button 
               onClick={() => setReportModalOpen(true)}
               className="ids-btn"
-              style={{ minWidth: '90px', padding: '3px 8px', color: '#0A246A' }}
+              style={{ minWidth: '85px', padding: '3px 8px', color: '#0A246A' }}
             >
               🖨️ Print Roster
             </button>
@@ -186,7 +419,7 @@ export default function IdsStaffMasterModal({
               placeholder="Search by name, role or ID..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ padding: '2px 6px', border: '1px solid #7F9DB9', fontSize: '11px', width: '180px', background: '#FFF' }}
+              style={{ padding: '2px 6px', border: '1px solid #7F9DB9', fontSize: '11px', width: '160px', background: '#FFF' }}
             />
             <button 
               onClick={handleResetDefaults} 
@@ -199,36 +432,38 @@ export default function IdsStaffMasterModal({
           </div>
         </div>
 
-        {/* Department Filters Bar */}
-        <div style={{ background: '#F5F4EC', borderBottom: '1px solid #D0CDC0', padding: '6px 12px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#333', marginRight: '4px' }}>Department:</span>
-          {[
-            { id: 'ALL', label: `All Staff (${deptCounts['ALL'] || 31})` },
-            { id: 'Reception', label: `Reception (${deptCounts['Reception'] || 3})` },
-            { id: 'Restaurant', label: `Restaurant / F&B (${deptCounts['Restaurant'] || 7})` },
-            { id: 'Kitchen', label: `Kitchen (${deptCounts['Kitchen'] || 10})` },
-            { id: 'Housekeeping', label: `Housekeeping (${deptCounts['Housekeeping'] || 9})` },
-            { id: 'Security', label: `Security (${deptCounts['Security'] || 2})` }
-          ].map(d => (
-            <button
-              key={d.id}
-              onClick={() => setSelectedDept(d.id)}
-              style={{
-                fontSize: '11px',
-                padding: '2px 8px',
-                borderRadius: '2px',
-                cursor: 'pointer',
-                border: '1px solid',
-                borderColor: selectedDept === d.id ? '#0A246A' : '#7F9DB9',
-                background: selectedDept === d.id ? '#0A246A' : '#FFF',
-                color: selectedDept === d.id ? '#FFF' : '#000',
-                fontWeight: selectedDept === d.id ? 'bold' : 'normal'
-              }}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
+        {/* Department Filters Bar (Visible for Directory & Roster) */}
+        {activeTab !== 'badges' && (
+          <div style={{ background: '#F5F4EC', borderBottom: '1px solid #D0CDC0', padding: '6px 12px', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#333', marginRight: '4px' }}>Department:</span>
+            {[
+              { id: 'ALL', label: `All Staff (${deptCounts['ALL'] || 31})` },
+              { id: 'Reception', label: `Reception (${deptCounts['Reception'] || 3})` },
+              { id: 'Restaurant', label: `Restaurant / F&B (${deptCounts['Restaurant'] || 7})` },
+              { id: 'Kitchen', label: `Kitchen (${deptCounts['Kitchen'] || 10})` },
+              { id: 'Housekeeping', label: `Housekeeping (${deptCounts['Housekeeping'] || 9})` },
+              { id: 'Security', label: `Security (${deptCounts['Security'] || 2})` }
+            ].map(d => (
+              <button
+                key={d.id}
+                onClick={() => setSelectedDept(d.id)}
+                style={{
+                  fontSize: '11px',
+                  padding: '2px 8px',
+                  borderRadius: '2px',
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: selectedDept === d.id ? '#0A246A' : '#7F9DB9',
+                  background: selectedDept === d.id ? '#0A246A' : '#FFF',
+                  color: selectedDept === d.id ? '#FFF' : '#000',
+                  fontWeight: selectedDept === d.id ? 'bold' : 'normal'
+                }}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '10px', gap: '10px' }}>
@@ -322,10 +557,20 @@ export default function IdsStaffMasterModal({
                       <div style={{ width: '42px', height: '42px', background: '#0A246A', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold' }}>
                         {selectedStaff.shortName ? selectedStaff.shortName[0] : 'S'}
                       </div>
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#0A246A' }}>{selectedStaff.name}</div>
                         <div style={{ color: '#666', fontSize: '10px' }}>{selectedStaff.designation} • {selectedStaff.gender}</div>
                       </div>
+                      {matchingQrBadge && (
+                        <button
+                          onClick={() => setActiveTab('badges')}
+                          className="ids-btn"
+                          style={{ fontSize: '10px', padding: '2px 8px', background: '#E6F4EA', borderColor: '#34A853', color: '#137333', fontWeight: 'bold' }}
+                          title="View steward/lead operational QR code"
+                        >
+                          📱 View QR Badge
+                        </button>
+                      )}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
@@ -503,6 +748,71 @@ export default function IdsStaffMasterModal({
             </div>
           )}
 
+          {/* TAB 4: OPERATIONAL QR BADGES (EXACTLY 9 BADGES) */}
+          {activeTab === 'badges' && (
+            <div style={{ flex: 1, border: '1px solid #7F9DB9', background: '#FFF', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ background: '#ECE9D8', padding: '6px 10px', borderBottom: '1px solid #7F9DB9', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontWeight: 'bold', color: '#0A246A', fontSize: '12px' }}>
+                    📱 Operational Staff QR Badges — Exactly 9 Operational Codes
+                  </span>
+                  <span style={{ fontSize: '10px', color: '#555', marginLeft: '8px' }}>
+                    (6 Stewards + 2 Housekeeping Leads + 1 Kitchen Display KDS)
+                  </span>
+                </div>
+                <button
+                  onClick={handlePrintAllOperationalBadges}
+                  className="ids-btn"
+                  style={{ fontSize: '10px', padding: '3px 10px', fontWeight: 'bold', color: '#0A246A' }}
+                  title="Print all 9 badges on a single 3x3 master badge sheet"
+                >
+                  🖨️ Print All 9 Badges Sheet
+                </button>
+              </div>
+
+              <div style={{ padding: '12px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {/* 1. RESTAURANT FLOOR STEWARDS (6 QR CODES) */}
+                <div>
+                  <div style={{ fontSize: '11.5px', fontWeight: 'bold', color: '#B8860B', background: '#FFF8E7', padding: '4px 8px', borderLeft: '4px solid #F59E0B', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>👨‍🍳 1. Restaurant Floor Stewards (6 QR Badges) — Scans into Personal Mobile Order Pad</span>
+                    <span style={{ fontSize: '10px', color: '#666' }}>Codes STW-01 to STW-06 (6 Staff)</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px' }}>
+                    {OPERATIONAL_QR_BADGES.filter(b => b.badgeType === 'steward').map(badge => (
+                      <IdsQrBadgeCard key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. HOUSEKEEPING LEADERSHIP (2 QR CODES) */}
+                <div>
+                  <div style={{ fontSize: '11.5px', fontWeight: 'bold', color: '#10B981', background: '#ECFDF5', padding: '4px 8px', borderLeft: '4px solid #10B981', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>🧹 2. Housekeeping Leadership (2 QR Badges) — Scans into HK Mobile Inspection Pad</span>
+                    <span style={{ fontSize: '10px', color: '#666' }}>1 Manager + 1 Supervisor</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px' }}>
+                    {OPERATIONAL_QR_BADGES.filter(b => b.badgeType === 'housekeeping').map(badge => (
+                      <IdsQrBadgeCard key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. KITCHEN PRODUCTION DISPLAY (1 QR CODE) */}
+                <div>
+                  <div style={{ fontSize: '11.5px', fontWeight: 'bold', color: '#EF4444', background: '#FEF2F2', padding: '4px 8px', borderLeft: '4px solid #EF4444', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>🍳 3. Kitchen Production Display (1 QR Badge) — Live KOT Feed & Order Bell Chime</span>
+                    <span style={{ fontSize: '10px', color: '#666' }}>Kitchen Manager Wall Tablet</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '10px', maxWidth: '320px' }}>
+                    {OPERATIONAL_QR_BADGES.filter(b => b.badgeType === 'kitchen').map(badge => (
+                      <IdsQrBadgeCard key={badge.id} badge={badge} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Toast Notification */}
           {toastMessage && (
             <div style={{ background: '#0A246A', color: '#FFF', padding: '6px 12px', fontSize: '11px', fontWeight: 'bold', borderRadius: '3px', boxShadow: '2px 2px 8px rgba(0,0,0,0.3)', alignSelf: 'center' }}>
@@ -513,15 +823,15 @@ export default function IdsStaffMasterModal({
           {/* Bottom Dialog Action Footer */}
           <div style={{ background: '#ECE9D8', borderTop: '1px solid #D0CDC0', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: '10px', color: '#555' }}>
-              PMS Accounting Date: <strong>{accountingDate}</strong> | User: <strong>{currentUser}</strong>
+              PMS Accounting Date: <strong>{accountingDate}</strong> | User: <strong>{currentUser}</strong> | Operational Badges: <strong>9 Codes (6 Stewards, 2 HK, 1 KDS)</strong>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
               <button 
-                onClick={() => setReportModalOpen(true)} 
+                onClick={handlePrintAllOperationalBadges} 
                 className="ids-btn" 
-                style={{ minWidth: '85px', padding: '3px 12px', fontWeight: 'bold' }}
+                style={{ minWidth: '95px', padding: '3px 12px', fontWeight: 'bold', color: '#0A246A' }}
               >
-                🖨️ Roster Print
+                📱 Badges Sheet
               </button>
               <button 
                 onClick={onClose} 

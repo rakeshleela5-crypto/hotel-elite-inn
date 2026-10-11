@@ -462,6 +462,12 @@ export default function IdsDesktopShell({
   const [restaurantTableMasterModalOpen, setRestaurantTableMasterModalOpen] = useState(false);
   const [serversModalOpen, setServersModalOpen] = useState(false);
   const [staffMasterModalOpen, setStaffMasterModalOpen] = useState(false);
+  const [staffMasterInitialTab, setStaffMasterInitialTab] = useState('directory');
+
+  const openStaffMaster = (tab = 'directory') => {
+    setStaffMasterInitialTab(tab);
+    setStaffMasterModalOpen(true);
+  };
   const [menuMasterModalOpen, setMenuMasterModalOpen] = useState(false);
   const [salesPromotionModalOpen, setSalesPromotionModalOpen] = useState(false);
   const [posReportsModalOpen, setPosReportsModalOpen] = useState(false);
@@ -862,7 +868,8 @@ export default function IdsDesktopShell({
       { label: 'HK Inventory Master', videoId: 'HK-06', action: () => { setHkInventoryTab('master'); setHkInventoryOpen(true); } },
       { label: 'HK Issue Entry', videoId: 'HK-06', action: () => { setHkInventoryTab('issue'); setHkInventoryOpen(true); } },
       { label: 'HK Issue Return', videoId: 'HK-06', action: () => { setHkInventoryTab('return'); setHkInventoryOpen(true); } },
-      { label: 'Housekeeping Staff & Attendants Roster (9 Staff)', videoId: 'HK-ROSTER', action: () => setStaffMasterModalOpen(true) },
+      { label: 'Housekeeping Staff & Attendants Roster (9 Staff)', videoId: 'HK-ROSTER', action: () => openStaffMaster('roster') },
+      { label: 'Housekeeping Mobile Pass QR Badges (2 Leads)', videoId: 'HK-QR', action: () => openStaffMaster('badges') },
       { label: 'User Defined Plnt (LAU)', videoId: 'HK-06', action: () => setLaundryPlantOpen(true) },
       { 
         label: 'Register Complaint from Housekeeping', 
@@ -942,6 +949,8 @@ export default function IdsDesktopShell({
       { label: 'Delete Restaurant Table (Alert Window V6.5.002.1)', videoId: 'POS-17', action: () => setRestaurantTableMasterModalOpen(true) },
       { label: 'Servers V6.5.002.1 (Setup -> Servers & Stewards)', videoId: 'POS-18', action: () => setServersModalOpen(true) },
       { label: 'Deactivate Server / Passive Status (Setup -> Servers)', videoId: 'POS-19', action: () => setServersModalOpen(true) },
+      { label: 'Steward Mobile Order Pad QR Badges (6 Stewards)', videoId: 'POS-QR', action: () => openStaffMaster('badges') },
+      { label: 'Kitchen KDS Display QR Badge (Chef Live KOT Wall)', videoId: 'KDS-QR', action: () => openStaffMaster('badges') },
       { label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', videoId: 'POS-20', action: () => setMenuMasterModalOpen(true) },
       { label: 'Sales Promotion Master V6.5.002.1 (Combos & Buy 2 Get 1 Free)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
       { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
@@ -1148,7 +1157,12 @@ export default function IdsDesktopShell({
       { 
         label: 'Staff Directory & HR Shift Rosters (All 31 Members)', 
         videoId: 'HR-01', 
-        action: () => setStaffMasterModalOpen(true) 
+        action: () => openStaffMaster('directory') 
+      },
+      { 
+        label: 'Operational Staff QR Badges (6 Stewards + 2 HK + 1 KDS)', 
+        videoId: 'QR-09', 
+        action: () => openStaffMaster('badges') 
       },
       { 
         label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', 
@@ -1718,8 +1732,8 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className={`ids-tool-btn ${activeTool === 'hr' ? 'active' : ''}`}
-            title="HR & Staff Register (31 Members)"
-            onClick={() => { setActiveTool('hr'); setStaffMasterModalOpen(true); }}
+            title="HR & Staff Register (31 Members) & Operational QR Badges"
+            onClick={() => { setActiveTool('hr'); openStaffMaster('directory'); }}
           >
             <Clipboard size={20} />
           </button>
@@ -3395,6 +3409,10 @@ export default function IdsDesktopShell({
           setServersModalOpen(false);
           setOrderEntryModalOpen(true);
         }}
+        onOpenOperationalBadges={() => {
+          setServersModalOpen(false);
+          openStaffMaster('badges');
+        }}
       />
 
       {/* POS Video 20: Menu Master V6.5.002.3 */}
@@ -3554,6 +3572,7 @@ export default function IdsDesktopShell({
         accountingDate={accountingDate}
         currentUser="MANAGER"
         onOpenMessageBox={showMessageBox}
+        initialTab={staffMasterInitialTab}
       />
     </div>
   );
