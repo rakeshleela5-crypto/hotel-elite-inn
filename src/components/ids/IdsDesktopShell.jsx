@@ -100,6 +100,7 @@ import IdsSalesPromotionMasterModal from './IdsSalesPromotionMasterModal';
 import IdsPosReportsModal from './IdsPosReportsModal';
 import IdsPosDiscountModal from './IdsPosDiscountModal';
 import IdsTouchPosTerminalModal from './IdsTouchPosTerminalModal';
+import IdsCashierShiftHandoverModal from './IdsCashierShiftHandoverModal';
 import IdsPoliceThanaManifestModal from './IdsPoliceThanaManifestModal';
 import IdsCorporateSplitBillingModal from './IdsCorporateSplitBillingModal';
 import IdsSplitTenderModal from './IdsSplitTenderModal';
@@ -511,6 +512,13 @@ export default function IdsDesktopShell({
   const [splitTenderModalOpen, setSplitTenderModalOpen] = useState(false);
   const [tenderReclassificationOpen, setTenderReclassificationOpen] = useState(false);
   const [transitSlotModalOpen, setTransitSlotModalOpen] = useState(false);
+  const [cashierShiftHandoverOpen, setCashierShiftHandoverOpen] = useState(false);
+  const [cashierShiftHandoverTab, setCashierShiftHandoverTab] = useState('handover');
+
+  const openCashierShiftHandover = (tab = 'handover') => {
+    setCashierShiftHandoverTab(tab);
+    setCashierShiftHandoverOpen(true);
+  };
 
   const showMessageBox = (message, title = 'IDS Fortune NEXT', type = 'info', buttons = 'ok', onOk = null) => {
     setMsgBoxConfig({
@@ -722,6 +730,16 @@ export default function IdsDesktopShell({
       }
     ],
     'Cashiering..': [
+      { 
+        label: 'Cashier Shift Handover & Float Lock (Shift 1, 2, 3)', 
+        videoId: 'SHIFT-01', 
+        action: () => openCashierShiftHandover('handover') 
+      },
+      { 
+        label: 'Daily Operations Morning Flash Report (Client Briefing)', 
+        videoId: 'SHIFT-02', 
+        action: () => openCashierShiftHandover('flash-report') 
+      },
       { 
         label: 'Post Deposit / Advance to Room', 
         videoId: '14', 
@@ -978,6 +996,16 @@ export default function IdsDesktopShell({
     ],
     'Day End process..': [
       { 
+        label: 'Daily Operations Morning Handover & Flash Report', 
+        videoId: 'SHIFT-02', 
+        action: () => openCashierShiftHandover('flash-report') 
+      },
+      { 
+        label: '3-Shift Handover & Dryer Float Lock (FO-01/02/03)', 
+        videoId: 'SHIFT-01', 
+        action: () => openCashierShiftHandover('handover') 
+      },
+      { 
         label: 'Night Audit Process (Full Midnight Rollover)', 
         videoId: '19', 
         action: () => {
@@ -1046,6 +1074,16 @@ export default function IdsDesktopShell({
       { label: 'Add Company Details & GSTN After Check-out', videoId: '43', action: () => setGstnChangeModalOpen(true) }
     ],
     'Reports..': [
+      { 
+        label: 'Daily Operations Morning Briefing Report (WhatsApp Format)', 
+        videoId: 'SHIFT-03', 
+        action: () => openCashierShiftHandover('flash-report') 
+      },
+      { 
+        label: 'Cashier Shift Synchronization & Safe Drop Ledger', 
+        videoId: 'SHIFT-04', 
+        action: () => openCashierShiftHandover('history') 
+      },
       { 
         label: 'Muniguda Police Station Daily Manifest (Form C / Sarai Act 1867)', 
         videoId: 'AUDIO-04', 
@@ -1624,7 +1662,7 @@ export default function IdsDesktopShell({
 
         {/* Sub-bar */}
         <div className="ids-subbar">
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <span>BS/GN V(0)</span>
             <span>SP V(0)</span>
             <span style={{ 
@@ -1638,6 +1676,25 @@ export default function IdsDesktopShell({
             }}>
               A/C DATE: {accountingDate}
             </span>
+            <button
+              onClick={() => openCashierShiftHandover('handover')}
+              style={{
+                background: '#2E7D32',
+                color: '#FFF',
+                border: '1px outset #FFF',
+                padding: '1px 8px',
+                borderRadius: '2px',
+                fontWeight: 700,
+                fontSize: '10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Click to view Cashier Shift Handover, Dryer Float & Daily Operations Flash Report"
+            >
+              <span>💰 SHIFT HANDOVER &amp; FLASH</span>
+            </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
@@ -3573,6 +3630,16 @@ export default function IdsDesktopShell({
         currentUser="MANAGER"
         onOpenMessageBox={showMessageBox}
         initialTab={staffMasterInitialTab}
+      />
+
+      {/* 7. Cashier Shift Handover, Dryer Float Lock & Daily Operations Morning Flash Report (3 Shifts) */}
+      <IdsCashierShiftHandoverModal
+        isOpen={cashierShiftHandoverOpen}
+        onClose={() => setCashierShiftHandoverOpen(false)}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
+        initialTab={cashierShiftHandoverTab}
+        onOpenMessageBox={showMessageBox}
       />
     </div>
   );
