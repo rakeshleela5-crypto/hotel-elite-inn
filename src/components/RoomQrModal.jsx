@@ -5,6 +5,7 @@ import {
   Download, Copy, Check, Sparkles, Smartphone, ShieldCheck
 } from 'lucide-react';
 import { HOTEL_CONFIG } from '../data/hotelData';
+import { getRoomStayTimer } from '../utils/stayFraudTracker';
 
 export default function RoomQrModal({
   isOpen,
@@ -18,7 +19,18 @@ export default function RoomQrModal({
   const [copied, setCopied] = useState(false);
   const [guestName, setGuestName] = useState('Valued Guest');
   const [guestPin, setGuestPin] = useState('7651');
+  const [roomTimer, setRoomTimer] = useState(() => getRoomStayTimer(selectedRoom));
   const printRef = useRef(null);
+
+  // Update room stay timer & live ticker
+  useEffect(() => {
+    setRoomTimer(getRoomStayTimer(selectedRoom));
+    if (!isOpen) return;
+    const interval = setInterval(() => {
+      setRoomTimer(getRoomStayTimer(selectedRoom));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [selectedRoom, isOpen]);
 
   // Keep selectedRoom updated if initialRoomNumber changes
   useEffect(() => {
@@ -402,6 +414,60 @@ export default function RoomQrModal({
                     fontSize: '0.88rem'
                   }}
                 />
+              </div>
+            </div>
+          )}
+
+          {/* Anti-Fraud Keycard Cutoff Security Banner */}
+          {qrType === 'keycard' && roomTimer.hasStay && (
+            <div style={{
+              background: roomTimer.isKeycardCutoff 
+                ? 'linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.3))' 
+                : roomTimer.isExpiringSoon 
+                  ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.3))' 
+                  : 'rgba(16, 185, 129, 0.1)',
+              border: `1px solid ${roomTimer.isKeycardCutoff ? '#ef4444' : roomTimer.isExpiringSoon ? '#f59e0b' : 'rgba(16, 185, 129, 0.3)'}`,
+              borderRadius: '10px',
+              padding: '0.75rem 1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              flexWrap: 'wrap'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>{roomTimer.isKeycardCutoff ? '🔒' : roomTimer.isExpiringSoon ? '⏳' : '🔑'}</span>
+                <div>
+                  <div style={{
+                    fontSize: '0.82rem',
+                    fontWeight: 800,
+                    color: roomTimer.isKeycardCutoff ? '#f87171' : roomTimer.isExpiringSoon ? '#fbbf24' : '#34d399'
+                  }}>
+                    {roomTimer.isKeycardCutoff 
+                      ? 'RFID KEYCARD CUTOFF ACTIVE (30m Before Checkout)' 
+                      : roomTimer.isExpiringSoon 
+                        ? 'STAY EXPIRING WITHIN 2 HOURS (RFID Active)' 
+                        : 'KEYCARD ACCESS AUTHORIZED'}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                    {roomTimer.isKeycardCutoff 
+                      ? 'Access locked out to prevent off-the-books overstays. Visit Reception to extend stay with payment.' 
+                      : `Scheduled Checkout: ${roomTimer.expectedCheckoutTime ? new Date(roomTimer.expectedCheckoutTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:00 PM'}`}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                background: roomTimer.isKeycardCutoff ? '#dc2626' : roomTimer.isExpiringSoon ? '#d97706' : '#059669',
+                color: '#fff',
+                padding: '0.25rem 0.6rem',
+                borderRadius: '6px',
+                fontFamily: 'monospace',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                letterSpacing: '0.5px'
+              }}>
+                {roomTimer.formattedCountdown}
               </div>
             </div>
           )}

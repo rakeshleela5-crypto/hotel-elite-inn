@@ -6,6 +6,7 @@ import {
 import { INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { getRoomStayTimer } from '../../utils/stayFraudTracker';
 
 /* =========================================================================
    VIDEO 05: RESERVATION CHECK-IN FOR SINGLE ROOM IN IDS FORTUNE NEXT 6.5 & 7.0
@@ -782,6 +783,16 @@ export function IdsRoomRackConsoleModal({
   const [remarks, setRemarks] = useState('CLEAN');
   const [roomStatusOpt, setRoomStatusOpt] = useState('Clean');
   const [localCleared, setLocalCleared] = useState([]);
+  const [liveTick, setLiveTick] = useState(0);
+
+  // Live timer interval for anti-fraud 2-hour stay countdowns
+  useEffect(() => {
+    if (!isOpen) return;
+    const tickInterval = setInterval(() => {
+      setLiveTick(t => t + 1);
+    }, 1000);
+    return () => clearInterval(tickInterval);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -1006,6 +1017,23 @@ export function IdsRoomRackConsoleModal({
               const actualGuest = sourceTransfer ? undefined : targetTransfer ? (targetTransfer.guest?.lastName || targetTransfer.guest?.guestName?.split(' ').pop() || 'Kumar') : r.guest;
               const isDirty = actualStatus === 'dirty';
               const activeRoom = { ...r, status: actualStatus, type: actualType, guest: actualGuest };
+              const stayTimer = actualStatus === 'occupied' ? getRoomStayTimer(r.no) : null;
+              const isCutoff = stayTimer?.isKeycardCutoff;
+              const isExpiring = stayTimer?.isExpiringSoon;
+
+              let tileBorder = '1px solid #777';
+              if (isCutoff) {
+                tileBorder = '2px solid #D32F2F';
+              } else if (isExpiring) {
+                tileBorder = '2px solid #E65100';
+              } else if (r.no === '102') {
+                tileBorder = '2px solid #000080';
+              }
+
+              let tileBg = getCellBg(actualStatus, r.no);
+              if (isCutoff) {
+                tileBg = '#FFD7D7';
+              }
 
               return (
                 <div 
@@ -1016,14 +1044,14 @@ export function IdsRoomRackConsoleModal({
                     isDirty 
                       ? `Room ${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
                       : actualStatus === 'occupied'
-                        ? `Room ${r.no} is Occupied (${actualGuest || ''}). Right-click or click for Actions / Room Transfer (Video 13)`
+                        ? `Room ${r.no} Occupied (${actualGuest || ''}). ${isCutoff ? '🔒 KEYCARD CUTOFF (30m) - Locked out! Visit reception to pay and extend.' : isExpiring ? '⏳ EXPIRING SOON (<2h). Countdown: ' + stayTimer?.formattedCountdown : 'Active stay.'} Right-click for Audited Stay Extension.`
                         : undefined
                   }
                   style={{
-                    background: getCellBg(actualStatus, r.no),
-                    border: r.no === '102' ? '2px solid #000080' : '1px solid #777',
+                    background: tileBg,
+                    border: tileBorder,
                     padding: '3px 4px',
-                    minHeight: '44px',
+                    minHeight: '46px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -1033,13 +1061,38 @@ export function IdsRoomRackConsoleModal({
                     userSelect: 'none'
                   }}
                 >
-                  <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ fontWeight: 700, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{r.no}</span>
                     <span>{actualType}</span>
                   </div>
+
+                  {/* Anti-Fraud Live Stay Expiry Countdown & 30-min Keycard Cutoff Badge */}
+                  {actualStatus === 'occupied' && stayTimer && stayTimer.hasStay && (isCutoff || isExpiring) && (
+                    <div style={{
+                      background: isCutoff ? '#D32F2F' : '#E65100',
+                      color: '#FFF',
+                      fontSize: '8px',
+                      fontWeight: 800,
+                      padding: '1px 2px',
+                      borderRadius: '1px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      margin: '1px 0',
+                      fontFamily: 'Courier New, monospace',
+                      letterSpacing: '0.2px'
+                    }}>
+                      <span>{isCutoff ? '🔒 CUTOFF' : '⏳ EXPIRING'}</span>
+                      <span>{stayTimer.formattedCountdown}</span>
+                    </div>
+                  )}
+
                   {actualGuest && (
-                    <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {actualGuest}
+                    <div style={{ fontWeight: 700, fontSize: '9px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>{actualGuest}</span>
+                      {stayTimer?.isExtended && (
+                        <span style={{ fontSize: '7px', background: '#D4AF37', color: '#000', padding: '0 2px', borderRadius: '1px', fontWeight: 800 }}>EXT</span>
+                      )}
                     </div>
                   )}
                 </div>
@@ -1060,6 +1113,19 @@ export function IdsRoomRackConsoleModal({
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#F15A24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{occupiedCount}</span>
               <span>Occupied</span>
+            </div>
+            {/* Anti-Fraud Live Monitoring Badges */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ background: '#E65100', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>
+                {roomsMatrix.filter(r => r.status === 'occupied' && getRoomStayTimer(r.no).isExpiringSoon).length}
+              </span>
+              <span style={{ color: '#E65100', fontWeight: 700 }}>Expiring (&lt;2h)</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ background: '#D32F2F', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>
+                {roomsMatrix.filter(r => r.status === 'occupied' && getRoomStayTimer(r.no).isKeycardCutoff).length}
+              </span>
+              <span style={{ color: '#D32F2F', fontWeight: 700 }}>Keycard Cutoff (30m)</span>
             </div>
             <div 
               style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: onOpenClearRoomsModal ? 'pointer' : 'default' }}
@@ -1131,6 +1197,26 @@ export function IdsRoomRackConsoleModal({
 
               {contextMenu.status === 'occupied' ? (
                 <>
+                  {/* Anti-Fraud Audited Stay Extension & Keycard Re-Encoder */}
+                  <div 
+                    style={{ 
+                      padding: '4px 8px', 
+                      cursor: 'pointer', 
+                      fontWeight: 800, 
+                      color: '#0A246A',
+                      background: '#FFF9D7',
+                      borderBottom: '1px solid #D4AF37'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#316AC5'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#FFF9D7'; e.currentTarget.style.color = '#0A246A'; }}
+                    onClick={() => {
+                      if (onOpenAmendStay) onOpenAmendStay(contextMenu.roomNo);
+                      setContextMenu(null);
+                    }}
+                    title="Audited Stay Extension & Keycard Re-encoder (Mandatory Payment Proof)"
+                  >
+                    ⚡ Audited Stay Extension
+                  </div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Audit</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Room Instructions</div>
                   <div style={{ padding: '2px 8px', color: '#777', fontSize: '10px' }}>Clear Room</div>

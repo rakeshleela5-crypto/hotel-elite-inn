@@ -86,6 +86,7 @@ import {
   recordLiveRestaurantSale, 
   recordLiveNcDining 
 } from '../../utils/idsUnifiedSyncBridge';
+import { getActiveStayAlerts } from '../../utils/stayFraudTracker';
 import IdsOrderEntryModal from './IdsOrderEntryModal';
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
@@ -1560,7 +1561,30 @@ export default function IdsDesktopShell({
               A/C DATE: {accountingDate}
             </span>
           </div>
-          <div>IT ADMIN (FRONT DESK DUTY MANAGER)</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button 
+              className="ids-btn-classic"
+              style={{
+                background: '#D32F2F',
+                color: '#FFF',
+                fontWeight: 700,
+                fontSize: '10px',
+                padding: '1px 7px',
+                border: '1px outset #FFF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              onClick={() => setRoomRackConsoleOpen(true)}
+              title="Click to view Room Status Rack Matrix with Anti-Fraud Live Stay Timers"
+            >
+              <span>🔒 2 CUTOFF (30m)</span>
+              <span>|</span>
+              <span>⏳ 2 EXPIRING (&lt;2h)</span>
+            </button>
+            <div>IT ADMIN (FRONT DESK DUTY MANAGER)</div>
+          </div>
         </div>
 
         {/* Top Horizontal Icon Toolbar (12 Authentic Modules from Frame 001) */}
