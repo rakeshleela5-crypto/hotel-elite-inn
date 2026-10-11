@@ -461,6 +461,12 @@ export default function IdsDesktopShell({
   const [posReportsInitialTab, setPosReportsInitialTab] = useState('shift-sales');
   const [posDiscountModalOpen, setPosDiscountModalOpen] = useState(false);
   const [touchPosTerminalModalOpen, setTouchPosTerminalModalOpen] = useState(false);
+  const [touchPosTerminalInitialMode, setTouchPosTerminalInitialMode] = useState('pos');
+
+  const openTouchPosTerminal = (mode = 'pos') => {
+    setTouchPosTerminalInitialMode(mode);
+    setTouchPosTerminalModalOpen(true);
+  };
 
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
@@ -866,22 +872,35 @@ export default function IdsDesktopShell({
       { label: 'Bill Settlement V6.5.008.30 (Cash/Card/Folio Settle)', videoId: 'POS-04', action: () => setPosBillSettlementModalOpen(true) },
       { label: 'Close Shift', videoId: 'POS-01', action: () => showMessageBox("Current Shift Closed & Audited.", "POS Shift Control") },
       { label: 'Close Outlet', videoId: 'POS-01', action: () => showMessageBox("Outlet Closed for Operations.", "Outlet Control") },
-      { label: 'Void KOTs', videoId: 'POS-06', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Chefs Recommendation', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Table Booking', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Print NC Bill (Options -> NC Bill Print)', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Delete NC KOT', videoId: 'POS-08', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Create POS MIS', action: () => showMessageBox("POS MIS Register Compiled.", "MIS Report") },
-      { label: 'Table Transfer V6.5.002.1 (Table 10 -> Table 14)', videoId: 'POS-12', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Void KOTs (Manager PIN Protected)', videoId: 'POS-06', action: () => openTouchPosTerminal('void-kot') },
+      { label: 'Chefs Recommendation', action: () => openTouchPosTerminal('pos') },
+      { label: 'Table Booking', action: () => setRestaurantTableMasterModalOpen(true) },
+      { 
+        label: 'Print NC Bill (Options -> NC Bill Print)', 
+        videoId: 'POS-08', 
+        action: () => {
+          setPosReportsInitialTab('nc-ledger');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { label: 'Delete NC KOT', videoId: 'POS-08', action: () => openTouchPosTerminal('void-kot') },
+      { 
+        label: 'Create POS MIS', 
+        action: () => {
+          setPosReportsInitialTab('menu-sales');
+          setPosReportsModalOpen(true);
+        } 
+      },
+      { label: 'Table Transfer V6.5.002.1 (Table 10 -> Table 14)', videoId: 'POS-12', action: () => openTouchPosTerminal('table-transfer') },
       { label: 'Short Keys & Toolbars in Order Entry (Shift+F1 to Shift+F10)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
       { label: 'Session Transfer (Shift+F5 - Breakfast / Lunch / Dinner)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Table Link (Shift+F6 - Link Multiple Tables in 1)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Table Link (Shift+F6 - Link Multiple Tables in 1)', videoId: 'POS-13', action: () => openTouchPosTerminal('table-merge') },
       { label: 'Multi-Restaurant Switch (Shift+F7 - RES / BAR)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
-      { label: 'KOT Reprint V6.5.002.1 (Toolbar Reprint)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
+      { label: 'KOT Reprint V6.5.002.1 (Toolbar Reprint)', videoId: 'POS-13', action: () => openTouchPosTerminal('kot-reprint') },
       { label: 'Item Modifiers (<F1> @ Qty for Modifier)', videoId: 'POS-13', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Food Item Cancellation / Void (Guest Disliked Taste - Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Table Merging for Single Bill (Client Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
-      { label: 'Thermal KOT Spooler (Kitchen vs Restaurant Slip - Audio 4)', videoId: 'AUDIO-04', action: () => setOrderEntryModalOpen(true) },
+      { label: 'Food Item Cancellation / Void (Manager PIN & Reason Protected)', videoId: 'AUDIO-04', action: () => openTouchPosTerminal('void-kot') },
+      { label: 'Table Merging for Single Bill (Client Audio 4)', videoId: 'AUDIO-04', action: () => openTouchPosTerminal('table-merge') },
+      { label: 'Thermal KOT Spooler (Kitchen vs Restaurant Slip - Audio 4)', videoId: 'AUDIO-04', action: () => openTouchPosTerminal('kot-reprint') },
       { label: 'Menu Groups V6.5.002.1 (Setup -> Menu Groups)', videoId: 'POS-14', action: () => setMenuGroupsModalOpen(true) },
       { label: 'Touch Screen Groups V6.5.002.1 (Setup -> Touch Screen Groups)', videoId: 'POS-15', action: () => setTouchScreenGroupsModalOpen(true) },
       { label: 'Restaurant Table Master V6.5.002.1 (Setup -> Tables & Covers)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
@@ -890,7 +909,7 @@ export default function IdsDesktopShell({
       { label: 'Deactivate Server / Passive Status (Setup -> Servers)', videoId: 'POS-19', action: () => setServersModalOpen(true) },
       { label: 'Menu Master V6.5.002.3 (Setup -> Items & Pricing)', videoId: 'POS-20', action: () => setMenuMasterModalOpen(true) },
       { label: 'Sales Promotion Master V6.5.002.1 (Combos & Buy 2 Get 1 Free)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
-      { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setOrderEntryModalOpen(true) },
+      { label: 'EAT AS U LIKE Package Punching (Ctrl+Shift+F4)', videoId: 'POS-21', action: () => setSalesPromotionModalOpen(true) },
       { label: 'Open Item Punching & Custom Modifiers (Code 9999 / Table 10)', videoId: 'POS-22', action: () => setOrderEntryModalOpen(true) },
       { label: 'Restaurant Table View (Floor Plan & Covers Matrix)', videoId: 'POS-16', action: () => setRestaurantTableMasterModalOpen(true) },
       { 
@@ -904,7 +923,7 @@ export default function IdsDesktopShell({
       { 
         label: 'Touch POS Terminal (Quick Service & Bar Mode)', 
         videoId: 'POS-15', 
-        action: () => setTouchPosTerminalModalOpen(true) 
+        action: () => openTouchPosTerminal('pos') 
       },
       { 
         label: 'Bill Discount & Allowance (Manager Override)', 
@@ -3335,6 +3354,7 @@ export default function IdsDesktopShell({
       <IdsTouchPosTerminalModal
         isOpen={touchPosTerminalModalOpen}
         onClose={() => setTouchPosTerminalModalOpen(false)}
+        initialMode={touchPosTerminalInitialMode}
         accountingDate={accountingDate}
         currentUser="MANAGER"
         onKotPunched={(res) => {

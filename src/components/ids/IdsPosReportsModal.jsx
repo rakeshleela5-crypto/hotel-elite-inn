@@ -5,6 +5,7 @@ import {
   RESTAURANT_JUNE_MGM_SALES, 
   RESTAURANT_JUNE_SUMMARY 
 } from '../../data/restaurantSaleJuneReportData';
+import { getKotVoidAuditRecords } from '../../utils/kotDataSync';
 
 // Mock/Initial POS Audit & Sales records reflecting operational data from Videos 01-22
 const INITIAL_SALES_RECORDS = [
@@ -380,6 +381,16 @@ export default function IdsPosReportsModal({
     });
   }, [filterSearch]);
 
+  // Merge dynamic KOT voids logged in Touch POS with statutory audit records
+  const liveVoidRecords = useMemo(() => {
+    try {
+      const customVoids = getKotVoidAuditRecords();
+      return [...customVoids, ...INITIAL_VOID_RECORDS];
+    } catch (e) {
+      return INITIAL_VOID_RECORDS;
+    }
+  }, [isOpen, activeTab]);
+
   // Calculate totals
   const totalGross = filteredSales.reduce((acc, r) => acc + r.gross, 0);
   const totalTaxable = filteredSales.reduce((acc, r) => acc + r.taxable, 0);
@@ -401,7 +412,7 @@ export default function IdsPosReportsModal({
       });
     } else if (activeTab === 'void-audit') {
       csvContent += "Voucher No,KOT No,Table,Item Name,Orig Qty,Cancelled Qty,Unit Rate,Loss Value,Reason,Remarks,Steward,Auth By\n";
-      INITIAL_VOID_RECORDS.forEach(r => {
+      liveVoidRecords.forEach(r => {
         csvContent += `${r.voucherNo},${r.kotNo},${r.tableNo},"${r.itemName}",${r.origQty},${r.cancelledQty},${r.unitRate},${r.lossValue},"${r.reason}","${r.remarks}",${r.steward},${r.authBy}\n`;
       });
     } else if (activeTab === 'nc-ledger') {
@@ -792,7 +803,7 @@ export default function IdsPosReportsModal({
                     </tr>
                   </thead>
                   <tbody>
-                    {INITIAL_VOID_RECORDS.map((r, i) => (
+                    {liveVoidRecords.map((r, i) => (
                       <tr key={i} style={{ background: i % 2 === 0 ? '#FFF' : '#FFF5F5', borderBottom: '1px solid #E0E0E0' }}>
                         <td style={{ padding: '3px 4px', fontWeight: 600, color: '#8B0000' }}>{r.voucherNo}</td>
                         <td style={{ padding: '3px 4px', fontWeight: 600 }}>{r.kotNo}</td>
@@ -818,7 +829,7 @@ export default function IdsPosReportsModal({
                     <tr style={{ background: '#ECE9D8', fontWeight: 700, borderTop: '2px solid #716F64' }}>
                       <td colSpan="8" style={{ padding: '4px', textAlign: 'right' }}>Total Void Loss:</td>
                       <td style={{ padding: '4px', textAlign: 'right', color: '#B00' }}>
-                        ₹{INITIAL_VOID_RECORDS.reduce((a, b) => a + b.lossValue, 0).toFixed(2)}
+                        ₹{liveVoidRecords.reduce((a, b) => a + b.lossValue, 0).toFixed(2)}
                       </td>
                       <td colSpan="4"></td>
                     </tr>

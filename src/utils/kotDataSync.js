@@ -261,3 +261,72 @@ export async function dispatchKotUnified(newKotOrder, tableSession = null) {
 
   return normalized;
 }
+
+export const KOT_VOID_AUDIT_KEY = 'hei_kot_void_audit_ledger';
+
+export function getKotVoidAuditRecords() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(KOT_VOID_AUDIT_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function recordKotItemVoid({
+  tableNo,
+  kotNumber = 'KOT-1',
+  itemCode = '-',
+  itemName,
+  voidQty = 1,
+  rate = 0,
+  reason,
+  remarks = '',
+  authorizedBy = 'DUTY MANAGER',
+  cashier = 'CASHIER',
+  steward = 'Sadananda',
+  accountingDate = '11-OCT-2026'
+}) {
+  const voidQtyNum = Number(voidQty) || 1;
+  const rateNum = Number(rate) || 0;
+  const lossValue = voidQtyNum * rateNum;
+
+  const voucherNo = `VD-${Date.now().toString().slice(-6)}`;
+  const record = {
+    voucherNo,
+    kotNo: kotNumber,
+    tableNo,
+    date: accountingDate,
+    time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    itemCode,
+    itemName,
+    origQty: voidQtyNum,
+    cancelledQty: voidQtyNum,
+    unitRate: rateNum,
+    lossValue,
+    reason: reason || 'Guest Cancelled',
+    remarks: remarks || 'Authorized by Duty Manager',
+    steward,
+    authBy: authorizedBy,
+    cashier,
+    timestamp: new Date().toISOString()
+  };
+
+  const records = getKotVoidAuditRecords();
+  records.unshift(record);
+  try {
+    localStorage.setItem(KOT_VOID_AUDIT_KEY, JSON.stringify(records));
+  } catch (e) {}
+
+  // Broadcast to KDS and all open terminals so chef sees KOT cancellation
+  broadcastKotChannel({
+    type: 'KOT_ITEM_VOIDED',
+    record,
+    tableNo,
+    itemName,
+    voidQty: voidQtyNum
+  });
+
+  return record;
+}

@@ -5,10 +5,21 @@ import { playSuccessChime, playOrderAlert } from '../../utils/soundAlert';
 import { 
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME,
-  TABLE_SESSIONS_KEY
+  TABLE_SESSIONS_KEY, recordKotItemVoid
 } from '../../utils/kotDataSync';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../../db/dexieDb';
 import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
+
+// Standard IDS Next Void & Cancellation Reason Codes
+export const KOT_VOID_REASONS = [
+  'Guest Cancelled Before Cooking',
+  'Food Quality / Taste Reject',
+  'Wrong Table Punched by Steward',
+  'Steward / Cashier Double Entry',
+  'Kitchen Stock Depleted (86 item)',
+  'Table Relocated / Order Shifted',
+  'Other Reason (Enter Details Below)'
+];
 
 // Touch Screen Menu Groups configured from Official Hotel Elite Inn Menu Card
 const TOUCH_GROUPS = [
@@ -155,7 +166,8 @@ export default function IdsTouchPosTerminalModal({
   accountingDate = '11-OCT-2026',
   currentUser = 'CASHIER',
   onKotPunched,
-  onBillSettled
+  onBillSettled,
+  initialMode = 'pos'
 }) {
   // Navigation & Table Selection
   const [selectedGroup, setSelectedGroup] = useState('ALL');
@@ -189,6 +201,16 @@ export default function IdsTouchPosTerminalModal({
   const [settleRoomNo, setSettleRoomNo] = useState('101');
   const [upiQrDataUrl, setUpiQrDataUrl] = useState('');
   const [messagePrompt, setMessagePrompt] = useState(null);
+
+  // KOT Voiding & Anti-Theft Security Dialog State (Videos 05 & 06, Audio 4)
+  const [voidModalOpen, setVoidModalOpen] = useState(false);
+  const [targetVoidItem, setTargetVoidItem] = useState(null);
+  const [voidQty, setVoidQty] = useState(1);
+  const [voidReason, setVoidReason] = useState(KOT_VOID_REASONS[0]);
+  const [voidRemarks, setVoidRemarks] = useState('');
+  const [managerPin, setManagerPin] = useState('');
+  const [voidError, setVoidError] = useState('');
+  const [showPinMask, setShowPinMask] = useState(true);
 
   // Sync with storage and BroadcastChannel in real-time
   useEffect(() => {
@@ -297,6 +319,22 @@ export default function IdsTouchPosTerminalModal({
     }
   }, [settlementModalOpen, settlePayMode, financials.grandTotal, selectedTable]);
 
+  // Handle initialMode when modal opens from IDS Desktop Shell submenus
+  useEffect(() => {
+    if (!isOpen) return;
+    if (initialMode === 'void-kot') {
+      if (dispatchedLineItems.length > 0) {
+        handleInitiateVoid(dispatchedLineItems[0]);
+      } else {
+        setMessagePrompt(`⚠️ Void Mode: No dispatched items on ${selectedTable}. Select an occupied table or punch items first.`);
+      }
+    } else if (initialMode === 'table-transfer' || initialMode === 'table-merge') {
+      setMergeTableModalOpen(true);
+    } else if (initialMode === 'kot-reprint') {
+      handleViewLatestKotSlip();
+    }
+  }, [isOpen, initialMode]);
+
   // Global Win32 Shortcut Keys
   useEffect(() => {
     if (!isOpen) return;
@@ -310,6 +348,13 @@ export default function IdsTouchPosTerminalModal({
       } else if (e.key === 'F5') {
         e.preventDefault();
         setMergeTableModalOpen(true);
+      } else if (e.key === 'F6') {
+        e.preventDefault();
+        if (dispatchedLineItems.length > 0) {
+          handleInitiateVoid(dispatchedLineItems[0]);
+        } else {
+          setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
+        }
       } else if (e.key === 'F7') {
         e.preventDefault();
         setPrintBillModalOpen(true);
@@ -321,7 +366,8 @@ export default function IdsTouchPosTerminalModal({
         setDraftCart([]);
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        if (thermalKotModalOpen) setThermalKotModalOpen(false);
+        if (voidModalOpen) setVoidModalOpen(false);
+        else if (thermalKotModalOpen) setThermalKotModalOpen(false);
         else if (mergeTableModalOpen) setMergeTableModalOpen(false);
         else if (printBillModalOpen) setPrintBillModalOpen(false);
         else if (settlementModalOpen) setSettlementModalOpen(false);
@@ -330,7 +376,132 @@ export default function IdsTouchPosTerminalModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen]);
+  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, dispatchedLineItems, selectedTable]);
+
+  // Void Handler Functions
+  const handleInitiateVoid = (row) => {
+    setTargetVoidItem(row);
+    setVoidQty(row.quantity || 1);
+    setVoidReason(KOT_VOID_REASONS[0]);
+    setVoidRemarks('');
+    setManagerPin('');
+    setVoidError('');
+    setVoidModalOpen(true);
+  };
+
+  const handlePinKeypadPress = (val) => {
+    setVoidError('');
+    if (val === 'CLEAR') {
+      setManagerPin('');
+    } else if (val === 'BACKSPACE') {
+      setManagerPin(prev => prev.slice(0, -1));
+    } else {
+      if (managerPin.length < 6) {
+        setManagerPin(prev => prev + val);
+      }
+    }
+  };
+
+  const handleConfirmVoidItem = () => {
+    if (managerPin !== '1234') {
+      setVoidError('❌ ACCESS DENIED: Invalid Manager PIN! Authorized Duty Manager PIN (1234) is required.');
+      return;
+    }
+    if (!voidReason) {
+      setVoidError('Please select a mandatory void reason to prevent pilferage.');
+      return;
+    }
+    if (voidReason.startsWith('Other') && !voidRemarks.trim()) {
+      setVoidError('Remarks are mandatory when "Other Reason" is selected.');
+      return;
+    }
+    if (!targetVoidItem) return;
+
+    const voidQtyNum = Number(voidQty) || 1;
+    if (voidQtyNum <= 0 || voidQtyNum > targetVoidItem.quantity) {
+      setVoidError(`Void quantity must be between 1 and ${targetVoidItem.quantity}.`);
+      return;
+    }
+
+    // 1. Immutable audit record in hei_kot_void_audit_ledger
+    const auditRecord = recordKotItemVoid({
+      tableNo: selectedTable,
+      kotNumber: targetVoidItem.kotNumber,
+      itemCode: targetVoidItem.itemCode,
+      itemName: targetVoidItem.name,
+      voidQty: voidQtyNum,
+      rate: targetVoidItem.rate,
+      reason: voidReason,
+      remarks: voidRemarks || `Void authorized by Manager PIN for Table ${selectedTable}`,
+      authorizedBy: 'DUTY MANAGER (PIN:1234)',
+      cashier: currentUser || 'CASHIER',
+      steward: targetVoidItem.steward || selectedServer,
+      accountingDate
+    });
+
+    // 2. Deduct or remove item from running tableSession
+    const updatedSessions = { ...tableSessions };
+    const rawNum = selectedTable.replace(/\D/g, '');
+    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+
+    if (sess && sess.kots) {
+      let itemUpdated = false;
+      sess.kots = sess.kots.map(kot => {
+        const kotLabel = `KOT #${kot.runningKotIndex || kot.kotNumber || 1}`;
+        if (kot.id === targetVoidItem.kotId || kotLabel === targetVoidItem.kotNumber) {
+          const updatedItems = [];
+          (kot.items || []).forEach(it => {
+            const itCode = it.itemCode || it.code || '-';
+            if (!itemUpdated && (it.name === targetVoidItem.name || itCode === targetVoidItem.itemCode)) {
+              itemUpdated = true;
+              if (it.quantity > voidQtyNum) {
+                updatedItems.push({
+                  ...it,
+                  quantity: it.quantity - voidQtyNum
+                });
+              }
+            } else {
+              updatedItems.push(it);
+            }
+          });
+          return {
+            ...kot,
+            items: updatedItems
+          };
+        }
+        return kot;
+      }).filter(kot => kot.items && kot.items.length > 0);
+
+      const allItems = sess.kots.flatMap(k => k.items || []);
+      const newGross = allItems.reduce((acc, it) => acc + (it.quantity * (it.rate || it.price || 0)), 0);
+      sess.cumulativeItems = allItems;
+      sess.subtotal = newGross;
+      sess.netTotal = Math.round(newGross * 1.05);
+
+      if (sess.kots.length === 0) {
+        sess.status = 'VACANT';
+      }
+
+      updatedSessions[selectedTable] = sess;
+      if (rawNum) updatedSessions[rawNum] = sess;
+
+      setTableSessions(updatedSessions);
+      try {
+        localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
+      } catch (e) {}
+
+      saveTableSessionToDexie(selectedTable, sess).catch(() => {});
+
+      broadcastKotChannel({
+        type: 'TABLE_SESSIONS_UPDATE',
+        tableSessions: updatedSessions
+      });
+    }
+
+    playOrderAlert();
+    setVoidModalOpen(false);
+    setMessagePrompt(`⚠️ VOID LOGGED: Voucher #${auditRecord.voucherNo} (${targetVoidItem.name} x${voidQtyNum}) voided by Manager. Reason: ${voidReason}. Audit updated.`);
+  };
 
   if (!isOpen) return null;
 
@@ -858,13 +1029,14 @@ export default function IdsTouchPosTerminalModal({
                     <th style={{ padding: '3px 4px', textAlign: 'center', width: '35px' }}>Qty</th>
                     <th style={{ padding: '3px 4px', textAlign: 'right', width: '50px' }}>Rate</th>
                     <th style={{ padding: '3px 4px', textAlign: 'right', width: '60px' }}>Amount</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '70px' }}>Status</th>
+                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '65px' }}>Status</th>
+                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '55px' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dispatchedLineItems.length === 0 ? (
                     <tr>
-                      <td colSpan={6} style={{ textAlign: 'center', padding: '24px 10px', color: '#888', fontStyle: 'italic' }}>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px 10px', color: '#888', fontStyle: 'italic' }}>
                         No dispatched KOTs on {selectedTable}. Punch new items below.
                       </td>
                     </tr>
@@ -880,6 +1052,29 @@ export default function IdsTouchPosTerminalModal({
                           <span style={{ fontSize: '9px', background: '#E6F4EA', color: '#137333', padding: '1px 4px', borderRadius: '2px', fontWeight: 700 }}>
                             {row.status}
                           </span>
+                        </td>
+                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleInitiateVoid(row);
+                            }}
+                            className="ids-btn-classic"
+                            style={{
+                              background: '#8B0000',
+                              color: '#FFF',
+                              padding: '1px 5px',
+                              fontSize: '9.5px',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              border: '1px solid #500',
+                              borderRadius: '2px',
+                              lineHeight: '1.2'
+                            }}
+                            title="Void this kitchen dish (Requires Manager PIN & Mandatory Reason)"
+                          >
+                            ✕ Void
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -980,7 +1175,7 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* WIN32 BEVEL COMMAND TOOLBAR */}
-            <div style={{ padding: '6px 8px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px' }}>
+            <div style={{ padding: '6px 8px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '4px' }}>
               <button 
                 onClick={handlePunchDeltaKot}
                 className="ids-btn-classic" 
@@ -1006,6 +1201,21 @@ export default function IdsTouchPosTerminalModal({
                 title="F5: Merge running KOTs from another table into this one"
               >
                 [F5] MERGE TABLE
+              </button>
+
+              <button 
+                onClick={() => {
+                  if (dispatchedLineItems.length > 0) {
+                    handleInitiateVoid(dispatchedLineItems[0]);
+                  } else {
+                    setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
+                  }
+                }}
+                className="ids-btn-classic" 
+                style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10.5px', cursor: 'pointer' }}
+                title="F6: Void kitchen dish with Manager PIN & mandatory reason"
+              >
+                [F6] VOID DISH
               </button>
 
               <button 
@@ -1382,6 +1592,209 @@ export default function IdsTouchPosTerminalModal({
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================================================================== */}
+      {/* MODAL 5: WIN32 KOT DISH VOID & SECURITY AUTHORIZATION DIALOG        */}
+      {/* Requires Supervisor/Manager PIN (1234) & Mandatory Reason to Void   */}
+      {/* =================================================================== */}
+      {voidModalOpen && targetVoidItem && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1300 }}>
+          <div className="ids-dialog-window" style={{ width: '470px', background: '#ECE9D8', border: '2px solid #FFF', borderRightColor: '#716F64', borderBottomColor: '#716F64', boxShadow: '3px 3px 10px rgba(0,0,0,0.5)' }}>
+            
+            {/* Titlebar with Wine Red Security Gradient */}
+            <div className="ids-dialog-titlebar" style={{ background: '#8B0000', color: '#FFF', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
+                <span>🔒</span>
+                <span>KOT Item Void & Cancellation — Manager Security Control</span>
+              </div>
+              <button className="ids-win-btn close" onClick={() => setVoidModalOpen(false)} style={{ color: '#000' }}>✕</button>
+            </div>
+
+            <div style={{ padding: '12px', fontSize: '11px' }}>
+              
+              {/* Statutory Anti-Theft Protocol Warning Box */}
+              <div style={{ background: '#FFF5F5', border: '1px solid #FFCDD2', padding: '6px 10px', marginBottom: '10px', borderRadius: '2px' }}>
+                <div style={{ fontWeight: 700, color: '#C62828', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span>🛡️ Anti-Pilferage Control Notice:</span>
+                </div>
+                <div style={{ color: '#444', fontSize: '10.5px', marginTop: '2px' }}>
+                  Dispatched dishes cannot be deleted by Cashiers/Stewards. Voiding requires a verified <strong>Supervisor PIN (Default: 1234)</strong> and a mandatory statutory reason. All actions are logged to the audit ledger.
+                </div>
+              </div>
+
+              {/* Target Item Details Card */}
+              <div style={{ background: '#FFF', border: '1px solid #716F64', padding: '8px 10px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span>Table: <strong style={{ color: '#0A246A' }}>{selectedTable}</strong></span>
+                  <span>Batch: <strong style={{ color: '#8B0000' }}>{targetVoidItem.kotNumber}</strong></span>
+                  <span>Steward: <strong>{targetVoidItem.steward || selectedServer}</strong></span>
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#000', margin: '4px 0' }}>
+                  {targetVoidItem.name}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', color: '#666', borderTop: '1px dashed #CCC', paddingTop: '4px' }}>
+                  <span>Code: {targetVoidItem.itemCode}</span>
+                  <span>Dispatched Qty: <strong>{targetVoidItem.quantity}</strong></span>
+                  <span>Rate: ₹{targetVoidItem.rate.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Void Quantity & Loss Value */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+                <div style={{ background: '#FFF', padding: '6px 8px', border: '1px solid #999' }}>
+                  <label style={{ display: 'block', fontWeight: 700, marginBottom: '3px' }}>Qty to Void / Cancel:</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setVoidQty(prev => Math.max(1, prev - 1))}
+                      style={{ width: '26px', height: '24px', fontWeight: 900, cursor: 'pointer', background: '#ECE9D8', border: '1px solid #716F64' }}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={targetVoidItem.quantity}
+                      value={voidQty}
+                      onChange={e => {
+                        const val = parseInt(e.target.value) || 1;
+                        setVoidQty(Math.min(targetVoidItem.quantity, Math.max(1, val)));
+                      }}
+                      style={{ width: '50px', textAlign: 'center', fontWeight: 700, fontSize: '12px', padding: '2px', border: '1px solid #7F9DB9' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setVoidQty(prev => Math.min(targetVoidItem.quantity, prev + 1))}
+                      style={{ width: '26px', height: '24px', fontWeight: 900, cursor: 'pointer', background: '#ECE9D8', border: '1px solid #716F64' }}
+                    >
+                      +
+                    </button>
+                    <span style={{ fontSize: '10px', color: '#666' }}>of {targetVoidItem.quantity}</span>
+                  </div>
+                </div>
+
+                <div style={{ background: '#FFF', padding: '6px 8px', border: '1px solid #999', textAlign: 'right' }}>
+                  <label style={{ display: 'block', fontWeight: 700, color: '#666', marginBottom: '2px' }}>Audit Loss Valuation:</label>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#C62828' }}>
+                    ₹{(Number(voidQty) * targetVoidItem.rate).toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: '9.5px', color: '#888' }}>Debited to F&B Void Loss</div>
+                </div>
+              </div>
+
+              {/* Mandatory Reason Dropdown */}
+              <div style={{ marginBottom: '8px' }}>
+                <label style={{ display: 'block', fontWeight: 700, marginBottom: '2px', color: '#000' }}>
+                  Mandatory Void Reason <span style={{ color: '#C62828' }}>*</span>:
+                </label>
+                <select
+                  value={voidReason}
+                  onChange={e => setVoidReason(e.target.value)}
+                  style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFF', fontSize: '11px', fontWeight: 600 }}
+                >
+                  {KOT_VOID_REASONS.map(r => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Remarks Text Box */}
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontWeight: 700, marginBottom: '2px', color: '#000' }}>
+                  Remarks / Guest Feedback {voidReason.startsWith('Other') && <span style={{ color: '#C62828' }}>*</span>}:
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Guest cancelled before kitchen started wok / Wrong item selected"
+                  value={voidRemarks}
+                  onChange={e => setVoidRemarks(e.target.value)}
+                  style={{ width: '100%', padding: '4px 6px', border: '1px solid #7F9DB9', background: '#FFF', fontSize: '11px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              {/* Touchscreen Manager Security PIN Section */}
+              <div style={{ background: '#F0ECE1', border: '1px solid #B0A898', padding: '8px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontWeight: 700, color: '#0A246A', fontSize: '11px' }}>
+                    🔑 Supervisor / Manager PIN:
+                  </label>
+                  <span style={{ fontSize: '10px', color: '#666' }}>(Default: <strong>1234</strong>)</span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                  <input
+                    type={showPinMask ? 'password' : 'text'}
+                    maxLength={6}
+                    placeholder="Enter PIN"
+                    value={managerPin}
+                    onChange={e => setManagerPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    style={{ flex: 1, padding: '6px 8px', fontSize: '16px', fontWeight: 800, letterSpacing: '4px', textAlign: 'center', border: '2px inset #FFF', background: '#FFF' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPinMask(prev => !prev)}
+                    className="ids-btn-classic"
+                    style={{ padding: '0 8px', fontSize: '11px', cursor: 'pointer' }}
+                    title="Toggle PIN Visibility"
+                  >
+                    {showPinMask ? '👁️ Show' : '🔒 Hide'}
+                  </button>
+                </div>
+
+                {/* On-Screen Touch Keypad for Touch Terminals */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', maxWidth: '240px', margin: '0 auto' }}>
+                  {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'CLEAR', '0', 'BACKSPACE'].map(keyVal => (
+                    <button
+                      key={keyVal}
+                      type="button"
+                      onClick={() => handlePinKeypadPress(keyVal)}
+                      className="ids-btn-classic"
+                      style={{
+                        padding: '8px 4px',
+                        fontSize: keyVal.length > 1 ? '10px' : '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        background: keyVal === 'CLEAR' ? '#FFF0F0' : keyVal === 'BACKSPACE' ? '#FFF8E7' : '#ECE9D8',
+                        color: keyVal === 'CLEAR' ? '#C62828' : '#000'
+                      }}
+                    >
+                      {keyVal === 'CLEAR' ? 'CLR' : keyVal === 'BACKSPACE' ? '⌫' : keyVal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Error Message Box */}
+              {voidError && (
+                <div style={{ background: '#FFEBEE', color: '#C62828', border: '1px solid #EF9A9A', padding: '6px 8px', marginBottom: '10px', fontWeight: 700, fontSize: '11px', borderRadius: '2px' }}>
+                  {voidError}
+                </div>
+              )}
+
+              {/* Dialog Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #B0A898', paddingTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={handleConfirmVoidItem}
+                  className="ids-btn-classic"
+                  style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '6px 14px', fontSize: '11px', cursor: 'pointer' }}
+                >
+                  ✓ Authorize & Void Item
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVoidModalOpen(false)}
+                  className="ids-btn-classic"
+                  style={{ padding: '6px 14px', fontSize: '11px', cursor: 'pointer' }}
+                >
+                  Cancel [Esc]
+                </button>
+              </div>
+
             </div>
           </div>
         </div>
