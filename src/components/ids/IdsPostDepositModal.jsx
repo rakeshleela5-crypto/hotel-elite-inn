@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createFastApiAdvanceDeposit } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 14: HOW TO POST DEPOSIT OR ADVANCE IN A ROOM NUMBER IN IDS 6.5 & 7.0
@@ -96,6 +97,19 @@ export default function IdsPostDepositModal({
     setShowPrintPrompt(false);
 
     const parsedAmount = parseFloat(receivedAmount) || 2000;
+
+    // Persist deposit to Railway PostgreSQL backend (Option A)
+    createFastApiAdvanceDeposit({
+      receipt_number: `DEP-${receiptNo}`,
+      room_number: selectedGuest?.roomNo || selectedRoomNo,
+      folio_number: 1,
+      guest_name: selectedGuest?.guestName || `${selectedGuest?.title || 'MR.'} ${selectedGuest?.lastName || 'GUEST'}`,
+      amount: parsedAmount,
+      payment_mode: (paymentMode || 'cash').toUpperCase(),
+      particulars: particulars || 'Room Advance Payment',
+      received_by: 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Advance deposit post error:', err));
+
     if (onSaveDeposit && selectedGuest) {
       onSaveDeposit({
         roomNo: selectedGuest.roomNo,

@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, Save, Plus, Edit, Trash2, X,
   Percent, ShieldCheck, Tag, Copy, Building2
 } from 'lucide-react';
+import { linkFastApiCorporateRate } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 31: HOW TO CREATE COMPANY CONTRACT RATES IN IDS 6.5 & 7.0 SOFTWARE
@@ -297,6 +298,20 @@ export default function IdsCompanyContractRatesModal({
       alert('Please enter Rate Table Description.');
       return;
     }
+
+    // Persist corporate contract rate table to Railway PostgreSQL backend (Option A)
+    linkFastApiCorporateRate({
+      company_code: selectedTable.tableNo,
+      company_name: selectedTable.description,
+      rate_table_no: selectedTable.tableNo,
+      meal_plan: selectedTable.planCode || 'MAP',
+      single_rate: selectedTable.slabs?.[0]?.single || 2999.0,
+      double_rate: selectedTable.slabs?.[0]?.double || 3499.0,
+      valid_from: selectedTable.applicableFrom,
+      valid_to: selectedTable.validUpto,
+      discount_percentage: 0.0,
+      approved_by: 'DIRECTOR'
+    }).catch(err => console.warn('[FastAPI] Link corporate rate error:', err));
 
     setRateTablesList(prev => {
       const exists = prev.some(t => t.tableNo === selectedTable.tableNo);

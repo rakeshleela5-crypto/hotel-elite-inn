@@ -3,6 +3,7 @@ import './idsFortuneNext.css';
 import { Printer, Search, Scissors, DollarSign, X, Check, FileText, Users } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { settleFastApiRoomFolio } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 15 & 16: CHECKOUT & SETTLE FRONT OFFICE BILL & BULK CHECK OUT
@@ -324,7 +325,17 @@ export default function IdsCheckoutBillModal({
   // Execute checkout & update room master
   const executeCheckoutExecution = (roomNosToCheckout) => {
     setIsSavingCheckout(true);
-    setStatusMessage('UPDATING ROOM MASTER...');
+    setStatusMessage('UPDATING ROOM MASTER & POSTGRESQL FOLIO LEDGER...');
+
+    // Persist settlement to Railway PostgreSQL backend (Option A)
+    if (isGroupMode) {
+      roomNosToCheckout.forEach(rm => {
+        settleFastApiRoomFolio(rm, 1, 'BTC', '4321').catch(err => console.warn(`[FastAPI] Settle Room ${rm} error:`, err));
+      });
+    } else {
+      const dominantMode = Object.entries(settlementOptions).find(([_, amt]) => Number(amt) > 0)?.[0] || 'Cash';
+      settleFastApiRoomFolio(currentRoom, 1, dominantMode, '4321').catch(err => console.warn(`[FastAPI] Settle Room ${currentRoom} error:`, err));
+    }
 
     setTimeout(() => {
       if (isGroupMode && onCompleteBulkCheckout) {

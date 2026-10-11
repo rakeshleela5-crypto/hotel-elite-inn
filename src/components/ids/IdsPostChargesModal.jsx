@@ -5,6 +5,7 @@ import {
   HelpCircle, ChevronDown, ChevronRight, Layers, FileText, ArrowRight, Printer
 } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { postFastApiFolioCharge, getFastApiRoomFolio } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 21: HOW TO USE POST CHARGES / ROOM CHARGES OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -203,6 +204,29 @@ export default function IdsPostChargesModal({
 
     setSavedVoucherData(voucher);
     setPostedCharges(prev => [voucher, ...prev]);
+
+    // Persist to Railway PostgreSQL backend (Option A)
+    postFastApiFolioCharge({
+      room_number: roomNo,
+      folio_number: parseInt(folioNo, 10) || 1,
+      registration_number: regNo,
+      guest_name: guestName,
+      revenue_code: revenueCode,
+      description: description,
+      reference_no: refNo || `REF-${receiptNo}`,
+      receipt_no: receiptNo,
+      particulars: particulars,
+      currency: currencyCode,
+      exchange_rate: parseFloat(exchangeRate) || 1.0,
+      tax_inclusive: taxInclusive === 'Yes',
+      base_charge: baseCharges,
+      tax_amount: taxAmt,
+      sgst: sgtTax,
+      cgst: cgtTax,
+      total_amount: totalAmount,
+      accounting_date: acDate,
+      posted_by: 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Folio charge background post error:', err));
 
     if (onSaveCharge) {
       onSaveCharge(voucher);

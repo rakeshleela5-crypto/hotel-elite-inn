@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createFastApiPaidOut } from '../../utils/backendApi';
 import './idsFortuneNext.css';
 import { 
   ArrowDownLeft, DollarSign, CheckCircle2, AlertTriangle, 
@@ -84,6 +85,20 @@ export default function IdsPaidOutModal({
       alert('Please enter a valid positive paid-out amount.');
       return;
     }
+
+    // Persist paid out to Railway PostgreSQL backend (Option A)
+    createFastApiPaidOut({
+      voucher_number: voucherNo || `POT-${Date.now()}`,
+      room_number: roomNo,
+      folio_number: parseInt(folioNo, 10) || 1,
+      registration_number: regNo,
+      guest_name: guestName,
+      paid_out_amount: amt,
+      payment_mode: paymentMode || 'Cash Paidout',
+      particulars: particulars || 'Excess Advance Refund',
+      reason: paidOutReason || 'Excess Advance Amount Refund',
+      paid_by: 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Create paid out error:', err));
 
     setPaidOutExecuted(true);
     setStatusMessage(`Paid-Out Voucher No.${voucherNo} for ₹${amt.toFixed(2)} saved! Folio balance is now ₹0.00.`);

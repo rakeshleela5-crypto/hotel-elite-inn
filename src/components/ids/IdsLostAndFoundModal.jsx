@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './idsFortuneNext.css';
 import { INITIAL_LOST_AND_FOUND } from '../../data/idsPmsStore';
+import { createFastApiLostAndFound, claimFastApiLostAndFound } from '../../utils/backendApi';
 
 export default function IdsLostAndFoundModal({
   isOpen,
@@ -104,6 +105,19 @@ export default function IdsLostAndFoundModal({
       lastUpdated: `${accountingDate} 20:15`
     };
 
+    // Persist to Railway PostgreSQL backend (Option A)
+    createFastApiLostAndFound({
+      tracking_no: payload.refNo,
+      found_location: payload.place || 'Hotel Elite Inn Premises',
+      item_name: payload.article,
+      item_category: 'Valuables',
+      found_by: payload.finder || 'Housekeeping Staff',
+      found_date: payload.foundDate || accountingDate,
+      storage_location: payload.custodyLocker || 'HK-LOCKER-B04',
+      status: payload.status || 'In Safe Custody',
+      guest_name: payload.guestName || 'Valued Guest'
+    }).catch(err => console.warn('[FastAPI] Create lost & found error:', err));
+
     let updatedList;
     if (isAdding) {
       updatedList = [...records, payload];
@@ -130,6 +144,10 @@ export default function IdsLostAndFoundModal({
   };
 
   const handleMarkReturned = () => {
+    // Persist claim status to Railway PostgreSQL backend (Option A)
+    claimFastApiLostAndFound(formData.refNo, formData.guestName || 'Valued Guest')
+      .catch(err => console.warn('[FastAPI] Claim lost & found error:', err));
+
     setFormData({
       ...formData,
       returnedDate: accountingDate,

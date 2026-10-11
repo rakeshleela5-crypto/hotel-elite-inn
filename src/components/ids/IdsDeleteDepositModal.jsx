@@ -5,6 +5,7 @@ import {
   ArrowRight, ShieldCheck, UserX, LayoutGrid, Check, X, RefreshCw
 } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { deleteFastApiAdvanceDeposit } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 39: HOW TO DELETE DEPOSIT BEFORE CANCEL CHECK IN IN IDS 6.5 & 7.0 SOFTWARE
@@ -107,6 +108,10 @@ export default function IdsDeleteDepositModal({
       alert('Please click [ Delete ] first to mark deposit for deletion.');
       return;
     }
+
+    // Persist deposit cancellation to Railway PostgreSQL backend (Option A)
+    deleteFastApiAdvanceDeposit(`DEP-${selectedItem.receiptNo || selectedItem.regNo}`, 'Cancelled Before Check-in')
+      .catch(err => console.warn('[FastAPI] Delete deposit error:', err));
 
     setDepositsList(prev => prev.map(item => 
       item.roomNo === selectedItem.roomNo 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { amendFastApiStay } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 12: HOW TO MODIFY GUEST DEPARTURE IN IDS 6.5 & 7.0 SOFTWARE
@@ -68,6 +69,16 @@ export default function IdsAmendStayModal({
     const updatedDeparture = `${departureDate} ${departureTime}`;
     const nights = departureDate === '15-OCT-2026' ? 15 : departureDate === '18-JAN-2026' ? 13 : 16;
     const balance = nights === 15 ? 16800 : nights === 13 ? 14600 : 18000;
+
+    // Persist stay amendment to Railway PostgreSQL backend (Option A)
+    amendFastApiStay({
+      room_number: selectedGuest?.roomNo || selectedRoomNo,
+      new_departure_date: departureDate,
+      new_departure_time: departureTime,
+      additional_nights: nights,
+      reason: 'Guest Departure Amendment & Stay Extension',
+      amended_by: 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Amend stay error:', err));
 
     if (onSaveAmendStay && selectedGuest) {
       onSaveAmendStay({

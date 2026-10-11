@@ -5,6 +5,7 @@ import {
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw, CheckCircle2
 } from 'lucide-react';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { reinstateFastApiRoomFolio } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 26: HOW TO USE FOLIO REINSTATE OPTION IN IDS 6.5 & 7.0 SOFTWARE
@@ -146,6 +147,11 @@ export default function IdsFolioReinstateModal({
   const handleExecuteReinstate = () => {
     setShowConfirmModal(false);
 
+    // Persist reinstatement to Railway PostgreSQL backend (Option A)
+    reinstateFastApiRoomFolio(selectedFolio.roomNo, 1, '4321').catch(err => {
+      console.warn(`[FastAPI] Reinstate Room ${selectedFolio.roomNo} error:`, err);
+    });
+
     if (onReinstateFolio) {
       onReinstateFolio({
         billNo: selectedFolio.billNo,
@@ -160,7 +166,7 @@ export default function IdsFolioReinstateModal({
 
     // Remove reinstated folio from checked out list
     setFoliosList(prev => prev.filter(f => f.billNo !== selectedFolio.billNo));
-    setStatusNotice(`Folio Bill No.${selectedFolio.billNo} for Room ${selectedFolio.roomNo} (${selectedFolio.guestName}) has been successfully REINSTATED in-house!`);
+    setStatusNotice(`✓ Folio Bill No.${selectedFolio.billNo} for Room ${selectedFolio.roomNo} (${selectedFolio.guestName}) REINSTATED in-house!`);
   };
 
   return (

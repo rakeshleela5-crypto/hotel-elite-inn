@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { INITIAL_ACCOUNTING_DATE, NEXT_ACCOUNTING_DATE } from '../../data/idsPmsStore';
+import { transferFastApiRoom } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 13: HOW TO DO ROOM TRANSFER IN IDS 6.5 & 7.0 SOFTWARE
@@ -111,6 +112,16 @@ export default function IdsRoomTransferModal({
 
   const handleAlertConfirm = () => {
     setShowSuccessAlert(false);
+
+    // Persist room transfer to Railway PostgreSQL backend (Option A)
+    transferFastApiRoom({
+      from_room: fromRoomNo,
+      to_room: toRoomNo,
+      registration_number: selectedGuest?.regNo || 'REG-102',
+      guest_name: selectedGuest?.guestName || 'In-House Guest',
+      reason: 'Guest Room Change Request',
+      transferred_by: 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Room transfer error:', err));
 
     if (onSaveRoomTransfer && selectedGuest) {
       onSaveRoomTransfer({

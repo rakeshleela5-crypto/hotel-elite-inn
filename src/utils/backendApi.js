@@ -194,6 +194,44 @@ export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = 
 }
 
 /**
+ * Create a new POS / KOT order on PostgreSQL
+ */
+export async function createFastApiPosOrder(orderData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create POS order error:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch all POS orders from PostgreSQL
+ */
+export async function getFastApiPosOrders(statusFilter = null) {
+  try {
+    const url = statusFilter
+      ? `${FASTAPI_BASE_URL}/api/pos/orders?status_filter=${encodeURIComponent(statusFilter)}`
+      : `${FASTAPI_BASE_URL}/api/pos/orders`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Get POS orders error:', err.message);
+    return [];
+  }
+}
+
+/**
  * Fetch official property profile, tariffs, wifi, and intercom directory
  */
 export async function getFastApiPropertyInfo() {

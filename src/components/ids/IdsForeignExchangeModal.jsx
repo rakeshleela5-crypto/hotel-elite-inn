@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './idsFortuneNext.css';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { createFastApiForex } from '../../utils/backendApi';
 import { 
   Globe, DollarSign, Printer, CheckCircle2, 
   Search, ShieldCheck, ArrowRight, RefreshCw, 
@@ -112,7 +113,7 @@ export default function IdsForeignExchangeModal({
   const [particulars, setParticulars] = useState('Money Exchange');
   const [voucherNo, setVoucherNo] = useState('3');
   const [encashmentNo, setEncashmentNo] = useState('ENC/2026/003');
-  const [roomNo, setRoomNo] = useState('1002');
+  const [roomNo, setRoomNo] = useState('201');
   const [guestName, setGuestName] = useState('Mr Gomes');
   const [passportNo, setPassportNo] = useState('S1234567');
   const [nationality, setNationality] = useState('USA');
@@ -186,6 +187,22 @@ export default function IdsForeignExchangeModal({
       cashier: 'IT ADMIN',
       status: 'Active'
     };
+
+    // Persist forex encashment to Railway PostgreSQL backend (Option A)
+    createFastApiForex({
+      encashment_number: newRecord.encashmentNo,
+      voucher_number: newRecord.voucherNo,
+      room_number: newRecord.roomNo,
+      guest_name: newRecord.guestName,
+      passport_number: newRecord.passportNo,
+      nationality: newRecord.nationality,
+      currency_code: newRecord.currencyCode,
+      exchange_rate: newRecord.exchangeRate,
+      foreign_amount: newRecord.amountReceived,
+      inr_amount: newRecord.netPaidInr,
+      tax_amount: newRecord.taxAmountInr,
+      cashier: newRecord.cashier
+    }).catch(err => console.warn('[FastAPI] Forex encashment post error:', err));
 
     setEncashmentsList(prev => {
       const idx = prev.findIndex(e => e.voucherNo === voucherNo);

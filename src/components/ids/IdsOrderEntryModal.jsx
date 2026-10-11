@@ -20,6 +20,7 @@ import IdsRestaurantTableMasterModal, { getStoredRestaurantTables } from './IdsR
 import IdsServersModal, { getStoredServers } from './IdsServersModal';
 import IdsMenuMasterModal, { getStoredMenuItems, DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
 import IdsSalesPromotionMasterModal, { getStoredPromotions } from './IdsSalesPromotionMasterModal';
+import { createFastApiPosOrder } from '../../utils/backendApi';
 
 // Authentic NC Department Cost Centers (Video 07 Frame 016)
 export const POS_NC_DEPARTMENTS = [
@@ -1385,6 +1386,18 @@ export default function IdsOrderEntryModal({
     const existing = getLiveKots();
     saveLiveKots([syncKot, ...existing]);
     broadcastKotChannel(syncKot);
+
+    // Persist KOT order to Railway PostgreSQL backend (Option A)
+    createFastApiPosOrder({
+      table_id: parseInt(tableNo, 10) || 1,
+      room_number: null,
+      order_type: isNcMode ? 'nc_kot' : 'dine_in',
+      items: lineItems.map(it => ({
+        item_name: it.name,
+        quantity: it.quantity,
+        rate: it.rate
+      }))
+    }).catch(err => console.warn('[FastAPI] Pos order background post error:', err));
 
     if (onKOTCreated) onKOTCreated(updatedKotRecord);
 
