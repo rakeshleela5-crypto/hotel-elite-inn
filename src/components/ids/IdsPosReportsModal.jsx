@@ -320,7 +320,7 @@ const INITIAL_MENU_SALES = [
   { group: 'BEVERAGES', code: '3', name: 'Mineral Water 1L', kitchen: 'Pantry', qtySold: 65, uom: 'Bottle', price: 30.00, revenue: 1950.00, cost: 975.00, marginPct: 50.0 },
   { group: 'INDIAN BREADS', code: '8', name: 'Butter Naan', kitchen: 'Main Kitchen', qtySold: 84, uom: 'Piece', price: 55.00, revenue: 4620.00, cost: 924.00, marginPct: 80.0 },
   { group: 'STARTERS', code: '12', name: 'Paneer Tikka', kitchen: 'Main Kitchen', qtySold: 19, uom: 'Plate', price: 260.00, revenue: 4940.00, cost: 1580.00, marginPct: 68.0 },
-  { group: 'LIQUOR BAR', code: '105', name: 'Kingfisher Premium 650ml', kitchen: 'Bar Counter', qtySold: 36, uom: 'Bottle', price: 280.00, revenue: 10080.00, cost: 4680.00, marginPct: 53.6 }
+  { group: 'BEVERAGE', code: 'BEV-05', name: 'Special Milk Coffee', kitchen: 'Pantry', qtySold: 36, uom: 'Cup', price: 35.00, revenue: 1260.00, cost: 450.00, marginPct: 64.3 }
 ];
 
 export default function IdsPosReportsModal({

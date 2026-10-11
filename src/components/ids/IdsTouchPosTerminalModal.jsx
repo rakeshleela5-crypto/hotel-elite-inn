@@ -1,39 +1,138 @@
 import React, { useState } from 'react';
 import { HOTEL_CONFIG } from '../../data/hotelData';
 
-// Touch Screen Menu Groups configured from Video 15
+// Touch Screen Menu Groups configured from Official Hotel Elite Inn Menu Card
 const TOUCH_GROUPS = [
   { id: 'ALL', name: 'ALL ITEMS', color: '#0A246A' },
-  { id: 'FOOD', name: 'FOOD / MAIN', color: '#B8860B' },
-  { id: 'BEVERAGE', name: 'BEVERAGES', color: '#008080' },
-  { id: 'BAR', name: 'LIQUOR BAR', color: '#8B0000' },
-  { id: 'BREADS', name: 'INDIAN BREADS', color: '#D2691E' },
-  { id: 'STARTERS', name: 'STARTERS & TIKKA', color: '#2E8B57' },
-  { id: 'DESSERTS', name: 'DESSERTS', color: '#C71585' }
+  { id: 'BEVERAGE', name: 'BEVERAGES & SHAKES', color: '#008080' },
+  { id: 'BREAKFAST', name: 'BREAKFAST & DOSAS', color: '#E65100' },
+  { id: 'STARTERS', name: 'KEBABS & STARTERS', color: '#2E8B57' },
+  { id: 'MAIN', name: 'MAIN COURSE CURRIES', color: '#B8860B' },
+  { id: 'BREADS', name: 'INDIAN BREADS & ROTI', color: '#D2691E' },
+  { id: 'RICE', name: 'BASMATI RICE & BIRYANI', color: '#4A148C' },
+  { id: 'CONTINENTAL', name: 'PASTA & SIZZLERS', color: '#1B5E20' },
+  { id: 'DESSERTS', name: 'SWEET MEMORIES', color: '#C71585' }
 ];
 
-// Touch Catalog Items configured from Menu Master (Video 20)
+// Touch Catalog Items configured directly from Official Hotel Elite Inn Menu Card
 const TOUCH_ITEMS = [
-  { code: '1', name: 'Steamed Rice (Full)', group: 'FOOD', price: 90.00, kitchen: 'Main Kitchen' },
-  { code: '2', name: 'Tandoori Chicken (Full)', group: 'FOOD', price: 450.00, kitchen: 'Main Kitchen' },
-  { code: '3', name: 'Mineral Water 1L', group: 'BEVERAGE', price: 30.00, kitchen: 'Pantry' },
-  { code: '4', name: 'Fresh Lime Soda', group: 'BEVERAGE', price: 60.00, kitchen: 'Pantry' },
-  { code: '5', name: 'Cold Coffee with Ice Cream', group: 'BEVERAGE', price: 120.00, kitchen: 'Pantry' },
-  { code: '8', name: 'Butter Naan', group: 'BREADS', price: 55.00, kitchen: 'Main Kitchen' },
-  { code: '9', name: 'Tandoori Roti Butter', group: 'BREADS', price: 35.00, kitchen: 'Main Kitchen' },
-  { code: '10', name: 'Garlic Naan', group: 'BREADS', price: 65.00, kitchen: 'Main Kitchen' },
-  { code: '12', name: 'Paneer Butter Masala', group: 'FOOD', price: 240.00, kitchen: 'Main Kitchen' },
-  { code: '13', name: 'Dal Makhani', group: 'FOOD', price: 190.00, kitchen: 'Main Kitchen' },
-  { code: '14', name: 'Chicken Biryani Special', group: 'FOOD', price: 320.00, kitchen: 'Main Kitchen' },
-  { code: '15', name: 'Paneer Tikka (6 Pcs)', group: 'STARTERS', price: 260.00, kitchen: 'Main Kitchen' },
-  { code: '16', name: 'Crispy Chilli Baby Corn', group: 'STARTERS', price: 210.00, kitchen: 'Main Kitchen' },
-  { code: '17', name: 'Chicken 65', group: 'STARTERS', price: 280.00, kitchen: 'Main Kitchen' },
-  { code: '101', name: 'Kingfisher Premium 650ml', group: 'BAR', price: 280.00, kitchen: 'Bar Counter' },
-  { code: '102', name: 'Budweiser Magnum 650ml', group: 'BAR', price: 330.00, kitchen: 'Bar Counter' },
-  { code: '103', name: 'Old Monk Rum 60ml', group: 'BAR', price: 140.00, kitchen: 'Bar Counter' },
-  { code: '104', name: 'Blenders Pride Whisky 60ml', group: 'BAR', price: 190.00, kitchen: 'Bar Counter' },
-  { code: '201', name: 'Gulab Jamun (2 Pcs)', group: 'DESSERTS', price: 80.00, kitchen: 'Pantry' },
-  { code: '202', name: 'Vanilla Ice Cream with Hot Fudge', group: 'DESSERTS', price: 110.00, kitchen: 'Pantry' }
+  // Beverages & Mocktails
+  { code: 'BEV-01', name: 'Tea', group: 'BEVERAGE', price: 25.00, kitchen: 'Pantry' },
+  { code: 'BEV-02', name: 'Black Tea', group: 'BEVERAGE', price: 20.00, kitchen: 'Pantry' },
+  { code: 'BEV-03', name: 'Lemon Tea', group: 'BEVERAGE', price: 25.00, kitchen: 'Pantry' },
+  { code: 'BEV-04', name: 'Green Tea', group: 'BEVERAGE', price: 30.00, kitchen: 'Pantry' },
+  { code: 'BEV-05', name: 'Coffee', group: 'BEVERAGE', price: 35.00, kitchen: 'Pantry' },
+  { code: 'BEV-06', name: 'Black Coffee', group: 'BEVERAGE', price: 40.00, kitchen: 'Pantry' },
+  { code: 'BEV-07', name: 'Hot & Cold Milk', group: 'BEVERAGE', price: 60.00, kitchen: 'Pantry' },
+  { code: 'BEV-08', name: 'Choice of Lassi', group: 'BEVERAGE', price: 60.00, kitchen: 'Pantry' },
+  { code: 'BEV-09', name: 'Cold Coffee with Ice Cream', group: 'BEVERAGE', price: 90.00, kitchen: 'Pantry' },
+  { code: 'BEV-10', name: 'Butter Milk', group: 'BEVERAGE', price: 50.00, kitchen: 'Pantry' },
+  { code: 'BEV-11', name: 'Fresh Lime Water / Soda', group: 'BEVERAGE', price: 40.00, kitchen: 'Pantry' },
+  { code: 'MOCK-01', name: 'Pina Colada', group: 'BEVERAGE', price: 80.00, kitchen: 'Pantry' },
+  { code: 'MOCK-02', name: 'Virgin Mojito', group: 'BEVERAGE', price: 100.00, kitchen: 'Pantry' },
+  { code: 'MOCK-03', name: 'Blue Lagoon', group: 'BEVERAGE', price: 120.00, kitchen: 'Pantry' },
+  { code: 'MOCK-04', name: 'Choice of Shake', group: 'BEVERAGE', price: 130.00, kitchen: 'Pantry' },
+
+  // Breakfast & Dosas
+  { code: 'BF-01', name: 'Special Maggi', group: 'BREAKFAST', price: 100.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-02', name: 'Idly with Sambhar Chutney', group: 'BREAKFAST', price: 80.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-03', name: 'Sambhar Vada', group: 'BREAKFAST', price: 80.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-04', name: 'Plain Dosa', group: 'BREAKFAST', price: 80.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-05', name: 'Masala Dosa', group: 'BREAKFAST', price: 100.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-06', name: 'Gini Dosa', group: 'BREAKFAST', price: 120.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-07', name: 'Mysore Masala Dosa', group: 'BREAKFAST', price: 150.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-08', name: 'Ghee Podi Masala Dosa', group: 'BREAKFAST', price: 150.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-09', name: 'Upma', group: 'BREAKFAST', price: 60.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-10', name: 'Uttapam', group: 'BREAKFAST', price: 80.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-11', name: 'Rawa Masala Dosa', group: 'BREAKFAST', price: 120.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-12', name: 'Special Poha', group: 'BREAKFAST', price: 120.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-13', name: 'Poori Bhaji', group: 'BREAKFAST', price: 140.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-14', name: 'Chholey Bhature', group: 'BREAKFAST', price: 100.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-15', name: 'Aloo Paratha with Curd', group: 'BREAKFAST', price: 110.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-16', name: 'Paneer Paratha with Curd', group: 'BREAKFAST', price: 150.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-17', name: 'Veg Grilled Sandwich', group: 'BREAKFAST', price: 100.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-18', name: 'Bread Omelette', group: 'BREAKFAST', price: 110.00, kitchen: 'Main Kitchen' },
+  { code: 'BF-19', name: 'Chicken Sandwich', group: 'BREAKFAST', price: 200.00, kitchen: 'Main Kitchen' },
+
+  // Starters & Kebabs
+  { code: 'ST-01', name: 'Hara Bhara Kebab', group: 'STARTERS', price: 200.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-02', name: 'Paneer Pakoda', group: 'STARTERS', price: 200.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-03', name: 'Paneer Tikka', group: 'STARTERS', price: 250.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-04', name: 'Paneer Hariyali Tikka', group: 'STARTERS', price: 250.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-05', name: 'Chana Roast', group: 'STARTERS', price: 150.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-06', name: 'Finger Chips', group: 'STARTERS', price: 120.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-07', name: 'Mushroom Pakoda', group: 'STARTERS', price: 180.00, kitchen: 'Main Kitchen' },
+  { code: 'ST-08', name: 'Tandoori Platter (Veg)', group: 'STARTERS', price: 650.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-01', name: 'Chicken Pakoda', group: 'STARTERS', price: 220.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-02', name: 'Chicken Amritsari (Fry)', group: 'STARTERS', price: 250.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-03', name: 'Chicken Tikka', group: 'STARTERS', price: 300.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-04', name: 'Chicken Banjara Tikka', group: 'STARTERS', price: 300.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-05', name: 'Chicken Malai Tikka', group: 'STARTERS', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-06', name: 'Chicken Afghani Tikka', group: 'STARTERS', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-07', name: 'Chicken Reshmi Kebab', group: 'STARTERS', price: 300.00, kitchen: 'Main Kitchen' },
+  { code: 'NST-08', name: 'Chicken Tangdi Kebab', group: 'STARTERS', price: 300.00, kitchen: 'Main Kitchen' },
+
+  // Main Course Curries
+  { code: 'MC-01', name: 'Chicken Masala', group: 'MAIN', price: 280.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-02', name: 'Chicken Kadai', group: 'MAIN', price: 280.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-03', name: 'Chicken Hyderabadi', group: 'MAIN', price: 290.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-04', name: 'Chicken Rara', group: 'MAIN', price: 320.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-05', name: 'Chicken Bharta', group: 'MAIN', price: 320.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-06', name: 'Chicken Butter Masala', group: 'MAIN', price: 320.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-07', name: 'Chicken Tikka Masala', group: 'MAIN', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-08', name: 'Butter Chicken Boneless', group: 'MAIN', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-09', name: 'Murg Mussallam (Half)', group: 'MAIN', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-10', name: 'Fish Curry (B/L)', group: 'MAIN', price: 270.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-11', name: 'Prawns Masala', group: 'MAIN', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-12', name: 'Mutton Curry', group: 'MAIN', price: 380.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-13', name: 'Mutton Rogan Josh', group: 'MAIN', price: 380.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-14', name: 'Champaran Meat', group: 'MAIN', price: 500.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-15', name: 'Dal Fry', group: 'MAIN', price: 130.00, kitchen: 'Main Kitchen' },
+  { code: 'MC-16', name: 'Dal Tadka', group: 'MAIN', price: 140.00, kitchen: 'Main Kitchen' },
+
+  // Indian Breads
+  { code: 'BRD-01', name: 'Tawa Roti', group: 'BREADS', price: 25.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-02', name: 'Butter Tawa Roti', group: 'BREADS', price: 25.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-03', name: 'Tandoori Roti', group: 'BREADS', price: 30.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-04', name: 'Butter Tandoori Roti', group: 'BREADS', price: 35.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-05', name: 'Rumali Roti', group: 'BREADS', price: 40.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-06', name: 'Plain Naan', group: 'BREADS', price: 40.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-07', name: 'Butter Naan', group: 'BREADS', price: 45.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-08', name: 'Garlic Naan', group: 'BREADS', price: 55.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-09', name: 'Masala Kulcha', group: 'BREADS', price: 55.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-10', name: 'Paneer Kulcha', group: 'BREADS', price: 70.00, kitchen: 'Main Kitchen' },
+  { code: 'BRD-11', name: 'Roti Basket', group: 'BREADS', price: 350.00, kitchen: 'Main Kitchen' },
+
+  // Basmati Rice & Biryani
+  { code: 'RC-01', name: 'Plain Rice (Basmati)', group: 'RICE', price: 100.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-02', name: 'Jeera Rice', group: 'RICE', price: 120.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-03', name: 'Veg Biryani', group: 'RICE', price: 210.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-04', name: 'Veg Pulao', group: 'RICE', price: 210.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-05', name: 'Curd Rice', group: 'RICE', price: 150.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-06', name: 'Egg Biryani', group: 'RICE', price: 180.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-07', name: 'Chicken Dum Biryani', group: 'RICE', price: 250.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-08', name: 'Chicken Hyderabadi Biryani', group: 'RICE', price: 270.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-09', name: 'Chicken Tikka Biryani', group: 'RICE', price: 300.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-10', name: 'Mutton Biryani', group: 'RICE', price: 350.00, kitchen: 'Main Kitchen' },
+  { code: 'RC-11', name: 'Mutton Handi Biryani', group: 'RICE', price: 400.00, kitchen: 'Main Kitchen' },
+
+  // Continental & Pastas
+  { code: 'CT-01', name: 'White Sauce Pasta Veg', group: 'CONTINENTAL', price: 200.00, kitchen: 'Main Kitchen' },
+  { code: 'CT-02', name: 'Red Sauce Pasta Veg', group: 'CONTINENTAL', price: 200.00, kitchen: 'Main Kitchen' },
+  { code: 'CT-03', name: 'White Sauce Chicken Pasta', group: 'CONTINENTAL', price: 280.00, kitchen: 'Main Kitchen' },
+  { code: 'CT-04', name: 'Veg Mix Grilled Sizzler', group: 'CONTINENTAL', price: 200.00, kitchen: 'Main Kitchen' },
+  { code: 'CT-05', name: 'Chicken Tikka Sizzler', group: 'CONTINENTAL', price: 400.00, kitchen: 'Main Kitchen' },
+
+  // Sweet Memories (Desserts)
+  { code: 'DES-01', name: 'Fresh Fruit Platter', group: 'DESSERTS', price: 200.00, kitchen: 'Pantry' },
+  { code: 'DES-02', name: 'Hot Gulab Jamun', group: 'DESSERTS', price: 110.00, kitchen: 'Pantry' },
+  { code: 'DES-03', name: 'Rice Kheer', group: 'DESSERTS', price: 90.00, kitchen: 'Pantry' },
+  { code: 'DES-04', name: 'Hot Gulab Jamun with Ice-Cream', group: 'DESSERTS', price: 150.00, kitchen: 'Pantry' },
+  { code: 'DES-05', name: 'Vanilla Ice-Cream', group: 'DESSERTS', price: 80.00, kitchen: 'Pantry' },
+  { code: 'DES-06', name: 'Vanilla with Hot Chocolate Sauce', group: 'DESSERTS', price: 150.00, kitchen: 'Pantry' },
+  { code: 'DES-07', name: 'Kesar Pista', group: 'DESSERTS', price: 100.00, kitchen: 'Pantry' },
+  { code: 'DES-08', name: 'Butter Scotch', group: 'DESSERTS', price: 110.00, kitchen: 'Pantry' },
+  { code: 'DES-09', name: 'Chocolate Ice-Cream', group: 'DESSERTS', price: 110.00, kitchen: 'Pantry' }
 ];
 
 export default function IdsTouchPosTerminalModal({
@@ -45,12 +144,12 @@ export default function IdsTouchPosTerminalModal({
   onBillSettled
 }) {
   const [selectedGroup, setSelectedGroup] = useState('ALL');
-  const [selectedTable, setSelectedTable] = useState('10');
+  const [selectedTable, setSelectedTable] = useState('T-01');
   const [selectedServer, setSelectedServer] = useState('Kaushik');
   const [covers, setCovers] = useState(2);
   const [cart, setCart] = useState([
-    { code: '1', name: 'Steamed Rice (Full)', price: 90.00, qty: 2, kitchen: 'Main Kitchen', modifier: '' },
-    { code: '2', name: 'Tandoori Chicken (Full)', price: 450.00, qty: 1, kitchen: 'Main Kitchen', modifier: 'spicy' }
+    { code: 'RC-01', name: 'Plain Rice (Basmati)', price: 100.00, qty: 2, kitchen: 'Main Kitchen', modifier: '' },
+    { code: 'MC-06', name: 'Chicken Butter Masala', price: 320.00, qty: 1, kitchen: 'Main Kitchen', modifier: 'Medium Spicy' }
   ]);
   const [activeOutlet, setActiveOutlet] = useState('RESTAURANT');
   const [activeSession, setActiveSession] = useState('Dinner');
@@ -62,501 +161,328 @@ export default function IdsTouchPosTerminalModal({
     ? TOUCH_ITEMS
     : TOUCH_ITEMS.filter(item => item.group === selectedGroup);
 
+  const subTotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+  const cgst = subTotal * 0.025; // 2.5% CGST
+  const sgst = subTotal * 0.025; // 2.5% SGST
+  const grandTotal = Math.round(subTotal + cgst + sgst);
+
   const handleAddItem = (item) => {
     setCart(prev => {
-      const existing = prev.find(i => i.code === item.code);
-      if (existing) {
-        return prev.map(i => i.code === item.code ? { ...i, qty: i.qty + 1 } : i);
+      const idx = prev.findIndex(p => p.code === item.code);
+      if (idx > -1) {
+        const copy = [...prev];
+        copy[idx].qty += 1;
+        return copy;
       }
       return [...prev, { ...item, qty: 1, modifier: '' }];
     });
   };
 
-  const handleIncrement = (code) => {
-    setCart(prev => prev.map(i => i.code === code ? { ...i, qty: i.qty + 1 } : i));
-  };
-
-  const handleDecrement = (code) => {
+  const handleUpdateQty = (code, delta) => {
     setCart(prev => {
-      return prev.map(i => {
-        if (i.code === code) {
-          return { ...i, qty: Math.max(0, i.qty - 1) };
+      return prev.map(p => {
+        if (p.code === code) {
+          const newQty = p.qty + delta;
+          return newQty > 0 ? { ...p, qty: newQty } : null;
         }
-        return i;
-      }).filter(i => i.qty > 0);
+        return p;
+      }).filter(Boolean);
     });
   };
 
-  const handleRemove = (code) => {
-    setCart(prev => prev.filter(i => i.code !== code));
-  };
-
-  const handleSetModifier = (code) => {
-    const mod = prompt("Enter kitchen instruction / modifier (e.g. less spicy, no onion, extra cheese):");
-    if (mod !== null) {
-      setCart(prev => prev.map(i => i.code === code ? { ...i, modifier: mod.trim() } : i));
-    }
-  };
-
-  // Calculations
-  const subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-  const cgst = subtotal * 0.025;
-  const sgst = subtotal * 0.025;
-  const rawTotal = subtotal + cgst + sgst;
-  const roundOff = Math.round(rawTotal) - rawTotal;
-  const grandTotal = Math.round(rawTotal);
-
-  const handlePunchKOT = () => {
-    if (cart.length === 0) {
-      alert("Cart is empty. Please tap items to punch KOT.");
-      return;
-    }
-    const kotId = `KOT-${Math.floor(1000 + Math.random() * 9000)}`;
-    setMessagePrompt(`✅ KOT ${kotId} Printed Successfully for Table ${selectedTable} (${covers} Pax) -> Main Kitchen!`);
-    if (onKotPunched) {
-      onKotPunched({ kotId, tableNo: selectedTable, items: cart, grandTotal });
-    }
-  };
-
-  const handleFastCashSettle = () => {
-    if (cart.length === 0) {
-      alert("Cart is empty.");
-      return;
-    }
-    const billNo = `RES-B-${Math.floor(10000 + Math.random() * 90000)}`;
-    setMessagePrompt(`💵 Bill ${billNo} Settled via Fast Cash! Table ${selectedTable} released to Vacant. Total: ₹${grandTotal}`);
+  const handleClearCart = () => {
     setCart([]);
-    if (onBillSettled) {
-      onBillSettled({ billNo, tableNo: selectedTable, amount: grandTotal, mode: 'Cash' });
+  };
+
+  const handlePunchKot = () => {
+    if (cart.length === 0) {
+      setMessagePrompt("Cannot punch KOT: Cart is empty!");
+      return;
     }
+    const kotId = Math.floor(1000 + Math.random() * 9000);
+    if (onKotPunched) {
+      onKotPunched({
+        kotId,
+        tableNo: selectedTable,
+        server: selectedServer,
+        covers,
+        items: cart,
+        outlet: activeOutlet,
+        timestamp: new Date().toLocaleTimeString()
+      });
+    }
+    setMessagePrompt(`✅ KOT #${kotId} punched successfully to Main Kitchen for Table ${selectedTable}!`);
+    setCart([]);
+  };
+
+  const handlePrintBill = () => {
+    if (cart.length === 0) {
+      setMessagePrompt("Cannot print bill: Cart is empty!");
+      return;
+    }
+    const billId = Math.floor(2000 + Math.random() * 8000);
+    if (onBillSettled) {
+      onBillSettled({
+        billId,
+        tableNo: selectedTable,
+        grandTotal,
+        items: cart,
+        timestamp: new Date().toLocaleTimeString()
+      });
+    }
+    setMessagePrompt(`🧾 Bill #${billId} generated: ₹${grandTotal.toFixed(2)} (Table ${selectedTable})`);
   };
 
   return (
-    <div
-      className="ids-modal-overlay"
-      style={{
-        zIndex: 1450,
-        background: 'rgba(0, 0, 0, 0.75)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '8px'
-      }}
-    >
-      <div
-        className="ids-dialog-window"
-        style={{
-          width: '1200px',
-          maxWidth: '98vw',
-          height: '92vh',
-          maxHeight: '94vh',
-          background: '#2B2B2B',
-          border: '3px solid #FFF',
-          borderRightColor: '#505050',
-          borderBottomColor: '#505050',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.8)',
-          fontFamily: 'Tahoma, Arial, sans-serif',
-          display: 'flex',
+    <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
+      <div 
+        className="ids-dialog-window" 
+        style={{ 
+          width: '980px', 
+          height: '680px', 
+          display: 'flex', 
           flexDirection: 'column',
-          color: '#FFF'
+          background: '#D4D0C8' 
         }}
       >
-        {/* Top Titlebar */}
-        <div
-          style={{
-            background: 'linear-gradient(90deg, #0A246A 0%, #1E5799 100%)',
-            padding: '6px 12px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '2px solid #FFF'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '16px' }}>🖥️</span>
-            <span style={{ fontWeight: 700, fontSize: '13px', letterSpacing: '0.4px' }}>
-              Fortune NEXT Touch POS Terminal V7.0 — {activeOutlet} ({activeSession})
-            </span>
+        {/* Title Bar */}
+        <div className="ids-dialog-titlebar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>Touch Screen POS Terminal V7.0 — {HOTEL_CONFIG.name} ({activeOutlet})</span>
+          <button className="ids-win-btn close" onClick={onClose}>✕</button>
+        </div>
+
+        {/* Top Control Bar */}
+        <div style={{ padding: '6px 10px', background: '#ECE9D8', borderBottom: '1px solid #716F64', display: 'flex', gap: '15px', alignItems: 'center', fontSize: '11px' }}>
+          <div>
+            <strong>Outlet:</strong>{' '}
+            <select className="ids-select" value={activeOutlet} onChange={e => setActiveOutlet(e.target.value)}>
+              <option value="RESTAURANT">RESTAURANT (Dine-in)</option>
+              <option value="ROOM SERVICE">ROOM SERVICE (POS 5)</option>
+              <option value="BANQUET">BANQUET HALL</option>
+            </select>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '11px', color: '#FFD700' }}>
-              📅 {accountingDate} | 👤 {currentUser}
-            </span>
-            <button
-              onClick={onClose}
-              style={{
-                background: '#D9534F',
-                border: '1px solid #FFF',
-                color: '#FFF',
-                fontWeight: 700,
-                padding: '2px 8px',
-                fontSize: '11px',
-                cursor: 'pointer'
-              }}
-            >
-              ✕ EXIT
-            </button>
+          <div>
+            <strong>Table No.:</strong>{' '}
+            <select className="ids-select" value={selectedTable} onChange={e => setSelectedTable(e.target.value)}>
+              {['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-06', 'T-07', 'T-08', 'T-09', 'T-10', 'T-11', 'T-12'].map(t => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <strong>Steward:</strong>{' '}
+            <select className="ids-select" value={selectedServer} onChange={e => setSelectedServer(e.target.value)}>
+              <option value="Kaushik">Kaushik</option>
+              <option value="Ajay">Ajay</option>
+              <option value="Bijay">Bijay</option>
+              <option value="Ranjan">Ranjan</option>
+            </select>
+          </div>
+          <div>
+            <strong>Covers:</strong>{' '}
+            <input 
+              type="number" 
+              className="ids-input" 
+              value={covers} 
+              onChange={e => setCovers(Math.max(1, parseInt(e.target.value) || 1))}
+              style={{ width: '45px', textAlign: 'center' }} 
+            />
+          </div>
+          <div style={{ marginLeft: 'auto', color: '#0A246A', fontWeight: 700 }}>
+            Session: {activeSession} | Date: {accountingDate} | User: {currentUser}
           </div>
         </div>
 
-        {/* Operational Control Bar */}
-        <div
-          style={{
-            background: '#3A3A3A',
-            padding: '6px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '12px',
-            borderBottom: '1px solid #505050'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div>
-              <span style={{ color: '#BBB', marginRight: '6px' }}>Table:</span>
-              <select
-                value={selectedTable}
-                onChange={e => setSelectedTable(e.target.value)}
-                style={{ padding: '3px 8px', fontWeight: 700, background: '#FFF', color: '#000', fontSize: '12px' }}
-              >
-                {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '14', 'B1', 'B2', 'VIP-1'].map(t => (
-                  <option key={t} value={t}>Table {t}</option>
-                ))}
-              </select>
+        {/* Main Work Area */}
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          
+          {/* Left Column: Menu Groups + Item Grid (65% width) */}
+          <div style={{ flex: '1 1 65%', display: 'flex', flexDirection: 'column', borderRight: '2px solid #716F64', background: '#F0EFEA' }}>
+            
+            {/* Group Filter Tabs */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', padding: '6px', background: '#D4D0C8', borderBottom: '1px solid #716F64' }}>
+              {TOUCH_GROUPS.map(g => (
+                <button
+                  key={g.id}
+                  onClick={() => setSelectedGroup(g.id)}
+                  style={{
+                    background: selectedGroup === g.id ? g.color : '#E0DFD8',
+                    color: selectedGroup === g.id ? '#FFF' : '#000',
+                    fontWeight: 700,
+                    fontSize: '11px',
+                    padding: '5px 8px',
+                    border: '1px solid #716F64',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    boxShadow: selectedGroup === g.id ? 'inset 0 2px 4px rgba(0,0,0,0.3)' : '1px 1px 0 #FFF'
+                  }}
+                >
+                  {g.name}
+                </button>
+              ))}
             </div>
 
-            <div>
-              <span style={{ color: '#BBB', marginRight: '6px' }}>Covers (Pax):</span>
-              <select
-                value={covers}
-                onChange={e => setCovers(Number(e.target.value))}
-                style={{ padding: '3px 8px', fontWeight: 700, background: '#FFF', color: '#000', fontSize: '12px' }}
-              >
-                {[1, 2, 3, 4, 5, 6, 8, 10, 12].map(p => (
-                  <option key={p} value={p}>{p} Pax</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <span style={{ color: '#BBB', marginRight: '6px' }}>Server:</span>
-              <select
-                value={selectedServer}
-                onChange={e => setSelectedServer(e.target.value)}
-                style={{ padding: '3px 8px', fontWeight: 700, background: '#FFF', color: '#000', fontSize: '12px' }}
-              >
-                {['Kaushik', 'Ajay', 'Bijay', 'Rahul', 'Biren'].map(s => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <span style={{ color: '#BBB', marginRight: '6px' }}>Outlet:</span>
-              <select
-                value={activeOutlet}
-                onChange={e => setActiveOutlet(e.target.value)}
-                style={{ padding: '3px 8px', fontWeight: 700, background: '#FFF', color: '#000', fontSize: '12px' }}
-              >
-                <option value="RESTAURANT">RESTAURANT</option>
-                <option value="LIQUOR BAR">LIQUOR BAR</option>
-                <option value="ROOM SERVICE">ROOM SERVICE</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {messagePrompt && (
-              <span style={{ background: '#2E7D32', color: '#FFF', padding: '3px 10px', borderRadius: '3px', fontWeight: 600 }}>
-                {messagePrompt}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Main Workspace (Grid 3 Columns) */}
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-          {/* Left Categories Column (Touch Screen Groups) */}
-          <div
-            style={{
-              width: '180px',
-              background: '#222',
-              borderRight: '2px solid #505050',
-              padding: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              overflowY: 'auto'
-            }}
-          >
-            <div style={{ fontSize: '11px', color: '#AAA', fontWeight: 700, paddingLeft: '4px', textTransform: 'uppercase' }}>
-              Touch Groups
-            </div>
-            {TOUCH_GROUPS.map(g => (
-              <button
-                key={g.id}
-                onClick={() => setSelectedGroup(g.id)}
-                style={{
-                  background: selectedGroup === g.id ? '#FFF' : g.color,
-                  color: selectedGroup === g.id ? '#000' : '#FFF',
-                  border: selectedGroup === g.id ? '3px solid #FFD700' : '2px solid #FFF',
-                  borderRightColor: '#333',
-                  borderBottomColor: '#333',
-                  padding: '12px 6px',
-                  fontWeight: 700,
-                  fontSize: '11px',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  borderRadius: '4px',
-                  boxShadow: selectedGroup === g.id ? '0 0 10px rgba(255,215,0,0.8)' : 'none',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {g.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Center Items Grid */}
-          <div
-            style={{
-              flex: 1,
-              background: '#1E1E1E',
-              padding: '10px',
-              overflowY: 'auto',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-              gridAutoRows: '95px',
-              gap: '8px'
-            }}
-          >
-            {filteredItems.map(item => (
-              <button
-                key={item.code}
-                onClick={() => handleAddItem(item)}
-                style={{
-                  background: '#2D3748',
-                  border: '2px solid #4A5568',
-                  borderRadius: '6px',
-                  color: '#FFF',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '8px 6px',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.4)',
-                  transition: 'transform 0.1s, background 0.1s'
-                }}
-                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.96)'}
-                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                <div style={{ fontWeight: 700, fontSize: '11px', lineHeight: '14px' }}>
-                  {item.name}
+            {/* Touch Item Tiles */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '6px', alignContent: 'start' }}>
+              {filteredItems.map(item => (
+                <div
+                  key={item.code}
+                  onClick={() => handleAddItem(item)}
+                  style={{
+                    background: '#FFFFFF',
+                    border: '1px solid #999',
+                    borderRadius: '3px',
+                    padding: '8px 6px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '68px',
+                    boxShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.05s'
+                  }}
+                  onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+                  onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000', lineHeight: '1.2' }}>{item.name}</div>
+                    <div style={{ fontSize: '9.5px', color: '#666' }}>{item.kitchen}</div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                    <span style={{ fontSize: '10px', color: '#888' }}>{item.code}</span>
+                    <span style={{ fontSize: '11.5px', fontWeight: 800, color: '#B8860B' }}>₹{item.price.toFixed(0)}</span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                  <span style={{ fontSize: '10px', color: '#A0AEC0' }}>{item.code}</span>
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#48BB78' }}>
-                    ₹{item.price.toFixed(0)}
-                  </span>
-                </div>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Right Ticket / Cart Pane */}
-          <div
-            style={{
-              width: '380px',
-              background: '#ECE9D8',
-              borderLeft: '2px solid #505050',
-              display: 'flex',
-              flexDirection: 'column',
-              color: '#000'
-            }}
-          >
+          {/* Right Column: Order Bill & KOT Cart (35% width) */}
+          <div style={{ flex: '0 0 35%', display: 'flex', flexDirection: 'column', background: '#FFF', borderLeft: '1px solid #FFF' }}>
+            
             {/* Cart Header */}
-            <div
-              style={{
-                background: '#0A246A',
-                color: '#FFF',
-                padding: '6px 10px',
-                fontSize: '11px',
-                fontWeight: 700,
-                display: 'flex',
-                justifyContent: 'space-between'
-              }}
-            >
-              <span>RUNNING TICKET: TBL {selectedTable}</span>
+            <div style={{ padding: '8px 10px', background: '#0A246A', color: '#FFF', fontWeight: 700, fontSize: '12px', display: 'flex', justifyContent: 'space-between' }}>
+              <span>CURRENT ORDER — {selectedTable}</span>
               <span>{cart.length} ITEMS</span>
             </div>
 
-            {/* Cart Items List */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '6px' }}>
-              {cart.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '12px' }}>
-                  Tap items from center grid to add to order
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {cart.map(item => (
-                    <div
-                      key={item.code}
-                      style={{
-                        background: '#FFF',
-                        border: '1px solid #7F9DB9',
-                        padding: '4px 6px',
-                        fontSize: '11px'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 700, color: '#0A246A' }}>{item.name}</span>
-                        <span style={{ fontWeight: 700 }}>₹{(item.price * item.qty).toFixed(2)}</span>
-                      </div>
-
-                      {/* Modifier instruction */}
-                      {item.modifier ? (
-                        <div style={{ color: '#D97706', fontSize: '10px', fontWeight: 600, marginTop: '2px' }}>
-                          ↳ Mod: {item.modifier}
-                        </div>
-                      ) : null}
-
-                      {/* Qty & Action Controls */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                        <button
-                          onClick={() => handleSetModifier(item.code)}
-                          style={{
-                            background: '#FFF3CD',
-                            border: '1px solid #FFEBAA',
-                            fontSize: '9px',
-                            fontWeight: 700,
-                            padding: '1px 5px',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          + Modifier
-                        </button>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <button
-                            onClick={() => handleDecrement(item.code)}
-                            style={{ width: '22px', height: '20px', fontWeight: 800, background: '#ECE9D8', border: '1px solid #716F64', cursor: 'pointer' }}
-                          >
-                            -
-                          </button>
-                          <span style={{ minWidth: '18px', textAlign: 'center', fontWeight: 700 }}>{item.qty}</span>
-                          <button
-                            onClick={() => handleIncrement(item.code)}
-                            style={{ width: '22px', height: '20px', fontWeight: 800, background: '#ECE9D8', border: '1px solid #716F64', cursor: 'pointer' }}
-                          >
-                            +
-                          </button>
-                          <button
-                            onClick={() => handleRemove(item.code)}
-                            style={{ marginLeft: '4px', background: '#F8D7DA', border: '1px solid #F5C6CB', color: '#721C24', fontSize: '10px', cursor: 'pointer', padding: '1px 4px' }}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {/* Cart Items Table */}
+            <div style={{ flex: 1, overflowY: 'auto', borderBottom: '1px solid #CCC' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0 }}>
+                  <tr>
+                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Item</th>
+                    <th style={{ padding: '4px', textAlign: 'center', width: '40px' }}>Qty</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '55px' }}>Price</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '60px' }}>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ textAlign: 'center', padding: '30px 10px', color: '#888' }}>
+                        Cart is empty.<br />Tap any menu item on the left to add.
+                      </td>
+                    </tr>
+                  ) : (
+                    cart.map(item => (
+                      <tr key={item.code} style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '4px 6px' }}>
+                          <div style={{ fontWeight: 600 }}>{item.name}</div>
+                          {item.modifier && <div style={{ fontSize: '9.5px', color: '#E65100' }}>• {item.modifier}</div>}
+                        </td>
+                        <td style={{ padding: '4px', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                            <button 
+                              onClick={() => handleUpdateQty(item.code, -1)}
+                              style={{ width: '16px', height: '16px', padding: 0, fontSize: '10px', cursor: 'pointer' }}
+                            >
+                              -
+                            </button>
+                            <span style={{ fontWeight: 700, minWidth: '14px' }}>{item.qty}</span>
+                            <button 
+                              onClick={() => handleUpdateQty(item.code, 1)}
+                              style={{ width: '16px', height: '16px', padding: 0, fontSize: '10px', cursor: 'pointer' }}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', color: '#555' }}>
+                          {item.price.toFixed(2)}
+                        </td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 700 }}>
+                          {(item.price * item.qty).toFixed(2)}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
 
-            {/* Cart Billing Summary Footer */}
-            <div style={{ background: '#E0DFD8', borderTop: '2px solid #716F64', padding: '8px 10px', fontSize: '11px' }}>
+            {/* Bill Calculation Totals */}
+            <div style={{ padding: '8px 12px', background: '#ECE9D8', borderTop: '1px solid #CCC', fontSize: '11px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
                 <span>Sub Total:</span>
-                <span>₹{subtotal.toFixed(2)}</span>
+                <span>₹{subTotal.toFixed(2)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#555' }}>
-                <span>CGST (2.5%) + SGST (2.5%):</span>
-                <span>₹{(cgst + sgst).toFixed(2)}</span>
+                <span>CGST (2.5%):</span>
+                <span>₹{cgst.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: '#777' }}>
-                <span>Round Off:</span>
-                <span>{roundOff >= 0 ? `+₹${roundOff.toFixed(2)}` : `-₹${Math.abs(roundOff).toFixed(2)}`}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', color: '#555' }}>
+                <span>SGST (2.5%):</span>
+                <span>₹{sgst.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #716F64', paddingTop: '4px', fontSize: '14px', fontWeight: 800, color: '#0A246A' }}>
-                <span>TOTAL PAYABLE:</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '14px', borderTop: '1px solid #716F64', paddingTop: '4px', color: '#0A246A' }}>
+                <span>Grand Total:</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
-
-              {/* Big Touch Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '8px' }}>
-                <button
-                  onClick={handlePunchKOT}
-                  style={{
-                    background: '#0A246A',
-                    color: '#FFF',
-                    border: '2px solid #FFF',
-                    borderRightColor: '#001040',
-                    borderBottomColor: '#001040',
-                    padding: '8px 4px',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    borderRadius: '3px'
-                  }}
-                >
-                  🖨️ Punch KOT
-                </button>
-                <button
-                  onClick={handleFastCashSettle}
-                  style={{
-                    background: '#2E7D32',
-                    color: '#FFF',
-                    border: '2px solid #FFF',
-                    borderRightColor: '#1B5E20',
-                    borderBottomColor: '#1B5E20',
-                    padding: '8px 4px',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                    cursor: 'pointer',
-                    borderRadius: '3px'
-                  }}
-                >
-                  💵 Fast Cash Settle
-                </button>
-                <button
-                  onClick={() => setCart([])}
-                  style={{
-                    background: '#C0C0C0',
-                    color: '#000',
-                    border: '2px solid #FFF',
-                    borderRightColor: '#666',
-                    borderBottomColor: '#666',
-                    padding: '6px 4px',
-                    fontWeight: 600,
-                    fontSize: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '3px'
-                  }}
-                >
-                  Clear Cart
-                </button>
-                <button
-                  onClick={onClose}
-                  style={{
-                    background: '#D9534F',
-                    color: '#FFF',
-                    border: '2px solid #FFF',
-                    borderRightColor: '#800',
-                    borderBottomColor: '#800',
-                    padding: '6px 4px',
-                    fontWeight: 700,
-                    fontSize: '10px',
-                    cursor: 'pointer',
-                    borderRadius: '3px'
-                  }}
-                >
-                  Exit Terminal
-                </button>
-              </div>
             </div>
+
+            {/* Action Buttons */}
+            <div style={{ padding: '8px 10px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+              <button 
+                onClick={handlePunchKot}
+                className="ids-btn-classic" 
+                style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700, padding: '8px 0', fontSize: '11.5px', cursor: 'pointer' }}
+              >
+                PUNCH KOT
+              </button>
+              <button 
+                onClick={handlePrintBill}
+                className="ids-btn-classic" 
+                style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '8px 0', fontSize: '11.5px', cursor: 'pointer' }}
+              >
+                PRINT BILL
+              </button>
+              <button 
+                onClick={handleClearCart}
+                className="ids-btn-classic" 
+                style={{ background: '#B22222', color: '#FFF', fontWeight: 700, padding: '8px 0', fontSize: '11.5px', cursor: 'pointer' }}
+              >
+                CLEAR
+              </button>
+            </div>
+
           </div>
+
         </div>
+
+        {/* Status / Message Bar */}
+        {messagePrompt && (
+          <div style={{ padding: '6px 12px', background: '#FFF7CC', borderTop: '1px solid #E6B800', fontSize: '11.5px', fontWeight: 700, color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>{messagePrompt}</span>
+            <button 
+              onClick={() => setMessagePrompt(null)}
+              style={{ border: 'none', background: 'transparent', cursor: 'pointer', fontWeight: 700 }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
       </div>
     </div>
   );

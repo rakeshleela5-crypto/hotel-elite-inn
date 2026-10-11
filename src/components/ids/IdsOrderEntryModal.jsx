@@ -70,18 +70,17 @@ export const POS_MENU_ITEMS = [
   { code: '60', name: 'CHICKEN MAJEDAR BHARTA', category: 'MAIN COURSE', outlet: 'RES', outletName: 'RESTAURANT', rate: 250.00 },
   { code: '120', name: 'CHICKEN SHASHLIK(OINV)', category: 'CONTINENTAL', outlet: 'RES', outletName: 'RESTAURANT', rate: 275.00 },
   
-  // Video 11 Authentic Bar Items (LIQUOR BAR, Outlet Code CAR / BAR - Frame 028, 033)
-  { code: '601', name: 'BLENDERS PRIDE ...', fullName: 'BLENDERS PRIDE (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 135.00 },
-  { code: '592', name: 'JW BLACK LABEL ...', fullName: 'JW BLACK LABEL (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 480.00 },
-  { code: '599', name: 'BLENDERS PRIDE RESERVE', fullName: 'BLENDERS PRIDE RESERVE (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 150.00 },
-  { code: '597', name: 'TEACHERS HIGHLAND CREAM', fullName: 'TEACHERS HIGHLAND CREAM (60ML)', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 220.00 },
-  { code: '585', name: 'KINGFISHER PREMIUM (650ML)', fullName: 'KINGFISHER PREMIUM BEER', category: 'BEER', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 180.00 },
-  { code: '586', name: 'CORONA EXTRA (330ML)', fullName: 'CORONA EXTRA BEER', category: 'BEER', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 280.00 },
-  { code: '590', name: 'BACARDI WHITE RUM (60ML)', fullName: 'BACARDI SUPERIOR WHITE RUM', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 140.00 },
-  { code: '594', name: 'CHIVAS REGAL 12 YRS (60ML)', fullName: 'CHIVAS REGAL 12 YEARS', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 420.00 },
-  { code: '595', name: 'GLENFIDDICH 12 YRS (60ML)', fullName: 'GLENFIDDICH 12 YRS SINGLE MALT', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 550.00 },
-  { code: '605', name: 'SMIRNOFF VODKA (60ML)', fullName: 'SMIRNOFF TRIPLE DISTILLED', category: 'LIQUOR', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 130.00 },
-  { code: '610', name: 'SULA SAUVIGNON BLANC (GLASS)', fullName: 'SULA WHITE WINE GLASS', category: 'WINE', outlet: 'CAR', outletName: 'LIQUOR BAR', rate: 290.00 },
+  // Official Hotel Elite Inn Dining Items
+  { code: 'BEV-01', name: 'TEA', category: 'BEVERAGE', outlet: 'RES', outletName: 'RESTAURANT', rate: 25.00 },
+  { code: 'BEV-05', name: 'COFFEE', category: 'BEVERAGE', outlet: 'RES', outletName: 'RESTAURANT', rate: 35.00 },
+  { code: 'BF-04', name: 'PLAIN DOSA', category: 'BREAKFAST', outlet: 'RES', outletName: 'RESTAURANT', rate: 80.00 },
+  { code: 'BF-05', name: 'MASALA DOSA', category: 'BREAKFAST', outlet: 'RES', outletName: 'RESTAURANT', rate: 100.00 },
+  { code: 'ST-03', name: 'PANEER TIKKA', category: 'STARTER', outlet: 'RES', outletName: 'RESTAURANT', rate: 250.00 },
+  { code: 'NST-03', name: 'CHICKEN TIKKA', category: 'STARTER', outlet: 'RES', outletName: 'RESTAURANT', rate: 300.00 },
+  { code: 'MC-06', name: 'CHICKEN BUTTER MASALA', category: 'MAIN COURSE', outlet: 'RES', outletName: 'RESTAURANT', rate: 320.00 },
+  { code: 'MC-14', name: 'CHAMPARAN MEAT', category: 'MAIN COURSE', outlet: 'RES', outletName: 'RESTAURANT', rate: 500.00 },
+  { code: 'RC-07', name: 'CHICKEN DUM BIRYANI', category: 'RICE', outlet: 'RES', outletName: 'RESTAURANT', rate: 250.00 },
+  { code: 'DES-02', name: 'HOT GULAB JAMUN', category: 'DESSERT', outlet: 'RES', outletName: 'RESTAURANT', rate: 110.00 },
 
   // Merge in the Elite Inn 204 item catalog
   ...RESTAURANT_MENU.map(m => ({
