@@ -62,8 +62,6 @@ export default function IdsCrystalReportModal({
     return () => { isMounted = false; };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const handlePrint = () => {
     window.print();
   };
@@ -235,6 +233,8 @@ export default function IdsCrystalReportModal({
     link.click();
     document.body.removeChild(link);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div 

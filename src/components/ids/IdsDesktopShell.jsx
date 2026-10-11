@@ -80,6 +80,7 @@ import IdsHkInventoryModal from './IdsHkInventoryModal';
 import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
+import IdsAuditedSalesRegisterModal from './IdsAuditedSalesRegisterModal';
 import IdsOrderEntryModal from './IdsOrderEntryModal';
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
@@ -469,6 +470,15 @@ export default function IdsDesktopShell({
   const [crystalReportModalOpen, setCrystalReportModalOpen] = useState(false);
   const [crystalReportType, setCrystalReportType] = useState('rule46-bill');
   const [crystalReportData, setCrystalReportData] = useState({});
+
+  // Win32 Audited Sales & Revenue Registers Modal State V6.5.004.2
+  const [auditedSalesRegisterModalOpen, setAuditedSalesRegisterModalOpen] = useState(false);
+  const [auditedSalesRegisterInitialTab, setAuditedSalesRegisterInitialTab] = useState('hotel-sales');
+
+  const openAuditedSalesRegister = (tab = 'hotel-sales') => {
+    setAuditedSalesRegisterInitialTab(tab);
+    setAuditedSalesRegisterModalOpen(true);
+  };
 
   const showMessageBox = (message, title = 'IDS Fortune NEXT', type = 'info', buttons = 'ok', onOk = null) => {
     setMsgBoxConfig({
@@ -970,17 +980,22 @@ export default function IdsDesktopShell({
       { 
         label: 'Hotel Sales Register - Monthly (26 Columns - June Month Audit)', 
         videoId: 'AUDIT-01', 
-        action: () => openCrystalReport('hotel-sale-monthly') 
+        action: () => openAuditedSalesRegister('hotel-sales') 
+      },
+      { 
+        label: 'Statutory Tax Reconciliation Summary (GSTR-3B Table 3.1a)', 
+        videoId: 'AUDIT-02', 
+        action: () => openAuditedSalesRegister('statutory-reconciliation') 
       },
       { 
         label: 'Restaurant & Bar Sales Register (12 Columns - June Month Audit)', 
-        videoId: 'AUDIT-02', 
-        action: () => openCrystalReport('restaurant-sale-monthly') 
+        videoId: 'AUDIT-03', 
+        action: () => openAuditedSalesRegister('restaurant-sales') 
       },
       { 
         label: 'Management Non-Chargeable (NC) Dining Register (June Month Audit)', 
-        videoId: 'AUDIT-03', 
-        action: () => openCrystalReport('restaurant-mgm-monthly') 
+        videoId: 'AUDIT-04', 
+        action: () => openAuditedSalesRegister('mgm-dining') 
       },
       { 
         label: 'Monthly F&B Sales Register in POS Reports Suite (1,324 Orders)', 
@@ -2209,11 +2224,11 @@ export default function IdsDesktopShell({
         onClose={() => setQuickScanModalOpen(false)}
         onSelectProgram={(programId) => {
           if (programId === 'hotel-sale-monthly') {
-            openCrystalReport('hotel-sale-monthly');
+            openAuditedSalesRegister('hotel-sales');
           } else if (programId === 'restaurant-sale-monthly') {
-            openCrystalReport('restaurant-sale-monthly');
+            openAuditedSalesRegister('restaurant-sales');
           } else if (programId === 'restaurant-mgm-monthly') {
-            openCrystalReport('restaurant-mgm-monthly');
+            openAuditedSalesRegister('mgm-dining');
           } else if (programId === 'room-status' || programId === 'housekeeping-room-status') {
             setRoomRackConsoleOpen(true);
           } else if (programId === 'clear-rooms') {
@@ -3293,6 +3308,15 @@ export default function IdsDesktopShell({
         onClose={() => setCrystalReportModalOpen(false)}
         reportType={crystalReportType}
         data={crystalReportData}
+      />
+
+      {/* Win32 Audited Sales & Revenue Registers Modal (June Month Audit) */}
+      <IdsAuditedSalesRegisterModal
+        isOpen={auditedSalesRegisterModalOpen}
+        onClose={() => setAuditedSalesRegisterModalOpen(false)}
+        initialTab={auditedSalesRegisterInitialTab}
+        accountingDate={accountingDate}
+        currentUser="MANAGER"
       />
     </div>
   );

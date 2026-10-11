@@ -343,8 +343,6 @@ export default function IdsPosReportsModal({
   const [toDate, setToDate] = useState('08-FEB-2026');
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
-  if (!isOpen) return null;
-
   // Filter Sales
   const filteredSales = INITIAL_SALES_RECORDS.filter(r => {
     if (filterOutlet !== 'ALL' && r.outlet !== filterOutlet) return false;
@@ -441,6 +439,8 @@ export default function IdsPosReportsModal({
     link.click();
     document.body.removeChild(link);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
