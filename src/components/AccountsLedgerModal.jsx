@@ -8,7 +8,7 @@ import {
   FilePlus, RefreshCw, FileCheck, Send, Mail, BookOpen, Terminal, Layers, Plus, MessageCircle
 } from 'lucide-react';
 import { HOTEL_CONFIG, CORPORATE_PARTNERS, INITIAL_CORPORATE_LEDGER, ITEM_WISE_SALES_REPORT_2026_09_24, GST_FOM_RECORDS_2026_09_25 } from '../data/hotelData';
-import BookingReceiptModal from './BookingReceiptModal';
+import IdsReprintBillModal from './ids/IdsReprintBillModal';
 import TallyConsoleModal from './TallyConsoleModal';
 import { generateOfficialGstr1Json, reconcileGstr2bWithPurchases, validateGstin, exportGstr1ExcelWorkbook } from '../utils/gstGovExport';
 import { useUniversalInlineEdit, InlineEditorBanner, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
@@ -6193,17 +6193,10 @@ export default function AccountsLedgerModal({
         )}
 
         {/* STATUTORY TAX INVOICE & NON-GST BILL MODAL */}
-        {isBillModalOpen && selectedBillBooking && (
-          <BookingReceiptModal
+        {isBillModalOpen && (
+          <IdsReprintBillModal
             isOpen={isBillModalOpen}
             onClose={() => setIsBillModalOpen(false)}
-            booking={selectedBillBooking}
-            initialType="a4"
-            onUpdateBooking={(updated) => {
-              if (updated) {
-                setSelectedBillBooking(updated);
-              }
-            }}
           />
         )}
 

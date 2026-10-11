@@ -12,9 +12,9 @@ import {
 import { HOTEL_CONFIG, ROOM_TIERS, GST_FOM_RECORDS_2026_09_25 } from '../data/hotelData';
 import { maskAadhaar } from '../utils/security';
 import { calculateRoomTax } from '../utils/taxUtils';
-import FolioActionsModal from './FolioActionsModal';
-import BookingReceiptModal from './BookingReceiptModal';
-import CheckoutSplitModal from './CheckoutSplitModal';
+import IdsCheckoutBillModal from './ids/IdsCheckoutBillModal';
+import IdsReprintBillModal from './ids/IdsReprintBillModal';
+import IdsPaxCheckoutModal from './ids/IdsPaxCheckoutModal';
 import PmsSidebar from './PmsSidebar';
 import PmsControlHeader from './PmsControlHeader';
 
@@ -8441,108 +8441,27 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         </div>
       )}
 
-      {/* FOLIO ACTIONS MODAL (hotel_documents.pdf Page 5 - 12 Edit Options) */}
+      {/* IDS NEXT OFFICIAL FOLIO & CHECKOUT BILL MODAL */}
       {selectedFolioRoom && (
-        <FolioActionsModal
+        <IdsCheckoutBillModal
           isOpen={!!selectedFolioRoom}
           onClose={() => setSelectedFolioRoom(null)}
-          room={selectedFolioRoom}
-          rooms={rooms}
-          transactions={transactions}
-          onAddTransaction={onAddTransaction}
-          onOpenMasterFolio={onOpenMasterFolio}
-          onUpdateFolio={(roomNumber, updateData) => {
-            if (updateData && updateData.deltaBalance !== undefined) {
-              setRooms(prev => prev.map(r => {
-                if (String(r.roomNumber) === String(roomNumber)) {
-                  const currentBal = Number(r.outstandingBalance !== undefined ? r.outstandingBalance : (r.tariff || 2199));
-                  const newBal = Math.max(0, Math.round((currentBal + updateData.deltaBalance) * 100) / 100);
-                  return { ...r, outstandingBalance: newBal };
-                }
-                return r;
-              }));
-            }
-          }}
-          onShiftRoom={(fromRoom, toRoom, reason) => {
-            onUpdateRoomStatus(fromRoom, 'Available', null, null);
-            onUpdateRoomStatus(toRoom, 'Occupied', selectedFolioRoom?.currentGuestName, null);
-            if (onShiftRoomTransactions) {
-              onShiftRoomTransactions(fromRoom, toRoom);
-            }
-            if (onAddTransaction) {
-              onAddTransaction({
-                transactionId: `TXN-SHIFT-${Date.now().toString().slice(-4)}`,
-                folioId: `FOLIO-${toRoom}`,
-                roomNumber: toRoom,
-                transactionType: 'Room Shift',
-                outlet: 'Front Desk PMS',
-                itemCode: 'ROOM-SHIFT',
-                description: `Room Shift from #${fromRoom} to #${toRoom} [Reason: ${reason || 'Guest Relocation'}]`,
-                debitAmount: 0,
-                creditAmount: 0,
-                createdBy: 'Front Desk'
-              });
-            }
-            setSelectedFolioRoom(null);
-          }}
-          onCheckoutRoom={(roomNumber, checkoutData) => {
-            onUpdateRoomStatus(roomNumber, 'Cleaning', null, null);
-            if (checkoutData?.transactions) {
-              const settleTx = checkoutData.transactions.find(t => t.type === 'SETTLEMENT');
-              if (settleTx?.tenders?.cash) {
-                setCashCollected(prev => prev + settleTx.tenders.cash);
-              }
-              if (settleTx?.tenders) {
-                const tenderRows = [];
-                if (settleTx.tenders.cash > 0) tenderRows.push({ mode: 'Cash', amount: settleTx.tenders.cash, ref: 'Front Desk Cash' });
-                if (settleTx.tenders.upi > 0) tenderRows.push({ mode: 'UPI', amount: settleTx.tenders.upi, ref: settleTx.tenders.upiRef || 'UPI' });
-                if (settleTx.tenders.card > 0) tenderRows.push({ mode: 'Card', amount: settleTx.tenders.card, ref: settleTx.tenders.cardRef || 'POS-Card' });
-                if (settleTx.tenders.btc > 0) tenderRows.push({ mode: 'Corporate Credit', amount: settleTx.tenders.btc, ref: settleTx.tenders.btcCompany || 'Company Credit' });
-
-                const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-                fetch('/api/sync', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-                  body: JSON.stringify({
-                    action: 'settle_split_payment',
-                    payload: { folioId: `FOLIO-${roomNumber}`, roomNumber, invoiceId: `INV-${roomNumber}`, tenderRows }
-                  })
-                }).catch(() => {});
-              }
-            }
-            setSelectedFolioRoom(null);
-          }}
-          onOpenSplitInvoice={(type) => {
-            const matchedBooking = bookings.find(b => b.roomNumber === selectedFolioRoom.roomNumber) || {
-              bookingId: `FMBIL2627-${selectedFolioRoom.roomNumber}`,
-              billNo: `FMBIL2627-${selectedFolioRoom.roomNumber}`,
-              roomNumber: selectedFolioRoom.roomNumber,
-              guestName: selectedFolioRoom.currentGuestName || 'MR. P ASHOK',
-              guestPhone: '+91 6305202068',
-              company: 'LINDE INDIA LTD',
-              corporateGstin: '21AAACB2528H1ZA',
-              tier: selectedFolioRoom.tier,
-              totalAmount: selectedFolioRoom.balanceDue || 13538,
-              nights: 4,
-              grcNo: '684'
-            };
-            setReceiptModalType(type || 'a4');
-            setSelectedReceiptBooking(matchedBooking);
-            setIsReceiptModalOpen(true);
-            setSelectedFolioRoom(null);
-          }}
+          roomNumber={selectedFolioRoom.roomNumber}
+          guestName={selectedFolioRoom.currentGuestName || 'Valued Guest'}
+          roomType={selectedFolioRoom.tier || 'Deluxe'}
+          tariff={selectedFolioRoom.tariff || 2050}
+          onSuccess={() => setSelectedFolioRoom(null)}
         />
       )}
 
-      {/* CHECKOUT & MULTI-TENDER SPLIT SETTLEMENT MODAL (Owner Video Requirement) */}
+      {/* IDS NEXT OFFICIAL SPLIT PAX CHECKOUT MODAL */}
       {checkoutRoom && (
-        <CheckoutSplitModal
+        <IdsPaxCheckoutModal
           isOpen={!!checkoutRoom}
           onClose={() => setCheckoutRoom(null)}
-          room={checkoutRoom}
-          rooms={projectedRooms}
-          bookings={allKnownBookings}
-          onConfirmCheckout={handleCheckoutConfirm}
+          roomNumber={checkoutRoom.roomNumber}
+          guestName={checkoutRoom.currentGuestName || 'Valued Guest'}
+          onConfirm={() => setCheckoutRoom(null)}
         />
       )}
 
@@ -8736,28 +8655,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         </div>
       )}
 
-      {/* STATUTORY TAX INVOICE, GRC & SPLIT BILL MODAL (hotel_documents.pdf Pages 1, 2, 3) */}
+      {/* IDS NEXT OFFICIAL REPRINT TAX INVOICE & RECEIPT MODAL */}
       {isReceiptModalOpen && selectedReceiptBooking && (
-        <BookingReceiptModal
+        <IdsReprintBillModal
           isOpen={isReceiptModalOpen}
           onClose={() => setIsReceiptModalOpen(false)}
-          booking={selectedReceiptBooking}
-          initialType={receiptModalType}
-          onUpdateBooking={(updated) => {
-            if (updated) {
-              if (onUpdateBooking) {
-                onUpdateBooking(updated);
-              }
-              if (updated.roomNumber && updated.guestName && onUpdateRoomStatus) {
-                const targetRoom = rooms.find(r => String(r.roomNumber) === String(updated.roomNumber));
-                if (targetRoom) {
-                  onUpdateRoomStatus(targetRoom.id || targetRoom.roomId, targetRoom.status || 'Occupied', updated.guestName);
-                }
-              }
-              setSelectedReceiptBooking(updated);
-              setFeedbackToast(`Folio & Tax Invoice saved for Room ${updated.roomNumber || ''} (${updated.guestName || ''})`);
-            }
-          }}
+          initialBillNo={selectedReceiptBooking.billNo || selectedReceiptBooking.bookingId}
         />
       )}
 

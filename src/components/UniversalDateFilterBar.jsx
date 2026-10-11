@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Download, Printer, FileSpreadsheet, RefreshCw, FileText, ExternalLink, SlidersHorizontal, Eye } from 'lucide-react';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
-import DateAuditSnapshotModal from './DateAuditSnapshotModal';
+import IdsAuditedSalesRegisterModal from './ids/IdsAuditedSalesRegisterModal';
 
 /**
  * UniversalDateFilterBar
@@ -430,26 +430,13 @@ export default function UniversalDateFilterBar({
         }}
       />
 
-      {/* Real-Time Audit Snapshot Pop View Modal */}
-      <DateAuditSnapshotModal
-        isOpen={isAuditModalOpen}
-        onClose={() => setIsAuditModalOpen(false)}
-        fromDate={internalFrom}
-        toDate={internalTo}
-        title={title ? `${title} (AUDIT SNAPSHOT)` : "REAL-TIME AUDIT WINDOW SNAPSHOT"}
-        subtitle={subtitle}
-        moduleType={moduleType}
-        rooms={auditRooms && auditRooms.length > 0 ? auditRooms : rooms}
-        auditItems={auditItems}
-        columns={columns}
-        kpis={kpis}
-        totalCount={totalCount}
-        totalAmount={totalAmount}
-        onExportCSV={onExportCSV}
-        onExportExcel={onExportExcel}
-        onPrint={onPrint}
-        onUpdateItem={onUpdateItem}
-      />
+      {/* Real-Time IDS NEXT Audited Register Modal */}
+      {isAuditModalOpen && (
+        <IdsAuditedSalesRegisterModal
+          isOpen={isAuditModalOpen}
+          onClose={() => setIsAuditModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

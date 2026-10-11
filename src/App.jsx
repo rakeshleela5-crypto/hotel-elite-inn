@@ -30,8 +30,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const FloorExplorer3DModal = lazyWithRetry(() => import('./components/FloorExplorer3DModal'));
 const VirtualTour360Modal = lazyWithRetry(() => import('./components/VirtualTour360Modal'));
-const BookingModal = lazyWithRetry(() => import('./components/BookingModal'));
-const BookingReceiptModal = lazyWithRetry(() => import('./components/BookingReceiptModal'));
+const IdsWalkInModal = lazyWithRetry(() => import('./components/ids/IdsWalkInModal'));
+const IdsReprintBillModal = lazyWithRetry(() => import('./components/ids/IdsReprintBillModal'));
 const ReceptionAdmin = lazyWithRetry(() => import('./components/ReceptionAdmin'));
 const IdsDesktopShell = lazyWithRetry(() => import('./components/ids/IdsDesktopShell'));
 const FinancialAnalytics = lazyWithRetry(() => import('./components/FinancialAnalytics'));
@@ -41,10 +41,10 @@ const FoodOrderModal = lazyWithRetry(() => import('./components/FoodOrderModal')
 const DarshanAdvisorModal = lazyWithRetry(() => import('./components/DarshanAdvisorModal'));
 const AiConciergeModal = lazyWithRetry(() => import('./components/AiConciergeModal'));
 const CorporatePortalModal = lazyWithRetry(() => import('./components/CorporatePortalModal'));
-const FolioActionsModal = lazyWithRetry(() => import('./components/FolioActionsModal'));
-const CannonKitchenPOS = lazyWithRetry(() => import('./components/CannonKitchenPOS'));
+const IdsCheckoutBillModal = lazyWithRetry(() => import('./components/ids/IdsCheckoutBillModal'));
+const IdsTouchPosTerminalModal = lazyWithRetry(() => import('./components/ids/IdsTouchPosTerminalModal'));
 const AccountsLedgerModal = lazyWithRetry(() => import('./components/AccountsLedgerModal'));
-const NightAuditModal = lazyWithRetry(() => import('./components/NightAuditModal'));
+const IdsNightAuditModal = lazyWithRetry(() => import('./components/ids/IdsNightAuditModal'));
 const StoreInventoryModal = lazyWithRetry(() => import('./components/StoreInventoryModal'));
 const DirectorPortal = lazyWithRetry(() => import('./components/DirectorPortal'));
 const RevenueManagementModal = lazyWithRetry(() => import('./components/RevenueManagementModal'));
@@ -58,7 +58,7 @@ const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMo
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
-const RoomQuickSearchModal = lazyWithRetry(() => import('./components/RoomQuickSearchModal'));
+const IdsQuickScanModal = lazyWithRetry(() => import('./components/ids/IdsQuickScanModal'));
 import { 
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
@@ -1266,36 +1266,25 @@ export default function App() {
           onBookRoom={(tier, roomNumber) => handleOpenBooking(tier, roomNumber)}
         />
 
-        <BookingModal 
-          isOpen={bookingModalOpen}
-          onClose={() => {
-            setBookingModalOpen(false);
-            setSelectedCheckInForBooking(null);
-            setSelectedCheckOutForBooking(null);
-          }}
-          initialTier={selectedTierForBooking}
-          initialRoomNumber={selectedRoomNumForBooking}
-          initialCheckInDate={selectedCheckInForBooking}
-          initialCheckOutDate={selectedCheckOutForBooking}
-          rooms={rooms}
-          bookings={bookings}
-          dynamicRates={dynamicRates}
-          onBookingSuccess={handleBookingSuccess}
-        />
+        {bookingModalOpen && (
+          <IdsWalkInModal 
+            isOpen={bookingModalOpen}
+            onClose={() => {
+              setBookingModalOpen(false);
+              setSelectedCheckInForBooking(null);
+              setSelectedCheckOutForBooking(null);
+            }}
+            initialRoomNo={selectedRoomNumForBooking || '203'}
+            onCompleteWalkIn={handleBookingSuccess}
+          />
+        )}
 
-        <BookingReceiptModal 
-          isOpen={receiptModalOpen}
-          onClose={() => setReceiptModalOpen(false)}
-          booking={currentReceiptBooking}
-          initialType={receiptInitialType}
-          onUpdateBooking={(updated) => {
-            if (updated && (updated.bookingId || updated.id)) {
-              const bId = updated.bookingId || updated.id;
-              setBookings(prev => prev.map(b => (b.bookingId === bId || b.id === bId) ? { ...b, ...updated } : b));
-              setCurrentReceiptBooking(updated);
-            }
-          }}
-        />
+        {receiptModalOpen && (
+          <IdsReprintBillModal 
+            isOpen={receiptModalOpen}
+            onClose={() => setReceiptModalOpen(false)}
+          />
+        )}
 
         <FoodOrderModal 
           isOpen={diningModalOpen}
@@ -1330,36 +1319,26 @@ export default function App() {
 
         {/* IDS Next Enterprise Operational Modals - Unified Primary Folio (1-17 Actions) */}
         {folioModalOpen && (
-          <FolioActionsModal 
+          <IdsCheckoutBillModal 
             isOpen={folioModalOpen}
             onClose={() => setFolioModalOpen(false)}
-            room={rooms.find(r => String(r.roomNumber) === String(selectedFolioRoomNumber)) || rooms.find(r => r.status === 'Occupied') || rooms[0]}
-            rooms={rooms}
-            transactions={transactions}
-            onAddTransaction={handleAddTransaction}
-            onShiftRoom={(fromRoom, toRoom) => {
-              handleUpdateRoomStatus(fromRoom, 'Available', null, null);
-              handleUpdateRoomStatus(toRoom, 'Occupied', 'Guest', null);
-              setFolioModalOpen(false);
-            }}
-            onCheckoutRoom={(roomNumber) => {
-              handleUpdateRoomStatus(roomNumber, 'Cleaning', null, null);
+            initialRoomNo={String(selectedFolioRoomNumber || '102')}
+            onCompleteCheckout={(res) => {
+              const rm = res?.roomNo || selectedFolioRoomNumber;
+              if (rm) handleUpdateRoomStatus(rm, 'Cleaning', null, null);
               setFolioModalOpen(false);
             }}
           />
         )}
 
         {posModalOpen && (
-          <CannonKitchenPOS 
+          <IdsTouchPosTerminalModal 
             isOpen={posModalOpen}
             onClose={() => setPosModalOpen(false)}
-            rooms={rooms}
-            bookings={bookings}
-            onBillToRoom={handleBillToRoomFromPOS}
-            foodOrders={foodOrders}
-            onUpdateOrderStatus={handleUpdateOrderStatus}
-            onAddFoodOrder={handleAddFoodOrder}
-            onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
+            currentUser="CASHIER"
+            onKotPunched={(kot) => {
+              if (kot) handleAddFoodOrder(kot);
+            }}
           />
         )}
 
@@ -1378,15 +1357,13 @@ export default function App() {
         )}
 
         {nightAuditModalOpen && (
-          <NightAuditModal 
+          <IdsNightAuditModal 
             isOpen={nightAuditModalOpen}
             onClose={() => setNightAuditModalOpen(false)}
-            rooms={rooms}
-            bookings={bookings}
-            transactions={transactions}
-            foodOrders={foodOrders}
-            onExecuteNightAudit={handleExecuteNightAudit}
-            onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
+            onCompleteNightAudit={() => {
+              handleExecuteNightAudit();
+              setNightAuditModalOpen(false);
+            }}
           />
         )}
 
@@ -1505,22 +1482,19 @@ export default function App() {
           />
         )}
 
-        {/* Universal 27-Room Quick Search & Command Navigator (Ctrl+K) */}
+        {/* Universal IDS Quick Scan & Command Navigator (Ctrl+K) */}
         {roomSearchModalOpen && (
-          <RoomQuickSearchModal 
+          <IdsQuickScanModal 
             isOpen={roomSearchModalOpen}
             onClose={() => setRoomSearchModalOpen(false)}
-            rooms={rooms}
-            bookings={bookings}
-            onOpenMasterFolio={handleOpenMasterFolio}
-            onOpenCannonKitchenPOS={() => setPosModalOpen(true)}
-            onOpenRoomQr={handleOpenRoomQr}
-            onUpdateRoomStatus={handleUpdateRoomStatus}
-            onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
-            onSelectBooking={(b) => {
-              if (b) {
-                setCurrentReceiptBooking(b);
-                setReceiptModalOpen(true);
+            onSelectProgram={(prog) => {
+              setRoomSearchModalOpen(false);
+              if (prog?.id === 'room-status' || prog?.id === 'housekeeping-room-status') {
+                setHousekeepingModalOpen(true);
+              } else if (prog?.id === 'checkout-settle') {
+                setFolioModalOpen(true);
+              } else if (prog?.id === 'express-checkin' || prog?.id === 'guest-management') {
+                setBookingModalOpen(true);
               }
             }}
           />

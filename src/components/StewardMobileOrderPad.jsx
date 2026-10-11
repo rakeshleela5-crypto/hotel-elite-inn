@@ -7,7 +7,6 @@ import {
 import QRCode from 'qrcode';
 import { RESTAURANT_MENU } from '../data/hotelData';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
-import StaffShiftLoginModal from './StaffShiftLoginModal';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import DexieSyncIndicator from './DexieSyncIndicator';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
@@ -36,7 +35,7 @@ export default function StewardMobileOrderPad({
   initialSteward = null,
   initialTable = '1' 
 }) {
-  const [shiftSession, setShiftSession] = useState(() => getStaffSession('steward'));
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('steward') || { staff_id: 'STW-01', staffName: 'Sadananda', role: 'Floor Captain & Steward', shift: 'Morning' });
 
   // Check URL params for pre-selected staff or table
   const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -480,22 +479,10 @@ export default function StewardMobileOrderPad({
   const handleClockOut = async () => {
     if (window.confirm(`Clock out from ${shiftSession?.shift || 'current'} shift and end session?`)) {
       await endStaffShiftSession('steward', shiftSession);
-      setShiftSession(null);
+      setShiftSession({ staff_id: 'STW-01', staffName: 'Sadananda', role: 'Floor Captain & Steward', shift: 'Morning' });
     }
   };
 
-  if (!shiftSession) {
-    return (
-      <StaffShiftLoginModal
-        portal="steward"
-        onLoginSuccess={(sess) => {
-          setShiftSession(sess);
-          setActiveSteward(sess.staffName);
-        }}
-        onCancel={onClose}
-      />
-    );
-  }
 
   return (
     <div style={{

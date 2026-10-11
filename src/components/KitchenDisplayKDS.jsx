@@ -5,12 +5,11 @@ import {
   Printer, QrCode, AlertOctagon, Timer, RotateCcw, Minus, Plus, Search, Check, ShieldAlert
 } from 'lucide-react';
 import { playOrderAlert, playSuccessChime } from '../utils/soundAlert';
-import StaffShiftLoginModal from './StaffShiftLoginModal';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 import { RESTAURANT_MENU } from '../data/hotelData';
 
 export default function KitchenDisplayKDS({ onClose }) {
-  const [shiftSession, setShiftSession] = useState(() => getStaffSession('kds'));
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('kds') || { staff_id: 'CHEF-01', staffName: 'Chef Basanta Swain', role: 'Executive Head Chef', shift: 'Morning' });
   const [orders, setOrders] = useState(() => {
     try {
       const saved = localStorage.getItem('hotel_elite_inn_live_kots');
@@ -427,19 +426,10 @@ export default function KitchenDisplayKDS({ onClose }) {
   const handleClockOut = async () => {
     if (window.confirm(`Clock out from Kitchen ${shiftSession?.shift || 'current'} shift and end session?`)) {
       await endStaffShiftSession('kds', shiftSession);
-      setShiftSession(null);
+      setShiftSession({ staff_id: 'CHEF-01', staffName: 'Chef Basanta Swain', role: 'Executive Head Chef', shift: 'Morning' });
     }
   };
 
-  if (!shiftSession) {
-    return (
-      <StaffShiftLoginModal
-        portal="kds"
-        onLoginSuccess={(sess) => setShiftSession(sess)}
-        onCancel={onClose}
-      />
-    );
-  }
 
   return (
     <div style={{

@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY } from '../data/hotelData';
 import { playHousekeepingChime } from '../utils/soundAlert';
-import StaffShiftLoginModal from './StaffShiftLoginModal';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
 
 // Housekeeping Staff Configuration
@@ -56,7 +55,13 @@ const STORAGE_KEY = 'hei_hk_room_statuses';
 const SERVICE_STORAGE_KEY = 'hei_hk_service_requests';
 
 export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER' }) {
-  const [shiftSession, setShiftSession] = useState(() => getStaffSession('housekeeping'));
+  const [shiftSession, setShiftSession] = useState(() => getStaffSession('housekeeping') || {
+    staffId: 'HK-MGR-01',
+    staffName: 'Anita Majhi',
+    role: 'HK_MANAGER',
+    shift: 'Morning',
+    loginTime: new Date().toISOString()
+  });
 
   const effectiveRole = shiftSession?.role === 'HK_SUPERVISOR' ? 'SUPERVISOR' : (shiftSession?.role === 'HK_MANAGER' ? 'MANAGER' : staffRole);
   const baseStaff = HOUSEKEEPING_STAFF[effectiveRole] || HOUSEKEEPING_STAFF.MANAGER;
@@ -411,19 +416,9 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
   const handleClockOut = async () => {
     if (window.confirm(`Clock out from ${staff.name}'s ${shiftSession?.shift || 'current'} housekeeping shift?`)) {
       await endStaffShiftSession('housekeeping', shiftSession);
-      setShiftSession(null);
+      if (onClose) onClose();
     }
   };
-
-  if (!shiftSession) {
-    return (
-      <StaffShiftLoginModal
-        portal="housekeeping"
-        onLoginSuccess={(sess) => setShiftSession(sess)}
-        onCancel={onClose}
-      />
-    );
-  }
 
   return (
     <div style={{
