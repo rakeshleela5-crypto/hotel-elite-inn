@@ -2,13 +2,19 @@
 // Built according to the Win32 dialog, folder-tab, and sunken datagrid model
 import React, { useState, useEffect, useMemo } from 'react';
 import { HOTEL_CONFIG } from '../../data/hotelData';
-import { HOTEL_JUNE_SALES, HOTEL_JUNE_SUMMARY } from '../../data/hotelSaleJuneReportData';
-import { RESTAURANT_JUNE_SALES, RESTAURANT_JUNE_MGM_SALES, RESTAURANT_JUNE_SUMMARY } from '../../data/restaurantSaleJuneReportData';
 import { 
   getFastApiHotelSaleMonthlyReport, 
   getFastApiRestaurantSaleMonthlyReport, 
   getFastApiRestaurantMgmReport 
 } from '../../utils/backendApi';
+import {
+  getAvailableSyncMonths,
+  getSynchronizedHotelSales,
+  getSynchronizedRestaurantSales,
+  getSynchronizedNcDining,
+  getSynchronizedGstr3bSummary,
+  subscribeToSyncUpdates
+} from '../../utils/idsUnifiedSyncBridge';
 
 export default function IdsAuditedSalesRegisterModal({
   isOpen,
@@ -25,11 +31,13 @@ export default function IdsAuditedSalesRegisterModal({
   const [pageSize, setPageSize] = useState(50);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
-  // Live state from FastAPI backend with seamless offline edge dataset fallback
-  const [hotelSalesData, setHotelSalesData] = useState(HOTEL_JUNE_SALES);
-  const [restaurantSalesData, setRestaurantSalesData] = useState(RESTAURANT_JUNE_SALES);
-  const [restaurantMgmData, setRestaurantMgmData] = useState(RESTAURANT_JUNE_MGM_SALES);
-  const [backendSyncStatus, setBackendSyncStatus] = useState('Checking PostgreSQL API...');
+  // Synchronized Multi-Period Records
+  const [hotelSalesData, setHotelSalesData] = useState(() => getSynchronizedHotelSales('JUNE-2026'));
+  const [restaurantSalesData, setRestaurantSalesData] = useState(() => getSynchronizedRestaurantSales('JUNE-2026', 'ALL'));
+  const [restaurantMgmData, setRestaurantMgmData] = useState(() => getSynchronizedNcDining('JUNE-2026'));
+  const [backendSyncStatus, setBackendSyncStatus] = useState('Synchronized with IDS Fortune NEXT Master Ledger');
+
+  const syncMonths = useMemo(() => getAvailableSyncMonths(), []);
 
   useEffect(() => {
     setActiveTab(initialTab);
@@ -38,30 +46,55 @@ export default function IdsAuditedSalesRegisterModal({
     setSelectedRowIndex(null);
   }, [initialTab, isOpen]);
 
+  // Load period data & attempt FastAPI parity
   useEffect(() => {
-    let isMounted = true;
-    Promise.all([
-      getFastApiHotelSaleMonthlyReport('JUNE-2026').catch(() => null),
-      getFastApiRestaurantSaleMonthlyReport('JUNE-2026', 'ALL').catch(() => null),
-      getFastApiRestaurantMgmReport('JUNE-2026').catch(() => null)
-    ]).then(([hotelRes, restRes, mgmRes]) => {
-      if (!isMounted) return;
-      if (hotelRes && Array.isArray(hotelRes.records) && hotelRes.records.length > 0) {
-        setHotelSalesData(hotelRes.records);
-      }
-      if (restRes && Array.isArray(restRes.records) && restRes.records.length > 0) {
-        setRestaurantSalesData(restRes.records);
-      }
-      if (mgmRes && Array.isArray(mgmRes.records) && mgmRes.records.length > 0) {
-        setRestaurantMgmData(mgmRes.records);
-      }
-      setBackendSyncStatus('Connected to PostgreSQL (Railway API)');
-    }).catch(() => {
-      if (isMounted) setBackendSyncStatus('Using Verified Edge Seed Cache (Offline Mode)');
-    });
+    const h = getSynchronizedHotelSales(selectedMonth);
+    const r = getSynchronizedRestaurantSales(selectedMonth, 'ALL');
+    const m = getSynchronizedNcDining(selectedMonth);
+    setHotelSalesData(h);
+    setRestaurantSalesData(r);
+    setRestaurantMgmData(m);
 
-    return () => { isMounted = false; };
-  }, []);
+    if (selectedMonth === 'JUNE-2026') {
+      let isMounted = true;
+      Promise.all([
+        getFastApiHotelSaleMonthlyReport('JUNE-2026').catch(() => null),
+        getFastApiRestaurantSaleMonthlyReport('JUNE-2026', 'ALL').catch(() => null),
+        getFastApiRestaurantMgmReport('JUNE-2026').catch(() => null)
+      ]).then(([hotelRes, restRes, mgmRes]) => {
+        if (!isMounted) return;
+        if (hotelRes && Array.isArray(hotelRes.records) && hotelRes.records.length > 0) {
+          setHotelSalesData(hotelRes.records);
+        }
+        if (restRes && Array.isArray(restRes.records) && restRes.records.length > 0) {
+          setRestaurantSalesData(restRes.records);
+        }
+        if (mgmRes && Array.isArray(mgmRes.records) && mgmRes.records.length > 0) {
+          setRestaurantMgmData(mgmRes.records);
+        }
+        setBackendSyncStatus('Connected to PostgreSQL (Railway API)');
+      }).catch(() => {
+        if (isMounted) setBackendSyncStatus('Using Verified Edge Seed Cache (Offline Mode)');
+      });
+      return () => { isMounted = false; };
+    } else {
+      setBackendSyncStatus(`Synchronized with Live IDS NEXT Ledger (${selectedMonth})`);
+    }
+  }, [selectedMonth]);
+
+  // Real-time synchronization subscription across all 67 modals
+  useEffect(() => {
+    const unsubscribe = subscribeToSyncUpdates(() => {
+      const h = getSynchronizedHotelSales(selectedMonth);
+      const r = getSynchronizedRestaurantSales(selectedMonth, 'ALL');
+      const m = getSynchronizedNcDining(selectedMonth);
+      setHotelSalesData(h);
+      setRestaurantSalesData(r);
+      setRestaurantMgmData(m);
+      setBackendSyncStatus(`Real-Time Synchronized (${new Date().toLocaleTimeString()})`);
+    });
+    return () => unsubscribe();
+  }, [selectedMonth]);
 
   // 1. Filtered Hotel Sales
   const filteredHotelSales = useMemo(() => {
@@ -99,7 +132,9 @@ export default function IdsAuditedSalesRegisterModal({
     return restaurantMgmData.filter(r => 
       (r.billNo && String(r.billNo).toLowerCase().includes(q)) ||
       (r.tableRoom && String(r.tableRoom).toLowerCase().includes(q)) ||
-      (r.date && String(r.date).toLowerCase().includes(q))
+      (r.date && String(r.date).toLowerCase().includes(q)) ||
+      (r.costCenter && String(r.costCenter).toLowerCase().includes(q)) ||
+      (r.reason && String(r.reason).toLowerCase().includes(q))
     );
   }, [restaurantMgmData, searchQuery]);
 
@@ -110,6 +145,62 @@ export default function IdsAuditedSalesRegisterModal({
     if (activeTab === 'mgm-dining') return filteredRestaurantMgm;
     return [];
   }, [activeTab, filteredHotelSales, filteredRestaurantSales, filteredRestaurantMgm]);
+
+  // Dynamic Mathematical Totals
+  const hotelTotals = useMemo(() => {
+    return filteredHotelSales.reduce((acc, r) => ({
+      rent: acc.rent + Number(r.rent || 0),
+      cgst: acc.cgst + Number(r.cgst || 0),
+      sgst: acc.sgst + Number(r.sgst || 0),
+      misc: acc.misc + Number(r.misc || 0),
+      laundry: acc.laundry + Number(r.laundry || 0),
+      minibar: acc.minibar + Number(r.minB || r.minibar || 0),
+      roomService: acc.roomService + Number(r.rs || r.roomService || 0),
+      netAmt: acc.netAmt + Number(r.netAmt || 0),
+      advanc: acc.advanc + Number(r.advanc || 0),
+      discount: acc.discount + Number(r.discount || 0),
+      complt: acc.complt + Number(r.complt || 0),
+      void: acc.void + Number(r.void || 0),
+      allowances: acc.allowances + Number(r.allowances || 0),
+      paidOut: acc.paidOut + Number(r.paidOut || 0),
+      cash: acc.cash + Number(r.cash || 0),
+      btc: acc.btc + Number(r.btc || 0),
+      cc: acc.cc + Number(r.cc || r.creditCard || 0),
+      online: acc.online + Number(r.online || 0)
+    }), {
+      rent: 0, cgst: 0, sgst: 0, misc: 0, laundry: 0, minibar: 0, roomService: 0,
+      netAmt: 0, advanc: 0, discount: 0, complt: 0, void: 0, allowances: 0,
+      paidOut: 0, cash: 0, btc: 0, cc: 0, online: 0
+    });
+  }, [filteredHotelSales]);
+
+  const restTotals = useMemo(() => {
+    return filteredRestaurantSales.reduce((acc, r) => ({
+      amount: acc.amount + Number(r.amount || 0),
+      food: acc.food + Number(r.food || 0),
+      beverage: acc.beverage + Number(r.beverage || 0),
+      cgst: acc.cgst + Number(r.cgst || 0),
+      sgst: acc.sgst + Number(r.sgst || 0),
+      discount: acc.discount + Number(r.discount || 0),
+      total: acc.total + Number(r.total || 0)
+    }), {
+      amount: 0, food: 0, beverage: 0, cgst: 0, sgst: 0, discount: 0, total: 0
+    });
+  }, [filteredRestaurantSales]);
+
+  const mgmTotals = useMemo(() => {
+    return filteredRestaurantMgm.reduce((acc, r) => ({
+      amount: acc.amount + Number(r.amount || 0),
+      food: acc.food + Number(r.food || 0),
+      beverage: acc.beverage + Number(r.beverage || 0)
+    }), {
+      amount: 0, food: 0, beverage: 0
+    });
+  }, [filteredRestaurantMgm]);
+
+  const gstrSummary = useMemo(() => {
+    return getSynchronizedGstr3bSummary(selectedMonth);
+  }, [selectedMonth, hotelSalesData, restaurantSalesData, restaurantMgmData]);
 
   const totalPages = pageSize === 'ALL' ? 1 : Math.max(1, Math.ceil(activeRecords.length / Number(pageSize)));
   const paginatedRecords = useMemo(() => {
@@ -138,18 +229,18 @@ export default function IdsAuditedSalesRegisterModal({
           Number(r.sgst || 0).toFixed(2),
           Number(r.misc || 0).toFixed(2),
           Number(r.laundry || 0).toFixed(2),
-          Number(r.minibar || 0).toFixed(2),
-          Number(r.roomService || 0).toFixed(2),
-          Number(r.netAmount || 0).toFixed(2),
-          Number(r.advance || 0).toFixed(2),
+          Number(r.minB || r.minibar || 0).toFixed(2),
+          Number(r.rs || r.roomService || 0).toFixed(2),
+          Number(r.netAmt || 0).toFixed(2),
+          Number(r.advanc || 0).toFixed(2),
           Number(r.discount || 0).toFixed(2),
-          Number(r.complimentary || 0).toFixed(2),
+          Number(r.complt || 0).toFixed(2),
           Number(r.void || 0).toFixed(2),
           Number(r.allowances || 0).toFixed(2),
           Number(r.paidOut || 0).toFixed(2),
           Number(r.cash || 0).toFixed(2),
           Number(r.btc || 0).toFixed(2),
-          Number(r.creditCard || 0).toFixed(2),
+          Number(r.cc || r.creditCard || 0).toFixed(2),
           Number(r.online || 0).toFixed(2),
           `"${(r.remark || '').replace(/"/g, '""')}"`,
           `"${(r.guestName || '').replace(/"/g, '""')}"`,
@@ -159,7 +250,7 @@ export default function IdsAuditedSalesRegisterModal({
       });
     } else if (activeTab === 'restaurant-sales') {
       filename = `IDS_RESTAURANT_SALE_REPORT_${selectedMonth}.csv`;
-      csv += 'No.,DATE,BILL,AMT.,FOOD,BEVE.,CGST,SGST,DIS,TOTAL,P.O.S,Table\\Room\n';
+      csv += 'NO,DATE,BILL NO,AMOUNT,FOOD,BEVERAGE,CGST 2.5%,SGST 2.5%,DISCOUNT,TOTAL,POS,TABLE_ROOM\n';
       filteredRestaurantSales.forEach(r => {
         csv += [
           r.no,
@@ -177,8 +268,8 @@ export default function IdsAuditedSalesRegisterModal({
         ].join(',') + '\n';
       });
     } else if (activeTab === 'mgm-dining') {
-      filename = `IDS_RESTAURANT_MGM_NC_REGISTER_${selectedMonth}.csv`;
-      csv += 'No.,DATE,BILL,AMT.,FOOD,BEVE.,CGST,SGST,DIS,TOTAL,P.O.S,Table\\Room,STATUS\n';
+      filename = `IDS_MGM_DINING_REGISTER_${selectedMonth}.csv`;
+      csv += 'NO,DATE,BILL NO,VALUATION AMOUNT,FOOD,BEVERAGE,CGST,SGST,DISCOUNT,TOTAL,POS,TABLE_ROOM,STATUS\n';
       filteredRestaurantMgm.forEach(r => {
         csv += [
           r.no,
@@ -289,10 +380,10 @@ export default function IdsAuditedSalesRegisterModal({
           }}
         >
           {[
-            { id: 'hotel-sales', label: '1. Hotel Sales Register (26 Columns - June Month)' },
-            { id: 'statutory-reconciliation', label: '2. Statutory Tax Reconciliation (GSTR-3B)' },
-            { id: 'restaurant-sales', label: '3. Restaurant & Bar Sales Register (12 Columns - 1,320 Orders)' },
-            { id: 'mgm-dining', label: '4. Management NC Dining Register (68 Orders)' }
+            { id: 'hotel-sales', label: `1. Hotel Sales Register (26 Columns — ${filteredHotelSales.length} Bills)` },
+            { id: 'statutory-reconciliation', label: '2. Statutory Tax Reconciliation (GSTR-3B Table 3.1a)' },
+            { id: 'restaurant-sales', label: `3. Restaurant & Bar Sales Register (12 Columns — ${filteredRestaurantSales.length} Orders)` },
+            { id: 'mgm-dining', label: `4. Management NC Dining Register (${filteredRestaurantMgm.length} Orders)` }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -342,10 +433,12 @@ export default function IdsAuditedSalesRegisterModal({
               <span style={{ fontWeight: 600, marginRight: '4px' }}>Period:</span>
               <select
                 value={selectedMonth}
-                onChange={e => setSelectedMonth(e.target.value)}
-                style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                onChange={e => { setSelectedMonth(e.target.value); setCurrentPage(1); }}
+                style={{ padding: '2px 6px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 600 }}
               >
-                <option value="JUNE-2026">JUNE 2026 (Audited Client Month)</option>
+                {syncMonths.map(m => (
+                  <option key={m.id} value={m.id}>{m.label}</option>
+                ))}
               </select>
             </div>
 
@@ -355,7 +448,7 @@ export default function IdsAuditedSalesRegisterModal({
                 <select
                   value={outletFilter}
                   onChange={e => { setOutletFilter(e.target.value); setCurrentPage(1); }}
-                  style={{ padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                  style={{ padding: '2px 6px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
                 >
                   <option value="ALL">All POS Outlets</option>
                   <option value="RESTAURANT">RESTAURANT</option>
@@ -373,20 +466,17 @@ export default function IdsAuditedSalesRegisterModal({
                 placeholder="Search bill, room, guest, co..."
                 value={searchQuery}
                 onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                style={{ width: '150px', padding: '1px 4px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                style={{ width: '160px', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  style={{ marginLeft: '2px', padding: '0 4px', fontSize: '10px', cursor: 'pointer' }}
-                >
-                  ✕
-                </button>
+                  style={{ marginLeft: '2px', padding: '1px 4px', fontSize: '10px', cursor: 'pointer' }}
+                >✕</button>
               )}
             </div>
 
-            {/* Pagination Controls */}
-            {activeTab !== 'statutory-reconciliation' && (
+            {activeRecords.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginLeft: '6px' }}>
                 <button
                   disabled={currentPage <= 1}
@@ -471,41 +561,41 @@ export default function IdsAuditedSalesRegisterModal({
           {/* TAB 1: 26-COLUMN HOTEL SALES REGISTER */}
           {activeTab === 'hotel-sales' && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              {/* KPI Summary Tiles */}
+              {/* Dynamic KPI Summary Tiles */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', marginBottom: '8px' }}>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>Room Rent Net</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹7,52,368.20</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>Gross: ₹7,53,058.20</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{hotelTotals.rent.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>{filteredHotelSales.length} Active Bills</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>CGST / SGST (Room)</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹18,809.20 ea</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>Total: ₹37,618.40</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{hotelTotals.cgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ea</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>Total: ₹{(hotelTotals.cgst + hotelTotals.sgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>Room Service Net</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#006600' }}>₹1,38,919.45</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>Outward Supply</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#006600' }}>₹{hotelTotals.roomService.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>In-Room Dining</div>
                 </div>
                 <div style={{ background: '#EBF3EB', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#006600', fontWeight: 700 }}>Total Hotel Net Turnover</div>
-                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#006600' }}>₹9,33,663.13</div>
-                  <div style={{ fontSize: '9px', color: '#444' }}>223 Audited Bills</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#006600' }}>₹{hotelTotals.netAmt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#444' }}>{filteredHotelSales.length} Records</div>
                 </div>
                 <div style={{ background: '#FFF8E7', border: '1px solid #D2B48C', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#8B4513' }}>Advances Applied</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B4513' }}>₹2,45,777.15</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B4513' }}>₹{hotelTotals.advanc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   <div style={{ fontSize: '9px', color: '#888' }}>FO Deposits</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>Online (UPI/QR)</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹3,98,998.00</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>42.7% Settlement</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{hotelTotals.online.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>Digital Collections</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>BTC (Corporate)</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹85,436.00</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{hotelTotals.btc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   <div style={{ fontSize: '9px', color: '#888' }}>Company Ledger</div>
                 </div>
               </div>
@@ -566,20 +656,20 @@ export default function IdsAuditedSalesRegisterModal({
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.sgst || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.misc || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.laundry || 0).toFixed(2)}</td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.minibar || 0).toFixed(2)}</td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.roomService || 0).toFixed(2)}</td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right', fontWeight: 700, background: isSelected ? '#1B4E9B' : '#EAF2FF' }}>
-                            {Number(r.netAmount || 0).toFixed(2)}
+                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.minB || r.minibar || 0).toFixed(2)}</td>
+                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.rs || r.roomService || 0).toFixed(2)}</td>
+                          <td style={{ padding: '2px 4px', textAlign: 'right', fontWeight: 700, color: isSelected ? '#FFF' : '#0A246A' }}>
+                            {Number(r.netAmt || 0).toFixed(2)}
                           </td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.advance || 0).toFixed(2)}</td>
+                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.advanc || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.discount || 0).toFixed(2)}</td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.complimentary || 0).toFixed(2)}</td>
+                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.complt || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.void || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.allowances || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.paidOut || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.cash || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.btc || 0).toFixed(2)}</td>
-                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.creditCard || 0).toFixed(2)}</td>
+                          <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.cc || r.creditCard || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'right' }}>{Number(r.online || 0).toFixed(2)}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'left', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.remark || ''}</td>
                           <td style={{ padding: '2px 4px', textAlign: 'left', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.guestName || ''}</td>
@@ -592,28 +682,28 @@ export default function IdsAuditedSalesRegisterModal({
                   <tfoot>
                     <tr style={{ background: '#ECE9D8', color: '#000', fontWeight: 700, borderTop: '2px solid #716F64', position: 'sticky', bottom: 0, zIndex: 10 }}>
                       <td colSpan={4} style={{ padding: '4px', textAlign: 'center' }}>
-                        MONTHLY JUNE TOTALS ({hotelSalesData.length} BILLS)
+                        REGISTER TOTALS ({filteredHotelSales.length} BILLS)
                       </td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹7,53,058.20</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹18,809.20</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹18,809.20</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹3,446.62</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹1,38,919.45</td>
-                      <td style={{ padding: '4px', textAlign: 'right', background: '#316AC5', color: '#FFF' }}>₹9,33,663.13</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹2,45,777.15</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹690.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹1,728.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹39.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹48,767.98</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹85,436.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹1,51,713.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹3,98,998.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.rent.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.cgst.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.sgst.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.misc.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.laundry.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.minibar.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.roomService.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right', background: '#316AC5', color: '#FFF' }}>₹{hotelTotals.netAmt.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.advanc.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.discount.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.complt.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.void.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.allowances.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.paidOut.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.cash.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.btc.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.cc.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.online.toFixed(2)}</td>
                       <td colSpan={4} style={{ padding: '4px', textAlign: 'center', fontSize: '9px', fontStyle: 'italic' }}>
-                        Reconciled with Client Master Excel
+                        Synchronized with IDS Fortune NEXT Master Ledger
                       </td>
                     </tr>
                   </tfoot>
@@ -626,7 +716,7 @@ export default function IdsAuditedSalesRegisterModal({
           {activeTab === 'statutory-reconciliation' && (
             <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '12px', flex: 1, overflowY: 'auto' }}>
               <div style={{ fontWeight: 700, fontSize: '13px', color: '#0A246A', borderBottom: '2px solid #0A246A', paddingBottom: '4px', marginBottom: '10px' }}>
-                FORM GSTR-3B & MASTER AUDIT RECONCILIATION — MONTH OF JUNE 2026
+                FORM GSTR-3B & MASTER AUDIT RECONCILIATION — PERIOD: {selectedMonth}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '12px' }}>
@@ -638,23 +728,19 @@ export default function IdsAuditedSalesRegisterModal({
                     <tbody>
                       <tr style={{ borderBottom: '1px dotted #CCC' }}>
                         <td style={{ padding: '3px 0' }}>Room Rent Gross Turnover:</td>
-                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹7,53,058.20</td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{gstrSummary.roomTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                        <td style={{ padding: '3px 0' }}>Less Tariff Discounts Allowed:</td>
-                        <td style={{ textAlign: 'right', color: '#B00' }}>-₹690.00</td>
+                        <td style={{ padding: '3px 0' }}>Central GST (CGST 6%):</td>
+                        <td style={{ textAlign: 'right' }}>₹{gstrSummary.roomCgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px dotted #CCC' }}>
+                        <td style={{ padding: '3px 0' }}>State GST (SGST 6%):</td>
+                        <td style={{ textAlign: 'right' }}>₹{gstrSummary.roomSgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px solid #000', fontWeight: 700 }}>
-                        <td style={{ padding: '4px 0' }}>Net Taxable Room Tariff (Table 3.1a):</td>
-                        <td style={{ textAlign: 'right', color: '#0A246A' }}>₹7,52,368.20</td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '3px 0' }}>Central GST @ 2.50%:</td>
-                        <td style={{ textAlign: 'right' }}>₹18,809.20</td>
-                      </tr>
-                      <tr>
-                        <td style={{ padding: '3px 0' }}>State GST @ 2.50%:</td>
-                        <td style={{ textAlign: 'right' }}>₹18,809.20</td>
+                        <td style={{ padding: '4px 0' }}>Total Room Revenue with GST:</td>
+                        <td style={{ textAlign: 'right', color: '#0A246A' }}>₹{(gstrSummary.roomTaxable + gstrSummary.roomCgst + gstrSummary.roomSgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -662,25 +748,29 @@ export default function IdsAuditedSalesRegisterModal({
 
                 <div style={{ border: '1px solid #D4D0C8', background: '#F9F9F9', padding: '10px' }}>
                   <div style={{ fontWeight: 700, fontSize: '11px', color: '#006600', marginBottom: '6px' }}>
-                    2. Ancillary & In-Room Outward Services
+                    2. F&B Restaurant & Ancillary Supplies (SAC 996331)
                   </div>
                   <table style={{ width: '100%', fontSize: '11px', borderCollapse: 'collapse' }}>
                     <tbody>
                       <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                        <td style={{ padding: '3px 0' }}>Room Service Food Billed (SAC 996332):</td>
-                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹1,38,919.45</td>
+                        <td style={{ padding: '3px 0' }}>F&B Restaurant Taxable Sales (5% Slab):</td>
+                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹{gstrSummary.fnbTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                        <td style={{ padding: '3px 0' }}>Guest Laundry Services (SAC 999791):</td>
-                        <td style={{ textAlign: 'right', fontWeight: 600 }}>₹3,446.62</td>
+                        <td style={{ padding: '3px 0' }}>F&B Central GST @ 2.5%:</td>
+                        <td style={{ textAlign: 'right' }}>₹{gstrSummary.fnbCgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px dotted #CCC' }}>
-                        <td style={{ padding: '3px 0' }}>Laundry GST (CGST + SGST 18%):</td>
-                        <td style={{ textAlign: 'right' }}>₹620.40</td>
+                        <td style={{ padding: '3px 0' }}>F&B State GST @ 2.5%:</td>
+                        <td style={{ textAlign: 'right' }}>₹{gstrSummary.fnbSgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px dotted #CCC' }}>
+                        <td style={{ padding: '3px 0' }}>Management NC Non-Taxable Valuation:</td>
+                        <td style={{ textAlign: 'right', color: '#888' }}>₹{gstrSummary.ncValuation.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                       <tr style={{ borderBottom: '1px solid #000', fontWeight: 700 }}>
-                        <td style={{ padding: '4px 0' }}>Total In-House Hotel Net Billed:</td>
-                        <td style={{ textAlign: 'right', color: '#006600' }}>₹9,33,663.13</td>
+                        <td style={{ padding: '4px 0' }}>Total Grand Consolidated Outward Supply:</td>
+                        <td style={{ textAlign: 'right', color: '#006600' }}>₹{gstrSummary.grandTurnover.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -689,33 +779,33 @@ export default function IdsAuditedSalesRegisterModal({
 
               <div style={{ border: '1px solid #D4D0C8', background: '#FDFDFD', padding: '10px' }}>
                 <div style={{ fontWeight: 700, fontSize: '11px', color: '#333', marginBottom: '6px' }}>
-                  3. Cash Flow & Settlement Mode Reconciliation (Audited vs Actual)
+                  3. Cash Flow & Settlement Mode Reconciliation ({selectedMonth})
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', textAlign: 'center', fontSize: '10.5px' }}>
                   <div style={{ background: '#ECE9D8', padding: '6px', border: '1px solid #716F64' }}>
                     <div>Online UPI / QR</div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹3,98,998.00</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>42.74% of Total</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹{hotelTotals.online.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>Digital Collections</div>
                   </div>
                   <div style={{ background: '#ECE9D8', padding: '6px', border: '1px solid #716F64' }}>
                     <div>Advance Adjusted</div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#8B4513' }}>₹2,45,777.15</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>26.32% of Total</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#8B4513' }}>₹{hotelTotals.advanc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>FO Guest Advances</div>
                   </div>
                   <div style={{ background: '#ECE9D8', padding: '6px', border: '1px solid #716F64' }}>
                     <div>Credit Card Swipe</div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹1,51,713.00</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>16.25% of Total</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹{hotelTotals.cc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>Card POS Swipes</div>
                   </div>
                   <div style={{ background: '#ECE9D8', padding: '6px', border: '1px solid #716F64' }}>
                     <div>Bill to Company (BTC)</div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹85,436.00</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>9.15% of Total</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹{hotelTotals.btc.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>Corporate Ledger</div>
                   </div>
                   <div style={{ background: '#ECE9D8', padding: '6px', border: '1px solid #716F64' }}>
                     <div>Cash Collections</div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹48,767.98</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>5.22% of Total</div>
+                    <div style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>₹{hotelTotals.cash.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: '9px', color: '#666' }}>Front Desk Cash</div>
                   </div>
                 </div>
               </div>
@@ -725,32 +815,32 @@ export default function IdsAuditedSalesRegisterModal({
           {/* TAB 3: 12-COLUMN RESTAURANT & BAR SALES REGISTER */}
           {activeTab === 'restaurant-sales' && (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-              {/* KPI Summary Tiles */}
+              {/* Dynamic KPI Summary Tiles */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '6px', marginBottom: '8px' }}>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>Food Sales Gross</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹8,28,328.53</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{restTotals.food.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   <div style={{ fontSize: '9px', color: '#888' }}>Kitchen Production</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>Beverage Sales</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹52,935.00</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{restTotals.beverage.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                   <div style={{ fontSize: '9px', color: '#888' }}>Pantry & Bar</div>
                 </div>
                 <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#666' }}>CGST / SGST (2.5%)</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹19,768.06 ea</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>Total: ₹39,536.12</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0A246A' }}>₹{restTotals.cgst.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ea</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>Total: ₹{(restTotals.cgst + restTotals.sgst).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                 </div>
                 <div style={{ background: '#EBF3EB', border: '1px solid #7F9DB9', padding: '4px 6px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '10px', color: '#006600', fontWeight: 700 }}>Total F&B Production</div>
-                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#006600' }}>₹9,20,739.00</div>
-                  <div style={{ fontSize: '9px', color: '#444' }}>Commercial + NC</div>
+                  <div style={{ fontSize: '10px', color: '#006600', fontWeight: 700 }}>Total F&B Commercial</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: '#006600' }}>₹{restTotals.total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#444' }}>{filteredRestaurantSales.length} Orders</div>
                 </div>
                 <div style={{ background: '#FFF8E7', border: '1px solid #D2B48C', padding: '4px 6px', textAlign: 'center' }}>
                   <div style={{ fontSize: '10px', color: '#8B4513' }}>Management NC Value</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B4513' }}>₹90,478.00</div>
-                  <div style={{ fontSize: '9px', color: '#888' }}>68 Cost Center Orders</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#8B4513' }}>₹{mgmTotals.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div style={{ fontSize: '9px', color: '#888' }}>{filteredRestaurantMgm.length} Cost Center Orders</div>
                 </div>
               </div>
 
@@ -760,17 +850,17 @@ export default function IdsAuditedSalesRegisterModal({
                   <thead>
                     <tr style={{ background: '#0A246A', color: '#FFF', position: 'sticky', top: 0, zIndex: 10 }}>
                       <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>No.</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>DATE</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>BILL</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>AMT.</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>FOOD</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>BEVE.</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>CGST</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>SGST</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>DIS</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right', background: '#316AC5' }}>TOTAL</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>P.O.S</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>Table\Room</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>Date</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>Bill No.</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>Taxable Amt (₹)</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>Food (₹)</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>Beverage (₹)</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>CGST 2.5%</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>SGST 2.5%</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right' }}>Discount</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'right', background: '#316AC5' }}>Total (₹)</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>POS Outlet</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #4060A0', textAlign: 'center' }}>Table / Room</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -819,15 +909,15 @@ export default function IdsAuditedSalesRegisterModal({
                   <tfoot>
                     <tr style={{ background: '#ECE9D8', color: '#000', fontWeight: 700, borderTop: '2px solid #716F64', position: 'sticky', bottom: 0, zIndex: 10 }}>
                       <td colSpan={3} style={{ padding: '4px', textAlign: 'center' }}>
-                        MONTHLY F&B PRODUCTION TOTALS
+                        TOTALS ({filteredRestaurantSales.length} ORDERS)
                       </td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹8,81,200.53</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹8,28,328.53</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹52,935.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹19,768.06</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹19,768.06</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹63.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right', background: '#316AC5', color: '#FFF' }}>₹9,20,739.00</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.amount.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.food.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.beverage.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.cgst.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.sgst.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{restTotals.discount.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right', background: '#316AC5', color: '#FFF' }}>₹{restTotals.total.toFixed(2)}</td>
                       <td colSpan={2} style={{ padding: '4px', textAlign: 'center', fontSize: '9px' }}>
                         SAC 996331 Reconciled
                       </td>
@@ -843,10 +933,10 @@ export default function IdsAuditedSalesRegisterModal({
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               <div style={{ background: '#FFF8E7', border: '1px solid #D2B48C', padding: '6px 10px', marginBottom: '8px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <strong>Internal Management Non-Chargeable (NC) Dining:</strong> 68 Orders Recorded in June 2026.
+                  <strong>Internal Management Non-Chargeable (NC) Dining:</strong> {filteredRestaurantMgm.length} Orders Recorded in {selectedMonth}.
                 </div>
                 <div style={{ fontWeight: 700, color: '#800000' }}>
-                  Total Kitchen Production Value: ₹90,478.00 (Zero GST Outward Supply)
+                  Total Kitchen Production Value: ₹{mgmTotals.amount.toFixed(2)} (Zero GST Outward Supply)
                 </div>
               </div>
 
@@ -860,9 +950,9 @@ export default function IdsAuditedSalesRegisterModal({
                       <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'right' }}>Valuation (₹)</th>
                       <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'right' }}>Food (₹)</th>
                       <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'right' }}>Beverage (₹)</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'center' }}>Outlet</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'center' }}>Cost Center</th>
                       <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'center' }}>Table / Location</th>
-                      <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'left' }}>Accounting Status</th>
+                      <th style={{ padding: '3px 4px', border: '1px solid #A04040', textAlign: 'left' }}>Status & Remarks</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -885,10 +975,10 @@ export default function IdsAuditedSalesRegisterModal({
                           <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700 }}>{Number(r.amount || 0).toFixed(2)}</td>
                           <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.food || 0).toFixed(2)}</td>
                           <td style={{ padding: '3px 4px', textAlign: 'right' }}>{Number(r.beverage || 0).toFixed(2)}</td>
-                          <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.pos || 'MANAGEMENT'}</td>
+                          <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.costCenter || r.pos || 'MANAGEMENT'}</td>
                           <td style={{ padding: '3px 4px', textAlign: 'center' }}>{r.tableRoom}</td>
                           <td style={{ padding: '3px 4px', fontStyle: 'italic', color: isSelected ? '#EEE' : '#555' }}>
-                            Debited to Department Cost Center
+                            {r.reason || 'Debited to Department Cost Center'}
                           </td>
                         </tr>
                       );
@@ -896,10 +986,10 @@ export default function IdsAuditedSalesRegisterModal({
                   </tbody>
                   <tfoot>
                     <tr style={{ background: '#ECE9D8', color: '#000', fontWeight: 700, borderTop: '2px solid #716F64', position: 'sticky', bottom: 0, zIndex: 10 }}>
-                      <td colSpan={3} style={{ padding: '4px', textAlign: 'center' }}>TOTAL MANAGEMENT NC COST (68 ORDERS)</td>
-                      <td style={{ padding: '4px', textAlign: 'right', color: '#800000' }}>₹90,478.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹90,478.00</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹0.00</td>
+                      <td colSpan={3} style={{ padding: '4px', textAlign: 'center' }}>TOTAL MANAGEMENT NC COST ({filteredRestaurantMgm.length} ORDERS)</td>
+                      <td style={{ padding: '4px', textAlign: 'right', color: '#800000' }}>₹{mgmTotals.amount.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{mgmTotals.food.toFixed(2)}</td>
+                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{mgmTotals.beverage.toFixed(2)}</td>
                       <td colSpan={3} style={{ padding: '4px', textAlign: 'center', fontSize: '9px' }}>
                         Complimentary Dining & Kitchen Quality Sampling
                       </td>
@@ -926,7 +1016,7 @@ export default function IdsAuditedSalesRegisterModal({
           }}
         >
           <div>
-            Accounting Date: <b>{accountingDate}</b> | Active User: <b>{currentUser}</b> | Status: <b style={{ color: '#006600' }}>{backendSyncStatus}</b>
+            Accounting Date: <b>{accountingDate}</b> | Active User: <b>{currentUser}</b> | Status: <b style={{ color: '#006600' }}>{backendSyncStatus}</b> | Active Filter: <b>{selectedMonth} ({activeRecords.length} records)</b>
           </div>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button

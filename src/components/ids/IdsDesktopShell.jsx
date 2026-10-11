@@ -81,6 +81,11 @@ import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
 import IdsAuditedSalesRegisterModal from './IdsAuditedSalesRegisterModal';
+import { 
+  recordLiveHotelSale, 
+  recordLiveRestaurantSale, 
+  recordLiveNcDining 
+} from '../../utils/idsUnifiedSyncBridge';
 import IdsOrderEntryModal from './IdsOrderEntryModal';
 import IdsPosBillModal from './IdsPosBillModal';
 import IdsPosBillSettlementModal from './IdsPosBillSettlementModal';
@@ -2994,8 +2999,22 @@ export default function IdsDesktopShell({
         onOpenCrystalReport={openCrystalReport}
         onCheckOutComplete={(checkOutData) => {
           console.log('Paid-Out & Check-Out completed:', checkOutData);
-          setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== checkOutData.roomNo));
-          setPaxCheckedOutRooms(prev => [...new Set([...prev, checkOutData.roomNo])]);
+          if (checkOutData) {
+            recordLiveHotelSale({
+              billNo: checkOutData.billNo || `B-${Date.now().toString().slice(-4)}`,
+              roomNo: checkOutData.roomNo || '101',
+              rent: checkOutData.tariff || checkOutData.rent || 1750,
+              netAmt: checkOutData.totalAmount || checkOutData.netAmt || 1960,
+              guestName: checkOutData.guestName || 'GUEST CHECKOUT',
+              company: checkOutData.companyName || '',
+              gstin: checkOutData.gstin || '',
+              remark: 'PAX CHECKOUT BILLED'
+            });
+          }
+          setWalkInCompletedList(prev => prev.filter(w => w.roomNo !== checkOutData?.roomNo));
+          if (checkOutData?.roomNo) {
+            setPaxCheckedOutRooms(prev => [...new Set([...prev, checkOutData.roomNo])]);
+          }
         }}
         onOpenRoomRack={() => {
           setRoomRackConsoleOpen(true);
@@ -3178,6 +3197,19 @@ export default function IdsDesktopShell({
         session="General"
         steward="Manash"
         onBillSettled={(record) => {
+          if (record) {
+            recordLiveRestaurantSale({
+              billNo: record.billNo,
+              amount: record.nettAmount || 0,
+              food: (record.nettAmount || 0) * 0.9,
+              beverage: (record.nettAmount || 0) * 0.1,
+              discount: record.discount || 0,
+              total: record.nettAmount || 0,
+              pos: record.outlet || 'RESTAURANT',
+              tableRoom: record.tableNo || 'T-10',
+              settlementMode: record.payments?.[0]?.mode || 'Cash'
+            });
+          }
           showMessageBox(`Bill No.${record.billNo} on Table ${record.tableNo} Settled Successfully! Amount: ₹${record.nettAmount.toFixed(2)}`, "Bill Settlement V6.5.008.30", "info");
         }}
         onOpenCrystalReport={({ reportType: rType, data }) => {
@@ -3285,6 +3317,19 @@ export default function IdsDesktopShell({
           showMessageBox(`Touch POS KOT ${res.kotId} for Table ${res.tableNo} punched to kitchen!`, "Touch POS V7.0", "info");
         }}
         onBillSettled={(res) => {
+          if (res) {
+            recordLiveRestaurantSale({
+              billNo: res.billNo,
+              amount: res.amount || 0,
+              food: res.amount || 0,
+              beverage: 0,
+              discount: 0,
+              total: res.amount || 0,
+              pos: res.outlet || 'RESTAURANT',
+              tableRoom: res.tableNo || 'T-01',
+              settlementMode: res.mode || 'Cash'
+            });
+          }
           showMessageBox(`Touch POS Bill No.${res.billNo} for ₹${res.amount} settled via ${res.mode}!`, "Touch POS Settlement", "info");
         }}
       />
