@@ -5,7 +5,12 @@ import {
   INITIAL_ACCOUNTING_DATE, 
   NEXT_ACCOUNTING_DATE, 
   getFormattedPmsDate, 
-  getFormattedPmsDateTime 
+  getFormattedPmsDateTime,
+  getStoredAccountingDate,
+  addDaysToPmsDate,
+  calculateRoomNights,
+  pmsDateToInputFormat,
+  inputFormatToPmsDate
 } from '../../data/idsPmsStore';
 
 /* =========================================================================
@@ -70,20 +75,50 @@ export default function IdsWalkInModal({
   isOpen,
   onClose,
   onCompleteWalkIn,
-  initialRoomNo = '203'
+  initialRoomNo = '203',
+  accountingDate
 }) {
   // Navigation Flow: 'rack' | 'registration' | 'guest-info'
   const [activeStep, setActiveStep] = useState('rack');
 
   // Step 1: Room Rack State (Video 17 Frame 010–030)
   const [selectedRoom, setSelectedRoom] = useState(initialRoomNo || '203');
-  const [rackDepDate, setRackDepDate] = useState(NEXT_ACCOUNTING_DATE);
+  const activeAccountingDate = accountingDate || getStoredAccountingDate();
+  const [rackArrDate, setRackArrDate] = useState(() => activeAccountingDate);
+  const [rackDepDate, setRackDepDate] = useState(() => addDaysToPmsDate(activeAccountingDate, 1));
+  const [roomNights, setRoomNights] = useState(1);
   const [rackDepTime, setRackDepTime] = useState('12:00');
   const [rackTitle, setRackTitle] = useState('Mr');
   const [rackLastName, setRackLastName] = useState('Sarkar');
   const [rackMiddleName, setRackMiddleName] = useState('');
   const [rackFirstName, setRackFirstName] = useState('Rajesh');
   const [activeRackTab, setActiveRackTab] = useState('Vacant');
+
+  useEffect(() => {
+    if (isOpen) {
+      const cur = accountingDate || getStoredAccountingDate();
+      setRackArrDate(cur);
+      setRackDepDate(addDaysToPmsDate(cur, roomNights || 1));
+    }
+  }, [isOpen, accountingDate]);
+
+  const handleArrDateChange = (newPmsDate) => {
+    setRackArrDate(newPmsDate);
+    const n = calculateRoomNights(newPmsDate, rackDepDate);
+    setRoomNights(n);
+  };
+
+  const handleDepDateChange = (newPmsDate) => {
+    setRackDepDate(newPmsDate);
+    const n = calculateRoomNights(rackArrDate, newPmsDate);
+    setRoomNights(n);
+  };
+
+  const handleNightsChange = (nights) => {
+    const n = Math.max(1, parseInt(nights, 10) || 1);
+    setRoomNights(n);
+    setRackDepDate(addDaysToPmsDate(rackArrDate, n));
+  };
 
   // Step 2: Walk-Ins Registration Form State (Video 17 Frame 035–075)
   const [currentPax, setCurrentPax] = useState(1);
@@ -225,9 +260,11 @@ export default function IdsWalkInModal({
           { name: `${guest1Title} ${guest1LastName} ${guest1FirstName}`, regNo: '621' },
           ...(isSecondPaxActive ? [{ name: `${guest2Title} ${guest2LastName}`, regNo: '622' }] : [])
         ],
-        arrival: getFormattedPmsDateTime(),
+        arrival: `${rackArrDate} 14:00`,
         departure: `${rackDepDate} ${rackDepTime}`,
+        nights: roomNights,
         rate: rateAmount,
+        totalTariff: rateAmount * roomNights,
         company: companyName,
         payMode,
         planCode
@@ -293,26 +330,56 @@ export default function IdsWalkInModal({
             {/* Top Form Section matching Frame 015 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', background: '#ECE9D8', padding: '6px', border: '1px solid #CCC' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                   <span style={{ width: '50px' }}>Room No.</span>
                   <input 
                     className="ids-input" 
-                    style={{ width: '80px', fontWeight: 700, background: '#FFF' }} 
+                    style={{ width: '60px', fontWeight: 700, background: '#FFF' }} 
                     value={selectedRoom} 
                     onChange={(e) => setSelectedRoom(e.target.value)}
                   />
-                  <span style={{ marginLeft: '10px' }}>Departure</span>
+                  <span style={{ marginLeft: '6px' }}>Arrival</span>
                   <input 
                     className="ids-input" 
-                    style={{ width: '90px', background: '#FFF' }} 
+                    style={{ width: '85px', background: '#FFF', fontWeight: 600 }} 
+                    value={rackArrDate} 
+                    onChange={(e) => handleArrDateChange(e.target.value.toUpperCase())}
+                  />
+                  <input 
+                    type="date"
+                    value={pmsDateToInputFormat(rackArrDate)}
+                    onChange={(e) => handleArrDateChange(inputFormatToPmsDate(e.target.value))}
+                    style={{ width: '18px', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' }}
+                    title="Pick Arrival Date"
+                  />
+                  <span style={{ marginLeft: '6px' }}>Departure</span>
+                  <input 
+                    className="ids-input" 
+                    style={{ width: '85px', background: '#FFF', fontWeight: 600 }} 
                     value={rackDepDate} 
-                    onChange={(e) => setRackDepDate(e.target.value)}
+                    onChange={(e) => handleDepDateChange(e.target.value.toUpperCase())}
+                  />
+                  <input 
+                    type="date"
+                    value={pmsDateToInputFormat(rackDepDate)}
+                    onChange={(e) => handleDepDateChange(inputFormatToPmsDate(e.target.value))}
+                    style={{ width: '18px', padding: 0, border: 'none', background: 'transparent', cursor: 'pointer' }}
+                    title="Pick Departure Date"
                   />
                   <input 
                     className="ids-input" 
-                    style={{ width: '50px', background: '#FFF' }} 
+                    style={{ width: '45px', background: '#FFF' }} 
                     value={rackDepTime} 
                     onChange={(e) => setRackDepTime(e.target.value)}
+                  />
+                  <span style={{ marginLeft: '6px' }}>Nts:</span>
+                  <input 
+                    className="ids-input"
+                    type="number"
+                    min="1"
+                    style={{ width: '35px', textAlign: 'center', fontWeight: 700, background: '#FFF' }}
+                    value={roomNights}
+                    onChange={(e) => handleNightsChange(e.target.value)}
                   />
 
                   {/* 3 Authentic Icons matching Frame 015 */}
@@ -1490,19 +1557,62 @@ export default function IdsWalkInModal({
                   {/* Arrival & Departure dates matching Frame 110 */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Arrival</span>
-                    <input className="ids-input" readOnly value={`${INITIAL_ACCOUNTING_DATE} 14:00`} style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
+                    <input 
+                      className="ids-input" 
+                      value={rackArrDate} 
+                      onChange={(e) => handleArrDateChange(e.target.value.toUpperCase())}
+                      style={{ width: '100px', background: '#FFF', fontWeight: 700, color: '#0A246A' }} 
+                    />
+                    <input 
+                      type="date"
+                      value={pmsDateToInputFormat(rackArrDate)}
+                      onChange={(e) => handleArrDateChange(inputFormatToPmsDate(e.target.value))}
+                      style={{ border: '1px solid #7F9DB9', padding: '1px 2px', cursor: 'pointer', background: '#FFF' }}
+                      title="Select Arrival Date"
+                    />
+                    <span style={{ fontSize: '10px', color: '#666' }}>14:00</span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Departure</span>
-                    <input className="ids-input" readOnly value={`${rackDepDate} ${rackDepTime}`} style={{ width: '180px', background: '#F5F5F5', fontWeight: 600 }} />
+                    <input 
+                      className="ids-input" 
+                      value={rackDepDate} 
+                      onChange={(e) => handleDepDateChange(e.target.value.toUpperCase())}
+                      style={{ width: '100px', background: '#FFF', fontWeight: 700, color: '#0A246A' }} 
+                    />
+                    <input 
+                      type="date"
+                      value={pmsDateToInputFormat(rackDepDate)}
+                      onChange={(e) => handleDepDateChange(inputFormatToPmsDate(e.target.value))}
+                      style={{ border: '1px solid #7F9DB9', padding: '1px 2px', cursor: 'pointer', background: '#FFF' }}
+                      title="Select Departure Date"
+                    />
+                    <input 
+                      className="ids-input" 
+                      value={rackDepTime} 
+                      onChange={(e) => setRackDepTime(e.target.value)}
+                      style={{ width: '50px', background: '#FFF' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Room Night(s)</span>
-                    <input className="ids-input" readOnly value="1" style={{ width: '40px', textAlign: 'center', background: '#F5F5F5' }} />
-                    <span style={{ marginLeft: '12px' }}>Ref. No.</span>
-                    <input className="ids-input" readOnly value="" style={{ width: '80px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      type="number"
+                      min="1"
+                      value={roomNights} 
+                      onChange={(e) => handleNightsChange(e.target.value)}
+                      style={{ width: '45px', textAlign: 'center', background: '#FFF', fontWeight: 700, color: '#0A246A' }} 
+                    />
+                    <span style={{ marginLeft: '10px', fontWeight: 600 }}>Total:</span>
+                    <span style={{ fontWeight: 800, color: '#2E7D32', fontSize: '12px' }}>
+                      ₹{(rateAmount * roomNights).toLocaleString('en-IN')}
+                    </span>
+                    <span style={{ fontSize: '10px', color: '#666' }}>
+                      ({roomNights} nt{roomNights > 1 ? 's' : ''} @ ₹{rateAmount.toLocaleString('en-IN')})
+                    </span>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

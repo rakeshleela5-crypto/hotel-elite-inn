@@ -65,6 +65,7 @@ import {
 const RoomQrModal = lazyWithRetry(() => import('./components/RoomQrModal'));
 
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
+import { getStoredAccountingDate } from './data/idsPmsStore';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
 import { FloatingDock } from '@/components/ui/floating-dock';
@@ -1274,6 +1275,7 @@ export default function App() {
               setSelectedCheckOutForBooking(null);
             }}
             initialRoomNo={selectedRoomNumForBooking || '203'}
+            accountingDate={getStoredAccountingDate()}
             onCompleteWalkIn={handleBookingSuccess}
           />
         )}

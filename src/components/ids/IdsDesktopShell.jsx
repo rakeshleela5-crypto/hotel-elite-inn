@@ -108,6 +108,7 @@ import IdsTenderReclassificationModal from './IdsTenderReclassificationModal';
 import IdsTransitSlotModal from './IdsTransitSlotModal';
 import IdsCorporateBtcAgingModal from './IdsCorporateBtcAgingModal';
 import IdsCaGstr1ExportModal from './IdsCaGstr1ExportModal';
+import IdsChangeBusinessDateModal from './IdsChangeBusinessDateModal';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { sealFastApiNightAudit } from '../../utils/backendApi';
 import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
@@ -123,7 +124,9 @@ import {
   INITIAL_SETTLED_BILLS,
   INITIAL_ACCOUNTING_DATE,
   NEXT_ACCOUNTING_DATE,
-  getFormattedPmsDate
+  getFormattedPmsDate,
+  getStoredAccountingDate,
+  saveStoredAccountingDate
 } from '../../data/idsPmsStore';
 import { HOTEL_CONFIG, ROOM_TIERS, INITIAL_ROOMS_INVENTORY } from '../../data/hotelData';
 
@@ -363,7 +366,19 @@ export default function IdsDesktopShell({
   // Video 19: Night Audit Process States (Frames 010–095)
   const [nightAuditModalOpen, setNightAuditModalOpen] = useState(false);
   const [nightAuditInitialStep, setNightAuditInitialStep] = useState('full-wizard'); // 'step1' | 'step2' | 'step3' | 'step4' | 'full-wizard' | 'info'
-  const [accountingDate, setAccountingDate] = useState(INITIAL_ACCOUNTING_DATE);
+  const [accountingDate, setAccountingDate] = useState(() => getStoredAccountingDate());
+  const [changeBusinessDateModalOpen, setChangeBusinessDateModalOpen] = useState(false);
+
+  // Synchronize accounting date across tabs / windows
+  useEffect(() => {
+    const handleDateChanged = (e) => {
+      if (e.detail?.accountingDate) {
+        setAccountingDate(e.detail.accountingDate);
+      }
+    };
+    window.addEventListener('ids-accounting-date-changed', handleDateChanged);
+    return () => window.removeEventListener('ids-accounting-date-changed', handleDateChanged);
+  }, []);
 
   // Video 20: Additional Room Rate & Quick Balances States (Frames 015–065)
   const [additionalRoomRateModalOpen, setAdditionalRoomRateModalOpen] = useState(false);
@@ -653,6 +668,7 @@ export default function IdsDesktopShell({
 
     setTimeout(() => {
       setAccountingDate(calculatedNext);
+      saveStoredAccountingDate(calculatedNext);
       setAutoAuditRunning(false);
       showMessageBox(
         `✅ AUTOMATED 12:00 AM MIDNIGHT DAY CLOSE COMPLETED!\n\n` +
@@ -1169,6 +1185,11 @@ export default function IdsDesktopShell({
         label: '3-Shift Handover & Dryer Float Lock (FO-01/02/03)', 
         videoId: 'SHIFT-01', 
         action: () => openCashierShiftHandover('handover') 
+      },
+      { 
+        label: 'Change System Business Date & Calendar', 
+        videoId: 'SYS-DATE', 
+        action: () => setChangeBusinessDateModalOpen(true) 
       },
       { 
         label: 'Night Audit Process (Full Midnight Rollover)', 
@@ -1878,17 +1899,27 @@ export default function IdsDesktopShell({
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <span>BS/GN V(0)</span>
             <span>SP V(0)</span>
-            <span style={{ 
-              background: '#0A246A', 
-              color: '#FFF', 
-              padding: '1px 8px', 
-              borderRadius: '2px', 
-              fontWeight: 700, 
-              fontSize: '11px', 
-              letterSpacing: '0.5px' 
-            }}>
-              A/C DATE: {accountingDate}
-            </span>
+            <button
+              onClick={() => setChangeBusinessDateModalOpen(true)}
+              style={{ 
+                background: '#0A246A', 
+                color: '#FFF', 
+                padding: '2px 8px', 
+                border: '1px outset #FFFFFF',
+                borderRadius: '2px', 
+                fontWeight: 700, 
+                fontSize: '11px', 
+                letterSpacing: '0.5px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Click to view & change System Accounting Date / Business Calendar"
+            >
+              <span>📅 A/C DATE: {accountingDate}</span>
+              <span style={{ fontSize: '9px', opacity: 0.8 }}>▼</span>
+            </button>
             <button
               onClick={() => openCashierShiftHandover('handover')}
               style={{
@@ -3075,6 +3106,7 @@ export default function IdsDesktopShell({
         isOpen={walkInModalOpen}
         onClose={() => setWalkInModalOpen(false)}
         initialRoomNo={walkInInitialRoom}
+        accountingDate={accountingDate}
         onCompleteWalkIn={(walkInData) => {
           setWalkInCompletedList(prev => [...prev, walkInData]);
           // Sync with inhouse guest database: add walked-in guest
@@ -3124,6 +3156,18 @@ export default function IdsDesktopShell({
         onCompleteNightAudit={(auditInfo) => {
           const newDate = typeof auditInfo === 'string' ? auditInfo : (auditInfo?.newDate || NEXT_ACCOUNTING_DATE);
           setAccountingDate(newDate);
+          saveStoredAccountingDate(newDate);
+        }}
+      />
+
+      {/* Change System Business Date & Calendar Modal */}
+      <IdsChangeBusinessDateModal 
+        isOpen={changeBusinessDateModalOpen}
+        onClose={() => setChangeBusinessDateModalOpen(false)}
+        currentAccountingDate={accountingDate}
+        onDateChange={(newDate) => {
+          setAccountingDate(newDate);
+          saveStoredAccountingDate(newDate);
         }}
       />
 

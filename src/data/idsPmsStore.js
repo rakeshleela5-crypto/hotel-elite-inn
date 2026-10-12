@@ -30,7 +30,87 @@ export function getFormattedPmsMonthYear(date = new Date()) {
 }
 
 // Live Current Accounting Date (Dynamic)
-export const INITIAL_ACCOUNTING_DATE = getFormattedPmsDate();
+export const STORAGE_KEY_ACCOUNTING_DATE = 'hotel_elite_inn_accounting_date';
+
+export function getStoredAccountingDate() {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const saved = localStorage.getItem(STORAGE_KEY_ACCOUNTING_DATE) || localStorage.getItem('hsi_active_business_date');
+    if (saved && /^\d{2}-[A-Za-z]{3}-\d{4}$/.test(saved)) {
+      return saved.toUpperCase();
+    }
+  }
+  return getFormattedPmsDate();
+}
+
+export function saveStoredAccountingDate(newDate) {
+  if (!newDate) return;
+  const normalized = String(newDate).toUpperCase();
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      localStorage.setItem(STORAGE_KEY_ACCOUNTING_DATE, normalized);
+      localStorage.setItem('hsi_active_business_date', normalized);
+      localStorage.setItem('hotel_elite_inn_business_date', normalized);
+      window.dispatchEvent(new CustomEvent('ids-accounting-date-changed', { detail: { accountingDate: normalized } }));
+      if ('BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('hotel_elite_inn_pms_date');
+        bc.postMessage({ type: 'ACCOUNTING_DATE_UPDATED', accountingDate: normalized });
+        bc.close();
+      }
+    } catch (e) {
+      console.warn('Error saving accounting date:', e);
+    }
+  }
+}
+
+export function parsePmsDate(pmsDateStr) {
+  if (!pmsDateStr) return new Date();
+  const parts = String(pmsDateStr).split('-');
+  if (parts.length === 3) {
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const mIdx = months.indexOf(parts[1].toUpperCase());
+    const day = parseInt(parts[0], 10);
+    const year = parseInt(parts[2], 10);
+    if (!isNaN(day) && mIdx >= 0 && !isNaN(year)) {
+      return new Date(year, mIdx, day);
+    }
+  }
+  const fallback = new Date(pmsDateStr);
+  return isNaN(fallback.getTime()) ? new Date() : fallback;
+}
+
+export function pmsDateToInputFormat(pmsDateStr) {
+  const d = parsePmsDate(pmsDateStr);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function inputFormatToPmsDate(isoDateStr) {
+  if (!isoDateStr) return getFormattedPmsDate();
+  const parts = isoDateStr.split('-');
+  if (parts.length === 3) {
+    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    return getFormattedPmsDate(d);
+  }
+  return getFormattedPmsDate(new Date(isoDateStr));
+}
+
+export function calculateRoomNights(arrPmsDate, depPmsDate) {
+  const d1 = parsePmsDate(arrPmsDate);
+  const d2 = parsePmsDate(depPmsDate);
+  const diffTime = d2.getTime() - d1.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(1, isNaN(diffDays) ? 1 : diffDays);
+}
+
+export function addDaysToPmsDate(pmsDateStr, days = 1) {
+  const d = parsePmsDate(pmsDateStr);
+  d.setDate(d.getDate() + days);
+  return getFormattedPmsDate(d);
+}
+
+export const INITIAL_ACCOUNTING_DATE = getStoredAccountingDate();
 export const CURRENT_ACCOUNTING_MONTH_YEAR = getFormattedPmsMonthYear();
 const nextDay = new Date();
 nextDay.setDate(nextDay.getDate() + 1);
