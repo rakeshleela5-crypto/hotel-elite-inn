@@ -37,6 +37,7 @@ export default function AccountsLedgerModal({
     }
   }, [initialTab, isOpen]);
   const [selectedCorporate, setSelectedCorporate] = useState('CORP-05'); // Ashok Leyland Limited by default
+  const [isMaximized, setIsMaximized] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState('09');
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isTallyConsoleOpen, setIsTallyConsoleOpen] = useState(false);
@@ -1291,19 +1292,20 @@ export default function AccountsLedgerModal({
         ref={ledgerContainerRef}
         className={'glass-panel printable-ledger printable-sheet hsi-live-edit-active'} 
         style={{
-        width: '100%',
-        maxWidth: 1360,
-        height: '94vh',
+        width: isMaximized ? '98vw' : '100%',
+        maxWidth: isMaximized ? '98vw' : 1360,
+        height: isMaximized ? '98vh' : '94vh',
+        maxHeight: isMaximized ? '98vh' : '94vh',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '16px',
+        borderRadius: isMaximized ? '4px' : '16px',
         border: '1px solid rgba(212, 175, 55, 0.4)',
         boxShadow: '0 25px 70px rgba(0,0,0,0.9)',
         overflow: 'hidden'
       }}>
         {/* Header Bar */}
         <div className="no-print" style={{
-          padding: '1.1rem 2rem',
+          padding: '0.8rem 1.6rem',
           borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
           background: 'linear-gradient(90deg, rgba(20,25,48,0.98), rgba(12,16,32,0.99))',
           display: 'flex',
@@ -1349,24 +1351,66 @@ export default function AccountsLedgerModal({
             </p>
           </div>
 
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-              border: 'none',
-              color: '#fff',
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'background 0.2s'
-            }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button
+              onClick={() => setIsMaximized(false)}
+              title="Minimize to Normal Window"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: '12px'
+              }}
+            >
+              _
+            </button>
+            <button
+              onClick={() => setIsMaximized(!isMaximized)}
+              title={isMaximized ? "Restore Window" : "Maximize Full Desktop"}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '13px'
+              }}
+            >
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button
+              onClick={onClose}
+              title="Close Dialog"
+              style={{
+                background: 'rgba(239,68,68,0.25)',
+                border: '1px solid rgba(239,68,68,0.4)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 0.2s'
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}

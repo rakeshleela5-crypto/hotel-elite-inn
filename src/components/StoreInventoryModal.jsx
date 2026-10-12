@@ -105,6 +105,7 @@ export default function StoreInventoryModal({
   isOpen,
   onClose
 }) {
+  const [isMaximized, setIsMaximized] = useState(true);
   const [activeTab, setActiveTab] = useState('purchases'); // 'purchases', 'requisitions', 'vendor-payables', 'recipe-bom'
   const [purchases, setPurchases] = useState(INITIAL_STORE_PURCHASES);
   const [requisitions, setRequisitions] = useState(INITIAL_KITCHEN_REQUISITIONS);
@@ -338,19 +339,20 @@ export default function StoreInventoryModal({
       padding: '1rem'
     }}>
       <div className="glass-panel" style={{
-        width: '100%',
-        maxWidth: 1180,
-        height: '90vh',
+        width: isMaximized ? '98vw' : '100%',
+        maxWidth: isMaximized ? '98vw' : 1180,
+        height: isMaximized ? '98vh' : '90vh',
+        maxHeight: isMaximized ? '98vh' : '90vh',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '16px',
+        borderRadius: isMaximized ? '4px' : '16px',
         border: '1px solid rgba(16, 185, 129, 0.35)',
         boxShadow: '0 25px 60px rgba(0,0,0,0.85)',
         overflow: 'hidden'
       }}>
         {/* Header */}
         <div style={{
-          padding: '1.25rem 2rem',
+          padding: '0.9rem 1.6rem',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
           background: 'linear-gradient(90deg, rgba(15,30,25,0.95), rgba(10,20,15,0.98))',
           display: 'flex',
@@ -371,23 +373,66 @@ export default function StoreInventoryModal({
             </p>
           </div>
 
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(255,255,255,0.08)',
-              border: 'none',
-              color: '#fff',
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <X size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <button
+              onClick={() => setIsMaximized(false)}
+              title="Minimize to Normal Window"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 900,
+                fontSize: '12px'
+              }}
+            >
+              _
+            </button>
+            <button
+              onClick={() => setIsMaximized(!isMaximized)}
+              title={isMaximized ? "Restore Window" : "Maximize Full Desktop"}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '13px'
+              }}
+            >
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button
+              onClick={onClose}
+              title="Close Dialog"
+              style={{
+                background: 'rgba(239,68,68,0.25)',
+                border: '1px solid rgba(239,68,68,0.4)',
+                color: '#fff',
+                width: 32,
+                height: 32,
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'background 0.2s'
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Navigation Tabs */}

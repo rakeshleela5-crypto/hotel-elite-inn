@@ -31,6 +31,7 @@ export default function IdsAuditedSalesRegisterModal({
   const [pageSize, setPageSize] = useState(50);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [rangeFilter, setRangeFilter] = useState('ALL');
+  const [isMaximized, setIsMaximized] = useState(true);
   const isOwner = currentUser === 'OWNER' || currentUser === 'MANAGER';
 
   // Synchronized Multi-Period Records
@@ -337,11 +338,12 @@ export default function IdsAuditedSalesRegisterModal({
     >
       {/* Win32 Desktop Dialog Window */}
       <div
-        className="ids-dialog-window"
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: '1240px',
+          width: isMaximized ? '98vw' : '1240px',
           maxWidth: '98vw',
-          maxHeight: '94vh',
+          height: isMaximized ? '96vh' : 'auto',
+          maxHeight: isMaximized ? '96vh' : '94vh',
           background: '#ECE9D8',
           border: '2px solid #FFF',
           borderRightColor: '#716F64',
@@ -370,24 +372,13 @@ export default function IdsAuditedSalesRegisterModal({
               Audited Hotel & F&B Sales Registers V6.5.004.2 — Hotel Elite Inn (Muniguda)
             </span>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: '#D4D0C8',
-              border: '1px solid #FFF',
-              borderRightColor: '#404040',
-              borderBottomColor: '#404040',
-              width: '18px',
-              height: '18px',
-              lineHeight: '14px',
-              textAlign: 'center',
-              fontWeight: 700,
-              fontSize: '11px',
-              cursor: 'pointer'
-            }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Win32 Folder Tab Headers */}

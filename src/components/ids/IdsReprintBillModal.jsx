@@ -139,6 +139,7 @@ export default function IdsReprintBillModal({
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const [searchBillTerm, setSearchBillTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   if (!isOpen) return null;
 
@@ -165,10 +166,10 @@ export default function IdsReprintBillModal({
   return (
     <div className="ids-modal-overlay">
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: stage === 'input' ? '460px' : '620px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '98vw' : (stage === 'input' ? '460px' : '620px'), 
+          maxWidth: '98vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8',
@@ -191,22 +192,13 @@ export default function IdsReprintBillModal({
             <Receipt size={14} />
             <span>Reprint FO Bill \ FMCRYBL V6.5.002.1 — IDS Fortune NEXT PMS</span>
           </div>
-          <button 
-            className="ids-win-btn close" 
-            onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Status notification banner */}

@@ -177,7 +177,7 @@ export default function IdsCheckoutBillModal({
   const [cardAmountInput, setCardAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4000.00');
   const [cardTipInput, setCardTipInput] = useState('0.00');
   const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal 1');
-  const [isMaximized, setIsMaximized] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(true);
 
   const [companyCodeInput, setCompanyCodeInput] = useState(initialMode === 'bulk' ? 'COM0006' : 'COM0015');
   const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'JK Paper Mills Ltd');
@@ -373,7 +373,7 @@ export default function IdsCheckoutBillModal({
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Check-out V6.5.002.6 — Departure & Billing Console</span>
             <div className="ids-window-controls">
-              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -612,7 +612,7 @@ export default function IdsCheckoutBillModal({
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Bill Summary — Folio Charges & Line Items</span>
             <div className="ids-window-controls">
-              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -900,7 +900,7 @@ export default function IdsCheckoutBillModal({
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Settlements V6.5.008.30 — Payment & Folio Clearance</span>
             <div className="ids-window-controls">
-              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>

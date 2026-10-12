@@ -52,6 +52,7 @@ export default function IdsNightAuditModal({
   const [confirmNextDate, setConfirmNextDate] = useState(NEXT_ACCOUNTING_DATE);
 
   // Step 1: Post Room Rate State
+  const [isMaximized, setIsMaximized] = useState(true);
   const [postMode, setPostMode] = useState('all'); // 'individual' | 'all'
   const [step1Running, setStep1Running] = useState(false);
   const [step1Log, setStep1Log] = useState('');
@@ -365,10 +366,10 @@ export default function IdsNightAuditModal({
           ========================================================================= */}
       {activeStep === 1 && (
         <div 
-          className="ids-dialog-window" 
+          className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: '640px', 
-            maxWidth: '96vw', 
+            width: isMaximized ? '98vw' : '640px', 
+            maxWidth: '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -395,7 +396,13 @@ export default function IdsNightAuditModal({
                 Post Room Rate V6.5.002.1 {step1Running ? '(Executing...)' : ''}
               </span>
             </div>
-            <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
+            <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
@@ -505,10 +512,10 @@ export default function IdsNightAuditModal({
           ========================================================================= */}
       {activeStep === 2 && (
         <div 
-          className="ids-dialog-window" 
+          className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: '620px', 
-            maxWidth: '96vw', 
+            width: isMaximized ? '98vw' : '620px', 
+            maxWidth: '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -535,7 +542,13 @@ export default function IdsNightAuditModal({
                 Create Guest Balance V6.5.002.1
               </span>
             </div>
-            <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
+            <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
@@ -637,10 +650,10 @@ export default function IdsNightAuditModal({
           ========================================================================= */}
       {activeStep === 3 && (
         <div 
-          className="ids-dialog-window" 
+          className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: '560px', 
-            maxWidth: '96vw', 
+            width: isMaximized ? '98vw' : '560px', 
+            maxWidth: '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -662,7 +675,13 @@ export default function IdsNightAuditModal({
             }}
           >
             <span style={{ fontWeight: 700, fontSize: '11px' }}>PENDING KOT'S</span>
-            <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
+            <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
           <div style={{ padding: '10px 12px', fontSize: '11px', color: '#000' }}>
@@ -735,10 +754,10 @@ export default function IdsNightAuditModal({
           ========================================================================= */}
       {activeStep === 4 && (
         <div 
-          className="ids-dialog-window" 
+          className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: '640px', 
-            maxWidth: '96vw', 
+            width: isMaximized ? '98vw' : '640px', 
+            maxWidth: '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -765,7 +784,13 @@ export default function IdsNightAuditModal({
                 Open New Date V6.5002.2
               </span>
             </div>
-            <button className="ids-win-btn close" onClick={onClose} style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '10px' }}>✕</button>
+            <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
           <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
