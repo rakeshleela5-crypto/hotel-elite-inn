@@ -84,6 +84,85 @@ export async function updateFastApiRoomStatus(roomId, newStatus) {
 }
 
 /**
+ * Create a new guest reservation or walk-in booking on Railway PostgreSQL
+ */
+export async function createFastApiBooking(bookingData) {
+  try {
+    const roomNumber = String(bookingData.roomNumber || bookingData.room_number || '201');
+    let roomId = Number(bookingData.roomId || bookingData.room_id);
+    if (!roomId || isNaN(roomId)) {
+      const num = parseInt(roomNumber, 10);
+      if (num >= 201 && num <= 209) roomId = num - 191; // 201 -> 10
+      else if (num >= 301 && num <= 309) roomId = num - 282; // 301 -> 19
+      else if (num >= 101 && num <= 109) roomId = num - 100; // 101 -> 1
+      else roomId = 10;
+    }
+
+    const payload = {
+      guest_name: bookingData.guestName || bookingData.guest_name || 'Guest',
+      guest_phone: bookingData.guestPhone || bookingData.phone || bookingData.guest_phone || '9999999999',
+      guest_email: bookingData.guestEmail || bookingData.email || bookingData.guest_email || null,
+      guest_id_type: bookingData.idProofType || bookingData.id_type || 'Aadhaar Card',
+      guest_id_number: bookingData.idProofNumber || bookingData.idProofMasked || bookingData.guest_id_number || null,
+      room_id: roomId,
+      check_in_date: bookingData.checkInDate ? (bookingData.checkInDate.includes('T') ? bookingData.checkInDate : `${bookingData.checkInDate}T12:00:00`) : new Date().toISOString(),
+      check_out_date: bookingData.checkOutDate ? (bookingData.checkOutDate.includes('T') ? bookingData.checkOutDate : `${bookingData.checkOutDate}T11:00:00`) : new Date(Date.now() + 86400000).toISOString(),
+      advance_paid: Number(bookingData.advanceDeposit || bookingData.advance_paid || 0),
+      corporate_account_id: bookingData.corporateAccountId || null,
+      grc_number: bookingData.grcNo || bookingData.grc_number || null,
+      num_pax: Number(bookingData.pax || bookingData.num_pax || 1),
+      second_pax_name: bookingData.secondPaxName || null,
+      second_pax_phone: bookingData.secondPaxPhone || null,
+      second_pax_id: bookingData.secondPaxId || null,
+      plan_code: bookingData.mealPlan || bookingData.plan_code || 'EP',
+      billing_mode: bookingData.paymentMode || bookingData.billing_mode || 'Cash',
+      vehicle_no: bookingData.vehicleNo || null,
+      purpose_of_visit: bookingData.purposeOfVisit || 'Business Visit'
+    };
+
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      // Ensure room status updates to occupied
+      updateFastApiRoomStatus(roomId, 'occupied').catch(() => {});
+      return data;
+    }
+    const errText = await res.text().catch(() => '');
+    console.warn('[FastAPI] Create booking returned non-200:', res.status, errText);
+    return { success: false, status: res.status, error: errText };
+  } catch (err) {
+    console.warn('[FastAPI] Create booking network error:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch all reservations from Railway PostgreSQL
+ */
+export async function getFastApiBookings(statusFilter = null) {
+  try {
+    const url = statusFilter
+      ? `${FASTAPI_BASE_URL}/api/bookings?status_filter=${encodeURIComponent(statusFilter)}`
+      : `${FASTAPI_BASE_URL}/api/bookings`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Bookings fetch failed:', err.message);
+    return [];
+  }
+}
+
+
+/**
  * Fetch all restaurant tables
  */
 export async function getFastApiTables() {

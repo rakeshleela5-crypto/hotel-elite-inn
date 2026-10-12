@@ -68,6 +68,12 @@ import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSA
 import { getStoredAccountingDate } from './data/idsPmsStore';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
+import {
+  createFastApiBooking,
+  postFastApiFolioCharge,
+  createFastApiAdvanceDeposit,
+  updateFastApiRoomStatus
+} from './utils/backendApi';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database, FileSpreadsheet, Search } from 'lucide-react';
 
@@ -753,14 +759,15 @@ export default function App() {
       return r;
     }));
 
-    // Persist new booking to Cloudflare D1
-    try {
-      fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'save_booking', payload: newBooking })
-      }).catch(err => console.warn("Cloudflare D1 save_booking background sync:", err));
-    } catch (e) { }
+    // Persist new booking to Railway FastAPI & PostgreSQL cloud server
+    createFastApiBooking(newBooking).then(res => {
+      console.log('[FastAPI-Railway] Booking registered to PostgreSQL:', res);
+    }).catch(err => {
+      console.warn('[FastAPI-Railway] Background booking sync error:', err);
+    });
+
+    // Update room status on Railway PostgreSQL
+    updateFastApiRoomStatus(newBooking.roomNumber, 'occupied').catch(() => {});
 
     // Auto-inject Day-1 Room Tariff debit and Advance Deposit credit into central transactions ledger
     const initialTxs = [];
@@ -811,16 +818,33 @@ export default function App() {
 
     setTransactions(prev => [...initialTxs, ...prev]);
 
-    // Dispatch initial transactions to Cloudflare D1
-    const adminPin = getVerifiedAdminPin();
-    if (adminPin) {
-      initialTxs.forEach(tx => {
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-          body: JSON.stringify({ action: 'post_folio_transaction', payload: tx })
-        }).catch(() => { });
-      });
+    // Dispatch initial transactions to Railway FastAPI & PostgreSQL
+    postFastApiFolioCharge({
+      room_number: String(newBooking.roomNumber),
+      folio_number: 1,
+      guest_name: newBooking.guestName,
+      transaction_type: 'Room Tariff',
+      particulars: `Room Tariff - ${newBooking.tier || 'Room'} (Day 1)`,
+      sac_code: '996311',
+      debit_amount: tariffAmount,
+      credit_amount: 0,
+      tax_amount: Math.round(tariffAmount * 0.12 * 100) / 100,
+      posting_date: new Date().toISOString().slice(0, 10),
+      posted_by: 'FRONT_DESK'
+    }).catch(err => console.warn('[FastAPI-Railway] Room tariff folio post failed:', err));
+
+    if (newBooking.advanceDeposit && Number(newBooking.advanceDeposit) > 0) {
+      createFastApiAdvanceDeposit({
+        receipt_number: `REC-${Date.now().toString().slice(-6)}`,
+        room_number: String(newBooking.roomNumber),
+        guest_name: newBooking.guestName,
+        amount: Number(newBooking.advanceDeposit),
+        payment_mode: newBooking.paymentMode || 'UPI',
+        reference_no: newBooking.bookingId,
+        remarks: 'Check-In Advance Deposit',
+        status: 'Active',
+        date: new Date().toISOString().slice(0, 10)
+      }).catch(err => console.warn('[FastAPI-Railway] Advance deposit sync failed:', err));
     }
 
     setCurrentReceiptBooking(newBooking);
