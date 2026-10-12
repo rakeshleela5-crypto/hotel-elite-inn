@@ -5,6 +5,7 @@ import {
   Save, X, CheckCircle2, FileText, Calendar, User, ShieldCheck, Tag,
   AlertTriangle
 } from 'lucide-react';
+import { createFastApiMarketSegment } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 30: HOW TO ADD MARKET SEGMENT IN IDS 6.5 & 7.0 SOFTWARE
@@ -177,6 +178,17 @@ export default function IdsMarketSegmentModal({
     });
 
     setStatusMessage(`Market Segment [${updatedRecord.code}] "${updatedRecord.name}" saved successfully!`);
+
+    // Auto-sync market segment to Railway PostgreSQL
+    createFastApiMarketSegment({
+      code: updatedRecord.code,
+      name: updatedRecord.name,
+      short_name: updatedRecord.shortName,
+      applicable_from: updatedRecord.applicableFrom || accountingDate,
+      status: updatedRecord.status || 'Active',
+      user: updatedRecord.user || 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Market segment cloud sync failed:', err));
+
     if (onSaveMarketSegment) {
       onSaveMarketSegment(updatedRecord);
     }

@@ -5,6 +5,7 @@ import {
   AlertCircle, CheckSquare, Search 
 } from 'lucide-react';
 import { INITIAL_HOUSEKEEPING_COMPLAINTS } from '../../data/idsPmsStore';
+import { createFastApiGuestComplaint, resolveFastApiGuestComplaint } from '../../utils/backendApi';
 
 export default function IdsGuestServicesModal({
   isOpen,
@@ -94,6 +95,17 @@ export default function IdsGuestServicesModal({
     setComplaintsList(updated);
     setSelectedComplaint(newComplaint);
 
+    // Auto-sync guest complaint to Railway PostgreSQL
+    createFastApiGuestComplaint({
+      complaint_id: newComplaint.complaintId,
+      room_no: newComplaint.roomNo,
+      guest_name: newComplaint.guestName,
+      department: newComplaint.department,
+      nature_of_complaint: newComplaint.natureOfComplaint,
+      received_by: newComplaint.receivedBy,
+      status: 'Pending'
+    }).catch(err => console.warn('[FastAPI] Guest complaint sync failed:', err));
+
     const pendingCount = updated.filter(c => c.status === 'Pending').length;
     if (onComplaintsCountChange) {
       onComplaintsCountChange(pendingCount);
@@ -113,6 +125,13 @@ export default function IdsGuestServicesModal({
 
   const handleAttendComplaint = () => {
     if (!selectedComplaint) return;
+
+    // Auto-sync resolution to Railway PostgreSQL
+    resolveFastApiGuestComplaint(
+      selectedComplaint.complaintId,
+      attendData.attendedBy,
+      attendData.actionTaken
+    ).catch(err => console.warn('[FastAPI] Complaint resolve sync failed:', err));
 
     const updated = complaintsList.map(c => {
       if (c.complaintId === selectedComplaint.complaintId) {

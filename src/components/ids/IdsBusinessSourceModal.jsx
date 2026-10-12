@@ -4,6 +4,7 @@ import {
   Globe, Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight,
   Save, X, CheckCircle2, FileText, Calendar, User, ShieldCheck, Tag
 } from 'lucide-react';
+import { createFastApiBusinessSource } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 29: HOW TO ADD BUSINESS SOURCE IN IDS 6.5 & 7.0 SOFTWARE
@@ -173,6 +174,17 @@ export default function IdsBusinessSourceModal({
     });
 
     setStatusMessage(`Business Source [${updatedRecord.code}] "${updatedRecord.name}" saved successfully!`);
+
+    // Auto-sync business source to Railway PostgreSQL
+    createFastApiBusinessSource({
+      code: updatedRecord.code,
+      name: updatedRecord.name,
+      short_name: updatedRecord.shortName,
+      applicable_from: updatedRecord.applicableFrom || accountingDate,
+      status: updatedRecord.status || 'Active',
+      user: updatedRecord.user || 'MANAGER'
+    }).catch(err => console.warn('[FastAPI] Business source cloud sync failed:', err));
+
     if (onSaveBusinessSource) {
       onSaveBusinessSource(updatedRecord);
     }

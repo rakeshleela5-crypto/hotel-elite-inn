@@ -1931,3 +1931,161 @@ export async function updateFastApiCorporateAccount(companyId, payload) {
   }
 }
 
+// =============================================================
+// Category 9: Business Sources, Market Segments, Packages & Complaints Connectors
+// =============================================================
+export async function getFastApiBusinessSources() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Business sources fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiBusinessSource(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create business source failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiMarketSegments() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Market segments fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiMarketSegment(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create market segment failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiPackageRates() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Package rates fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiPackageRate(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create package rate failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiLaundryRateMaster(serviceType = null) {
+  try {
+    const url = serviceType 
+      ? `${FASTAPI_BASE_URL}/api/laundry/rate-master?service_type=${encodeURIComponent(serviceType)}`
+      : `${FASTAPI_BASE_URL}/api/laundry/rate-master`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Laundry rate master fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiLaundryRate(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/rate-master`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create laundry rate failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiGuestComplaints(statusFilter = null) {
+  try {
+    const url = statusFilter
+      ? `${FASTAPI_BASE_URL}/api/guest/complaints?status_filter=${encodeURIComponent(statusFilter)}`
+      : `${FASTAPI_BASE_URL}/api/guest/complaints`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Guest complaints fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiGuestComplaint(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/guest/complaints`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create guest complaint failed:', err.message);
+    return null;
+  }
+}
+
+export async function resolveFastApiGuestComplaint(complaintId, attendedBy = 'Duty Manager', actionTaken = 'Issue resolved') {
+  try {
+    const url = `${FASTAPI_BASE_URL}/api/guest/complaints/${encodeURIComponent(complaintId)}/resolve?attended_by=${encodeURIComponent(attendedBy)}&action_taken=${encodeURIComponent(actionTaken)}`;
+    const res = await fetch(url, { method: 'PATCH', headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Resolve complaint failed:', err.message);
+    return null;
+  }
+}
+
+

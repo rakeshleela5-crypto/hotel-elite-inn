@@ -6,6 +6,7 @@ import {
   X, Plus, Trash2, Search, CheckCircle2, ShieldCheck, 
   Coffee, Utensils, Car, Compass, Scissors, LayoutGrid, ArrowRight
 } from 'lucide-react';
+import { createFastApiPackageRate } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 40: HOW TO CREATE / SELL PACKAGE RATES IN IDS 6.5 & 7.0 SOFTWARE
@@ -194,6 +195,21 @@ export default function IdsPackageRatesModal({
 
     setSelectedPackage(newPkg);
     setStatusMessage(`Package ${packageId} ("${description}") saved successfully into Room Rate Master!`);
+
+    // Auto-sync package rate to Railway PostgreSQL
+    createFastApiPackageRate({
+      code: packageId,
+      name: description,
+      tier: roomType.toLowerCase(),
+      total_tariff: computedTotal,
+      room_tariff: baseRoomTariff,
+      buffet_breakfast: 200.0,
+      dinner_buffet: 400.0,
+      sac_code: '996311',
+      tax_rate: 12.0,
+      status: 'Active'
+    }).catch(err => console.warn('[FastAPI] Package rate cloud sync failed:', err));
+
     setTimeout(() => setStatusMessage(''), 4000);
   };
 
