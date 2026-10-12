@@ -78,75 +78,122 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-3xl overflow-hidden bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl text-slate-100 flex flex-col max-h-[90vh]">
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 999999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: 'rgba(0, 0, 0, 0.88)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        style={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: '780px',
+          maxHeight: '90vh',
+          backgroundColor: '#0f172a',
+          border: '1px solid #334155',
+          borderRadius: '16px',
+          boxShadow: '0 25px 60px -10px rgba(0, 0, 0, 0.95)',
+          color: '#f1f5f9',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-400">
-              <Cloud className="w-6 h-6" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: '1px solid #1e293b', backgroundColor: '#090d16' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ padding: '10px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', color: '#fbbf24' }}>
+              <Cloud size={22} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <div style={{ fontSize: '17px', fontWeight: 800, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 Cloudflare R2 Automated Backup Vault
-                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <span style={{ padding: '2px 8px', fontSize: '11px', fontWeight: 700, borderRadius: '20px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                   Zero-Egress S3
                 </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Independent Cloud-to-Cloud disaster recovery & nightly automated snapshot pipeline
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                Independent Cloud-to-Cloud disaster recovery &amp; nightly automated snapshot pipeline
               </p>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            style={{
+              padding: '6px',
+              color: '#94a3b8',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title="Close"
           >
-            <X className="w-5 h-5" />
+            <X size={18} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto', flex: 1, backgroundColor: '#0f172a' }}>
           {/* Architecture Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between">
-              <div className="flex items-center gap-2 text-amber-400 mb-1">
-                <Cloud className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Cloud Storage</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px' }}>
+            <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: '#1e293b', border: '1px solid #334155', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fbbf24', marginBottom: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Cloud size={14} />
+                <span>Cloud Storage</span>
               </div>
-              <div className="text-sm font-bold text-white">Cloudflare R2 Bucket</div>
-              <div className="text-xs text-slate-400 mt-1">10 GB Free Tier • Zero Egress Fees</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>Cloudflare R2 Bucket</div>
+              <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>10 GB Free Tier • Zero Egress Fees</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between">
-              <div className="flex items-center gap-2 text-cyan-400 mb-1">
-                <Clock className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Nightly Cron</span>
+            <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: '#1e293b', border: '1px solid #334155', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#22d3ee', marginBottom: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <Clock size={14} />
+                <span>Nightly Cron</span>
               </div>
-              <div className="text-sm font-bold text-white">02:00 AM UTC Daily</div>
-              <div className="text-xs text-slate-400 mt-1">Automated post-night audit backup</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>02:00 AM UTC Daily</div>
+              <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>Automated post-night audit backup</div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between">
-              <div className="flex items-center gap-2 text-emerald-400 mb-1">
-                <HardDrive className="w-4 h-4" />
-                <span className="text-xs font-semibold uppercase tracking-wider">Independence</span>
+            <div style={{ padding: '14px', borderRadius: '12px', backgroundColor: '#1e293b', border: '1px solid #334155', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399', marginBottom: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <HardDrive size={14} />
+                <span>Independence</span>
               </div>
-              <div className="text-sm font-bold text-white">100% Cloud-to-Cloud</div>
-              <div className="text-xs text-slate-400 mt-1">Runs even if hotel PC is powered off</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>100% Cloud-to-Cloud</div>
+              <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '4px' }}>Runs even if hotel PC is powered off</div>
             </div>
           </div>
 
           {/* Action Callouts */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-800/60 via-slate-900 to-slate-950 border border-slate-700/80 space-y-4">
-            <div className="flex items-center justify-between">
+          <div style={{ padding: '18px', borderRadius: '14px', backgroundColor: '#131b2e', border: '1px solid #25334d', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Database className="w-4 h-4 text-amber-400" />
+                <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Database size={16} color="#fbbf24" />
                   Primary Disaster Recovery (Cloud-to-Cloud)
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#94a3b8' }}>
                   Takes a full PostgreSQL tables snapshot, compresses it with Gzip, and vaults it into Cloudflare R2.
                 </p>
               </div>
@@ -155,32 +202,46 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
                 type="button"
                 disabled={triggering}
                 onClick={handleTriggerBackup}
-                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 rounded-xl shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '9px 16px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  cursor: triggering ? 'not-allowed' : 'pointer',
+                  opacity: triggering ? 0.6 : 1,
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.2)'
+                }}
               >
                 {triggering ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw size={14} className="animate-spin" />
                     <span>Backing Up...</span>
                   </>
                 ) : (
                   <>
-                    <Cloud className="w-4 h-4" />
+                    <Cloud size={14} />
                     <span>Backup to Cloudflare R2 Now</span>
                   </>
                 )}
               </button>
             </div>
 
-            <hr className="border-slate-800" />
+            <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: 0 }} />
 
-            <div className="flex items-center justify-between">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <FileArchive className="w-4 h-4 text-cyan-400" />
+                <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FileArchive size={16} color="#22d3ee" />
                   Owner Self-Service Export (Client Peace of Mind)
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Downloads today's complete hotel books, bookings, and F&B ledger (.JSON) directly to your local PC.
+                <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                  Downloads today's complete hotel books, bookings, and F&amp;B ledger (.JSON) directly to your local PC.
                 </p>
               </div>
 
@@ -188,16 +249,29 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
                 type="button"
                 disabled={downloading}
                 onClick={handleDownloadArchive}
-                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all disabled:opacity-50"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '9px 16px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  color: '#f8fafc',
+                  backgroundColor: '#1e293b',
+                  border: '1px solid #334155',
+                  borderRadius: '10px',
+                  cursor: downloading ? 'not-allowed' : 'pointer',
+                  opacity: downloading ? 0.6 : 1
+                }}
               >
                 {downloading ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+                    <RefreshCw size={14} className="animate-spin" color="#22d3ee" />
                     <span>Downloading...</span>
                   </>
                 ) : (
                   <>
-                    <Download className="w-4 h-4 text-cyan-400" />
+                    <Download size={14} color="#22d3ee" />
                     <span>Download Local Archive</span>
                   </>
                 )}
@@ -208,24 +282,29 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
           {/* Action Result Feedback Notification */}
           {lastActionResult && (
             <div
-              className={`p-4 rounded-xl border flex items-start gap-3 animate-fade-in ${
-                lastActionResult.success
-                  ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
-                  : 'bg-red-950/40 border-red-500/40 text-red-200'
-              }`}
+              style={{
+                padding: '14px',
+                borderRadius: '12px',
+                border: lastActionResult.success ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)',
+                backgroundColor: lastActionResult.success ? 'rgba(6, 78, 59, 0.3)' : 'rgba(127, 29, 29, 0.3)',
+                color: lastActionResult.success ? '#a7f3d0' : '#fecaca',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px'
+              }}
             >
               {lastActionResult.success ? (
-                <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <CheckCircle size={18} color="#34d399" style={{ marginTop: '2px', flexShrink: 0 }} />
               ) : (
-                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                <AlertCircle size={18} color="#f87171" style={{ marginTop: '2px', flexShrink: 0 }} />
               )}
-              <div className="text-xs space-y-1">
-                <div className="font-semibold">
+              <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ fontWeight: 700 }}>
                   {lastActionResult.success ? 'Operation Completed' : 'Action Notice'}
                 </div>
                 <div>{lastActionResult.message || lastActionResult.error || 'Done.'}</div>
                 {lastActionResult.backup_key && (
-                  <div className="font-mono text-[11px] text-amber-300">
+                  <div style={{ fontFamily: 'monospace', fontSize: '11px', color: '#fcd34d' }}>
                     Vault Key: {lastActionResult.backup_key} ({lastActionResult.compressed_size_bytes} bytes)
                   </div>
                 )}
@@ -234,34 +313,45 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
           )}
 
           {/* Recent Backups Table */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, color: '#cbd5e1' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ShieldCheck size={16} color="#34d399" />
                 Cloudflare R2 Backup Vault Inventory
               </span>
               <button
+                type="button"
                 onClick={loadStatus}
-                className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors"
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontSize: '11.5px' }}
               >
-                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
+                <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
                 <span>Refresh</span>
               </button>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800 rounded-xl overflow-hidden">
+            <div style={{ backgroundColor: '#090d16', border: '1px solid #1e293b', borderRadius: '12px', overflow: 'hidden' }}>
               {statusData?.recent_backups && statusData.recent_backups.length > 0 ? (
-                <div className="divide-y divide-slate-800/80">
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {statusData.recent_backups.map((b, idx) => (
-                    <div key={idx} className="p-3 flex items-center justify-between text-xs hover:bg-slate-900/50">
-                      <div className="flex items-center gap-2">
-                        <Database className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span className="font-mono text-slate-200">{b.key}</span>
+                    <div 
+                      key={idx} 
+                      style={{ 
+                        padding: '12px 16px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        fontSize: '12px',
+                        borderBottom: idx < statusData.recent_backups.length - 1 ? '1px solid #1e293b' : 'none'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Database size={14} color="#fbbf24" style={{ flexShrink: 0 }} />
+                        <span style={{ fontFamily: 'monospace', color: '#e2e8f0' }}>{b.key}</span>
                       </div>
-                      <div className="flex items-center gap-4 text-slate-400">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', color: '#94a3b8' }}>
                         <span>{(b.size_bytes / 1024).toFixed(1)} KB</span>
                         <span>{new Date(b.last_modified).toLocaleString()}</span>
-                        <span className="px-2 py-0.5 text-[10px] rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span style={{ padding: '2px 8px', fontSize: '10px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
                           Active
                         </span>
                       </div>
@@ -269,13 +359,13 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
                   ))}
                 </div>
               ) : (
-                <div className="p-6 text-center text-xs text-slate-400 space-y-2">
-                  <Cloud className="w-8 h-8 mx-auto text-slate-600" />
-                  <p>
+                <div style={{ padding: '24px', textAlign: 'center', fontSize: '12px', color: '#94a3b8', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                  <Cloud size={28} color="#475569" />
+                  <p style={{ margin: 0 }}>
                     Automated snapshots trigger nightly at 02:00 AM UTC.
                   </p>
-                  <p className="text-[11px] text-slate-500">
-                    Target Bucket: <span className="font-mono text-slate-400">{statusData?.bucket_name || 'hotel-elite-inn-backups'}</span>
+                  <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>
+                    Target Bucket: <span style={{ fontFamily: 'monospace', color: '#94a3b8' }}>{statusData?.bucket_name || 'hotel-elite-inn-backups'}</span>
                   </p>
                 </div>
               )}
@@ -284,11 +374,21 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400">
+        <div style={{ padding: '14px 24px', borderTop: '1px solid #1e293b', backgroundColor: '#090d16', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: '#94a3b8' }}>
           <span>SLA: 90-Day daily snapshot retention + 12 monthly archives</span>
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+            style={{
+              padding: '6px 16px',
+              borderRadius: '8px',
+              backgroundColor: '#1e293b',
+              border: '1px solid #334155',
+              color: '#f8fafc',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
           >
             Close
           </button>
@@ -297,3 +397,4 @@ export default function CloudflareR2BackupModal({ isOpen, onClose }) {
     </div>
   );
 }
+
