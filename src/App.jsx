@@ -768,9 +768,19 @@ export default function App() {
     setReceiptModalOpen(true);
   };
 
-  const handleUpdateRoomStatus = (roomNumber, status, guestName = null, bookingId = null) => {
+  const handleUpdateRoomStatus = (arg1, arg2, guestName = null, bookingId = null) => {
+    let roomNumber = arg1;
+    let status = arg2;
+    if (typeof arg1 === 'object' && arg1 !== null) {
+      roomNumber = arg1.roomNo || arg1.roomNumber;
+      status = arg1.status;
+      guestName = arg1.guestName !== undefined ? arg1.guestName : null;
+      bookingId = arg1.bookingId !== undefined ? arg1.bookingId : null;
+    }
+    const rNumStr = String(roomNumber);
+
     setRooms(prev => prev.map(r => {
-      if (r.roomNumber === roomNumber) {
+      if (r.roomNumber === rNumStr) {
         return {
           ...r,
           status,
@@ -782,7 +792,7 @@ export default function App() {
     }));
 
     // Send update to Railway PostgreSQL
-    updateFastApiRoomStatus(roomNumber, status).catch(err => {
+    updateFastApiRoomStatus(rNumStr, status).catch(err => {
       console.warn('[FastAPI-Railway] Update room status error:', err);
     });
   };
