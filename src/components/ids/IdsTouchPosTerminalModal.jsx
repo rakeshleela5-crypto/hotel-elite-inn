@@ -172,6 +172,9 @@ export default function IdsTouchPosTerminalModal({
   onBillSettled,
   initialMode = 'pos'
 }) {
+  // Window State: Default to maximized for immersive POS touch screen experience
+  const [isMaximized, setIsMaximized] = useState(true);
+
   // Navigation & Table Selection
   const [selectedGroup, setSelectedGroup] = useState('ALL');
   const [selectedTable, setSelectedTable] = useState('T-01');
@@ -952,19 +955,82 @@ export default function IdsTouchPosTerminalModal({
     return { text: 'VACANT', color: '#2E8B57', isOccupied: false };
   };
 
+  // Keyboard Shortcut Handler for Authentic POS Terminal (F1-F8, Esc)
+  useEffect(() => {
+    if (isOpen === false) return;
+    const handleKeyDown = (e) => {
+      // Don't intercept if an internal subdialog (Void, Discount, Thermal KOT, Merge, Print, Settlement) is open
+      if (voidModalOpen || discountModalOpen || thermalKotModalOpen || mergeTableModalOpen || printBillModalOpen || settlementModalOpen) {
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose?.();
+      } else if (e.key === 'F1') {
+        e.preventDefault();
+        setSelectedGroup('ALL');
+      } else if (e.key === 'F2') {
+        e.preventDefault();
+        handlePunchDeltaKot();
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        handleViewLatestKotSlip();
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        setDiscountModalOpen(true);
+      } else if (e.key === 'F5') {
+        e.preventDefault();
+        setMergeTableModalOpen(true);
+      } else if (e.key === 'F6') {
+        e.preventDefault();
+        if (dispatchedLineItems.length > 0) {
+          handleInitiateVoid(dispatchedLineItems[0]);
+        } else {
+          setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
+        }
+      } else if (e.key === 'F7') {
+        e.preventDefault();
+        setPrintBillModalOpen(true);
+      } else if (e.key === 'F8') {
+        e.preventDefault();
+        setSettlementModalOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, voidModalOpen, discountModalOpen, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, draftCart, dispatchedLineItems, selectedTable, selectedServer, covers]);
+
   const currentTableBadge = getTableOccupancyBadge(selectedTable);
 
+  if (isOpen === false) return null;
+
   return (
-    <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
+    <div className="ids-modal-overlay" style={{ zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div 
-        className="ids-dialog-window" 
-        style={{ 
-          width: '1060px', 
-          height: '730px', 
-          display: 'flex', 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
+        style={isMaximized ? {
+          position: 'fixed',
+          top: '1vh',
+          left: '1vw',
+          width: '98vw',
+          height: '98vh',
+          display: 'flex',
           flexDirection: 'column',
           background: '#D4D0C8',
-          position: 'relative' 
+          zIndex: 1101,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          overflow: 'hidden'
+        } : {
+          width: '1200px',
+          maxWidth: '96vw',
+          height: '840px',
+          maxHeight: '94vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: '#D4D0C8',
+          position: 'relative',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          overflow: 'hidden'
         }}
       >
         {/* ================================================================= */}
@@ -1053,26 +1119,64 @@ export default function IdsTouchPosTerminalModal({
             justifyContent: 'space-between', 
             alignItems: 'center',
             padding: '4px 8px',
-            fontSize: '11.5px',
-            fontWeight: 700
+            fontSize: '12px',
+            fontWeight: 700,
+            userSelect: 'none',
+            flexShrink: 0
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ background: '#A02020', padding: '1px 5px', fontSize: '10px', borderRadius: '2px' }}>IDS NEXT</span>
-            <span>Touch Screen POS Terminal V7.0 — {HOTEL_CONFIG.name} [{activeOutlet}]</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ background: '#A02020', color: '#FFF', padding: '2px 6px', fontSize: '10.5px', borderRadius: '2px', fontWeight: 800, letterSpacing: '0.5px' }}>IDS NEXT</span>
+            <span style={{ textShadow: '1px 1px 1px rgba(0,0,0,0.5)' }}>Touch Screen POS Terminal V7.0 — {HOTEL_CONFIG.name} [{activeOutlet}]</span>
           </div>
-          <div style={{ display: 'flex', gap: '2px' }}>
-            <button className="ids-win-btn close" onClick={onClose} style={{ background: '#ECE9D8', fontWeight: 900 }}>✕</button>
+          <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button 
+              className="ids-win-btn" 
+              title="Minimize to normal size"
+              onClick={() => setIsMaximized(false)}
+              style={{ background: '#ECE9D8', fontWeight: 900, width: '22px', height: '20px', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              _
+            </button>
+            <button 
+              className="ids-win-btn" 
+              title={isMaximized ? "Restore window" : "Maximize full screen"}
+              onClick={() => setIsMaximized(!isMaximized)}
+              style={{ background: '#ECE9D8', fontWeight: 900, width: '22px', height: '20px', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close" 
+              title="Close POS Terminal (Esc)"
+              onClick={onClose} 
+              style={{ background: '#A02020', color: '#FFFFFF', fontWeight: 900, width: '22px', height: '20px', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              ✕
+            </button>
           </div>
         </div>
 
         {/* ================================================================= */}
         {/* TOP STATUS & TABLE SELECTOR BAR                                   */}
         {/* ================================================================= */}
-        <div style={{ padding: '6px 10px', background: '#ECE9D8', borderBottom: '1px solid #716F64', display: 'flex', gap: '14px', alignItems: 'center', fontSize: '11px', flexWrap: 'wrap' }}>
-          <div>
-            <strong>Outlet:</strong>{' '}
-            <select className="ids-select" value={activeOutlet} onChange={e => setActiveOutlet(e.target.value)}>
+        <div 
+          style={{ 
+            padding: '6px 12px', 
+            background: '#ECE9D8', 
+            borderBottom: '2px solid #716F64', 
+            display: 'flex', 
+            gap: '14px', 
+            alignItems: 'center', 
+            fontSize: '11.5px', 
+            flexWrap: 'nowrap',
+            flexShrink: 0,
+            overflowX: 'auto'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <strong style={{ color: '#000080' }}>Outlet:</strong>
+            <select className="ids-select" value={activeOutlet} onChange={e => setActiveOutlet(e.target.value)} style={{ padding: '2px 6px', fontWeight: 600 }}>
               <option value="RESTAURANT">RESTAURANT (Cannon Kitchen)</option>
               <option value="ROOM SERVICE">ROOM SERVICE (POS 5)</option>
               <option value="DROP IN BAR">DROP IN BAR</option>
@@ -1080,13 +1184,13 @@ export default function IdsTouchPosTerminalModal({
             </select>
           </div>
 
-          <div>
-            <strong>Table No.:</strong>{' '}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <strong style={{ color: '#000080' }}>Table No.:</strong>
             <select 
               className="ids-select" 
               value={selectedTable} 
               onChange={e => setSelectedTable(e.target.value)}
-              style={{ fontWeight: 700, color: currentTableBadge.isOccupied ? '#A02020' : '#000080' }}
+              style={{ fontWeight: 700, color: currentTableBadge.isOccupied ? '#A02020' : '#000080', padding: '2px 6px' }}
             >
               {ALL_POS_TABLES.map(t => {
                 const badge = getTableOccupancyBadge(t);
@@ -1099,22 +1203,22 @@ export default function IdsTouchPosTerminalModal({
             </select>
             <span 
               style={{ 
-                marginLeft: '6px', 
-                padding: '2px 6px', 
-                fontSize: '10px', 
+                padding: '2px 8px', 
+                fontSize: '10.5px', 
                 fontWeight: 700, 
                 color: '#FFF', 
                 background: currentTableBadge.color,
-                borderRadius: '2px' 
+                borderRadius: '2px',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)'
               }}
             >
               {currentTableBadge.text}
             </span>
           </div>
 
-          <div>
-            <strong>Steward:</strong>{' '}
-            <select className="ids-select" value={selectedServer} onChange={e => setSelectedServer(e.target.value)}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <strong style={{ color: '#000080' }}>Steward:</strong>
+            <select className="ids-select" value={selectedServer} onChange={e => setSelectedServer(e.target.value)} style={{ padding: '2px 6px' }}>
               {getStewardsList().map(s => (
                 <option key={s.id} value={s.shortName}>
                   [{s.serverCode}] {s.shortName} ({s.role})
@@ -1123,48 +1227,57 @@ export default function IdsTouchPosTerminalModal({
             </select>
           </div>
 
-          <div>
-            <strong>Covers:</strong>{' '}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <strong style={{ color: '#000080' }}>Covers:</strong>
             <input 
               type="number" 
               className="ids-input" 
               value={covers} 
               onChange={e => setCovers(Math.max(1, parseInt(e.target.value) || 1))}
-              style={{ width: '40px', textAlign: 'center' }} 
+              style={{ width: '46px', textAlign: 'center', fontWeight: 700 }} 
             />
           </div>
 
-          <div style={{ marginLeft: 'auto', color: '#0A246A', fontWeight: 700 }}>
-            Session: {activeSession} | Date: {accountingDate} | Cashier: {currentUser}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', whiteSpace: 'nowrap' }}>
+            <span style={{ background: '#D4D0C8', padding: '3px 8px', border: '1px inset #FFF', fontWeight: 600 }}>
+              Session: <strong style={{ color: '#0A246A' }}>{activeSession}</strong>
+            </span>
+            <span style={{ background: '#D4D0C8', padding: '3px 8px', border: '1px inset #FFF', fontWeight: 600 }}>
+              Date: <strong style={{ color: '#0A246A' }}>{accountingDate}</strong>
+            </span>
+            <span style={{ background: '#0A246A', color: '#FFF', padding: '3px 8px', borderRadius: '2px', fontWeight: 700 }}>
+              Cashier: {currentUser}
+            </span>
           </div>
         </div>
 
         {/* ================================================================= */}
-        {/* MAIN SPLIT WORKSPACE                                              */}
+        {/* MAIN SPLIT WORKSPACE (50% TOUCH MENU | 50% ORDERS & BILLING)      */}
         {/* ================================================================= */}
         <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
           
           {/* ------------------------------------------------------------- */}
           {/* LEFT 50%: TOUCH MENU TILES & GROUPS                           */}
           {/* ------------------------------------------------------------- */}
-          <div style={{ flex: '0 0 48%', display: 'flex', flexDirection: 'column', borderRight: '2px solid #716F64', background: '#F0EFEA' }}>
+          <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', borderRight: '2px solid #716F64', background: '#F0EFEA' }}>
             
             {/* Menu Group Filter Buttons */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', padding: '6px', background: '#D4D0C8', borderBottom: '1px solid #716F64' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '6px 8px', background: '#D4D0C8', borderBottom: '2px solid #716F64', flexShrink: 0 }}>
               {TOUCH_GROUPS.map(g => (
                 <button
                   key={g.id}
                   onClick={() => setSelectedGroup(g.id)}
                   style={{
-                    background: selectedGroup === g.id ? g.color : '#E0DFD8',
+                    background: selectedGroup === g.id ? g.color : '#ECE9D8',
                     color: selectedGroup === g.id ? '#FFF' : '#000',
                     fontWeight: 700,
-                    fontSize: '10.5px',
-                    padding: '4px 7px',
+                    fontSize: '11px',
+                    padding: '6px 10px',
                     border: '1px solid #716F64',
                     borderRadius: '2px',
                     cursor: 'pointer',
-                    boxShadow: selectedGroup === g.id ? 'inset 0 2px 4px rgba(0,0,0,0.3)' : '1px 1px 0 #FFF'
+                    boxShadow: selectedGroup === g.id ? 'inset 0 2px 4px rgba(0,0,0,0.3)' : '1px 1px 0 #FFF',
+                    letterSpacing: '0.3px'
                   }}
                 >
                   {g.name}
@@ -1173,7 +1286,7 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* Menu Food Tile Grid */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '6px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(115px, 1fr))', gap: '5px', alignContent: 'start' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '8px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '6px', alignContent: 'start' }}>
               {filteredItems.map(item => (
                 <div
                   key={item.code}
@@ -1181,25 +1294,27 @@ export default function IdsTouchPosTerminalModal({
                   style={{
                     background: '#FFFFFF',
                     border: '1px solid #999',
-                    borderRadius: '2px',
-                    padding: '6px 5px',
+                    borderRadius: '3px',
+                    padding: '8px 8px',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    minHeight: '62px',
-                    boxShadow: '1px 1px 2px rgba(0,0,0,0.1)'
+                    minHeight: '72px',
+                    boxShadow: '1px 1px 3px rgba(0,0,0,0.12)',
+                    userSelect: 'none',
+                    transition: 'all 0.08s ease'
                   }}
                   onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
                   onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
                 >
                   <div>
-                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#000', lineHeight: '1.2' }}>{item.name}</div>
-                    <div style={{ fontSize: '9px', color: '#666' }}>{item.kitchen}</div>
+                    <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#111', lineHeight: '1.25' }}>{item.name}</div>
+                    <div style={{ fontSize: '9.5px', color: '#666', marginTop: '2px' }}>{item.kitchen}</div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                    <span style={{ fontSize: '9.5px', color: '#888' }}>{item.code}</span>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: '#B8860B' }}>₹{item.price.toFixed(0)}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px', borderTop: '1px dashed #EEE', paddingTop: '4px' }}>
+                    <span style={{ fontSize: '10px', color: '#777', fontWeight: 600 }}>{item.code}</span>
+                    <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#B8860B' }}>₹{item.price.toFixed(0)}</span>
                   </div>
                 </div>
               ))}
@@ -1207,50 +1322,50 @@ export default function IdsTouchPosTerminalModal({
           </div>
 
           {/* ------------------------------------------------------------- */}
-          {/* RIGHT 52%: WIN32 TABULAR ORDER GRIDS (DISPATCHED + DRAFT)      */}
+          {/* RIGHT 50%: WIN32 TABULAR ORDER GRIDS (DISPATCHED + DRAFT)      */}
           {/* ------------------------------------------------------------- */}
-          <div style={{ flex: '1 1 52%', display: 'flex', flexDirection: 'column', background: '#FFF' }}>
+          <div style={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', background: '#FFF' }}>
             
             {/* PANE 1: PREVIOUSLY DISPATCHED KOTS (SUNKEN WIN32 GRID) */}
-            <div style={{ background: '#000080', color: '#FFF', padding: '4px 8px', fontSize: '11px', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ background: '#000080', color: '#FFF', padding: '5px 10px', fontSize: '11.5px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
               <span>ACTIVE DISPATCHED KOTS — {selectedTable} ({dispatchedKots.length} BATCHES)</span>
               <span>SUBTOTAL: ₹{financials.dispatchedTotal.toFixed(2)}</span>
             </div>
 
             <div style={{ flex: '1 1 50%', overflowY: 'auto', borderBottom: '2px solid #716F64', border: '2px inset #FFF' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
-                <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0, zIndex: 2 }}>
                   <tr>
-                    <th style={{ padding: '3px 4px', textAlign: 'left', width: '55px' }}>KOT #</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'left' }}>Item Description</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '35px' }}>Qty</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'right', width: '50px' }}>Rate</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'right', width: '60px' }}>Amount</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '65px' }}>Status</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '55px' }}>Action</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'left', width: '60px' }}>KOT #</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Item Description</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'center', width: '40px' }}>Qty</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '60px' }}>Rate</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '70px' }}>Amount</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'center', width: '75px' }}>Status</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'center', width: '60px' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dispatchedLineItems.length === 0 ? (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px 10px', color: '#888', fontStyle: 'italic' }}>
-                        No dispatched KOTs on {selectedTable}. Punch new items below.
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '28px 10px', color: '#888', fontStyle: 'italic' }}>
+                        No dispatched KOTs on {selectedTable}. Click menu items on the left to queue draft items.
                       </td>
                     </tr>
                   ) : (
                     dispatchedLineItems.map(row => (
                       <tr key={row.itemKey} style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
-                        <td style={{ padding: '3px 4px', fontWeight: 700, color: '#A02020' }}>{row.kotNumber}</td>
-                        <td style={{ padding: '3px 4px', fontWeight: 600 }}>{row.name}</td>
-                        <td style={{ padding: '3px 4px', textAlign: 'center', fontWeight: 700 }}>{row.quantity}</td>
-                        <td style={{ padding: '3px 4px', textAlign: 'right', color: '#555' }}>{row.rate.toFixed(2)}</td>
-                        <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 700 }}>{row.amount.toFixed(2)}</td>
-                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>
-                          <span style={{ fontSize: '9px', background: '#E6F4EA', color: '#137333', padding: '1px 4px', borderRadius: '2px', fontWeight: 700 }}>
+                        <td style={{ padding: '4px 6px', fontWeight: 700, color: '#A02020' }}>{row.kotNumber}</td>
+                        <td style={{ padding: '4px 6px', fontWeight: 600 }}>{row.name}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'center', fontWeight: 700 }}>{row.quantity}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', color: '#555' }}>{row.rate.toFixed(2)}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 700 }}>{row.amount.toFixed(2)}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                          <span style={{ fontSize: '9.5px', background: '#E6F4EA', color: '#137333', padding: '1px 5px', borderRadius: '2px', fontWeight: 700 }}>
                             {row.status}
                           </span>
                         </td>
-                        <td style={{ padding: '2px 4px', textAlign: 'center' }}>
+                        <td style={{ padding: '3px 6px', textAlign: 'center' }}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1260,8 +1375,8 @@ export default function IdsTouchPosTerminalModal({
                             style={{
                               background: '#8B0000',
                               color: '#FFF',
-                              padding: '1px 5px',
-                              fontSize: '9.5px',
+                              padding: '2px 6px',
+                              fontSize: '10px',
                               fontWeight: 700,
                               cursor: 'pointer',
                               border: '1px solid #500',
@@ -1281,54 +1396,64 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* PANE 2: UNPRINTED DRAFT DELTA ITEMS (WAITING FOR KITCHEN PUNCH) */}
-            <div style={{ background: '#716F64', color: '#FFF', padding: '3px 8px', fontSize: '11px', fontWeight: 700, display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ background: '#475569', color: '#FFF', padding: '4px 10px', fontSize: '11.5px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
               <span>DRAFT TO PUNCH (DELTA KOT #{dispatchedKots.length + 1})</span>
               <span>{draftCart.length} ITEMS WAITING</span>
             </div>
 
             <div style={{ flex: '1 1 50%', overflowY: 'auto', border: '2px inset #FFF' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px' }}>
-                <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0, zIndex: 2 }}>
                   <tr>
-                    <th style={{ padding: '3px 4px', textAlign: 'left' }}>Item</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'center', width: '60px' }}>Qty (+/-)</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'right', width: '50px' }}>Rate</th>
-                    <th style={{ padding: '3px 4px', textAlign: 'right', width: '60px' }}>Amount</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'left' }}>Item Description</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'center', width: '80px' }}>Qty (+/-)</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '60px' }}>Rate</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'right', width: '70px' }}>Amount</th>
+                    <th style={{ padding: '4px 6px', textAlign: 'center', width: '40px' }}>✕</th>
                   </tr>
                 </thead>
                 <tbody>
                   {draftCart.length === 0 ? (
                     <tr>
-                      <td colSpan={4} style={{ textAlign: 'center', padding: '24px 10px', color: '#888', fontStyle: 'italic' }}>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '28px 10px', color: '#888', fontStyle: 'italic' }}>
                         Draft is empty. Click any item on the left to queue for next KOT.
                       </td>
                     </tr>
                   ) : (
                     draftCart.map(item => (
                       <tr key={item.code} style={{ borderBottom: '1px solid #FFE4B5', background: '#FFFFF0' }}>
-                        <td style={{ padding: '3px 4px' }}>
+                        <td style={{ padding: '4px 6px' }}>
                           <div style={{ fontWeight: 700, color: '#B8860B' }}>{item.name}</div>
-                          <div style={{ fontSize: '9px', color: '#888' }}>{item.code} • {item.kitchen}</div>
+                          <div style={{ fontSize: '9.5px', color: '#888' }}>{item.code} • {item.kitchen}</div>
                         </td>
-                        <td style={{ padding: '3px 4px', textAlign: 'center' }}>
+                        <td style={{ padding: '4px 6px', textAlign: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }}>
                             <button 
                               onClick={() => handleUpdateDraftQty(item.code, -1)}
-                              style={{ width: '16px', height: '16px', padding: 0, fontSize: '10px', cursor: 'pointer' }}
+                              style={{ width: '20px', height: '20px', padding: 0, fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
                               -
                             </button>
-                            <span style={{ fontWeight: 800, minWidth: '14px' }}>{item.qty}</span>
+                            <span style={{ fontWeight: 800, minWidth: '18px', textAlign: 'center' }}>{item.qty}</span>
                             <button 
                               onClick={() => handleUpdateDraftQty(item.code, 1)}
-                              style={{ width: '16px', height: '16px', padding: 0, fontSize: '10px', cursor: 'pointer' }}
+                              style={{ width: '20px', height: '20px', padding: 0, fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
                             >
                               +
                             </button>
                           </div>
                         </td>
-                        <td style={{ padding: '3px 4px', textAlign: 'right', color: '#555' }}>{item.price.toFixed(2)}</td>
-                        <td style={{ padding: '3px 4px', textAlign: 'right', fontWeight: 800 }}>{(item.price * item.qty).toFixed(2)}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', color: '#555' }}>{item.price.toFixed(2)}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'right', fontWeight: 800 }}>{(item.price * item.qty).toFixed(2)}</td>
+                        <td style={{ padding: '4px 6px', textAlign: 'center' }}>
+                          <button
+                            onClick={() => handleUpdateDraftQty(item.code, -item.qty)}
+                            style={{ background: 'none', border: 'none', color: '#991B1B', fontWeight: 900, cursor: 'pointer', fontSize: '12px' }}
+                            title="Remove item from draft"
+                          >
+                            ✕
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -1337,16 +1462,16 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* FINANCIAL TOTALS SUMMARY BAR */}
-            <div style={{ padding: '6px 10px', background: '#ECE9D8', borderTop: '2px solid #716F64', fontSize: '11px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <div style={{ padding: '8px 12px', background: '#ECE9D8', borderTop: '2px solid #716F64', fontSize: '11.5px', flexShrink: 0 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
                     <span>Dispatched Total:</span>
-                    <span>₹{financials.dispatchedTotal.toFixed(2)}</span>
+                    <span style={{ fontWeight: 600 }}>₹{financials.dispatchedTotal.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', color: '#B8860B' }}>
                     <span>Unprinted Draft Total:</span>
-                    <span>₹{financials.draftTotal.toFixed(2)}</span>
+                    <span style={{ fontWeight: 600 }}>₹{financials.draftTotal.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
                     <span>Gross Subtotal:</span>
@@ -1367,7 +1492,7 @@ export default function IdsTouchPosTerminalModal({
                       </span>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A246A', marginTop: '2px', fontSize: '10.5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A246A', marginTop: '2px', fontSize: '11px' }}>
                       <span>Bill Discount:</span>
                       <button
                         onClick={() => setDiscountModalOpen(true)}
@@ -1400,7 +1525,7 @@ export default function IdsTouchPosTerminalModal({
                       <span>{financials.roundOff >= 0 ? `+₹${financials.roundOff.toFixed(2)}` : `-₹${Math.abs(financials.roundOff).toFixed(2)}`}</span>
                     </div>
                   )}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '13px', color: '#0A246A', borderTop: '1px solid #999', paddingTop: '2px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '14px', color: '#0A246A', borderTop: '2px solid #716F64', paddingTop: '3px' }}>
                     <span>GRAND TOTAL:</span>
                     <span>₹{financials.grandTotal.toFixed(2)}</span>
                   </div>
@@ -1408,86 +1533,107 @@ export default function IdsTouchPosTerminalModal({
               </div>
             </div>
 
-            {/* WIN32 BEVEL COMMAND TOOLBAR */}
-            <div style={{ padding: '6px 8px', background: '#D4D0C8', borderTop: '1px solid #716F64', display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
-              <button 
-                onClick={handlePunchDeltaKot}
-                className="ids-btn-classic" 
-                style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F2: Dispatches ONLY draft items with new KOT # to kitchen"
-              >
-                [F2] PUNCH KOT
-              </button>
-
-              <button 
-                onClick={handleViewLatestKotSlip}
-                className="ids-btn-classic" 
-                style={{ background: '#4A5568', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F3: View or reprint 80mm thermal KOT slip"
-              >
-                [F3] VIEW KOT
-              </button>
-
-              <button 
-                onClick={() => setDiscountModalOpen(true)}
-                className="ids-btn-classic" 
-                style={{ background: financials.isDiscountApplied ? '#B8860B' : '#3B82F6', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F4: Apply food bill discount (≤ 5% Cashier, > 5% Manager PIN)"
-              >
-                {financials.isDiscountApplied ? `[F4] DISC ${financials.discountPercent.toFixed(0)}%` : '[F4] DISCOUNT'}
-              </button>
-
-              <button 
-                onClick={() => setMergeTableModalOpen(true)}
-                className="ids-btn-classic" 
-                style={{ background: '#7B1FA2', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F5: Merge running KOTs from another table into this one"
-              >
-                [F5] MERGE
-              </button>
-
-              <button 
-                onClick={() => {
-                  if (dispatchedLineItems.length > 0) {
-                    handleInitiateVoid(dispatchedLineItems[0]);
-                  } else {
-                    setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
-                  }
-                }}
-                className="ids-btn-classic" 
-                style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F6: Void kitchen dish with Manager PIN & mandatory reason"
-              >
-                [F6] VOID
-              </button>
-
-              <button 
-                onClick={() => setPrintBillModalOpen(true)}
-                className="ids-btn-classic" 
-                style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F7: Print consolidated GST Tax Invoice for guest"
-              >
-                [F7] PRINT BILL
-              </button>
-
-              <button 
-                onClick={() => setSettlementModalOpen(true)}
-                className="ids-btn-classic" 
-                style={{ background: '#B8860B', color: '#FFF', fontWeight: 700, padding: '7px 2px', fontSize: '10px', cursor: 'pointer' }}
-                title="F8: Settle payment (Cash, UPI QR, Card, Room Folio) and free table"
-              >
-                [F8] SETTLE
-              </button>
-            </div>
-
           </div>
+        </div>
+
+        {/* ================================================================= */}
+        {/* WIN32 BEVEL COMMAND TOOLBAR (FULL WIDTH SPAN ACROSS MODAL BOTTOM)  */}
+        {/* ================================================================= */}
+        <div 
+          style={{ 
+            padding: '6px 10px', 
+            background: '#D4D0C8', 
+            borderTop: '2px solid #716F64', 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(8, 1fr)', 
+            gap: '6px',
+            flexShrink: 0
+          }}
+        >
+          <button 
+            onClick={() => setSelectedGroup('ALL')}
+            className="ids-btn-classic" 
+            style={{ background: '#334155', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F1: Reset menu to ALL ITEMS category"
+          >
+            [F1] ALL MENU
+          </button>
+
+          <button 
+            onClick={handlePunchDeltaKot}
+            className="ids-btn-classic" 
+            style={{ background: '#166534', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F2: Dispatches ONLY draft items with new KOT # to kitchen"
+          >
+            [F2] PUNCH KOT
+          </button>
+
+          <button 
+            onClick={handleViewLatestKotSlip}
+            className="ids-btn-classic" 
+            style={{ background: '#475569', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F3: View or reprint 80mm thermal KOT slip"
+          >
+            [F3] VIEW KOT
+          </button>
+
+          <button 
+            onClick={() => setDiscountModalOpen(true)}
+            className="ids-btn-classic" 
+            style={{ background: financials.isDiscountApplied ? '#B45309' : '#1D4ED8', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F4: Apply food bill discount (≤ 5% Cashier, > 5% Manager PIN)"
+          >
+            {financials.isDiscountApplied ? `[F4] DISC ${financials.discountPercent.toFixed(0)}%` : '[F4] DISCOUNT'}
+          </button>
+
+          <button 
+            onClick={() => setMergeTableModalOpen(true)}
+            className="ids-btn-classic" 
+            style={{ background: '#6B21A8', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F5: Merge running KOTs from another table into this one"
+          >
+            [F5] MERGE
+          </button>
+
+          <button 
+            onClick={() => {
+              if (dispatchedLineItems.length > 0) {
+                handleInitiateVoid(dispatchedLineItems[0]);
+              } else {
+                setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
+              }
+            }}
+            className="ids-btn-classic" 
+            style={{ background: '#991B1B', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F6: Void kitchen dish with Manager PIN & mandatory reason"
+          >
+            [F6] VOID
+          </button>
+
+          <button 
+            onClick={() => setPrintBillModalOpen(true)}
+            className="ids-btn-classic" 
+            style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F7: Print consolidated GST Tax Invoice for guest"
+          >
+            [F7] PRINT BILL
+          </button>
+
+          <button 
+            onClick={() => setSettlementModalOpen(true)}
+            className="ids-btn-classic" 
+            style={{ background: '#B45309', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            title="F8: Settle payment (Cash, UPI QR, Card, Room Folio) and free table"
+          >
+            [F8] SETTLE
+          </button>
         </div>
 
         {/* ================================================================= */}
         {/* BOTTOM MESSAGE PROMPT STATUS BAR                                  */}
         {/* ================================================================= */}
         {messagePrompt && (
-          <div style={{ padding: '4px 10px', background: '#FFF7CC', borderTop: '1px solid #E6B800', fontSize: '11px', fontWeight: 700, color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '4px 10px', background: '#FFF7CC', borderTop: '1px solid #E6B800', fontSize: '11px', fontWeight: 700, color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
             <span>{messagePrompt}</span>
             <button 
               onClick={() => setMessagePrompt(null)}
