@@ -104,23 +104,7 @@ export async function onRequestPost({ request, env }) {
       }, 400, origin);
     }
 
-    // Log to D1 for audit trail
-    try {
-      if (env.DB) {
-        await env.DB.prepare(`
-          INSERT INTO payment_orders (order_id, amount_paise, currency, receipt, status, created_at)
-          VALUES (?, ?, ?, ?, 'created', ?)
-        `).bind(
-          orderData.id,
-          amountPaise,
-          currency,
-          orderData.receipt,
-          new Date().toISOString()
-        ).run();
-      }
-    } catch (dbErr) {
-      console.error("[PAYMENT ORDER DB ERROR]", dbErr?.message);
-    }
+
 
     return jsonRes({
       success: true,

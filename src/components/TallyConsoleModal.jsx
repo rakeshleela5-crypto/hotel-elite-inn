@@ -179,42 +179,7 @@ export default function TallyConsoleModal({
 
   const [notification, setNotification] = useState('');
 
-  // Live Cloudflare D1 Synchronization for Tally Master Ledgers and Vouchers
-  useEffect(() => {
-    if (!isOpen && !isEmbedded) return;
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      headers: { 'X-Admin-Key': adminPin }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data) {
-          if (Array.isArray(data.data.tallyLedgers) && data.data.tallyLedgers.length > 0) {
-            const mappedLedgers = data.data.tallyLedgers.map(l => ({
-              id: l.ledger_id || l.id,
-              name: l.ledger_name || l.name,
-              group: l.group_name || l.group,
-              balance: Number(l.current_balance !== undefined ? l.current_balance : l.balance) || 0,
-              type: l.balance_type || l.type || 'Dr'
-            }));
-            setLedgers(mappedLedgers);
-          }
-          if (Array.isArray(data.data.tallyVouchers) && data.data.tallyVouchers.length > 0) {
-            const mappedVouchers = data.data.tallyVouchers.map(v => ({
-              voucherNo: v.voucher_no || v.voucherNo,
-              type: v.voucher_type || v.type,
-              typeCode: v.type_code || v.typeCode,
-              date: v.voucher_date || v.date,
-              refNo: v.ref_no || v.refNo || '',
-              narration: v.narration || '',
-              lines: []
-            }));
-            setVouchers(mappedVouchers);
-          }
-        }
-      })
-      .catch(err => console.debug('Offline Tally D1 sync:', err));
-  }, [isOpen, isEmbedded]);
+
 
   // Keyboard Navigation Handling (Tally ERP 9 / TallyPrime Hotkeys)
   useEffect(() => {
@@ -372,38 +337,7 @@ export default function TallyConsoleModal({
 
     setVouchers([newVoucher, ...vouchers]);
 
-    // Dispatch double-entry balanced voucher to Cloudflare D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'save_tally_voucher',
-        payload: {
-          voucher_no: newVoucher.voucherNo,
-          voucher_type: newVoucher.type,
-          type_code: newVoucher.typeCode,
-          voucher_date: newVoucher.date,
-          ref_no: newVoucher.refNo,
-          narration: newVoucher.narration,
-          total_debit: totalDebit,
-          total_credit: totalCredit,
-          is_balanced: 1,
-          lines: newVoucher.lines.map((l, idx) => ({
-            line_id: `${newVoucher.voucherNo}-L${idx + 1}`,
-            dr_cr: l.drCr,
-            ledger_id: l.ledgerId,
-            ledger_name: l.ledgerName,
-            amount: l.amount
-          }))
-        }
-      })
-    }).catch(err => console.warn('Tally voucher cloud sync error:', err));
-
-    setNotification(`✓ Voucher ${newVoucher.voucherNo} posted successfully! Synced to D1 tally_vouchers.`);
+    setNotification(`✓ Voucher ${newVoucher.voucherNo} posted successfully!`);
     setTimeout(() => setNotification(''), 4000);
     setCurrentView('day-book');
   };
@@ -422,30 +356,9 @@ export default function TallyConsoleModal({
 
     setLedgers([...ledgers, newLedger]);
 
-    // Dispatch Master Ledger to Cloudflare D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'save_tally_ledger',
-        payload: {
-          ledger_id: newLedger.id,
-          ledger_name: newLedger.name,
-          group_name: newLedger.group,
-          opening_balance: newLedger.balance,
-          current_balance: newLedger.balance,
-          balance_type: newLedger.type
-        }
-      })
-    }).catch(err => console.warn('Tally ledger cloud sync error:', err));
-
     setIsQuickLedgerOpen(false);
     setQuickLedgerForm({ name: '', group: 'Sundry Creditors', openingBalance: 0, type: 'Cr' });
-    setNotification(`✓ Created Master Ledger: ${newLedger.name} under ${newLedger.group}. Synced to D1 tally_ledgers.`);
+    setNotification(`✓ Created Master Ledger: ${newLedger.name} under ${newLedger.group}.`);
     setTimeout(() => setNotification(''), 3500);
   };
 

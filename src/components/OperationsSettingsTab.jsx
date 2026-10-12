@@ -50,20 +50,6 @@ export default function OperationsSettingsTab({ onSettingsUpdated }) {
     try {
       localStorage.setItem('hsi_operations_settings', JSON.stringify(settings));
 
-      // Dispatch to Cloudflare D1
-      const adminPin = localStorage.getItem('hsi_admin_pin') || settings.managerPin || '7650';
-      await fetch('/api/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Key': adminPin
-        },
-        body: JSON.stringify({
-          action: 'update_operations_settings',
-          payload: settings
-        })
-      }).catch(err => console.warn('Offline settings fallback:', err));
-
       if (onSettingsUpdated) {
         onSettingsUpdated(settings);
       }
@@ -189,7 +175,7 @@ export default function OperationsSettingsTab({ onSettingsUpdated }) {
           fontSize: '0.82rem',
           fontWeight: 700
         }}>
-          <CheckCircle2 size={16} /> Operational settings successfully updated and synced across front desk &amp; Cloudflare D1!
+          <CheckCircle2 size={16} /> Operational settings successfully updated and saved across front desk!
         </div>
       )}
 

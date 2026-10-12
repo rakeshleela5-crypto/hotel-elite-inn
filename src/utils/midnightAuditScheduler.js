@@ -121,18 +121,7 @@ export function initMidnightAuditScheduler({
           localStorage.setItem('hsi_night_audits', JSON.stringify([auditPayload, ...existing]));
         } catch (e) {}
 
-        // 3. Sync to Cloudflare D1 Remote Database
-        const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-        fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-          body: JSON.stringify({
-            action: 'execute_automated_night_audit',
-            payload: auditPayload
-          })
-        }).catch(err => console.warn('[Auto-Night-Audit] Offline sync warning:', err));
-
-        // 4. Notify app listeners
+        // 3. Notify app listeners
         window.dispatchEvent(new CustomEvent('hotel_midnight_audit_executed', { detail: auditPayload }));
 
         if (onAuditExecuted) {

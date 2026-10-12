@@ -574,27 +574,6 @@ export function sealDailyPmsAuditRecord(businessDate, rooms = [], bookings = [],
     window.dispatchEvent(new CustomEvent('pms_audit_updated', { detail: sealedRecord }));
   }
 
-  // 4. Sync directly to Cloudflare D1
-  const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-  fetch('/api/sync', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Admin-Key': adminPin
-    },
-    body: JSON.stringify({
-      action: 'seal_pms_daily_master_audit',
-      payload: sealedRecord
-    })
-  })
-    .then(r => r.json())
-    .then(d => {
-      if (d && d.success) {
-        console.log(`✓ 26-Column PMS Master Audit for ${dateStr} sealed in Cloudflare D1`);
-      }
-    })
-    .catch(err => console.warn('Offline PMS audit seal fallback:', err));
-
   return sealedRecord;
 }
 

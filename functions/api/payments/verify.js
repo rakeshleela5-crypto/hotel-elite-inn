@@ -113,36 +113,15 @@ export async function onRequestPost({ request, env }) {
     // Log tamper attempt for security audit
     console.warn(`[PAYMENT TAMPER DETECTED] Order: ${razorpay_order_id}, Payment: ${razorpay_payment_id}`);
 
-    // Update D1 audit log with tamper flag
-    try {
-      if (env.DB) {
-        await env.DB.prepare(`
-          UPDATE payment_orders SET status = 'tampered', updated_at = ? WHERE order_id = ?
-        `).bind(new Date().toISOString(), razorpay_order_id).run();
-      }
-    } catch (_) {}
-
     return jsonRes({
       success: false,
       error: "Payment signature verification failed. This transaction cannot be confirmed."
     }, 400, origin);
   }
 
-  // ✅ Payment verified — generate booking reference and update D1
+  // ✅ Payment verified — generate booking reference
   const bookingRef = `HSI-RES-${Date.now().toString(36).toUpperCase()}`;
   const confirmedAt = new Date().toISOString();
-
-  try {
-    if (env.DB) {
-      await env.DB.prepare(`
-        UPDATE payment_orders
-        SET status = 'paid', payment_id = ?, booking_ref = ?, updated_at = ?
-        WHERE order_id = ?
-      `).bind(razorpay_payment_id, bookingRef, confirmedAt, razorpay_order_id).run();
-    }
-  } catch (dbErr) {
-    console.error("[VERIFY DB ERROR]", dbErr?.message);
-  }
 
   console.log(`[PAYMENT CONFIRMED] Ref: ${bookingRef}, Order: ${razorpay_order_id}, Payment: ${razorpay_payment_id}`);
 

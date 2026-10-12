@@ -1,6 +1,6 @@
 // src/db/dexieDb.js
 // Enterprise Offline-First IndexedDB Layer for Hotel Elite Inn
-// Powered by Dexie.js with Automatic Cloudflare D1 Background Outbox Sync
+// Powered by Dexie.js with Local-First Offline Storage
 
 import Dexie from 'dexie';
 import { RESTAURANT_MENU } from '../data/hotelData';
@@ -191,31 +191,17 @@ export async function saveKotToDexie(rawKot) {
   if (!kot) return;
 
   try {
-    // 1. Write to Dexie persistent storage
+    // 1. Write to Dexie persistent storage (mark synced locally)
+    kot.syncStatus = 'synced';
     await db.kots.put(kot);
 
-    // 2. Add to outbox queue for Cloudflare D1 sync
-    await db.outboxQueue.add({
-      action: 'create_live_kot',
-      endpoint: '/api/sync',
-      payload: kot,
-      status: 'pending',
-      retries: 0,
-      timestamp: new Date().toISOString(),
-      entityId: kot.id
-    });
-
-    // 3. Keep localStorage & BroadcastChannel in sync for legacy listeners
+    // 2. Keep localStorage & BroadcastChannel in sync for legacy listeners
     try {
       const allKots = await db.kots.orderBy('timestamp').reverse().limit(100).toArray();
       localStorage.setItem('hotel_elite_inn_live_kots', JSON.stringify(allKots));
     } catch (e) {}
 
     await refreshPendingCounts();
-
-    // 4. Trigger background flush
-    flushDexieOutbox();
-
     return kot;
   } catch (err) {
     console.error('saveKotToDexie error:', err);
@@ -232,20 +218,9 @@ export async function updateKotStatusInDexie(orderId, newStatus) {
     if (existing) {
       await db.kots.update(orderId, {
         status: newStatus,
-        syncStatus: 'pending'
+        syncStatus: 'synced'
       });
     }
-
-    // Add to outbox queue
-    await db.outboxQueue.add({
-      action: 'update_order_status',
-      endpoint: '/api/sync',
-      payload: { orderId, status: newStatus },
-      status: 'pending',
-      retries: 0,
-      timestamp: new Date().toISOString(),
-      entityId: orderId
-    });
 
     // Update localStorage mirror
     try {
@@ -254,7 +229,6 @@ export async function updateKotStatusInDexie(orderId, newStatus) {
     } catch (e) {}
 
     await refreshPendingCounts();
-    flushDexieOutbox();
   } catch (err) {
     console.error('updateKotStatusInDexie error:', err);
   }
@@ -274,17 +248,6 @@ export async function saveTableSessionToDexie(tableNumber, sessionData) {
   try {
     await db.tableSessions.put(entry);
 
-    // Enqueue for Cloudflare D1 sync
-    await db.outboxQueue.add({
-      action: 'save_running_table_session',
-      endpoint: '/api/sync',
-      payload: entry,
-      status: 'pending',
-      retries: 0,
-      timestamp: new Date().toISOString(),
-      entityId: entry.sessionId || `SESSION-${tStr}`
-    });
-
     // Mirror to localStorage
     try {
       const allSessions = await db.tableSessions.toArray();
@@ -294,7 +257,6 @@ export async function saveTableSessionToDexie(tableNumber, sessionData) {
     } catch (e) {}
 
     await refreshPendingCounts();
-    flushDexieOutbox();
   } catch (err) {
     console.error('saveTableSessionToDexie error:', err);
   }
@@ -315,21 +277,6 @@ export async function settleTableSessionInDexie(tableNumber, settlementData = {}
       });
     }
 
-    await db.outboxQueue.add({
-      action: 'settle_running_table_session',
-      endpoint: '/api/sync',
-      payload: {
-        tableNumber: tStr,
-        sessionId: existing?.sessionId || '',
-        paymentMode: settlementData.paymentMode || 'Cash',
-        ...settlementData
-      },
-      status: 'pending',
-      retries: 0,
-      timestamp: new Date().toISOString(),
-      entityId: `SETTLE-${tStr}`
-    });
-
     // Mirror to localStorage
     try {
       const allSessions = await db.tableSessions.toArray();
@@ -341,14 +288,13 @@ export async function settleTableSessionInDexie(tableNumber, settlementData = {}
     } catch (e) {}
 
     await refreshPendingCounts();
-    flushDexieOutbox();
   } catch (err) {
     console.error('settleTableSessionInDexie error:', err);
   }
 }
 
 /**
- * 7. Outbox Sync Engine: Flushes pending queue to Cloudflare D1
+ * 7. Outbox Queue Flush Engine
  */
 export async function flushDexieOutbox() {
   if (typeof window === 'undefined') return;
@@ -380,8 +326,17 @@ export async function flushDexieOutbox() {
     const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
 
     for (const item of pendingItems) {
+      if (!item.endpoint || item.endpoint.includes('sync')) {
+        // Clear legacy outbox queue item
+        await db.outboxQueue.delete(item.id);
+        if (item.entityId) {
+          await db.kots.update(item.entityId, { syncStatus: 'synced' }).catch(() => {});
+        }
+        continue;
+      }
+
       try {
-        const response = await fetch(item.endpoint || '/api/sync', {
+        const response = await fetch(item.endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

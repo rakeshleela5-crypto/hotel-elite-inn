@@ -314,21 +314,7 @@ export default function HousekeepingMobilePortal({ onClose, staffRole = 'MANAGER
       ch.close();
     } catch {}
 
-    // D1 API sync
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'place_room_service',
-        payload: {
-          roomNumber: newServiceRoom,
-          serviceType: newServiceType,
-          description: newTicket.description,
-          priority: newServicePriority
-        }
-      })
-    }).catch(err => console.warn('HK manual service sync:', err));
+
 
     showToast(`\uD83D\uDECE\uFE0F Service ticket created for Room ${newServiceRoom}: ${newServiceType}`);
     setCreateServiceModalOpen(false);

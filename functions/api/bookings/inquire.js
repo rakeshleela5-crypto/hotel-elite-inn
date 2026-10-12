@@ -60,30 +60,7 @@ export async function onRequestPost({ request, env }) {
   const inquiryId = `SSVR-INQ-${Date.now().toString(36).toUpperCase()}`;
   const createdAt = new Date().toISOString();
 
-  // Save inquiry to D1 database
-  try {
-    if (env.DB) {
-      await env.DB.prepare(`
-        INSERT INTO inquiries
-          (inquiry_id, guest_name, phone, email, check_in, check_out, room_type, guests_count, notes, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).bind(
-        inquiryId,
-        sanitize(guestName),
-        sanitize(phone),
-        sanitize(email || ""),
-        sanitize(checkIn),
-        sanitize(checkOut),
-        sanitize(roomType),
-        Number(guestsCount) || 1,
-        sanitize(notes),
-        createdAt
-      ).run();
-    }
-  } catch (dbErr) {
-    // DB write fails silently — inquiry still returns success so guest experience is not broken
-    console.error("[INQUIRY DB ERROR]", dbErr?.message);
-  }
+
 
   return jsonRes({
     success: true,

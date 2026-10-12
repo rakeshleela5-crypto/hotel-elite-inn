@@ -14,7 +14,6 @@
  */
 
 const STORAGE_KEY = 'hsi_edits_v2';
-const SYNC_URL    = '/api/sync';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 
@@ -234,22 +233,7 @@ class HotelEditEngine {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     } catch (_) { /* quota / private mode */ }
 
-    // 2. Cloudflare D1 (fire and forget)
-    fetch(SYNC_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'save_inline_override',
-        payload: {
-          key,
-          value,
-          tableName: cell?.closest('[data-table-name]')?.dataset.tableName || 'universal_matrix',
-          editedBy:  localStorage.getItem('hsi_staff_user') || 'Front Desk'
-        }
-      })
-    }).catch(() => { /* network offline — localStorage already saved */ });
-
-    // 3. Reactive broadcast for any component listening
+    // 2. Reactive broadcast for any component listening
     window.dispatchEvent(new CustomEvent('hsi:edited', {
       detail: { key, value, cell }
     }));

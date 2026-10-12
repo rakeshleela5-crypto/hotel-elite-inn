@@ -229,17 +229,6 @@ export default function InRoomGuestPortal({
       console.warn('Folio auto-post error:', err);
     }
 
-    // 4. Remote Cloudflare D1 Sync
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'create_live_kot',
-        payload: newOrder
-      })
-    }).catch(err => console.warn('Offline in-room KOT sync fallback:', err));
-
     if (onPlaceFoodOrder) {
       onPlaceFoodOrder(newOrder);
     }
@@ -382,17 +371,6 @@ export default function InRoomGuestPortal({
     } catch (e) {
       console.warn('HK guest broadcast error:', e);
     }
-
-    // 3. Dispatch to Cloudflare D1 Remote Database Sync
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'create_housekeeping_ticket',
-        payload: newReq
-      })
-    }).catch(err => console.warn('Offline HK sync fallback:', err));
 
     if (onRequestRoomService) {
       onRequestRoomService(newReq);

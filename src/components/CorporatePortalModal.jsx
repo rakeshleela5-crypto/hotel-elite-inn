@@ -118,48 +118,11 @@ export default function CorporatePortalModal({ isOpen, onClose }) {
     e.preventDefault();
     if (!advanceTxRef) return;
     setAdvanceRecorded(true);
-
-    // Sync to Cloudflare D1
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'record_corporate_advance_quotation',
-        payload: {
-          quotationNo,
-          partnerId: selectedPartner.id,
-          companyName: selectedPartner.name,
-          grandTotal,
-          advanceRequired,
-          advanceTxRef,
-          roomCount,
-          nightCount,
-          status: 'Advance Confirmed'
-        }
-      })
-    }).catch(err => console.warn('Offline quotation advance sync:', err));
   };
 
   const handleOnboardingSubmit = (e) => {
     e.preventDefault();
     if (!companyName || !gstin) return;
-
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'apply_corporate_account',
-        payload: {
-          corporateId: `CORP-${Date.now().toString().slice(-4)}`,
-          companyName,
-          gstin,
-          contactPerson,
-          contactEmail,
-          contactPhone: phone,
-          estimatedRooms
-        }
-      })
-    }).catch(err => console.warn('Offline corporate account application:', err));
 
     setSubmitted(true);
     setTimeout(() => {

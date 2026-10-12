@@ -141,31 +141,11 @@ export async function loginStaffViaBackend(portal, staffId, pin, staffName = '',
 export async function endStaffShiftSession(portal, session) {
   if (!session) return;
   try {
-    // Notify Cloudflare D1 immediately
-    await fetch('/api/staff-auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'logout',
-        sessionId: session.sessionId,
-        staffId: session.staffId
-      })
-    }).catch(err => {
-      // Fallback via /api/sync
-      fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'staff_logout',
-          payload: { sessionId: session.sessionId, staffId: session.staffId }
-        })
-      }).catch(() => {});
-    });
-  } catch (e) {
-    console.warn('Shift logout sync error:', e);
-  } finally {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(`hei_staff_session_${portal}`);
+      localStorage.removeItem(`hei_staff_token_${portal}`);
     }
+  } catch (e) {
+    console.warn('Shift logout error:', e);
   }
 }

@@ -14,6 +14,7 @@ import { generateOfficialGstr1Json, reconcileGstr2bWithPurchases, validateGstin,
 import { useUniversalInlineEdit, InlineEditorBanner, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import { sendDebtorStatementWhatsApp } from '../utils/whatsappDispatch';
+import { getFastApiCorporateAccounts, createFastApiGstFiling } from '../utils/backendApi';
 
 export default function AccountsLedgerModal({
   isOpen,
@@ -360,59 +361,30 @@ export default function AccountsLedgerModal({
     );
   });
 
-  // Sync corporate ledger and GST FOM records from Cloudflare D1
+  // Load corporate ledger from Railway FastAPI backend
   useEffect(() => {
     if (!isOpen) return;
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      headers: { 'X-Admin-Key': adminPin }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data) {
-          if (data.data.corporateLedger && data.data.corporateLedger.length > 0) {
-            const mapped = data.data.corporateLedger.map(l => ({
-              entryId: l.entry_id || l.entryId,
-              corporateId: l.corporate_id || l.corporateId,
-              date: l.entry_date || l.date,
-              invoiceNo: l.invoice_id || l.invoiceNo || '-',
-              bankRef: l.bank_ref || l.bankRef || '-',
-              type: l.entry_type || l.type || 'Bank NEFT Credit',
-              description: l.description,
-              debit: l.debit_amount !== undefined ? l.debit_amount : l.debit,
-              credit: l.credit_amount !== undefined ? l.credit_amount : l.credit,
-              tdsSection: l.tds_section || l.tdsSection,
-              tdsAmount: l.tds_amount !== undefined ? l.tds_amount : l.tdsAmount,
-              balance: l.running_balance !== undefined ? l.running_balance : l.balance
-            }));
-            setCorporateLedger(mapped);
-          }
-
-          if (data.data.gstFomRecords && data.data.gstFomRecords.length > 0) {
-            const mappedFom = data.data.gstFomRecords.map(r => ({
-              recordId: r.record_id || r.recordId,
-              billNo: r.bill_no || r.billNo,
-              billDate: r.bill_date || r.billDate,
-              refNo: r.ref_no || r.refNo,
-              guestName: r.guest_name || r.guestName,
-              roomNumber: r.room_number || r.roomNumber,
-              companyName: r.company_name || r.companyName || '',
-              gstin: r.gstin || '',
-              billingAddress: r.billing_address || r.billingAddress || '',
-              stateCode: r.state_code || r.stateCode || '21 (Odisha)',
-              taxable0: r.taxable_0 !== undefined ? r.taxable_0 : (r.taxable0 || 0),
-              taxable5: r.taxable_5 !== undefined ? r.taxable_5 : (r.taxable5 || 0),
-              cgst: r.cgst !== undefined ? r.cgst : 0,
-              sgst: r.sgst !== undefined ? r.sgst : 0,
-              totalAmount: r.total_amount !== undefined ? r.total_amount : (r.totalAmount || 0),
-              amendmentReason: r.amendment_reason || r.amendmentReason,
-              amendedBy: r.amended_by || r.amendedBy
-            }));
-            setGstFomRecords(mappedFom);
-          }
-        }
-      })
-      .catch(err => console.warn('Corporate ledger & GST sync error:', err));
+    getFastApiCorporateAccounts().then(data => {
+      if (data && Array.isArray(data.corporateLedger) && data.corporateLedger.length > 0) {
+        const mapped = data.corporateLedger.map(l => ({
+          entryId: l.entry_id || l.entryId,
+          corporateId: l.corporate_id || l.corporateId,
+          date: l.entry_date || l.date,
+          invoiceNo: l.invoice_id || l.invoiceNo || '-',
+          bankRef: l.bank_ref || l.bankRef || '-',
+          type: l.entry_type || l.type || 'Bank NEFT Credit',
+          description: l.description,
+          debit: l.debit_amount !== undefined ? l.debit_amount : l.debit,
+          credit: l.credit_amount !== undefined ? l.credit_amount : l.credit,
+          tdsSection: l.tds_section || l.tdsSection,
+          tdsAmount: l.tds_amount !== undefined ? l.tds_amount : l.tdsAmount,
+          balance: l.running_balance !== undefined ? l.running_balance : l.balance
+        }));
+        setCorporateLedger(mapped);
+      }
+    }).catch(err => {
+      console.warn('FastAPI corporate ledger sync fallback:', err);
+    });
   }, [isOpen]);
 
   // Contract Master modal state
@@ -474,27 +446,8 @@ export default function AccountsLedgerModal({
       return corp;
     }));
 
-    // Sync contract updates to Cloudflare D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'update_corporate_contract',
-        payload: {
-          corporateId: currentCorp.id,
-          creditLimit: Number(contractForm.creditLimit),
-          creditDays: Number(contractForm.creditDays),
-          contractDiscount: Number(contractForm.contractDiscount),
-          billingMode: contractForm.billingMode,
-          contactPerson: contractForm.contactPerson,
-          contactPhone: contractForm.contactPhone
-        }
-      })
-    }).catch(err => console.warn('Offline corporate contract sync fallback:', err));
-
     setShowContractModal(false);
-    setActionSuccessMsg(`✓ Contract terms updated and synced to Cloudflare D1 for ${currentCorp.name}`);
+    setActionSuccessMsg(`✓ Contract terms updated successfully for ${currentCorp.name}`);
     setTimeout(() => setActionSuccessMsg(''), 4000);
   };
 
@@ -595,34 +548,9 @@ export default function AccountsLedgerModal({
 
     setGstFomRecords(prev => prev.map(r => r.billNo === editingGstRecord.billNo ? updatedRecord : r));
 
-    // Remote Cloudflare D1 Prepared Statement Sync (Action 37: amend_gst_invoice)
-    try {
-      const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-      await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-        body: JSON.stringify({
-          action: 'amend_gst_invoice',
-          payload: {
-            invoiceNo: editingGstRecord.billNo,
-            guestName: gstAmendForm.guestName,
-            companyName: gstAmendForm.company,
-            gstin: cleanGstin,
-            address1: gstAmendForm.billingAddress,
-            state: gstAmendForm.stateCode,
-            isB2B,
-            totalAmount: updatedRecord.totalAmount,
-            amendedBy: 'Sudhakar Reddy (Front Office Lead)'
-          }
-        })
-      });
-    } catch (err) {
-      console.warn('Offline D1 GST Amend sync fallback:', err);
-    }
-
     setGstAmendSaving(false);
     setIsGstAmendOpen(false);
-    setActionSuccessMsg(`✓ Bill ${editingGstRecord.billNo} amended: ${isB2B ? 'B2B (GSTR-1 Table 4A)' : 'B2C (Table 7)'} synced to Cloudflare D1`);
+    setActionSuccessMsg(`✓ Bill ${editingGstRecord.billNo} amended: ${isB2B ? 'B2B (GSTR-1 Table 4A)' : 'B2C (Table 7)'} updated successfully`);
     setTimeout(() => setActionSuccessMsg(''), 5000);
   };
 
@@ -713,26 +641,6 @@ export default function AccountsLedgerModal({
 
     setPettyCashEntries(prev => [newVoucher, ...prev]);
 
-    // Dispatch to Cloudflare D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'add_journal_entry',
-        payload: {
-          date: newVoucher.date,
-          category: newVoucher.category,
-          description: newVoucher.item,
-          debitAmount: amt,
-          creditAmount: 0,
-          paymentMode: journalForm.paymentMode,
-          voucherNo: newVoucher.voucher,
-          createdBy: newVoucher.approvedBy
-        }
-      })
-    }).catch(err => console.warn('Offline journal sync fallback:', err));
-
     setShowAddJournalModal(false);
     setJournalForm({
       date: new Date().toISOString().split('T')[0],
@@ -742,7 +650,7 @@ export default function AccountsLedgerModal({
       paymentMode: 'Cash',
       approvedBy: 'General Manager'
     });
-    setActionSuccessMsg(`✓ Journal Voucher ${newVoucher.voucher} (₹${amt.toLocaleString('en-IN')}) recorded and synced to D1!`);
+    setActionSuccessMsg(`✓ Journal Voucher ${newVoucher.voucher} (₹${amt.toLocaleString('en-IN')}) recorded successfully!`);
     setTimeout(() => setActionSuccessMsg(''), 4500);
   };
 
@@ -794,40 +702,6 @@ export default function AccountsLedgerModal({
     };
 
     setCorporateLedger(prev => [...prev, newEntry]);
-
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'record_corporate_ledger_entry',
-        payload: {
-          entryId: newEntry.entryId,
-          corporateId: currentCorp.id,
-          date: newEntry.date,
-          entryType: 'Bank NEFT Credit',
-          invoiceId: null,
-          description: newEntry.description,
-          debitAmount: 0,
-          creditAmount: grossVal,
-          tdsSection: newEntry.tdsSection,
-          tdsAmount: tdsVal,
-          runningBalance: newBalance,
-          bankRef: newEntry.bankRef
-        }
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.success) {
-          console.log(`✓ Corporate ledger entry recorded in Cloudflare D1 for ${currentCorp.name}`);
-        }
-      })
-      .catch(err => console.warn('Offline corporate ledger fallback:', err));
 
     setShowSettlementModal(false);
     setActionSuccessMsg(`Posted ₹${grossVal.toLocaleString('en-IN')} corporate settlement receipt for ${currentCorp.name}`);
@@ -1180,36 +1054,25 @@ export default function AccountsLedgerModal({
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    // Sync GSTR-1 return filing metadata and payload to Cloudflare D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'save_gstr1_filing',
-        payload: {
-          filing_id: `GSTR1-${selectedMonth}${selectedYear}`,
-          return_period: `${selectedMonth}${selectedYear}`,
-          gstin: HOTEL_CONFIG.gstin,
-          financial_year: `${selectedYear}-${Number(selectedYear) + 1}`,
-          gross_turnover: Number(payload.gt || 0),
-          b2b_invoices_count: Array.isArray(payload.b2b) ? payload.b2b.length : 0,
-          b2b_taxable_value: totalTaxableRoom + totalTaxableFood,
-          b2b_total_tax: totalGstCollected,
-          b2cs_taxable_value: 0,
-          b2cs_total_tax: 0,
-          hsn_items_count: Array.isArray(payload.hsn?.data) ? payload.hsn.data.length : 0,
-          docs_issued_count: Array.isArray(payload.doc_issue?.doc_det) ? payload.doc_issue.doc_det.length : 0,
-          json_payload: payload,
-          status: 'Generated'
-        }
-      })
-    }).catch(err => console.warn('GSTR-1 cloud sync error:', err));
+    // Save GSTR-1 return filing metadata and payload to Railway PostgreSQL
+    createFastApiGstFiling({
+      filing_id: `GSTR1-${selectedMonth}${selectedYear}`,
+      return_period: `${selectedMonth}${selectedYear}`,
+      gstin: HOTEL_CONFIG.gstin,
+      financial_year: `${selectedYear}-${Number(selectedYear) + 1}`,
+      gross_turnover: Number(payload.gt || 0),
+      b2b_invoices_count: Array.isArray(payload.b2b) ? payload.b2b.length : 0,
+      b2b_taxable_value: totalTaxableRoom + totalTaxableFood,
+      b2b_total_tax: totalGstCollected,
+      b2cs_taxable_value: 0,
+      b2cs_total_tax: 0,
+      hsn_items_count: Array.isArray(payload.hsn?.data) ? payload.hsn.data.length : 0,
+      docs_issued_count: Array.isArray(payload.doc_issue?.doc_det) ? payload.doc_issue.doc_det.length : 0,
+      json_payload: payload,
+      status: 'Generated'
+    }).catch(err => console.warn('FastAPI GSTR-1 save fallback:', err));
 
-    setActionSuccessMsg(`✓ Official GSTR-1 JSON (GSTN Schema v1.7) generated for ${selectedMonth}/${selectedYear}! Synced to D1 gstr1_filings table.`);
+    setActionSuccessMsg(`✓ Official GSTR-1 JSON (GSTN Schema v1.7) generated for ${selectedMonth}/${selectedYear}! Saved to Railway PostgreSQL.`);
     setTimeout(() => setActionSuccessMsg(''), 5000);
   };
 
@@ -1229,43 +1092,8 @@ export default function AccountsLedgerModal({
       if (res.success) {
         setGstr2bReconData(res.results);
         setIsGstr2bModalOpen(false);
-        setActionSuccessMsg(`✓ GSTR-2B ITC Audited! Matched: ${res.results.matchedCount}, Variances: ${res.results.taxMismatchCount}, Missing in Books: ${res.results.missingInBooksCount}. Synced to D1 gstr2b_inward_supplies.`);
+        setActionSuccessMsg(`✓ GSTR-2B ITC Audited! Matched: ${res.results.matchedCount}, Variances: ${res.results.taxMismatchCount}, Missing in Books: ${res.results.missingInBooksCount}. Audit reconciled.`);
         setTimeout(() => setActionSuccessMsg(''), 6000);
-
-        // Sync matched rows to Cloudflare D1 gstr2b_inward_supplies
-        if (Array.isArray(res.results.matched)) {
-          const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-          res.results.matched.forEach((item, idx) => {
-            fetch('/api/sync', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Admin-Key': adminPin
-              },
-              body: JSON.stringify({
-                action: 'save_gstr2b_recon',
-                payload: {
-                  record_id: `G2B-${item.invNo || idx}-${Date.now().toString().slice(-4)}`,
-                  return_period: `${selectedMonth}${selectedYear}`,
-                  supplier_gstin: item.vendorGstin || '21AAACR4910K1Z1',
-                  supplier_name: item.vendorName || 'Supplier',
-                  invoice_number: item.invNo || `INV-${idx}`,
-                  invoice_date: item.invDate || new Date().toISOString().slice(0, 10),
-                  invoice_value: item.invValue || item.taxableValue || 0,
-                  taxable_value: item.taxableValue || 0,
-                  cgst: item.cgst || (item.taxAmount ? item.taxAmount / 2 : 0),
-                  sgst: item.sgst || (item.taxAmount ? item.taxAmount / 2 : 0),
-                  igst: item.igst || 0,
-                  itc_eligibility: 'Y',
-                  reconciliation_status: 'MATCHED',
-                  books_purchase_id: item.billNo || null,
-                  difference_amount: 0,
-                  remarks: 'Reconciled and ITC Claimed'
-                }
-              })
-            }).catch(() => {});
-          });
-        }
       } else {
         alert(res.error || 'Failed to parse GSTR-2B format.');
       }

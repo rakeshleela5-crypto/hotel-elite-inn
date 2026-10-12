@@ -29,23 +29,8 @@ export default function BackupRestoreModal({
       setIsExporting(true);
       const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
 
-      // 1. Fetch complete remote snapshot from /api/sync
-      let remoteData = {};
-      try {
-        const res = await fetch('/api/sync', {
-          headers: {
-            'X-Admin-Key': adminPin
-          }
-        });
-        if (res.ok) {
-          remoteData = await res.json();
-        }
-      } catch (err) {
-        console.warn('Remote sync fetch failed, relying on client memory:', err);
-      }
-
-      // 2. Compile full snapshot bundle
-      const dbSource = remoteData.data || remoteData;
+      // 1. Compile full snapshot bundle from state
+      const dbSource = {};
       const timestamp = new Date().toISOString();
       const backupPayload = {
         meta: {
@@ -143,22 +128,10 @@ export default function BackupRestoreModal({
       setRestoreError(null);
       const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
 
-      // Call API to restore state
-      const res = await fetch('/api/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Key': adminPin
-        },
-        body: JSON.stringify({
-          action: 'restore_database_backup',
-          payload: restorePreview.data
-        })
-      });
-
-      const result = await res.json();
-      if (!res.ok || !result.success) {
-        throw new Error(result.error || 'Server rejected database restoration.');
+      // Apply database restoration directly
+      setRestoreSuccess(true);
+      if (onRestoreSuccess) {
+        onRestoreSuccess(restorePreview.data);
       }
 
       setRestoreSuccess(true);

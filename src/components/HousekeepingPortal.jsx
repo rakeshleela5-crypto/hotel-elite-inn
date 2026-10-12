@@ -8,6 +8,7 @@ import {
 import { HOTEL_CONFIG } from '../data/hotelData';
 import { playHousekeepingChime } from '../utils/soundAlert';
 import { openWhatsAppLink } from '../utils/whatsappDispatch';
+import { updateFastApiRoomStatus } from '../utils/backendApi';
 
 // 8 Official Housekeeping Staff Roster of Hotel Elite Inn
 const DEFAULT_STAFF_ROSTER = [
@@ -277,23 +278,11 @@ export default function HousekeepingPortal({
     }
   };
 
-  // Sync to Cloudflare D1
-  const syncHkToD1 = (roomNumber, newStatus, previousStatus, notes) => {
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'update_housekeeping_status',
-        payload: {
-          roomNumber,
-          newStatus,
-          previousStatus,
-          attendantName: selectedAttendant,
-          notes: notes || `Updated by ${selectedAttendant}`
-        }
-      })
-    }).catch(err => console.warn('Offline D1 sync fallback:', err));
+  // Sync to Railway PostgreSQL
+  const syncHkToD1 = (roomNumber, newStatus) => {
+    updateFastApiRoomStatus(roomNumber, newStatus).catch(err => {
+      console.warn('[FastAPI-Railway] HK room status update fallback:', err);
+    });
   };
 
   // 1. Supervisor: Start Cleaning

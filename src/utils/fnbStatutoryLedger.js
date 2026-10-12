@@ -404,27 +404,6 @@ export function sealDailyFnbStatutoryRecord(businessDate, liveOrders = []) {
 
   window.dispatchEvent(new CustomEvent('fnb_statutory_updated', { detail: sealedRecord }));
 
-  // 4. Sync directly to Cloudflare D1
-  const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-  fetch('/api/sync', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Admin-Key': adminPin
-    },
-    body: JSON.stringify({
-      action: 'seal_fnb_daily_statutory',
-      payload: sealedRecord
-    })
-  })
-    .then(r => r.json())
-    .then(d => {
-      if (d && d.success) {
-        console.log(`✓ F&B Statutory Ledger for ${dateStr} sealed in Cloudflare D1`);
-      }
-    })
-    .catch(err => console.warn('Offline F&B seal fallback:', err));
-
   return sealedRecord;
 }
 

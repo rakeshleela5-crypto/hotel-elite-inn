@@ -70,12 +70,6 @@ export default function FoodOrderModal({ isOpen, onClose, initialItem = null, ro
           captainName: 'In-Room Service Captain',
           createdAt: new Date().toISOString()
         });
-      } else {
-        await fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'place_food_order', payload: finalPayload })
-        }).catch(() => {});
       }
       const orderSummary = {
         orderId: finalPayload.kotId,

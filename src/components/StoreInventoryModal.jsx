@@ -158,45 +158,6 @@ export default function StoreInventoryModal({
       }
     }).catch(err => console.warn('Railway store sync note:', err));
 
-    // 2. Also sync from local D1 if available
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      headers: { 'X-Admin-Key': adminPin }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data) {
-          if (data.data.storePurchases && data.data.storePurchases.length > 0) {
-            const mapped = data.data.storePurchases.map(p => ({
-              purchaseId: p.purchase_id || p.purchaseId,
-              vendorName: p.vendor_name || p.vendorName,
-              invoiceNo: p.invoice_no || p.invoiceNo,
-              date: p.purchase_date || p.date,
-              category: p.category,
-              itemsSummary: p.items_summary || p.itemsSummary,
-              totalAmount: p.total_amount !== undefined ? p.total_amount : p.totalAmount,
-              paymentStatus: p.payment_status || p.paymentStatus,
-              receivedBy: p.received_by || p.receivedBy
-            }));
-            setPurchases(prev => mapped.length >= prev.length ? mapped : prev);
-          }
-          if (data.data.kitchenRequisitions && data.data.kitchenRequisitions.length > 0) {
-            const mappedReq = data.data.kitchenRequisitions.map(r => ({
-              requisitionId: r.requisition_id || r.requisitionId,
-              issueDate: r.issue_date || r.issueDate,
-              targetOutlet: r.target_outlet || r.targetOutlet,
-              itemName: r.item_name || r.itemName,
-              quantityIssued: r.quantity_issued !== undefined ? r.quantity_issued : r.quantityIssued,
-              unit: r.unit,
-              approxCost: r.approx_cost !== undefined ? r.approx_cost : r.approxCost,
-              issuedTo: r.issued_to || r.issuedTo,
-              issuedBy: r.issued_by || r.issuedBy
-            }));
-            setRequisitions(prev => mappedReq.length >= prev.length ? mappedReq : prev);
-          }
-        }
-      })
-      .catch(err => console.warn('Store inventory sync error:', err));
   }, [isOpen]);
 
 
@@ -266,30 +227,6 @@ export default function StoreInventoryModal({
 
     setPurchases([newP, ...purchases]);
 
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'record_store_purchase',
-        payload: {
-          purchaseId: newP.purchaseId,
-          vendorName: newP.vendorName,
-          invoiceNo: newP.invoiceNo,
-          date: newP.date,
-          category: newP.category,
-          itemsSummary: newP.itemsSummary,
-          totalAmount: newP.totalAmount,
-          paymentStatus: newP.paymentStatus,
-          receivedBy: newP.receivedBy
-        }
-      })
-    }).catch(err => console.warn('Offline store purchase sync:', err));
-
     setNewPurchaseOpen(false);
     setItemsSummary('');
     setAmount('');
@@ -310,16 +247,6 @@ export default function StoreInventoryModal({
 
     setRequisitions([newVoucher, ...requisitions]);
     setVoucherGenerated(true);
-
-    const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-      body: JSON.stringify({
-        action: 'record_kitchen_requisition',
-        payload: newVoucher
-      })
-    }).catch(err => console.warn('Offline requisition sync:', err));
   };
 
   if (!isOpen) return null;

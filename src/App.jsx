@@ -72,7 +72,10 @@ import {
   createFastApiBooking,
   postFastApiFolioCharge,
   createFastApiAdvanceDeposit,
-  updateFastApiRoomStatus
+  updateFastApiRoomStatus,
+  getFastApiRooms,
+  settleFastApiRoomFolio,
+  sealFastApiNightAudit
 } from './utils/backendApi';
 import { FloatingDock } from '@/components/ui/floating-dock';
 import { Hotel, Layers, Compass, Utensils, ShieldCheck, Sparkles, Scale, MessageCircle, Terminal, Database, FileSpreadsheet, Search } from 'lucide-react';
@@ -474,17 +477,6 @@ export default function App() {
 
     const adminPin = adminPinVerified ? getVerifiedAdminPin() : '';
     if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'update_order_status',
-        payload: { orderId, status: newStatus }
-      })
-    }).catch(err => console.warn('Offline order status sync:', err));
   };
 
   const handleAddFoodOrder = (newOrder) => {
@@ -539,23 +531,20 @@ export default function App() {
       return r;
     }));
 
-    // Post to Cloudflare D1 via public guest action
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'place_food_order',
-        payload: {
-          roomNumber: newOrder.roomNumber,
-          guestName: `Room ${newOrder.roomNumber} In-House Guest`,
-          items: newOrder.items,
-          subtotal: Math.round((newOrder.totalAmount / 1.05) * 100) / 100,
-          gst: Math.round((newOrder.totalAmount - (newOrder.totalAmount / 1.05)) * 100) / 100,
-          totalAmount: newOrder.totalAmount,
-          isJain: newOrder.is_jain_satvik === 1
-        }
-      })
-    }).catch(err => console.warn('Offline in-room food order sync:', err));
+    // Post to Railway PostgreSQL Folio
+    postFastApiFolioCharge({
+      room_number: String(newOrder.roomNumber),
+      folio_number: 1,
+      guest_name: `Room ${newOrder.roomNumber} In-House Guest`,
+      transaction_type: 'Food & Beverage',
+      particulars: `In-Room Dining (${newOrder.orderId || 'KOT'})`,
+      sac_code: '996331',
+      debit_amount: Number(newOrder.totalAmount),
+      credit_amount: 0,
+      tax_amount: Math.round((newOrder.totalAmount - (newOrder.totalAmount / 1.05)) * 100) / 100,
+      posting_date: new Date().toISOString().slice(0, 10),
+      posted_by: 'GUEST_QR'
+    }).catch(err => console.warn('[FastAPI-Railway] In-room food order folio post failed:', err));
   };
 
   const handleRequestRoomServiceFromGuestPortal = (newReq) => {
@@ -581,21 +570,6 @@ export default function App() {
     } catch (e) {
       console.warn('HK broadcast room service error:', e);
     }
-
-    // Post to Cloudflare D1 via public guest action
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'place_room_service',
-        payload: {
-          roomNumber: newReq.roomNumber,
-          serviceType: newReq.serviceType,
-          description: newReq.description,
-          priority: newReq.priority || 'Normal'
-        }
-      })
-    }).catch(err => console.warn('Offline room service sync:', err));
   };
 
   const [searchDates, setSearchDates] = useState({
@@ -604,136 +578,32 @@ export default function App() {
     guests: '2'
   });
 
-  // Sync with Cloudflare Edge on mount and view changes
+  // Load real-time room inventory from Railway PostgreSQL on mount
   useEffect(() => {
-    const adminPin = adminPinVerified ? getVerifiedAdminPin() : '';
-    const headers = adminPin ? { 'X-Admin-Key': adminPin } : {};
-
-    fetch('/api/sync', { headers })
-      .then(res => res.json())
+    getFastApiRooms()
       .then(data => {
-        if (data && data.data) {
-          if (data.data.rooms && data.data.rooms.length > 0) {
-            const mappedRooms = data.data.rooms.map(r => ({
-              ...r,
-              roomNumber: r.roomNumber || r.room_number,
-              roomType: r.roomType || r.room_type || 'EXEDEL',
-              floor: r.floor,
-              tariff: r.tariff,
-              basePrice: r.basePrice || r.tariff,
-              outstandingBalance: r.outstandingBalance !== undefined ? r.outstandingBalance : (r.outstanding_balance !== undefined ? r.outstanding_balance : 0),
-              balanceDue: r.balanceDue !== undefined ? r.balanceDue : (r.outstanding_balance !== undefined ? r.outstanding_balance : 0),
-              pax: r.pax || '1 Pax',
-              currentGuestName: r.currentGuestName || r.current_guest_name,
-              currentBookingId: r.currentBookingId || r.current_booking_id,
-              status: r.status
-            }));
-            setRooms(mappedRooms);
-          }
-          if (data.data.bookings && data.data.bookings.length > 0) {
-            const mappedBookings = data.data.bookings.map(b => ({
-              ...b,
-              bookingId: b.booking_id || b.bookingId,
-              roomNumber: b.room_number || b.roomNumber,
-              guestName: b.guest_name || b.guestName,
-              guestPhone: b.guest_phone || b.guestPhone,
-              guestEmail: b.guest_email || b.guestEmail,
-              checkInDate: b.check_in_date || b.checkInDate,
-              checkOutDate: b.check_out_date || b.checkOutDate,
-              tariffPerNight: b.tariff_per_night !== undefined ? b.tariff_per_night : b.tariffPerNight,
-              baseTotal: b.base_total !== undefined ? b.base_total : b.baseTotal,
-              cgst: b.cgst,
-              sgst: b.sgst,
-              totalAmount: b.total_amount !== undefined ? b.total_amount : b.totalAmount,
-              advanceDeposit: b.advance_deposit !== undefined ? b.advance_deposit : b.advanceDeposit,
-              balanceDue: b.balance_due !== undefined ? b.balance_due : b.balanceDue,
-              paymentMode: b.payment_mode || b.paymentMode,
-              paymentStatus: b.payment_status || b.paymentStatus,
-              bookingStatus: b.booking_status || b.bookingStatus,
-              isB2b: b.is_b2b !== undefined ? b.is_b2b : b.isB2b,
-              corporateId: b.corporate_id || b.corporateId,
-              corporateGstin: b.corporate_gstin || b.corporateGstin,
-              companyName: b.company_name || b.companyName || '',
-              billNo: b.bill_no || b.billNo || `INV-${b.room_number || b.roomNumber}-${(b.booking_id || b.bookingId || '').slice(-4)}`
-            }));
-            setBookings(mappedBookings);
-          }
-          if (data.data.corporatePartners && data.data.corporatePartners.length > 0) {
-            setCorporatePartners(data.data.corporatePartners);
-          }
-          if (data.data.folioTransactions && data.data.folioTransactions.length > 0) {
-            const mappedTxs = data.data.folioTransactions.map(t => ({
-              transactionId: t.transaction_id || t.transactionId,
-              folioId: t.folio_id || t.folioId,
-              bookingId: t.booking_id || t.bookingId,
-              roomNumber: t.room_number || t.roomNumber,
-              transactionType: t.transaction_type || t.transactionType,
-              outlet: t.outlet,
-              itemCode: t.item_code || t.itemCode,
-              description: t.description,
-              debitAmount: t.debit_amount !== undefined ? t.debit_amount : t.debitAmount,
-              creditAmount: t.credit_amount !== undefined ? t.credit_amount : t.creditAmount,
-              taxableBase: t.taxable_base !== undefined ? t.taxable_base : t.taxableBase,
-              gstRate: t.gst_rate !== undefined ? t.gst_rate : t.gstRate,
-              cgst: t.cgst,
-              sgst: t.sgst,
-              sacCode: t.sac_code || t.sacCode,
-              invoiceId: t.invoice_id || t.invoiceId,
-              isLocked: t.is_locked !== undefined ? t.is_locked : t.isLocked,
-              createdBy: t.created_by || t.createdBy,
-              createdAt: t.created_at || t.createdAt || t.date
-            }));
-            setTransactions(mappedTxs);
-          }
-          if (data.data.foodOrders && data.data.foodOrders.length > 0) {
-            setFoodOrders(data.data.foodOrders);
-          }
-          if (data.data.roomServiceRequests && data.data.roomServiceRequests.length > 0) {
-            setRoomServices(data.data.roomServiceRequests);
-          }
+        if (data && Array.isArray(data) && data.length > 0) {
+          const mappedRooms = data.map(r => ({
+            ...r,
+            roomNumber: String(r.number || r.roomNumber || r.room_number),
+            roomType: r.category || r.roomType || 'EXEDEL',
+            floor: r.floor || 2,
+            tariff: Number(r.base_price || r.tariff || 1699),
+            basePrice: Number(r.base_price || r.tariff || 1699),
+            outstandingBalance: 0,
+            balanceDue: 0,
+            pax: '1 Pax',
+            currentGuestName: null,
+            currentBookingId: null,
+            status: (r.status || 'available').charAt(0).toUpperCase() + (r.status || 'available').slice(1).toLowerCase()
+          }));
+          setRooms(mappedRooms);
         }
       })
       .catch(err => {
-        console.debug("Edge sync offline, initialized with 27-inventory state:", err);
+        console.warn('[FastAPI-Railway] Initial room fetch:', err);
       });
-
-    // Periodic Background Polling & Focus Sync for Cross-Device Operations (e.g. Steward mobile pad, Housekeeping phone)
-    const syncRemoteState = () => {
-      fetch('/api/sync?action=get_all_state', {
-        headers: { 'X-Admin-Key': adminPin }
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.success && data.data) {
-            if (data.data.foodOrders && data.data.foodOrders.length > 0) {
-              setFoodOrders(prev => {
-                const map = new Map();
-                data.data.foodOrders.forEach(o => map.set(o.id || o.orderId, o));
-                prev.forEach(o => { if (!map.has(o.id || o.orderId)) map.set(o.id || o.orderId, o); });
-                return Array.from(map.values());
-              });
-            }
-            if (data.data.roomServiceRequests && data.data.roomServiceRequests.length > 0) {
-              setRoomServices(data.data.roomServiceRequests);
-            }
-          }
-        })
-        .catch(() => { });
-    };
-
-    const pollInterval = setInterval(syncRemoteState, 8000);
-    window.addEventListener('focus', syncRemoteState);
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible') syncRemoteState();
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    return () => {
-      clearInterval(pollInterval);
-      window.removeEventListener('focus', syncRemoteState);
-      document.removeEventListener('visibilitychange', handleVisibility);
-    };
-  }, [currentView, adminPinVerified]);
+  }, []);
 
   const handleOpenBooking = (tier, roomNumber = null, checkInDate = null, checkOutDate = null) => {
     setSelectedTierForBooking(tier || ROOM_TIERS[0]);
@@ -865,20 +735,10 @@ export default function App() {
       return r;
     }));
 
-    // Send update to Edge
-    const adminPin = getVerifiedAdminPin();
-    if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'update_room_status',
-        payload: { roomNumber, status, guestName, bookingId }
-      })
-    }).catch(() => { });
+    // Send update to Railway PostgreSQL
+    updateFastApiRoomStatus(roomNumber, status).catch(err => {
+      console.warn('[FastAPI-Railway] Update room status error:', err);
+    });
   };
 
   // Live Housekeeping Real-Time Sync via BroadcastChannel (turns rooms Green when Cleaned)
@@ -918,20 +778,20 @@ export default function App() {
   const handleAddTransaction = (newTxn) => {
     setTransactions(prev => [newTxn, ...prev]);
 
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = getVerifiedAdminPin();
-    if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'post_folio_transaction',
-        payload: newTxn
-      })
-    }).catch(err => console.warn('Offline transaction sync:', err));
+    // Dispatch to Railway FastAPI Folio
+    postFastApiFolioCharge({
+      room_number: String(newTxn.roomNumber),
+      folio_number: 1,
+      guest_name: newTxn.guestName || 'In-House Guest',
+      transaction_type: newTxn.transactionType || 'Sundry Charge',
+      particulars: newTxn.description || 'Front Desk Charge',
+      sac_code: newTxn.sacCode || '996311',
+      debit_amount: Number(newTxn.debitAmount || 0),
+      credit_amount: Number(newTxn.creditAmount || 0),
+      tax_amount: Number(newTxn.cgst || 0) + Number(newTxn.sgst || 0),
+      posting_date: new Date().toISOString().slice(0, 10),
+      posted_by: 'FRONT_DESK'
+    }).catch(err => console.warn('[FastAPI-Railway] Folio post failed:', err));
   };
 
   const handleBillToRoomFromPOS = (payload) => {
@@ -981,30 +841,20 @@ export default function App() {
       return b;
     }));
 
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = getVerifiedAdminPin();
-    if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'bill_kot_to_room',
-        payload: {
-          roomNumber: payload.roomNumber,
-          kotId: payload.kotId,
-          items: payload.items || [],
-          subtotal: payload.subtotal,
-          gst: payload.gst,
-          totalAmount: payload.totalAmount,
-          description: payload.description,
-          outlet: payload.outlet || 'Fenugreek Restaurant',
-          captainName: payload.captainName || 'F&B Captain'
-        }
-      })
-    }).catch(err => console.warn('Offline KOT room bill sync:', err));
+    // Dispatch to Railway FastAPI Folio
+    postFastApiFolioCharge({
+      room_number: String(payload.roomNumber),
+      folio_number: 1,
+      guest_name: rooms.find(r => r.roomNumber === payload.roomNumber)?.currentGuestName || `Room ${payload.roomNumber} Guest`,
+      transaction_type: 'Food & Beverage',
+      particulars: `POS Bill ${payload.kotId}: ${payload.description || 'F&B Order'}`,
+      sac_code: '996331',
+      debit_amount: Number(payload.totalAmount),
+      credit_amount: 0,
+      tax_amount: Number(payload.gst || 0),
+      posting_date: new Date().toISOString().slice(0, 10),
+      posted_by: payload.captainName || 'POS'
+    }).catch(err => console.warn('[FastAPI-Railway] POS room bill post failed:', err));
 
     // Also propagate to Live Food Orders & KDS queue
     handleAddFoodOrder({
@@ -1026,32 +876,17 @@ export default function App() {
       created_at: new Date().toISOString()
     });
 
-    alert(`✓ KOT #${payload.kotId} (${payload.outlet || 'Fenugreek Restaurant'}) of ₹${payload.totalAmount.toFixed(2)} debited directly to Room ${payload.roomNumber} Master Folio & synced to D1!`);
+    alert(`✓ KOT #${payload.kotId} (${payload.outlet || 'Fenugreek Restaurant'}) of ₹${payload.totalAmount.toFixed(2)} debited directly to Room ${payload.roomNumber} Master Folio & synced to Railway PostgreSQL!`);
   };
 
   const handleSettleFolio = (roomNumber, tenderRows) => {
     handleUpdateRoomStatus(roomNumber, 'Cleaning');
     setTransactions(prev => prev.map(t => t.roomNumber === roomNumber ? { ...t, isLocked: 1 } : t));
 
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = getVerifiedAdminPin();
-    if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'settle_split_payment',
-        payload: {
-          folioId: `FOLIO-${roomNumber}`,
-          roomNumber,
-          invoiceId: `INV-${roomNumber}`,
-          tenderRows
-        }
-      })
-    }).catch(err => console.warn('Offline split settlement sync:', err));
+    // Dispatch to Railway FastAPI Folio Settle
+    settleFastApiRoomFolio(roomNumber, 1, tenderRows?.[0]?.paymentMode || 'Cash').catch(err => {
+      console.warn('[FastAPI-Railway] Settle folio error:', err);
+    });
 
     alert(`✓ Room ${roomNumber} folio settled via ${tenderRows.length} tenders! Room status changed to 'Cleaning'.`);
   };
@@ -1074,29 +909,12 @@ export default function App() {
       }
     } catch (e) { }
 
-    // Dispatch to Cloudflare Edge D1
-    const adminPin = getVerifiedAdminPin();
-    if (!adminPin) return;
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Admin-Key': adminPin
-      },
-      body: JSON.stringify({
-        action: 'execute_night_audit',
-        payload: auditPayload
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.success) {
-          console.log(`✓ Night Audit synced to Cloudflare D1 (auditId: ${data.auditId})`);
-        }
-      })
-      .catch(err => console.warn('Offline night audit sync:', err));
+    // Dispatch to Railway FastAPI Night Audit
+    sealFastApiNightAudit(auditPayload.businessDate).catch(err => {
+      console.warn('[FastAPI-Railway] Night audit seal failed:', err);
+    });
 
-    alert(`✓ Night Audit for ${auditPayload.businessDate} executed & synced to Cloudflare D1! All transactions locked (is_locked = 1). Business date rolled to ${auditPayload.nextBusinessDate || 'next day'}.`);
+    alert(`✓ Night Audit for ${auditPayload.businessDate} executed & synced to Railway PostgreSQL! All transactions locked (is_locked = 1). Business date rolled to ${auditPayload.nextBusinessDate || 'next day'}.`);
   };
 
   // Dedicated In-Room Guest Portal View (When QR Code is scanned in a guest room)
@@ -1464,17 +1282,7 @@ export default function App() {
                 return r;
               }));
 
-              // Persist published rates to Cloudflare D1
-              const adminPin = getVerifiedAdminPin();
-              if (adminPin) {
-                fetch('/api/sync', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-                  body: JSON.stringify({ action: 'publish_dynamic_rates', payload: { rates: newRates } })
-                }).catch(e => console.warn('D1 rate publish sync:', e));
-              }
-
-              alert("⚡ IDeaS G3 RMS: Continuous dynamic micro-rates published to live booking engine, room catalog, front desk reception, and synced to Cloudflare D1!");
+              alert("⚡ IDeaS G3 RMS: Continuous dynamic micro-rates published to live booking engine, room catalog, and front desk reception!");
             }}
           />
         )}

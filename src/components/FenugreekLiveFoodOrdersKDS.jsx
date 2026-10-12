@@ -150,36 +150,10 @@ export default function FenugreekLiveFoodOrdersKDS({
 
     window.addEventListener('storage', handleStorage);
 
-    // 3. Real-Time Cloud Network Sync: Bridges orders from Mobile Stewards & Room QRs across internet
-    const fetchCloudOrders = async () => {
-      try {
-        const adminPin = localStorage.getItem('hsi_admin_pin') || '7650';
-        const res = await fetch('/api/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-          body: JSON.stringify({ action: 'get_live_kots' })
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data?.kots && Array.isArray(data.kots)) {
-          data.kots.forEach(order => {
-            handleIncomingOrder(order);
-          });
-        }
-      } catch (err) {
-        // silent fallback on network glitch
-      }
-    };
-
-    fetchCloudOrdersRef.current = fetchCloudOrders;
-    fetchCloudOrders();
-    const cloudPollInterval = setInterval(fetchCloudOrders, 2500);
-
     return () => {
       if (channel) channel.close();
       if (channelKot) channelKot.close();
       window.removeEventListener('storage', handleStorage);
-      clearInterval(cloudPollInterval);
     };
   }, [isAudioMuted]);
 
