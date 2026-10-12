@@ -81,7 +81,6 @@ import IdsLaundryPlantModal from './IdsLaundryPlantModal';
 import IdsMessageBox from './IdsMessageBox';
 import IdsCrystalReportModal from './IdsCrystalReportModal';
 import IdsAuditedSalesRegisterModal from './IdsAuditedSalesRegisterModal';
-import CloudflareR2BackupModal from '../admin/CloudflareR2BackupModal';
 import { 
   recordLiveHotelSale, 
   recordLiveRestaurantSale, 
@@ -313,9 +312,6 @@ export default function IdsDesktopShell({
     });
     return unsubscribe;
   }, []);
-
-  // Cloudflare R2 Automated & On-Demand Backup Vault State
-  const [r2BackupModalOpen, setR2BackupModalOpen] = useState(false);
 
   // Video 10: Guest Management & Change Guest Details States (Frames 008–072)
   const [guestManagementOpen, setGuestManagementOpen] = useState(false);
@@ -1458,11 +1454,6 @@ export default function IdsDesktopShell({
         label: 'Add Company Details & GSTN After Check-out (GSTN Change)', 
         videoId: '43', 
         action: () => setGstnChangeModalOpen(true) 
-      },
-      { 
-        label: 'Database Backup & Cloud Disaster Recovery (Cloudflare R2 Vault)', 
-        videoId: 'UTILITY-01', 
-        action: () => setR2BackupModalOpen(true) 
       }
     ],
     'Lookups..': [
@@ -1920,25 +1911,6 @@ export default function IdsDesktopShell({
               title="Chartered Accountant GSTR-1 Portal JSON Export with SAC 996311 (12%) & 996331 (5%)"
             >
               <span>🏛️ CA GSTR-1 JSON</span>
-            </button>
-            <button
-              onClick={() => setR2BackupModalOpen(true)}
-              style={{
-                background: '#B45309',
-                color: '#FFF',
-                border: '1px outset #FFF',
-                padding: '1px 8px',
-                borderRadius: '2px',
-                fontWeight: 700,
-                fontSize: '10px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}
-              title="Cloudflare R2 Automated & On-Demand Backup Vault (Zero-Egress S3) & Daily Data Archive"
-            >
-              <span>☁️ R2 BACKUP VAULT</span>
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3929,11 +3901,6 @@ export default function IdsDesktopShell({
         onOpenMessageBox={showMessageBox}
       />
 
-      {/* 10. Cloudflare R2 Automated & On-Demand Backup Vault Modal */}
-      <CloudflareR2BackupModal
-        isOpen={r2BackupModalOpen}
-        onClose={() => setR2BackupModalOpen(false)}
-      />
     </div>
   );
 }
