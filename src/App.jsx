@@ -18,7 +18,7 @@ const lazyWithRetry = (componentImport) => {
       if (!isRefreshed) {
         sessionStorage.setItem('hsi_chunk_refreshed', 'true');
         window.location.reload();
-        return new Promise(() => {}); // prevent throwing before reload
+        return new Promise(() => { }); // prevent throwing before reload
       }
       sessionStorage.removeItem('hsi_chunk_refreshed');
       throw error;
@@ -30,7 +30,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 
 const FloorExplorer3DModal = lazyWithRetry(() => import('./components/FloorExplorer3DModal'));
 const VirtualTour360Modal = lazyWithRetry(() => import('./components/VirtualTour360Modal'));
-const IdsWalkInModal = lazyWithRetry(() => import('./components/ids/IdsWalkInModal'));
+const GuestBookingModal = lazyWithRetry(() => import('./components/GuestBookingModal'));
 const IdsReprintBillModal = lazyWithRetry(() => import('./components/ids/IdsReprintBillModal'));
 const IdsDesktopShell = lazyWithRetry(() => import('./components/ids/IdsDesktopShell'));
 const FinancialAnalytics = lazyWithRetry(() => import('./components/FinancialAnalytics'));
@@ -58,9 +58,9 @@ const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDispla
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
 const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
 const IdsQuickScanModal = lazyWithRetry(() => import('./components/ids/IdsQuickScanModal'));
-import { 
-  getLiveKots, saveLiveKots, broadcastKotChannel, 
-  normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME 
+import {
+  getLiveKots, saveLiveKots, broadcastKotChannel,
+  normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME
 } from './utils/kotDataSync';
 const RoomQrModal = lazyWithRetry(() => import('./components/RoomQrModal'));
 
@@ -437,7 +437,7 @@ export default function App() {
           if (Array.isArray(fresh)) {
             setFoodOrders(fresh.map(normalizeKotOrder).filter(Boolean));
           }
-        } catch (err) {}
+        } catch (err) { }
       }
     };
 
@@ -712,7 +712,7 @@ export default function App() {
             }
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     };
 
     const pollInterval = setInterval(syncRemoteState, 8000);
@@ -760,7 +760,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save_booking', payload: newBooking })
       }).catch(err => console.warn("Cloudflare D1 save_booking background sync:", err));
-    } catch (e) {}
+    } catch (e) { }
 
     // Auto-inject Day-1 Room Tariff debit and Advance Deposit credit into central transactions ledger
     const initialTxs = [];
@@ -819,7 +819,7 @@ export default function App() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
           body: JSON.stringify({ action: 'post_folio_transaction', payload: tx })
-        }).catch(() => {});
+        }).catch(() => { });
       });
     }
 
@@ -854,7 +854,7 @@ export default function App() {
         action: 'update_room_status',
         payload: { roomNumber, status, guestName, bookingId }
       })
-    }).catch(() => {});
+    }).catch(() => { });
   };
 
   // Live Housekeeping Real-Time Sync via BroadcastChannel (turns rooms Green when Cleaned)
@@ -1038,7 +1038,7 @@ export default function App() {
     if (auditPayload?.nextBusinessDate) {
       try {
         localStorage.setItem('hotel_elite_inn_business_date', auditPayload.nextBusinessDate);
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Broadcast across all system windows & devices
@@ -1048,7 +1048,7 @@ export default function App() {
         kdsCh.postMessage({ type: 'NIGHT_AUDIT_COMPLETED', payload: auditPayload });
         kdsCh.close();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Dispatch to Cloudflare Edge D1
     const adminPin = getVerifiedAdminPin();
@@ -1094,7 +1094,7 @@ export default function App() {
           Loading Hotel Sai In-Room Companion...
         </div>
       }>
-        <InRoomGuestPortal 
+        <InRoomGuestPortal
           roomNumber={inRoomPortalState.roomNumber}
           onPlaceFoodOrder={handlePlaceFoodOrderFromGuestPortal}
           onRequestRoomService={handleRequestRoomServiceFromGuestPortal}
@@ -1115,7 +1115,7 @@ export default function App() {
   if (stewardPortalOpen) {
     return (
       <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Cannon Kitchen Steward Pad...</div>}>
-        <StewardMobileOrderPad 
+        <StewardMobileOrderPad
           onClose={() => {
             setStewardPortalOpen(false);
             if (typeof window !== 'undefined' && window.history) {
@@ -1131,7 +1131,7 @@ export default function App() {
   if (kitchenKdsOpen) {
     return (
       <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#060913', minHeight: '100vh' }}>Loading Cannon Kitchen Display (KDS)...</div>}>
-        <KitchenDisplayKDS 
+        <KitchenDisplayKDS
           onClose={() => {
             setKitchenKdsOpen(false);
             if (typeof window !== 'undefined' && window.history) {
@@ -1147,7 +1147,7 @@ export default function App() {
   if (housekeepingPortalOpen) {
     return (
       <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Housekeeping Mobile Portal...</div>}>
-        <HousekeepingMobilePortal 
+        <HousekeepingMobilePortal
           staffRole={housekeepingStaffRole}
           onClose={() => {
             setHousekeepingPortalOpen(false);
@@ -1164,7 +1164,7 @@ export default function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Guest Public Navbar: Rendered ONLY on Public Website (Cleanly hidden in Staff Front Desk PMS) */}
       {currentView === 'guest' && (
-        <Navbar 
+        <Navbar
           currentView={currentView}
           setCurrentView={setCurrentView}
           onOpen3DExplorer={() => setFloorExplorerOpen(true)}
@@ -1199,7 +1199,7 @@ export default function App() {
       <main style={{ flex: 1 }}>
         {currentView === 'guest' ? (
           <>
-            <Hero 
+            <Hero
               rooms={rooms}
               onOpenBooking={handleOpenBooking}
               onOpen3DExplorer={() => setFloorExplorerOpen(true)}
@@ -1210,7 +1210,7 @@ export default function App() {
             />
 
             <div id="inventory">
-              <RoomCatalog 
+              <RoomCatalog
                 rooms={rooms}
                 dynamicRates={dynamicRates}
                 onSelectTier={handleOpenBooking}
@@ -1219,14 +1219,14 @@ export default function App() {
               />
             </div>
 
-            <SatvikDining 
+            <SatvikDining
               onOpenOrderModal={(item) => {
                 setSelectedFoodItem(item);
                 setDiningModalOpen(true);
               }}
             />
 
-            <FaqSection 
+            <FaqSection
               onOpenBooking={() => handleOpenBooking(ROOM_TIERS[0])}
             />
 
@@ -1237,7 +1237,7 @@ export default function App() {
         ) : (
           <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center', color: 'var(--gold-glow)' }}>Loading Front Desk PMS...</div>}>
             <ErrorBoundary onExit={() => setCurrentView('guest')}>
-              <IdsDesktopShell 
+              <IdsDesktopShell
                 rooms={rooms}
                 bookings={bookings}
                 onExitPMS={() => setCurrentView('guest')}
@@ -1250,7 +1250,7 @@ export default function App() {
 
       {/* On-Demand Modals with Suspense Code-Splitting */}
       <Suspense fallback={null}>
-        <FloorExplorer3DModal 
+        <FloorExplorer3DModal
           isOpen={floorExplorerOpen}
           onClose={() => setFloorExplorerOpen(false)}
           rooms={rooms}
@@ -1258,7 +1258,7 @@ export default function App() {
           onOpen360Tour={(sceneId) => handleOpenVirtualTour(sceneId)}
         />
 
-        <VirtualTour360Modal 
+        <VirtualTour360Modal
           isOpen={virtualTourOpen}
           onClose={() => setVirtualTourOpen(false)}
           initialSceneId={virtualTourSceneId}
@@ -1267,27 +1267,30 @@ export default function App() {
         />
 
         {bookingModalOpen && (
-          <IdsWalkInModal 
+          <GuestBookingModal
             isOpen={bookingModalOpen}
             onClose={() => {
               setBookingModalOpen(false);
               setSelectedCheckInForBooking(null);
               setSelectedCheckOutForBooking(null);
             }}
-            initialRoomNo={selectedRoomNumForBooking || '203'}
-            accountingDate={getStoredAccountingDate()}
-            onCompleteWalkIn={handleBookingSuccess}
+            initialTier={selectedTierForBooking}
+            initialRoomNumber={selectedRoomNumForBooking}
+            initialCheckIn={selectedCheckInForBooking}
+            initialCheckOut={selectedCheckOutForBooking}
+            rooms={rooms}
+            onConfirmBooking={handleBookingSuccess}
           />
         )}
 
         {receiptModalOpen && (
-          <IdsReprintBillModal 
+          <IdsReprintBillModal
             isOpen={receiptModalOpen}
             onClose={() => setReceiptModalOpen(false)}
           />
         )}
 
-        <FoodOrderModal 
+        <FoodOrderModal
           isOpen={diningModalOpen}
           onClose={() => {
             setDiningModalOpen(false);
@@ -1298,29 +1301,29 @@ export default function App() {
           onBillToRoom={handleBillToRoomFromPOS}
         />
 
-        <DarshanAdvisorModal 
+        <DarshanAdvisorModal
           isOpen={darshanModalOpen}
           onClose={() => setDarshanModalOpen(false)}
         />
 
-        <AiConciergeModal 
+        <AiConciergeModal
           isOpen={aiConciergeOpen}
           onClose={() => setAiConciergeOpen(false)}
         />
 
-        <AutonomousBotFleetModal 
+        <AutonomousBotFleetModal
           isOpen={botFleetOpen}
           onClose={() => setBotFleetOpen(false)}
         />
 
-        <CorporatePortalModal 
+        <CorporatePortalModal
           isOpen={corporateModalOpen}
           onClose={() => setCorporateModalOpen(false)}
         />
 
         {/* IDS Next Enterprise Operational Modals - Unified Primary Folio (1-17 Actions) */}
         {folioModalOpen && (
-          <IdsCheckoutBillModal 
+          <IdsCheckoutBillModal
             isOpen={folioModalOpen}
             onClose={() => setFolioModalOpen(false)}
             initialRoomNo={String(selectedFolioRoomNumber || '102')}
@@ -1333,7 +1336,7 @@ export default function App() {
         )}
 
         {posModalOpen && (
-          <IdsTouchPosTerminalModal 
+          <IdsTouchPosTerminalModal
             isOpen={posModalOpen}
             onClose={() => setPosModalOpen(false)}
             currentUser="CASHIER"
@@ -1344,7 +1347,7 @@ export default function App() {
         )}
 
         {accountsModalOpen && (
-          <AccountsLedgerModal 
+          <AccountsLedgerModal
             isOpen={accountsModalOpen}
             onClose={() => setAccountsModalOpen(false)}
             bookings={bookings}
@@ -1358,7 +1361,7 @@ export default function App() {
         )}
 
         {nightAuditModalOpen && (
-          <IdsNightAuditModal 
+          <IdsNightAuditModal
             isOpen={nightAuditModalOpen}
             onClose={() => setNightAuditModalOpen(false)}
             onCompleteNightAudit={() => {
@@ -1370,7 +1373,7 @@ export default function App() {
 
         {auditedSalesRegisterOpen && (
           <ErrorBoundary onExit={() => setAuditedSalesRegisterOpen(false)}>
-            <AuditedSalesRegisterModal 
+            <AuditedSalesRegisterModal
               isOpen={auditedSalesRegisterOpen}
               onClose={() => setAuditedSalesRegisterOpen(false)}
               initialMonth="2026-10"
@@ -1384,7 +1387,7 @@ export default function App() {
 
         {auditedRestaurantRegisterOpen && (
           <ErrorBoundary onExit={() => setAuditedRestaurantRegisterOpen(false)}>
-            <AuditedRestaurantRegisterModal 
+            <AuditedRestaurantRegisterModal
               isOpen={auditedRestaurantRegisterOpen}
               onClose={() => setAuditedRestaurantRegisterOpen(false)}
             />
@@ -1392,21 +1395,21 @@ export default function App() {
         )}
 
         {stewardQrModalOpen && (
-          <StewardQrManagerModal 
+          <StewardQrManagerModal
             isOpen={stewardQrModalOpen}
             onClose={() => setStewardQrModalOpen(false)}
           />
         )}
 
         {storeInventoryModalOpen && (
-          <StoreInventoryModal 
+          <StoreInventoryModal
             isOpen={storeInventoryModalOpen}
             onClose={() => setStoreInventoryModalOpen(false)}
           />
         )}
 
         {directorPortalOpen && (
-          <DirectorPortal 
+          <DirectorPortal
             isOpen={directorPortalOpen}
             onClose={() => setDirectorPortalOpen(false)}
             rooms={rooms}
@@ -1420,53 +1423,53 @@ export default function App() {
 
         {/* IDeaS SAS G3 RMS Platform Revenue Director's Console */}
         {revenueModalOpen && (
-          <RevenueManagementModal 
+          <RevenueManagementModal
             isOpen={revenueModalOpen}
             onClose={() => setRevenueModalOpen(false)}
             currentOccupancy={Math.round((rooms.filter(r => r.status === 'Occupied').length / (rooms.length || 18)) * 100)}
             activeRates={dynamicRates}
-          onPublishRates={(newRates) => {
-            setDynamicRates(newRates);
-            setRooms(prev => prev.map(r => {
-              const tierId = r.tier === 'Standard Deluxe' ? 'standard-deluxe' :
-                             r.tier === 'Deluxe Room' ? 'deluxe-room' :
-                             r.tier === 'Executive Room' ? 'executive-room' : 'premium-suite';
-              if (newRates[tierId]) {
-                return { ...r, tariff: newRates[tierId].recommendedRate };
+            onPublishRates={(newRates) => {
+              setDynamicRates(newRates);
+              setRooms(prev => prev.map(r => {
+                const tierId = r.tier === 'Standard Deluxe' ? 'standard-deluxe' :
+                  r.tier === 'Deluxe Room' ? 'deluxe-room' :
+                    r.tier === 'Executive Room' ? 'executive-room' : 'premium-suite';
+                if (newRates[tierId]) {
+                  return { ...r, tariff: newRates[tierId].recommendedRate };
+                }
+                return r;
+              }));
+
+              // Persist published rates to Cloudflare D1
+              const adminPin = getVerifiedAdminPin();
+              if (adminPin) {
+                fetch('/api/sync', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
+                  body: JSON.stringify({ action: 'publish_dynamic_rates', payload: { rates: newRates } })
+                }).catch(e => console.warn('D1 rate publish sync:', e));
               }
-              return r;
-            }));
 
-            // Persist published rates to Cloudflare D1
-            const adminPin = getVerifiedAdminPin();
-            if (adminPin) {
-              fetch('/api/sync', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminPin },
-                body: JSON.stringify({ action: 'publish_dynamic_rates', payload: { rates: newRates } })
-              }).catch(e => console.warn('D1 rate publish sync:', e));
-            }
-
-            alert("⚡ IDeaS G3 RMS: Continuous dynamic micro-rates published to live booking engine, room catalog, front desk reception, and synced to Cloudflare D1!");
-          }}
-        />
+              alert("⚡ IDeaS G3 RMS: Continuous dynamic micro-rates published to live booking engine, room catalog, front desk reception, and synced to Cloudflare D1!");
+            }}
+          />
         )}
 
         {/* Statutory Legal & Compliance Modals */}
-        <LegalPoliciesModal 
+        <LegalPoliciesModal
           isOpen={legalModalOpen}
           onClose={() => setLegalModalOpen(false)}
           initialTab={legalModalTab}
         />
 
-        <DpdpDataRightsModal 
+        <DpdpDataRightsModal
           isOpen={dataRightsModalOpen}
           onClose={() => setDataRightsModalOpen(false)}
         />
 
         {/* System #36: CA Filing Station & Financial Intelligence Engine Modal */}
         {caFilingModalOpen && (
-          <CaFilingStationModal 
+          <CaFilingStationModal
             isOpen={caFilingModalOpen}
             onClose={() => setCaFilingModalOpen(false)}
             onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
@@ -1475,7 +1478,7 @@ export default function App() {
 
         {/* Dedicated Mobile Housekeeping Attendant Portal (Audio 3 Turnaround Protocol) */}
         {housekeepingModalOpen && (
-          <HousekeepingPortal 
+          <HousekeepingPortal
             isOpen={housekeepingModalOpen}
             onClose={() => setHousekeepingModalOpen(false)}
             rooms={rooms}
@@ -1485,7 +1488,7 @@ export default function App() {
 
         {/* Universal IDS Quick Scan & Command Navigator (Ctrl+K) */}
         {roomSearchModalOpen && (
-          <IdsQuickScanModal 
+          <IdsQuickScanModal
             isOpen={roomSearchModalOpen}
             onClose={() => setRoomSearchModalOpen(false)}
             onSelectProgram={(prog) => {
@@ -1503,7 +1506,7 @@ export default function App() {
 
         {/* Digital Room QR & Keycard Access Modal */}
         {roomQrModalOpen && (
-          <RoomQrModal 
+          <RoomQrModal
             isOpen={roomQrModalOpen}
             onClose={() => setRoomQrModalOpen(false)}
             initialRoomNumber={selectedRoomForQr}
@@ -1514,7 +1517,7 @@ export default function App() {
 
       {currentView === 'guest' && (
         <>
-          <Footer 
+          <Footer
             onOpenDarshan={() => setDarshanModalOpen(true)}
             onOpenDining={() => setDiningModalOpen(true)}
             onOpenCorporate={() => setCorporateModalOpen(true)}
@@ -1526,7 +1529,7 @@ export default function App() {
             onOpenDataRights={() => setDataRightsModalOpen(true)}
           />
 
-          <CookieConsentBanner 
+          <CookieConsentBanner
             onOpenPolicy={() => {
               setLegalModalTab('cookies');
               setLegalModalOpen(true);
@@ -1537,7 +1540,7 @@ export default function App() {
 
       {/* 21st.dev / Magic UI Floating Luxury Navigation Dock (Guest Website Only) */}
       {currentView === 'guest' && (
-        <FloatingDock 
+        <FloatingDock
           items={[
             {
               title: "Quick Search 27 Rooms (Ctrl+K)",

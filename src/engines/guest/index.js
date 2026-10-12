@@ -9,7 +9,7 @@ export { default as SatvikDining } from '../../components/SatvikDining';
 export { default as FaqSection } from '../../components/FaqSection';
 export { default as Footer } from '../../components/Footer';
 export { default as Navbar } from '../../components/Navbar';
-export { default as BookingModal } from '../../components/ids/IdsWalkInModal';
+export { default as BookingModal } from '../../components/GuestBookingModal';
 export { default as BookingReceiptModal } from '../../components/ids/IdsReprintBillModal';
 export { default as FloorExplorer3DModal } from '../../components/FloorExplorer3DModal';
 export { default as DarshanAdvisorModal } from '../../components/DarshanAdvisorModal';
