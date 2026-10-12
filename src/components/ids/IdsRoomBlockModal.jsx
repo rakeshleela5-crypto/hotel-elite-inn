@@ -190,10 +190,10 @@ export default function IdsRoomBlockModal({
       <div 
         className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '1240px' : '920px', 
-          maxWidth: isMaximized ? '1240px' : '96vw',
-          height: isMaximized ? '760px' : 'auto',
-          maxHeight: isMaximized ? '760px' : '94vh',
+          width: isMaximized ? '1024px' : '920px', 
+          maxWidth: isMaximized ? '1024px' : '96vw',
+          height: isMaximized ? '768px' : 'auto',
+          maxHeight: isMaximized ? '768px' : '94vh',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
@@ -219,7 +219,7 @@ export default function IdsRoomBlockModal({
           <span>Room Block V6.5.002.1</span>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>

@@ -168,8 +168,8 @@ export default function IdsReprintBillModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '1240px' : (stage === 'input' ? '460px' : '620px'), 
-          maxWidth: isMaximized ? '1240px' : '98vw', 
+          width: isMaximized ? '1024px' : (stage === 'input' ? '460px' : '620px'), 
+          maxWidth: isMaximized ? '1024px' : '98vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8',
@@ -194,7 +194,7 @@ export default function IdsReprintBillModal({
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>

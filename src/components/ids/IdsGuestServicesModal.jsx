@@ -169,10 +169,10 @@ export default function IdsGuestServicesModal({
       <div 
         className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '98vw' : '880px', 
-          maxWidth: isMaximized ? '98vw' : '92vw',
-          height: isMaximized ? '96vh' : 'auto',
-          maxHeight: isMaximized ? '96vh' : '90vh',
+          width: isMaximized ? '1024px' : '880px', 
+          maxWidth: isMaximized ? '1024px' : '92vw',
+          height: isMaximized ? '768px' : 'auto',
+          maxHeight: isMaximized ? '768px' : '90vh',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#ECE9D8',
@@ -198,7 +198,7 @@ export default function IdsGuestServicesModal({
           <span>Guest Services V6.5.002.1</span>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px' }}>
             <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>

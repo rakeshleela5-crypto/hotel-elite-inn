@@ -368,8 +368,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '1240px' : '640px', 
-            maxWidth: isMaximized ? '1240px' : '98vw', 
+            width: isMaximized ? '1024px' : '640px', 
+            maxWidth: isMaximized ? '1024px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -398,7 +398,7 @@ export default function IdsNightAuditModal({
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
@@ -514,8 +514,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '1240px' : '620px', 
-            maxWidth: isMaximized ? '1240px' : '98vw', 
+            width: isMaximized ? '1024px' : '620px', 
+            maxWidth: isMaximized ? '1024px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -544,7 +544,7 @@ export default function IdsNightAuditModal({
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
@@ -652,8 +652,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '1240px' : '560px', 
-            maxWidth: isMaximized ? '1240px' : '98vw', 
+            width: isMaximized ? '1024px' : '560px', 
+            maxWidth: isMaximized ? '1024px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -677,7 +677,7 @@ export default function IdsNightAuditModal({
             <span style={{ fontWeight: 700, fontSize: '11px' }}>PENDING KOT'S</span>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
@@ -756,8 +756,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '1240px' : '640px', 
-            maxWidth: isMaximized ? '1240px' : '98vw', 
+            width: isMaximized ? '1024px' : '640px', 
+            maxWidth: isMaximized ? '1024px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -786,7 +786,7 @@ export default function IdsNightAuditModal({
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>

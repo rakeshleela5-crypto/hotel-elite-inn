@@ -84,13 +84,20 @@
   flex: 0 0 auto !important;
 }
 
-.ids-dialog-window.maximized,
-.ids-modal-window.maximized,
-.ids-modal-container.maximized {
-  width: 95vw !important;
-  max-width: 1280px !important;
-  height: 90vh !important;
-  max-height: 820px !important;
+/* =========================================================================
+   STANDARD 15-INCH 4:3 ASPECT RATIO WORKSTATION MAXIMIZE ENGINE
+   (Native 1024x768 Standard - Front Desk CRT / LCD Aspect Ratio: 4:3)
+   Used across all 19 PMS dialog modals (Express Check-In, Walk-In, Room Block, etc.)
+   Front Desk Desktop Shell & Kitchen POS Touch Terminal remain full screen.
+   ========================================================================= */
+.ids-dialog-window.maximized:not(.ids-touch-pos-window),
+.ids-modal-window.maximized:not(.ids-touch-pos-window),
+.ids-modal-container.maximized:not(.ids-touch-pos-window) {
+  width: min(94vw, calc(86vh * (4 / 3)), 1024px) !important;
+  height: min(86vh, calc(94vw * (3 / 4)), 768px) !important;
+  aspect-ratio: 4 / 3 !important;
+  max-width: 1024px !important;
+  max-height: 768px !important;
   margin: auto !important;
   position: relative !important;
   inset: auto !important;
@@ -99,7 +106,7 @@
   border: 2px outset #FFFFFF !important;
   border-right-color: #555544 !important;
   border-bottom-color: #555544 !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 0 1px #808080 !important;
   transform: none !important;
   display: flex !important;
   flex-direction: column !important;

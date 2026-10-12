@@ -1292,10 +1292,10 @@ export default function AccountsLedgerModal({
         ref={ledgerContainerRef}
         className={'glass-panel printable-ledger printable-sheet hsi-live-edit-active'} 
         style={{
-        width: isMaximized ? '1240px' : '100%',
-        maxWidth: isMaximized ? '1240px' : 1360,
-        height: isMaximized ? '760px' : '94vh',
-        maxHeight: isMaximized ? '760px' : '94vh',
+        width: isMaximized ? '1024px' : '100%',
+        maxWidth: isMaximized ? '1024px' : 1360,
+        height: isMaximized ? '768px' : '94vh',
+        maxHeight: isMaximized ? '768px' : '94vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',
@@ -1374,7 +1374,7 @@ export default function AccountsLedgerModal({
             </button>
             <button
               onClick={() => setIsMaximized(!isMaximized)}
-              title={isMaximized ? "Restore Window" : "Maximize Full Desktop"}
+              title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"}
               style={{
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.2)',
