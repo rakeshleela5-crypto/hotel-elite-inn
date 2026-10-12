@@ -426,10 +426,10 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '880px' : '780px',
-          maxWidth: isMaximized ? '880px' : '96vw',
-          height: isMaximized ? '520px' : 'auto',
-          maxHeight: isMaximized ? '520px' : '94vh',
+          width: isMaximized ? '980px' : '880px',
+          maxWidth: isMaximized ? '96vw' : '94vw',
+          height: isMaximized ? '620px' : '560px',
+          maxHeight: isMaximized ? '92vh' : '88vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',

@@ -218,10 +218,10 @@ export function IdsGuestManagementModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '880px' : '780px', 
-          maxWidth: isMaximized ? '880px' : '96vw', 
-          height: isMaximized ? '520px' : 'auto',
-          maxHeight: isMaximized ? '520px' : '92vh',
+          width: isMaximized ? '980px' : '880px', 
+          maxWidth: isMaximized ? '96vw' : '94vw', 
+          height: isMaximized ? '620px' : '560px',
+          maxHeight: isMaximized ? '92vh' : '88vh',
           boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
           background: '#ECE9D8',
           display: 'flex',

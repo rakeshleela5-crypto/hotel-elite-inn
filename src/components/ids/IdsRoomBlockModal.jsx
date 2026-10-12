@@ -190,10 +190,10 @@ export default function IdsRoomBlockModal({
       <div 
         className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '880px' : '920px', 
-          maxWidth: isMaximized ? '880px' : '96vw',
-          height: isMaximized ? '520px' : 'auto',
-          maxHeight: isMaximized ? '520px' : '94vh',
+          width: isMaximized ? '1120px' : '1040px', 
+          maxWidth: isMaximized ? '96vw' : '94vw',
+          height: isMaximized ? '680px' : '620px',
+          maxHeight: isMaximized ? '92vh' : '88vh',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',

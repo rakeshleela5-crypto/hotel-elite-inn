@@ -241,7 +241,7 @@ export default function IdsWalkInModal({
           SCREEN 1: ROOM RACK V6.5.002.2 (Video 17 Frames 010–030)
           ========================================================================= */}
       {activeStep === 'rack' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '920px', maxWidth: isMaximized ? '880px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1120px' : '1040px', maxWidth: isMaximized ? '96vw' : '94vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Room Rack V6.5.002.2</span>
             <div className="ids-window-controls">
@@ -517,7 +517,7 @@ export default function IdsWalkInModal({
           SCREEN 2: WALK-INS V6.5002.5 REGISTRATION CONSOLE (Video 17 Frames 035–075)
           ========================================================================= */}
       {activeStep === 'registration' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '920px', maxWidth: isMaximized ? '880px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1120px' : '1040px', maxWidth: isMaximized ? '96vw' : '94vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Walk-Ins V6.5002.5 — Guest Registration</span>
             <div className="ids-window-controls">
@@ -1395,7 +1395,7 @@ export default function IdsWalkInModal({
           SCREEN 3: GUEST INFORMATION V6.5002.2 (Video 17 Frame 110)
           ========================================================================= */}
       {activeStep === 'guest-info' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '940px', maxWidth: isMaximized ? '880px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1120px' : '1040px', maxWidth: isMaximized ? '96vw' : '94vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Guest Information V6.5002.2 — Reservation Profile</span>
             <div className="ids-window-controls">

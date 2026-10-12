@@ -85,18 +85,18 @@
 }
 
 /* =========================================================================
-   AUTHENTIC WIN32 HIGH-DENSITY COMPACT DIALOG ENGINE
-   Eliminates all empty voids and awkward stretches across operational modals.
-   Snug dialog dimensions: max-width 880px, max-height 520px, height: auto.
+   AUTHENTIC WIN32 HIGH-DENSITY COMFORTABLE DIALOG ENGINE
+   Spacious, clear layout with zero horizontal clipping.
+   Default size: 1040px x 620px | Maximized size: 1120px x 680px
    Front Desk Desktop Shell & Kitchen POS Touch Terminal remain full screen.
    ========================================================================= */
 .ids-dialog-window.maximized:not(.ids-touch-pos-window),
 .ids-modal-window.maximized:not(.ids-touch-pos-window),
 .ids-modal-container.maximized:not(.ids-touch-pos-window) {
-  width: min(92vw, 880px) !important;
-  max-width: 880px !important;
+  width: min(96vw, 1120px) !important;
+  max-width: 1120px !important;
   height: auto !important;
-  max-height: min(84vh, 520px) !important;
+  max-height: min(90vh, 680px) !important;
   aspect-ratio: auto !important;
   margin: auto !important;
   position: relative !important;
@@ -106,7 +106,7 @@
   border: 2px outset #FFFFFF !important;
   border-right-color: #555544 !important;
   border-bottom-color: #555544 !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px #808080 !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.75), 0 0 0 1px #808080 !important;
   transform: none !important;
   display: flex !important;
   flex-direction: column !important;

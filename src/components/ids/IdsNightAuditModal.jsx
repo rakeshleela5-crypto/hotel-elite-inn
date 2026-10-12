@@ -368,8 +368,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '880px' : '640px', 
-            maxWidth: isMaximized ? '880px' : '98vw', 
+            width: isMaximized ? '1120px' : '1040px', 
+            maxWidth: isMaximized ? '96vw' : '94vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -514,8 +514,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '880px' : '620px', 
-            maxWidth: isMaximized ? '880px' : '98vw', 
+            width: isMaximized ? '1120px' : '1040px', 
+            maxWidth: isMaximized ? '96vw' : '94vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -652,8 +652,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '880px' : '560px', 
-            maxWidth: isMaximized ? '880px' : '98vw', 
+            width: isMaximized ? '1120px' : '1040px', 
+            maxWidth: isMaximized ? '96vw' : '94vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -756,8 +756,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '880px' : '640px', 
-            maxWidth: isMaximized ? '880px' : '98vw', 
+            width: isMaximized ? '1120px' : '1040px', 
+            maxWidth: isMaximized ? '96vw' : '94vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',

@@ -256,10 +256,10 @@ export default function IdsExpressCheckInModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '890px' : '850px', 
-          maxWidth: '94vw', 
-          height: isMaximized ? '520px' : '480px', 
-          maxHeight: '84vh', 
+          width: isMaximized ? '1120px' : '1040px', 
+          maxWidth: '96vw', 
+          height: isMaximized ? '680px' : '620px', 
+          maxHeight: '90vh', 
           display: 'flex', 
           flexDirection: 'column' 
         }}

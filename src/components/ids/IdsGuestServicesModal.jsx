@@ -169,10 +169,10 @@ export default function IdsGuestServicesModal({
       <div 
         className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '880px' : '880px', 
-          maxWidth: isMaximized ? '880px' : '92vw',
-          height: isMaximized ? '520px' : 'auto',
-          maxHeight: isMaximized ? '520px' : '90vh',
+          width: isMaximized ? '980px' : '880px', 
+          maxWidth: isMaximized ? '96vw' : '94vw',
+          height: isMaximized ? '620px' : '560px',
+          maxHeight: isMaximized ? '92vh' : '88vh',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: '#ECE9D8',
@@ -415,7 +415,7 @@ export default function IdsGuestServicesModal({
                 border: '1px solid #7F9DB9', 
                 background: '#FFF', 
                 flex: isMaximized ? 1 : 'unset',
-                maxHeight: isMaximized ? 'none' : '220px', 
+                maxHeight: isMaximized ? '92vh' : '88vh', 
                 minHeight: '140px', 
                 overflowY: 'auto',
                 marginBottom: '14px'

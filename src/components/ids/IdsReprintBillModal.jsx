@@ -169,7 +169,7 @@ export default function IdsReprintBillModal({
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
           width: isMaximized ? '880px' : (stage === 'input' ? '460px' : '620px'), 
-          maxWidth: isMaximized ? '880px' : '98vw', 
+          maxWidth: isMaximized ? '96vw' : '94vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8',

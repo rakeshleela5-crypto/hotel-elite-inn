@@ -329,10 +329,10 @@ export default function IdsPoliceThanaManifestModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '880px' : '960px', 
-          maxWidth: isMaximized ? '880px' : '96vw', 
-          height: isMaximized ? '520px' : '660px', 
-          maxHeight: isMaximized ? '520px' : '92vh',
+          width: isMaximized ? '1120px' : '1040px', 
+          maxWidth: isMaximized ? '96vw' : '94vw', 
+          height: isMaximized ? '680px' : '620px', 
+          maxHeight: isMaximized ? '92vh' : '88vh',
           display: 'flex', 
           flexDirection: 'column',
           background: '#ECE9D8',
