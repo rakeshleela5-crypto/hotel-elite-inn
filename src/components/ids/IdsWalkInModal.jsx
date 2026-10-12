@@ -154,6 +154,7 @@ export default function IdsWalkInModal({
   // Status message
   const [statusMessage, setStatusMessage] = useState('');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Reset when opening
   useEffect(() => {
@@ -235,6 +236,41 @@ export default function IdsWalkInModal({
     onClose();
   };
 
+  if (isMinimized) {
+    return (
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '34px',
+          left: '520px',
+          zIndex: 10000,
+          background: '#ECE9D8',
+          border: '2px outset #FFFFFF',
+          borderRightColor: '#555544',
+          borderBottomColor: '#555544',
+          padding: '4px 10px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
+          cursor: 'pointer',
+          fontFamily: 'Tahoma, Arial, sans-serif',
+          fontSize: '11px',
+          fontWeight: 700
+        }}
+        onClick={() => setIsMinimized(false)}
+        title="Click to Restore Window"
+      >
+        <span style={{ color: '#0A246A' }}>🗕 Walk-In Registration V6.5.002.2</span>
+        <button 
+          className="ids-win-btn close" 
+          style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '12px' }}
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+        >✕</button>
+      </div>
+    );
+  }
+
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       {/* =========================================================================
@@ -245,7 +281,7 @@ export default function IdsWalkInModal({
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Room Rack V6.5.002.2</span>
             <div className="ids-window-controls">
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize Window" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -521,7 +557,7 @@ export default function IdsWalkInModal({
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Walk-Ins V6.5002.5 — Guest Registration</span>
             <div className="ids-window-controls">
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize Window" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>

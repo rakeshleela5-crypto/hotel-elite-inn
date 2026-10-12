@@ -39,6 +39,7 @@ export default function IdsCashierShiftHandoverModal({
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Sync tab if changed externally
   useEffect(() => {
@@ -155,6 +156,50 @@ export default function IdsCashierShiftHandoverModal({
   };
 
   if (!isOpen) return null;
+
+  if (isMinimized) {
+    return (
+      <div 
+        className="ids-minimized-dock-pill"
+        onClick={() => setIsMinimized(false)}
+        style={{
+          position: 'fixed',
+          bottom: '34px',
+          left: '1000px',
+          zIndex: 99999,
+          background: 'linear-gradient(180deg, #ECE9D8 0%, #D8D4C0 100%)',
+          border: '2px outset #FFFFFF',
+          borderRadius: '3px 3px 0 0',
+          padding: '4px 10px',
+          fontSize: '11px',
+          fontFamily: 'Tahoma, sans-serif',
+          fontWeight: 'bold',
+          color: '#0A246A',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          boxShadow: '2px 2px 5px rgba(0,0,0,0.4)'
+        }}
+        title="Restore Cashier Shift Handover V6.5.008.1"
+      >
+        <span>💰 🗕 Cashier Handover ({shiftData.shiftName})</span>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          style={{
+            background: '#C00',
+            color: '#FFF',
+            border: 'none',
+            borderRadius: '2px',
+            fontSize: '9px',
+            padding: '1px 4px',
+            cursor: 'pointer'
+          }}
+          title="Close Dialog"
+        >✕</button>
+      </div>
+    );
+  }
 
   // Handle Denomination Change
   const handleDenomChange = (field, val) => {
@@ -417,7 +462,7 @@ export default function IdsCashierShiftHandoverModal({
             </span>
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title="Minimize to Desktop Taskbar" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
             <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>

@@ -53,6 +53,7 @@ export default function IdsNightAuditModal({
 
   // Step 1: Post Room Rate State
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [postMode, setPostMode] = useState('all'); // 'individual' | 'all'
   const [step1Running, setStep1Running] = useState(false);
   const [step1Log, setStep1Log] = useState('');
@@ -357,6 +358,50 @@ export default function IdsNightAuditModal({
 
   if (!isOpen) return null;
 
+  if (isMinimized) {
+    return (
+      <div 
+        className="ids-minimized-dock-pill"
+        onClick={() => setIsMinimized(false)}
+        style={{
+          position: 'fixed',
+          bottom: '34px',
+          left: '840px',
+          zIndex: 99999,
+          background: 'linear-gradient(180deg, #ECE9D8 0%, #D8D4C0 100%)',
+          border: '2px outset #FFFFFF',
+          borderRadius: '3px 3px 0 0',
+          padding: '4px 10px',
+          fontSize: '11px',
+          fontFamily: 'Tahoma, sans-serif',
+          fontWeight: 'bold',
+          color: '#0A246A',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          boxShadow: '2px 2px 5px rgba(0,0,0,0.4)'
+        }}
+        title="Restore Night Audit V6.5.002.4"
+      >
+        <span>🌙 🗕 Night Audit (Step {activeStep}/4)</span>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          style={{
+            background: '#C00',
+            color: '#FFF',
+            border: 'none',
+            borderRadius: '2px',
+            fontSize: '9px',
+            padding: '1px 4px',
+            cursor: 'pointer'
+          }}
+          title="Close Night Audit"
+        >✕</button>
+      </div>
+    );
+  }
+
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
 
@@ -397,7 +442,7 @@ export default function IdsNightAuditModal({
               </span>
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Desktop Taskbar" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -543,7 +588,7 @@ export default function IdsNightAuditModal({
               </span>
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Desktop Taskbar" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -676,7 +721,7 @@ export default function IdsNightAuditModal({
           >
             <span style={{ fontWeight: 700, fontSize: '11px' }}>PENDING KOT'S</span>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Desktop Taskbar" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
@@ -785,7 +830,7 @@ export default function IdsNightAuditModal({
               </span>
             </div>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title="Minimize to Desktop Taskbar" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
               <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>

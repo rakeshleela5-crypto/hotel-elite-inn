@@ -7,6 +7,7 @@ import {
 import { INITIAL_INHOUSE_GUESTS } from './IdsGuestManagementModal';
 import { settleFastApiOrder } from '../../utils/backendApi';
 import IdsSplitTenderModal from './IdsSplitTenderModal';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
 // Authentic Bank / Card Codes in IDS Fortune NEXT
 export const CARD_PROVIDERS = [
@@ -132,6 +133,7 @@ export default function IdsPosBillSettlementModal({
   const [discPercent, setDiscPercent] = useState('0');
   const [discReason, setDiscReason] = useState('Manager Discretion');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Active Bill Record
   const currentBill = useMemo(() => {
@@ -329,7 +331,210 @@ export default function IdsPosBillSettlementModal({
     }, 3500);
   };
 
+  // Foreign Exchange Settlement Routine
+  const handleForexSettlement = () => {
+    if (currentBalance <= 0) return;
+    const usdRate = 86.50;
+    const usdVal = (currentBalance / usdRate).toFixed(2);
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Foreign Exchange',
+      cur: 'USD',
+      foreignAmt: usdVal,
+      localAmt: currentBalance,
+      diffAmt: '0.00',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `$${usdVal} USD @ ₹${usdRate} (Forex Slip #FX-104)`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Plan Settlement (CP / MAP / AP Meal allowance)
+  const handlePlanSettlement = () => {
+    if (currentBalance <= 0) return;
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Plan Inclusion',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `Room Meal Allowance (CP Package) Room ${guestRoomNo}`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Cheque Settlement Routine
+  const handleChequeSettlement = () => {
+    if (currentBalance <= 0) return;
+    const chqNo = prompt("Enter Bank Cheque Number:", "CHQ-108420");
+    if (!chqNo) return;
+    const bank = prompt("Enter Bank & Branch:", "State Bank of India (Muniguda)");
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Cheque',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `${bank || 'Bank'} Chq #${chqNo}`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Corporate BTC Settlement
+  const handleCompanySettlement = () => {
+    if (currentBalance <= 0) return;
+    const comp = prompt("Select Corporate BTC Account:\n1. COM0001 - Vedanta Alumina Ltd\n2. COM0002 - Utkal Alumina Ltd\n3. COM0003 - JK Paper Mills Ltd", "COM0001 - Vedanta Alumina Ltd");
+    if (!comp) return;
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Company BTC',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `Direct BTC Ledger: ${comp}`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Staff Duty Meal Settlement
+  const handleStaffSettlement = () => {
+    if (currentBalance <= 0) return;
+    const staff = prompt("Enter Employee Name / ID for Duty Meal deduction:", "EMP-014 (Chef Manoj Kumar)");
+    if (!staff) return;
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Staff Duty Meal',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `Internal Ledger: ${staff}`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Non Chargeable (NC) Protocol
+  const handleNcSettlement = () => {
+    if (currentBalance <= 0) return;
+    const reason = prompt("Enter NC Protocol Authorisation Reason:", "F&B Executive Food Tasting / MD Official Protocol");
+    if (!reason) return;
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Non Chargeable (NC)',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `NC Protocol: ${reason}`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Complimentary Management Routine
+  const handleComplimentarySettlement = () => {
+    if (currentBalance <= 0) return;
+    const newPayment = {
+      id: Date.now(),
+      mode: 'Complimentary',
+      cur: 'INR',
+      foreignAmt: '',
+      localAmt: currentBalance,
+      diffAmt: '',
+      tipsCur: '',
+      tipsAmount: 0,
+      details: `100% GM Management Exemption (#GM-902)`
+    };
+    setPaymentsGrid(prev => [...prev, newPayment]);
+    playSuccessChime();
+  };
+
+  // Void / Hold Bill Routine
+  const handleVoidHoldBill = () => {
+    if (confirm(`Do you wish to Void Bill #${currentBill.billNo} and release Table ${currentBill.tableNo}?`)) {
+      setBillsRegistry(prev => prev.filter(b => b.billNo !== currentBill.billNo));
+      playSuccessChime();
+      alert(`Bill #${currentBill.billNo} voided successfully. Table ${currentBill.tableNo} released to Vacant.`);
+      onClose();
+    }
+  };
+
+  // Navigate Previous / Next bills
+  const handlePrevBill = () => {
+    const idx = billsRegistry.findIndex(b => b.billNo === currentBill.billNo);
+    if (idx > 0) {
+      setActiveBillNo(billsRegistry[idx - 1].billNo);
+      playReceptionChime();
+    } else {
+      alert("Already at earliest pending bill.");
+    }
+  };
+
+  const handleNextBill = () => {
+    const idx = billsRegistry.findIndex(b => b.billNo === currentBill.billNo);
+    if (idx < billsRegistry.length - 1) {
+      setActiveBillNo(billsRegistry[idx + 1].billNo);
+      playReceptionChime();
+    } else {
+      alert("Already at latest active bill.");
+    }
+  };
+
   if (!isOpen) return null;
+
+  if (isMinimized) {
+    return (
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '34px',
+          left: '380px',
+          zIndex: 10000,
+          background: '#ECE9D8',
+          border: '2px outset #FFFFFF',
+          borderRightColor: '#555544',
+          borderBottomColor: '#555544',
+          padding: '4px 10px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
+          cursor: 'pointer',
+          fontFamily: 'Tahoma, Arial, sans-serif',
+          fontSize: '11px',
+          fontWeight: 700
+        }}
+        onClick={() => setIsMinimized(false)}
+        title="Click to Restore Window"
+      >
+        <span style={{ color: '#0A246A' }}>🗕 POS Settle Bill - #{activeBillNo}</span>
+        <button 
+          className="ids-win-btn close" 
+          style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '12px' }}
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+        >✕</button>
+      </div>
+    );
+  }
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1280 }}>
@@ -362,7 +567,7 @@ export default function IdsPosBillSettlementModal({
         >
           <span style={{ fontWeight: 700, fontSize: '12px' }}>Bill Settlement V6.5.008.30</span>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title="Minimize Window" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
             <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
@@ -539,15 +744,17 @@ export default function IdsPosBillSettlementModal({
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Foreign Exchange Settlement Routine")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleForexSettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Settle in USD / Foreign Currency with real-time conversion"
             >
               <u>F</u>oreign Exchange
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Plan Settlement Routine (CP/MAP/AP)")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handlePlanSettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Post to Room Meal Inclusion Plan (CP / MAP / AP)"
             >
               <u>P</u>lan
             </button>
@@ -562,15 +769,17 @@ export default function IdsPosBillSettlementModal({
             {/* Row 2 */}
             <button 
               className="ids-btn" 
-              onClick={() => alert("Cheque Settlement Routine")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleChequeSettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Settle via Bank Clearing Cheque"
             >
               C<u>h</u>eque
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Company / BTC Direct Billing")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleCompanySettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Direct Bill to Corporate BTC Account"
             >
               C<u>o</u>mpany
             </button>
@@ -584,8 +793,9 @@ export default function IdsPosBillSettlementModal({
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Staff Meal / Internal Account")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleStaffSettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Staff Duty Meal / Internal Account Deduction"
             >
               <u>S</u>taff
             </button>
@@ -593,8 +803,9 @@ export default function IdsPosBillSettlementModal({
             {/* Row 3 */}
             <button 
               className="ids-btn" 
-              onClick={() => alert("Non Chargeable (NC) Protocol")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleNcSettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="Non Chargeable Protocol (F&B Tasting / MD Table)"
             >
               <u>N</u>on Chargeable
             </button>
@@ -607,15 +818,17 @@ export default function IdsPosBillSettlementModal({
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Void / Hold Bill Routine")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleVoidHoldBill}
+              style={{ padding: '5px 4px', fontSize: '11px', color: '#C62828', fontWeight: 700 }}
+              title="Void or Hold current table bill"
             >
               <u>V</u>oid / Hold
             </button>
             <button 
               className="ids-btn" 
-              onClick={() => alert("Complimentary Management Exemption")}
-              style={{ padding: '5px 4px', fontSize: '11px' }}
+              onClick={handleComplimentarySettlement}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
+              title="100% Management Exemption"
             >
               Co<u>m</u>plimentary
             </button>
@@ -648,14 +861,14 @@ export default function IdsPosBillSettlementModal({
             <button 
               className="ids-btn" 
               style={{ padding: '2px 8px', fontSize: '11px' }}
-              onClick={() => alert("Navigated to Previous settled POS Bill.")}
+              onClick={handlePrevBill}
             >
               Previous
             </button>
             <button 
               className="ids-btn" 
               style={{ padding: '2px 8px', fontSize: '11px', fontWeight: 600 }}
-              onClick={() => alert("Navigated to Current active POS Bill.")}
+              onClick={handleNextBill}
             >
               Current
             </button>
