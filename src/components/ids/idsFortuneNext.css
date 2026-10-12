@@ -489,15 +489,198 @@
   white-space: nowrap;
   user-select: none;
   flex-shrink: 0;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 .ids-btn-classic:hover {
   background: #F3EFE0;
 }
 .ids-btn-classic:active {
-  border: 2px inset #716F64;
-  border-right-color: #FFFFFF;
-  border-bottom-color: #FFFFFF;
-  background: #D8D4C2;
+  border: 2px inset #716F64 !important;
+  border-right-color: #FFFFFF !important;
+  border-bottom-color: #FFFFFF !important;
+  background: #D8D4C2 !important;
+}
+
+/* ==========================================================================
+   WIN32 TACTILE SEMANTIC BUTTON TOKENS (LIGHT COLOR TINTS + 3D BEVELS)
+   ========================================================================== */
+
+/* 1. EXIT / DANGER / CANCEL / CLOSE / VOID (Pastel Rose Red Tint) */
+.ids-btn-classic.exit,
+.ids-btn-classic.danger,
+.ids-btn-classic.cancel,
+.ids-btn-classic.void,
+.ids-btn-classic.close-btn,
+.ids-btn-exit,
+button[data-btn-type="exit"] {
+  background: #FEE2E2 !important;
+  color: #991B1B !important;
+  border: 2px outset #FECACA !important;
+  border-right-color: #DC2626 !important;
+  border-bottom-color: #DC2626 !important;
+  font-weight: 700 !important;
+}
+.ids-btn-classic.exit:hover,
+.ids-btn-classic.danger:hover,
+.ids-btn-classic.cancel:hover,
+.ids-btn-classic.void:hover,
+.ids-btn-classic.close-btn:hover,
+.ids-btn-exit:hover,
+button[data-btn-type="exit"]:hover {
+  background: #FECDD3 !important;
+  border-right-color: #B91C1C !important;
+  border-bottom-color: #B91C1C !important;
+  color: #7F1D1D !important;
+}
+.ids-btn-classic.exit:active,
+.ids-btn-classic.danger:active,
+.ids-btn-classic.cancel:active,
+.ids-btn-classic.void:active,
+.ids-btn-classic.close-btn:active,
+.ids-btn-exit:active,
+button[data-btn-type="exit"]:active {
+  background: #FCA5A5 !important;
+  border: 2px inset #DC2626 !important;
+  border-right-color: #FECACA !important;
+  border-bottom-color: #FECACA !important;
+  color: #7F1D1D !important;
+}
+
+/* 2. SUCCESS / SAVE / ATTEND & CLOSE / CONFIRM / CHECK-IN (Pastel Mint Green Tint) */
+.ids-btn-classic.success,
+.ids-btn-classic.save,
+.ids-btn-classic.attend,
+.ids-btn-classic.confirm,
+.ids-btn-classic.checkin,
+.ids-btn-classic.primary,
+.ids-btn-success,
+button[data-btn-type="success"] {
+  background: #DCFCE7 !important;
+  color: #14532D !important;
+  border: 2px outset #BBF7D0 !important;
+  border-right-color: #16A34A !important;
+  border-bottom-color: #16A34A !important;
+  font-weight: 700 !important;
+}
+.ids-btn-classic.success:hover,
+.ids-btn-classic.save:hover,
+.ids-btn-classic.attend:hover,
+.ids-btn-classic.confirm:hover,
+.ids-btn-classic.checkin:hover,
+.ids-btn-classic.primary:hover,
+.ids-btn-success:hover,
+button[data-btn-type="success"]:hover {
+  background: #BBF7D0 !important;
+  border-right-color: #15803D !important;
+  border-bottom-color: #15803D !important;
+  color: #052E16 !important;
+}
+.ids-btn-classic.success:active,
+.ids-btn-classic.save:active,
+.ids-btn-classic.attend:active,
+.ids-btn-classic.confirm:active,
+.ids-btn-classic.checkin:active,
+.ids-btn-classic.primary:active,
+.ids-btn-success:active,
+button[data-btn-type="success"]:active {
+  background: #86EFAC !important;
+  border: 2px inset #16A34A !important;
+  border-right-color: #BBF7D0 !important;
+  border-bottom-color: #BBF7D0 !important;
+  color: #052E16 !important;
+}
+
+/* 3. REFRESH / INFO / SEARCH / PRINT / FOLIO (Pastel Ice Sapphire Blue Tint) */
+.ids-btn-classic.info,
+.ids-btn-classic.refresh,
+.ids-btn-classic.search,
+.ids-btn-classic.print,
+.ids-btn-classic.folio,
+.ids-btn-info,
+button[data-btn-type="info"] {
+  background: #E0F2FE !important;
+  color: #075985 !important;
+  border: 2px outset #BAE6FD !important;
+  border-right-color: #0284C7 !important;
+  border-bottom-color: #0284C7 !important;
+  font-weight: 700 !important;
+}
+.ids-btn-classic.info:hover,
+.ids-btn-classic.refresh:hover,
+.ids-btn-classic.search:hover,
+.ids-btn-classic.print:hover,
+.ids-btn-classic.folio:hover,
+.ids-btn-info:hover,
+button[data-btn-type="info"]:hover {
+  background: #BAE6FD !important;
+  border-right-color: #0369A1 !important;
+  border-bottom-color: #0369A1 !important;
+  color: #0C4A6E !important;
+}
+.ids-btn-classic.info:active,
+.ids-btn-classic.refresh:active,
+.ids-btn-classic.search:active,
+.ids-btn-classic.print:active,
+.ids-btn-classic.folio:active,
+.ids-btn-info:active,
+button[data-btn-type="info"]:active {
+  background: #7DD3FC !important;
+  border: 2px inset #0284C7 !important;
+  border-right-color: #BAE6FD !important;
+  border-bottom-color: #BAE6FD !important;
+  color: #0C4A6E !important;
+}
+
+/* 4. WARNING / AMBER / MODIFY / HOLD / PENDING (Pastel Sand Amber Tint) */
+.ids-btn-classic.warning,
+.ids-btn-classic.modify,
+.ids-btn-classic.hold,
+.ids-btn-classic.amber,
+.ids-btn-warning,
+button[data-btn-type="warning"] {
+  background: #FEF3C7 !important;
+  color: #92400E !important;
+  border: 2px outset #FDE68A !important;
+  border-right-color: #D97706 !important;
+  border-bottom-color: #D97706 !important;
+  font-weight: 700 !important;
+}
+.ids-btn-classic.warning:hover,
+.ids-btn-classic.modify:hover,
+.ids-btn-classic.hold:hover,
+.ids-btn-classic.amber:hover,
+.ids-btn-warning:hover,
+button[data-btn-type="warning"]:hover {
+  background: #FDE68A !important;
+  border-right-color: #B45309 !important;
+  border-bottom-color: #B45309 !important;
+  color: #78350F !important;
+}
+.ids-btn-classic.warning:active,
+.ids-btn-classic.modify:active,
+.ids-btn-classic.hold:active,
+.ids-btn-classic.amber:active,
+.ids-btn-warning:active,
+button[data-btn-type="warning"]:active {
+  background: #FCD34D !important;
+  border: 2px inset #D97706 !important;
+  border-right-color: #FDE68A !important;
+  border-bottom-color: #FDE68A !important;
+  color: #78350F !important;
+}
+
+/* Disabled states across all classic variants */
+.ids-btn-classic:disabled,
+.ids-btn-classic[disabled],
+.ids-btn-classic.disabled {
+  background: #E8E5D8 !important;
+  color: #8C8A80 !important;
+  border: 2px outset #F5F4EE !important;
+  border-right-color: #B0ADA0 !important;
+  border-bottom-color: #B0ADA0 !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  pointer-events: none !important;
 }
 
 .ids-btn-divider {

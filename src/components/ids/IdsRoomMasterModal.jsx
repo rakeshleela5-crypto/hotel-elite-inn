@@ -571,14 +571,14 @@ export default function IdsRoomMasterModal({
                 </button>
               )}
               <button 
-                className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                className="ids-btn-classic save success" 
+                style={{ fontWeight: 700, minWidth: '70px' }}
                 onClick={handleSave}
               >
                 Save
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setRoomBrowseOpen(true)}>Panel...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '60px' }} onClick={() => setRoomBrowseOpen(true)}>Panel...</button>
+              <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 

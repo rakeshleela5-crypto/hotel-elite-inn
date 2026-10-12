@@ -1072,8 +1072,8 @@ export default function IdsWalkInModal({
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '70px', fontWeight: 700, background: '#D1E7DD', color: '#0F5132' }}
+                  className="ids-btn-classic save success" 
+                  style={{ minWidth: '70px', fontWeight: 700 }}
                   onClick={handleSaveRegistration}
                   title="Save Registration & Proceed (Video 17 Frame 075)"
                 >
@@ -1081,7 +1081,7 @@ export default function IdsWalkInModal({
                 </button>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic warning" 
                   style={{ minWidth: '60px' }} 
                   onClick={() => alert('Form fields cleared to default.')}
                 >
@@ -1089,7 +1089,7 @@ export default function IdsWalkInModal({
                 </button>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic info" 
                   style={{ minWidth: '60px' }}
                   onClick={() => setActiveStep('guest-info')}
                   title="Toggle Detailed Registration Panel"
@@ -1098,7 +1098,7 @@ export default function IdsWalkInModal({
                 </button>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ minWidth: '60px' }} 
                   onClick={() => setActiveStep('rack')}
                 >
@@ -1203,8 +1203,8 @@ export default function IdsWalkInModal({
 
               <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
+                  className="ids-btn-classic confirm success" 
+                  style={{ minWidth: '70px', fontWeight: 700 }}
                   onClick={() => {
                     setRateAmount(2500.00);
                     setRateDetailsOpen(false);
@@ -1212,7 +1212,7 @@ export default function IdsWalkInModal({
                 >
                   Confirm
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setRateDetailsOpen(false)}>
+                <button className="ids-btn-classic cancel exit danger" style={{ minWidth: '65px' }} onClick={() => setRateDetailsOpen(false)}>
                   Cancel
                 </button>
               </div>
@@ -1746,7 +1746,7 @@ export default function IdsWalkInModal({
 
                 {/* Bottom Action buttons matching Frame 110 */}
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => alert('Printing Guest Registration Card...')}>Print</button>
+                  <button className="ids-btn-classic print info" style={{ minWidth: '65px' }} onClick={() => alert('Printing Guest Registration Card...')}>Print</button>
                   <button 
                     type="button"
                     className="ids-btn-classic" 
@@ -1765,8 +1765,8 @@ export default function IdsWalkInModal({
                   </button>
                   <button 
                     type="button"
-                    className="ids-btn-classic" 
-                    style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
+                    className="ids-btn-classic exit danger" 
+                    style={{ minWidth: '90px', fontWeight: 700 }}
                     onClick={handleFinishWalkIn}
                   >
                     Exit &amp; Settle

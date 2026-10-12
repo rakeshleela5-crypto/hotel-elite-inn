@@ -632,8 +632,8 @@ export default function IdsCheckoutBillModal({
 
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button className="ids-btn-classic" style={{ minWidth: '85px' }} onClick={() => { playReceptionChime(); alert("Cut Off Date: Accounting cutoff is 12:00 Noon."); }}>Cut Off Date</button>
-                <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => { setSearchRoomInput(''); setFilterGroup('ALL'); setFilterCompany('ALL'); setIsGroupMode(false); }}>Refresh</button>
-                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
+                <button className="ids-btn-classic refresh info" style={{ minWidth: '75px' }} onClick={() => { setSearchRoomInput(''); setFilterGroup('ALL'); setFilterCompany('ALL'); setIsGroupMode(false); }}>Refresh</button>
+                <button className="ids-btn-classic exit danger" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
               </div>
             </div>
           </div>
@@ -901,16 +901,16 @@ export default function IdsCheckoutBillModal({
                 </button>
                 <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => alert('Generating Provisional Bill copy...')}>Prov. Bill...</button>
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '75px', fontWeight: 700, background: '#FFF7CC', color: '#0A246A' }}
+                  className="ids-btn-classic warning" 
+                  style={{ minWidth: '75px', fontWeight: 700 }}
                   onClick={() => setSplitBillOpen(true)}
                   title="Bill Split (Video 15 & 16)"
                 >
                   ✂️ Split Bill...
                 </button>
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '75px', fontWeight: 700, background: '#C8E6C9', color: '#004D40' }}
+                  className="ids-btn-classic success" 
+                  style={{ minWidth: '75px', fontWeight: 700 }}
                   onClick={() => {
                     setSettlementBillNo(isGroupMode ? '502' : '501');
                     setSettlementLoaded(true);
@@ -920,8 +920,8 @@ export default function IdsCheckoutBillModal({
                 >
                   💳 Bill Settle
                 </button>
-                <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => setViewBillOpen(true)}>View Bill...</button>
-                <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setActiveScreen('selector')}>Back</button>
+                <button className="ids-btn-classic info" style={{ minWidth: '70px' }} onClick={() => setViewBillOpen(true)}>View Bill...</button>
+                <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={() => setActiveScreen('selector')}>Back</button>
               </div>
             </div>
           </div>

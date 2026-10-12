@@ -399,9 +399,9 @@ export default function IdsGuestServicesModal({
 
             {/* Bottom Command Buttons */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-              <button onClick={handleSaveComplaint} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px', fontWeight: 'bold' }}>Save</button>
-              <button onClick={() => {}} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Panel</button>
-              <button onClick={onClose} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
+              <button onClick={handleSaveComplaint} className="ids-btn-classic success" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px', fontWeight: 'bold' }}>Save</button>
+              <button onClick={() => {}} className="ids-btn-classic info" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Panel</button>
+              <button onClick={onClose} className="ids-btn-classic exit" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
             </div>
           </div>
         )}
@@ -527,13 +527,13 @@ export default function IdsGuestServicesModal({
               <button 
                 onClick={handleAttendComplaint}
                 disabled={!selectedComplaint || selectedComplaint.status === 'Resolved'}
-                className="ids-btn-classic" 
+                className="ids-btn-classic attend success" 
                 style={{ minWidth: '120px', height: '28px', fontSize: '12.5px', fontWeight: 'bold' }}
               >
                 Attend & Close
               </button>
-              <button onClick={() => {}} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Refresh</button>
-              <button onClick={onClose} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
+              <button onClick={() => {}} className="ids-btn-classic refresh info" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Refresh</button>
+              <button onClick={onClose} className="ids-btn-classic exit danger" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
             </div>
           </div>
         )}
