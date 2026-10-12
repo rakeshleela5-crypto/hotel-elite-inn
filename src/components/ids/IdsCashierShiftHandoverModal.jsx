@@ -6,7 +6,8 @@ import {
   saveStoredShiftRecords, 
   getStoredActiveShiftId, 
   saveStoredActiveShiftId,
-  formatClientMorningBriefing 
+  formatClientMorningBriefing,
+  DEFAULT_SHIFT_RECORDS
 } from '../../data/idsShiftStore';
 import { playSuccessChime, playReceptionChime } from '../../utils/soundAlert';
 import { 
@@ -33,7 +34,7 @@ export default function IdsCashierShiftHandoverModal({
   const [records, setRecords] = useState(() => getStoredShiftRecords());
   const [selectedDate, setSelectedDate] = useState('02-10-2026');
   const [activeShiftId, setActiveShiftId] = useState(() => getStoredActiveShiftId());
-  const [activeTab, setActiveTab] = useState(initialTab); // 'handover' | 'flash-report' | 'history'
+  const [activeTab, setActiveTab] = useState(initialTab || 'handover'); // 'handover' | 'flash-report' | 'history'
   const [toastMessage, setToastMessage] = useState('');
   const [authPin, setAuthPin] = useState('7650');
   const [pinModalOpen, setPinModalOpen] = useState(false);
@@ -41,9 +42,11 @@ export default function IdsCashierShiftHandoverModal({
   const [isMaximized, setIsMaximized] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
-  // Sync tab if changed externally
+  // Sync tab if changed externally or when modal opens
   useEffect(() => {
-    if (initialTab) setActiveTab(initialTab);
+    if (isOpen) {
+      setActiveTab(initialTab || 'handover');
+    }
   }, [initialTab, isOpen]);
 
   // Ensure record exists for selectedDate
@@ -356,6 +359,44 @@ export default function IdsCashierShiftHandoverModal({
     }
   };
 
+  // Auto-calculate Total Revenue from F&B Outlets + Room revenue
+  const handleAutoCalcFlashTotals = () => {
+    const rs = parseFloat(rollup.roomService) || 0;
+    const rest = parseFloat(rollup.restaurant) || 0;
+    const take = parseFloat(rollup.takeAway) || 0;
+    const totalFb = rs + rest + take;
+    setRollup(prev => ({
+      ...prev,
+      totalRevenueActual: totalFb
+    }));
+    try { playSuccessChime(); } catch (e) {}
+    showToast(`✓ Total Revenue synchronized: ₹${totalFb.toLocaleString('en-IN')}`);
+  };
+
+  // Reset Flash Report metrics to default Night Audit rollups
+  const handleResetFlashDefaults = () => {
+    const def = DEFAULT_SHIFT_RECORDS['02-10-2026']?.dailyRollup || {
+      reportDate: selectedDate,
+      totalRoomsAvailable: 22,
+      totalRoomsSaleable: 5,
+      arrActual: 1611,
+      occupancy: 18,
+      mgmHold: 0,
+      underMaintenance: 0,
+      outOfOrder: 0.0,
+      roomService: 805.00,
+      restaurant: 28651.00,
+      takeAway: 4337.00,
+      totalRevenueActual: 33793.00,
+      mtdFbRevenueActual: 53690.00,
+      restaurantComplimentary: 5.00,
+      totalBtcAmount: 0.00
+    };
+    setRollup(def);
+    try { playReceptionChime(); } catch (e) {}
+    showToast('✓ Operational metrics reset to Night Audit benchmark figures.');
+  };
+
   // Print Handover Voucher
   const handlePrintHandoverVoucher = () => {
     const win = window.open('', '_blank', 'width=550,height=720');
@@ -427,10 +468,10 @@ export default function IdsCashierShiftHandoverModal({
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '980px' : '880px',
-          maxWidth: isMaximized ? '96vw' : '94vw',
-          height: isMaximized ? '620px' : '560px',
-          maxHeight: isMaximized ? '92vh' : '88vh',
+          width: isMaximized ? '1040px' : '960px',
+          maxWidth: isMaximized ? '98vw' : '96vw',
+          height: isMaximized ? '660px' : '620px',
+          maxHeight: isMaximized ? '95vh' : '90vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',
@@ -498,22 +539,23 @@ export default function IdsCashierShiftHandoverModal({
                     setActiveShiftId(s.id);
                     saveStoredActiveShiftId(s.id);
                   }}
-                  className="ids-btn"
+                  className={`ids-btn ${isSelected ? 'info' : (isLocked ? 'success' : '')}`}
                   style={{
-                    padding: '3px 8px',
-                    fontSize: '10.5px',
-                    fontWeight: isSelected ? 800 : 500,
-                    background: isSelected ? '#0A246A' : (isLocked ? '#E8F5E9' : '#FFF'),
-                    color: isSelected ? '#FFF' : (isLocked ? '#2E7D32' : '#000'),
-                    borderColor: isSelected ? '#000' : '#808080',
+                    padding: '3px 10px',
+                    fontSize: '11px',
+                    fontWeight: isSelected ? 800 : 600,
+                    border: isSelected ? '2px inset #FFF' : '2px outset #FFF',
+                    background: isSelected ? '#0A246A' : (isLocked ? '#DCFCE7' : '#ECE9D8'),
+                    color: isSelected ? '#FFF' : (isLocked ? '#14532D' : '#000'),
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    gap: '5px',
+                    cursor: 'pointer'
                   }}
                 >
                   <span>{isLocked ? '🔒' : '🟢'}</span>
                   <span>{s.name}</span>
-                  <span style={{ fontSize: '9px', opacity: 0.85 }}>({s.cashierName.split(' ')[0]})</span>
+                  <span style={{ fontSize: '9.5px', opacity: 0.85 }}>({s.cashierName.split(' ')[0]})</span>
                 </button>
               );
             })}
@@ -531,45 +573,51 @@ export default function IdsCashierShiftHandoverModal({
         </div>
 
         {/* Main Tabs */}
-        <div style={{ display: 'flex', gap: '2px', padding: '6px 10px 0 10px', background: '#ECE9D8', borderBottom: '1px solid #999' }}>
+        <div style={{ display: 'flex', gap: '2px', padding: '6px 10px 0 10px', background: '#ECE9D8', borderBottom: '1px solid #716F64' }}>
           <button
             onClick={() => setActiveTab('handover')}
+            className={`ids-tab-btn ${activeTab === 'handover' ? 'active' : ''}`}
             style={{
-              padding: '4px 12px',
-              border: '1px solid #999',
-              borderBottom: activeTab === 'handover' ? '1px solid #ECE9D8' : '1px solid #999',
+              padding: '5px 14px',
+              border: '2px outset #FFFFFF',
+              borderBottom: activeTab === 'handover' ? '2px solid #ECE9D8' : '1px solid #716F64',
               background: activeTab === 'handover' ? '#ECE9D8' : '#D4D0C8',
               fontWeight: activeTab === 'handover' ? 700 : 500,
               fontSize: '11px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: activeTab === 'handover' ? '#0A246A' : '#333'
             }}
           >
             💵 Shift Handover & Float Count
           </button>
           <button
             onClick={() => setActiveTab('flash-report')}
+            className={`ids-tab-btn ${activeTab === 'flash-report' ? 'active' : ''}`}
             style={{
-              padding: '4px 12px',
-              border: '1px solid #999',
-              borderBottom: activeTab === 'flash-report' ? '1px solid #ECE9D8' : '1px solid #999',
+              padding: '5px 14px',
+              border: '2px outset #FFFFFF',
+              borderBottom: activeTab === 'flash-report' ? '2px solid #ECE9D8' : '1px solid #716F64',
               background: activeTab === 'flash-report' ? '#ECE9D8' : '#D4D0C8',
               fontWeight: activeTab === 'flash-report' ? 700 : 500,
               fontSize: '11px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: activeTab === 'flash-report' ? '#0A246A' : '#333'
             }}
           >
             📊 Daily Operations Flash Report (Client Format)
           </button>
           <button
             onClick={() => setActiveTab('history')}
+            className={`ids-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
             style={{
-              padding: '4px 12px',
-              border: '1px solid #999',
-              borderBottom: activeTab === 'history' ? '1px solid #ECE9D8' : '1px solid #999',
+              padding: '5px 14px',
+              border: '2px outset #FFFFFF',
+              borderBottom: activeTab === 'history' ? '2px solid #ECE9D8' : '1px solid #716F64',
               background: activeTab === 'history' ? '#ECE9D8' : '#D4D0C8',
               fontWeight: activeTab === 'history' ? 700 : 500,
               fontSize: '11px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              color: activeTab === 'history' ? '#0A246A' : '#333'
             }}
           >
             📜 3-Shift Synchronization Ledger
@@ -912,143 +960,352 @@ export default function IdsCashierShiftHandoverModal({
           </div>
         )}
 
-        {/* Tab 2: Flash Report (Exact Client WhatsApp Format) */}
+        {/* Tab 2: Flash Report (Win32 Structured Operational DataGrid & WhatsApp Broadcast) */}
         {activeTab === 'flash-report' && (
-          <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ background: '#FFFBE6', border: '1px solid #FFE58F', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', flex: 1 }}>
+            
+            {/* Top Operational KPI Summary Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+              {/* Card 1: Room Inventory & Occupancy */}
+              <div style={{ background: '#FFF', border: '2px outset #FFF', padding: '6px 8px', boxShadow: 'inset 0 0 0 1px #808080' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #D4D0C8', paddingBottom: '2px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '10.5px', color: '#0A246A' }}>🏨 ROOMS &amp; OCCUPANCY</span>
+                  <span style={{ fontSize: '9.5px', color: '#666' }}>FO Rack Sync</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '4px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#1B5E20' }}>{rollup.occupancy}% Occ</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#0A246A' }}>ARR: ₹{Math.round(rollup.arrActual || 0).toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#555', marginTop: '2px' }}>
+                  Avail: <strong>{rollup.totalRoomsAvailable}</strong> | Saleable: <strong>{rollup.totalRoomsSaleable}</strong> | Hold: <strong>{rollup.mgmHold ?? 0}</strong> | Maint: <strong>{rollup.underMaintenance ?? 0}</strong>
+                </div>
+              </div>
+
+              {/* Card 2: Food & Beverage Outlets */}
+              <div style={{ background: '#FFF', border: '2px outset #FFF', padding: '6px 8px', boxShadow: 'inset 0 0 0 1px #808080' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #D4D0C8', paddingBottom: '2px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '10.5px', color: '#0A246A' }}>🍽️ F&amp;B OUTLETS BREAKDOWN</span>
+                  <span style={{ fontSize: '9.5px', color: '#666' }}>POS Rollover</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '4px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#B71C1C' }}>
+                    ₹{((Number(rollup.roomService) || 0) + (Number(rollup.restaurant) || 0) + (Number(rollup.takeAway) || 0)).toLocaleString('en-IN')}
+                  </span>
+                  <span style={{ fontSize: '10px', color: '#666' }}>Comp: <strong>{rollup.restaurantComplimentary ?? 5}</strong></span>
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#555', marginTop: '2px' }}>
+                  Dine-In: ₹{Number(rollup.restaurant || 0).toLocaleString('en-IN')} | Parcel: ₹{Number(rollup.takeAway || 0).toLocaleString('en-IN')} | RS: ₹{Number(rollup.roomService || 0).toLocaleString('en-IN')}
+                </div>
+              </div>
+
+              {/* Card 3: Financial Rollup & MTD */}
+              <div style={{ background: '#FFF', border: '2px outset #FFF', padding: '6px 8px', boxShadow: 'inset 0 0 0 1px #808080' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #D4D0C8', paddingBottom: '2px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '10.5px', color: '#0A246A' }}>💰 DAILY REVENUE &amp; MTD</span>
+                  <span style={{ fontSize: '9.5px', color: '#2E7D32', fontWeight: 700 }}>07:30 AM Verified</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '4px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#0D47A1' }}>₹{Number(rollup.totalRevenueActual || 0).toLocaleString('en-IN')}</span>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: '#4A148C' }}>MTD: ₹{Number(rollup.mtdFbRevenueActual || 0).toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ fontSize: '9.5px', color: '#555', marginTop: '2px' }}>
+                  Corporate BTC: ₹{Number(rollup.totalBtcAmount || 0).toLocaleString('en-IN')} | Date: <strong>{selectedDate}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Split Section: Left = Win32 Table Grid | Right = WhatsApp Broadcast */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 390px', gap: '8px', minHeight: '340px' }}>
+              
+              {/* Left Column: Win32 Structured Operational DataGrid */}
+              <div style={{ background: '#FFF', border: '1px solid #7F9DB9', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ background: 'linear-gradient(180deg, #ECE9D8 0%, #D4D0C8 100%)', borderBottom: '1px solid #999', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: '11px', color: '#0A246A' }}>
+                    📊 Operational Flash Metrics &amp; Audit Overrides (Excel Grid Style)
+                  </span>
+                  <span style={{ fontSize: '9.5px', color: '#555' }}>Double-click to edit cell values</span>
+                </div>
+
+                <div style={{ overflowY: 'auto', flex: 1, maxHeight: '275px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                    <thead style={{ position: 'sticky', top: 0, background: '#F0EDE5', borderBottom: '1px solid #808080', zIndex: 1 }}>
+                      <tr>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #CCC', fontSize: '10px', color: '#333' }}>Metric Category / Field</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'right', borderRight: '1px solid #CCC', width: '100px', fontSize: '10px', color: '#333' }}>Current Value</th>
+                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '130px', fontSize: '10px', color: '#333' }}>Sync Source</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Section 1: Room Inventory & Occupancy */}
+                      <tr style={{ background: '#E3F2FD', fontWeight: 700, color: '#0A246A', borderBottom: '1px solid #BBDEFB' }}>
+                        <td colSpan={3} style={{ padding: '3px 6px', fontSize: '10.5px' }}>1. ROOM INVENTORY &amp; OCCUPANCY YIELD</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Total Rooms Available</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.totalRoomsAvailable} 
+                            onChange={e => setRollup(prev => ({ ...prev, totalRoomsAvailable: parseInt(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Hotel Elite Master (22)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Total Rooms Saleable</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.totalRoomsSaleable} 
+                            onChange={e => setRollup(prev => ({ ...prev, totalRoomsSaleable: parseInt(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Vacant Ready (5)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>ARR Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.arrActual} 
+                            onChange={e => setRollup(prev => ({ ...prev, arrActual: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9', fontWeight: 600 }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Average Room Rate (₹1611)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Occupancy (%)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.occupancy} 
+                            onChange={e => setRollup(prev => ({ ...prev, occupancy: parseInt(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9', fontWeight: 700, color: '#1B5E20' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Night Audit Closed (18%)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Management Hold / Maintenance / OOO</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <span style={{ fontSize: '10px', color: '#555' }}>
+                            {rollup.mgmHold ?? 0} / {rollup.underMaintenance ?? 0} / {Number(rollup.outOfOrder ?? 0).toFixed(1)}
+                          </span>
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Housekeeping Rack Sync</td>
+                      </tr>
+
+                      {/* Section 2: Food & Beverage Outlets */}
+                      <tr style={{ background: '#FFF3E0', fontWeight: 700, color: '#E65100', borderBottom: '1px solid #FFE0B2' }}>
+                        <td colSpan={3} style={{ padding: '3px 6px', fontSize: '10.5px' }}>2. FOOD &amp; BEVERAGE (F&amp;B) OUTLETS BREAKDOWN</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Room Service Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.roomService} 
+                            onChange={e => setRollup(prev => ({ ...prev, roomService: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>In-Room Dining KOT</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Restaurant Dine-In Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.restaurant} 
+                            onChange={e => setRollup(prev => ({ ...prev, restaurant: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9', fontWeight: 600 }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Elite Dine Restaurant POS</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Take Away / Parcel Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.takeAway} 
+                            onChange={e => setRollup(prev => ({ ...prev, takeAway: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Parcel / Counter Sale</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Restaurant Complimentary Items</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.restaurantComplimentary} 
+                            onChange={e => setRollup(prev => ({ ...prev, restaurantComplimentary: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Management NC / VIP Tea</td>
+                      </tr>
+
+                      {/* Section 3: Revenue Aggregation & Ledger */}
+                      <tr style={{ background: '#E8F5E9', fontWeight: 700, color: '#1B5E20', borderBottom: '1px solid #C8E6C9' }}>
+                        <td colSpan={3} style={{ padding: '3px 6px', fontSize: '10.5px' }}>3. FINANCIAL TOTALS &amp; CUMULATIVE (MTD)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#F1F8E9' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE', fontWeight: 700 }}>Total Revenue Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.totalRevenueActual} 
+                            onChange={e => setRollup(prev => ({ ...prev, totalRevenueActual: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9', fontWeight: 800, color: '#1B5E20' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#2E7D32', fontWeight: 600 }}>Daily Gross Master (₹33,793)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>MTD F&amp;B Revenue Actual (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.mtdFbRevenueActual} 
+                            onChange={e => setRollup(prev => ({ ...prev, mtdFbRevenueActual: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9', fontWeight: 600 }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Month-to-Date (₹53,690)</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                        <td style={{ padding: '3px 6px', borderRight: '1px solid #EEE' }}>Total BTC Amount (₹)</td>
+                        <td style={{ padding: '2px 4px', textAlign: 'right', borderRight: '1px solid #EEE' }}>
+                          <input 
+                            type="number" 
+                            value={rollup.totalBtcAmount} 
+                            onChange={e => setRollup(prev => ({ ...prev, totalBtcAmount: parseFloat(e.target.value) || 0 }))}
+                            style={{ width: '80px', padding: '1px 3px', textAlign: 'right', fontSize: '11px', border: '1px solid #7F9DB9' }}
+                          />
+                        </td>
+                        <td style={{ padding: '3px 6px', fontSize: '9.5px', color: '#666' }}>Bill to Company Ledger</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Table Bottom Action Toolbar */}
+                <div style={{ background: '#ECE9D8', borderTop: '1px solid #D4D0C8', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button 
+                      onClick={handleAutoCalcFlashTotals}
+                      className="ids-btn info"
+                      style={{ fontSize: '10.5px', padding: '2px 6px', fontWeight: 600 }}
+                      title="Automatically sum up F&B room service, restaurant, and takeaway outlets"
+                    >
+                      ⚡ Auto-Sum Outlets
+                    </button>
+                    <button 
+                      onClick={handleResetFlashDefaults}
+                      className="ids-btn warning modify"
+                      style={{ fontSize: '10.5px', padding: '2px 6px' }}
+                      title="Reset numbers to authentic benchmark Night Audit figures"
+                    >
+                      🔄 Reset Benchmark
+                    </button>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const updated = {
+                        ...records,
+                        [selectedDate]: {
+                          ...currentDayData,
+                          dailyRollup: rollup
+                        }
+                      };
+                      setRecords(updated);
+                      saveStoredShiftRecords(updated);
+                      try { playSuccessChime(); } catch (e) {}
+                      showToast('✓ Operational metrics saved & synchronized to database!');
+                    }}
+                    className="ids-btn success save"
+                    style={{ fontSize: '10.5px', padding: '2px 10px', fontWeight: 800 }}
+                  >
+                    💾 Save Metrics
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: WhatsApp Official Management Broadcast Card */}
+              <div style={{ background: '#0B141A', border: '1px solid #2A3942', borderRadius: '4px', display: 'flex', flexDirection: 'column', boxShadow: '2px 2px 8px rgba(0,0,0,0.4)', overflow: 'hidden' }}>
+                <div style={{ background: '#1F2C34', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #2A3942' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '14px' }}>📱</span>
+                    <div>
+                      <div style={{ color: '#E9EDEF', fontWeight: 700, fontSize: '11px', letterSpacing: '0.3px' }}>
+                        WhatsApp Morning Briefing
+                      </div>
+                      <div style={{ color: '#8696A0', fontSize: '9px' }}>
+                        Hotel Elite Inn — GM &amp; Management Group (07:30 AM)
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ background: '#00A884', color: '#111B21', fontWeight: 800, fontSize: '9px', padding: '1px 5px', borderRadius: '3px' }}>
+                    LIVE
+                  </span>
+                </div>
+
+                {/* Monospace Preview Box matching Client's Format */}
+                <div style={{ 
+                  flex: 1, 
+                  padding: '10px 12px', 
+                  fontFamily: 'Consolas, Courier New, monospace', 
+                  fontSize: '11px', 
+                  lineHeight: '1.45', 
+                  color: '#25D366', 
+                  background: '#111B21',
+                  overflowY: 'auto',
+                  whiteSpace: 'pre-wrap',
+                  userSelect: 'text'
+                }}>
+                  {formatClientMorningBriefing(rollup)}
+                </div>
+
+                {/* WhatsApp Card Footer */}
+                <div style={{ background: '#1F2C34', borderTop: '1px solid #2A3942', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#8696A0', fontSize: '9.5px' }}>
+                    ● 100% formatted for clipboard
+                  </span>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button 
+                      onClick={handleCopyWhatsAppBriefing}
+                      className="ids-btn success"
+                      style={{ 
+                        background: '#00A884', 
+                        color: '#FFF', 
+                        fontWeight: 800, 
+                        fontSize: '10.5px', 
+                        padding: '3px 8px',
+                        borderColor: '#02735E'
+                      }}
+                      title="Copy exact formatted morning report text to clipboard"
+                    >
+                      📋 Copy WhatsApp Briefing
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Status / Tip Line */}
+            <div style={{ background: '#F5F4EC', padding: '4px 8px', border: '1px solid #D0CDC0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: '#555' }}>
               <div>
-                <span style={{ fontWeight: 800, color: '#B8860B', fontSize: '11.5px' }}>
-                  📱 Daily Operations Morning Flash Report (Exact WhatsApp Broadcast)
-                </span>
-                <div style={{ fontSize: '10px', color: '#666' }}>
-                  Generated at 07:30 AM rollover. Click "Copy WhatsApp Briefing" to paste directly into hotel group chats.
-                </div>
+                💡 <strong>Audit Routine:</strong> At 07:30 AM, Shift 3 Night Auditor verifies Room Rack, seals POS day-end, and copies this Briefing directly to hotel WhatsApp group.
               </div>
-              <button 
-                onClick={handleCopyWhatsAppBriefing}
-                className="ids-btn success"
-                style={{ padding: '4px 10px', fontWeight: 800 }}
-              >
-                📋 Copy WhatsApp Briefing
-              </button>
-            </div>
-
-            {/* Display Box matching Notebook Format */}
-            <div style={{ background: '#1E293B', color: '#E2E8F0', padding: '14px', borderRadius: '4px', fontFamily: 'Courier New, Courier, monospace', fontSize: '12px', lineHeight: '1.5', whiteSpace: 'pre-wrap', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.5)' }}>
-              {formatClientMorningBriefing(rollup)}
-            </div>
-
-            {/* Editable Controls Grid to update metrics */}
-            <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ fontWeight: 700, fontSize: '11px', color: '#0A246A', borderBottom: '1px solid #D4D0C8', paddingBottom: '3px' }}>
-                Operational Metric Overrides (Synchronized with IDS Night Audit & POS):
+              <div style={{ fontWeight: 600 }}>
+                Status: <span style={{ color: '#2E7D32' }}>● Synchronized with Shift 3 Handover</span>
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Available Rooms:</span>
-                  <input 
-                    type="number" 
-                    value={rollup.totalRoomsAvailable} 
-                    onChange={e => setRollup(prev => ({ ...prev, totalRoomsAvailable: parseInt(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Saleable Rooms:</span>
-                  <input 
-                    type="number" 
-                    value={rollup.totalRoomsSaleable} 
-                    onChange={e => setRollup(prev => ({ ...prev, totalRoomsSaleable: parseInt(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>ARR Actual (₹):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.arrActual} 
-                    onChange={e => setRollup(prev => ({ ...prev, arrActual: parseFloat(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Occupancy (%):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.occupancy} 
-                    onChange={e => setRollup(prev => ({ ...prev, occupancy: parseInt(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Room Service (₹):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.roomService} 
-                    onChange={e => setRollup(prev => ({ ...prev, roomService: parseFloat(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Restaurant Dining (₹):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.restaurant} 
-                    onChange={e => setRollup(prev => ({ ...prev, restaurant: parseFloat(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Take Away / Parcel (₹):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.takeAway} 
-                    onChange={e => setRollup(prev => ({ ...prev, takeAway: parseFloat(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box' }}
-                  />
-                </div>
-                <div>
-                  <span style={{ fontSize: '10px', color: '#666' }}>Total Revenue (₹):</span>
-                  <input 
-                    type="number" 
-                    value={rollup.totalRevenueActual} 
-                    onChange={e => setRollup(prev => ({ ...prev, totalRevenueActual: parseFloat(e.target.value) || 0 }))}
-                    style={{ width: '100%', padding: '2px 4px', fontSize: '11px', border: '1px solid #7F9DB9', boxSizing: 'border-box', fontWeight: 700 }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
-              <button 
-                onClick={() => {
-                  const updated = {
-                    ...records,
-                    [selectedDate]: {
-                      ...currentDayData,
-                      dailyRollup: rollup
-                    }
-                  };
-                  setRecords(updated);
-                  saveStoredShiftRecords(updated);
-                  showToast('✓ Flash report updated & synchronized!');
-                }}
-                className="ids-btn"
-                style={{ minWidth: '90px' }}
-              >
-                Save Metrics
-              </button>
-              <button 
-                onClick={handleCopyWhatsAppBriefing}
-                className="ids-btn info"
-                style={{ minWidth: '110px', fontWeight: 700 }}
-              >
-                📋 Copy Broadcast
-              </button>
             </div>
           </div>
         )}

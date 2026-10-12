@@ -1189,7 +1189,7 @@ export default function IdsDesktopShell({
       { 
         label: 'Daily Operations Morning Handover & Flash Report', 
         videoId: 'SHIFT-02', 
-        action: () => openCashierShiftHandover('flash-report') 
+        action: () => openCashierShiftHandover('handover') 
       },
       { 
         label: '3-Shift Handover & Dryer Float Lock (FO-01/02/03)', 
