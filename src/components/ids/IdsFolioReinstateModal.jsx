@@ -442,13 +442,10 @@ export default function IdsFolioReinstateModal({
               {/* Action Buttons matching Frame 055 */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ 
                     width: '90px', 
-                    fontWeight: 700, 
-                    color: '#0A246A',
-                    background: '#FFE8A1',
-                    borderColor: '#316AC5'
+                    fontWeight: 700
                   }}
                   onClick={handleReinstateClick}
                   disabled={foliosList.length === 0}
@@ -458,7 +455,7 @@ export default function IdsFolioReinstateModal({
                 </button>
 
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ width: '80px' }}
                   onClick={onClose}
                 >
@@ -528,8 +525,8 @@ export default function IdsFolioReinstateModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ fontWeight: 700, color: '#006600', background: '#D4EDDA' }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ fontWeight: 700 }}
                   onClick={() => {
                     if (onClearRoom) onClearRoom(selectedFolio.roomNo);
                     setCurrentView('reinstate-dialog');
@@ -539,7 +536,7 @@ export default function IdsFolioReinstateModal({
                   ✓ Clear Room & Proceed to Reinstate
                 </button>
                 <button 
-                  className="ids-btn-classic"
+                  className="ids-btn-classic cancel"
                   onClick={() => setCurrentView('reinstate-dialog')}
                 >
                   Cancel
@@ -634,14 +631,14 @@ export default function IdsFolioReinstateModal({
             {/* Buttons */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', paddingBottom: '14px' }}>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 style={{ width: '75px', fontWeight: 700 }}
                 onClick={handleExecuteReinstate}
               >
                 Yes
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic cancel" 
                 style={{ width: '75px' }}
                 onClick={() => setShowConfirmModal(false)}
               >
@@ -723,7 +720,7 @@ export default function IdsFolioReinstateModal({
 
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ width: '80px' }}
                   onClick={() => setActiveDetailFolio(null)}
                 >

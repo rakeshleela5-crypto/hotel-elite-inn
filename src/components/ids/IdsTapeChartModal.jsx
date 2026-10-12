@@ -527,7 +527,7 @@ export default function IdsTapeChartModal({
           {/* Navigation Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic info" 
               onClick={() => handleShiftDate(-7)}
               title="Jump 1 Week Earlier"
               style={{ padding: '3px 8px', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: 600 }}
@@ -543,7 +543,7 @@ export default function IdsTapeChartModal({
               📅 Today ({new Date().toLocaleDateString('en-GB')})
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic info" 
               onClick={() => handleShiftDate(7)}
               title="Jump 1 Week Later"
               style={{ padding: '3px 8px', display: 'flex', alignItems: 'center', gap: '3px', fontSize: '11px', fontWeight: 600 }}
@@ -625,11 +625,11 @@ export default function IdsTapeChartModal({
 
             {/* Refresh Cloud Button */}
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic refresh info" 
               onClick={refreshCloudReservations}
               disabled={isRefreshingCloud}
               title="Re-query live Railway PostgreSQL database"
-              style={{ padding: '3px 8px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px', background: '#00695C', color: '#FFF' }}
+              style={{ padding: '3px 8px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <RefreshCw size={12} className={isRefreshingCloud ? 'spin' : ''} />
               <span>{isRefreshingCloud ? 'Syncing...' : 'Sync Cloud'}</span>
@@ -637,9 +637,9 @@ export default function IdsTapeChartModal({
 
             {/* Direct Advance Reservation Button */}
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               onClick={() => handleOpenBookingDialog('101', startDateStr)}
-              style={{ padding: '3px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px', background: '#D32F2F', color: '#FFF', fontWeight: 700 }}
+              style={{ padding: '3px 10px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
             >
               <Plus size={14} />
               <span>New Advance Res</span>
@@ -1217,7 +1217,7 @@ export default function IdsTapeChartModal({
                 {/* Dialog Action Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic cancel" 
                     onClick={() => setBookingDialogOpen(false)}
                     disabled={isSavingBooking}
                     style={{ padding: '5px 14px', minWidth: '80px' }}
@@ -1225,10 +1225,10 @@ export default function IdsTapeChartModal({
                     Cancel
                   </button>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic save success" 
                     onClick={handleSaveAdvanceBooking}
                     disabled={isSavingBooking}
-                    style={{ padding: '5px 18px', background: '#2E7D32', color: '#FFF', fontWeight: 700, minWidth: '120px' }}
+                    style={{ padding: '5px 18px', fontWeight: 700, minWidth: '120px' }}
                   >
                     {isSavingBooking ? 'Saving to Cloud...' : '✔ [F10] Save & Lock'}
                   </button>
@@ -1319,18 +1319,18 @@ export default function IdsTapeChartModal({
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
                   {onOpenFolio && (
                     <button 
-                      className="ids-btn-classic" 
+                      className="ids-btn-classic folio info" 
                       onClick={() => {
                         onOpenFolio(inspectedBooking.roomNumber);
                         setInspectedBooking(null);
                       }}
-                      style={{ background: '#0A246A', color: '#FFF', fontWeight: 600 }}
+                      style={{ fontWeight: 600 }}
                     >
                       View Guest Folio
                     </button>
                   )}
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic exit danger" 
                     onClick={() => setInspectedBooking(null)}
                     style={{ minWidth: '70px', fontWeight: 700 }}
                   >

@@ -1695,14 +1695,14 @@ export default function IdsTouchPosTerminalModal({
                     window.print();
                     setThermalKotModalOpen(false);
                   }}
-                  className="ids-btn-classic"
-                  style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic print success"
+                  style={{ fontWeight: 700 }}
                 >
                   Print to Thermal Printer
                 </button>
                 <button 
                   onClick={() => setThermalKotModalOpen(false)}
-                  className="ids-btn-classic"
+                  className="ids-btn-classic exit danger"
                 >
                   Close [Esc]
                 </button>
@@ -1762,14 +1762,14 @@ export default function IdsTouchPosTerminalModal({
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
                   onClick={handleExecuteTableMerge}
-                  className="ids-btn-classic" 
-                  style={{ background: '#7B1FA2', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ fontWeight: 700 }}
                 >
                   Execute Table Merge
                 </button>
                 <button 
                   onClick={() => setMergeTableModalOpen(false)}
-                  className="ids-btn-classic"
+                  className="ids-btn-classic cancel danger"
                 >
                   Cancel
                 </button>
@@ -1876,14 +1876,14 @@ export default function IdsTouchPosTerminalModal({
                     window.print();
                     setPrintBillModalOpen(false);
                   }}
-                  className="ids-btn-classic"
-                  style={{ background: '#0A246A', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic print info"
+                  style={{ fontWeight: 700 }}
                 >
                   Print Bill
                 </button>
                 <button 
                   onClick={() => setPrintBillModalOpen(false)}
-                  className="ids-btn-classic"
+                  className="ids-btn-classic exit danger"
                 >
                   Close
                 </button>
@@ -1989,14 +1989,14 @@ export default function IdsTouchPosTerminalModal({
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
                   onClick={handleExecuteSettlement}
-                  className="ids-btn-classic" 
-                  style={{ background: '#2E8B57', color: '#FFF', fontWeight: 700, padding: '7px 16px' }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ fontWeight: 700, padding: '7px 16px' }}
                 >
                   Confirm Settlement & Release Table
                 </button>
                 <button 
                   onClick={() => setSettlementModalOpen(false)}
-                  className="ids-btn-classic"
+                  className="ids-btn-classic cancel"
                 >
                   Cancel
                 </button>
@@ -2189,15 +2189,15 @@ export default function IdsTouchPosTerminalModal({
                 <button
                   type="button"
                   onClick={handleConfirmVoidItem}
-                  className="ids-btn-classic"
-                  style={{ background: '#8B0000', color: '#FFF', fontWeight: 700, padding: '6px 14px', fontSize: '11px', cursor: 'pointer' }}
+                  className="ids-btn-classic danger void"
+                  style={{ fontWeight: 700, padding: '6px 14px', fontSize: '11px', cursor: 'pointer' }}
                 >
                   ✓ Authorize & Void Item
                 </button>
                 <button
                   type="button"
                   onClick={() => setVoidModalOpen(false)}
-                  className="ids-btn-classic"
+                  className="ids-btn-classic cancel danger"
                   style={{ padding: '6px 14px', fontSize: '11px', cursor: 'pointer' }}
                 >
                   Cancel [Esc]

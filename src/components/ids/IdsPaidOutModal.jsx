@@ -272,7 +272,7 @@ export default function IdsPaidOutModal({
 
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic danger" 
                   style={{ background: '#C5221F', color: '#FFF', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => setCurrentStep('paidOutForm')}
                 >
@@ -286,7 +286,7 @@ export default function IdsPaidOutModal({
                 >
                   Bill Settle
                 </button>
-                <button className="ids-btn-classic" onClick={onClose}>Back</button>
+                <button className="ids-btn-classic exit danger" onClick={onClose}>Back</button>
               </div>
             </div>
 
@@ -389,13 +389,13 @@ export default function IdsPaidOutModal({
               }}
             >
               <button 
-                className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                className="ids-btn-classic save success" 
+                style={{ fontWeight: 700, minWidth: '70px' }}
                 onClick={handleSavePaidOut}
               >
                 Save
               </button>
-              <button className="ids-btn-classic" onClick={() => setCurrentStep('checkoutNegative')}>Cancel</button>
+              <button className="ids-btn-classic cancel" onClick={() => setCurrentStep('checkoutNegative')}>Cancel</button>
             </div>
 
           </div>
@@ -519,13 +519,13 @@ export default function IdsPaidOutModal({
 
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ background: '#137333', color: '#FFF', fontWeight: 800, minWidth: '90px' }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ minWidth: '90px', fontWeight: 800 }}
                   onClick={handleSettleAndCheckOut}
                 >
                   Bill Settle & Check-Out
                 </button>
-                <button className="ids-btn-classic" onClick={onClose}>Exit</button>
+                <button className="ids-btn-classic exit danger" onClick={onClose}>Exit</button>
               </div>
             </div>
 
@@ -565,8 +565,8 @@ export default function IdsPaidOutModal({
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
               {onOpenRoomRack && (
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ background: '#DCE6F1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
+                  className="ids-btn-classic info" 
+                  style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}
                   onClick={() => {
                     onClose();
                     onOpenRoomRack();
@@ -575,7 +575,7 @@ export default function IdsPaidOutModal({
                   <LayoutGrid size={13} /> View in Room Status Rack
                 </button>
               )}
-              <button className="ids-btn-classic" onClick={onClose}>
+              <button className="ids-btn-classic exit danger" onClick={onClose}>
                 Close PMS Window
               </button>
             </div>
@@ -647,8 +647,8 @@ export default function IdsPaidOutModal({
                   >
                     Crystal Reports Print
                   </button>
-                  <button className="ids-btn-classic" onClick={() => window.print()}>Quick Print</button>
-                  <button className="ids-btn-classic" onClick={() => setVoucherModalOpen(false)}>Close</button>
+                  <button className="ids-btn-classic print info" onClick={() => window.print()}>Quick Print</button>
+                  <button className="ids-btn-classic exit danger" onClick={() => setVoucherModalOpen(false)}>Close</button>
                 </div>
               </div>
             </div>

@@ -607,15 +607,15 @@ export default function IdsLaundryEntryModal({
 
           {/* Standard 9-Button Command Bar */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '14px' }}>
-            <button onClick={handleAdd} disabled={isAdding || isModifying} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Add</button>
-            <button onClick={() => { setIsModifying(true); setIsAdding(false); }} disabled={isAdding || isModifying} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Modify</button>
-            <button onClick={() => {}} disabled className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Delete</button>
-            <button onClick={() => {}} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Browse</button>
-            <button onClick={() => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); }} disabled={currentIndex <= 0} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Previous</button>
-            <button onClick={() => { if (currentIndex < entries.length - 1) setCurrentIndex(currentIndex + 1); }} disabled={currentIndex >= entries.length - 1} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Next</button>
-            <button onClick={handleSave} disabled={isFormLocked} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px', fontWeight: !isFormLocked ? 'bold' : 'normal' }}>Save</button>
-            <button onClick={() => { setIsAdding(false); setIsModifying(false); }} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Panel</button>
-            <button onClick={onClose} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
+            <button onClick={handleAdd} disabled={isAdding || isModifying} className="ids-btn success" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Add</button>
+            <button onClick={() => { setIsModifying(true); setIsAdding(false); }} disabled={isAdding || isModifying} className="ids-btn warning modify" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Modify</button>
+            <button onClick={() => {}} disabled className="ids-btn danger" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Delete</button>
+            <button onClick={() => {}} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Browse</button>
+            <button onClick={() => { if (currentIndex > 0) setCurrentIndex(currentIndex - 1); }} disabled={currentIndex <= 0} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Previous</button>
+            <button onClick={() => { if (currentIndex < entries.length - 1) setCurrentIndex(currentIndex + 1); }} disabled={currentIndex >= entries.length - 1} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Next</button>
+            <button onClick={handleSave} disabled={isFormLocked} className="ids-btn success save" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px', fontWeight: !isFormLocked ? 'bold' : 'normal' }}>Save</button>
+            <button onClick={() => { setIsAdding(false); setIsModifying(false); }} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Panel</button>
+            <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
           </div>
         </div>
 
@@ -661,8 +661,8 @@ export default function IdsLaundryEntryModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
-                  <button onClick={() => setStaffModalOpen(false)} className="ids-btn" style={{ padding: '2px 14px', fontSize: '11px' }}>Select</button>
-                  <button onClick={() => setStaffModalOpen(false)} className="ids-btn" style={{ padding: '2px 14px', fontSize: '11px' }}>Cancel</button>
+                  <button onClick={() => setStaffModalOpen(false)} className="ids-btn success confirm" style={{ padding: '2px 14px', fontSize: '11px' }}>Select</button>
+                  <button onClick={() => setStaffModalOpen(false)} className="ids-btn danger cancel" style={{ padding: '2px 14px', fontSize: '11px' }}>Cancel</button>
                 </div>
               </div>
             </div>
@@ -708,7 +708,7 @@ export default function IdsLaundryEntryModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                  <button onClick={() => setRoomLookupOpen(false)} className="ids-btn" style={{ padding: '2px 14px', fontSize: '11px' }}>Close</button>
+                  <button onClick={() => setRoomLookupOpen(false)} className="ids-btn exit danger" style={{ padding: '2px 14px', fontSize: '11px' }}>Close</button>
                 </div>
               </div>
             </div>

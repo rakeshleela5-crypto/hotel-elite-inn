@@ -291,26 +291,26 @@ export default function IdsLaundryBillPrintingModal({
             }}
           >
             <div style={{ display: 'flex', gap: '4px' }}>
-              <button className="ids-btn" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Tax Assessment: GST 18% (CGST 9% + SGST 9%) applied on laundry bill."); }}>VAT / GST</button>
-              <button onClick={handlePrint} className="ids-btn" style={{ padding: '3px 12px', fontSize: '11px', fontWeight: 'bold', background: '#DCE6F1' }}>Print</button>
-              <button className="ids-btn" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Split Bill Option: Generated Sub-Folio 1A and 1B."); }}>Split Bill</button>
-              <button className="ids-btn" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Split Qty: Item count allocated across split covers."); }}>Split Qty</button>
-              <button onClick={() => setDiscountModalOpen(true)} className="ids-btn" style={{ padding: '3px 10px', fontSize: '11px', fontWeight: 'bold' }}>Discount</button>
-              <button className="ids-btn" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Laundry Tax Breakdown: Service Net ₹600.00, Tax ₹108.00, Total ₹708.00."); }}>Tax</button>
-              <button className="ids-btn" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Previewing Laundry Bill Voucher format."); }}>View</button>
+              <button className="ids-btn info" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Tax Assessment: GST 18% (CGST 9% + SGST 9%) applied on laundry bill."); }}>VAT / GST</button>
+              <button onClick={handlePrint} className="ids-btn print info" style={{ padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}>Print</button>
+              <button className="ids-btn warning split" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Split Bill Option: Generated Sub-Folio 1A and 1B."); }}>Split Bill</button>
+              <button className="ids-btn warning split" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Split Qty: Item count allocated across split covers."); }}>Split Qty</button>
+              <button onClick={() => setDiscountModalOpen(true)} className="ids-btn warning modify" style={{ padding: '3px 10px', fontSize: '11px', fontWeight: 'bold' }}>Discount</button>
+              <button className="ids-btn info" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Laundry Tax Breakdown: Service Net ₹600.00, Tax ₹108.00, Total ₹708.00."); }}>Tax</button>
+              <button className="ids-btn info search" style={{ padding: '3px 8px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Previewing Laundry Bill Voucher format."); }}>View</button>
             </div>
 
-            <button onClick={handleSettle} className="ids-btn" style={{ padding: '3px 16px', fontSize: '11px', fontWeight: 'bold', background: '#D4EDDA', borderColor: '#28A745' }}>
+            <button onClick={handleSettle} className="ids-btn success confirm" style={{ padding: '3px 16px', fontSize: '11px', fontWeight: 'bold' }}>
               Settle to Room
             </button>
           </div>
 
           {/* Bottom Command Strip */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
-            <button className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Loaded latest pending laundry orders."); }}>Load</button>
-            <button className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); setRoomNo(''); setGuestName(''); alert("Cleared inputs."); }}>Clear</button>
-            <button className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Selector: Housekeeping & Laundry Controller."); }}>Panel</button>
-            <button onClick={onClose} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
+            <button className="ids-btn info refresh" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("Loaded latest pending laundry orders."); }}>Load</button>
+            <button className="ids-btn warning clear" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); setRoomNo(''); setGuestName(''); alert("Cleared inputs."); }}>Clear</button>
+            <button className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Selector: Housekeeping & Laundry Controller."); }}>Panel</button>
+            <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
           </div>
         </div>
 
@@ -373,8 +373,8 @@ export default function IdsLaundryBillPrintingModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
-                  <button onClick={handleApplyDiscount} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px', fontSize: '11px', fontWeight: 'bold' }}>Ok</button>
-                  <button onClick={() => setDiscountModalOpen(false)} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px', fontSize: '11px' }}>Back</button>
+                  <button onClick={handleApplyDiscount} className="ids-btn success confirm" style={{ minWidth: '70px', padding: '3px 14px', fontSize: '11px', fontWeight: 'bold' }}>Ok</button>
+                  <button onClick={() => setDiscountModalOpen(false)} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px', fontSize: '11px' }}>Back</button>
                 </div>
               </div>
             </div>

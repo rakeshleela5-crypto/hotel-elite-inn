@@ -514,16 +514,16 @@ export default function IdsNightAuditModal({
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic success save" 
                 onClick={handleExecuteStep1}
                 disabled={step1Running}
-                style={{ minWidth: '70px', fontWeight: 700, color: '#0A246A' }}
+                style={{ minWidth: '70px', fontWeight: 700 }}
               >
                 {step1Running ? 'Saving...' : 'Save'}
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => alert('Panel details: 8 in-house rooms queued for tariff posting.')}
               >
@@ -532,8 +532,8 @@ export default function IdsNightAuditModal({
               {step1Done && (
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '85px', background: '#316AC5', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ minWidth: '85px', fontWeight: 700 }}
                   onClick={() => setActiveStep(2)}
                 >
                   Next Step ➔
@@ -541,7 +541,7 @@ export default function IdsNightAuditModal({
               )}
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 onClick={onClose}
                 style={{ minWidth: '60px' }}
               >
@@ -652,16 +652,16 @@ export default function IdsNightAuditModal({
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 onClick={handleExecuteStep2}
                 disabled={step2Running}
-                style={{ minWidth: '70px', fontWeight: 700, color: '#0A246A' }}
+                style={{ minWidth: '70px', fontWeight: 700 }}
               >
                 {step2Running ? 'Calculating...' : 'Continue'}
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => alert('Panel: Inhouse balance consolidation ledger active.')}
               >
@@ -670,8 +670,8 @@ export default function IdsNightAuditModal({
               {step2Done && (
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '85px', background: '#316AC5', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ minWidth: '85px', fontWeight: 700 }}
                   onClick={() => setActiveStep(3)}
                 >
                   Next Step ➔
@@ -679,7 +679,7 @@ export default function IdsNightAuditModal({
               )}
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 onClick={onClose}
                 style={{ minWidth: '60px' }}
               >
@@ -775,15 +775,15 @@ export default function IdsNightAuditModal({
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 onClick={handleExecuteStep3}
-                style={{ minWidth: '70px', fontWeight: 700, color: '#0A246A' }}
+                style={{ minWidth: '70px', fontWeight: 700 }}
               >
                 Continue
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 onClick={onClose}
                 style={{ minWidth: '60px' }}
               >
@@ -936,18 +936,18 @@ export default function IdsNightAuditModal({
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 onClick={handleExecuteStep4}
                 disabled={step4Running || step4Done}
-                style={{ minWidth: '70px', fontWeight: 700, color: step4Done ? '#888' : '#0A246A' }}
+                style={{ minWidth: '70px', fontWeight: 700 }}
               >
                 {step4Running ? 'Opening...' : 'Open'}
               </button>
               {step4Done && (
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '100px', background: '#316AC5', color: '#FFF', fontWeight: 700 }}
+                  className="ids-btn-classic info" 
+                  style={{ minWidth: '100px', fontWeight: 700 }}
                   onClick={() => setShowInfoModal(true)}
                 >
                   Verify in Info ➔
@@ -955,7 +955,7 @@ export default function IdsNightAuditModal({
               )}
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic danger cancel" 
                 onClick={onClose}
                 style={{ minWidth: '60px' }}
               >
@@ -1077,7 +1077,7 @@ export default function IdsNightAuditModal({
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   onClick={() => setShowInfoModal(false)}
                   style={{ minWidth: '60px', fontWeight: 700 }}
                 >

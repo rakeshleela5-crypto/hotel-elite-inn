@@ -238,11 +238,8 @@ export default function IdsCancelCheckInModal({
                       <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{row.group}</td>
                       <td style={{ padding: '2px 4px', textAlign: 'center' }}>
                         <button 
-                          className="ids-btn-classic" 
+                          className="ids-btn-classic danger cancel" 
                           style={{ 
-                            background: '#FCE8E6', 
-                            color: '#C5221F', 
-                            border: '1px solid #D93025', 
                             fontWeight: 900, 
                             padding: '1px 8px',
                             cursor: 'pointer'
@@ -293,11 +290,11 @@ export default function IdsCancelCheckInModal({
 
             <div style={{ display: 'flex', gap: '6px' }}>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => alert("Cancel Check-in Control Panel: Room status and key card access revocation verified.")}
               >Panel</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 
@@ -356,13 +353,13 @@ export default function IdsCancelCheckInModal({
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                   <button 
-                    className="ids-btn-classic" 
-                    style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                    className="ids-btn-classic success confirm" 
+                    style={{ fontWeight: 700, minWidth: '70px' }}
                     onClick={handleConfirmCancelCheckIn}
                   >
                     Ok
                   </button>
-                  <button className="ids-btn-classic" onClick={() => setReasonModalOpen(false)}>
+                  <button className="ids-btn-classic cancel" onClick={() => setReasonModalOpen(false)}>
                     Cancel
                   </button>
                 </div>

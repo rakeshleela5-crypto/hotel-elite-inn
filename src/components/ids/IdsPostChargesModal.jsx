@@ -635,12 +635,12 @@ export default function IdsPostChargesModal({
                 marginTop: '8px'
               }}
             >
-              <button type="button" className="ids-btn-classic" onClick={handleAddNew} style={{ minWidth: '55px' }}>
+              <button type="button" className="ids-btn-classic primary success" onClick={handleAddNew} style={{ minWidth: '55px' }}>
                 Add
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic warning modify" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
                   const amt = prompt("Modify Charge Amount (INR):", charges);
@@ -651,7 +651,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic danger void" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
                   if (confirm(`Remove charge (${revenueCode} - ₹${charges}) from posting queue?`)) {
@@ -664,7 +664,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => alert(`📂 Browsing posted charges journal for Room ${roomNo}: All vouchers synchronized.`)}
               >
@@ -672,7 +672,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
                   const codes = REVENUE_CODES_DATA.map(r => r.code);
@@ -684,7 +684,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => {
                   const codes = REVENUE_CODES_DATA.map(r => r.code);
@@ -696,7 +696,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic save success" 
                 style={{ minWidth: '55px', fontWeight: 700, color: '#0A246A' }}
                 onClick={handleSaveCharge}
               >
@@ -704,7 +704,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => setCurrentView(currentView === 'post-charges' ? 'quick-balances' : 'post-charges')}
               >
@@ -712,8 +712,8 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
-                style={{ minWidth: '95px', background: '#FFF7CC', fontWeight: 700 }}
+                className="ids-btn-classic warning" 
+                style={{ minWidth: '95px', fontWeight: 700 }}
                 onClick={() => setCurrentView('quick-balances')}
                 title="Verify Folio Ledger in Quick Balances (Video 21 Frame 065)"
               >
@@ -721,7 +721,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 style={{ minWidth: '55px' }}
                 onClick={onClose}
               >
@@ -929,15 +929,15 @@ export default function IdsPostChargesModal({
             >
               <button 
                 type="button" 
-                className="ids-btn-classic"
+                className="ids-btn-classic info"
                 onClick={() => setCurrentView('post-charges')}
-                style={{ fontWeight: 600, color: '#0A246A' }}
+                style={{ fontWeight: 600 }}
               >
                 ◀ Post Another Room Charge
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '70px' }}
                 onClick={() => {
                   const totalPosted = postedCharges.reduce((acc, c) => acc + (c.total || 0), 0);
@@ -948,7 +948,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic warning clear" 
                 style={{ minWidth: '60px' }}
                 onClick={() => {
                   setCharges('0.00');
@@ -960,7 +960,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => setCurrentView('post-charges')}
               >
@@ -968,7 +968,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 style={{ minWidth: '60px', fontWeight: 700 }}
                 onClick={onClose}
               >
@@ -1002,15 +1002,15 @@ export default function IdsPostChargesModal({
               <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
-                  style={{ minWidth: '70px', fontWeight: 700, background: '#316AC5', color: '#FFF' }}
+                  className="ids-btn-classic success confirm" 
+                  style={{ minWidth: '70px', fontWeight: 700 }}
                   onClick={() => handleConfirmPrintPrompt(true)}
                 >
                   Yes
                 </button>
                 <button 
                   type="button"
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic cancel" 
                   style={{ minWidth: '70px' }}
                   onClick={() => handleConfirmPrintPrompt(false)}
                 >
@@ -1124,8 +1124,8 @@ export default function IdsPostChargesModal({
             <div style={{ background: '#ECE9D8', padding: '8px 12px', display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #716F64' }}>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
-                style={{ fontWeight: 700, color: '#0A246A' }}
+                className="ids-btn-classic print info" 
+                style={{ fontWeight: 700 }}
                 onClick={() => {
                   alert(`🖨️ Voucher No.${savedVoucherData?.receiptNo || receiptNo} printed to Front Desk thermal printer.`);
                   setShowVoucherPreview(false);
@@ -1135,7 +1135,7 @@ export default function IdsPostChargesModal({
               </button>
               <button 
                 type="button" 
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 onClick={() => setShowVoucherPreview(false)}
               >
                 Close Preview

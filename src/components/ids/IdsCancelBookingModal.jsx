@@ -88,14 +88,14 @@ export function IdsCancelBookingDialog({
           {/* Bottom OK / Cancel */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '70px', fontWeight: 700 }}
               onClick={() => onProceed({ cancelYes })}
             >
               Ok
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic cancel" 
               style={{ minWidth: '70px' }}
               onClick={onClose}
             >
@@ -141,21 +141,21 @@ export function IdsDepositWarningDialog({
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic warning" 
               style={{ minWidth: '75px', fontWeight: 700, color: '#A02020' }}
               onClick={onRefund}
             >
               Refund
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '65px' }}
               onClick={onProceedWithoutRefund}
             >
               Ok
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic cancel" 
               style={{ minWidth: '65px' }}
               onClick={onClose}
             >
@@ -382,30 +382,30 @@ export function IdsDepositRefundModal({
 
           {/* Bottom Action Ribbon from Frame 022 & 028 */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #D0CDC0' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancel reason entry added to queue."); }}>Add</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancellation reasons unlocked for edit."); }}>Modify</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cleared cancellation reason."); }}>Delete</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Browse cancellation archive."); }}>Browse</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to previous cancellation record."); }}>Previous</button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to next cancellation record."); }}>Next</button>
+            <button className="ids-btn-classic primary success" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancel reason entry added to queue."); }}>Add</button>
+            <button className="ids-btn-classic warning modify" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cancellation reasons unlocked for edit."); }}>Modify</button>
+            <button className="ids-btn-classic danger void" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Cleared cancellation reason."); }}>Delete</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Browse cancellation archive."); }}>Browse</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to previous cancellation record."); }}>Previous</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("Navigating to next cancellation record."); }}>Next</button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic save success" 
               style={{ minWidth: '65px', fontWeight: 700, color: '#0A246A' }}
               onClick={handleSave}
             >
               <u>S</u>ave
             </button>
-            <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("PMS Navigation Panel: Cancellation Journal."); }}>Panel</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("PMS Navigation Panel: Cancellation Journal."); }}>Panel</button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic exit danger" 
               style={{ minWidth: '55px' }}
               onClick={onClose}
             >
               <u>E</u>xit
             </button>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI): Cancellation Policy & Retention Audit Rules active."); }}>GI</button>
-              <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => { playSuccessChime(); alert("Reloaded Cancel Booking Module V6.5002.5."); }}>Load Pgm</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI): Cancellation Policy & Retention Audit Rules active."); }}>GI</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '70px' }} onClick={() => { playSuccessChime(); alert("Reloaded Cancel Booking Module V6.5002.5."); }}>Load Pgm</button>
             </div>
           </div>
         </div>
@@ -511,7 +511,7 @@ export function IdsCancelReasonModal({
             {/* OK button from frame 030 */}
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '14px' }}>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 style={{ minWidth: '80px', fontWeight: 700 }}
                 onClick={handleConfirm}
               >
@@ -540,7 +540,7 @@ export function IdsCancelReasonModal({
                 onChange={(e) => setCustomReasonText(e.target.value)}
               />
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
-                <button className="ids-btn-classic" onClick={() => setFreeFlowOpen(false)}>Ok</button>
+                <button className="ids-btn-classic success confirm" onClick={() => setFreeFlowOpen(false)}>Ok</button>
               </div>
             </div>
           </div>
@@ -572,7 +572,7 @@ export function IdsBlockedRoomWarningDialog({
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '70px', fontWeight: 700 }}
               onClick={onOk}
             >
@@ -617,14 +617,14 @@ export function IdsCancelVoucherPromptDialog({
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '18px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '65px', fontWeight: 700 }}
               onClick={onYes}
             >
               Yes
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic cancel" 
               style={{ minWidth: '65px' }}
               onClick={onNo}
             >
@@ -741,7 +741,7 @@ export function IdsCancellationVoucherModal({
         {/* Voucher Action Footer */}
         <div style={{ background: '#ECE9D8', borderTop: '1px solid #D0CDC0', padding: '10px 14px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
           <button 
-            className="ids-btn-classic" 
+            className="ids-btn-classic print info" 
             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
             onClick={handlePrint}
           >
@@ -749,7 +749,7 @@ export function IdsCancellationVoucherModal({
             <span>Print</span>
           </button>
           <button 
-            className="ids-btn-classic" 
+            className="ids-btn-classic exit danger" 
             style={{ minWidth: '70px' }}
             onClick={onClose}
           >

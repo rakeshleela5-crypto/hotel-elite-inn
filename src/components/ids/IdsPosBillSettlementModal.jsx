@@ -736,14 +736,14 @@ export default function IdsPosBillSettlementModal({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
             {/* Row 1 */}
             <button 
-              className="ids-btn" 
+              className="ids-btn success" 
               onClick={handleOpenCashModal}
               style={{ fontWeight: 700, padding: '5px 4px', fontSize: '11px' }}
             >
               <u>C</u>ash
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               onClick={handleForexSettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Settle in USD / Foreign Currency with real-time conversion"
@@ -751,7 +751,7 @@ export default function IdsPosBillSettlementModal({
               <u>F</u>oreign Exchange
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               onClick={handlePlanSettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Post to Room Meal Inclusion Plan (CP / MAP / AP)"
@@ -759,16 +759,16 @@ export default function IdsPosBillSettlementModal({
               <u>P</u>lan
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               onClick={handleOpenCardModal}
-              style={{ fontWeight: 700, padding: '5px 4px', fontSize: '11px', color: '#000080' }}
+              style={{ fontWeight: 700, padding: '5px 4px', fontSize: '11px' }}
             >
               C<u>r</u>edit Card
             </button>
 
             {/* Row 2 */}
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               onClick={handleChequeSettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Settle via Bank Clearing Cheque"
@@ -776,7 +776,7 @@ export default function IdsPosBillSettlementModal({
               C<u>h</u>eque
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               onClick={handleCompanySettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Direct Bill to Corporate BTC Account"
@@ -784,15 +784,15 @@ export default function IdsPosBillSettlementModal({
               C<u>o</u>mpany
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn success confirm" 
               onClick={() => setSplitTenderModalOpen(true)}
-              style={{ fontWeight: 800, padding: '5px 4px', fontSize: '11px', background: '#E8F5E9', color: '#1B5E20', border: '1px solid #81C784' }}
+              style={{ fontWeight: 800, padding: '5px 4px', fontSize: '11px' }}
               title="Split Tender Settlement (Multi-Pay: UPI + Card + Cash) - Audio 4"
             >
               ⚡ <u>S</u>plit Tender
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn warning" 
               onClick={handleStaffSettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Staff Duty Meal / Internal Account Deduction"
@@ -802,7 +802,7 @@ export default function IdsPosBillSettlementModal({
 
             {/* Row 3 */}
             <button 
-              className="ids-btn" 
+              className="ids-btn warning" 
               onClick={handleNcSettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="Non Chargeable Protocol (F&B Tasting / MD Table)"
@@ -810,22 +810,22 @@ export default function IdsPosBillSettlementModal({
               <u>N</u>on Chargeable
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info folio" 
               onClick={handleOpenGuestModal}
-              style={{ fontWeight: 700, padding: '5px 4px', fontSize: '11px', color: '#800080' }}
+              style={{ fontWeight: 700, padding: '5px 4px', fontSize: '11px' }}
             >
               <u>G</u>uest
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn danger void" 
               onClick={handleVoidHoldBill}
-              style={{ padding: '5px 4px', fontSize: '11px', color: '#C62828', fontWeight: 700 }}
+              style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 700 }}
               title="Void or Hold current table bill"
             >
               <u>V</u>oid / Hold
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn warning" 
               onClick={handleComplimentarySettlement}
               style={{ padding: '5px 4px', fontSize: '11px', fontWeight: 600 }}
               title="100% Management Exemption"
@@ -859,14 +859,14 @@ export default function IdsPosBillSettlementModal({
         <div style={{ padding: '6px 14px', background: '#ECE9D8', borderTop: '1px solid #CCC', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               style={{ padding: '2px 8px', fontSize: '11px' }}
               onClick={handlePrevBill}
             >
               Previous
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn info" 
               style={{ padding: '2px 8px', fontSize: '11px', fontWeight: 600 }}
               onClick={handleNextBill}
             >
@@ -875,21 +875,19 @@ export default function IdsPosBillSettlementModal({
           </div>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button 
-              className="ids-btn" 
+              className="ids-btn success confirm" 
               onClick={handleSaveSettlement}
               disabled={currentBill?.status === 'Settled' && currentBalance === 0 && paymentsGrid.length === 0}
               style={{ 
                 padding: '3px 14px', 
                 fontSize: '11px', 
-                fontWeight: 700, 
-                background: currentBalance === 0 ? '#DFF0D8' : '#ECE9D8', 
-                borderColor: currentBalance === 0 ? '#3C763D' : '#808080' 
+                fontWeight: 700
               }}
             >
               <u>S</u>ave
             </button>
             <button 
-              className="ids-btn" 
+              className="ids-btn warning clear" 
               onClick={() => setPaymentsGrid([])}
               style={{ padding: '3px 10px', fontSize: '11px' }}
             >
@@ -897,7 +895,7 @@ export default function IdsPosBillSettlementModal({
             </button>
             {currentBill?.status === 'Settled' && (
               <button 
-                className="ids-btn" 
+                className="ids-btn info print" 
                 onClick={() => {
                   if (onOpenCrystalReport) {
                     onOpenCrystalReport({
@@ -920,13 +918,13 @@ export default function IdsPosBillSettlementModal({
                     });
                   }
                 }}
-                style={{ padding: '3px 10px', fontSize: '11px', fontWeight: 600, color: '#000080' }}
+                style={{ padding: '3px 10px', fontSize: '11px', fontWeight: 600 }}
               >
                 Print Receipt
               </button>
             )}
             <button 
-              className="ids-btn" 
+              className="ids-btn exit danger" 
               onClick={onClose}
               style={{ padding: '3px 12px', fontSize: '11px' }}
             >
@@ -1096,7 +1094,7 @@ export default function IdsPosBillSettlementModal({
               {/* Bottom Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => {
                     setActiveBillNo(selectedHelpBillNo);
                     setBillHelpOpen(false);
@@ -1106,7 +1104,7 @@ export default function IdsPosBillSettlementModal({
                   Select
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setBillHelpOpen(false)}
                   style={{ minWidth: '65px' }}
                 >
@@ -1295,21 +1293,21 @@ export default function IdsPosBillSettlementModal({
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={handleConfirmCardPayment}
                   style={{ minWidth: '60px', fontWeight: 700 }}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn warning clear" 
                   onClick={() => setCardAmount('')}
                   style={{ minWidth: '60px' }}
                 >
                   Clear
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn exit danger" 
                   onClick={() => setCardModalOpen(false)}
                   style={{ minWidth: '60px' }}
                 >
@@ -1412,21 +1410,21 @@ export default function IdsPosBillSettlementModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={handleConfirmCashPayment}
                   style={{ minWidth: '60px', fontWeight: 700 }}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn warning clear" 
                   onClick={() => { setCashReceived(''); setCashAmount(''); }}
                   style={{ minWidth: '60px' }}
                 >
                   Clear
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setCashModalOpen(false)}
                   style={{ minWidth: '60px' }}
                 >
@@ -1535,14 +1533,14 @@ export default function IdsPosBillSettlementModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={handleConfirmGuestPayment}
                   style={{ minWidth: '60px', fontWeight: 700 }}
                 >
                   Post to Folio
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setGuestModalOpen(false)}
                   style={{ minWidth: '60px' }}
                 >
@@ -1615,7 +1613,7 @@ export default function IdsPosBillSettlementModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => {
                     const pct = parseFloat(discPercent) || 0;
                     const calculatedDisc = Number(((currentBill.amount * pct) / 100).toFixed(2));
@@ -1627,7 +1625,7 @@ export default function IdsPosBillSettlementModal({
                   Apply
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn warning clear" 
                   onClick={() => { setDiscountAmount(0); setDiscountModalOpen(false); }}
                   style={{ minWidth: '60px' }}
                 >

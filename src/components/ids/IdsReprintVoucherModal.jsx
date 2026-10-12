@@ -451,7 +451,7 @@ export default function IdsReprintVoucherModal({
                 <Printer size={12} /> Crystal Reports Print
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => {
                   if (selectedVoucher) {
@@ -464,18 +464,18 @@ export default function IdsReprintVoucherModal({
                 Quick Preview
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic warning clear" 
                 style={{ minWidth: '60px' }}
                 onClick={() => setStatusMessage('Grid cleared.')}
               >
                 Clear
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => alert("Voucher Reprint Panel: Cashier session vouchers audit complete.")}
               >Panel</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 
@@ -601,8 +601,8 @@ export default function IdsReprintVoucherModal({
                 }}
               >
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ fontWeight: 700, background: '#DCE6F1', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  className="ids-btn-classic print info" 
+                  style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => {
                     window.print();
                   }}
@@ -610,7 +610,7 @@ export default function IdsReprintVoucherModal({
                   <Printer size={12} /> Send to Printer
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => {
                     alert(`PDF Voucher exported successfully: ${selectedVoucher.voucherNo}.pdf`);
@@ -619,7 +619,7 @@ export default function IdsReprintVoucherModal({
                 >
                   <Download size={12} /> Export PDF
                 </button>
-                <button className="ids-btn-classic" onClick={() => setPrintPreviewOpen(false)}>
+                <button className="ids-btn-classic exit danger" onClick={() => setPrintPreviewOpen(false)}>
                   Close
                 </button>
               </div>

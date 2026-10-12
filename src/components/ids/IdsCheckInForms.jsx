@@ -43,14 +43,14 @@ export function IdsReservationCheckinPromptModal({
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '75px', fontWeight: 700 }}
               onClick={onContinue}
             >
               Continue
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic cancel" 
               style={{ minWidth: '70px' }}
               onClick={onClose}
             >
@@ -137,21 +137,21 @@ export function IdsCheckinGuestListModal({
           {/* Action Buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic warning" 
               style={{ minWidth: '65px' }}
               onClick={() => onRelease && onRelease(booking)}
             >
               Release
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '65px', fontWeight: 700 }}
               onClick={() => onSelectGuest(guests[selectedIdx], selectedIdx)}
             >
               <u>S</u>elect
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic cancel" 
               style={{ minWidth: '65px' }}
               onClick={onClose}
             >
@@ -252,8 +252,8 @@ export function IdsCheckInRateModal({
           </table>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '14px' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onConfirm}>Confirm</button>
-            <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={onClose}>Cancel</button>
+            <button className="ids-btn-classic success confirm" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onConfirm}>Confirm</button>
+            <button className="ids-btn-classic cancel" style={{ minWidth: '70px' }} onClick={onClose}>Cancel</button>
           </div>
         </div>
       </div>
@@ -615,22 +615,22 @@ export function IdsCheckInRegistrationModal({
 
             {/* Bottom Button Toolbar from Frame 012 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', borderTop: '1px solid #D0CDC0', paddingTop: '6px' }}>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const inst = prompt("Special Instructions / Guest Notes:", "Airport drop required at 08:00 AM."); if (inst) setStatusMessage(`Special Instruction saved: "${inst}"`); }}>Spl. Inst...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const addr = prompt("Local Address / Stay Location in City:", "Dilsukhnagar, Hyderabad, Telangana"); if (addr) setStatusMessage(`Local Address: ${addr}`); }}>Local Add</button>
-              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); alert("Additional PMS Parameters:\nWake-up Call: Not set\nNewspaper: Times of India\nKeycard Count: 2 Issued\nRegistration Form: Signed & Filed"); }}>Others...</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const inst = prompt("Special Instructions / Guest Notes:", "Airport drop required at 08:00 AM."); if (inst) setStatusMessage(`Special Instruction saved: "${inst}"`); }}>Spl. Inst...</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); const addr = prompt("Local Address / Stay Location in City:", "Dilsukhnagar, Hyderabad, Telangana"); if (addr) setStatusMessage(`Local Address: ${addr}`); }}>Local Add</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '65px' }} onClick={() => { playReceptionChime(); alert("Additional PMS Parameters:\nWake-up Call: Not set\nNewspaper: Times of India\nKeycard Count: 2 Issued\nRegistration Form: Signed & Filed"); }}>Others...</button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic save success" 
                 style={{ minWidth: '65px', fontWeight: 700, color: '#0A246A' }}
                 onClick={handleSave}
               >
                 <u>S</u>ave
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); if (confirm("Clear current form inputs?")) { setRegNo(Math.floor(10000 + Math.random() * 90000).toString()); setStatusMessage("Registration form fields refreshed."); } }}>Clear</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Navigator: Showing active check-in transaction pane."); }}>Panel</button>
-              <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic warning clear" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); if (confirm("Clear current form inputs?")) { setRegNo(Math.floor(10000 + Math.random() * 90000).toString()); setStatusMessage("Registration form fields refreshed."); } }}>Clear</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '55px' }} onClick={() => { playReceptionChime(); alert("FortuneNext Panel Navigator: Showing active check-in transaction pane."); }}>Panel</button>
+              <button className="ids-btn-classic exit danger" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI):\nHotel Elite Inn - Unit 01\nProperty Tax No: 36AAACH1234F1Z5\nNight Audit Cutoff: 02:00 AM"); }}>GI</button>
-                <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => { playSuccessChime(); setStatusMessage("Loaded PMS FortuneNext Check-In Program V6.5002.5 successfully."); }}>Load Pgm</button>
+                <button className="ids-btn-classic info" style={{ minWidth: '35px' }} onClick={() => { playReceptionChime(); alert("General Information (GI):\nHotel Elite Inn - Unit 01\nProperty Tax No: 36AAACH1234F1Z5\nNight Audit Cutoff: 02:00 AM"); }}>GI</button>
+                <button className="ids-btn-classic info" style={{ minWidth: '65px' }} onClick={() => { playSuccessChime(); setStatusMessage("Loaded PMS FortuneNext Check-In Program V6.5002.5 successfully."); }}>Load Pgm</button>
               </div>
             </div>
           </div>
@@ -720,7 +720,7 @@ export function IdsCheckedInPositionModal({
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic exit danger" 
               style={{ minWidth: '70px', fontWeight: 700 }}
               onClick={onClose}
             >
@@ -1159,10 +1159,10 @@ export function IdsRoomRackConsoleModal({
 
           {/* Bottom buttons */}
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '8px' }}>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); window.print(); }}>Print</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '3' : (prev === '1' ? 'All' : String(Number(prev) - 1))); }}>Previous</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '1' : (prev === '3' ? 'All' : String(Number(prev) + 1))); }}>Next</button>
-            <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+            <button className="ids-btn-classic print info" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); window.print(); }}>Print</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '3' : (prev === '1' ? 'All' : String(Number(prev) - 1))); }}>Previous</button>
+            <button className="ids-btn-classic info" style={{ minWidth: '60px' }} onClick={() => { playReceptionChime(); setFilterFloor(prev => prev === 'All' ? '1' : (prev === '3' ? 'All' : String(Number(prev) + 1))); }}>Next</button>
+            <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
           </div>
         </div>
 
@@ -1685,14 +1685,14 @@ export function IdsRoomRackConsoleModal({
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic save success" 
                     style={{ minWidth: '60px', fontWeight: 700 }}
                     onClick={handleSaveClearDialog}
                   >
                     <u>S</u>ave
                   </button>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic cancel" 
                     style={{ minWidth: '60px' }}
                     onClick={() => setClearDialogRoom(null)}
                   >

@@ -534,7 +534,7 @@ export default function IdsPostDepositModal({
             <div style={{ display: 'flex', gap: '4px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic primary success" 
                 style={{ minWidth: '45px' }}
                 onClick={() => {
                   setReceivedAmount('1000.00');
@@ -546,7 +546,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic warning modify" 
                 style={{ minWidth: '45px' }}
                 onClick={() => {
                   const amt = prompt("Modify Advance Deposit Amount (INR):", receivedAmount);
@@ -557,7 +557,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic danger void" 
                 style={{ minWidth: '45px' }}
                 onClick={() => {
                   if (confirm("Clear current deposit draft?")) {
@@ -570,7 +570,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '45px' }}
                 onClick={() => alert(`📂 Deposits Register for Room ${selectedRoomNo}:\nAll advance deposit receipts logged under IDS FortuneNext audit book.`)}
               >
@@ -578,7 +578,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => alert("Previous deposit voucher loaded.")}
               >
@@ -586,7 +586,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '45px' }}
                 onClick={() => alert("Next deposit voucher loaded.")}
               >
@@ -597,7 +597,7 @@ export default function IdsPostDepositModal({
             <div style={{ display: 'flex', gap: '6px' }}>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic save success" 
                 style={{ minWidth: '60px', fontWeight: 700 }}
                 onClick={handleSave}
               >
@@ -605,7 +605,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '55px' }}
                 onClick={() => alert(`Panel: Folio Advance Management active.`)}
               >
@@ -613,7 +613,7 @@ export default function IdsPostDepositModal({
               </button>
               <button 
                 type="button"
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 style={{ minWidth: '55px' }}
                 onClick={onClose}
               >
@@ -645,14 +645,14 @@ export default function IdsPostDepositModal({
 
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic success confirm" 
                     style={{ minWidth: '70px', fontWeight: 700 }}
                     onClick={() => handleConfirmPrintPrompt(true)}
                   >
                     Yes
                   </button>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic cancel" 
                     style={{ minWidth: '70px' }}
                     onClick={() => handleConfirmPrintPrompt(false)}
                   >
@@ -755,8 +755,8 @@ export default function IdsPostDepositModal({
                 {/* Action Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
                   <button 
-                    className="ids-btn-classic" 
-                    style={{ fontWeight: 700, padding: '4px 14px', background: '#DCE6F1' }}
+                    className="ids-btn-classic print info" 
+                    style={{ fontWeight: 700, padding: '4px 14px' }}
                     onClick={() => {
                       if (onOpenCrystalReport) {
                         onOpenCrystalReport('advance-receipt', {
@@ -780,7 +780,7 @@ export default function IdsPostDepositModal({
                     Crystal Reports Print
                   </button>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic print info" 
                     style={{ padding: '4px 14px' }}
                     onClick={() => {
                       window.print();
@@ -789,7 +789,7 @@ export default function IdsPostDepositModal({
                     Quick Print
                   </button>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic exit danger" 
                     style={{ padding: '4px 14px' }}
                     onClick={() => {
                       setShowVoucherPreview(false);

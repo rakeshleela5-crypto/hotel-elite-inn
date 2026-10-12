@@ -281,7 +281,7 @@ export default function IdsLostAndFoundModal({
             <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', borderBottom: '1px solid #CCC', paddingBottom: '2px' }}>
                 <span style={{ fontWeight: 'bold', color: '#0A246A' }}>Returned Details</span>
-                <button onClick={handleMarkReturned} className="ids-btn" style={{ padding: '1px 6px', fontSize: '10px' }}>Return to Guest</button>
+                <button onClick={handleMarkReturned} className="ids-btn success confirm" style={{ padding: '1px 6px', fontSize: '10px' }}>Return to Guest</button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -325,15 +325,15 @@ export default function IdsLostAndFoundModal({
 
           {/* Standard 9-Button Command Bar */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '14px' }}>
-            <button onClick={handleAdd} disabled={isAdding || isModifying} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Add</button>
-            <button onClick={() => { setIsModifying(true); setIsAdding(false); }} disabled={isAdding || isModifying} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Modify</button>
-            <button onClick={() => {}} disabled className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Delete</button>
-            <button onClick={() => setHelpLookupOpen(true)} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Browse</button>
-            <button onClick={() => { if (currentIndex > 0) { setCurrentIndex(currentIndex - 1); setFormData(records[currentIndex - 1]); } }} disabled={currentIndex <= 0} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Previous</button>
-            <button onClick={() => { if (currentIndex < records.length - 1) { setCurrentIndex(currentIndex + 1); setFormData(records[currentIndex + 1]); } }} disabled={currentIndex >= records.length - 1} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Next</button>
-            <button onClick={handleSave} disabled={isFormLocked} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px', fontWeight: !isFormLocked ? 'bold' : 'normal' }}>Save</button>
-            <button onClick={() => { setIsAdding(false); setIsModifying(false); setFormData(records[currentIndex]); }} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Panel</button>
-            <button onClick={onClose} className="ids-btn" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
+            <button onClick={handleAdd} disabled={isAdding || isModifying} className="ids-btn success" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Add</button>
+            <button onClick={() => { setIsModifying(true); setIsAdding(false); }} disabled={isAdding || isModifying} className="ids-btn warning modify" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Modify</button>
+            <button onClick={() => {}} disabled className="ids-btn danger" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Delete</button>
+            <button onClick={() => setHelpLookupOpen(true)} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Browse</button>
+            <button onClick={() => { if (currentIndex > 0) { setCurrentIndex(currentIndex - 1); setFormData(records[currentIndex - 1]); } }} disabled={currentIndex <= 0} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Previous</button>
+            <button onClick={() => { if (currentIndex < records.length - 1) { setCurrentIndex(currentIndex + 1); setFormData(records[currentIndex + 1]); } }} disabled={currentIndex >= records.length - 1} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Next</button>
+            <button onClick={handleSave} disabled={isFormLocked} className="ids-btn success save" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px', fontWeight: !isFormLocked ? 'bold' : 'normal' }}>Save</button>
+            <button onClick={() => { setIsAdding(false); setIsModifying(false); setFormData(records[currentIndex]); }} className="ids-btn info" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Panel</button>
+            <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '60px', padding: '4px 10px', fontSize: '11px' }}>Exit</button>
           </div>
         </div>
 
@@ -383,8 +383,8 @@ export default function IdsLostAndFoundModal({
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
-                  <button onClick={() => setHelpLookupOpen(false)} className="ids-btn" style={{ padding: '2px 14px', fontSize: '11px' }}>Select</button>
-                  <button onClick={() => setHelpLookupOpen(false)} className="ids-btn" style={{ padding: '2px 14px', fontSize: '11px' }}>Cancel</button>
+                  <button onClick={() => setHelpLookupOpen(false)} className="ids-btn success confirm" style={{ padding: '2px 14px', fontSize: '11px' }}>Select</button>
+                  <button onClick={() => setHelpLookupOpen(false)} className="ids-btn danger cancel" style={{ padding: '2px 14px', fontSize: '11px' }}>Cancel</button>
                 </div>
               </div>
             </div>
@@ -486,12 +486,12 @@ export default function IdsLostAndFoundModal({
                       setReportEngineOpen(false);
                       setExcelPreviewOpen(true);
                     }} 
-                    className="ids-btn" 
+                    className="ids-btn success confirm" 
                     style={{ minWidth: '80px', padding: '3px 14px', fontSize: '11px', fontWeight: 'bold' }}
                   >
                     Continue
                   </button>
-                  <button onClick={() => setReportEngineOpen(false)} className="ids-btn" style={{ minWidth: '80px', padding: '3px 14px', fontSize: '11px' }}>
+                  <button onClick={() => setReportEngineOpen(false)} className="ids-btn danger cancel" style={{ minWidth: '80px', padding: '3px 14px', fontSize: '11px' }}>
                     Cancel
                   </button>
                 </div>
@@ -630,9 +630,9 @@ export default function IdsLostAndFoundModal({
                     <span style={{ padding: '2px 10px', color: '#666' }}>Sheet1</span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => window.print()} className="ids-btn" style={{ padding: '2px 10px', fontSize: '11px', fontWeight: 'bold' }}>🖨️ Print Sheet</button>
-                    <button onClick={() => alert("Spreadsheet exported as 'Book1 - Returned Details Receipt.xlsx'")} className="ids-btn" style={{ padding: '2px 10px', fontSize: '11px', fontWeight: 'bold', color: '#217346' }}>💾 Save .XLSX</button>
-                    <button onClick={() => setExcelPreviewOpen(false)} className="ids-btn" style={{ padding: '2px 10px', fontSize: '11px' }}>Close</button>
+                    <button onClick={() => window.print()} className="ids-btn print info" style={{ padding: '2px 10px', fontSize: '11px', fontWeight: 'bold' }}>🖨️ Print Sheet</button>
+                    <button onClick={() => alert("Spreadsheet exported as 'Book1 - Returned Details Receipt.xlsx'")} className="ids-btn success save" style={{ padding: '2px 10px', fontSize: '11px', fontWeight: 'bold' }}>💾 Save .XLSX</button>
+                    <button onClick={() => setExcelPreviewOpen(false)} className="ids-btn exit danger" style={{ padding: '2px 10px', fontSize: '11px' }}>Close</button>
                   </div>
                 </div>
               </div>

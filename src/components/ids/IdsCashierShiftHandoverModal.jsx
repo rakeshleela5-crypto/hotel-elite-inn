@@ -860,7 +860,7 @@ export default function IdsCashierShiftHandoverModal({
                 {shiftData.status !== 'LOCKED' && (
                   <button 
                     onClick={handleSaveDraft}
-                    className="ids-btn"
+                    className="ids-btn success save"
                     style={{ minWidth: '70px' }}
                   >
                     Save Draft
@@ -868,7 +868,7 @@ export default function IdsCashierShiftHandoverModal({
                 )}
                 <button 
                   onClick={handlePrintHandoverVoucher}
-                  className="ids-btn"
+                  className="ids-btn print info"
                   style={{ minWidth: '80px', fontWeight: 600 }}
                 >
                   🖨️ Print Voucher
@@ -879,8 +879,8 @@ export default function IdsCashierShiftHandoverModal({
                       .then(() => setToastMessage('✓ Daily Archive (.JSON) downloaded directly to your PC (Downloads)!'))
                       .catch(err => setToastMessage('Archive error: ' + err.message));
                   }}
-                  className="ids-btn"
-                  style={{ minWidth: '120px', fontWeight: 700, background: '#FFF3E0', borderColor: '#E65100', color: '#E65100' }}
+                  className="ids-btn info"
+                  style={{ minWidth: '120px', fontWeight: 700 }}
                   title="Download today's complete hotel books & shift transactions (.JSON) directly to local PC"
                 >
                   📥 Export Daily Archive (.JSON)
@@ -888,8 +888,8 @@ export default function IdsCashierShiftHandoverModal({
                 {shiftData.status !== 'LOCKED' ? (
                   <button 
                     onClick={handleOpenLockModal}
-                    className="ids-btn"
-                    style={{ minWidth: '130px', fontWeight: 800, background: '#DFF0D8', borderColor: '#3C763D', color: '#3C763D' }}
+                    className="ids-btn success confirm"
+                    style={{ minWidth: '130px', fontWeight: 800 }}
                   >
                     🔒 Lock Shift & Handover
                   </button>
@@ -901,8 +901,8 @@ export default function IdsCashierShiftHandoverModal({
                       setActiveShiftId(next);
                       saveStoredActiveShiftId(next);
                     }}
-                    className="ids-btn"
-                    style={{ minWidth: '130px', fontWeight: 700, background: '#E6F0FA', borderColor: '#0A246A', color: '#0A246A' }}
+                    className="ids-btn info"
+                    style={{ minWidth: '130px', fontWeight: 700 }}
                   >
                     Switch to Next Shift →
                   </button>
@@ -926,8 +926,8 @@ export default function IdsCashierShiftHandoverModal({
               </div>
               <button 
                 onClick={handleCopyWhatsAppBriefing}
-                className="ids-btn"
-                style={{ padding: '4px 10px', fontWeight: 800, background: '#DFF0D8', borderColor: '#3C763D', color: '#2E7D32' }}
+                className="ids-btn success"
+                style={{ padding: '4px 10px', fontWeight: 800 }}
               >
                 📋 Copy WhatsApp Briefing
               </button>
@@ -1044,8 +1044,8 @@ export default function IdsCashierShiftHandoverModal({
               </button>
               <button 
                 onClick={handleCopyWhatsAppBriefing}
-                className="ids-btn"
-                style={{ minWidth: '110px', fontWeight: 700, color: '#0A246A' }}
+                className="ids-btn info"
+                style={{ minWidth: '110px', fontWeight: 700 }}
               >
                 📋 Copy Broadcast
               </button>
@@ -1110,21 +1110,21 @@ export default function IdsCashierShiftHandoverModal({
           <div style={{ display: 'flex', gap: '6px' }}>
             <button 
               onClick={handleCopyWhatsAppBriefing}
-              className="ids-btn"
+              className="ids-btn info"
               style={{ minWidth: '90px' }}
             >
               📋 Copy Flash
             </button>
             <button 
               onClick={handlePrintHandoverVoucher}
-              className="ids-btn"
+              className="ids-btn print info"
               style={{ minWidth: '80px' }}
             >
               🖨️ Print Slip
             </button>
             <button 
               onClick={onClose}
-              className="ids-btn"
+              className="ids-btn exit danger"
               style={{ minWidth: '70px', fontWeight: 700 }}
             >
               Exit
@@ -1162,14 +1162,14 @@ export default function IdsCashierShiftHandoverModal({
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                   <button 
                     onClick={handleExecuteShiftLock} 
-                    className="ids-btn"
+                    className="ids-btn success confirm"
                     style={{ fontWeight: 700, minWidth: '60px' }}
                   >
                     Confirm Lock
                   </button>
                   <button 
                     onClick={() => setPinModalOpen(false)} 
-                    className="ids-btn"
+                    className="ids-btn danger cancel"
                     style={{ minWidth: '50px' }}
                   >
                     Cancel

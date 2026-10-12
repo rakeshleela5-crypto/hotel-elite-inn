@@ -979,7 +979,7 @@ export default function IdsExpressCheckInModal({
           </button>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic success confirm" 
               style={{ minWidth: '130px', fontWeight: 600 }}
               onClick={() => {
                 onClose();
@@ -991,7 +991,7 @@ export default function IdsExpressCheckInModal({
               Reservation Check-In
             </button>
             <button 
-              className="ids-btn-classic" 
+              className="ids-btn-classic refresh info" 
               style={{ minWidth: '70px' }} 
               onClick={() => {
                 setArrivals(initialArrivalsList);
@@ -1000,7 +1000,7 @@ export default function IdsExpressCheckInModal({
             >
               Refresh
             </button>
-            <button className="ids-btn-classic" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onClose}>
+            <button className="ids-btn-classic exit danger" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onClose}>
               Exit
             </button>
           </div>
@@ -1076,9 +1076,9 @@ export default function IdsExpressCheckInModal({
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
-                <button className="ids-btn-classic" style={{ minWidth: '85px' }} onClick={() => alert('Folio generated.')}>Bill Preview</button>
-                <button className="ids-btn-classic" style={{ minWidth: '95px' }} onClick={() => window.print()}>Print Reg Card</button>
-                <button className="ids-btn-classic" style={{ minWidth: '70px', fontWeight: 700 }} onClick={handleConfirmSingleOk}>OK</button>
+                <button className="ids-btn-classic info" style={{ minWidth: '85px' }} onClick={() => alert('Folio generated.')}>Bill Preview</button>
+                <button className="ids-btn-classic print info" style={{ minWidth: '95px' }} onClick={() => window.print()}>Print Reg Card</button>
+                <button className="ids-btn-classic success confirm" style={{ minWidth: '70px', fontWeight: 700 }} onClick={handleConfirmSingleOk}>OK</button>
               </div>
             </div>
           </div>
@@ -1175,7 +1175,7 @@ export default function IdsExpressCheckInModal({
                   }}
                 >Gst Cmt</button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ minWidth: '70px', fontWeight: 700 }}
                   onClick={handleConfirmGroupOk}
                 >
@@ -1270,14 +1270,14 @@ export default function IdsExpressCheckInModal({
               {/* Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '12px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ minWidth: '60px', fontWeight: 700 }}
                   onClick={handleConfirmUpgradeOk}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic cancel" 
                   style={{ minWidth: '60px' }}
                   onClick={() => setUpgradeModalOpen(false)}
                 >
@@ -1328,14 +1328,14 @@ export default function IdsExpressCheckInModal({
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '16px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ minWidth: '60px', fontWeight: 700 }}
                   onClick={handleConfirmRegCardSelect}
                 >
                   Select
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic cancel" 
                   style={{ minWidth: '60px' }}
                   onClick={() => setRegCardModalOpen(false)}
                 >
@@ -1482,7 +1482,7 @@ export default function IdsExpressCheckInModal({
               {/* Action Buttons */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <button 
-                  className="ids-btn-classic"
+                  className="ids-btn-classic print info"
                   onClick={() => {
                     playSuccessChime();
                     alert("🖨️ Hotel Room Position Statement sent to Front Desk Laser Spooler (WS-FRONTDESK-01)!");
@@ -1491,7 +1491,7 @@ export default function IdsExpressCheckInModal({
                   🖨️ Print Position Sheet
                 </button>
                 <button 
-                  className="ids-btn-classic"
+                  className="ids-btn-classic exit danger"
                   onClick={() => setHotelPositionModalOpen(false)}
                   style={{ minWidth: '80px', fontWeight: 700 }}
                 >

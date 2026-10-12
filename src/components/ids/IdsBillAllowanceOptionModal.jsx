@@ -817,7 +817,7 @@ export default function IdsBillAllowanceOptionModal({
                 </button>
 
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic save success" 
                   style={{ width: '75px', fontWeight: 700 }}
                   onClick={handleSaveClick}
                   disabled={totalBaseAllowance <= 0}
@@ -826,7 +826,7 @@ export default function IdsBillAllowanceOptionModal({
                 </button>
 
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic warning clear" 
                   style={{ width: '75px' }}
                   onClick={() => {
                     setGridRows(prev => prev.map(r => ({ ...r, allowance: 0 })));
@@ -837,7 +837,7 @@ export default function IdsBillAllowanceOptionModal({
                 </button>
 
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic info" 
                   style={{ width: '75px' }}
                   onClick={() => alert('Panel Option')}
                 >
@@ -845,7 +845,7 @@ export default function IdsBillAllowanceOptionModal({
                 </button>
 
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ width: '75px' }}
                   onClick={onClose}
                 >
@@ -1172,14 +1172,14 @@ export default function IdsBillAllowanceOptionModal({
               {/* Dialog Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '16px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ width: '70px', fontWeight: 700 }}
                   onClick={handleConfirmSelectRevenue}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ width: '70px' }}
                   onClick={() => setShowSelectRevenue(false)}
                 >
@@ -1289,14 +1289,14 @@ export default function IdsBillAllowanceOptionModal({
               {/* Command Buttons */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ width: '75px', fontWeight: 700 }}
                   onClick={handleExecuteApplyDiscount}
                 >
                   Apply
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   style={{ width: '75px' }}
                   onClick={() => setShowApplyDiscount(false)}
                 >
@@ -1394,14 +1394,14 @@ export default function IdsBillAllowanceOptionModal({
               {/* Buttons matching Frame 060 */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '16px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ width: '80px', fontWeight: 700 }}
                   onClick={handleConfirmAuthorization}
                 >
                   Confirm
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic cancel" 
                   style={{ width: '80px' }}
                   onClick={() => setShowAuthorization(false)}
                 >
@@ -1473,14 +1473,14 @@ export default function IdsBillAllowanceOptionModal({
             {/* Buttons */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', paddingBottom: '14px' }}>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic success confirm" 
                 style={{ width: '70px', fontWeight: 700 }}
                 onClick={handleFinalSaveConfirm}
               >
                 Yes
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic cancel" 
                 style={{ width: '70px' }}
                 onClick={() => setShowSaveConfirmPrompt(false)}
               >

@@ -346,7 +346,7 @@ export default function IdsCrystalReportModal({
 
           <button 
             type="button"
-            className="ids-btn-classic" 
+            className="ids-btn-classic print info" 
             onClick={handlePrint}
             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
           >
@@ -355,9 +355,9 @@ export default function IdsCrystalReportModal({
 
           <button 
             type="button"
-            className="ids-btn-classic" 
+            className="ids-btn-classic success save" 
             onClick={handleExportCsv}
-            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, color: '#006600' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700 }}
           >
             <span>💾</span> Export (Excel / CSV)
           </button>
@@ -480,7 +480,7 @@ export default function IdsCrystalReportModal({
 
           <button 
             type="button"
-            className="ids-btn-classic" 
+            className="ids-btn-classic exit danger" 
             onClick={onClose}
             style={{ marginLeft: 'auto', minWidth: '60px', fontWeight: 700 }}
           >

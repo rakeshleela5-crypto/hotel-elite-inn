@@ -392,8 +392,8 @@ export default function IdsHkInventoryModal({
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-              <button onClick={() => alert("Reorder Purchase Indent generated for low stock items.")} className="ids-btn" style={{ padding: '3px 14px' }}>Generate Purchase Indent</button>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+              <button onClick={() => alert("Reorder Purchase Indent generated for low stock items.")} className="ids-btn info" style={{ padding: '3px 14px' }}>Generate Purchase Indent</button>
+              <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
             </div>
           </div>
         )}
@@ -462,7 +462,7 @@ export default function IdsHkInventoryModal({
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-                <button onClick={handleSaveIssue} className="ids-btn" style={{ padding: '3px 14px', fontWeight: 'bold' }}>Post Issue</button>
+                <button onClick={handleSaveIssue} className="ids-btn success confirm" style={{ padding: '3px 14px', fontWeight: 'bold' }}>Post Issue</button>
               </div>
             </div>
 
@@ -495,7 +495,7 @@ export default function IdsHkInventoryModal({
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+              <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
             </div>
           </div>
         )}
@@ -564,7 +564,7 @@ export default function IdsHkInventoryModal({
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-                <button onClick={handleSaveReturn} className="ids-btn" style={{ padding: '3px 14px', fontWeight: 'bold' }}>Process Return</button>
+                <button onClick={handleSaveReturn} className="ids-btn success confirm" style={{ padding: '3px 14px', fontWeight: 'bold' }}>Process Return</button>
               </div>
             </div>
 
@@ -599,7 +599,7 @@ export default function IdsHkInventoryModal({
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+              <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
             </div>
           </div>
         )}
@@ -660,7 +660,7 @@ export default function IdsHkInventoryModal({
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button onClick={handleDhobiSubmit} className="ids-btn" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
+                <button onClick={handleDhobiSubmit} className="ids-btn success confirm" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
                   {dhobiAction === 'dispatch' ? 'Post Dhobi Dispatch Gatepass' : 'Record Dhobi Clean Receipt'}
                 </button>
               </div>
@@ -695,7 +695,7 @@ export default function IdsHkInventoryModal({
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+              <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
             </div>
           </div>
         )}
@@ -761,7 +761,7 @@ export default function IdsHkInventoryModal({
                   </div>
                 )}
                 <div style={{ marginLeft: 'auto' }}>
-                  <button onClick={handleVerifyRoomAssets} className="ids-btn" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
+                  <button onClick={handleVerifyRoomAssets} className="ids-btn success confirm" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
                     Record & Post Inspection Scorecard
                   </button>
                 </div>
@@ -769,7 +769,7 @@ export default function IdsHkInventoryModal({
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+              <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
             </div>
           </div>
         )}

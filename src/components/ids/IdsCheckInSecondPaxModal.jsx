@@ -387,7 +387,7 @@ export default function IdsCheckInSecondPaxModal({
                   Walk-in
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic exit danger" 
                   onClick={onClose}
                   style={{ height: '24px', fontWeight: 600, color: '#800' }}
                 >
@@ -605,14 +605,14 @@ export default function IdsCheckInSecondPaxModal({
                   {/* Buttons matching Video 22 Frame 062 */}
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '14px' }}>
                     <button 
-                      className="ids-btn-classic" 
+                      className="ids-btn-classic danger cancel" 
                       onClick={handleAbort}
                       style={{ minWidth: '70px', height: '23px', fontWeight: 600 }}
                     >
                       Abort
                     </button>
                     <button 
-                      className="ids-btn-classic" 
+                      className="ids-btn-classic success confirm" 
                       onClick={handleContinue}
                       style={{ minWidth: '70px', height: '23px', fontWeight: 700, color: '#0A246A' }}
                     >
@@ -686,7 +686,7 @@ export default function IdsCheckInSecondPaxModal({
 
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <button 
-                      className="ids-btn-classic" 
+                      className="ids-btn-classic success confirm" 
                       onClick={handleConfirmRegistration}
                       style={{ minWidth: '70px', height: '24px', fontWeight: 700, color: '#0A246A' }}
                     >
@@ -895,16 +895,16 @@ export default function IdsCheckInSecondPaxModal({
               </div>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button 
-                  className="ids-btn-classic"
+                  className="ids-btn-classic info"
                   onClick={() => setCurrentStep('room-rack')}
                   style={{ fontWeight: 600 }}
                 >
                   ← Back to Room Rack
                 </button>
                 <button 
-                  className="ids-btn-classic"
+                  className="ids-btn-classic exit danger"
                   onClick={onClose}
-                  style={{ fontWeight: 700, color: '#0A246A' }}
+                  style={{ fontWeight: 700 }}
                 >
                   Close & Done
                 </button>

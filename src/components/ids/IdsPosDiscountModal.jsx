@@ -535,16 +535,9 @@ export default function IdsPosDiscountModal({
                 onRemoveDiscount();
                 onClose();
               }}
+              className="ids-btn-classic danger"
               style={{
-                background: '#FFEBEE',
-                color: '#C62828',
-                border: '2px solid #FFF',
-                borderRightColor: '#716F64',
-                borderBottomColor: '#716F64',
                 padding: '6px 14px',
-                fontSize: '11px',
-                fontWeight: 700,
-                cursor: 'pointer',
                 marginRight: 'auto'
               }}
             >
@@ -553,31 +546,20 @@ export default function IdsPosDiscountModal({
           )}
           <button
             onClick={handleApply}
+            className="ids-btn-classic success confirm"
             style={{
-              background: '#0A246A',
-              color: '#FFF',
-              border: '2px solid #FFF',
-              borderRightColor: '#001040',
-              borderBottomColor: '#001040',
               padding: '6px 18px',
-              fontSize: '11px',
-              fontWeight: 700,
-              cursor: 'pointer'
+              minWidth: '120px'
             }}
           >
             ✓ Apply Discount
           </button>
           <button
             onClick={onClose}
+            className="ids-btn-classic cancel exit danger"
             style={{
-              background: '#ECE9D8',
-              border: '2px solid #FFF',
-              borderRightColor: '#716F64',
-              borderBottomColor: '#716F64',
               padding: '6px 14px',
-              fontSize: '11px',
-              fontWeight: 600,
-              cursor: 'pointer'
+              minWidth: '90px'
             }}
           >
             Cancel [Esc]

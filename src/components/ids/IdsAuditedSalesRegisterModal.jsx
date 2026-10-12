@@ -591,11 +591,8 @@ export default function IdsAuditedSalesRegisterModal({
             </span>
             <button
               onClick={() => window.print()}
+              className="ids-btn print info"
               style={{
-                background: '#ECE9D8',
-                border: '2px solid #FFF',
-                borderRightColor: '#716F64',
-                borderBottomColor: '#716F64',
                 padding: '2px 8px',
                 fontSize: '11px',
                 fontWeight: 600,
@@ -606,15 +603,11 @@ export default function IdsAuditedSalesRegisterModal({
             </button>
             <button
               onClick={handleExportCSV}
+              className="ids-btn success save"
               style={{
-                background: '#ECE9D8',
-                border: '2px solid #FFF',
-                borderRightColor: '#716F64',
-                borderBottomColor: '#716F64',
                 padding: '2px 8px',
                 fontSize: '11px',
                 fontWeight: 600,
-                color: '#006600',
                 cursor: 'pointer'
               }}
             >
@@ -1089,11 +1082,8 @@ export default function IdsAuditedSalesRegisterModal({
           <div style={{ display: 'flex', gap: '6px' }}>
             <button
               onClick={onClose}
+              className="ids-btn exit danger"
               style={{
-                background: '#ECE9D8',
-                border: '2px solid #FFF',
-                borderRightColor: '#716F64',
-                borderBottomColor: '#716F64',
                 padding: '2px 14px',
                 fontSize: '11px',
                 fontWeight: 600,

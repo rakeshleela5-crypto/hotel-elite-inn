@@ -666,7 +666,7 @@ export default function IdsTransferFolioModal({
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic save success" 
                     style={{ width: '75px', fontWeight: 700 }}
                     onClick={handleSaveClick}
                     disabled={transactions.length === 0}
@@ -675,7 +675,7 @@ export default function IdsTransferFolioModal({
                   </button>
 
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic warning clear" 
                     style={{ width: '75px' }}
                     onClick={() => {
                       setTransactions(prev => prev.map(t => ({ ...t, tag: 'No' })));
@@ -686,7 +686,7 @@ export default function IdsTransferFolioModal({
                   </button>
 
                   <button 
-                    className="ids-btn-classic" 
+                    className="ids-btn-classic exit danger" 
                     style={{ width: '75px' }}
                     onClick={onClose}
                   >
@@ -724,7 +724,7 @@ export default function IdsTransferFolioModal({
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <button className="ids-btn-classic" onClick={() => setCurrentView('transfer-folios')}>
+                  <button className="ids-btn-classic info" onClick={() => setCurrentView('transfer-folios')}>
                     Back to Transfer
                   </button>
                 </div>
@@ -808,7 +808,7 @@ export default function IdsTransferFolioModal({
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <button className="ids-btn-classic" onClick={() => setCurrentView('transfer-folios')}>
+                  <button className="ids-btn-classic info" onClick={() => setCurrentView('transfer-folios')}>
                     Back to Transfer
                   </button>
                 </div>
@@ -956,14 +956,14 @@ export default function IdsTransferFolioModal({
               {/* Buttons matching Frame 085 */}
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '16px' }}>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ width: '75px', fontWeight: 700 }}
                   onClick={handleConfirmTransfer}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic cancel" 
                   style={{ width: '75px' }}
                   onClick={() => setShowAuthPopup(false)}
                 >

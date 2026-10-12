@@ -645,18 +645,18 @@ export default function IdsPosBillModal({
 
         {/* Bottom Command Buttons matching Video 09 Frame 021 */}
         <div style={{ padding: '6px 12px 10px 12px', background: '#ECE9D8', borderTop: '1px solid #BBB', display: 'flex', flexWrap: 'wrap', gap: '4px', justifyContent: 'center' }}>
-          <button className="ids-btn" onClick={() => handlePrintBills(true)} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button className="ids-btn info" onClick={() => handlePrintBills(true)} style={{ fontSize: '10px', padding: '3px 6px' }}>
             Provisional Bill
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn success print" 
             onClick={() => handlePrintBills(false)} 
-            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700, background: '#DFF0D8', borderColor: '#3C763D' }}
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700 }}
           >
             Print Bill
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn success confirm" 
             onClick={() => {
               if (currentActiveBill) {
                 const targetBillNo = currentActiveBill.billNo || billNumber || `B-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -664,56 +664,56 @@ export default function IdsPosBillModal({
                 setSettleModalOpen(true);
               }
             }} 
-            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700, color: '#800080' }}
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700 }}
           >
             Bill &amp; Settle
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn warning split" 
             onClick={handleOpenSplitBill} 
             title="Split POS Bill Item Wise (Video 09)"
-            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700, background: '#FFF3CD', borderColor: '#856404' }}
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 700 }}
           >
             Split Bill
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn warning split" 
             onClick={() => setSplitQtyModalOpen(true)} 
             style={{ fontSize: '10px', padding: '3px 6px' }}
           >
             Split Qty
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn warning split" 
             onClick={() => setSplitEqualModalOpen(true)} 
             style={{ fontSize: '10px', padding: '3px 6px' }}
           >
             Split Equal
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn warning modify" 
             onClick={() => setDiscountModalOpen(true)} 
-            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 600, background: '#E6F0FA' }}
+            style={{ fontSize: '10px', padding: '3px 8px', fontWeight: 600 }}
           >
             Discount
           </button>
-          <button className="ids-btn" onClick={() => alert("Tax Exemption Routine")} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button className="ids-btn info" onClick={() => alert("Tax Exemption Routine")} style={{ fontSize: '10px', padding: '3px 6px' }}>
             Tax Exemption
           </button>
           <button 
-            className="ids-btn" 
+            className="ids-btn info search" 
             onClick={() => handleOpenViewKot(null)} 
             style={{ fontSize: '10px', padding: '3px 6px', fontWeight: 600 }}
           >
             View
           </button>
-          <button className="ids-btn" onClick={() => setMemberCode('')} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button className="ids-btn warning clear" onClick={() => setMemberCode('')} style={{ fontSize: '10px', padding: '3px 6px' }}>
             Clear
           </button>
-          <button className="ids-btn" onClick={() => alert("Panel Options")} style={{ fontSize: '10px', padding: '3px 6px' }}>
+          <button className="ids-btn info" onClick={() => alert("Panel Options")} style={{ fontSize: '10px', padding: '3px 6px' }}>
             Panel
           </button>
-          <button className="ids-btn" onClick={onClose} style={{ fontSize: '10px', padding: '3px 8px' }}>
+          <button className="ids-btn exit danger" onClick={onClose} style={{ fontSize: '10px', padding: '3px 8px' }}>
             Exit
           </button>
         </div>
@@ -870,14 +870,14 @@ export default function IdsPosBillModal({
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button 
-                    className="ids-btn" 
+                    className="ids-btn success confirm" 
                     onClick={handleApplySplitBill} 
                     style={{ minWidth: '60px', fontWeight: 700 }}
                   >
                     Ok
                   </button>
                   <button 
-                    className="ids-btn" 
+                    className="ids-btn danger cancel" 
                     onClick={() => setSplitBillModalOpen(false)} 
                     style={{ minWidth: '60px' }}
                   >
@@ -988,14 +988,14 @@ export default function IdsPosBillModal({
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button 
-                    className="ids-btn" 
+                    className="ids-btn success confirm" 
                     onClick={() => setViewKotModalOpen(false)} 
                     style={{ minWidth: '60px', fontWeight: 700 }}
                   >
                     Ok
                   </button>
                   <button 
-                    className="ids-btn" 
+                    className="ids-btn danger cancel" 
                     onClick={() => setViewKotModalOpen(false)} 
                     style={{ minWidth: '60px' }}
                   >
@@ -1079,7 +1079,7 @@ export default function IdsPosBillModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => setGstInfoModalOpen(false)} 
                   style={{ minWidth: '65px', fontWeight: 700 }}
                 >
@@ -1147,14 +1147,14 @@ export default function IdsPosBillModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => handleApplyEqualSplit(equalSplitCount)} 
                   style={{ minWidth: '65px', fontWeight: 700 }}
                 >
                   Ok
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setSplitEqualModalOpen(false)} 
                   style={{ minWidth: '65px' }}
                 >
@@ -1239,7 +1239,7 @@ export default function IdsPosBillModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => {
                     // Automatically configure 2-way split
                     setItemSplitAssignments({ 0: 1, 1: 1, 2: 2, 3: 2 });
@@ -1252,7 +1252,7 @@ export default function IdsPosBillModal({
                   Ok
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setSplitQtyModalOpen(false)} 
                   style={{ minWidth: '65px' }}
                 >
@@ -1333,7 +1333,7 @@ export default function IdsPosBillModal({
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn success confirm" 
                   onClick={() => {
                     const sel = DEFAULT_BILL_KOTS[selectedTableLookupIdx];
                     if (sel) setTableNo(sel.tableNo);
@@ -1344,7 +1344,7 @@ export default function IdsPosBillModal({
                   Select
                 </button>
                 <button 
-                  className="ids-btn" 
+                  className="ids-btn danger cancel" 
                   onClick={() => setTableHelpOpen(false)} 
                   style={{ minWidth: '60px' }}
                 >

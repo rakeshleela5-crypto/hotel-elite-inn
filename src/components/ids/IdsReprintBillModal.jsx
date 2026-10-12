@@ -260,14 +260,14 @@ export default function IdsReprintBillModal({
               }}
             >
               <button 
-                className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                className="ids-btn-classic success confirm" 
+                style={{ fontWeight: 700, minWidth: '70px' }}
                 onClick={handleContinue}
               >
                 Continue
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setBillLookupOpen(true)}>Panel</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic info" style={{ minWidth: '60px' }} onClick={() => setBillLookupOpen(true)}>Panel</button>
+              <button className="ids-btn-classic exit danger" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
         )}
@@ -337,15 +337,15 @@ export default function IdsReprintBillModal({
               }}
             >
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                 onClick={() => setLineItemsDetailsOpen(true)}
               >
                 <LayoutList size={12} /> Details
               </button>
               <button 
-                className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1', display: 'flex', alignItems: 'center', gap: '4px' }}
+                className="ids-btn-classic print info" 
+                style={{ fontWeight: 700, minWidth: '70px', display: 'flex', alignItems: 'center', gap: '4px' }}
                 onClick={() => {
                   if (onOpenCrystalReport) {
                     onOpenCrystalReport('rule46-bill', {
@@ -373,19 +373,19 @@ export default function IdsReprintBillModal({
                 <Printer size={12} /> Crystal Reports Print
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => setPrintPreviewOpen(true)}
               >
                 Quick Preview
               </button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic info" 
                 style={{ minWidth: '60px' }}
                 onClick={() => alert("Bill Audit & Reprint Panel: Folio tax invoice registers active.")}
               >Panel</button>
               <button 
-                className="ids-btn-classic" 
+                className="ids-btn-classic exit danger" 
                 style={{ minWidth: '60px' }} 
                 onClick={() => setStage('input')}
               >
@@ -658,8 +658,8 @@ export default function IdsReprintBillModal({
                 }}
               >
                 <button 
-                  className="ids-btn-classic" 
-                  style={{ fontWeight: 700, background: '#DCE6F1', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  className="ids-btn-classic print info" 
+                  style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => {
                     window.print();
                   }}
@@ -667,7 +667,7 @@ export default function IdsReprintBillModal({
                   <Printer size={12} /> Send to Printer
                 </button>
                 <button 
-                  className="ids-btn-classic" 
+                  className="ids-btn-classic success confirm" 
                   style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                   onClick={() => {
                     alert(`Tax Invoice PDF saved as: FO_Bill_${activeBill.billNo}.pdf (Frame 034)`);
@@ -676,7 +676,7 @@ export default function IdsReprintBillModal({
                 >
                   <Download size={12} /> Save PDF (Frame 034)
                 </button>
-                <button className="ids-btn-classic" onClick={() => setPrintPreviewOpen(false)}>
+                <button className="ids-btn-classic exit danger" onClick={() => setPrintPreviewOpen(false)}>
                   Close
                 </button>
               </div>

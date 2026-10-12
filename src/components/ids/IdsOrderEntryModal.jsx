@@ -2538,21 +2538,21 @@ export default function IdsOrderEntryModal({
             </div>
             <div style={{ display: 'flex', gap: '6px' }}>
               <button 
-                className="ids-btn" 
+                className="ids-btn success save" 
                 onClick={() => handleSaveKOT()} 
-                style={{ fontWeight: 700, minWidth: '65px', background: '#DFF0D8', borderColor: '#3C763D' }}
+                style={{ fontWeight: 700, minWidth: '65px' }}
               >
                 Save
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn warning clear" 
                 onClick={() => { setLineItems([]); setSelectedRowIdx(null); }}
                 style={{ minWidth: '60px' }}
               >
                 Clear
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn danger" 
                 onClick={() => {
                   if (editingKotNo) {
                     // Video 06 Frame 020: Delete entire KOT
@@ -2566,35 +2566,34 @@ export default function IdsOrderEntryModal({
                 title={editingKotNo ? `Delete entire KOT ${editingKotNo}` : "Delete item (<F5>)"}
                 style={{ 
                   minWidth: '60px', 
-                  fontWeight: (editingKotNo || selectedRowIdx !== null) ? 700 : 400, 
-                  color: (editingKotNo || selectedRowIdx !== null) ? '#C00000' : '#000' 
+                  fontWeight: (editingKotNo || selectedRowIdx !== null) ? 700 : 400
                 }}
               >
                 Delete {editingKotNo ? '' : (selectedRowIdx !== null && lineItems[selectedRowIdx] ? `(${lineItems[selectedRowIdx].code})` : '')}
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn info" 
                 onClick={() => alert("Touch Screen Panel Toggle")}
                 style={{ minWidth: '60px' }}
               >
                 Panel
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn info" 
                 onClick={() => alert(`Room info lookup for in-house dining`)}
                 style={{ minWidth: '65px' }}
               >
                 Room info
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn success confirm" 
                 onClick={() => setPosBillModalOpen(true)}
                 style={{ minWidth: '70px', fontWeight: 600 }}
               >
                 Check Out
               </button>
               <button 
-                className="ids-btn" 
+                className="ids-btn exit danger" 
                 onClick={onClose}
                 style={{ minWidth: '60px' }}
               >

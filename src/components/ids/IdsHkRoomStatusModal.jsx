@@ -193,7 +193,7 @@ export default function IdsHkRoomStatusModal({
 
           {/* Bottom Command Buttons */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
-            <button onClick={() => {}} className="ids-btn" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Refresh</button>
+            <button onClick={() => {}} className="ids-btn info refresh" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Refresh</button>
             <button 
               onClick={() => {
                 if (onOpenRoomVerificationReport) {
@@ -202,12 +202,12 @@ export default function IdsHkRoomStatusModal({
                   alert("Opening Room Verification Report...");
                 }
               }} 
-              className="ids-btn" 
-              style={{ minWidth: '160px', padding: '3px 12px', fontSize: '11px', fontWeight: 'bold', color: '#0A246A' }}
+              className="ids-btn info print" 
+              style={{ minWidth: '160px', padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}
             >
               📄 Room Verification Report
             </button>
-            <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Exit</button>
+            <button onClick={onClose} className="ids-btn exit danger" style={{ minWidth: '70px', padding: '3px 12px', fontSize: '11px' }}>Exit</button>
           </div>
         </div>
 
@@ -308,9 +308,9 @@ export default function IdsHkRoomStatusModal({
 
                 {/* Sub-Modal Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '12px' }}>
-                  <button onClick={handleSaveDetails} className="ids-btn" style={{ minWidth: '60px', padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}>Ok</button>
-                  <button onClick={() => {}} className="ids-btn" style={{ minWidth: '80px', padding: '3px 12px', fontSize: '11px' }}>Instruction</button>
-                  <button onClick={() => setDetailsModalOpen(false)} className="ids-btn" style={{ minWidth: '60px', padding: '3px 12px', fontSize: '11px' }}>Cancel</button>
+                  <button onClick={handleSaveDetails} className="ids-btn success confirm" style={{ minWidth: '60px', padding: '3px 12px', fontSize: '11px', fontWeight: 'bold' }}>Ok</button>
+                  <button onClick={() => {}} className="ids-btn info" style={{ minWidth: '80px', padding: '3px 12px', fontSize: '11px' }}>Instruction</button>
+                  <button onClick={() => setDetailsModalOpen(false)} className="ids-btn danger cancel" style={{ minWidth: '60px', padding: '3px 12px', fontSize: '11px' }}>Cancel</button>
                 </div>
               </div>
             </div>

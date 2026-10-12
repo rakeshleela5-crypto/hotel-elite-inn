@@ -464,6 +464,7 @@
   scrollbar-width: thin;
 }
 
+.ids-btn,
 .ids-btn-classic {
   background: #ECE9D8;
   border: 2px outset #FFFFFF;
@@ -507,10 +508,15 @@
 
 /* 1. EXIT / DANGER / CANCEL / CLOSE / VOID (Pastel Rose Red Tint) */
 .ids-btn-classic.exit,
+.ids-btn.exit,
 .ids-btn-classic.danger,
+.ids-btn.danger,
 .ids-btn-classic.cancel,
+.ids-btn.cancel,
 .ids-btn-classic.void,
+.ids-btn.void,
 .ids-btn-classic.close-btn,
+.ids-btn.close-btn,
 .ids-btn-exit,
 button[data-btn-type="exit"] {
   background: #FEE2E2 !important;
@@ -521,10 +527,15 @@ button[data-btn-type="exit"] {
   font-weight: 700 !important;
 }
 .ids-btn-classic.exit:hover,
+.ids-btn.exit:hover,
 .ids-btn-classic.danger:hover,
+.ids-btn.danger:hover,
 .ids-btn-classic.cancel:hover,
+.ids-btn.cancel:hover,
 .ids-btn-classic.void:hover,
+.ids-btn.void:hover,
 .ids-btn-classic.close-btn:hover,
+.ids-btn.close-btn:hover,
 .ids-btn-exit:hover,
 button[data-btn-type="exit"]:hover {
   background: #FECDD3 !important;
@@ -533,10 +544,15 @@ button[data-btn-type="exit"]:hover {
   color: #7F1D1D !important;
 }
 .ids-btn-classic.exit:active,
+.ids-btn.exit:active,
 .ids-btn-classic.danger:active,
+.ids-btn.danger:active,
 .ids-btn-classic.cancel:active,
+.ids-btn.cancel:active,
 .ids-btn-classic.void:active,
+.ids-btn.void:active,
 .ids-btn-classic.close-btn:active,
+.ids-btn.close-btn:active,
 .ids-btn-exit:active,
 button[data-btn-type="exit"]:active {
   background: #FCA5A5 !important;
@@ -548,11 +564,17 @@ button[data-btn-type="exit"]:active {
 
 /* 2. SUCCESS / SAVE / ATTEND & CLOSE / CONFIRM / CHECK-IN (Pastel Mint Green Tint) */
 .ids-btn-classic.success,
+.ids-btn.success,
 .ids-btn-classic.save,
+.ids-btn.save,
 .ids-btn-classic.attend,
+.ids-btn.attend,
 .ids-btn-classic.confirm,
+.ids-btn.confirm,
 .ids-btn-classic.checkin,
+.ids-btn.checkin,
 .ids-btn-classic.primary,
+.ids-btn.primary,
 .ids-btn-success,
 button[data-btn-type="success"] {
   background: #DCFCE7 !important;
@@ -563,11 +585,17 @@ button[data-btn-type="success"] {
   font-weight: 700 !important;
 }
 .ids-btn-classic.success:hover,
+.ids-btn.success:hover,
 .ids-btn-classic.save:hover,
+.ids-btn.save:hover,
 .ids-btn-classic.attend:hover,
+.ids-btn.attend:hover,
 .ids-btn-classic.confirm:hover,
+.ids-btn.confirm:hover,
 .ids-btn-classic.checkin:hover,
+.ids-btn.checkin:hover,
 .ids-btn-classic.primary:hover,
+.ids-btn.primary:hover,
 .ids-btn-success:hover,
 button[data-btn-type="success"]:hover {
   background: #BBF7D0 !important;
@@ -576,11 +604,17 @@ button[data-btn-type="success"]:hover {
   color: #052E16 !important;
 }
 .ids-btn-classic.success:active,
+.ids-btn.success:active,
 .ids-btn-classic.save:active,
+.ids-btn.save:active,
 .ids-btn-classic.attend:active,
+.ids-btn.attend:active,
 .ids-btn-classic.confirm:active,
+.ids-btn.confirm:active,
 .ids-btn-classic.checkin:active,
+.ids-btn.checkin:active,
 .ids-btn-classic.primary:active,
+.ids-btn.primary:active,
 .ids-btn-success:active,
 button[data-btn-type="success"]:active {
   background: #86EFAC !important;
@@ -592,10 +626,15 @@ button[data-btn-type="success"]:active {
 
 /* 3. REFRESH / INFO / SEARCH / PRINT / FOLIO (Pastel Ice Sapphire Blue Tint) */
 .ids-btn-classic.info,
+.ids-btn.info,
 .ids-btn-classic.refresh,
+.ids-btn.refresh,
 .ids-btn-classic.search,
+.ids-btn.search,
 .ids-btn-classic.print,
+.ids-btn.print,
 .ids-btn-classic.folio,
+.ids-btn.folio,
 .ids-btn-info,
 button[data-btn-type="info"] {
   background: #E0F2FE !important;
@@ -606,10 +645,15 @@ button[data-btn-type="info"] {
   font-weight: 700 !important;
 }
 .ids-btn-classic.info:hover,
+.ids-btn.info:hover,
 .ids-btn-classic.refresh:hover,
+.ids-btn.refresh:hover,
 .ids-btn-classic.search:hover,
+.ids-btn.search:hover,
 .ids-btn-classic.print:hover,
+.ids-btn.print:hover,
 .ids-btn-classic.folio:hover,
+.ids-btn.folio:hover,
 .ids-btn-info:hover,
 button[data-btn-type="info"]:hover {
   background: #BAE6FD !important;
@@ -618,10 +662,15 @@ button[data-btn-type="info"]:hover {
   color: #0C4A6E !important;
 }
 .ids-btn-classic.info:active,
+.ids-btn.info:active,
 .ids-btn-classic.refresh:active,
+.ids-btn.refresh:active,
 .ids-btn-classic.search:active,
+.ids-btn.search:active,
 .ids-btn-classic.print:active,
+.ids-btn.print:active,
 .ids-btn-classic.folio:active,
+.ids-btn.folio:active,
 .ids-btn-info:active,
 button[data-btn-type="info"]:active {
   background: #7DD3FC !important;
@@ -631,11 +680,19 @@ button[data-btn-type="info"]:active {
   color: #0C4A6E !important;
 }
 
-/* 4. WARNING / AMBER / MODIFY / HOLD / PENDING (Pastel Sand Amber Tint) */
+/* 4. WARNING / AMBER / MODIFY / HOLD / PENDING / CLEAR / SPLIT (Pastel Sand Amber Tint) */
 .ids-btn-classic.warning,
+.ids-btn.warning,
 .ids-btn-classic.modify,
+.ids-btn.modify,
 .ids-btn-classic.hold,
+.ids-btn.hold,
 .ids-btn-classic.amber,
+.ids-btn.amber,
+.ids-btn-classic.clear,
+.ids-btn.clear,
+.ids-btn-classic.split,
+.ids-btn.split,
 .ids-btn-warning,
 button[data-btn-type="warning"] {
   background: #FEF3C7 !important;
@@ -646,9 +703,17 @@ button[data-btn-type="warning"] {
   font-weight: 700 !important;
 }
 .ids-btn-classic.warning:hover,
+.ids-btn.warning:hover,
 .ids-btn-classic.modify:hover,
+.ids-btn.modify:hover,
 .ids-btn-classic.hold:hover,
+.ids-btn.hold:hover,
 .ids-btn-classic.amber:hover,
+.ids-btn.amber:hover,
+.ids-btn-classic.clear:hover,
+.ids-btn.clear:hover,
+.ids-btn-classic.split:hover,
+.ids-btn.split:hover,
 .ids-btn-warning:hover,
 button[data-btn-type="warning"]:hover {
   background: #FDE68A !important;
@@ -657,9 +722,17 @@ button[data-btn-type="warning"]:hover {
   color: #78350F !important;
 }
 .ids-btn-classic.warning:active,
+.ids-btn.warning:active,
 .ids-btn-classic.modify:active,
+.ids-btn.modify:active,
 .ids-btn-classic.hold:active,
+.ids-btn.hold:active,
 .ids-btn-classic.amber:active,
+.ids-btn.amber:active,
+.ids-btn-classic.clear:active,
+.ids-btn.clear:active,
+.ids-btn-classic.split:active,
+.ids-btn.split:active,
 .ids-btn-warning:active,
 button[data-btn-type="warning"]:active {
   background: #FCD34D !important;
@@ -690,6 +763,88 @@ button[data-btn-type="warning"]:active {
   border-right: 1px solid #FFFFFF;
   margin: 0 4px;
   flex-shrink: 0;
+}
+
+/* 5. ICON COMMAND BUTTONS (Toolbar Floppy Disk, Red Close, Blue Next) */
+.ids-icon-save-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 6px !important;
+  background: #D1FAE5 !important;
+  color: #065F46 !important;
+  border: 2px outset #A7F3D0 !important;
+  border-right-color: #059669 !important;
+  border-bottom-color: #059669 !important;
+  cursor: pointer !important;
+  border-radius: 2px !important;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
+  transition: filter 0.08s ease !important;
+}
+.ids-icon-save-btn:hover {
+  background: #A7F3D0 !important;
+  border-right-color: #047857 !important;
+  border-bottom-color: #047857 !important;
+}
+.ids-icon-save-btn:active {
+  background: #6EE7B7 !important;
+  border: 2px inset #059669 !important;
+  border-right-color: #A7F3D0 !important;
+  border-bottom-color: #A7F3D0 !important;
+}
+
+.ids-icon-cancel-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 6px !important;
+  background: #FFE4E6 !important;
+  color: #9F1239 !important;
+  border: 2px outset #FECDD3 !important;
+  border-right-color: #E11D48 !important;
+  border-bottom-color: #E11D48 !important;
+  cursor: pointer !important;
+  border-radius: 2px !important;
+  font-weight: 700 !important;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
+}
+.ids-icon-cancel-btn:hover {
+  background: #FECDD3 !important;
+  border-right-color: #BE123C !important;
+  border-bottom-color: #BE123C !important;
+}
+.ids-icon-cancel-btn:active {
+  background: #FDA4AF !important;
+  border: 2px inset #E11D48 !important;
+  border-right-color: #FECDD3 !important;
+  border-bottom-color: #FECDD3 !important;
+}
+
+.ids-icon-next-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 6px !important;
+  background: #E0F2FE !important;
+  color: #0369A1 !important;
+  border: 2px outset #BAE6FD !important;
+  border-right-color: #0284C7 !important;
+  border-bottom-color: #0284C7 !important;
+  cursor: pointer !important;
+  border-radius: 2px !important;
+  font-weight: 700 !important;
+  font-family: 'Tahoma', 'Segoe UI', sans-serif !important;
+}
+.ids-icon-next-btn:hover {
+  background: #BAE6FD !important;
+  border-right-color: #0369A1 !important;
+  border-bottom-color: #0369A1 !important;
+}
+.ids-icon-next-btn:active {
+  background: #7DD3FC !important;
+  border: 2px inset #0284C7 !important;
+  border-right-color: #BAE6FD !important;
+  border-bottom-color: #BAE6FD !important;
 }
 
 /* ==========================================================================
