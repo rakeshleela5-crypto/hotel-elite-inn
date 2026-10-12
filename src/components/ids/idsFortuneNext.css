@@ -411,6 +411,14 @@
   align-items: center;
   justify-content: center;
   min-height: 70px;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.ids-stat-card:hover {
+  background: #DFDBC7;
+}
+.ids-stat-card:active {
+  background: #D5D1BD;
 }
 .ids-stat-card:nth-child(2n) {
   border-right: none;

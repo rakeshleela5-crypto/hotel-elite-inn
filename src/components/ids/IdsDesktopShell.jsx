@@ -108,6 +108,7 @@ import IdsTenderReclassificationModal from './IdsTenderReclassificationModal';
 import IdsTransitSlotModal from './IdsTransitSlotModal';
 import IdsCorporateBtcAgingModal from './IdsCorporateBtcAgingModal';
 import IdsCaGstr1ExportModal from './IdsCaGstr1ExportModal';
+import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { sealFastApiNightAudit } from '../../utils/backendApi';
 import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
 import { 
@@ -549,6 +550,45 @@ export default function IdsDesktopShell({
   const [autoAuditRunning, setAutoAuditRunning] = useState(false);
   const [countdownToMidnight, setCountdownToMidnight] = useState('00:00:00');
   const [lastAutoAuditDate, setLastAutoAuditDate] = useState('');
+
+  // Step 2: Bottom Ribbon Functional Modals & Features
+  const [sysUpdateModalOpen, setSysUpdateModalOpen] = useState(false);
+  const [sysUpdateProgress, setSysUpdateProgress] = useState(100);
+  const [hotKeyModalOpen, setHotKeyModalOpen] = useState(false);
+  const [otherUtilitiesModalOpen, setOtherUtilitiesModalOpen] = useState(false);
+  const [eventsRegisterModalOpen, setEventsRegisterModalOpen] = useState(false);
+  const [auditLogModalOpen, setAuditLogModalOpen] = useState(false);
+  const [todoModalOpen, setTodoModalOpen] = useState(false);
+  const [todoList, setTodoList] = useState([
+    { id: 1, text: 'Morning Handover & Cashier Drawer Float Count (FO-01)', time: '07:00 AM', done: true, priority: 'HIGH' },
+    { id: 2, text: 'Reconcile In-House Room Rack vs Housekeeping Inspection', time: '10:00 AM', done: true, priority: 'MEDIUM' },
+    { id: 3, text: 'Verify Expected Checkout Folios & Clear Guest Ledger Balances', time: '11:30 AM', done: false, priority: 'HIGH' },
+    { id: 4, text: 'Prepare RFID Key Cards & Reg Cards for Afternoon Arrivals', time: '02:00 PM', done: false, priority: 'MEDIUM' },
+    { id: 5, text: 'Muniguda Police Station Daily Manifest (Form C) Export', time: '06:00 PM', done: false, priority: 'HIGH' },
+    { id: 6, text: 'Restaurant & Liquor Bar Unbilled KOT Audit Sweep', time: '09:30 PM', done: false, priority: 'HIGH' },
+    { id: 7, text: 'Execute Automated Midnight Day Close & Night Audit Rollover', time: '11:59 PM', done: false, priority: 'CRITICAL' }
+  ]);
+  const [newTodoText, setNewTodoText] = useState('');
+  const [eventsList, setEventsList] = useState([
+    { id: 1, name: 'Vedanta Alumina Annual Contractor Review', space: 'Elite Royal Banquet Hall', time: '09:00 AM - 05:00 PM', pax: 45, plan: 'Buffet Lunch CP', contact: 'Mr. Pradeep Mohanty (+91 94370 18001)', status: 'Active In-Progress' },
+    { id: 2, name: 'JK Paper Technical Delegation Coordination', space: 'Executive Board Room (1st Flr)', time: '11:00 AM - 03:00 PM', pax: 12, plan: 'Hi-Tea & Snacks', contact: 'Mr. Arvind Singhania (+91 94370 18002)', status: 'Confirmed' },
+    { id: 3, name: 'Family Reception & Dinner Gathering', space: 'Lawn Garden Banquet', time: '07:30 PM - 10:30 PM', pax: 80, plan: 'Mughlai Dinner', contact: 'Dr. Debasis Panda (+91 94370 11999)', status: 'Scheduled' }
+  ]);
+  const [newEventName, setNewEventName] = useState('');
+  const [newEventSpace, setNewEventSpace] = useState('Elite Royal Banquet Hall');
+  const [newEventPax, setNewEventPax] = useState('25');
+
+  const triggerSystemUpdate = () => {
+    playReceptionChime();
+    setSysUpdateProgress(15);
+    setSysUpdateModalOpen(true);
+    setTimeout(() => setSysUpdateProgress(48), 250);
+    setTimeout(() => setSysUpdateProgress(82), 550);
+    setTimeout(() => {
+      setSysUpdateProgress(100);
+      playSuccessChime();
+    }, 900);
+  };
 
   // Automated 12:00 AM Midnight Day Close (Night Audit) Daemon
   // "Right now Day Close is done manually between 12:00 and 12:05 AM... Adi manual avutundi, adi automatic ga kavali!"
@@ -2095,11 +2135,21 @@ export default function IdsDesktopShell({
             <div className="ids-column-header">Statistics</div>
             <div className="ids-stat-grid">
               {/* Row 1 */}
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Expected Arrivals List & Rapid Check-In (Video 06 & 07)"
+                onClick={() => setExpressCheckInOpen(true)}
+              >
                 <div className="ids-stat-val">{stats.expectedArrivals}</div>
                 <div className="ids-stat-lbl">Expected<br />Arrivals</div>
               </div>
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Expected Departures & Checkout Billing Folio (Video 14)"
+                onClick={() => setCheckoutBillModalOpen(true)}
+              >
                 <div className="ids-stat-val">{stats.expectedDepartures}</div>
                 <div className="ids-stat-lbl">Expected<br />Departures</div>
               </div>
@@ -2116,7 +2166,12 @@ export default function IdsDesktopShell({
                 </div>
                 <div className="ids-stat-lbl">Check-in Rooms</div>
               </div>
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to open Front Desk Walk-In Registration Console (Video 08)"
+                onClick={() => setWalkInModalOpen(true)}
+              >
                 <div className="ids-stat-val">{stats.walkInRooms}</div>
                 <div className="ids-stat-lbl">Walk-in Rooms</div>
               </div>
@@ -2156,13 +2211,26 @@ export default function IdsDesktopShell({
                 <div className="ids-stat-val orange">{stats.inhouseRoomsGuests}</div>
                 <div className="ids-stat-lbl">Inhouse<br />Rooms/Guests</div>
               </div>
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Inhouse Guest Occupancy & Extra Bedding Charges"
+                onClick={() => {
+                  setGuestServicesTab('inhouse-guests');
+                  setGuestServicesOpen(true);
+                }}
+              >
                 <div className="ids-stat-val">{stats.extraAdultChild}</div>
                 <div className="ids-stat-lbl">Extra<br />Adult/Child</div>
               </div>
 
               {/* Row 5 */}
-              <div className="ids-stat-card">
+              <div 
+                className="ids-stat-card"
+                style={{ cursor: 'pointer' }}
+                title="Click to view Foreign Guest Registry & Muniguda Police Thana Manifest (Form C)"
+                onClick={() => setPoliceThanaManifestOpen(true)}
+              >
                 <div className="ids-stat-val">{stats.inhouseForeigners}</div>
                 <div className="ids-stat-lbl">Inhouse Forgn.<br />Rooms/Guests</div>
               </div>
@@ -2183,37 +2251,43 @@ export default function IdsDesktopShell({
         <div className="ids-bottom-commands">
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('System Update: All 27 physical room ledgers reconciled with Hotel Elite Inn local ledger. Status: NORMAL.', 'IDS Fortune NEXT - System Update', 'info')}
+            onClick={triggerSystemUpdate}
+            title="System Update & Physical Room Ledger Reconciliation (Video 19)"
           >
             Sys Update
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('IDS PMS Keyboard Shortcuts:\n• F2 / Load Pgm: Quick Scan Program Launcher\n• Enter: Advance to next input field\n• Esc: Close active dialog\n• Alt+S: Save Transaction\n• Alt+E: Exit Window', 'IDS Fortune NEXT - System HotKeys', 'info')}
+            onClick={() => setHotKeyModalOpen(true)}
+            title="IDS Fortune NEXT Keyboard Shortcuts Console (F1-F12)"
           >
             HotKey
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('Other Utilities: Night Audit Queue, POS 5 Room Service Sync, Local Master Ledger: ACTIVE.', 'IDS Fortune NEXT - Utilities', 'info')}
+            onClick={() => setOtherUtilitiesModalOpen(true)}
+            title="IDS System Utilities & Operations Console"
           >
             Other
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('Events Register: 0 pending maintenance events. 1 active banquet booking scheduled.', 'IDS Fortune NEXT - Events Register', 'info')}
+            onClick={() => setEventsRegisterModalOpen(true)}
+            title="Hotel Banquet & Events Space Register"
           >
             Events
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox(`Last Updated: ${accountingDate} 18:02 by USER: IT ADMIN (FRONT DESK DUTY MANAGER).`, 'IDS Fortune NEXT - Audit Info', 'info')}
+            onClick={() => setAuditLogModalOpen(true)}
+            title="System Audit & Duty Log Sheet"
           >
             Last Updated
           </button>
           <button 
             className="ids-btn-classic"
-            onClick={() => showMessageBox('Front Office Duty Checklist:\n1. Reconcile Guest Ledgers\n2. Verify Inhouse Guest KYC (Aadhaar/Passports)\n3. Check unbilled restaurant KOTs\n4. Perform Night Audit rollover at 00:00', 'IDS Fortune NEXT - Duty To-Do List', 'info')}
+            onClick={() => setTodoModalOpen(true)}
+            title="Front Office Duty Checklist & Task Register"
           >
             To-Do
           </button>
@@ -3913,6 +3987,471 @@ export default function IdsDesktopShell({
         currentUser="MANAGER"
         onOpenMessageBox={showMessageBox}
       />
+
+      {/* 10. System Update & Physical Room Ledger Reconciliation Modal */}
+      {sysUpdateModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🔄 IDS Fortune NEXT - System Update & Ledger Reconcile</span>
+              <button className="ids-win-btn close" onClick={() => setSysUpdateModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '14px', fontSize: '11px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <RefreshCw size={18} className={sysUpdateProgress < 100 ? "spin" : ""} color="#0A246A" />
+                <span style={{ fontWeight: 700, fontSize: '12px', color: '#0A246A' }}>
+                  {sysUpdateProgress < 100 ? `Reconciling Physical Room Ledgers... (${sysUpdateProgress}%)` : `Ledgers Reconciled Successfully (100%)`}
+                </span>
+              </div>
+              <div style={{ background: '#FFF', border: '1px solid #7F9DB9', height: '14px', borderRadius: '2px', overflow: 'hidden', marginBottom: '12px' }}>
+                <div style={{ width: `${sysUpdateProgress}%`, height: '100%', background: 'linear-gradient(90deg, #1565C0, #2E7D32)', transition: 'width 0.3s ease' }} />
+              </div>
+              <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Physical Rooms Audited:</span>
+                  <strong style={{ color: '#2E7D32' }}>27 / 27 Rooms Reconciled</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>In-House Occupancy Check:</span>
+                  <strong>{stats.inhouseRoomsGuests} Rooms/Guests In-House</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Out of Order (OOO) Isolation:</span>
+                  <strong style={{ color: '#C62828' }}>Room 206 (AC Maintenance)</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Unbilled F&B Restaurant KOTs:</span>
+                  <strong style={{ color: '#2E7D32' }}>Zero Orphaned KOTs</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Cloud Replication (D1 & Postgres):</span>
+                  <strong style={{ color: '#1565C0' }}>ONLINE (Ping: 22ms)</strong>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                <button 
+                  className="ids-btn-classic"
+                  onClick={triggerSystemUpdate}
+                  style={{ background: '#E0F2F1' }}
+                >
+                  🔄 Re-Audit All Rooms
+                </button>
+                <button 
+                  className="ids-btn-classic" 
+                  onClick={() => setSysUpdateModalOpen(false)}
+                  style={{ minWidth: '70px', fontWeight: 700 }}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 11. HotKey Console Modal (Win32 Keyboard Accelerators) */}
+      {hotKeyModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '680px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>⌨️ IDS Fortune NEXT - System Keyboard Shortcuts (HotKeys)</span>
+              <button className="ids-win-btn close" onClick={() => setHotKeyModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '12px', fontSize: '11px' }}>
+              <div style={{ background: '#FFFFE1', border: '1px solid #ACA899', padding: '6px 10px', marginBottom: '10px', color: '#555' }}>
+                Windows ERP Hotkeys allow high-speed front desk operation without touching the mouse. Click <strong>[ Launch ]</strong> to test any shortcut immediately.
+              </div>
+              <div style={{ maxHeight: '380px', overflowY: 'auto', border: '1px solid #ACA899', background: '#FFF' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ background: '#DFDBC9', borderBottom: '1px solid #ACA899' }}>
+                      <th style={{ padding: '6px 10px', width: '80px' }}>Shortcut</th>
+                      <th style={{ padding: '6px 10px' }}>Function Description</th>
+                      <th style={{ padding: '6px 10px', width: '90px', textAlign: 'center' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F2</td>
+                      <td style={{ padding: '6px 10px' }}>Quick Scan / Load Program Launcher</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setQuickScanModalOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F3</td>
+                      <td style={{ padding: '6px 10px' }}>Room Status Rack & Availability Tape Chart</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setRoomRackConsoleOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F4</td>
+                      <td style={{ padding: '6px 10px' }}>Rapid Express & Group Check-In Console</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setExpressCheckInOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F5</td>
+                      <td style={{ padding: '6px 10px' }}>Cannon Kitchen & Restaurant Touch POS Terminal</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setTouchPosModalOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F6</td>
+                      <td style={{ padding: '6px 10px' }}>Guest Checkout Billing Folio & Settlements</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setCheckoutBillModalOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F7</td>
+                      <td style={{ padding: '6px 10px' }}>Statutory Crystal Reports 8.5/9.0 Vouchers</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); openCrystalReport('arrival-manifest'); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>F8</td>
+                      <td style={{ padding: '6px 10px' }}>Guest Complaints Register & Maintenance Tickets</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setGuestServicesTab('attend-complaints'); setGuestServicesOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE', background: '#FAFAFA' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#0A246A' }}>Shift+F1</td>
+                      <td style={{ padding: '6px 10px' }}>Print F&B Restaurant / Bar Order Bill</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                        <button className="ids-btn-classic" style={{ fontSize: '10px' }} onClick={() => { setHotKeyModalOpen(false); setPosBillModalOpen(true); }}>Launch</button>
+                      </td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#777' }}>Alt+S</td>
+                      <td style={{ padding: '6px 10px' }}>Commit / Save Active Transaction</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center', color: '#888' }}>Global</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '6px 10px', fontWeight: 700, color: '#777' }}>Esc</td>
+                      <td style={{ padding: '6px 10px' }}>Close / Dismiss Active Dialog</td>
+                      <td style={{ padding: '6px 10px', textAlign: 'center', color: '#888' }}>Global</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                <button className="ids-btn-classic" onClick={() => setHotKeyModalOpen(false)} style={{ minWidth: '70px', fontWeight: 700 }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 12. Other Utilities Console Modal */}
+      {otherUtilitiesModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '640px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🛠️ IDS Fortune NEXT - System Utilities & Operations Console</span>
+              <button className="ids-win-btn close" onClick={() => setOtherUtilitiesModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '14px', fontSize: '11px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>🌙 Night Audit Wizard</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>Automated Midnight Day Close & Revenue Rollover scheduler.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); setNightAuditModalOpen(true); }}>Launch Night Audit</button>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>🍽️ Touch Screen POS & KDS</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>Cannon Kitchen Point of Sale & Chef Live Order Wall.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); setTouchPosModalOpen(true); }}>Open Touch POS</button>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>📋 Staff Register & QR Badges</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>31 Hotel Staff Directory with camera QR badges.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); openStaffMaster('directory'); }}>Open Staff Master</button>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>🚨 Muniguda Police Thana Manifest</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>Daily Form C guest arrival compliance export.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); setPoliceThanaManifestOpen(true); }}>Open Thana Manifest</button>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>🏢 Corporate BTC Debtors Ledger</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>Vedanta, JK Paper & RVNL aging analysis statement.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); setCorporateBtcModalOpen(true); }}>Open BTC Ledger</button>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ fontWeight: 700, color: '#0A246A' }}>🏛️ CA GSTR-1 Portal JSON Export</div>
+                  <div style={{ color: '#666', fontSize: '10.5px' }}>Gov SAC 996311 (12%) & 996331 (5%) JSON filing tool.</div>
+                  <button className="ids-btn-classic" style={{ marginTop: '4px', alignSelf: 'flex-start' }} onClick={() => { setOtherUtilitiesModalOpen(false); setCaGstr1ModalOpen(true); }}>Open GSTR-1 Export</button>
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="ids-btn-classic" onClick={() => setOtherUtilitiesModalOpen(false)} style={{ minWidth: '70px', fontWeight: 700 }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 13. Events & Banquet Register Modal */}
+      {eventsRegisterModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '740px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>📅 IDS Fortune NEXT - Hotel Banquet & Events Register</span>
+              <button className="ids-win-btn close" onClick={() => setEventsRegisterModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '12px', fontSize: '11px' }}>
+              <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '8px 12px', marginBottom: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <strong style={{ color: '#0A246A' }}>Function Spaces:</strong> Elite Royal Banquet (150 Pax) • Executive Board Room (20 Pax) • Lawn Garden Banquet (250 Pax)
+                </div>
+                <span style={{ background: '#E8F5E9', color: '#2E7D32', padding: '2px 8px', fontWeight: 700, border: '1px solid #C8E6C9' }}>
+                  {eventsList.length} Active Events
+                </span>
+              </div>
+              <div style={{ maxHeight: '250px', overflowY: 'auto', border: '1px solid #ACA899', background: '#FFF', marginBottom: '12px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '11px' }}>
+                  <thead>
+                    <tr style={{ background: '#DFDBC9', borderBottom: '1px solid #ACA899' }}>
+                      <th style={{ padding: '6px 8px' }}>Event Name / Organiser</th>
+                      <th style={{ padding: '6px 8px' }}>Banquet Space</th>
+                      <th style={{ padding: '6px 8px' }}>Timing</th>
+                      <th style={{ padding: '6px 8px' }}>Pax</th>
+                      <th style={{ padding: '6px 8px' }}>Plan</th>
+                      <th style={{ padding: '6px 8px' }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eventsList.map(ev => (
+                      <tr key={ev.id} style={{ borderBottom: '1px solid #EEE' }}>
+                        <td style={{ padding: '6px 8px' }}>
+                          <div style={{ fontWeight: 700, color: '#0A246A' }}>{ev.name}</div>
+                          <div style={{ fontSize: '10px', color: '#666' }}>{ev.contact}</div>
+                        </td>
+                        <td style={{ padding: '6px 8px' }}>{ev.space}</td>
+                        <td style={{ padding: '6px 8px' }}>{ev.time}</td>
+                        <td style={{ padding: '6px 8px', fontWeight: 700 }}>{ev.pax}</td>
+                        <td style={{ padding: '6px 8px' }}>{ev.plan}</td>
+                        <td style={{ padding: '6px 8px' }}>
+                          <span style={{ 
+                            background: ev.status.includes('Active') ? '#E8F5E9' : '#FFF3E0', 
+                            color: ev.status.includes('Active') ? '#2E7D32' : '#E65100',
+                            padding: '1px 6px',
+                            fontWeight: 700,
+                            fontSize: '10px',
+                            borderRadius: '2px'
+                          }}>
+                            {ev.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Quick Add Event Form */}
+              <div style={{ background: '#DFDBC9', border: '1px solid #B0AB9A', padding: '8px 10px', marginBottom: '12px' }}>
+                <div style={{ fontWeight: 700, marginBottom: '6px', color: '#333' }}>+ Quick Schedule Banquet Booking:</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 60px auto', gap: '8px', alignItems: 'center' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Event Name / Host..." 
+                    value={newEventName} 
+                    onChange={e => setNewEventName(e.target.value)} 
+                    style={{ padding: '3px 6px', fontSize: '11px', border: '1px solid #7F9DB9' }} 
+                  />
+                  <select 
+                    value={newEventSpace} 
+                    onChange={e => setNewEventSpace(e.target.value)}
+                    style={{ padding: '3px 6px', fontSize: '11px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                  >
+                    <option value="Elite Royal Banquet Hall">Elite Royal Banquet</option>
+                    <option value="Executive Board Room (1st Flr)">Executive Board Room</option>
+                    <option value="Lawn Garden Banquet">Lawn Garden Banquet</option>
+                  </select>
+                  <input 
+                    type="number" 
+                    placeholder="Pax" 
+                    value={newEventPax} 
+                    onChange={e => setNewEventPax(e.target.value)} 
+                    style={{ padding: '3px 4px', fontSize: '11px', border: '1px solid #7F9DB9' }} 
+                  />
+                  <button 
+                    className="ids-btn-classic"
+                    onClick={() => {
+                      if (!newEventName.trim()) return alert("Please enter event name.");
+                      setEventsList(prev => [...prev, {
+                        id: Date.now(),
+                        name: newEventName.trim(),
+                        space: newEventSpace,
+                        time: '18:00 - 22:00',
+                        pax: Number(newEventPax) || 20,
+                        plan: 'Standard Banquet Package',
+                        contact: 'Front Desk Logged',
+                        status: 'Confirmed'
+                      }]);
+                      setNewEventName('');
+                      playSuccessChime();
+                    }}
+                    style={{ background: '#2E7D32', color: '#FFF' }}
+                  >
+                    + Add Event
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="ids-btn-classic" onClick={() => setEventsRegisterModalOpen(false)} style={{ minWidth: '70px', fontWeight: 700 }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 14. System Audit & Duty Timestamp Log Sheet */}
+      {auditLogModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '620px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🕒 IDS Fortune NEXT - System Audit & Duty Timestamp Log</span>
+              <button className="ids-win-btn close" onClick={() => setAuditLogModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '12px', fontSize: '11px' }}>
+              <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', marginBottom: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <div><strong>Software Build:</strong> IDS Fortune NEXT V6.5.002.2</div>
+                  <div><strong>Accounting Date:</strong> {accountingDate}</div>
+                  <div><strong>Workstation Node:</strong> WS-FRONTDESK-01 (192.168.1.104)</div>
+                  <div><strong>Active Terminal Role:</strong> Front Desk Lead Cashier</div>
+                  <div><strong>Current Operator:</strong> IT ADMIN (DUTY MANAGER)</div>
+                  <div><strong>Active Shift:</strong> FO-02 Evening Cashier Shift</div>
+                </div>
+              </div>
+              <div style={{ fontWeight: 700, marginBottom: '6px', color: '#0A246A' }}>Recent Operational Audit Trail:</div>
+              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #ACA899', background: '#FFF', padding: '6px 10px', fontFamily: 'monospace', fontSize: '10.5px' }}>
+                <div>• [18:02:14] Check-In Success: Room 102 (Rajesh Sharma) folio opened by USER: MANAGER</div>
+                <div>• [17:45:00] Cashier Shift FO-01 closed & audited. Dryer float ₹5,000 verified.</div>
+                <div>• [16:30:22] F&B Bill #4 on Table 10 settled via Cash (₹627.00)</div>
+                <div>• [15:10:45] Corporate BTC Aging ledger queried for Vedanta Alumina</div>
+                <div>• [14:00:00] Scheduled Automated Midnight Day Close active (12:00 AM)</div>
+                <div>• [09:15:30] Front Desk Duty checklist morning tasks verified</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                <button className="ids-btn-classic" onClick={() => setAuditLogModalOpen(false)} style={{ minWidth: '70px', fontWeight: 700 }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 15. Front Desk Duty Checklist & Task Register Modal */}
+      {todoModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
+          <div className="ids-dialog-window" style={{ width: '640px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>✅ IDS Fortune NEXT - Front Desk Duty Checklist & Task Register</span>
+              <button className="ids-win-btn close" onClick={() => setTodoModalOpen(false)}>✕</button>
+            </div>
+            <div style={{ padding: '12px', fontSize: '11px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', background: '#FFF', padding: '8px 12px', border: '1px solid #ACA899' }}>
+                <div>
+                  <strong>Duty Progress:</strong> {todoList.filter(t => t.done).length} of {todoList.length} Tasks Completed
+                </div>
+                <div style={{ width: '140px', background: '#EEE', height: '10px', borderRadius: '5px', overflow: 'hidden' }}>
+                  <div style={{ 
+                    width: `${Math.round((todoList.filter(t => t.done).length / todoList.length) * 100)}%`, 
+                    height: '100%', 
+                    background: '#2E7D32',
+                    transition: 'width 0.2s ease'
+                  }} />
+                </div>
+              </div>
+
+              <div style={{ maxHeight: '280px', overflowY: 'auto', border: '1px solid #ACA899', background: '#FFF', marginBottom: '10px' }}>
+                {todoList.map(item => (
+                  <div 
+                    key={item.id} 
+                    onClick={() => {
+                      setTodoList(prev => prev.map(t => t.id === item.id ? { ...t, done: !t.done } : t));
+                      playReceptionChime();
+                    }}
+                    style={{ 
+                      padding: '8px 12px', 
+                      borderBottom: '1px solid #EEE', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      cursor: 'pointer',
+                      background: item.done ? '#F9FBF9' : '#FFF' 
+                    }}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={item.done} 
+                      onChange={() => {}} 
+                      style={{ cursor: 'pointer', transform: 'scale(1.2)' }} 
+                    />
+                    <div style={{ flex: 1, textDecoration: item.done ? 'line-through' : 'none', color: item.done ? '#888' : '#000' }}>
+                      {item.text}
+                    </div>
+                    <span style={{ fontSize: '10px', color: '#666' }}>{item.time}</span>
+                    <span style={{ 
+                      fontSize: '9px', 
+                      fontWeight: 700, 
+                      padding: '1px 5px', 
+                      borderRadius: '2px',
+                      background: item.priority === 'CRITICAL' ? '#FFEBEE' : item.priority === 'HIGH' ? '#FFF3E0' : '#E8F5E9',
+                      color: item.priority === 'CRITICAL' ? '#C62828' : item.priority === 'HIGH' ? '#E65100' : '#2E7D32'
+                    }}>
+                      {item.priority}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add Custom Task */}
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '12px' }}>
+                <input 
+                  type="text" 
+                  placeholder="Enter new front desk shift task..." 
+                  value={newTodoText} 
+                  onChange={e => setNewTodoText(e.target.value)} 
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && newTodoText.trim()) {
+                      setTodoList(prev => [...prev, { id: Date.now(), text: newTodoText.trim(), time: 'Now', done: false, priority: 'MEDIUM' }]);
+                      setNewTodoText('');
+                      playSuccessChime();
+                    }
+                  }}
+                  style={{ flex: 1, padding: '4px 8px', fontSize: '11px', border: '1px solid #7F9DB9' }} 
+                />
+                <button 
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    if (!newTodoText.trim()) return;
+                    setTodoList(prev => [...prev, { id: Date.now(), text: newTodoText.trim(), time: 'Now', done: false, priority: 'MEDIUM' }]);
+                    setNewTodoText('');
+                    playSuccessChime();
+                  }}
+                  style={{ background: '#2E7D32', color: '#FFF' }}
+                >
+                  + Add Task
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button className="ids-btn-classic" onClick={() => setTodoModalOpen(false)} style={{ minWidth: '70px', fontWeight: 700 }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
