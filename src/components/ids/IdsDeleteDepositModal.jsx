@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { 
   Trash2, DollarSign, AlertCircle, CheckCircle2, 

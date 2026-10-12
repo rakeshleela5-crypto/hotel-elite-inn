@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { 
