@@ -4,4 +4,3 @@
 // ============================================================================
 
 export { default as CannonKitchenPOS } from '../../components/ids/IdsTouchPosTerminalModal';
-export { default as FoodOrderModal } from '../../components/FoodOrderModal';

@@ -7,7 +7,6 @@
 export { default as MasterFolioModal } from '../../components/ids/IdsCheckoutBillModal';
 export { default as FolioActionsModal } from '../../components/ids/IdsCheckoutBillModal';
 export { default as CheckoutSplitModal } from '../../components/ids/IdsPaxCheckoutModal';
-export { default as AccountsLedgerModal } from '../../components/AccountsLedgerModal';
+export { default as AuditedSalesRegisterModal } from '../../components/ids/IdsAuditedSalesRegisterModal';
 export { default as NightAuditModal } from '../../components/ids/IdsNightAuditModal';
-export { default as StoreInventoryModal } from '../../components/StoreInventoryModal';
 export { default as FinancialAnalytics } from '../../components/FinancialAnalytics';

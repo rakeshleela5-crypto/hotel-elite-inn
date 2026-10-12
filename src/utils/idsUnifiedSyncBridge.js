@@ -9,7 +9,6 @@ import {
   getFormattedPmsDate,
   getFormattedPmsMonthYear 
 } from '../data/idsPmsStore';
-import { OCTOBER_2026_SEEDED_PMS_DAILY_RECORDS } from './pmsMasterAuditLedger';
 import { postFastApiHotelSaleRecord, postFastApiRestaurantSaleRecord } from './backendApi';
 
 const STORAGE_KEY_HOTEL_LIVE = 'ids_unified_hotel_live_sales_v1';

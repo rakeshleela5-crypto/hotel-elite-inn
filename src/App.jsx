@@ -36,27 +36,23 @@ const IdsDesktopShell = lazyWithRetry(() => import('./components/ids/IdsDesktopS
 const FinancialAnalytics = lazyWithRetry(() => import('./components/FinancialAnalytics'));
 const CaFilingStationModal = lazyWithRetry(() => import('./components/CaFilingStationModal'));
 const AutonomousBotFleetModal = lazyWithRetry(() => import('./components/AutonomousBotFleetModal'));
-const FoodOrderModal = lazyWithRetry(() => import('./components/FoodOrderModal'));
 const DarshanAdvisorModal = lazyWithRetry(() => import('./components/DarshanAdvisorModal'));
 const AiConciergeModal = lazyWithRetry(() => import('./components/AiConciergeModal'));
-const CorporatePortalModal = lazyWithRetry(() => import('./components/CorporatePortalModal'));
+const IdsCompanyProfileModal = lazyWithRetry(() => import('./components/ids/IdsCompanyProfileModal'));
 const IdsCheckoutBillModal = lazyWithRetry(() => import('./components/ids/IdsCheckoutBillModal'));
 const IdsTouchPosTerminalModal = lazyWithRetry(() => import('./components/ids/IdsTouchPosTerminalModal'));
-const AccountsLedgerModal = lazyWithRetry(() => import('./components/AccountsLedgerModal'));
+const IdsAuditedSalesRegisterModal = lazyWithRetry(() => import('./components/ids/IdsAuditedSalesRegisterModal'));
 const IdsNightAuditModal = lazyWithRetry(() => import('./components/ids/IdsNightAuditModal'));
-const StoreInventoryModal = lazyWithRetry(() => import('./components/StoreInventoryModal'));
 const DirectorPortal = lazyWithRetry(() => import('./components/DirectorPortal'));
 const RevenueManagementModal = lazyWithRetry(() => import('./components/RevenueManagementModal'));
 const LegalPoliciesModal = lazyWithRetry(() => import('./components/LegalPoliciesModal'));
 const DpdpDataRightsModal = lazyWithRetry(() => import('./components/DpdpDataRightsModal'));
-const InRoomGuestPortal = lazyWithRetry(() => import('./components/InRoomGuestPortal'));
-const HousekeepingPortal = lazyWithRetry(() => import('./components/HousekeepingPortal'));
-import AuditedSalesRegisterModal from './components/AuditedSalesRegisterModal';
-import AuditedRestaurantRegisterModal from './components/AuditedRestaurantRegisterModal';
+const IdsGuestServicesModal = lazyWithRetry(() => import('./components/ids/IdsGuestServicesModal'));
+const IdsPosReportsModal = lazyWithRetry(() => import('./components/ids/IdsPosReportsModal'));
+const IdsHkRoomStatusModal = lazyWithRetry(() => import('./components/ids/IdsHkRoomStatusModal'));
 const StewardMobileOrderPad = lazyWithRetry(() => import('./components/StewardMobileOrderPad'));
 const KitchenDisplayKDS = lazyWithRetry(() => import('./components/KitchenDisplayKDS'));
 const StewardQrManagerModal = lazyWithRetry(() => import('./components/StewardQrManagerModal'));
-const HousekeepingMobilePortal = lazyWithRetry(() => import('./components/HousekeepingMobilePortal'));
 const IdsQuickScanModal = lazyWithRetry(() => import('./components/ids/IdsQuickScanModal'));
 import {
   getLiveKots, saveLiveKots, broadcastKotChannel,
@@ -67,7 +63,6 @@ const RoomQrModal = lazyWithRetry(() => import('./components/RoomQrModal'));
 import { HOTEL_CONFIG, INITIAL_ROOMS_INVENTORY, ROOM_TIERS, INITIAL_FOLIO_TRANSACTIONS, CORPORATE_PARTNERS } from './data/hotelData';
 import { getStoredAccountingDate } from './data/idsPmsStore';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
-import { initMidnightAuditScheduler } from './utils/midnightAuditScheduler';
 import {
   createFastApiBooking,
   postFastApiFolioCharge,
@@ -351,24 +346,10 @@ export default function App() {
   const [nightAudits, setNightAudits] = useState([]);
   const [housekeepingModalOpen, setHousekeepingModalOpen] = useState(false);
 
-  // Requirement 2: Automated Midnight Day Close (Night Audit) Background Scheduler
-  useEffect(() => {
-    const cleanup = initMidnightAuditScheduler({
-      rooms,
-      bookings,
-      transactions,
-      onAuditExecuted: (auditPayload) => {
-        setNightAudits(prev => [auditPayload, ...prev]);
-      }
-    });
-    return cleanup;
-  }, [rooms, bookings, transactions]);
-
   const handleOpenAccountsWithTab = (tab = 'tally-erp') => {
     setAccountsInitialTab(tab);
     setAccountsModalOpen(true);
   };
-  const [storeInventoryModalOpen, setStoreInventoryModalOpen] = useState(false);
   const [directorPortalOpen, setDirectorPortalOpen] = useState(false);
   const [revenueModalOpen, setRevenueModalOpen] = useState(false);
   const [caFilingModalOpen, setCaFilingModalOpen] = useState(false);
@@ -936,18 +917,15 @@ export default function App() {
           Loading Hotel Sai In-Room Companion...
         </div>
       }>
-        <InRoomGuestPortal
-          roomNumber={inRoomPortalState.roomNumber}
-          onPlaceFoodOrder={handlePlaceFoodOrderFromGuestPortal}
-          onRequestRoomService={handleRequestRoomServiceFromGuestPortal}
-          onExitToFullWebsite={() => {
+        <IdsGuestServicesModal
+          isOpen={true}
+          onClose={() => {
             setInRoomPortalState({ active: false, roomNumber: inRoomPortalState.roomNumber });
             if (typeof window !== 'undefined' && window.history) {
               window.history.pushState({}, '', window.location.pathname);
             }
           }}
-          activeFoodOrders={foodOrders}
-          activeRoomServices={roomServices}
+          inhouseGuests={rooms.filter(r => r.status === 'Occupied' || r.status === 'occupied').map(r => ({ roomNo: r.number, name: r.guestName || 'Guest' }))}
         />
       </Suspense>
     );
@@ -988,15 +966,16 @@ export default function App() {
   // Dedicated Housekeeping Mobile Portal View (Triggered via Housekeeping QR code or /?view=housekeeping)
   if (housekeepingPortalOpen) {
     return (
-      <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Housekeeping Mobile Portal...</div>}>
-        <HousekeepingMobilePortal
-          staffRole={housekeepingStaffRole}
+      <Suspense fallback={<div style={{ padding: '3rem 1rem', color: '#fff', textAlign: 'center', background: '#090d16', minHeight: '100vh' }}>Loading Housekeeping Console...</div>}>
+        <IdsHkRoomStatusModal
+          isOpen={true}
           onClose={() => {
             setHousekeepingPortalOpen(false);
             if (typeof window !== 'undefined' && window.history) {
               window.history.pushState({}, '', window.location.pathname);
             }
           }}
+          onUpdateStatus={handleUpdateRoomStatus}
         />
       </Suspense>
     );
@@ -1011,23 +990,7 @@ export default function App() {
           setCurrentView={setCurrentView}
           onOpen3DExplorer={() => setFloorExplorerOpen(true)}
           onOpenVirtualTour={() => handleOpenVirtualTour('entrance-gate')}
-          onOpenDining={() => setDiningModalOpen(true)}
-          onOpenDarshan={() => setDarshanModalOpen(true)}
           onOpenAiConcierge={() => setAiConciergeOpen(true)}
-          onOpenBotFleet={() => setBotFleetOpen(true)}
-          onOpenCorporate={() => setCorporateModalOpen(true)}
-          onOpenMasterFolio={handleOpenMasterFolio}
-          onOpenCannonKitchenPOS={() => setPosModalOpen(true)}
-          onOpenAccountsLedger={() => setAccountsModalOpen(true)}
-          onOpenNightAudit={() => setNightAuditModalOpen(true)}
-          onOpenStoreInventory={() => setStoreInventoryModalOpen(true)}
-          onOpenDirectorPortal={() => setDirectorPortalOpen(true)}
-          onOpenRevenueManagement={() => setRevenueModalOpen(true)}
-          onOpenD1Database={handleOpenD1Database}
-          onOpenCaFilingStation={() => setCaFilingModalOpen(true)}
-          onOpenHousekeeping={() => setHousekeepingModalOpen(true)}
-          onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
-          onOpenAuditedRestaurantRegister={() => setAuditedRestaurantRegisterOpen(true)}
           onOpenRoomSearch={() => setRoomSearchModalOpen(true)}
           rooms={rooms}
           adminPinVerified={adminPinVerified}
@@ -1132,16 +1095,20 @@ export default function App() {
           />
         )}
 
-        <FoodOrderModal
-          isOpen={diningModalOpen}
-          onClose={() => {
-            setDiningModalOpen(false);
-            setSelectedFoodItem(null);
-          }}
-          initialItem={selectedFoodItem}
-          rooms={rooms}
-          onBillToRoom={handleBillToRoomFromPOS}
-        />
+        {(diningModalOpen || posModalOpen) && (
+          <IdsTouchPosTerminalModal
+            isOpen={diningModalOpen || posModalOpen}
+            onClose={() => {
+              setDiningModalOpen(false);
+              setPosModalOpen(false);
+              setSelectedFoodItem(null);
+            }}
+            currentUser="CASHIER"
+            onKotPunched={(kot) => {
+              if (kot) handleAddFoodOrder(kot);
+            }}
+          />
+        )}
 
         <DarshanAdvisorModal
           isOpen={darshanModalOpen}
@@ -1158,7 +1125,7 @@ export default function App() {
           onClose={() => setBotFleetOpen(false)}
         />
 
-        <CorporatePortalModal
+        <IdsCompanyProfileModal
           isOpen={corporateModalOpen}
           onClose={() => setCorporateModalOpen(false)}
         />
@@ -1177,31 +1144,6 @@ export default function App() {
           />
         )}
 
-        {posModalOpen && (
-          <IdsTouchPosTerminalModal
-            isOpen={posModalOpen}
-            onClose={() => setPosModalOpen(false)}
-            currentUser="CASHIER"
-            onKotPunched={(kot) => {
-              if (kot) handleAddFoodOrder(kot);
-            }}
-          />
-        )}
-
-        {accountsModalOpen && (
-          <AccountsLedgerModal
-            isOpen={accountsModalOpen}
-            onClose={() => setAccountsModalOpen(false)}
-            bookings={bookings}
-            rooms={rooms}
-            transactions={transactions}
-            corporatePartners={corporatePartners}
-            onAddTransaction={handleAddTransaction}
-            initialTab={accountsInitialTab}
-            onOpenAuditedSalesRegister={() => setAuditedSalesRegisterOpen(true)}
-          />
-        )}
-
         {nightAuditModalOpen && (
           <IdsNightAuditModal
             isOpen={nightAuditModalOpen}
@@ -1213,23 +1155,21 @@ export default function App() {
           />
         )}
 
-        {auditedSalesRegisterOpen && (
-          <ErrorBoundary onExit={() => setAuditedSalesRegisterOpen(false)}>
-            <AuditedSalesRegisterModal
-              isOpen={auditedSalesRegisterOpen}
-              onClose={() => setAuditedSalesRegisterOpen(false)}
-              initialMonth="2026-10"
-              rooms={rooms}
-              bookings={bookings}
-              foodOrders={foodOrders}
-              transactions={transactions}
+        {(accountsModalOpen || auditedSalesRegisterOpen) && (
+          <ErrorBoundary onExit={() => { setAccountsModalOpen(false); setAuditedSalesRegisterOpen(false); }}>
+            <IdsAuditedSalesRegisterModal
+              isOpen={accountsModalOpen || auditedSalesRegisterOpen}
+              onClose={() => {
+                setAccountsModalOpen(false);
+                setAuditedSalesRegisterOpen(false);
+              }}
             />
           </ErrorBoundary>
         )}
 
         {auditedRestaurantRegisterOpen && (
           <ErrorBoundary onExit={() => setAuditedRestaurantRegisterOpen(false)}>
-            <AuditedRestaurantRegisterModal
+            <IdsPosReportsModal
               isOpen={auditedRestaurantRegisterOpen}
               onClose={() => setAuditedRestaurantRegisterOpen(false)}
             />
@@ -1239,14 +1179,7 @@ export default function App() {
         {stewardQrModalOpen && (
           <StewardQrManagerModal
             isOpen={stewardQrModalOpen}
-            onClose={() => setStewardQrModalOpen(false)}
-          />
-        )}
-
-        {storeInventoryModalOpen && (
-          <StoreInventoryModal
-            isOpen={storeInventoryModalOpen}
-            onClose={() => setStoreInventoryModalOpen(false)}
+            onClose={() => setStewardQrManagerModalOpen ? setStewardQrManagerModalOpen(false) : setStewardQrModalOpen(false)}
           />
         )}
 
@@ -1308,13 +1241,12 @@ export default function App() {
           />
         )}
 
-        {/* Dedicated Mobile Housekeeping Attendant Portal (Audio 3 Turnaround Protocol) */}
+        {/* Authentic IDS Next Housekeeping Room Status & Turnaround Console */}
         {housekeepingModalOpen && (
-          <HousekeepingPortal
+          <IdsHkRoomStatusModal
             isOpen={housekeepingModalOpen}
             onClose={() => setHousekeepingModalOpen(false)}
-            rooms={rooms}
-            onUpdateRoomStatus={handleUpdateRoomStatus}
+            onUpdateStatus={handleUpdateRoomStatus}
           />
         )}
 

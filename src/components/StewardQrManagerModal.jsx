@@ -6,9 +6,8 @@ import {
   Utensils, Wifi, Bed, Download
 } from 'lucide-react';
 import { RECOGNIZED_STEWARDS } from './StewardMobileOrderPad';
-import { HOUSEKEEPING_STAFF } from './HousekeepingMobilePortal';
 import { HOTEL_CONFIG } from '../data/hotelData';
-import { getHousekeepingCrew } from '../data/hotelStaffData';
+import { getHousekeepingCrew, HOUSEKEEPING_STAFF } from '../data/hotelStaffData';
 
 // All 27 rooms across 3 floors
 const ALL_ROOMS = [

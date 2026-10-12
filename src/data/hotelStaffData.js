@@ -991,3 +991,24 @@ export const OPERATIONAL_QR_BADGES = [
   }
 ];
 
+export const HOUSEKEEPING_STAFF = {
+  MANAGER: {
+    id: 'HK-MANAGER',
+    name: 'Anita Majhi',
+    role: 'Housekeeping Manager',
+    code: 'HK-MGR-01',
+    phone: '+91 98611 52365',
+    emoji: '👩‍💼',
+    color: '#10b981'
+  },
+  SUPERVISOR: {
+    id: 'HK-SUPERVISOR',
+    name: 'Bikram Mohanty',
+    role: 'Housekeeping Supervisor',
+    code: 'HK-SUP-01',
+    phone: '+91 63707 57541',
+    emoji: '👨‍🔧',
+    color: '#38bdf8'
+  }
+};
+
