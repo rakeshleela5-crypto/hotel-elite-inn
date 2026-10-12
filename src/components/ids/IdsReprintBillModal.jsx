@@ -139,7 +139,7 @@ export default function IdsReprintBillModal({
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const [searchBillTerm, setSearchBillTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   if (!isOpen) return null;
 
@@ -168,8 +168,8 @@ export default function IdsReprintBillModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : (stage === 'input' ? '460px' : '620px'), 
-          maxWidth: isMaximized ? '100vw' : '98vw', 
+          width: isMaximized ? '1240px' : (stage === 'input' ? '460px' : '620px'), 
+          maxWidth: isMaximized ? '1240px' : '98vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8',

@@ -149,7 +149,7 @@ export default function IdsPoliceThanaManifestModal({
   const [selectedRowIndex, setSelectedRowIndex] = useState(0);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [dispatchStatus, setDispatchStatus] = useState(null);
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
   const [loadingApi, setLoadingApi] = useState(false);
@@ -329,10 +329,10 @@ export default function IdsPoliceThanaManifestModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '100vw' : '1180px', 
-          maxWidth: isMaximized ? '100vw' : '96vw', 
-          height: isMaximized ? '100vh' : '660px', 
-          maxHeight: isMaximized ? '100vh' : '92vh',
+          width: isMaximized ? '1240px' : '1180px', 
+          maxWidth: isMaximized ? '1240px' : '96vw', 
+          height: isMaximized ? '760px' : '660px', 
+          maxHeight: isMaximized ? '760px' : '92vh',
           display: 'flex', 
           flexDirection: 'column',
           background: '#ECE9D8',

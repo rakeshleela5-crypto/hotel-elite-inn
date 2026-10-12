@@ -32,7 +32,7 @@ export default function IdsExpressCheckInModal({
   const [activeTab, setActiveTab] = useState('Expected Arrivals'); // 'Expected Arrivals' | 'No Show' | 'Next Day Arrivals'
   const [displayFilter, setDisplayFilter] = useState('ALL');
   const [searchGuestName, setSearchGuestName] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   
   // Selection state
   const [selectedArrivalRes, setSelectedArrivalRes] = useState('276'); // Default to Group 276 or 274
@@ -256,10 +256,10 @@ export default function IdsExpressCheckInModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : '1090px', 
-          maxWidth: isMaximized ? '100vw' : '98vw', 
-          height: isMaximized ? '100vh' : '650px', 
-          maxHeight: isMaximized ? '100vh' : '94vh', 
+          width: isMaximized ? '1240px' : '1090px', 
+          maxWidth: '96vw', 
+          height: isMaximized ? '740px' : '650px', 
+          maxHeight: '92vh', 
           display: 'flex', 
           flexDirection: 'column' 
         }}

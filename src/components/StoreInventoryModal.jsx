@@ -105,7 +105,7 @@ export default function StoreInventoryModal({
   isOpen,
   onClose
 }) {
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [activeTab, setActiveTab] = useState('purchases'); // 'purchases', 'requisitions', 'vendor-payables', 'recipe-bom'
   const [purchases, setPurchases] = useState(INITIAL_STORE_PURCHASES);
   const [requisitions, setRequisitions] = useState(INITIAL_KITCHEN_REQUISITIONS);
@@ -339,10 +339,10 @@ export default function StoreInventoryModal({
       padding: '1rem'
     }}>
       <div className="glass-panel" style={{
-        width: isMaximized ? '100vw' : '100%',
-        maxWidth: isMaximized ? '100vw' : 1180,
-        height: isMaximized ? '100vh' : '90vh',
-        maxHeight: isMaximized ? '100vh' : '90vh',
+        width: isMaximized ? '1240px' : '100%',
+        maxWidth: isMaximized ? '1240px' : 1180,
+        height: isMaximized ? '760px' : '90vh',
+        maxHeight: isMaximized ? '760px' : '90vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',

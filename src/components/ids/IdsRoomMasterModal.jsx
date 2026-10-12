@@ -124,7 +124,7 @@ export default function IdsRoomMasterModal({
   const [oppositeRoomsOpen, setOppositeRoomsOpen] = useState(false);
   const [searchRoomTerm, setSearchRoomTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   if (!isOpen) return null;
 
@@ -233,10 +233,10 @@ export default function IdsRoomMasterModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : '740px', 
-          maxWidth: isMaximized ? '100vw' : '96vw', 
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '740px', 
+          maxWidth: isMaximized ? '1240px' : '96vw', 
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
           background: '#ECE9D8',

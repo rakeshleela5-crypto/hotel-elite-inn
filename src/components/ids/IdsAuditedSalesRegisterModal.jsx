@@ -31,7 +31,7 @@ export default function IdsAuditedSalesRegisterModal({
   const [pageSize, setPageSize] = useState(50);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [rangeFilter, setRangeFilter] = useState('ALL');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   const isOwner = currentUser === 'OWNER' || currentUser === 'MANAGER';
 
   // Synchronized Multi-Period Records
@@ -340,10 +340,10 @@ export default function IdsAuditedSalesRegisterModal({
       <div
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '100vw' : '1240px',
-          maxWidth: isMaximized ? '100vw' : '98vw',
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '1240px',
+          maxWidth: isMaximized ? '1240px' : '98vw',
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8',
           border: '2px solid #FFF',
           borderRightColor: '#716F64',

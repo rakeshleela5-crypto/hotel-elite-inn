@@ -210,7 +210,7 @@ export function IdsGuestManagementModal({
   onOpenRoomTransfer,
   onOpenAmendStay
 }) {
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   if (!isOpen) return null;
 
   return (
@@ -218,10 +218,10 @@ export function IdsGuestManagementModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : '780px', 
-          maxWidth: isMaximized ? '100vw' : '96vw', 
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '92vh',
+          width: isMaximized ? '1240px' : '780px', 
+          maxWidth: isMaximized ? '1240px' : '96vw', 
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '92vh',
           boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
           background: '#ECE9D8',
           display: 'flex',

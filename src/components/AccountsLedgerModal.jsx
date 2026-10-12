@@ -37,7 +37,7 @@ export default function AccountsLedgerModal({
     }
   }, [initialTab, isOpen]);
   const [selectedCorporate, setSelectedCorporate] = useState('CORP-05'); // Ashok Leyland Limited by default
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('09');
   const [selectedYear, setSelectedYear] = useState('2026');
   const [isTallyConsoleOpen, setIsTallyConsoleOpen] = useState(false);
@@ -1292,10 +1292,10 @@ export default function AccountsLedgerModal({
         ref={ledgerContainerRef}
         className={'glass-panel printable-ledger printable-sheet hsi-live-edit-active'} 
         style={{
-        width: isMaximized ? '100vw' : '100%',
-        maxWidth: isMaximized ? '100vw' : 1360,
-        height: isMaximized ? '100vh' : '94vh',
-        maxHeight: isMaximized ? '100vh' : '94vh',
+        width: isMaximized ? '1240px' : '100%',
+        maxWidth: isMaximized ? '1240px' : 1360,
+        height: isMaximized ? '760px' : '94vh',
+        maxHeight: isMaximized ? '760px' : '94vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',

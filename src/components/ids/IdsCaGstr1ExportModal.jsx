@@ -16,7 +16,7 @@ export default function IdsCaGstr1ExportModal({
   const [activeTab, setActiveTab] = useState('summary'); // 'summary' | 'json' | 'instructions'
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -126,10 +126,10 @@ Official JSON generated & exported from IDS Fortune NEXT PMS. Please upload to g
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '100vw' : '780px',
-          maxWidth: isMaximized ? '100vw' : '96vw',
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '780px',
+          maxWidth: isMaximized ? '1240px' : '96vw',
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',

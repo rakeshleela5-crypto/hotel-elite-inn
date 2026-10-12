@@ -148,7 +148,7 @@ export default function IdsCorporateBtcAgingModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBracketFilter, setSelectedBracketFilter] = useState('ALL'); // 'ALL', '0-30', '31-60', '61-90', '90+'
   const [toastMessage, setToastMessage] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Settlement Form State
   const [settleAmount, setSettleAmount] = useState('');
@@ -426,10 +426,10 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '100vw' : '780px',
-          maxWidth: isMaximized ? '100vw' : '96vw',
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '780px',
+          maxWidth: isMaximized ? '1240px' : '96vw',
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',

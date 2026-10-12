@@ -175,7 +175,7 @@ export default function IdsOrderEntryModal({
   const [selectedOutlet, setSelectedOutlet] = useState('RESTAURANT');
   const [resOutlet, setResOutlet] = useState('RES');
   const [selectedSession, setSelectedSession] = useState('General');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Order Header state (Video 01 Frame 015 & 025)
   const [currency, setCurrency] = useState('INR');
@@ -1551,10 +1551,10 @@ export default function IdsOrderEntryModal({
         <div 
           className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '100vw' : '920px', 
-            maxWidth: isMaximized ? '100vw' : '98vw', 
-            height: isMaximized ? '100vh' : 'auto',
-            maxHeight: isMaximized ? '100vh' : '94vh',
+            width: isMaximized ? '1240px' : '920px', 
+            maxWidth: isMaximized ? '1240px' : '98vw', 
+            height: isMaximized ? '760px' : 'auto',
+            maxHeight: isMaximized ? '760px' : '94vh',
             background: '#ECE9D8', 
             border: '2px solid #808080', 
             boxShadow: '4px 4px 15px rgba(0,0,0,0.6)',

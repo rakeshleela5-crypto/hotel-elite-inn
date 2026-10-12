@@ -23,7 +23,7 @@ export default function IdsRoomBlockModal({
   const [selectedCell, setSelectedCell] = useState(null);
   const [progressVisible, setProgressVisible] = useState(false);
   const [saveSuccessMsgOpen, setSaveSuccessMsgOpen] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Form for New Block
   const [blockForm, setBlockForm] = useState({
@@ -190,10 +190,10 @@ export default function IdsRoomBlockModal({
       <div 
         className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : '920px', 
-          maxWidth: isMaximized ? '100vw' : '96vw',
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '920px', 
+          maxWidth: isMaximized ? '1240px' : '96vw',
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',

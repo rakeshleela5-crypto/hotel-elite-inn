@@ -38,7 +38,7 @@ export default function IdsCashierShiftHandoverModal({
   const [authPin, setAuthPin] = useState('7650');
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pinInput, setPinInput] = useState('');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Sync tab if changed externally
   useEffect(() => {
@@ -382,10 +382,10 @@ export default function IdsCashierShiftHandoverModal({
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '100vw' : '740px',
-          maxWidth: isMaximized ? '100vw' : '96vw',
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '740px',
+          maxWidth: isMaximized ? '1240px' : '96vw',
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',

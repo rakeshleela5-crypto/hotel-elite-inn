@@ -52,7 +52,7 @@ export default function IdsNightAuditModal({
   const [confirmNextDate, setConfirmNextDate] = useState(NEXT_ACCOUNTING_DATE);
 
   // Step 1: Post Room Rate State
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   const [postMode, setPostMode] = useState('all'); // 'individual' | 'all'
   const [step1Running, setStep1Running] = useState(false);
   const [step1Log, setStep1Log] = useState('');
@@ -368,8 +368,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '100vw' : '640px', 
-            maxWidth: isMaximized ? '100vw' : '98vw', 
+            width: isMaximized ? '1240px' : '640px', 
+            maxWidth: isMaximized ? '1240px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -514,8 +514,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '100vw' : '620px', 
-            maxWidth: isMaximized ? '100vw' : '98vw', 
+            width: isMaximized ? '1240px' : '620px', 
+            maxWidth: isMaximized ? '1240px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -652,8 +652,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '100vw' : '560px', 
-            maxWidth: isMaximized ? '100vw' : '98vw', 
+            width: isMaximized ? '1240px' : '560px', 
+            maxWidth: isMaximized ? '1240px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -756,8 +756,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '100vw' : '640px', 
-            maxWidth: isMaximized ? '100vw' : '98vw', 
+            width: isMaximized ? '1240px' : '640px', 
+            maxWidth: isMaximized ? '1240px' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',

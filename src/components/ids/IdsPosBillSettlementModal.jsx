@@ -131,7 +131,7 @@ export default function IdsPosBillSettlementModal({
   // Discount Form State
   const [discPercent, setDiscPercent] = useState('0');
   const [discReason, setDiscReason] = useState('Manager Discretion');
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Active Bill Record
   const currentBill = useMemo(() => {
@@ -337,10 +337,10 @@ export default function IdsPosBillSettlementModal({
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '100vw' : '790px', 
-          maxWidth: isMaximized ? '100vw' : '98vw', 
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '790px', 
+          maxWidth: isMaximized ? '1240px' : '98vw', 
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8', 
           border: '2px solid #808080', 
           boxShadow: '4px 4px 18px rgba(0,0,0,0.65)',

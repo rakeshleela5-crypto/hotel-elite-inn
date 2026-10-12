@@ -33,7 +33,7 @@ export default function IdsTransitSlotModal({
   // Current time state (defaults to morning 08:30 AM for realistic testing)
   const [checkInHour, setCheckInHour] = useState(8); // 8 AM
   const [checkInMinute, setCheckInMinute] = useState(30);
-  const [isMaximized, setIsMaximized] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
   
   // Passenger Details
   const [selectedRoom, setSelectedRoom] = useState('108');
@@ -124,10 +124,10 @@ export default function IdsTransitSlotModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '100vw' : '920px', 
-          maxWidth: isMaximized ? '100vw' : '96vw', 
-          height: isMaximized ? '100vh' : 'auto',
-          maxHeight: isMaximized ? '100vh' : '94vh',
+          width: isMaximized ? '1240px' : '920px', 
+          maxWidth: isMaximized ? '1240px' : '96vw', 
+          height: isMaximized ? '760px' : 'auto',
+          maxHeight: isMaximized ? '760px' : '94vh',
           background: '#ECE9D8',
           boxShadow: '0 8px 30px rgba(0,0,0,0.65)',
           display: 'flex',
