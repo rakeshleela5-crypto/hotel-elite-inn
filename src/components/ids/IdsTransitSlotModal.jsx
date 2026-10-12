@@ -33,6 +33,7 @@ export default function IdsTransitSlotModal({
   // Current time state (defaults to morning 08:30 AM for realistic testing)
   const [checkInHour, setCheckInHour] = useState(8); // 8 AM
   const [checkInMinute, setCheckInMinute] = useState(30);
+  const [isMaximized, setIsMaximized] = useState(true);
   
   // Passenger Details
   const [selectedRoom, setSelectedRoom] = useState('108');
@@ -121,12 +122,16 @@ export default function IdsTransitSlotModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       {/* Authentic IDS FortuneNEXT Win32 Dialog Window */}
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: '920px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '100vw' : '920px', 
+          maxWidth: isMaximized ? '100vw' : '96vw', 
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.65)'
+          boxShadow: '0 8px 30px rgba(0,0,0,0.65)',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Win32 Title Bar */}
@@ -137,7 +142,13 @@ export default function IdsTransitSlotModal({
               IDS FortuneNEXT - Muniguda Junction 3-Hour Transit Slot (Audio 4: 68:46-81:10)
             </span>
           </div>
-          <button className="ids-win-btn close" onClick={onClose} title="Close (Esc)">✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" onClick={onClose} title="Close (Esc)" style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Operational Context Header Banner */}

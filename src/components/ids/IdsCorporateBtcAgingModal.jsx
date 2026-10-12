@@ -148,6 +148,7 @@ export default function IdsCorporateBtcAgingModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBracketFilter, setSelectedBracketFilter] = useState('ALL'); // 'ALL', '0-30', '31-60', '61-90', '90+'
   const [toastMessage, setToastMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   // Settlement Form State
   const [settleAmount, setSettleAmount] = useState('');
@@ -423,15 +424,20 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1420 }}>
       <div 
-        className="ids-modal-container"
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: '780px',
+          width: isMaximized ? '100vw' : '780px',
+          maxWidth: isMaximized ? '100vw' : '96vw',
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',
           fontFamily: 'Tahoma, Arial, sans-serif',
           fontSize: '11px',
-          color: '#000'
+          color: '#000',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar */}
@@ -454,13 +460,19 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
               (Cashiering - Bill to Company (BTC) Ledger & Aging Analysis)
             </span>
           </div>
-          <button 
-            className="ids-win-btn close"
-            onClick={onClose}
-            style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close"
+              onClick={onClose}
+              style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Status Toast */}

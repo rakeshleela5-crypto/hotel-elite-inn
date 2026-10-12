@@ -369,7 +369,7 @@ export default function IdsCheckoutBillModal({
           SCREEN 1: CHECK-OUT V6.5.002.6 SELECTION CONSOLE (Video 15 & 16 Frame 010 & 022)
           ========================================================================= */}
       {activeScreen === 'selector' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '960px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '100vw' : '960px', maxWidth: isMaximized ? '100vw' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Check-out V6.5.002.6 — Departure & Billing Console</span>
             <div className="ids-window-controls">
@@ -608,7 +608,7 @@ export default function IdsCheckoutBillModal({
           SCREEN 2: BILL SUMMARY DIALOG (Video 15 Frame 013 & Video 16 Frame 024/038)
           ========================================================================= */}
       {activeScreen === 'bill-summary' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '960px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '100vw' : '960px', maxWidth: isMaximized ? '100vw' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Bill Summary — Folio Charges & Line Items</span>
             <div className="ids-window-controls">
@@ -896,7 +896,7 @@ export default function IdsCheckoutBillModal({
           SCREEN 3: SETTLEMENTS V6.5.008.30 DIALOG (Video 15 & Video 16 Frame 055)
           ========================================================================= */}
       {activeScreen === 'settlements' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '920px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '100vw' : '920px', maxWidth: isMaximized ? '100vw' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Settlements V6.5.008.30 — Payment & Folio Clearance</span>
             <div className="ids-window-controls">

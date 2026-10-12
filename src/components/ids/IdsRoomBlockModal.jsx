@@ -23,6 +23,7 @@ export default function IdsRoomBlockModal({
   const [selectedCell, setSelectedCell] = useState(null);
   const [progressVisible, setProgressVisible] = useState(false);
   const [saveSuccessMsgOpen, setSaveSuccessMsgOpen] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(true);
 
   // Form for New Block
   const [blockForm, setBlockForm] = useState({
@@ -187,13 +188,18 @@ export default function IdsRoomBlockModal({
   return (
     <div className="ids-modal-backdrop" style={{ zIndex: 1100 }}>
       <div 
-        className="ids-modal-window" 
+        className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '920px', 
+          width: isMaximized ? '100vw' : '920px', 
+          maxWidth: isMaximized ? '100vw' : '96vw',
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
-          fontFamily: 'Tahoma, Arial, sans-serif'
+          fontFamily: 'Tahoma, Arial, sans-serif',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar */}
@@ -211,7 +217,13 @@ export default function IdsRoomBlockModal({
           }}
         >
           <span>Room Block V6.5.002.1</span>
-          <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
+          </div>
         </div>
 
         {/* Content Body */}

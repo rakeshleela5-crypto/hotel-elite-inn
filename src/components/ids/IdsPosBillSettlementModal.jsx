@@ -131,6 +131,7 @@ export default function IdsPosBillSettlementModal({
   // Discount Form State
   const [discPercent, setDiscPercent] = useState('0');
   const [discReason, setDiscReason] = useState('Manager Discretion');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   // Active Bill Record
   const currentBill = useMemo(() => {
@@ -334,13 +335,17 @@ export default function IdsPosBillSettlementModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1280 }}>
       {/* Authentic Win32 Bill Settlement Dialog Window (Video 04 Frame 016 - 054) */}
       <div 
-        className="ids-modal-container" 
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '790px', 
-          maxWidth: '98vw', 
+          width: isMaximized ? '100vw' : '790px', 
+          maxWidth: isMaximized ? '100vw' : '98vw', 
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8', 
           border: '2px solid #808080', 
-          boxShadow: '4px 4px 18px rgba(0,0,0,0.65)' 
+          boxShadow: '4px 4px 18px rgba(0,0,0,0.65)',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar matching Video 04 Frame 016: Bill Settlement V6.5.008.30 */}
@@ -356,13 +361,19 @@ export default function IdsPosBillSettlementModal({
           }}
         >
           <span style={{ fontWeight: 700, fontSize: '12px' }}>Bill Settlement V6.5.008.30</span>
-          <button 
-            className="ids-win-btn close" 
-            onClick={onClose} 
-            style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close" 
+              onClick={onClose} 
+              style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Top 3-Beveled Header Indicators (Video 04 Frame 016) */}

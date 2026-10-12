@@ -38,6 +38,7 @@ export default function IdsCashierShiftHandoverModal({
   const [authPin, setAuthPin] = useState('7650');
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pinInput, setPinInput] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   // Sync tab if changed externally
   useEffect(() => {
@@ -379,15 +380,20 @@ export default function IdsCashierShiftHandoverModal({
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
       <div 
-        className="ids-modal-container"
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: '740px',
+          width: isMaximized ? '100vw' : '740px',
+          maxWidth: isMaximized ? '100vw' : '96vw',
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',
           fontFamily: 'Tahoma, Arial, sans-serif',
           fontSize: '11px',
-          color: '#000'
+          color: '#000',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Titlebar */}
@@ -410,13 +416,19 @@ export default function IdsCashierShiftHandoverModal({
               (Front Office Cashiering - Shift Handover, Dryer Float & Lock)
             </span>
           </div>
-          <button 
-            className="ids-win-btn close"
-            onClick={onClose}
-            style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close"
+              onClick={onClose}
+              style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Status Notification Banner */}

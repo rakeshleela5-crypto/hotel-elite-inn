@@ -124,6 +124,7 @@ export default function IdsRoomMasterModal({
   const [oppositeRoomsOpen, setOppositeRoomsOpen] = useState(false);
   const [searchRoomTerm, setSearchRoomTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   if (!isOpen) return null;
 
@@ -230,13 +231,17 @@ export default function IdsRoomMasterModal({
   return (
     <div className="ids-modal-overlay">
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '740px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '100vw' : '740px', 
+          maxWidth: isMaximized ? '100vw' : '96vw', 
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
-          background: '#ECE9D8'
+          background: '#ECE9D8',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Titlebar matching Frame 016 */}
@@ -255,22 +260,28 @@ export default function IdsRoomMasterModal({
             <BedDouble size={14} />
             <span>Room Master V6.5.002.1 — Room Inventory Master Setup</span>
           </div>
-          <button 
-            className="ids-win-btn close" 
-            onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close" 
+              onClick={onClose}
+              style={{ 
+                background: '#C75050', 
+                color: '#FFF', 
+                border: '1px outset #FFF', 
+                fontWeight: 700, 
+                width: '18px', 
+                height: '18px', 
+                lineHeight: '14px', 
+                cursor: 'pointer' 
+              }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Status notification banner */}

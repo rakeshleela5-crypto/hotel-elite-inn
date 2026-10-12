@@ -339,10 +339,10 @@ export default function StoreInventoryModal({
       padding: '1rem'
     }}>
       <div className="glass-panel" style={{
-        width: isMaximized ? '98vw' : '100%',
-        maxWidth: isMaximized ? '98vw' : 1180,
-        height: isMaximized ? '98vh' : '90vh',
-        maxHeight: isMaximized ? '98vh' : '90vh',
+        width: isMaximized ? '100vw' : '100%',
+        maxWidth: isMaximized ? '100vw' : 1180,
+        height: isMaximized ? '100vh' : '90vh',
+        maxHeight: isMaximized ? '100vh' : '90vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',

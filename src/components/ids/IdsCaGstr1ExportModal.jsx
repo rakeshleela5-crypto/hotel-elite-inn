@@ -16,6 +16,7 @@ export default function IdsCaGstr1ExportModal({
   const [activeTab, setActiveTab] = useState('summary'); // 'summary' | 'json' | 'instructions'
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -123,15 +124,20 @@ Official JSON generated & exported from IDS Fortune NEXT PMS. Please upload to g
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1430 }}>
       <div 
-        className="ids-modal-container"
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: '780px',
+          width: isMaximized ? '100vw' : '780px',
+          maxWidth: isMaximized ? '100vw' : '96vw',
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',
           fontFamily: 'Tahoma, Arial, sans-serif',
           fontSize: '11px',
-          color: '#000'
+          color: '#000',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar */}
@@ -154,13 +160,19 @@ Official JSON generated & exported from IDS Fortune NEXT PMS. Please upload to g
               (Reports & Setup - Statutory GST Portal JSON Generator with HSN/SAC Codes)
             </span>
           </div>
-          <button 
-            className="ids-win-btn close"
-            onClick={onClose}
-            style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close"
+              onClick={onClose}
+              style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Status Toast */}

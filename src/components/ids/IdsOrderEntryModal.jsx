@@ -175,6 +175,7 @@ export default function IdsOrderEntryModal({
   const [selectedOutlet, setSelectedOutlet] = useState('RESTAURANT');
   const [resOutlet, setResOutlet] = useState('RES');
   const [selectedSession, setSelectedSession] = useState('General');
+  const [isMaximized, setIsMaximized] = useState(true);
 
   // Order Header state (Video 01 Frame 015 & 025)
   const [currency, setCurrency] = useState('INR');
@@ -1548,13 +1549,29 @@ export default function IdsOrderEntryModal({
       ) : (
         /* 2. ORDER ENTRY V6.5.002.4 MAIN WINDOW (Video 01 Frame 015 - Frame 040) */
         <div 
-          className="ids-modal-container" 
-          style={{ width: '920px', maxWidth: '98vw', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' }}
+          className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
+          style={{ 
+            width: isMaximized ? '100vw' : '920px', 
+            maxWidth: isMaximized ? '100vw' : '98vw', 
+            height: isMaximized ? '100vh' : 'auto',
+            maxHeight: isMaximized ? '100vh' : '94vh',
+            background: '#ECE9D8', 
+            border: '2px solid #808080', 
+            boxShadow: '4px 4px 15px rgba(0,0,0,0.6)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
         >
           {/* Main Title Bar */}
           <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '12px' }}>Order Entry V6.5.002.4</span>
-            <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
+            <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+              <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
+            </div>
           </div>
 
           {/* Subheader Banner (Frame 015 & Video 07 Frame 022) */}

@@ -340,10 +340,10 @@ export default function IdsAuditedSalesRegisterModal({
       <div
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '98vw' : '1240px',
-          maxWidth: '98vw',
-          height: isMaximized ? '96vh' : 'auto',
-          maxHeight: isMaximized ? '96vh' : '94vh',
+          width: isMaximized ? '100vw' : '1240px',
+          maxWidth: isMaximized ? '100vw' : '98vw',
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8',
           border: '2px solid #FFF',
           borderRightColor: '#716F64',

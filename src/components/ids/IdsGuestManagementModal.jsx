@@ -210,23 +210,34 @@ export function IdsGuestManagementModal({
   onOpenRoomTransfer,
   onOpenAmendStay
 }) {
+  const [isMaximized, setIsMaximized] = useState(true);
   if (!isOpen) return null;
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1200 }}>
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '780px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '100vw' : '780px', 
+          maxWidth: isMaximized ? '100vw' : '96vw', 
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '92vh',
           boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
-          background: '#ECE9D8'
+          background: '#ECE9D8',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar matching Frame 012 */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, fontSize: '11px' }}>Guest Management V6.5.002.1</span>
-          <button className="ids-win-btn close" onClick={onClose}>✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Content Area */}

@@ -118,6 +118,7 @@ export default function IdsPosBillModal({
   onOpenCrystalReport
 }) {
   const [tableNo, setTableNo] = useState(initialTableNo);
+  const [isMaximized, setIsMaximized] = useState(true);
   const [covers, setCovers] = useState('1');
   const [currentSteward, setCurrentSteward] = useState(steward);
   const [memberCode, setMemberCode] = useState('');
@@ -385,13 +386,17 @@ export default function IdsPosBillModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       {/* Dialog Window matching Video 03 Frame 021 & Video 09 Frame 016 */}
       <div 
-        className="ids-modal-container" 
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '760px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '100vw' : '760px', 
+          maxWidth: isMaximized ? '100vw' : '96vw', 
+          height: isMaximized ? '100vh' : 'auto',
+          maxHeight: isMaximized ? '100vh' : '94vh',
           background: '#ECE9D8', 
           border: '2px solid #808080', 
-          boxShadow: '4px 4px 15px rgba(0,0,0,0.6)' 
+          boxShadow: '4px 4px 15px rgba(0,0,0,0.6)',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         {/* Title Bar */}
@@ -407,7 +412,13 @@ export default function IdsPosBillModal({
           }}
         >
           <span style={{ fontWeight: 700, fontSize: '12px' }}>Bill</span>
-          <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>
+          </div>
         </div>
 
         {/* Header Controls (Video 09 Frame 016) */}

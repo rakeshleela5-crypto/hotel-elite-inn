@@ -368,8 +368,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '98vw' : '640px', 
-            maxWidth: '98vw', 
+            width: isMaximized ? '100vw' : '640px', 
+            maxWidth: isMaximized ? '100vw' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -514,8 +514,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '98vw' : '620px', 
-            maxWidth: '98vw', 
+            width: isMaximized ? '100vw' : '620px', 
+            maxWidth: isMaximized ? '100vw' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -652,8 +652,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '98vw' : '560px', 
-            maxWidth: '98vw', 
+            width: isMaximized ? '100vw' : '560px', 
+            maxWidth: isMaximized ? '100vw' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',
@@ -756,8 +756,8 @@ export default function IdsNightAuditModal({
         <div 
           className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '98vw' : '640px', 
-            maxWidth: '98vw', 
+            width: isMaximized ? '100vw' : '640px', 
+            maxWidth: isMaximized ? '100vw' : '98vw', 
             background: '#ECE9D8', 
             boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
             border: '2px solid #FFF',

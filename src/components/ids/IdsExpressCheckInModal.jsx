@@ -32,6 +32,7 @@ export default function IdsExpressCheckInModal({
   const [activeTab, setActiveTab] = useState('Expected Arrivals'); // 'Expected Arrivals' | 'No Show' | 'Next Day Arrivals'
   const [displayFilter, setDisplayFilter] = useState('ALL');
   const [searchGuestName, setSearchGuestName] = useState('');
+  const [isMaximized, setIsMaximized] = useState(true);
   
   // Selection state
   const [selectedArrivalRes, setSelectedArrivalRes] = useState('276'); // Default to Group 276 or 274
@@ -253,12 +254,12 @@ export default function IdsExpressCheckInModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
       {/* Express Check-In Main Window */}
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '1090px', 
-          maxWidth: '98vw', 
-          height: '650px', 
-          maxHeight: '94vh', 
+          width: isMaximized ? '100vw' : '1090px', 
+          maxWidth: isMaximized ? '100vw' : '98vw', 
+          height: isMaximized ? '100vh' : '650px', 
+          maxHeight: isMaximized ? '100vh' : '94vh', 
           display: 'flex', 
           flexDirection: 'column' 
         }}
@@ -271,7 +272,13 @@ export default function IdsExpressCheckInModal({
               {groupAllocationMode ? '[Group Allocation Console - Res. No. 276]' : '[Front Desk Rapid Check-In]'}
             </span>
           </div>
-          <button className="ids-win-btn close" onClick={onClose}>✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Window Content: 2 Columns (Left: Arrivals or Group Console / Right: Tape Chart & Preview) */}

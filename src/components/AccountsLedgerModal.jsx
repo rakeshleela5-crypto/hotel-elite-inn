@@ -1292,10 +1292,10 @@ export default function AccountsLedgerModal({
         ref={ledgerContainerRef}
         className={'glass-panel printable-ledger printable-sheet hsi-live-edit-active'} 
         style={{
-        width: isMaximized ? '98vw' : '100%',
-        maxWidth: isMaximized ? '98vw' : 1360,
-        height: isMaximized ? '98vh' : '94vh',
-        maxHeight: isMaximized ? '98vh' : '94vh',
+        width: isMaximized ? '100vw' : '100%',
+        maxWidth: isMaximized ? '100vw' : 1360,
+        height: isMaximized ? '100vh' : '94vh',
+        maxHeight: isMaximized ? '100vh' : '94vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',

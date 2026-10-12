@@ -149,6 +149,7 @@ export default function IdsPoliceThanaManifestModal({
   const [selectedRowIndex, setSelectedRowIndex] = useState(0);
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [dispatchStatus, setDispatchStatus] = useState(null);
+  const [isMaximized, setIsMaximized] = useState(true);
 
   const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
   const [loadingApi, setLoadingApi] = useState(false);
@@ -326,12 +327,12 @@ export default function IdsPoliceThanaManifestModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       {/* Authentic IDS FortuneNEXT Win32 Dialog Window */}
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: '1180px', 
-          maxWidth: '96vw', 
-          height: '660px', 
-          maxHeight: '92vh',
+          width: isMaximized ? '100vw' : '1180px', 
+          maxWidth: isMaximized ? '100vw' : '96vw', 
+          height: isMaximized ? '100vh' : '660px', 
+          maxHeight: isMaximized ? '100vh' : '92vh',
           display: 'flex', 
           flexDirection: 'column',
           background: '#ECE9D8',
@@ -346,9 +347,13 @@ export default function IdsPoliceThanaManifestModal({
               IDS FortuneNEXT 6.5 - Muniguda Police Station (Thana) Daily Guest Manifest [Form C / Sarai Act 1867]
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '3px' }}>
-            <button className="ids-win-btn" onClick={handlePrint} title="Quick Print (F7)">🖨️</button>
-            <button className="ids-win-btn close" onClick={onClose} title="Close (Esc)">✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
+            <button className="ids-win-btn" onClick={handlePrint} title="Quick Print (F7)" style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>🖨️</button>
+            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" onClick={onClose} title="Close (Esc)" style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
           </div>
         </div>
 
