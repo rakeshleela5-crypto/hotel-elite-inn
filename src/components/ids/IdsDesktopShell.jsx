@@ -134,6 +134,7 @@ export default function IdsDesktopShell({
 }) {
   const [selectedMaster, setSelectedMaster] = useState('Reservations..');
   const [activeSubItem, setActiveSubItem] = useState('Room Booking');
+  const [isMaximized, setIsMaximized] = useState(true);
   
   // Dynamic Live Reservations List for Hotel Elite Inn
   const [reservations, setReservations] = useState([
@@ -1788,9 +1789,9 @@ export default function IdsDesktopShell({
   const currentSubList = subMenuMap[selectedMaster] || [];
 
   return (
-    <div className="ids-desktop-container">
+    <div className={`ids-desktop-container ${isMaximized ? 'maximized' : ''}`}>
       {/* Master IDS Window */}
-      <div className="ids-window">
+      <div className={`ids-window ${isMaximized ? 'maximized' : ''}`}>
         {/* Title Bar (Frame 001) */}
         <div className="ids-titlebar">
           <div className="ids-titlebar-left">
@@ -1798,8 +1799,20 @@ export default function IdsDesktopShell({
             <span>FORTUNE NEXT V6.5.002.2 - {HOTEL_CONFIG.name}</span>
           </div>
           <div className="ids-titlebar-buttons">
-            <button className="ids-win-btn" title="Minimize" onClick={() => alert("IDS Fortune NEXT minimized to Windows taskbar.")}>_</button>
-            <button className="ids-win-btn" title="Maximize" onClick={() => alert("IDS Fortune NEXT maximized to full desktop.")}>□</button>
+            <button 
+              className="ids-win-btn" 
+              title="Minimize to normal window" 
+              onClick={() => setIsMaximized(false)}
+            >
+              _
+            </button>
+            <button 
+              className="ids-win-btn" 
+              title={isMaximized ? "Restore window (centered)" : "Maximize full desktop"} 
+              onClick={() => setIsMaximized(!isMaximized)}
+            >
+              {isMaximized ? '❐' : '□'}
+            </button>
             <button className="ids-win-btn close" title="Exit PMS" onClick={onExitPMS}>✕</button>
           </div>
         </div>
