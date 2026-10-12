@@ -33,6 +33,10 @@ export default function IdsExpressCheckInModal({
   const [displayFilter, setDisplayFilter] = useState('ALL');
   const [searchGuestName, setSearchGuestName] = useState('');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [hotelPositionModalOpen, setHotelPositionModalOpen] = useState(false);
+  const [floorFilter, setFloorFilter] = useState('ALL');
+  const [blockFilter, setBlockFilter] = useState('ALL');
   
   // Selection state
   const [selectedArrivalRes, setSelectedArrivalRes] = useState('276'); // Default to Group 276 or 274
@@ -250,6 +254,41 @@ export default function IdsExpressCheckInModal({
     }
   };
 
+  if (isMinimized) {
+    return (
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '34px',
+          left: '180px',
+          zIndex: 10000,
+          background: '#ECE9D8',
+          border: '2px outset #FFFFFF',
+          borderRightColor: '#555544',
+          borderBottomColor: '#555544',
+          padding: '4px 10px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: '2px 2px 8px rgba(0,0,0,0.4)',
+          cursor: 'pointer',
+          fontFamily: 'Tahoma, Arial, sans-serif',
+          fontSize: '11px',
+          fontWeight: 700
+        }}
+        onClick={() => setIsMinimized(false)}
+        title="Click to Restore Window"
+      >
+        <span style={{ color: '#0A246A' }}>🗕 Express Check-In V6.5.002.4</span>
+        <button 
+          className="ids-win-btn close" 
+          style={{ width: '16px', height: '14px', fontSize: '9px', lineHeight: '12px' }}
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+        >✕</button>
+      </div>
+    );
+  }
+
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
       {/* Express Check-In Main Window */}
@@ -273,7 +312,7 @@ export default function IdsExpressCheckInModal({
             </span>
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-            <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title="Minimize Window" onClick={() => setIsMinimized(true)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
             <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
@@ -593,14 +632,30 @@ export default function IdsExpressCheckInModal({
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span>Floor</span>
-                  <select className="ids-select" style={{ width: '60px' }}>
+                  <select 
+                    className="ids-select" 
+                    style={{ width: '68px', fontWeight: floorFilter !== 'ALL' ? 700 : 400 }}
+                    value={floorFilter}
+                    onChange={(e) => setFloorFilter(e.target.value)}
+                  >
                     <option value="ALL">ALL</option>
+                    <option value="1">1st Flr</option>
+                    <option value="2">2nd Flr</option>
+                    <option value="3">3rd Flr</option>
                   </select>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span>Block</span>
-                  <select className="ids-select" style={{ width: '60px' }}>
+                  <select 
+                    className="ids-select" 
+                    style={{ width: '75px', fontWeight: blockFilter !== 'ALL' ? 700 : 400 }}
+                    value={blockFilter}
+                    onChange={(e) => setBlockFilter(e.target.value)}
+                  >
                     <option value="ALL">ALL</option>
+                    <option value="BA-FF01">BA-FF01</option>
+                    <option value="BA-FF02">BA-FF02</option>
+                    <option value="BA-FF03">BA-FF03</option>
                   </select>
                 </div>
 
@@ -716,97 +771,134 @@ export default function IdsExpressCheckInModal({
                   </thead>
                   <tbody>
                     {/* BA-FF03 (Floor 3) matching Video 08 Frame 012, 020, 045 */}
-                    <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
-                      <td colSpan={8}>BA-FF03 (Floor 3)</td>
-                    </tr>
-                    <tr style={{ background: '#FFFFFF' }}>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>302 DLX</td>
-                      <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        SHARMA
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr style={{ background: '#FFFFFF' }}>
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>314 DLX</td>
-                      <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        ANIRUDH
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr 
-                      style={{ 
-                        background: is309Upgraded ? '#FFEBE6' : '#FFFFFF', 
-                        cursor: 'pointer' 
-                      }}
-                      onMouseEnter={() => setHoveredRoomNo('309')}
-                      onClick={() => handleTriggerUpgradeFor309()}
-                      title="Click & Drag RoomGrid against the Room no. for Check-in"
-                    >
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>309 SUI</td>
-                      {is309Upgraded ? (
-                        <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
-                            <span style={{ fontSize: '11px' }}>🚪➔</span>
-                            <span>KUMAR GROUP</span>
-                          </span>
-                        </td>
-                      ) : (
-                        <td colSpan={2} style={{ background: '#FFFFFF', color: '#0A246A', textAlign: 'center', fontWeight: 600, border: '1px dashed #316AC5' }}>
-                          [ Click to Assign / Upgrade Room 309 SUI ]
-                        </td>
-                      )}
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
+                    {(floorFilter === 'ALL' || floorFilter === '3') && (blockFilter === 'ALL' || blockFilter === 'BA-FF03') && (
+                      <>
+                        <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
+                          <td colSpan={8}>BA-FF03 (Floor 3)</td>
+                        </tr>
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'DLX') && (
+                          <tr style={{ background: '#FFFFFF' }}>
+                            <td style={{ fontWeight: 700, color: '#A02020' }}>302 DLX</td>
+                            <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              SHARMA
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'DLX') && (
+                          <tr style={{ background: '#FFFFFF' }}>
+                            <td style={{ fontWeight: 700, color: '#A02020' }}>314 DLX</td>
+                            <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              ANIRUDH
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'SUI') && (
+                          <tr 
+                            style={{ 
+                              background: is309Upgraded ? '#FFEBE6' : '#FFFFFF', 
+                              cursor: 'pointer' 
+                            }}
+                            onMouseEnter={() => setHoveredRoomNo('309')}
+                            onClick={() => handleTriggerUpgradeFor309()}
+                            title="Click & Drag RoomGrid against the Room no. for Check-in"
+                          >
+                            <td style={{ fontWeight: 700, color: '#0A246A' }}>309 SUI</td>
+                            {is309Upgraded ? (
+                              <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}>
+                                  <span style={{ fontSize: '11px' }}>🚪➔</span>
+                                  <span>KUMAR GROUP</span>
+                                </span>
+                              </td>
+                            ) : (
+                              <td colSpan={2} style={{ background: '#FFFFFF', color: '#0A246A', textAlign: 'center', fontWeight: 600, border: '1px dashed #316AC5' }}>
+                                [ Click to Assign / Upgrade Room 309 SUI ]
+                              </td>
+                            )}
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr onMouseEnter={() => setHoveredRoomNo('301')}>
+                            <td style={{ fontWeight: 700 }}>301 EXE</td>
+                            <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              BISWAKARMA (OCCUPIED)
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                      </>
+                    )}
 
-                    {/* BA-FF04 Header */}
-                    <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
-                      <td colSpan={8}>BA-FF01 (Floor 1)</td>
-                    </tr>
-                    <tr 
-                      style={{ background: '#FFF7E6', cursor: 'pointer' }}
-                      onClick={() => setRightViewMode('preview')}
-                      onMouseEnter={() => setHoveredRoomNo('102')}
-                      title="Room 102 EXE"
-                    >
-                      <td style={{ fontWeight: 700, color: '#A02020' }}>102 EXE</td>
-                      <td colSpan={2} style={{ background: '#00AEEF', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        KHAN,KH (RES #274)
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('415')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>201 EXE</td>
-                      <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        KUMAR (ALLOCATED)
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
+                    {/* BA-FF01 (Floor 1) */}
+                    {(floorFilter === 'ALL' || floorFilter === '1') && (blockFilter === 'ALL' || blockFilter === 'BA-FF01') && (
+                      <>
+                        <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
+                          <td colSpan={8}>BA-FF01 (Floor 1)</td>
+                        </tr>
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr 
+                            style={{ background: '#FFF7E6', cursor: 'pointer' }}
+                            onClick={() => setRightViewMode('preview')}
+                            onMouseEnter={() => setHoveredRoomNo('102')}
+                            title="Room 102 EXE"
+                          >
+                            <td style={{ fontWeight: 700, color: '#A02020' }}>102 EXE</td>
+                            <td colSpan={2} style={{ background: '#00AEEF', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              KHAN,KH (RES #274)
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('101')}>
+                            <td style={{ fontWeight: 700, color: '#0A246A' }}>101 EXE</td>
+                            <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              VACANT CLEAN
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                      </>
+                    )}
 
-                    {/* BA-FF05 Header */}
-                    <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
-                      <td colSpan={8}>BA-FF02 (Floor 2)</td>
-                    </tr>
-                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('205')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>205 EXE</td>
-                      <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        ANIL KUMAR G (ALLOCATED)
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('515')}>
-                      <td style={{ fontWeight: 700, color: '#0A246A' }}>207 EXE</td>
-                      <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        ANIL KUMAR G (ALLOCATED)
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
-                    <tr onMouseEnter={() => setHoveredRoomNo('309')}>
-                      <td style={{ fontWeight: 700 }}>301 EXE</td>
-                      <td colSpan={2} style={{ background: '#F15A24', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
-                        BISWAKARMA (OCCUPIED)
-                      </td>
-                      <td></td><td></td><td></td><td></td><td></td>
-                    </tr>
+                    {/* BA-FF02 (Floor 2) */}
+                    {(floorFilter === 'ALL' || floorFilter === '2') && (blockFilter === 'ALL' || blockFilter === 'BA-FF02') && (
+                      <>
+                        <tr style={{ background: '#DFDBC9', fontWeight: 700 }}>
+                          <td colSpan={8}>BA-FF02 (Floor 2)</td>
+                        </tr>
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('201')}>
+                            <td style={{ fontWeight: 700, color: '#0A246A' }}>201 EXE</td>
+                            <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              KUMAR (ALLOCATED)
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('205')}>
+                            <td style={{ fontWeight: 700, color: '#0A246A' }}>205 EXE</td>
+                            <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              ANIL KUMAR G (ALLOCATED)
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                        {(roomTypeFilter === 'ALL' || roomTypeFilter === 'EXE') && (
+                          <tr style={{ background: '#E6F0FA' }} onMouseEnter={() => setHoveredRoomNo('207')}>
+                            <td style={{ fontWeight: 700, color: '#0A246A' }}>207 EXE</td>
+                            <td colSpan={2} style={{ background: '#58B957', color: '#FFF', fontWeight: 700, textAlign: 'center' }}>
+                              ANIL KUMAR G (ALLOCATED)
+                            </td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                          </tr>
+                        )}
+                      </>
+                    )}
                   </tbody>
                 </table>
               )}
@@ -874,33 +966,44 @@ export default function IdsExpressCheckInModal({
         {/* =========================================================================
             BOTTOM COMMAND BUTTONS (Frame 012 & Frame 044)
             ========================================================================= */}
-        <div style={{ background: '#ECE9D8', borderTop: '1px solid #716F64', padding: '6px 12px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+        <div style={{ background: '#ECE9D8', borderTop: '1px solid #716F64', padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button 
             className="ids-btn-classic" 
-            style={{ minWidth: '90px' }}
+            style={{ minWidth: '105px', fontWeight: 600 }}
             onClick={() => {
               playReceptionChime();
-              alert("Hotel Room Position Summary:\n• Total Rooms: 30\n• Occupied: 14\n• Expected Arrivals: 6\n• Expected Departures: 4\n• Available: 10\n• Housekeeping Clean: 22, Dirty: 8");
+              setHotelPositionModalOpen(true);
             }}
           >
-            Hotel Position
+            🏨 Hotel Position
           </button>
-          <button 
-            className="ids-btn-classic" 
-            style={{ minWidth: '120px' }}
-            onClick={() => {
-              onClose();
-              if (onOpenStandardCheckin) onOpenStandardCheckin();
-            }}
-          >
-            Reservation Check-In
-          </button>
-          <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => setArrivals(initialArrivalsList)}>
-            Refresh
-          </button>
-          <button className="ids-btn-classic" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onClose}>
-            Exit
-          </button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              className="ids-btn-classic" 
+              style={{ minWidth: '130px', fontWeight: 600 }}
+              onClick={() => {
+                onClose();
+                if (onOpenStandardCheckin) {
+                  onOpenStandardCheckin(selectedArrivalRes);
+                }
+              }}
+            >
+              Reservation Check-In
+            </button>
+            <button 
+              className="ids-btn-classic" 
+              style={{ minWidth: '70px' }} 
+              onClick={() => {
+                setArrivals(initialArrivalsList);
+                playReceptionChime();
+              }}
+            >
+              Refresh
+            </button>
+            <button className="ids-btn-classic" style={{ minWidth: '70px', fontWeight: 700 }} onClick={onClose}>
+              Exit
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1237,6 +1340,162 @@ export default function IdsExpressCheckInModal({
                   onClick={() => setRegCardModalOpen(false)}
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          AUTHENTIC WIN32 HOTEL POSITION & HOUSE COUNT MODAL
+          ========================================================================= */}
+      {hotelPositionModalOpen && (
+        <div className="ids-modal-overlay" style={{ zIndex: 1400 }}>
+          <div 
+            className="ids-dialog-window" 
+            style={{ 
+              width: '820px', 
+              maxWidth: '96vw', 
+              background: '#ECE9D8', 
+              boxShadow: '0 12px 36px rgba(0,0,0,0.7)', 
+              border: '2px outset #FFF',
+              borderRightColor: '#555544',
+              borderBottomColor: '#555544'
+            }}
+          >
+            {/* Title Bar */}
+            <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontWeight: 700, fontSize: '11px' }}>🏨 Hotel Position & House Count - Room Status V6.5.002.4</span>
+              </div>
+              <button className="ids-win-btn close" onClick={() => setHotelPositionModalOpen(false)}>✕</button>
+            </div>
+
+            <div style={{ padding: '10px 12px', fontSize: '11px' }}>
+              {/* Top Operational KPI Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Total Rooms</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#0A246A' }}>30</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Occupied (46.7%)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#C62828' }}>14</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Expected Arrivals</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#2E7D32' }}>6</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Expected Departures</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#E65100' }}>4</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Vacant Available</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#1565C0' }}>10</div>
+                </div>
+                <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '6px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '10px', color: '#666' }}>Dirty / OOO</div>
+                  <div style={{ fontSize: '16px', fontWeight: 800, color: '#795548' }}>6</div>
+                </div>
+              </div>
+
+              {/* Room Category Breakdown Grid */}
+              <div style={{ border: '1px solid #716F64', background: '#FFF', marginBottom: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                <table className="ids-grid-table" style={{ width: '100%', fontSize: '11px', textAlign: 'center' }}>
+                  <thead>
+                    <tr style={{ background: '#DFDBC9', borderBottom: '1px solid #ACA899' }}>
+                      <th style={{ textAlign: 'left', padding: '6px 8px' }}>Room Category</th>
+                      <th>Total</th>
+                      <th>Occ</th>
+                      <th>Arr</th>
+                      <th>Dep</th>
+                      <th>Clean</th>
+                      <th>Dirty</th>
+                      <th>OOO</th>
+                      <th style={{ background: '#E8F5E9', color: '#2E7D32' }}>Available</th>
+                      <th style={{ textAlign: 'right', padding: '6px 8px' }}>Rack Tariff</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style={{ textAlign: 'left', padding: '5px 8px', fontWeight: 700 }}>Executive AC (EXE)</td>
+                      <td>12</td>
+                      <td style={{ fontWeight: 700, color: '#C62828' }}>6</td>
+                      <td style={{ color: '#2E7D32' }}>3</td>
+                      <td style={{ color: '#E65100' }}>2</td>
+                      <td>4</td>
+                      <td>2</td>
+                      <td>0</td>
+                      <td style={{ fontWeight: 800, color: '#2E7D32', background: '#F1F8E9' }}>4</td>
+                      <td style={{ textAlign: 'right', padding: '5px 8px', fontWeight: 700 }}>₹4,500.00</td>
+                    </tr>
+                    <tr style={{ background: '#FAFAFA' }}>
+                      <td style={{ textAlign: 'left', padding: '5px 8px', fontWeight: 700 }}>Deluxe AC (DLX)</td>
+                      <td>14</td>
+                      <td style={{ fontWeight: 700, color: '#C62828' }}>7</td>
+                      <td style={{ color: '#2E7D32' }}>2</td>
+                      <td style={{ color: '#E65100' }}>2</td>
+                      <td>5</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td style={{ fontWeight: 800, color: '#2E7D32', background: '#F1F8E9' }}>5</td>
+                      <td style={{ textAlign: 'right', padding: '5px 8px', fontWeight: 700 }}>₹3,500.00</td>
+                    </tr>
+                    <tr>
+                      <td style={{ textAlign: 'left', padding: '5px 8px', fontWeight: 700 }}>Luxury Suite (SUI)</td>
+                      <td>4</td>
+                      <td style={{ fontWeight: 700, color: '#C62828' }}>1</td>
+                      <td style={{ color: '#2E7D32' }}>1</td>
+                      <td style={{ color: '#E65100' }}>0</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td>1</td>
+                      <td style={{ fontWeight: 800, color: '#2E7D32', background: '#F1F8E9' }}>1</td>
+                      <td style={{ textAlign: 'right', padding: '5px 8px', fontWeight: 700 }}>₹7,500.00</td>
+                    </tr>
+                    <tr style={{ background: '#DFDBC9', fontWeight: 800, borderTop: '2px solid #716F64' }}>
+                      <td style={{ textAlign: 'left', padding: '6px 8px' }}>HOTEL TOTALS:</td>
+                      <td>30</td>
+                      <td style={{ color: '#C62828' }}>14</td>
+                      <td style={{ color: '#2E7D32' }}>6</td>
+                      <td style={{ color: '#E65100' }}>4</td>
+                      <td>10</td>
+                      <td>4</td>
+                      <td>2</td>
+                      <td style={{ color: '#2E7D32', background: '#C8E6C9' }}>10</td>
+                      <td style={{ textAlign: 'right', padding: '6px 8px' }}>Avg ₹4,433.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Yield & Forecast Metrics */}
+              <div style={{ background: '#FFFFE1', border: '1px solid #ACA899', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div>
+                  <strong>Revenue Yield:</strong> Projected Day Room Revenue: <strong style={{ color: '#0A246A' }}>₹54,880.00</strong> • ADR: <strong>₹3,920.00</strong> • RevPAR: <strong>₹1,829.33</strong>
+                </div>
+                <span style={{ fontSize: '10px', color: '#666' }}>Accounting Date: {INITIAL_ACCOUNTING_DATE}</span>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <button 
+                  className="ids-btn-classic"
+                  onClick={() => {
+                    playSuccessChime();
+                    alert("🖨️ Hotel Room Position Statement sent to Front Desk Laser Spooler (WS-FRONTDESK-01)!");
+                  }}
+                >
+                  🖨️ Print Position Sheet
+                </button>
+                <button 
+                  className="ids-btn-classic"
+                  onClick={() => setHotelPositionModalOpen(false)}
+                  style={{ minWidth: '80px', fontWeight: 700 }}
+                >
+                  Close
                 </button>
               </div>
             </div>
