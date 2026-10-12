@@ -8,9 +8,8 @@ import QRCode from 'qrcode';
 import { RESTAURANT_MENU } from '../data/hotelData';
 import { playSuccessChime, playOrderAlert } from '../utils/soundAlert';
 import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession';
-import DexieSyncIndicator from './DexieSyncIndicator';
 import GeofenceSecurityBanner from './GeofenceSecurityBanner';
-import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../db/dexieDb';
+import { saveTableSessionToDexie } from '../db/dexieDb';
 import { syncDispatchKotOrder } from '../utils/liveSyncBridge';
 import { RECOGNIZED_STEWARDS } from '../data/hotelStaffData';
 export { RECOGNIZED_STEWARDS };
@@ -505,7 +504,25 @@ export default function StewardMobileOrderPad({
 
         {/* Active Steward Chip & Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <DexieSyncIndicator compact={true} />
+          <div
+            title="Connected directly to Railway PostgreSQL Cloud API"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: '3px 8px',
+              borderRadius: '20px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.4)',
+              color: '#34d399',
+              userSelect: 'none'
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+            <span>Cloud Live</span>
+          </div>
 
           <button
             type="button"
