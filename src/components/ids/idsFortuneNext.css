@@ -53,11 +53,51 @@
   flex-direction: column !important;
 }
 
-.ids-dialog-window.maximized > div:not(.ids-dialog-titlebar):not(.ids-modal-titlebar),
-.ids-modal-window.maximized > div:not(.ids-modal-titlebar),
-.ids-modal-container.maximized > div:not(.ids-modal-titlebar) {
+.ids-dialog-window.maximized:not(.ids-touch-pos-window) > div:not(.ids-dialog-titlebar):not(.ids-modal-titlebar):not(.ids-toolbar):not(.ids-bottom-bar):not(.ids-statusbar),
+.ids-modal-window.maximized:not(.ids-touch-pos-window) > div:not(.ids-modal-titlebar):not(.ids-toolbar):not(.ids-bottom-bar):not(.ids-statusbar),
+.ids-modal-container.maximized:not(.ids-touch-pos-window) > div:not(.ids-modal-titlebar):not(.ids-toolbar):not(.ids-bottom-bar):not(.ids-statusbar) {
   flex: 1 1 auto;
   overflow-y: auto;
+}
+
+/* Authentic IDS Touch Screen POS Terminal Strict Layout Rules */
+.ids-touch-pos-window.maximized {
+  width: 98vw !important;
+  max-width: 98vw !important;
+  height: 96vh !important;
+  max-height: 96vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.ids-touch-pos-window > div.ids-dialog-titlebar {
+  flex: 0 0 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+}
+
+.ids-touch-pos-window > div.ids-touch-pos-topbar {
+  flex: 0 0 auto !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  overflow-y: hidden !important;
+}
+
+.ids-touch-pos-window > div.ids-touch-pos-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.ids-touch-pos-window > div.ids-touch-pos-bottombar {
+  flex: 0 0 50px !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  overflow-y: hidden !important;
 }
 
 /* Window Title Bar (Authentic Deep Navy Gradient) */

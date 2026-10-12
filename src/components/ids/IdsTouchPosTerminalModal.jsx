@@ -970,7 +970,7 @@ export default function IdsTouchPosTerminalModal({
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div 
-        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
+        className={`ids-dialog-window ids-touch-pos-window ${isMaximized ? 'maximized' : ''}`}
         style={isMaximized ? {
           position: 'fixed',
           top: '1vh',
@@ -1124,8 +1124,9 @@ export default function IdsTouchPosTerminalModal({
         {/* TOP STATUS & TABLE SELECTOR BAR                                   */}
         {/* ================================================================= */}
         <div 
+          className="ids-touch-pos-topbar"
           style={{ 
-            padding: '6px 12px', 
+            padding: '4px 12px', 
             background: '#ECE9D8', 
             borderBottom: '2px solid #716F64', 
             display: 'flex', 
@@ -1133,8 +1134,13 @@ export default function IdsTouchPosTerminalModal({
             alignItems: 'center', 
             fontSize: '11.5px', 
             flexWrap: 'nowrap',
+            flex: '0 0 auto',
             flexShrink: 0,
-            overflowX: 'auto'
+            height: '42px',
+            minHeight: '42px',
+            maxHeight: '42px',
+            overflowX: 'auto',
+            boxSizing: 'border-box'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -1217,12 +1223,22 @@ export default function IdsTouchPosTerminalModal({
         {/* ================================================================= */}
         {/* MAIN SPLIT WORKSPACE (50% TOUCH MENU | 50% ORDERS & BILLING)      */}
         {/* ================================================================= */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <div 
+          className="ids-touch-pos-body"
+          style={{ 
+            flex: '1 1 auto', 
+            display: 'flex', 
+            overflow: 'hidden', 
+            minHeight: 0,
+            height: 'auto',
+            background: '#F0EFEA'
+          }}
+        >
           
           {/* ------------------------------------------------------------- */}
           {/* LEFT 50%: TOUCH MENU TILES & GROUPS                           */}
           {/* ------------------------------------------------------------- */}
-          <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', borderRight: '2px solid #716F64', background: '#F0EFEA' }}>
+          <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', borderRight: '2px solid #716F64', background: '#F0EFEA', minHeight: 0 }}>
             
             {/* Menu Group Filter Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', padding: '6px 8px', background: '#D4D0C8', borderBottom: '2px solid #716F64', flexShrink: 0 }}>
@@ -1287,7 +1303,7 @@ export default function IdsTouchPosTerminalModal({
           {/* ------------------------------------------------------------- */}
           {/* RIGHT 50%: WIN32 TABULAR ORDER GRIDS (DISPATCHED + DRAFT)      */}
           {/* ------------------------------------------------------------- */}
-          <div style={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', background: '#FFF' }}>
+          <div style={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', background: '#FFF', minHeight: 0 }}>
             
             {/* PANE 1: PREVIOUSLY DISPATCHED KOTS (SUNKEN WIN32 GRID) */}
             <div style={{ background: '#000080', color: '#FFF', padding: '5px 10px', fontSize: '11.5px', fontWeight: 700, display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
@@ -1295,7 +1311,7 @@ export default function IdsTouchPosTerminalModal({
               <span>SUBTOTAL: ₹{financials.dispatchedTotal.toFixed(2)}</span>
             </div>
 
-            <div style={{ flex: '1 1 50%', overflowY: 'auto', borderBottom: '2px solid #716F64', border: '2px inset #FFF' }}>
+            <div style={{ flex: '1 1 50%', minHeight: 0, overflowY: 'auto', borderBottom: '2px solid #716F64', border: '2px inset #FFF' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0, zIndex: 2 }}>
                   <tr>
@@ -1364,7 +1380,7 @@ export default function IdsTouchPosTerminalModal({
               <span>{draftCart.length} ITEMS WAITING</span>
             </div>
 
-            <div style={{ flex: '1 1 50%', overflowY: 'auto', border: '2px inset #FFF' }}>
+            <div style={{ flex: '1 1 50%', minHeight: 0, overflowY: 'auto', border: '2px inset #FFF' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead style={{ background: '#ECE9D8', borderBottom: '1px solid #716F64', position: 'sticky', top: 0, zIndex: 2 }}>
                   <tr>
@@ -1425,7 +1441,7 @@ export default function IdsTouchPosTerminalModal({
             </div>
 
             {/* FINANCIAL TOTALS SUMMARY BAR */}
-            <div style={{ padding: '8px 12px', background: '#ECE9D8', borderTop: '2px solid #716F64', fontSize: '11.5px', flexShrink: 0 }}>
+            <div style={{ padding: '8px 12px', background: '#ECE9D8', borderTop: '2px solid #716F64', fontSize: '11.5px', flexShrink: 0, flex: '0 0 auto' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
@@ -1503,20 +1519,27 @@ export default function IdsTouchPosTerminalModal({
         {/* WIN32 BEVEL COMMAND TOOLBAR (FULL WIDTH SPAN ACROSS MODAL BOTTOM)  */}
         {/* ================================================================= */}
         <div 
+          className="ids-touch-pos-bottombar"
           style={{ 
-            padding: '6px 10px', 
+            padding: '5px 10px', 
             background: '#D4D0C8', 
             borderTop: '2px solid #716F64', 
             display: 'grid', 
             gridTemplateColumns: 'repeat(8, 1fr)', 
             gap: '6px',
-            flexShrink: 0
+            flex: '0 0 auto',
+            flexShrink: 0,
+            height: '50px',
+            minHeight: '50px',
+            maxHeight: '50px',
+            boxSizing: 'border-box',
+            alignItems: 'center'
           }}
         >
           <button 
             onClick={() => setSelectedGroup('ALL')}
             className="ids-btn-classic" 
-            style={{ background: '#334155', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#334155', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F1: Reset menu to ALL ITEMS category"
           >
             [F1] ALL MENU
@@ -1525,7 +1548,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={handlePunchDeltaKot}
             className="ids-btn-classic" 
-            style={{ background: '#166534', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#166534', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F2: Dispatches ONLY draft items with new KOT # to kitchen"
           >
             [F2] PUNCH KOT
@@ -1534,7 +1557,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={handleViewLatestKotSlip}
             className="ids-btn-classic" 
-            style={{ background: '#475569', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#475569', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F3: View or reprint 80mm thermal KOT slip"
           >
             [F3] VIEW KOT
@@ -1543,7 +1566,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={() => setDiscountModalOpen(true)}
             className="ids-btn-classic" 
-            style={{ background: financials.isDiscountApplied ? '#B45309' : '#1D4ED8', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: financials.isDiscountApplied ? '#B45309' : '#1D4ED8', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F4: Apply food bill discount (≤ 5% Cashier, > 5% Manager PIN)"
           >
             {financials.isDiscountApplied ? `[F4] DISC ${financials.discountPercent.toFixed(0)}%` : '[F4] DISCOUNT'}
@@ -1552,7 +1575,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={() => setMergeTableModalOpen(true)}
             className="ids-btn-classic" 
-            style={{ background: '#6B21A8', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#6B21A8', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F5: Merge running KOTs from another table into this one"
           >
             [F5] MERGE
@@ -1567,7 +1590,7 @@ export default function IdsTouchPosTerminalModal({
               }
             }}
             className="ids-btn-classic" 
-            style={{ background: '#991B1B', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#991B1B', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F6: Void kitchen dish with Manager PIN & mandatory reason"
           >
             [F6] VOID
@@ -1576,7 +1599,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={() => setPrintBillModalOpen(true)}
             className="ids-btn-classic" 
-            style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#0A246A', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F7: Print consolidated GST Tax Invoice for guest"
           >
             [F7] PRINT BILL
@@ -1585,7 +1608,7 @@ export default function IdsTouchPosTerminalModal({
           <button 
             onClick={() => setSettlementModalOpen(true)}
             className="ids-btn-classic" 
-            style={{ background: '#B45309', color: '#FFF', fontWeight: 700, padding: '8px 4px', fontSize: '11px', cursor: 'pointer', minHeight: '38px', borderRadius: '2px' }}
+            style={{ background: '#B45309', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F8: Settle payment (Cash, UPI QR, Card, Room Folio) and free table"
           >
             [F8] SETTLE
