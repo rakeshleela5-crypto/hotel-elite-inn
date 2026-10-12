@@ -37,12 +37,27 @@
   border-radius: 3px 3px 0 0;
 }
 
-.ids-window.maximized {
-  width: 99vw !important;
-  max-width: 99vw !important;
-  height: 98vh !important;
-  max-height: 98vh !important;
+.ids-window.maximized,
+.ids-dialog-window.maximized,
+.ids-modal-window.maximized,
+.ids-modal-container.maximized {
+  width: 98vw !important;
+  max-width: 98vw !important;
+  height: 96vh !important;
+  max-height: 96vh !important;
   margin: 0 !important;
+  top: 2vh !important;
+  left: 1vw !important;
+  transform: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.ids-dialog-window.maximized > div:not(.ids-dialog-titlebar):not(.ids-modal-titlebar),
+.ids-modal-window.maximized > div:not(.ids-modal-titlebar),
+.ids-modal-container.maximized > div:not(.ids-modal-titlebar) {
+  flex: 1 1 auto;
+  overflow-y: auto;
 }
 
 /* Window Title Bar (Authentic Deep Navy Gradient) */
@@ -569,21 +584,66 @@
 }
 
 /* 2. Global Text & Button Contrast */
-.ids-desktop-container button,
-.ids-modal-overlay button,
-.ids-modal-backdrop button,
-.ids-modal-container button,
-.ids-modal-window button,
-.ids-dialog-window button,
-.ids-window button,
+.ids-desktop-container button:not(.close),
+.ids-modal-overlay button:not(.close),
+.ids-modal-backdrop button:not(.close),
+.ids-modal-container button:not(.close),
+.ids-modal-window button:not(.close),
+.ids-dialog-window button:not(.close),
+.ids-window button:not(.close),
 .ids-btn,
 .ids-btn-classic {
-  color: #000000 !important;
+  color: #000000;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   text-shadow: none !important;
 }
 
-/* 3. Form Inputs, Selects, and Textareas */
+/* Close button text MUST ALWAYS be crisp white on red background */
+.ids-win-btn.close,
+button.ids-win-btn.close {
+  color: #FFFFFF !important;
+  background: #C75050 !important;
+}
+.ids-win-btn.close:hover,
+button.ids-win-btn.close:hover {
+  background: #E81123 !important;
+  color: #FFFFFF !important;
+}
+
+/* 3. Standard Titlebar Definitions for All Modals & Dialogs */
+.ids-dialog-titlebar,
+.ids-modal-titlebar {
+  background: linear-gradient(90deg, #0A246A 0%, #3A6EA5 70%, #A6CAF0 100%) !important;
+  color: #FFFFFF !important;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px solid #716F64;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.ids-titlebar span,
+.ids-dialog-titlebar span,
+.ids-modal-titlebar span,
+.ids-dialog-titlebar strong,
+.ids-modal-titlebar strong {
+  color: #FFFFFF !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+.ids-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* 4. Form Inputs, Selects, and Textareas */
 .ids-desktop-container input,
 .ids-modal-overlay input,
 .ids-modal-backdrop input,
@@ -594,9 +654,32 @@
 .ids-input {
   color-scheme: light !important;
   color: #000000 !important;
-  background-color: #FFFFFF !important;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
   font-size: 13px !important;
+}
+
+.ids-desktop-container input:not(:disabled):not([readonly]),
+.ids-modal-overlay input:not(:disabled):not([readonly]),
+.ids-modal-backdrop input:not(:disabled):not([readonly]),
+.ids-modal-container input:not(:disabled):not([readonly]),
+.ids-modal-window input:not(:disabled):not([readonly]),
+.ids-dialog-window input:not(:disabled):not([readonly]),
+.ids-window input:not(:disabled):not([readonly]),
+.ids-input:not(:disabled):not([readonly]) {
+  background-color: #FFFFFF;
+}
+
+/* Disabled & Readonly Inputs Preserve Authentic Win32 Grey & Highlight */
+.ids-desktop-container input:disabled,
+.ids-modal-overlay input:disabled,
+.ids-modal-backdrop input:disabled,
+.ids-modal-container input:disabled,
+.ids-modal-window input:disabled,
+.ids-dialog-window input:disabled,
+.ids-window input:disabled,
+.ids-input:disabled {
+  background-color: #EBE9ED !important;
+  color: #444444 !important;
 }
 
 .ids-desktop-container select,
@@ -609,9 +692,20 @@
 .ids-select {
   color-scheme: light !important;
   color: #000000 !important;
-  background-color: #FFFFFF !important;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
   font-size: 13px !important;
+}
+
+.ids-desktop-container select:disabled,
+.ids-modal-overlay select:disabled,
+.ids-modal-backdrop select:disabled,
+.ids-modal-container select:disabled,
+.ids-modal-window select:disabled,
+.ids-dialog-window select:disabled,
+.ids-window select:disabled,
+.ids-select:disabled {
+  background-color: #EBE9ED !important;
+  color: #444444 !important;
 }
 
 .ids-desktop-container select option,
@@ -628,7 +722,7 @@
   font-size: 13px !important;
 }
 
-/* 4. Form labels, legends, and table contents */
+/* 5. Form labels, legends, and table contents */
 .ids-dialog-window label,
 .ids-modal-container label,
 .ids-modal-window label,
@@ -638,9 +732,9 @@
   font-size: 13px !important;
 }
 
-.ids-dialog-window span,
-.ids-modal-container span,
-.ids-modal-window span {
+.ids-dialog-window span:not(.ids-dialog-titlebar span),
+.ids-modal-container span:not(.ids-modal-titlebar span),
+.ids-modal-window span:not(.ids-modal-titlebar span) {
   color: #111111;
   font-size: 13px;
 }

@@ -177,6 +177,7 @@ export default function IdsCheckoutBillModal({
   const [cardAmountInput, setCardAmountInput] = useState(initialMode === 'bulk' ? '33320.00' : '4000.00');
   const [cardTipInput, setCardTipInput] = useState('0.00');
   const [cardRemarksInput, setCardRemarksInput] = useState('Settled via POS Terminal 1');
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const [companyCodeInput, setCompanyCodeInput] = useState(initialMode === 'bulk' ? 'COM0006' : 'COM0015');
   const [companyNameInput, setCompanyNameInput] = useState(initialMode === 'bulk' ? 'M/S. ALKEM LABS. LTD.' : 'JK Paper Mills Ltd');
@@ -368,13 +369,19 @@ export default function IdsCheckoutBillModal({
           SCREEN 1: CHECK-OUT V6.5.002.6 SELECTION CONSOLE (Video 15 & 16 Frame 010 & 022)
           ========================================================================= */}
       {activeScreen === 'selector' && (
-        <div className="ids-dialog-window" style={{ width: '920px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '960px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Check-out V6.5.002.6</span>
-            <button className="ids-win-btn close" onClick={onClose}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Check-out V6.5.002.6 — Departure & Billing Console</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Header Filters Strip matching Frame 010 & Video 16 Frame 022 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', background: '#ECE9D8', padding: '4px', borderBottom: '1px solid #CCC', fontSize: '11px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -601,13 +608,19 @@ export default function IdsCheckoutBillModal({
           SCREEN 2: BILL SUMMARY DIALOG (Video 15 Frame 013 & Video 16 Frame 024/038)
           ========================================================================= */}
       {activeScreen === 'bill-summary' && (
-        <div className="ids-dialog-window" style={{ width: '940px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '960px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Bill Summary</span>
-            <button className="ids-win-btn close" onClick={() => setActiveScreen('selector')}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Bill Summary — Folio Charges & Line Items</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Back to Departure Console" onClick={() => setActiveScreen('selector')} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Header Form matching Frame 013 & Video 16 Frame 024 */}
             <div style={{ border: '1px solid #7F9DB9', padding: '6px 10px', background: '#FFF', fontSize: '11px', marginBottom: '8px' }}>
               {/* Row 1 */}
@@ -883,13 +896,19 @@ export default function IdsCheckoutBillModal({
           SCREEN 3: SETTLEMENTS V6.5.008.30 DIALOG (Video 15 & Video 16 Frame 055)
           ========================================================================= */}
       {activeScreen === 'settlements' && (
-        <div className="ids-dialog-window" style={{ width: '820px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '920px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Settlements V6.5.008.30</span>
-            <button className="ids-win-btn close" onClick={() => setActiveScreen('bill-summary')}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Settlements V6.5.008.30 — Payment & Folio Clearance</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Back to Bill Summary" onClick={() => setActiveScreen('bill-summary')} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Top Form Section matching Frame 035 & Video 16 Frame 055 */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', fontSize: '11px', marginBottom: '8px' }}>
               {/* Left Column */}

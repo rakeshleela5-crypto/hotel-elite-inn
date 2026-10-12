@@ -153,6 +153,7 @@ export default function IdsWalkInModal({
 
   // Status message
   const [statusMessage, setStatusMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Reset when opening
   useEffect(() => {
@@ -240,13 +241,19 @@ export default function IdsWalkInModal({
           SCREEN 1: ROOM RACK V6.5.002.2 (Video 17 Frames 010–030)
           ========================================================================= */}
       {activeStep === 'rack' && (
-        <div className="ids-dialog-window" style={{ width: '890px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '920px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Room Rack V6.5.002.2</span>
-            <button className="ids-win-btn close" onClick={onClose}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Room Rack V6.5.002.2</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px', fontSize: '11px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Top Form Section matching Frame 015 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', background: '#ECE9D8', padding: '6px', border: '1px solid #CCC' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -510,13 +517,19 @@ export default function IdsWalkInModal({
           SCREEN 2: WALK-INS V6.5002.5 REGISTRATION CONSOLE (Video 17 Frames 035–075)
           ========================================================================= */}
       {activeStep === 'registration' && (
-        <div className="ids-dialog-window" style={{ width: '880px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '920px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Walk-Ins V6.5002.5</span>
-            <button className="ids-win-btn close" onClick={() => setActiveStep('rack')}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Walk-Ins V6.5002.5 — Guest Registration</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Back to Rack" onClick={() => setActiveStep('rack')} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px', fontSize: '11px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Top Registration Header Strip matching Frame 035 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <div style={{ border: '1px solid #7F9DB9', padding: '2px 8px', background: '#FFF', fontWeight: 700 }}>
@@ -1382,13 +1395,19 @@ export default function IdsWalkInModal({
           SCREEN 3: GUEST INFORMATION V6.5002.2 (Video 17 Frame 110)
           ========================================================================= */}
       {activeStep === 'guest-info' && (
-        <div className="ids-dialog-window" style={{ width: '920px', maxWidth: '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '98vw' : '940px', maxWidth: '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>Guest Information V6.5002.2</span>
-            <button className="ids-win-btn close" onClick={handleFinishWalkIn}>✕</button>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>Guest Information V6.5002.2 — Reservation Profile</span>
+            <div className="ids-window-controls">
+              <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+                {isMaximized ? '❐' : '□'}
+              </button>
+              <button className="ids-win-btn close" title="Finish & Close" onClick={handleFinishWalkIn} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+            </div>
           </div>
 
-          <div style={{ padding: '8px 12px', fontSize: '11px' }}>
+          <div style={{ padding: '12px 14px', fontSize: '13px' }}>
             {/* Top Grid matching Frame 110 */}
             <div style={{ border: '1px solid #7F9DB9', padding: '8px', background: '#FFF', marginBottom: '8px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px' }}>
