@@ -168,39 +168,54 @@ export default function IdsGuestServicesModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '780px', 
-          backgroundColor: '#ECE9D8',
-          border: '2px solid #000',
-          boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
-          fontFamily: 'Tahoma, Arial, sans-serif'
+          width: '820px', 
+          maxWidth: '96vw',
+          backgroundColor: '#0f172a',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '14px',
+          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.1)',
+          overflow: 'hidden'
         }}
       >
-        {/* Title Bar */}
+        {/* Modern Luxury Title Bar */}
         <div 
           className="ids-modal-titlebar" 
           style={{ 
-            background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', 
-            color: '#FFF', 
-            padding: '3px 6px', 
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            color: '#f8fafc', 
+            padding: '14px 20px', 
             display: 'flex', 
             justifyContent: 'space-between', 
-            alignItems: 'center',
-            fontSize: '12px',
-            fontWeight: 'bold'
+            alignItems: 'center'
           }}
         >
-          <span>Guest Services V6.5.002.1</span>
-          <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '6px', borderRadius: '8px', color: '#38bdf8' }}>
+              <Compass size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '14px', letterSpacing: '-0.01em', color: '#f8fafc' }}>
+                Guest Services & Complaints Console
+              </div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                IDS Fortune NEXT PMS • Guest Concierge, Wakeups & Ticket Dispatch
+              </div>
+            </div>
+          </div>
+          <button className="ids-win-btn close" onClick={onClose} title="Close Dialog">
+            <X size={15} />
+          </button>
         </div>
 
-        {/* 7 Tabs Header with Authentic Retro Icons (Frame 019 & Frame 015) */}
+        {/* 7 Tabs Header with Modern Executive Pills */}
         <div 
           style={{ 
             display: 'flex', 
-            background: '#ECE9D8', 
-            borderBottom: '2px solid #716F64',
-            padding: '6px 8px 0 8px',
-            gap: '3px',
+            background: '#0f172a', 
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            padding: '8px 14px 0 14px',
+            gap: '6px',
             overflowX: 'auto'
           }}
         >
@@ -209,8 +224,8 @@ export default function IdsGuestServicesModal({
             { id: 'locator', label: 'Locator', icon: <Compass size={14} /> },
             { id: 'likes', label: 'Likes/Dislikes', icon: <ThumbsUp size={14} /> },
             { id: 'wakeups', label: 'Wakeup Calls', icon: <PhoneCall size={14} /> },
-            { id: 'log-complaints', label: 'Log Complaints', icon: <AlertCircle size={14} color="#C00" /> },
-            { id: 'attend-complaints', label: 'Attend Complaints', icon: <CheckSquare size={14} color="#008000" /> },
+            { id: 'log-complaints', label: 'Log Complaints', icon: <AlertCircle size={14} color="#f87171" /> },
+            { id: 'attend-complaints', label: 'Attend Complaints', icon: <CheckSquare size={14} color="#34d399" /> },
             { id: 'browse-complaints', label: 'Browse Complaints', icon: <Search size={14} /> }
           ].map(tab => {
             const isActive = activeTab === tab.id;
@@ -218,24 +233,22 @@ export default function IdsGuestServicesModal({
               <button 
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className="ids-tab-btn" 
+                className={`ids-tab-btn ${isActive ? 'active' : ''}`}
                 style={{ 
-                  padding: '5px 12px', 
-                  fontSize: '11px', 
-                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  padding: '8px 14px', 
+                  fontSize: '12px', 
                   fontWeight: isActive ? 700 : 600,
-                  color: isActive ? '#0A246A' : '#1A1A1A',
-                  background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
-                  border: '1px solid #716F64',
-                  borderBottom: isActive ? '2px solid #FFFFFF' : '1px solid #716F64',
-                  marginBottom: isActive ? '-2px' : '0px',
-                  boxShadow: isActive ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF',
-                  whiteSpace: 'nowrap',
+                  color: isActive ? '#38bdf8' : '#94a3b8',
+                  background: isActive ? 'rgba(56, 189, 248, 0.1)' : '#1e293b',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderBottom: isActive ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '8px 8px 0 0',
                   cursor: 'pointer',
-                  borderRadius: '3px 3px 0 0',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease'
                 }}
               >
                 {tab.icon} {tab.label}

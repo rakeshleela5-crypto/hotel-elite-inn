@@ -209,89 +209,91 @@ export default function IdsBusinessSourceModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '580px', 
-          maxWidth: '94vw', 
-          boxShadow: '0 10px 32px rgba(0,0,0,0.6)', 
-          border: '2px outset #ECE9D8',
-          background: '#ECE9D8'
+          width: '620px', 
+          maxWidth: '95vw', 
+          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '14px',
+          background: '#0f172a'
         }}
       >
-        {/* Titlebar matching Frame 010 */}
+        {/* Modern Luxury Header */}
         <div 
           className="ids-dialog-titlebar" 
           style={{ 
-            background: 'linear-gradient(90deg, #0A246A 0%, #3A6EA5 100%)', 
-            color: '#FFF', 
-            padding: '4px 8px', 
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            color: '#f8fafc', 
+            padding: '14px 20px', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center' 
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
-            <Globe size={14} />
-            <span>Business Sources V6.5.002.1 — IDS Fortune NEXT PMS</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '6px', borderRadius: '8px', color: '#38bdf8' }}>
+              <Globe size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '14px', letterSpacing: '-0.01em', color: '#f8fafc' }}>
+                Business Source Master
+              </div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                IDS Fortune NEXT PMS • Rate & Distribution Channel Setup
+              </div>
+            </div>
           </div>
           <button 
             className="ids-win-btn close" 
             onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
+            title="Close Dialog"
           >
-            ✕
+            <X size={15} />
           </button>
         </div>
 
         {/* Status notification banner */}
         {statusMessage && (
-          <div style={{ background: '#E6F4EA', borderBottom: '1px solid #137333', color: '#137333', padding: '4px 12px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CheckCircle2 size={14} />
+          <div style={{ background: 'rgba(16, 185, 129, 0.15)', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} />
             <span>{statusMessage}</span>
           </div>
         )}
 
-        {/* Form Body matching Frame 015 & Frame 030 */}
-        <div style={{ padding: '16px 20px', fontSize: '11px' }}>
+        {/* Form Body */}
+        <div style={{ padding: '20px 22px' }}>
           
-          <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '16px 18px', marginBottom: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px 14px', alignItems: 'center' }}>
+          <div style={{ border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(30, 41, 59, 0.5)', borderRadius: '10px', padding: '18px 20px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '12px 16px', alignItems: 'center' }}>
               
-              <span style={{ fontWeight: 600 }}>Applicable From</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Applicable From</span>
               <input 
                 className="ids-input" 
                 value={formData.applicableFrom} 
                 onChange={(e) => handleChange('applicableFrom', e.target.value)} 
-                style={{ width: '140px' }} 
+                style={{ width: '160px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Code</span>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Source Code</span>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
                   value={formData.code} 
                   onChange={(e) => handleChange('code', e.target.value)} 
                   placeholder="e.g. OTA"
-                  style={{ width: '100px', fontWeight: 700, background: '#FFF7CC', textTransform: 'uppercase' }} 
+                  style={{ width: '120px', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase' }} 
                 />
                 <button 
                   className="ids-btn-classic" 
-                  style={{ width: '22px' }} 
+                  style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
                   onClick={() => setBrowseModalOpen(true)}
                   title="Open Business Sources Browser (Frame 040)"
                 >
-                  ?
+                  <Search size={14} />
                 </button>
               </div>
 
-              <span style={{ fontWeight: 600 }}>Name</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Full Name</span>
               <input 
                 className="ids-input" 
                 value={formData.name} 
@@ -300,39 +302,39 @@ export default function IdsBusinessSourceModal({
                 style={{ width: '100%', fontWeight: 600 }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Short Name</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Short Name</span>
               <input 
                 className="ids-input" 
                 value={formData.shortName || ''} 
                 onChange={(e) => handleChange('shortName', e.target.value)} 
-                style={{ width: '140px' }} 
+                style={{ width: '160px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Status</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Status</span>
               <select 
-                className="ids-input" 
+                className="ids-select" 
                 value={formData.status} 
                 onChange={(e) => handleChange('status', e.target.value)}
-                style={{ width: '140px', fontWeight: 600, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
+                style={{ width: '160px', fontWeight: 600, color: formData.status === 'Active' ? '#34d399' : '#f87171' }}
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
 
-              <span style={{ fontWeight: 600 }}>User</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Audit User</span>
               <input 
                 className="ids-input" 
                 value={formData.user || 'MANAGER'} 
                 readOnly 
-                style={{ width: '140px', background: '#F0F0F0' }} 
+                style={{ width: '160px', opacity: 0.8 }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Last Updated</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Last Updated</span>
               <input 
                 className="ids-input" 
                 value={formData.lastUpdated || `${accountingDate} 18:02`} 
                 readOnly 
-                style={{ width: '180px', background: '#F0F0F0' }} 
+                style={{ width: '200px', opacity: 0.8 }} 
               />
 
             </div>
@@ -341,33 +343,40 @@ export default function IdsBusinessSourceModal({
           {/* Bottom Toolbar matching Frames 010–040 */}
           <div 
             style={{ 
-              background: '#D4D0C8', 
-              border: '1px solid #808080', 
-              padding: '6px 10px', 
+              background: '#1e293b', 
+              border: '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '10px',
+              padding: '10px 14px', 
               display: 'flex', 
               justifyContent: 'space-between',
               alignItems: 'center'
             }}
           >
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button className="ids-btn-classic" onClick={handleAddNew}>Add</button>
               <button className="ids-btn-classic" onClick={() => setStatusMessage('Edit mode active. Update fields and click Save.')}>Modify</button>
               <button className="ids-btn-classic" onClick={() => alert('Delete operation requires Manager authorization.')}>Delete</button>
               <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => setBrowseModalOpen(true)}>Browse</button>
-              <button className="ids-btn-classic" onClick={handlePrevious}>Previous</button>
+              <button className="ids-btn-classic" onClick={handlePrevious}>Prev</button>
               <button className="ids-btn-classic" onClick={handleNext}>Next</button>
             </div>
 
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                style={{ 
+                  fontWeight: 700, 
+                  minWidth: '78px', 
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  borderColor: '#38bdf8',
+                  color: '#ffffff'
+                }}
                 onClick={handleSave}
               >
                 Save
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 
@@ -380,20 +389,22 @@ export default function IdsBusinessSourceModal({
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setBrowseModalOpen(false)}>
             <div 
               className="ids-dialog-window" 
-              style={{ width: '560px', maxWidth: '94vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}
+              style={{ width: '600px', maxWidth: '94vw', background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div 
                 className="ids-dialog-titlebar plain" 
-                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+                style={{ background: '#1e293b', color: '#f8fafc', padding: '10px 16px', fontWeight: 700, fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <span>Business Sources V6.5.002.1</span>
-                <button className="ids-win-btn close" onClick={() => setBrowseModalOpen(false)}>✕</button>
+                <span>Select Business Source</span>
+                <button className="ids-win-btn close" onClick={() => setBrowseModalOpen(false)}>
+                  <X size={14} />
+                </button>
               </div>
 
-              <div style={{ padding: '10px' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 600 }}>Search:</span>
+              <div style={{ padding: '16px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#94a3b8' }}>Search:</span>
                   <input 
                     className="ids-input" 
                     value={searchTerm} 
@@ -403,53 +414,65 @@ export default function IdsBusinessSourceModal({
                   />
                 </div>
 
-                <div style={{ border: '1px solid #808080', background: '#FFF', maxHeight: '240px', overflowY: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <div style={{ border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px', background: '#0f172a', maxHeight: '260px', overflowY: 'auto' }}>
+                  <table className="ids-grid-table">
                     <thead>
-                      <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #808080', fontWeight: 700 }}>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '70px' }}>Code</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '110px' }}>Applicable From</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left' }}>Name</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '70px' }}>Status</th>
+                      <tr>
+                        <th style={{ width: '80px' }}>Code</th>
+                        <th style={{ width: '130px' }}>Applicable From</th>
+                        <th>Name</th>
+                        <th style={{ width: '80px' }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {sourcesList
                         .filter(s => s.code.toLowerCase().includes(searchTerm.toLowerCase()) || s.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                        .map((s, idx) => (
+                        .map((s) => (
                           <tr 
                             key={s.code} 
-                            style={{ 
-                              cursor: 'pointer', 
-                              borderBottom: '1px solid #EEE',
-                              background: s.code === formData.code ? '#316AC5' : idx % 2 === 0 ? '#FFF' : '#F9F9F9',
-                              color: s.code === formData.code ? '#FFF' : '#000'
-                            }}
+                            className={s.code === formData.code ? 'selected' : ''}
+                            style={{ cursor: 'pointer' }}
                             onClick={() => setFormData(s)}
                             onDoubleClick={() => {
                               setFormData(s);
                               setBrowseModalOpen(false);
                             }}
                           >
-                            <td style={{ padding: '4px 8px', fontWeight: 700 }}>{s.code}</td>
-                            <td style={{ padding: '4px 8px' }}>{s.applicableFrom}</td>
-                            <td style={{ padding: '4px 8px', fontWeight: 600 }}>{s.name}</td>
-                            <td style={{ padding: '4px 8px' }}>{s.status}</td>
+                            <td style={{ fontWeight: 700, color: '#38bdf8' }}>{s.code}</td>
+                            <td>{s.applicableFrom}</td>
+                            <td style={{ fontWeight: 600 }}>{s.name}</td>
+                            <td>
+                              <span style={{ 
+                                padding: '2px 8px', 
+                                borderRadius: '4px', 
+                                fontSize: '11px',
+                                background: s.status === 'Active' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                color: s.status === 'Active' ? '#34d399' : '#f87171' 
+                              }}>
+                                {s.status}
+                              </span>
+                            </td>
                           </tr>
                         ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
                   <button 
                     className="ids-btn-classic" 
-                    style={{ fontWeight: 700, minWidth: '70px' }}
+                    style={{ 
+                      fontWeight: 700, 
+                      minWidth: '80px',
+                      background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                      borderColor: '#38bdf8',
+                      color: '#ffffff'
+                    }}
                     onClick={() => setBrowseModalOpen(false)}
                   >
                     Select
                   </button>
-                  <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => setBrowseModalOpen(false)}>Cancel</button>
+                  <button className="ids-btn-classic" style={{ minWidth: '80px' }} onClick={() => setBrowseModalOpen(false)}>Cancel</button>
                 </div>
               </div>
             </div>

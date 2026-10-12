@@ -213,89 +213,91 @@ export default function IdsMarketSegmentModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '580px', 
-          maxWidth: '94vw', 
-          boxShadow: '0 10px 32px rgba(0,0,0,0.6)', 
-          border: '2px outset #ECE9D8',
-          background: '#ECE9D8'
+          width: '620px', 
+          maxWidth: '95vw', 
+          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          borderRadius: '14px',
+          background: '#0f172a'
         }}
       >
-        {/* Titlebar matching Frame 010 */}
+        {/* Modern Luxury Header */}
         <div 
           className="ids-dialog-titlebar" 
           style={{ 
-            background: 'linear-gradient(90deg, #0A246A 0%, #3A6EA5 100%)', 
-            color: '#FFF', 
-            padding: '4px 8px', 
+            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            color: '#f8fafc', 
+            padding: '14px 20px', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center' 
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
-            <PieChart size={14} />
-            <span>Market Segments V6.5.002.1 — IDS Fortune NEXT PMS</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '6px', borderRadius: '8px', color: '#38bdf8' }}>
+              <PieChart size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '14px', letterSpacing: '-0.01em', color: '#f8fafc' }}>
+                Market Segments Master
+              </div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                IDS Fortune NEXT PMS • Guest Profiling & Revenue Segmentation
+              </div>
+            </div>
           </div>
           <button 
             className="ids-win-btn close" 
             onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
+            title="Close Dialog"
           >
-            ✕
+            <X size={15} />
           </button>
         </div>
 
         {/* Status notification banner */}
         {statusMessage && (
-          <div style={{ background: '#E6F4EA', borderBottom: '1px solid #137333', color: '#137333', padding: '4px 12px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CheckCircle2 size={14} />
+          <div style={{ background: 'rgba(16, 185, 129, 0.15)', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={16} />
             <span>{statusMessage}</span>
           </div>
         )}
 
-        {/* Form Body matching Frame 015 & Frame 030 */}
-        <div style={{ padding: '16px 20px', fontSize: '11px' }}>
+        {/* Form Body */}
+        <div style={{ padding: '20px 22px' }}>
           
-          <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '16px 18px', marginBottom: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px 14px', alignItems: 'center' }}>
+          <div style={{ border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(30, 41, 59, 0.5)', borderRadius: '10px', padding: '18px 20px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '12px 16px', alignItems: 'center' }}>
               
-              <span style={{ fontWeight: 600 }}>Applicable From</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Applicable From</span>
               <input 
                 className="ids-input" 
                 value={formData.applicableFrom} 
                 onChange={(e) => handleChange('applicableFrom', e.target.value)} 
-                style={{ width: '140px' }} 
+                style={{ width: '160px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Code</span>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Segment Code</span>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
                   value={formData.code} 
                   onChange={(e) => handleChange('code', e.target.value)} 
                   placeholder="e.g. CVG"
-                  style={{ width: '100px', fontWeight: 700, background: '#FFF7CC', textTransform: 'uppercase' }} 
+                  style={{ width: '120px', fontWeight: 700, color: '#38bdf8', textTransform: 'uppercase' }} 
                 />
                 <button 
                   className="ids-btn-classic" 
-                  style={{ width: '22px' }} 
+                  style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
                   onClick={() => setBrowseModalOpen(true)}
                   title="Open Market Segments Browser (Frame 044)"
                 >
-                  ?
+                  <Search size={14} />
                 </button>
               </div>
 
-              <span style={{ fontWeight: 600 }}>Name</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Full Name</span>
               <input 
                 className="ids-input" 
                 value={formData.name} 
@@ -304,40 +306,40 @@ export default function IdsMarketSegmentModal({
                 style={{ width: '100%', fontWeight: 600 }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Short Name</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Short Name</span>
               <input 
                 className="ids-input" 
                 value={formData.shortName || ''} 
                 onChange={(e) => handleChange('shortName', e.target.value)} 
                 placeholder="e.g. CVG / FIT"
-                style={{ width: '140px' }} 
+                style={{ width: '160px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Status</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Status</span>
               <select 
-                className="ids-input" 
+                className="ids-select" 
                 value={formData.status} 
                 onChange={(e) => handleChange('status', e.target.value)}
-                style={{ width: '140px', fontWeight: 600, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
+                style={{ width: '160px', fontWeight: 600, color: formData.status === 'Active' ? '#34d399' : '#f87171' }}
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
 
-              <span style={{ fontWeight: 600 }}>User</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Audit User</span>
               <input 
                 className="ids-input" 
                 value={formData.user || 'MANAGER'} 
                 readOnly 
-                style={{ width: '140px', background: '#F0F0F0' }} 
+                style={{ width: '160px', opacity: 0.8 }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Last Updated</span>
+              <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Last Updated</span>
               <input 
                 className="ids-input" 
                 value={formData.lastUpdated || `${accountingDate} 18:01`} 
                 readOnly 
-                style={{ width: '180px', background: '#F0F0F0' }} 
+                style={{ width: '200px', opacity: 0.8 }} 
               />
 
             </div>
@@ -346,33 +348,40 @@ export default function IdsMarketSegmentModal({
           {/* Bottom Toolbar matching Frames 010–044 */}
           <div 
             style={{ 
-              background: '#D4D0C8', 
-              border: '1px solid #808080', 
-              padding: '6px 10px', 
+              background: '#1e293b', 
+              border: '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '10px',
+              padding: '10px 14px', 
               display: 'flex', 
               justifyContent: 'space-between',
               alignItems: 'center'
             }}
           >
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button className="ids-btn-classic" onClick={handleAddNew}>Add</button>
               <button className="ids-btn-classic" onClick={() => setStatusMessage('Edit mode active. Update fields and click Save.')}>Modify</button>
               <button className="ids-btn-classic" onClick={() => alert('Delete operation requires Manager authorization.')}>Delete</button>
               <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => setBrowseModalOpen(true)}>Browse</button>
-              <button className="ids-btn-classic" onClick={handlePrevious}>Previous</button>
+              <button className="ids-btn-classic" onClick={handlePrevious}>Prev</button>
               <button className="ids-btn-classic" onClick={handleNext}>Next</button>
             </div>
 
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                style={{ 
+                  fontWeight: 700, 
+                  minWidth: '78px', 
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  borderColor: '#38bdf8',
+                  color: '#ffffff'
+                }}
                 onClick={handleSave}
               >
                 Save
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
+              <button className="ids-btn-classic" style={{ minWidth: '65px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 
@@ -385,25 +394,25 @@ export default function IdsMarketSegmentModal({
           <div className="ids-modal-overlay" style={{ zIndex: 1700 }} onClick={() => setShowGenh007Info(false)}>
             <div 
               className="ids-dialog-window" 
-              style={{ width: '380px', maxWidth: '90vw', background: '#FFFFE1', border: '1px solid #D4D0C8', boxShadow: '0 8px 24px rgba(0,0,0,0.6)', padding: '16px' }}
+              style={{ width: '400px', maxWidth: '90vw', background: '#0f172a', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', padding: '18px' }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                <AlertTriangle size={32} color="#F9AB00" style={{ flexShrink: 0 }} />
+              <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                <AlertTriangle size={30} color="#f59e0b" style={{ flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: '12px', color: '#000', marginBottom: '6px' }}>
+                  <div style={{ fontWeight: 700, fontSize: '13px', color: '#f8fafc', marginBottom: '6px' }}>
                     Market Segments
                   </div>
-                  <div style={{ fontSize: '11px', color: '#333', marginBottom: '12px' }}>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '14px' }}>
                     No information to be displayed for the given Search Criteria.
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #CCC', paddingTop: '8px' }}>
-                    <span style={{ fontSize: '10px', color: '#666', fontWeight: 600 }}>
-                      ID: GENH007 &nbsp;&nbsp;&nbsp; MSG CODE: 10
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px' }}>
+                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                      ID: GENH007 • MSG CODE: 10
                     </span>
                     <button 
                       className="ids-btn-classic" 
-                      style={{ minWidth: '60px', fontWeight: 700 }}
+                      style={{ minWidth: '65px', fontWeight: 700 }}
                       onClick={() => setShowGenh007Info(false)}
                     >
                       Exit
@@ -422,41 +431,43 @@ export default function IdsMarketSegmentModal({
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setBrowseModalOpen(false)}>
             <div 
               className="ids-dialog-window" 
-              style={{ width: '560px', maxWidth: '94vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}
+              style={{ width: '600px', maxWidth: '94vw', background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div 
                 className="ids-dialog-titlebar plain" 
-                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+                style={{ background: '#1e293b', color: '#f8fafc', padding: '10px 16px', fontWeight: 700, fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <span>Market Segments V6.5.002.1</span>
-                <button className="ids-win-btn close" onClick={() => setBrowseModalOpen(false)}>✕</button>
+                <span>Select Market Segment</span>
+                <button className="ids-win-btn close" onClick={() => setBrowseModalOpen(false)}>
+                  <X size={14} />
+                </button>
               </div>
 
-              <div style={{ padding: '10px 14px', fontSize: '11px' }}>
+              <div style={{ padding: '16px' }}>
                 {/* Search Header */}
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                  <Search size={14} />
-                  <span style={{ fontWeight: 600 }}>Search Segment:</span>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
+                  <Search size={15} color="#94a3b8" />
+                  <span style={{ fontWeight: 600, color: '#94a3b8', fontSize: '12px' }}>Search Segment:</span>
                   <input 
                     className="ids-input" 
                     value={searchTerm} 
                     onChange={(e) => setSearchTerm(e.target.value)} 
                     placeholder="Search by Code or Name..."
-                    style={{ flex: 1, padding: '2px 6px' }}
+                    style={{ flex: 1 }}
                     autoFocus
                   />
                 </div>
 
                 {/* Table Data matching Frame 044 */}
-                <div style={{ height: '220px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-                    <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
+                <div style={{ height: '240px', overflowY: 'auto', background: '#0f172a', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '8px' }}>
+                  <table className="ids-grid-table">
+                    <thead>
                       <tr>
-                        <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '60px' }}>Code</th>
-                        <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A', width: '100px' }}>Applicable From</th>
-                        <th style={{ padding: '4px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Name</th>
-                        <th style={{ padding: '4px 6px', textAlign: 'left', width: '70px' }}>Status</th>
+                        <th style={{ width: '70px' }}>Code</th>
+                        <th style={{ width: '130px' }}>Applicable From</th>
+                        <th>Name</th>
+                        <th style={{ width: '80px' }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -479,18 +490,22 @@ export default function IdsMarketSegmentModal({
                                 setCurrentIndex(idx);
                                 setBrowseModalOpen(false);
                               }}
-                              style={{ 
-                                background: isSelected ? '#316AC5' : idx % 2 === 0 ? '#FFF' : '#F9F9F9',
-                                color: isSelected ? '#FFF' : '#000',
-                                cursor: 'pointer',
-                                borderBottom: '1px solid #E0E0E0'
-                              }}
+                              className={isSelected ? 'selected' : ''}
+                              style={{ cursor: 'pointer' }}
                             >
-                              <td style={{ padding: '4px 6px', fontWeight: 700, borderRight: '1px solid #E0E0E0' }}>{seg.code}</td>
-                              <td style={{ padding: '4px 6px', borderRight: '1px solid #E0E0E0' }}>{seg.applicableFrom}</td>
-                              <td style={{ padding: '4px 6px', borderRight: '1px solid #E0E0E0' }}>{seg.name}</td>
-                              <td style={{ padding: '4px 6px', color: isSelected ? '#FFF' : seg.status === 'Active' ? '#137333' : '#C5221F', fontWeight: 600 }}>
-                                {seg.status}
+                              <td style={{ fontWeight: 700, color: '#38bdf8' }}>{seg.code}</td>
+                              <td>{seg.applicableFrom}</td>
+                              <td style={{ fontWeight: 600 }}>{seg.name}</td>
+                              <td>
+                                <span style={{ 
+                                  padding: '2px 8px', 
+                                  borderRadius: '4px', 
+                                  fontSize: '11px',
+                                  background: seg.status === 'Active' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                  color: seg.status === 'Active' ? '#34d399' : '#f87171' 
+                                }}>
+                                  {seg.status}
+                                </span>
                               </td>
                             </tr>
                           );
@@ -500,17 +515,23 @@ export default function IdsMarketSegmentModal({
                 </div>
 
                 {/* Footer buttons */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
                   <button 
                     className="ids-btn-classic" 
-                    style={{ fontWeight: 700, minWidth: '70px' }}
+                    style={{ 
+                      fontWeight: 700, 
+                      minWidth: '80px',
+                      background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                      borderColor: '#38bdf8',
+                      color: '#ffffff'
+                    }}
                     onClick={() => setBrowseModalOpen(false)}
                   >
                     Select
                   </button>
                   <button 
                     className="ids-btn-classic" 
-                    style={{ minWidth: '60px' }}
+                    style={{ minWidth: '70px' }}
                     onClick={() => setBrowseModalOpen(false)}
                   >
                     Cancel
