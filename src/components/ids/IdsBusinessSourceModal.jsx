@@ -125,6 +125,7 @@ export default function IdsBusinessSourceModal({
   const [browseModalOpen, setBrowseModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [isMaximized, setIsMaximized] = useState(false);
 
   if (!isOpen) return null;
 
@@ -207,47 +208,51 @@ export default function IdsBusinessSourceModal({
   return (
     <div className="ids-modal-overlay">
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: '580px', 
-          maxWidth: '94vw', 
-          boxShadow: '0 10px 32px rgba(0,0,0,0.6)', 
-          border: '2px outset #ECE9D8',
+          width: isMaximized ? '98vw' : '860px', 
+          maxWidth: '98vw', 
+          boxShadow: '0 14px 44px rgba(0,0,0,0.65), 0 3px 10px rgba(0,0,0,0.4)', 
+          border: '2px outset #FFFFFF',
+          borderRightColor: '#555544',
+          borderBottomColor: '#555544',
           background: '#ECE9D8'
         }}
       >
-        {/* Titlebar matching Frame 010 */}
+        {/* Titlebar with Working Maximize / Restore Window Controls */}
         <div 
           className="ids-dialog-titlebar" 
           style={{ 
-            background: 'linear-gradient(90deg, #0A246A 0%, #3A6EA5 100%)', 
+            background: 'linear-gradient(90deg, #0A246A 0%, #3A6EA5 65%, #A6CAF0 100%)', 
             color: '#FFF', 
-            padding: '4px 8px', 
+            height: '32px',
+            padding: '0 8px', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center' 
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
-            <Globe size={14} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '13px' }}>
+            <span className="ids-logo-badge">IDS</span>
             <span>Business Sources V6.5.002.1 — IDS Fortune NEXT PMS</span>
           </div>
-          <button 
-            className="ids-win-btn close" 
-            onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
-          >
-            ✕
-          </button>
+          <div className="ids-titlebar-buttons">
+            <button className="ids-win-btn" title="Minimize">_</button>
+            <button 
+              className="ids-win-btn" 
+              title={isMaximized ? "Restore Down" : "Maximize Full Desktop"} 
+              onClick={() => setIsMaximized(!isMaximized)}
+            >
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button 
+              className="ids-win-btn close" 
+              onClick={onClose}
+              title="Close"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Status notification banner */}
@@ -261,29 +266,29 @@ export default function IdsBusinessSourceModal({
         {/* Form Body matching Frame 015 & Frame 030 */}
         <div style={{ padding: '16px 20px', fontSize: '11px' }}>
           
-          <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '16px 18px', marginBottom: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '10px 14px', alignItems: 'center' }}>
+          <div style={{ border: '2px groove #FFFFFF', background: '#ECE9D8', padding: '18px 22px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '12px 18px', alignItems: 'center' }}>
               
-              <span style={{ fontWeight: 600 }}>Applicable From</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Applicable From</span>
               <input 
                 className="ids-input" 
                 value={formData.applicableFrom} 
                 onChange={(e) => handleChange('applicableFrom', e.target.value)} 
-                style={{ width: '140px' }} 
+                style={{ width: '180px', height: '28px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Code</span>
-              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Code</span>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
                   value={formData.code} 
                   onChange={(e) => handleChange('code', e.target.value)} 
                   placeholder="e.g. OTA"
-                  style={{ width: '100px', fontWeight: 700, background: '#FFF7CC', textTransform: 'uppercase' }} 
+                  style={{ width: '130px', height: '28px', fontWeight: 800, background: '#FFF7CC', textTransform: 'uppercase', color: '#0A246A' }} 
                 />
                 <button 
                   className="ids-btn-classic" 
-                  style={{ width: '22px' }} 
+                  style={{ width: '30px', height: '28px', padding: 0, fontWeight: 800 }} 
                   onClick={() => setBrowseModalOpen(true)}
                   title="Open Business Sources Browser (Frame 040)"
                 >
@@ -291,48 +296,48 @@ export default function IdsBusinessSourceModal({
                 </button>
               </div>
 
-              <span style={{ fontWeight: 600 }}>Name</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Name</span>
               <input 
                 className="ids-input" 
                 value={formData.name} 
                 onChange={(e) => handleChange('name', e.target.value)} 
                 placeholder="e.g. Online Travel Agent"
-                style={{ width: '100%', fontWeight: 600 }} 
+                style={{ width: '100%', height: '28px', fontWeight: 600 }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Short Name</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Short Name</span>
               <input 
                 className="ids-input" 
                 value={formData.shortName || ''} 
                 onChange={(e) => handleChange('shortName', e.target.value)} 
-                style={{ width: '140px' }} 
+                style={{ width: '180px', height: '28px' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Status</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Status</span>
               <select 
-                className="ids-input" 
+                className="ids-select" 
                 value={formData.status} 
                 onChange={(e) => handleChange('status', e.target.value)}
-                style={{ width: '140px', fontWeight: 600, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
+                style={{ width: '180px', height: '28px', fontWeight: 700, color: formData.status === 'Active' ? '#137333' : '#C5221F' }}
               >
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
 
-              <span style={{ fontWeight: 600 }}>User</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>User</span>
               <input 
                 className="ids-input" 
                 value={formData.user || 'MANAGER'} 
                 readOnly 
-                style={{ width: '140px', background: '#F0F0F0' }} 
+                style={{ width: '180px', height: '28px', background: '#F0F0F0' }} 
               />
 
-              <span style={{ fontWeight: 600 }}>Last Updated</span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Last Updated</span>
               <input 
                 className="ids-input" 
                 value={formData.lastUpdated || `${accountingDate} 18:02`} 
                 readOnly 
-                style={{ width: '180px', background: '#F0F0F0' }} 
+                style={{ width: '220px', height: '28px', background: '#F0F0F0' }} 
               />
 
             </div>
@@ -341,33 +346,35 @@ export default function IdsBusinessSourceModal({
           {/* Bottom Toolbar matching Frames 010–040 */}
           <div 
             style={{ 
-              background: '#D4D0C8', 
-              border: '1px solid #808080', 
-              padding: '6px 10px', 
+              background: '#DFDBC9', 
+              border: '2px solid #716F64', 
+              borderTopColor: '#FFFFFF',
+              borderLeftColor: '#FFFFFF',
+              padding: '8px 14px', 
               display: 'flex', 
               justifyContent: 'space-between',
               alignItems: 'center'
             }}
           >
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button className="ids-btn-classic" onClick={handleAddNew}>Add</button>
               <button className="ids-btn-classic" onClick={() => setStatusMessage('Edit mode active. Update fields and click Save.')}>Modify</button>
               <button className="ids-btn-classic" onClick={() => alert('Delete operation requires Manager authorization.')}>Delete</button>
-              <button className="ids-btn-classic" style={{ fontWeight: 700 }} onClick={() => setBrowseModalOpen(true)}>Browse</button>
+              <button className="ids-btn-classic" style={{ fontWeight: 800 }} onClick={() => setBrowseModalOpen(true)}>Browse</button>
               <button className="ids-btn-classic" onClick={handlePrevious}>Previous</button>
               <button className="ids-btn-classic" onClick={handleNext}>Next</button>
             </div>
 
-            <div style={{ display: 'flex', gap: '6px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '70px', background: '#DCE6F1' }}
+                style={{ fontWeight: 800, minWidth: '85px', background: '#DCE6F1', borderColor: '#316AC5' }}
                 onClick={handleSave}
               >
                 Save
               </button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
-              <button className="ids-btn-classic" style={{ minWidth: '60px' }} onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={() => setBrowseModalOpen(true)}>Panel...</button>
+              <button className="ids-btn-classic" style={{ minWidth: '75px' }} onClick={onClose}>Exit</button>
             </div>
           </div>
 
@@ -380,37 +387,37 @@ export default function IdsBusinessSourceModal({
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => setBrowseModalOpen(false)}>
             <div 
               className="ids-dialog-window" 
-              style={{ width: '560px', maxWidth: '94vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}
+              style={{ width: '740px', maxWidth: '96vw', background: '#ECE9D8', border: '2px outset #FFFFFF', borderRightColor: '#555544', borderBottomColor: '#555544', boxShadow: '0 12px 36px rgba(0,0,0,0.6)' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div 
                 className="ids-dialog-titlebar plain" 
-                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+                style={{ background: '#316AC5', color: '#FFF', height: '32px', padding: '0 10px', fontWeight: 700, fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <span>Business Sources V6.5.002.1</span>
+                <span>Select Business Source</span>
                 <button className="ids-win-btn close" onClick={() => setBrowseModalOpen(false)}>✕</button>
               </div>
 
-              <div style={{ padding: '10px' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: 600 }}>Search:</span>
+              <div style={{ padding: '14px 18px', fontSize: '13px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700 }}>Search:</span>
                   <input 
                     className="ids-input" 
                     value={searchTerm} 
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search code or name..."
-                    style={{ flex: 1 }} 
+                    style={{ flex: 1, height: '28px' }} 
                   />
                 </div>
 
-                <div style={{ border: '1px solid #808080', background: '#FFF', maxHeight: '240px', overflowY: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <div style={{ border: '2px inset #FFFFFF', borderRightColor: '#716F64', borderBottomColor: '#716F64', background: '#FFF', maxHeight: '320px', overflowY: 'auto' }}>
+                  <table className="ids-grid-table">
                     <thead>
-                      <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #808080', fontWeight: 700 }}>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '70px' }}>Code</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '110px' }}>Applicable From</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left' }}>Name</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', width: '70px' }}>Status</th>
+                      <tr>
+                        <th style={{ width: '90px' }}>Code</th>
+                        <th style={{ width: '150px' }}>Applicable From</th>
+                        <th>Name</th>
+                        <th style={{ width: '90px' }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -431,25 +438,27 @@ export default function IdsBusinessSourceModal({
                               setBrowseModalOpen(false);
                             }}
                           >
-                            <td style={{ padding: '4px 8px', fontWeight: 700 }}>{s.code}</td>
-                            <td style={{ padding: '4px 8px' }}>{s.applicableFrom}</td>
-                            <td style={{ padding: '4px 8px', fontWeight: 600 }}>{s.name}</td>
-                            <td style={{ padding: '4px 8px' }}>{s.status}</td>
+                            <td style={{ fontWeight: 800, padding: '6px 10px' }}>{s.code}</td>
+                            <td style={{ padding: '6px 10px' }}>{s.applicableFrom}</td>
+                            <td style={{ fontWeight: 600, padding: '6px 10px' }}>{s.name}</td>
+                            <td style={{ padding: '6px 10px', fontWeight: 700, color: s.code === formData.code ? '#FFF' : s.status === 'Active' ? '#137333' : '#C5221F' }}>
+                              {s.status}
+                            </td>
                           </tr>
                         ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '14px' }}>
                   <button 
                     className="ids-btn-classic" 
-                    style={{ fontWeight: 700, minWidth: '70px' }}
+                    style={{ fontWeight: 800, minWidth: '85px', background: '#DCE6F1' }}
                     onClick={() => setBrowseModalOpen(false)}
                   >
                     Select
                   </button>
-                  <button className="ids-btn-classic" style={{ minWidth: '70px' }} onClick={() => setBrowseModalOpen(false)}>Cancel</button>
+                  <button className="ids-btn-classic" style={{ minWidth: '85px' }} onClick={() => setBrowseModalOpen(false)}>Cancel</button>
                 </div>
               </div>
             </div>

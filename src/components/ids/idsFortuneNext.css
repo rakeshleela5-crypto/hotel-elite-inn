@@ -1,8 +1,12 @@
-/* IDS FORTUNE NEXT 6.5 & 7.0 AUTHENTIC DESKTOP GUI STYLES */
+/* ==========================================================================
+   IDS FORTUNE NEXT 6.5 & 7.0 AUTHENTIC HIGH-DPI WIN32 DESKTOP GUI STYLES
+   Location: Hotel Elite Inn Enterprise PMS
+   Maintains 100% Authentic Windows Desktop Look & Feel with High-DPI Legibility
+   ========================================================================== */
 
 .ids-desktop-container {
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-  font-size: 11px;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 13px;
   color: #000000;
   user-select: none;
   background-color: #2F3935;
@@ -21,28 +25,39 @@
 /* Master IDS Application Window */
 .ids-window {
   width: 100%;
-  max-width: 1380px;
+  max-width: 1440px;
   background-color: #ECE9D8;
-  border: 1px solid #716F64;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.4);
+  border: 2px outset #FFFFFF;
+  border-right-color: #716F64;
+  border-bottom-color: #716F64;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.65), 0 3px 8px rgba(0,0,0,0.4);
   display: flex;
   flex-direction: column;
   position: relative;
   border-radius: 3px 3px 0 0;
 }
 
-/* Window Title Bar */
+.ids-window.maximized {
+  width: 99vw !important;
+  max-width: 99vw !important;
+  height: 98vh !important;
+  max-height: 98vh !important;
+  margin: 0 !important;
+}
+
+/* Window Title Bar (Authentic Deep Navy Gradient) */
 .ids-titlebar {
-  background: linear-gradient(180deg, #FFFFFF 0%, #E8E8E8 60%, #D4D0C8 100%);
-  border-bottom: 1px solid #999488;
-  height: 28px;
+  background: linear-gradient(90deg, #0A246A 0%, #3A6EA5 70%, #A6CAF0 100%);
+  border-bottom: 1px solid #716F64;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  color: #333333;
+  color: #FFFFFF;
+  letter-spacing: 0.2px;
 }
 
 .ids-titlebar-left {
@@ -55,10 +70,11 @@
   background: #A02020;
   color: #FFFFFF;
   font-weight: 900;
-  font-size: 10px;
-  padding: 1px 4px;
+  font-size: 11px;
+  padding: 2px 6px;
   border-radius: 2px;
   letter-spacing: 0.5px;
+  border: 1px solid #FFFFFF;
 }
 
 .ids-titlebar-buttons {
@@ -68,22 +84,37 @@
 }
 
 .ids-win-btn {
-  width: 22px;
-  height: 20px;
+  width: 24px;
+  height: 22px;
   background: #ECE9D8;
-  border: 1px solid #716F64;
+  border: 1px outset #FFFFFF;
+  border-right-color: #555544;
+  border-bottom-color: #555544;
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  color: #333;
+  color: #111111;
+  box-sizing: border-box;
 }
 .ids-win-btn:hover {
-  background: #E0DEC8;
+  background: #DFDBC7;
+}
+.ids-win-btn:active {
+  border: 1px inset #555544;
+  background: #D5D1BD;
+}
+.ids-win-btn.close {
+  background: #C75050;
+  color: #FFFFFF;
+  border-color: #FFFFFF;
+  border-right-color: #555544;
+  border-bottom-color: #555544;
 }
 .ids-win-btn.close:hover {
   background: #E81123;
@@ -96,15 +127,17 @@
   border-bottom: 1px solid #D0CDC0;
   display: flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 3px 10px;
   gap: 16px;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .ids-menu-item {
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 3px 8px;
   color: #222;
+  border-radius: 1px;
 }
 .ids-menu-item:hover {
   background: #316AC5;
@@ -115,12 +148,12 @@
 .ids-subbar {
   background: #E2DFCE;
   border-bottom: 1px solid #C4C0AE;
-  padding: 3px 12px;
+  padding: 4px 14px;
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: #444;
+  color: #333;
 }
 
 /* Top Horizontal Icon Strip */
@@ -131,13 +164,13 @@
   padding: 6px 12px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   overflow-x: auto;
 }
 
 .ids-tool-btn {
-  width: 44px;
-  height: 42px;
+  min-width: 50px;
+  height: 46px;
   background: #3A4232;
   border: 1px solid #282E23;
   border-radius: 4px;
@@ -149,34 +182,34 @@
   color: #DDE5D0;
   transition: all 0.1s ease;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 1px 2px rgba(0,0,0,0.3);
-  padding: 0;
+  padding: 2px 6px;
+  font-size: 11px;
 }
 .ids-tool-btn:hover {
   background: #4E5944;
   color: #FFFFFF;
 }
 .ids-tool-btn.active {
-  background: #73A72E;
   background: linear-gradient(180deg, #8BC239 0%, #689626 100%);
   border-color: #4B6E18;
   color: #FFFFFF;
   box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4);
 }
 
-/* Main Body Layout: Left Master, Middle Submenu, Right Statistics */
+/* Main Body Layout */
 .ids-main-layout {
   display: grid;
-  grid-template-columns: 260px 1fr 280px;
-  min-height: 520px;
+  grid-template-columns: 280px 1fr 300px;
+  min-height: 560px;
   background: #ECE9D8;
 }
 
 .ids-column-header {
   background: #DFDBC9;
   border-bottom: 1px solid #B0AB9A;
-  padding: 6px 10px;
+  padding: 7px 12px;
   font-weight: 800;
-  font-size: 12px;
+  font-size: 12.5px;
   text-align: center;
   color: #333333;
   letter-spacing: 0.5px;
@@ -191,8 +224,8 @@
 }
 
 .ids-master-item {
-  padding: 7px 14px;
-  font-size: 12px;
+  padding: 8px 16px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #111111;
   cursor: pointer;
@@ -220,14 +253,14 @@
 }
 
 .ids-submenu-item {
-  padding: 7px 16px;
-  font-size: 12px;
+  padding: 8px 18px;
+  font-size: 12.5px;
   color: #000000;
   cursor: pointer;
   border-bottom: 1px solid #F0F0F0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .ids-submenu-item:hover {
   background: #316AC5;
@@ -254,20 +287,20 @@
 .ids-stat-card {
   border-right: 1px solid #C4C0AE;
   border-bottom: 1px solid #C4C0AE;
-  padding: 10px 6px;
+  padding: 12px 8px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 64px;
+  min-height: 70px;
 }
 .ids-stat-card:nth-child(2n) {
   border-right: none;
 }
 
 .ids-stat-val {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #BD5317;
   line-height: 1.1;
@@ -280,8 +313,8 @@
   color: #D35400;
 }
 .ids-stat-lbl {
-  font-size: 10px;
-  color: #666655;
+  font-size: 11px;
+  color: #555544;
   line-height: 1.2;
 }
 
@@ -289,11 +322,11 @@
 .ids-bottom-commands {
   background: #DFDBC9;
   border-top: 2px solid #B0AB9A;
-  padding: 6px 12px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
 .ids-btn-classic {
@@ -301,84 +334,116 @@
   border: 2px outset #FFFFFF;
   border-right-color: #716F64;
   border-bottom-color: #716F64;
-  padding: 3px 12px;
-  font-size: 11px;
+  padding: 5px 16px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   color: #000000;
-  min-width: 65px;
+  min-width: 75px;
+  min-height: 28px;
   text-align: center;
   box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+.ids-btn-classic:hover {
+  background: #DFDBC7;
 }
 .ids-btn-classic:active {
   border: 2px inset #716F64;
   border-right-color: #FFFFFF;
   border-bottom-color: #FFFFFF;
-  padding: 4px 11px 2px 13px;
+  padding: 6px 15px 4px 17px;
 }
 
-/* Modal Popup Window Frame */
-.ids-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 12px;
+/* ==========================================================================
+   AUTHENTIC WIN32 MDI MODAL BACKDROP & EXPANDED DESKTOP SYSTEM
+   ========================================================================== */
+.ids-modal-overlay,
+.ids-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999 !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+  overflow: auto;
 }
 
-.ids-dialog-window {
+/* Windowed Dialog Container - Expanded & High-DPI */
+.ids-dialog-window,
+.ids-modal-window {
   background: #ECE9D8;
   border: 2px outset #FFFFFF;
   border-right-color: #555544;
   border-bottom-color: #555544;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.65), 0 3px 10px rgba(0,0,0,0.4);
   display: flex;
   flex-direction: column;
   position: relative;
-  max-height: 92vh;
+  max-height: 94vh;
+  min-width: 680px;
   overflow: hidden;
+  box-sizing: border-box;
+  transition: width 0.15s ease, height 0.15s ease;
 }
 
-.ids-dialog-titlebar {
-  background: linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%);
-  color: #FFFFFF;
-  font-weight: 700;
-  font-size: 12px;
-  padding: 3px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Full Desktop Maximized State */
+.ids-dialog-window.maximized,
+.ids-modal-window.maximized {
+  width: 98vw !important;
+  max-width: 98vw !important;
+  height: 96vh !important;
+  max-height: 96vh !important;
+  border-radius: 0 !important;
+}
+
+.ids-dialog-titlebar,
+.ids-modal-titlebar {
+  background: linear-gradient(90deg, #0A246A 0%, #3A6EA5 65%, #A6CAF0 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  height: 32px !important;
+  padding: 0 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid #555544 !important;
+  letter-spacing: 0.2px;
 }
 .ids-dialog-titlebar.plain {
-  background: #ECE9D8;
-  color: #000000;
-  border-bottom: 1px solid #B0AB9A;
+  background: #ECE9D8 !important;
+  color: #000000 !important;
+  border-bottom: 1px solid #B0AB9A !important;
 }
 
-/* Inset inputs and tables */
+/* Inset inputs and tables - Scaled & High-DPI */
 .ids-input {
-  border: 1px solid #7F9DB9;
-  background: #FFFFFF;
-  color: #000000;
-  font-size: 11px;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-  padding: 2px 4px;
-  box-sizing: border-box;
+  border: 1px solid #7F9DB9 !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  font-size: 13px !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  padding: 4px 8px !important;
+  height: 28px !important;
+  box-sizing: border-box !important;
 }
 .ids-input:focus {
-  outline: 1px solid #316AC5;
+  outline: 1px solid #316AC5 !important;
 }
 
 .ids-select {
-  border: 1px solid #7F9DB9;
-  background: #FFFFFF;
-  font-size: 11px;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-  padding: 2px 2px;
-  box-sizing: border-box;
+  border: 1px solid #7F9DB9 !important;
+  background: #FFFFFF !important;
+  color: #000000 !important;
+  font-size: 13px !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  padding: 3px 6px !important;
+  height: 28px !important;
+  box-sizing: border-box !important;
 }
 
 .ids-grid-table {
@@ -386,18 +451,20 @@
   border-collapse: collapse;
   background: #FFFFFF;
   border: 1px solid #7F9DB9;
-  font-size: 11px;
+  font-size: 12.5px;
 }
 .ids-grid-table th {
   background: #DFDBC9;
   border: 1px solid #C4C0AE;
-  padding: 3px 6px;
+  padding: 6px 10px;
   font-weight: 700;
   text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.2px;
 }
 .ids-grid-table td {
   border: 1px solid #E0DEC8;
-  padding: 2px 6px;
+  padding: 5px 10px;
   color: #000000;
 }
 .ids-grid-table tr:hover td {
@@ -406,21 +473,22 @@
 .ids-grid-table tr.selected td {
   background: #316AC5;
   color: #FFFFFF;
+  font-weight: 600;
 }
 
-/* Dialog Action Ribbon Buttons (+, Edit, Del, Help, Building, Group, Checkin, Search) */
+/* Dialog Action Ribbon Buttons */
 .ids-dialog-top-tools {
   background: #ECE9D8;
   border-bottom: 1px solid #B0AB9A;
-  padding: 4px 8px;
+  padding: 5px 10px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .ids-dialog-action-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -433,178 +501,20 @@
   border-color: #B0AB9A;
 }
 
-/* Floppy Disk Save & Big X Cancel Buttons */
-.ids-icon-save-btn {
-  background: #ECE9D8;
-  border: 2px outset #FFFFFF;
-  border-right-color: #716F64;
-  border-bottom-color: #716F64;
-  width: 44px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.ids-icon-save-btn:active {
-  border: 2px inset #716F64;
-}
-
-.ids-icon-cancel-btn {
-  background: #ECE9D8;
-  border: 2px outset #FFFFFF;
-  border-right-color: #716F64;
-  border-bottom-color: #716F64;
-  width: 44px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: 900;
-  color: #333333;
-}
-.ids-icon-cancel-btn:active {
-  border: 2px inset #716F64;
-}
-
-.ids-icon-next-btn {
-  background: #ECE9D8;
-  border: 2px outset #FFFFFF;
-  border-right-color: #716F64;
-  border-bottom-color: #716F64;
-  width: 44px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 900;
-  color: #111111;
-}
-.ids-icon-next-btn:active {
-  border: 2px inset #716F64;
-}
-
-/* Authentic Win32 MDI Modal Backdrop & Centering System */
-.ids-modal-backdrop {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background-color: rgba(0, 0, 0, 0.45) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  z-index: 1100;
-  overflow: auto;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-.ids-modal-window {
-  position: relative !important;
-  max-height: 94vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-/* ==========================================================================
-   AUTHENTIC HIGH-CONTRAST SYSTEM OVERRIDE FOR ALL IDS WINDOWS & MODALS
-   Eliminates washed-out, disturbed, white-on-white text across the entire PMS
-   ========================================================================== */
-
-/* 1. Universal Theme and Color-Scheme Isolation */
-.ids-desktop-container,
-.ids-modal-overlay,
-.ids-modal-backdrop,
-.ids-modal-container,
-.ids-modal-window,
-.ids-dialog-window,
-.ids-window {
-  color-scheme: light !important;
-  color: #000000 !important;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif !important;
-}
-
-/* 2. Global Text & Button Contrast */
-.ids-desktop-container button,
-.ids-modal-overlay button,
-.ids-modal-backdrop button,
-.ids-modal-container button,
-.ids-modal-window button,
-.ids-dialog-window button,
-.ids-window button,
-.ids-btn,
-.ids-btn-classic {
-  color: #000000;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-  text-shadow: none !important;
-}
-
-/* 3. Form Inputs, Selects, and Textareas */
-.ids-desktop-container input,
-.ids-modal-overlay input,
-.ids-modal-backdrop input,
-.ids-modal-container input,
-.ids-modal-window input,
-.ids-dialog-window input,
-.ids-window input,
-.ids-input {
-  color-scheme: light !important;
-  color: #000000 !important;
-  background-color: #FFFFFF;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-}
-
-.ids-desktop-container select,
-.ids-modal-overlay select,
-.ids-modal-backdrop select,
-.ids-modal-container select,
-.ids-modal-window select,
-.ids-dialog-window select,
-.ids-window select,
-.ids-select {
-  color-scheme: light !important;
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
-}
-
-.ids-desktop-container select option,
-.ids-modal-overlay select option,
-.ids-modal-backdrop select option,
-.ids-modal-container select option,
-.ids-modal-window select option,
-.ids-dialog-window select option,
-.ids-window select option,
-.ids-select option {
-  color-scheme: light !important;
-  color: #000000 !important;
-  background-color: #FFFFFF !important;
-}
-
-/* 4. Standardized High-Contrast Tabs System */
+/* Standardized High-Contrast Folder Tabs System */
 .ids-tab-bar {
   display: flex;
   gap: 3px;
   background: #ECE9D8;
   border-bottom: 2px solid #716F64;
-  padding: 6px 8px 0 8px;
+  padding: 6px 10px 0 10px;
   overflow-x: auto;
 }
 
 .ids-tab-btn {
-  padding: 5px 12px;
-  font-size: 11px;
-  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+  padding: 6px 16px;
+  font-size: 12.5px;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-weight: 600;
   color: #1A1A1A !important;
   background: linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%);
@@ -615,11 +525,10 @@
   border-radius: 3px 3px 0 0;
   box-shadow: inset 0 1px 0 #FFFFFF;
   white-space: nowrap;
-  text-shadow: none;
   outline: none;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   transition: all 0.1s ease;
 }
 
@@ -639,42 +548,99 @@
   box-shadow: inset 0 2px 0 #316AC5 !important;
 }
 
-/* 5. Inactive vs Active button fallbacks */
-.ids-desktop-container button[style*="background: #FFF"],
-.ids-desktop-container button[style*="background: #fff"],
-.ids-desktop-container button[style*="background: #FFFFFF"],
-.ids-desktop-container button[style*="background: #ffffff"],
-.ids-desktop-container button[style*="background: rgb(255, 255, 255)"],
-.ids-modal-overlay button[style*="background: #FFF"],
-.ids-modal-overlay button[style*="background: #fff"],
-.ids-modal-overlay button[style*="background: #FFFFFF"],
-.ids-modal-overlay button[style*="background: #ffffff"],
-.ids-modal-overlay button[style*="background: rgb(255, 255, 255)"],
-.ids-modal-backdrop button[style*="background: #FFF"],
-.ids-modal-backdrop button[style*="background: #fff"],
-.ids-modal-backdrop button[style*="background: #FFFFFF"],
-.ids-modal-backdrop button[style*="background: #ffffff"],
-.ids-modal-backdrop button[style*="background: rgb(255, 255, 255)"],
-.ids-modal-container button[style*="background: #FFF"],
-.ids-modal-container button[style*="background: #fff"],
-.ids-modal-container button[style*="background: #FFFFFF"],
-.ids-modal-container button[style*="background: #ffffff"],
-.ids-modal-container button[style*="background: rgb(255, 255, 255)"],
-.ids-dialog-window button[style*="background: #FFF"],
-.ids-dialog-window button[style*="background: #fff"],
-.ids-dialog-window button[style*="background: #FFFFFF"],
-.ids-dialog-window button[style*="background: #ffffff"],
-.ids-dialog-window button[style*="background: rgb(255, 255, 255)"] {
-  color: #0A246A !important;
+/* ==========================================================================
+   AUTHENTIC HIGH-CONTRAST SYSTEM OVERRIDE FOR ALL IDS WINDOWS & MODALS
+   Eliminates washed-out, disturbed, white-on-white text across the entire PMS
+   ========================================================================== */
+
+/* 1. Universal Theme and Color-Scheme Isolation */
+.ids-desktop-container,
+.ids-modal-overlay,
+.ids-modal-backdrop,
+.ids-modal-container,
+.ids-modal-window,
+.ids-dialog-window,
+.ids-window {
+  color-scheme: light !important;
+  color: #000000 !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  font-size: 13px !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 6. Form labels, legends, and table contents */
+/* 2. Global Text & Button Contrast */
+.ids-desktop-container button,
+.ids-modal-overlay button,
+.ids-modal-backdrop button,
+.ids-modal-container button,
+.ids-modal-window button,
+.ids-dialog-window button,
+.ids-window button,
+.ids-btn,
+.ids-btn-classic {
+  color: #000000 !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  text-shadow: none !important;
+}
+
+/* 3. Form Inputs, Selects, and Textareas */
+.ids-desktop-container input,
+.ids-modal-overlay input,
+.ids-modal-backdrop input,
+.ids-modal-container input,
+.ids-modal-window input,
+.ids-dialog-window input,
+.ids-window input,
+.ids-input {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  font-size: 13px !important;
+}
+
+.ids-desktop-container select,
+.ids-modal-overlay select,
+.ids-modal-backdrop select,
+.ids-modal-container select,
+.ids-modal-window select,
+.ids-dialog-window select,
+.ids-window select,
+.ids-select {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
+  font-size: 13px !important;
+}
+
+.ids-desktop-container select option,
+.ids-modal-overlay select option,
+.ids-modal-backdrop select option,
+.ids-modal-container select option,
+.ids-modal-window select option,
+.ids-dialog-window select option,
+.ids-window select option,
+.ids-select option {
+  color-scheme: light !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-size: 13px !important;
+}
+
+/* 4. Form labels, legends, and table contents */
 .ids-dialog-window label,
 .ids-modal-container label,
 .ids-modal-window label,
 .ids-window label,
 .ids-desktop-container label {
   color: #000000 !important;
+  font-size: 13px !important;
 }
 
-
+.ids-dialog-window span,
+.ids-modal-container span,
+.ids-modal-window span {
+  color: #111111;
+  font-size: 13px;
+}

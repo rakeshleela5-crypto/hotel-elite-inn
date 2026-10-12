@@ -17,6 +17,7 @@ export default function IdsGuestServicesModal({
   onOpenMessageBox
 }) {
   const [activeTab, setActiveTab] = useState(initialTab || 'log-complaints');
+  const [isMaximized, setIsMaximized] = useState(false);
   const [complaintsList, setComplaintsList] = useState(INITIAL_HOUSEKEEPING_COMPLAINTS);
   const [selectedComplaint, setSelectedComplaint] = useState(complaintsList[0] || null);
 
@@ -166,13 +167,18 @@ export default function IdsGuestServicesModal({
   return (
     <div className="ids-modal-backdrop" style={{ zIndex: 1100 }}>
       <div 
-        className="ids-modal-window" 
+        className={`ids-modal-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: '780px', 
+          width: isMaximized ? '98vw' : '880px', 
+          maxWidth: isMaximized ? '98vw' : '92vw',
+          height: isMaximized ? '96vh' : 'auto',
+          maxHeight: isMaximized ? '96vh' : '90vh',
+          display: 'flex',
+          flexDirection: 'column',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
-          fontFamily: 'Tahoma, Arial, sans-serif'
+          fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif"
         }}
       >
         {/* Title Bar */}
@@ -181,16 +187,22 @@ export default function IdsGuestServicesModal({
           style={{ 
             background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', 
             color: '#FFF', 
-            padding: '3px 6px', 
+            padding: '4px 8px', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
-            fontSize: '12px',
+            fontSize: '13px',
             fontWeight: 'bold'
           }}
         >
           <span>Guest Services V6.5.002.1</span>
-          <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px' }}>
+            <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* 7 Tabs Header with Authentic Retro Icons (Frame 019 & Frame 015) */}
@@ -199,8 +211,8 @@ export default function IdsGuestServicesModal({
             display: 'flex', 
             background: '#ECE9D8', 
             borderBottom: '2px solid #716F64',
-            padding: '6px 8px 0 8px',
-            gap: '3px',
+            padding: '8px 10px 0 10px',
+            gap: '4px',
             overflowX: 'auto'
           }}
         >
@@ -220,9 +232,9 @@ export default function IdsGuestServicesModal({
                 onClick={() => setActiveTab(tab.id)}
                 className="ids-tab-btn" 
                 style={{ 
-                  padding: '5px 12px', 
-                  fontSize: '11px', 
-                  fontFamily: 'Tahoma, Arial, sans-serif',
+                  padding: '6px 12px', 
+                  fontSize: '12px', 
+                  fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif",
                   fontWeight: isActive ? 700 : 600,
                   color: isActive ? '#0A246A' : '#1A1A1A',
                   background: isActive ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
@@ -235,7 +247,7 @@ export default function IdsGuestServicesModal({
                   borderRadius: '3px 3px 0 0',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '5px'
                 }}
               >
                 {tab.icon} {tab.label}
@@ -246,28 +258,28 @@ export default function IdsGuestServicesModal({
 
         {/* Tab 5: Log Complaints Body (Video 05 Frame 019) */}
         {activeTab === 'log-complaints' && (
-          <div style={{ padding: '14px' }}>
+          <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
             <div 
               style={{ 
                 border: '1px solid #7F9DB9', 
                 background: '#FFF', 
-                padding: '16px',
-                fontSize: '11px',
-                marginBottom: '14px'
+                padding: '18px',
+                fontSize: '13px',
+                marginBottom: '16px'
               }}
             >
               {/* Radio Selector */}
-              <div style={{ display: 'flex', gap: '20px', marginBottom: '12px', paddingBottom: '8px', borderBottom: '1px dotted #CCC' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', gap: '24px', marginBottom: '14px', paddingBottom: '10px', borderBottom: '1px dotted #CCC' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px' }}>
                   <input 
                     type="radio" 
                     name="scope" 
                     checked={logFormData.scope === 'Room'} 
                     onChange={() => setLogFormData({ ...logFormData, scope: 'Room' })} 
                   />
-                  <strong>Room</strong>
+                  <strong style={{ color: '#0A246A' }}>Room</strong>
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '13px' }}>
                   <input 
                     type="radio" 
                     name="scope" 
@@ -279,20 +291,22 @@ export default function IdsGuestServicesModal({
               </div>
 
               {/* Form Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px' }}>
                 {/* Left Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Room No.</label>
-                    <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Room No.</label>
+                    <div style={{ display: 'flex', gap: '6px', flex: 1 }}>
                       <input 
                         type="text" 
                         value={logFormData.roomNo}
                         onChange={(e) => handleRoomSelect(e.target.value)}
-                        style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9', fontWeight: 'bold' }} 
+                        className="ids-input"
+                        style={{ width: '80px', fontWeight: 'bold', fontSize: '13px', height: '28px' }} 
                       />
                       <button 
-                        style={{ padding: '1px 5px', background: '#ECE9D8', border: '1px solid #7F9DB9' }}
+                        className="ids-btn-classic"
+                        style={{ padding: '0 8px', height: '28px', fontSize: '12px' }}
                         title="Room Lookup"
                         onClick={() => {
                           const r = prompt("Select Room (101, 102, 201, 202):", logFormData.roomNo);
@@ -303,11 +317,12 @@ export default function IdsGuestServicesModal({
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Guest Name</label>
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Guest Name</label>
                     <select 
                       value={logFormData.guestName}
                       onChange={(e) => setLogFormData({ ...logFormData, guestName: e.target.value })}
-                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9' }}
+                      className="ids-select"
+                      style={{ flex: 1, fontSize: '13px', height: '28px' }}
                     >
                       <option value="Mr Kumar Anil">Mr Kumar Anil</option>
                       <option value="Mr Vikram Singhania">Mr Vikram Singhania</option>
@@ -316,11 +331,12 @@ export default function IdsGuestServicesModal({
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Department</label>
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Department</label>
                     <select 
                       value={logFormData.department}
                       onChange={(e) => setLogFormData({ ...logFormData, department: e.target.value })}
-                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', fontWeight: 'bold', color: '#0A246A' }}
+                      className="ids-select"
+                      style={{ flex: 1, fontWeight: 'bold', color: '#0A246A', fontSize: '13px', height: '28px' }}
                     >
                       <option value="Housekeeping">Housekeeping</option>
                       <option value="Maintenance / Engineering">Maintenance / Engineering</option>
@@ -332,87 +348,88 @@ export default function IdsGuestServicesModal({
                 </div>
 
                 {/* Right Column */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Arrival</label>
-                    <input type="text" value={logFormData.arrival} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Arrival</label>
+                    <input type="text" value={logFormData.arrival} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Departure</label>
-                    <input type="text" value={logFormData.departure} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Departure</label>
+                    <input type="text" value={logFormData.departure} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Guest Status</label>
-                    <input type="text" value={logFormData.guestStatus} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Guest Status</label>
+                    <input type="text" value={logFormData.guestStatus} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
                 </div>
               </div>
 
               {/* Description & Audit Footer */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '16px', marginTop: '14px', paddingTop: '10px', borderTop: '1px dotted #CCC' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '20px', marginTop: '16px', paddingTop: '12px', borderTop: '1px dotted #CCC' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>Nature of Complaint</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: 'bold', fontSize: '13px' }}>Nature of Complaint</label>
                   <textarea 
                     rows={4}
                     value={logFormData.natureOfComplaint}
                     onChange={(e) => setLogFormData({ ...logFormData, natureOfComplaint: e.target.value })}
-                    style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', fontFamily: 'inherit', fontSize: '11px', resize: 'none' }}
+                    style={{ width: '100%', padding: '6px 8px', border: '1px solid #7F9DB9', fontFamily: 'inherit', fontSize: '13px', resize: 'vertical', minHeight: '90px' }}
                   />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '80px' }}>Received by</label>
-                    <input type="text" value={logFormData.receivedBy} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Received by</label>
+                    <input type="text" value={logFormData.receivedBy} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '80px' }}>Date</label>
-                    <input type="text" value={logFormData.date} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Date</label>
+                    <input type="text" value={logFormData.date} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '80px' }}>Time</label>
-                    <input type="text" value={logFormData.time} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Time</label>
+                    <input type="text" value={logFormData.time} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Command Buttons */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-              <button onClick={handleSaveComplaint} className="ids-btn" style={{ minWidth: '70px', padding: '4px 14px', fontSize: '11px', fontWeight: 'bold' }}>Save</button>
-              <button onClick={() => {}} className="ids-btn" style={{ minWidth: '70px', padding: '4px 14px', fontSize: '11px' }}>Panel</button>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '4px 14px', fontSize: '11px' }}>Exit</button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+              <button onClick={handleSaveComplaint} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px', fontWeight: 'bold' }}>Save</button>
+              <button onClick={() => {}} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Panel</button>
+              <button onClick={onClose} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
             </div>
           </div>
         )}
 
         {/* Tab 6: Attend Complaints Body (Video 07 Frame 015) */}
         {activeTab === 'attend-complaints' && (
-          <div style={{ padding: '14px' }}>
+          <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
             {/* Worklist Grid Table */}
             <div 
               style={{ 
                 border: '1px solid #7F9DB9', 
                 background: '#FFF', 
-                maxHeight: '160px', 
-                minHeight: '120px', 
+                flex: isMaximized ? 1 : 'unset',
+                maxHeight: isMaximized ? 'none' : '220px', 
+                minHeight: '140px', 
                 overflowY: 'auto',
-                marginBottom: '12px'
+                marginBottom: '14px'
               }}
             >
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <table className="ids-grid-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
                 <thead>
                   <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px' }}>Room No.</th>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Guest Name</th>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '80px' }}>Status</th>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '70px' }}>Complaints</th>
-                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', width: '60px' }}>Messages</th>
-                    <th style={{ padding: '4px', width: '60px' }}>Requests</th>
+                    <th style={{ padding: '6px 8px', borderRight: '1px solid #CCC', width: '80px' }}>Room No.</th>
+                    <th style={{ padding: '6px 8px', borderRight: '1px solid #CCC' }}>Guest Name</th>
+                    <th style={{ padding: '6px 8px', borderRight: '1px solid #CCC', width: '100px' }}>Status</th>
+                    <th style={{ padding: '6px 8px', borderRight: '1px solid #CCC', width: '90px' }}>Complaints</th>
+                    <th style={{ padding: '6px 8px', borderRight: '1px solid #CCC', width: '80px' }}>Messages</th>
+                    <th style={{ padding: '6px 8px', width: '80px' }}>Requests</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -427,13 +444,13 @@ export default function IdsGuestServicesModal({
                         color: selectedComplaint?.complaintId === c.complaintId ? '#FFF' : '#000'
                       }}
                     >
-                      <td style={{ padding: '4px', fontWeight: 'bold' }}>{c.roomNo}</td>
-                      <td style={{ padding: '4px' }}>{c.guestName}</td>
-                      <td style={{ padding: '4px' }}>
+                      <td style={{ padding: '6px 8px', fontWeight: 'bold' }}>{c.roomNo}</td>
+                      <td style={{ padding: '6px 8px' }}>{c.guestName}</td>
+                      <td style={{ padding: '6px 8px' }}>
                         <span style={{ 
-                          padding: '1px 6px', 
+                          padding: '2px 8px', 
                           borderRadius: '2px', 
-                          fontSize: '10px', 
+                          fontSize: '11px', 
                           fontWeight: 'bold',
                           background: c.status === 'Resolved' ? '#D4EDDA' : '#FFF3CD',
                           color: c.status === 'Resolved' ? '#155724' : '#856404'
@@ -441,11 +458,11 @@ export default function IdsGuestServicesModal({
                           {c.status}
                         </span>
                       </td>
-                      <td style={{ padding: '4px', fontWeight: 'bold', color: c.status === 'Pending' ? '#C00' : 'inherit' }}>
+                      <td style={{ padding: '6px 8px', fontWeight: 'bold', color: c.status === 'Pending' ? '#C00' : 'inherit' }}>
                         {c.status === 'Pending' ? 'Yes' : 'No'}
                       </td>
-                      <td style={{ padding: '4px' }}>-</td>
-                      <td style={{ padding: '4px' }}>-</td>
+                      <td style={{ padding: '6px 8px' }}>-</td>
+                      <td style={{ padding: '6px 8px' }}>-</td>
                     </tr>
                   ))}
                 </tbody>
@@ -458,69 +475,72 @@ export default function IdsGuestServicesModal({
                 style={{ 
                   border: '1px solid #7F9DB9', 
                   background: '#FFF', 
-                  padding: '12px',
-                  fontSize: '11px',
-                  marginBottom: '12px'
+                  padding: '14px',
+                  fontSize: '13px',
+                  marginBottom: '14px'
                 }}
               >
-                <div style={{ marginBottom: '8px', paddingBottom: '6px', borderBottom: '1px dotted #CCC' }}>
-                  <strong>Complaint Details ({selectedComplaint.complaintId}) - Room {selectedComplaint.roomNo}:</strong>
-                  <div style={{ marginTop: '4px', color: '#444' }}>{selectedComplaint.natureOfComplaint}</div>
+                <div style={{ marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px dotted #CCC' }}>
+                  <strong style={{ color: '#0A246A' }}>Complaint Details ({selectedComplaint.complaintId}) - Room {selectedComplaint.roomNo}:</strong>
+                  <div style={{ marginTop: '4px', color: '#333' }}>{selectedComplaint.natureOfComplaint}</div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>Attended By</label>
+                    <label style={{ width: '110px', fontWeight: 600 }}>Attended By</label>
                     <input 
                       type="text" 
                       value={attendData.attendedBy}
                       onChange={(e) => setAttendData({ ...attendData, attendedBy: e.target.value })}
-                      style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9' }} 
+                      className="ids-input"
+                      style={{ flex: 1, fontSize: '13px', height: '28px' }} 
                     />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <label style={{ width: '90px' }}>TAT (Mins)</label>
+                    <label style={{ width: '110px', fontWeight: 600 }}>TAT (Mins)</label>
                     <input 
                       type="number" 
                       value={attendData.tatMinutes}
                       onChange={(e) => setAttendData({ ...attendData, tatMinutes: e.target.value })}
-                      style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9' }} 
+                      className="ids-input"
+                      style={{ width: '80px', fontSize: '13px', height: '28px' }} 
                     />
                   </div>
                 </div>
 
-                <div style={{ marginTop: '8px' }}>
-                  <label style={{ display: 'block', marginBottom: '2px' }}>Action Taken Remarks</label>
+                <div style={{ marginTop: '10px' }}>
+                  <label style={{ display: 'block', marginBottom: '4px', fontWeight: 600 }}>Action Taken Remarks</label>
                   <input 
                     type="text" 
                     value={attendData.actionTaken}
                     onChange={(e) => setAttendData({ ...attendData, actionTaken: e.target.value })}
-                    style={{ width: '100%', padding: '2px 4px', border: '1px solid #7F9DB9' }} 
+                    className="ids-input"
+                    style={{ width: '100%', fontSize: '13px', height: '28px' }} 
                   />
                 </div>
               </div>
             )}
 
             {/* Bottom Actions */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
               <button 
                 onClick={handleAttendComplaint}
                 disabled={!selectedComplaint || selectedComplaint.status === 'Resolved'}
-                className="ids-btn" 
-                style={{ minWidth: '100px', padding: '4px 14px', fontSize: '11px', fontWeight: 'bold' }}
+                className="ids-btn-classic" 
+                style={{ minWidth: '120px', height: '28px', fontSize: '12.5px', fontWeight: 'bold' }}
               >
                 Attend & Close
               </button>
-              <button onClick={() => {}} className="ids-btn" style={{ minWidth: '70px', padding: '4px 14px', fontSize: '11px' }}>Refresh</button>
-              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '4px 14px', fontSize: '11px' }}>Exit</button>
+              <button onClick={() => {}} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Refresh</button>
+              <button onClick={onClose} className="ids-btn-classic" style={{ minWidth: '85px', height: '28px', fontSize: '12.5px' }}>Exit</button>
             </div>
           </div>
         )}
 
         {/* Other Tabs Placeholder */}
         {activeTab !== 'log-complaints' && activeTab !== 'attend-complaints' && (
-          <div style={{ padding: '40px', textAlign: 'center', fontSize: '11px', color: '#666' }}>
+          <div style={{ padding: '40px', textAlign: 'center', fontSize: '13px', color: '#666' }}>
             <span>No active records found for this section. Use 'Log Complaints' or 'Attend Complaints' to manage room requests.</span>
           </div>
         )}

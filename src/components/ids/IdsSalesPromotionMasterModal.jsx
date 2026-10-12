@@ -109,6 +109,7 @@ export default function IdsSalesPromotionMasterModal({
   const [formMode, setFormMode] = useState('VIEW'); // 'VIEW', 'ADD', 'MODIFY'
   const [activeItemTab, setActiveItemTab] = useState('MAIN'); // 'MAIN', 'ADDITIONAL', 'COMPLIMENTARY'
   const [statusMsg, setStatusMsg] = useState(null);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   // Form Fields (Frames 010 - 030)
   const [applicableFrom, setApplicableFrom] = useState(accountingDate);
@@ -386,14 +387,17 @@ export default function IdsSalesPromotionMasterModal({
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
       <div 
-        className="ids-modal-container"
+        className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: '740px',
+          width: isMaximized ? '98vw' : '880px',
+          maxWidth: isMaximized ? '98vw' : '94vw',
+          height: isMaximized ? '96vh' : 'auto',
+          maxHeight: isMaximized ? '96vh' : '92vh',
           background: '#ECE9D8',
           border: '2px solid #808080',
           boxShadow: '4px 4px 18px rgba(0,0,0,0.7)',
-          fontFamily: 'Tahoma, "Segoe UI", Arial, sans-serif',
-          fontSize: '11px',
+          fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif",
+          fontSize: '12.5px',
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -404,26 +408,25 @@ export default function IdsSalesPromotionMasterModal({
           style={{
             background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)',
             color: '#FFF',
-            padding: '3px 6px',
+            padding: '4px 8px',
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            cursor: 'move'
+            alignItems: 'center'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '13px' }}>🎁</span>
-            <span style={{ fontWeight: 700, fontSize: '11px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '14px' }}>🎁</span>
+            <span style={{ fontWeight: 700, fontSize: '13px' }}>
               Sales Promotion Master V6.5.002.1
             </span>
           </div>
-          <button 
-            className="ids-win-btn close"
-            onClick={onClose}
-            style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px' }}>
+            <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Notification Toast */}

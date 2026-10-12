@@ -121,6 +121,7 @@ export default function IdsPackageRatesModal({
   onOpenRoomRack
 }) {
   const [activeTab, setActiveTab] = useState(initialMode === 'sell' ? 'sellPackage' : 'packageMaster'); // 'packageMaster' | 'sellPackage' | 'completed'
+  const [isMaximized, setIsMaximized] = useState(false);
   const [packagesList, setPackagesList] = useState(INITIAL_PACKAGES_DATABASE);
   const [selectedPackage, setSelectedPackage] = useState(INITIAL_PACKAGES_DATABASE[0]);
 
@@ -239,13 +240,18 @@ export default function IdsPackageRatesModal({
   return (
     <div className="ids-modal-overlay">
       <div 
-        className="ids-dialog-window" 
+        className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: '780px', 
-          maxWidth: '96vw', 
+          width: isMaximized ? '98vw' : '880px', 
+          maxWidth: isMaximized ? '98vw' : '94vw', 
+          height: isMaximized ? '96vh' : 'auto',
+          maxHeight: isMaximized ? '96vh' : '92vh',
+          display: 'flex',
+          flexDirection: 'column',
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',
-          background: '#ECE9D8'
+          background: '#ECE9D8',
+          fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif"
         }}
       >
         {/* Titlebar matching Video 40 Frame 018 */}
@@ -260,42 +266,35 @@ export default function IdsPackageRatesModal({
             alignItems: 'center' 
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
-            <Package size={14} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '13px' }}>
+            <Package size={15} />
             <span>Room Rate Master V6.5.002.1 — Create / Sell Package Rates</span>
           </div>
-          <button 
-            className="ids-win-btn close" 
-            onClick={onClose}
-            style={{ 
-              background: '#C75050', 
-              color: '#FFF', 
-              border: '1px outset #FFF', 
-              fontWeight: 700, 
-              width: '18px', 
-              height: '18px', 
-              lineHeight: '14px', 
-              cursor: 'pointer' 
-            }}
-          >
-            ✕
-          </button>
+          <div className="ids-window-controls" style={{ display: 'flex', gap: '2px' }}>
+            <button className="ids-win-btn" title="Minimize" onClick={() => {}} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize Full Desktop"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              {isMaximized ? '❐' : '□'}
+            </button>
+            <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
+          </div>
         </div>
 
         {/* Status notification banner */}
         {statusMessage && (
-          <div style={{ background: '#E6F4EA', borderBottom: '1px solid #137333', color: '#137333', padding: '4px 12px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CheckCircle2 size={14} />
+          <div style={{ background: '#E6F4EA', borderBottom: '1px solid #137333', color: '#137333', padding: '6px 14px', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CheckCircle2 size={15} />
             <span>{statusMessage}</span>
           </div>
         )}
 
         {/* Main Mode Navigation Bar matching Frame 018 Tabs */}
-        <div style={{ display: 'flex', gap: '4px', padding: '6px 12px 0 12px', background: '#ECE9D8', borderBottom: '2px solid #716F64' }}>
+        <div style={{ display: 'flex', gap: '4px', padding: '8px 14px 0 14px', background: '#ECE9D8', borderBottom: '2px solid #716F64' }}>
           <button 
             className="ids-tab-btn" 
             style={{ 
               fontWeight: activeTab === 'packageMaster' ? 700 : 600, 
+              fontSize: '12.5px',
+              padding: '6px 14px',
               color: activeTab === 'packageMaster' ? '#0A246A' : '#1A1A1A',
               background: activeTab === 'packageMaster' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
               border: '1px solid #716F64',
@@ -311,6 +310,8 @@ export default function IdsPackageRatesModal({
             className="ids-tab-btn" 
             style={{ 
               fontWeight: activeTab === 'sellPackage' ? 700 : 600, 
+              fontSize: '12.5px',
+              padding: '6px 14px',
               color: activeTab === 'sellPackage' ? '#0A246A' : '#1A1A1A',
               background: activeTab === 'sellPackage' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
               border: '1px solid #716F64',
@@ -328,51 +329,51 @@ export default function IdsPackageRatesModal({
             MODE 1: PACKAGE MASTER CONFIGURATION CONSOLE (Frames 018–060)
             ========================================================================= */}
         {activeTab === 'packageMaster' && (
-          <div style={{ padding: '12px 16px', fontSize: '11px' }}>
+          <div style={{ padding: '16px', fontSize: '13px', flex: 1, overflowY: 'auto' }}>
             
             {/* Header Form Controls matching Frame 018 */}
-            <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px 14px', marginBottom: '10px' }}>
+            <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '14px 16px', marginBottom: '14px' }}>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '90px 130px 90px 1fr', gap: '6px 10px', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontWeight: 600 }}>Property</span>
-                <input className="ids-input" value="DEM" readOnly style={{ width: '70px', fontWeight: 700 }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 140px 120px 1fr', gap: '10px 14px', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Property</span>
+                <input className="ids-input" value="DEM" readOnly style={{ width: '80px', fontWeight: 700, fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Package ID</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <input className="ids-input" value={packageId} onChange={(e) => setPackageId(e.target.value)} style={{ width: '60px', fontWeight: 700, background: '#FFF7CC' }} />
-                  <button className="ids-btn-classic" style={{ width: '22px' }} onClick={() => setPackageLookupOpen(true)}>?</button>
-                  <button className="ids-btn-classic" onClick={() => alert('Package copied to new ID')}>Copy</button>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Package ID</span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input className="ids-input" value={packageId} onChange={(e) => setPackageId(e.target.value)} style={{ width: '70px', fontWeight: 700, background: '#FFF7CC', fontSize: '13px', height: '28px' }} />
+                  <button className="ids-btn-classic" style={{ width: '28px', height: '28px', fontSize: '13px' }} onClick={() => setPackageLookupOpen(true)}>?</button>
+                  <button className="ids-btn-classic" style={{ height: '28px', fontSize: '12px' }} onClick={() => alert('Package copied to new ID')}>Copy</button>
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Description</span>
-                <input className="ids-input" value={description} onChange={(e) => setDescription(e.target.value)} style={{ gridColumn: 'span 3', width: '100%', fontWeight: 700 }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Description</span>
+                <input className="ids-input" value={description} onChange={(e) => setDescription(e.target.value)} style={{ gridColumn: 'span 3', width: '100%', fontWeight: 700, fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Applicable From</span>
-                <input className="ids-input" value={applicableFrom} onChange={(e) => setApplicableFrom(e.target.value)} style={{ width: '110px' }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Applicable From</span>
+                <input className="ids-input" value={applicableFrom} onChange={(e) => setApplicableFrom(e.target.value)} style={{ width: '130px', fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Applicable To</span>
-                <input className="ids-input" value={applicableTo} onChange={(e) => setApplicableTo(e.target.value)} style={{ width: '110px' }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Applicable To</span>
+                <input className="ids-input" value={applicableTo} onChange={(e) => setApplicableTo(e.target.value)} style={{ width: '130px', fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Room Type</span>
-                <select className="ids-input" value={roomType} onChange={(e) => setRoomType(e.target.value)} style={{ width: '90px', fontWeight: 700 }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Room Type</span>
+                <select className="ids-select" value={roomType} onChange={(e) => setRoomType(e.target.value)} style={{ width: '120px', fontWeight: 700, fontSize: '13px', height: '28px' }}>
                   <option value="DLX">DLX - Deluxe</option>
                   <option value="EXE">EXE - Executive</option>
                   <option value="SUI">SUI - Suite</option>
                 </select>
 
-                <span style={{ fontWeight: 600 }}>Occupancy Type</span>
-                <select className="ids-input" value={occupancyType} onChange={(e) => setOccupancyType(e.target.value)} style={{ width: '110px', fontWeight: 700 }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Occupancy Type</span>
+                <select className="ids-select" value={occupancyType} onChange={(e) => setOccupancyType(e.target.value)} style={{ width: '140px', fontWeight: 700, fontSize: '13px', height: '28px' }}>
                   <option value="SINGLE">SINGLE (1 Pax)</option>
                   <option value="DOUBLE">DOUBLE (2 Pax)</option>
                 </select>
 
-                <span style={{ fontWeight: 600 }}>Stay Duration</span>
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Stay Duration</span>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', fontSize: '13px', fontWeight: 600 }}>
                   <span>{days} Days / {nights} Nights</span>
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Total Rate</span>
-                <div style={{ fontWeight: 900, color: '#0A246A', fontSize: '13px' }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Total Rate</span>
+                <div style={{ fontWeight: 900, color: '#0A246A', fontSize: '15px' }}>
                   ₹{computedTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })} (INR)
                 </div>
               </div>
@@ -380,28 +381,28 @@ export default function IdsPackageRatesModal({
             </div>
 
             {/* Inclusions & Plan Breakdown Tables matching Frame 038 & Frame 048 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
               
               {/* Left Column: Meal Plan & Room Tariff */}
-              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '8px 10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCC', paddingBottom: '4px', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 700, color: '#0A246A' }}>Meal Plan & Room Tariff</span>
-                  <button className="ids-btn-classic" style={{ fontSize: '10px', fontWeight: 700 }} onClick={() => setPackagePlanModalOpen(true)}>Edit Plan..</button>
+              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '12px 14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCC', paddingBottom: '6px', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 700, color: '#0A246A', fontSize: '13px' }}>Meal Plan & Room Tariff</span>
+                  <button className="ids-btn-classic" style={{ fontSize: '11px', fontWeight: 700, height: '24px' }} onClick={() => setPackagePlanModalOpen(true)}>Edit Plan..</button>
                 </div>
-                <div style={{ fontSize: '10.5px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div style={{ fontSize: '12.5px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <span>Plan Code:</span>
                     <strong>{planCode} ({planCode === 'AP' ? 'All Meals' : 'Breakfast'})</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <span>Plan Meal Charge:</span>
                     <strong>₹{planAmount.toFixed(2)} / night</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                     <span>Base Room Tariff:</span>
                     <strong>₹{roomTariffPerNight.toFixed(2)} / night</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #CCC', paddingTop: '4px', color: '#137333', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #CCC', paddingTop: '6px', color: '#137333', fontWeight: 700, fontSize: '13px' }}>
                     <span>Room & Meals Total ({nights}N):</span>
                     <span>₹{((roomTariffPerNight + planAmount) * nights).toFixed(2)}</span>
                   </div>
@@ -409,20 +410,20 @@ export default function IdsPackageRatesModal({
               </div>
 
               {/* Right Column: Bundled Services (Sightseeing / Spa / Cabs) */}
-              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '8px 10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCC', paddingBottom: '4px', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 700, color: '#0A246A' }}>Bundled Services & Amenities</span>
-                  <button className="ids-btn-classic" style={{ fontSize: '10px', fontWeight: 700 }} onClick={() => setServiceModalOpen(true)}>Add Service..</button>
+              <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '12px 14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCC', paddingBottom: '6px', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 700, color: '#0A246A', fontSize: '13px' }}>Bundled Services & Amenities</span>
+                  <button className="ids-btn-classic" style={{ fontSize: '11px', fontWeight: 700, height: '24px' }} onClick={() => setServiceModalOpen(true)}>Add Service..</button>
                 </div>
-                <div style={{ height: '70px', overflowY: 'auto', fontSize: '10px' }}>
+                <div style={{ height: '85px', overflowY: 'auto', fontSize: '12px' }}>
                   {servicesList.map((s, idx) => (
-                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', borderBottom: '1px solid #EEE', paddingBottom: '2px' }}>
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', borderBottom: '1px solid #EEE', paddingBottom: '3px' }}>
                       <span>• {s.name} ({s.code})</span>
                       <strong>₹{s.amount.toFixed(2)}</strong>
                     </div>
                   ))}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #CCC', paddingTop: '4px', color: '#137333', fontWeight: 700, fontSize: '10.5px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #CCC', paddingTop: '6px', color: '#137333', fontWeight: 700, fontSize: '13px' }}>
                   <span>Services Total:</span>
                   <span>₹{servicesList.reduce((sum, s) => sum + s.amount, 0).toFixed(2)}</span>
                 </div>
@@ -435,15 +436,15 @@ export default function IdsPackageRatesModal({
               style={{ 
                 background: '#D4D0C8', 
                 border: '1px solid #808080', 
-                padding: '6px 10px', 
+                padding: '8px 12px', 
                 display: 'flex', 
-                justifyContent: 'space-between',
-                alignItems: 'center'
+                justifyContent: 'space-between', 
+                alignItems: 'center' 
               }}
             >
               <button 
                 className="ids-btn-classic" 
-                style={{ background: '#E6F4EA', color: '#137333', fontWeight: 700 }}
+                style={{ background: '#E6F4EA', color: '#137333', fontWeight: 700, height: '28px', fontSize: '12.5px' }}
                 onClick={() => setActiveTab('sellPackage')}
               >
                 Proceed to Sell This Package →
@@ -452,7 +453,7 @@ export default function IdsPackageRatesModal({
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button 
                   className="ids-btn-classic" 
-                  style={{ minWidth: '55px' }}
+                  style={{ minWidth: '65px', height: '28px', fontSize: '12px' }}
                   onClick={() => {
                     playReceptionChime();
                     alert("Ready to configure new Room Package Rate in Master.");
@@ -460,7 +461,7 @@ export default function IdsPackageRatesModal({
                 >Add</button>
                 <button 
                   className="ids-btn-classic" 
-                  style={{ minWidth: '55px' }}
+                  style={{ minWidth: '65px', height: '28px', fontSize: '12px' }}
                   onClick={() => {
                     playReceptionChime();
                     alert("Selected Room Package Rate loaded for modification.");
@@ -468,29 +469,29 @@ export default function IdsPackageRatesModal({
                 >Modify</button>
                 <button 
                   className="ids-btn-classic" 
-                  style={{ minWidth: '55px' }}
+                  style={{ minWidth: '65px', height: '28px', fontSize: '12px' }}
                   onClick={() => {
                     playReceptionChime();
                     alert("Package Rate definition deleted from Rate Master.");
                   }}
                 >Delete</button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={() => setPackageLookupOpen(true)}>Browse</button>
+                <button className="ids-btn-classic" style={{ minWidth: '65px', height: '28px', fontSize: '12px' }} onClick={() => setPackageLookupOpen(true)}>Browse</button>
                 <button 
                   className="ids-btn-classic" 
-                  style={{ fontWeight: 700, minWidth: '65px', background: '#DCE6F1' }}
+                  style={{ fontWeight: 700, minWidth: '75px', height: '28px', fontSize: '12px', background: '#DCE6F1' }}
                   onClick={handleSavePackageMaster}
                 >
                   Save
                 </button>
                 <button 
                   className="ids-btn-classic" 
-                  style={{ minWidth: '55px' }}
+                  style={{ minWidth: '65px', height: '28px', fontSize: '12px' }}
                   onClick={() => {
                     playReceptionChime();
                     alert("Package Rates Control Panel: 4 active packages configured.");
                   }}
                 >Panel</button>
-                <button className="ids-btn-classic" style={{ minWidth: '55px' }} onClick={onClose}>Exit</button>
+                <button className="ids-btn-classic" style={{ minWidth: '65px', height: '28px', fontSize: '12px' }} onClick={onClose}>Exit</button>
               </div>
             </div>
 
@@ -501,48 +502,48 @@ export default function IdsPackageRatesModal({
             MODE 2: SELL PACKAGE IN ROOM BOOKING / WALK-IN (Frames 076–096)
             ========================================================================= */}
         {activeTab === 'sellPackage' && (
-          <div style={{ padding: '12px 16px', fontSize: '11px' }}>
+          <div style={{ padding: '16px', fontSize: '13px', flex: 1, overflowY: 'auto' }}>
             
-            <div style={{ background: '#FFFDE6', border: '1px solid #E6D043', padding: '6px 10px', fontSize: '11px', color: '#7D5700', marginBottom: '10px' }}>
+            <div style={{ background: '#FFFDE6', border: '1px solid #E6D043', padding: '8px 12px', fontSize: '12.5px', color: '#7D5700', marginBottom: '14px' }}>
               Select a guest and room number to attach package rate <strong>Pkg {sellSelectedPkg.packageId} ({sellSelectedPkg.description})</strong>:
             </div>
 
             {/* Guest & Room Assignment Fields */}
-            <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '10px 14px', marginBottom: '10px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '90px 120px 90px 1fr', gap: '8px 10px', alignItems: 'center' }}>
+            <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '14px 16px', marginBottom: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '120px 140px 120px 1fr', gap: '10px 14px', alignItems: 'center' }}>
                 
-                <span style={{ fontWeight: 600 }}>Room No.</span>
-                <input className="ids-input" value={sellRoomNo} onChange={(e) => setSellRoomNo(e.target.value)} style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Room No.</span>
+                <input className="ids-input" value={sellRoomNo} onChange={(e) => setSellRoomNo(e.target.value)} style={{ width: '90px', fontWeight: 700, background: '#FFF7CC', fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Selected Package</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <input className="ids-input" value={`${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
-                  <button className="ids-btn-classic" onClick={() => setSellPkgLookupOpen(true)} title="Browse Packages">?</button>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Selected Package</span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input className="ids-input" value={`${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0', fontSize: '13px', height: '28px' }} />
+                  <button className="ids-btn-classic" onClick={() => setSellPkgLookupOpen(true)} title="Browse Packages" style={{ height: '28px', width: '28px' }}>?</button>
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Guest Name</span>
-                <div style={{ display: 'flex', gap: '4px' }}>
-                  <input className="ids-input" value={sellGuestTitle} onChange={(e) => setSellGuestTitle(e.target.value)} style={{ width: '40px', fontWeight: 700 }} />
-                  <input className="ids-input" value={sellGuestName} onChange={(e) => setSellGuestName(e.target.value)} style={{ flex: 1, fontWeight: 700, background: '#FFF7CC' }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Guest Name</span>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input className="ids-input" value={sellGuestTitle} onChange={(e) => setSellGuestTitle(e.target.value)} style={{ width: '50px', fontWeight: 700, fontSize: '13px', height: '28px' }} />
+                  <input className="ids-input" value={sellGuestName} onChange={(e) => setSellGuestName(e.target.value)} style={{ flex: 1, fontWeight: 700, background: '#FFF7CC', fontSize: '13px', height: '28px' }} />
                 </div>
 
-                <span style={{ fontWeight: 600 }}>Mobile No.</span>
-                <input className="ids-input" value={sellMobile} onChange={(e) => setSellMobile(e.target.value)} style={{ width: '120px' }} />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Mobile No.</span>
+                <input className="ids-input" value={sellMobile} onChange={(e) => setSellMobile(e.target.value)} style={{ width: '140px', fontSize: '13px', height: '28px' }} />
 
-                <span style={{ fontWeight: 600 }}>Duration</span>
-                <span>{sellSelectedPkg.days} Days / {sellSelectedPkg.nights} Nights</span>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Duration</span>
+                <span style={{ fontSize: '13px', fontWeight: 600 }}>{sellSelectedPkg.days} Days / {sellSelectedPkg.nights} Nights</span>
 
-                <span style={{ fontWeight: 600 }}>Total Package Rate</span>
-                <span style={{ fontWeight: 900, color: '#0A246A', fontSize: '13px' }}>
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>Total Package Rate</span>
+                <span style={{ fontWeight: 900, color: '#0A246A', fontSize: '15px' }}>
                   ₹{sellSelectedPkg.totalPackageAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             </div>
 
             {/* Package Folio Breakdown Preview */}
-            <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '8px 12px', marginBottom: '10px' }}>
-              <div style={{ fontWeight: 700, color: '#0A246A', marginBottom: '4px' }}>Included Package Folio Line Items:</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '10.5px' }}>
+            <div style={{ border: '1px solid #7F9DB9', background: '#FFF', padding: '12px 14px', marginBottom: '14px' }}>
+              <div style={{ fontWeight: 700, color: '#0A246A', fontSize: '13px', marginBottom: '8px' }}>Included Package Folio Line Items:</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12.5px' }}>
                 <div>• Room Tariff ({sellSelectedPkg.roomType}): ₹{(sellSelectedPkg.roomTariffPerNight * sellSelectedPkg.nights).toFixed(2)}</div>
                 <div>• Meal Plan ({sellSelectedPkg.planCode}): ₹{(sellSelectedPkg.planAmount * sellSelectedPkg.nights).toFixed(2)}</div>
                 {sellSelectedPkg.services.map((s, i) => (
@@ -556,21 +557,21 @@ export default function IdsPackageRatesModal({
               style={{ 
                 background: '#D4D0C8', 
                 border: '1px solid #808080', 
-                padding: '6px 10px', 
+                padding: '8px 12px', 
                 display: 'flex', 
-                justifyContent: 'flex-end',
-                gap: '6px'
+                justifyContent: 'flex-end', 
+                gap: '8px' 
               }}
             >
               <button 
                 className="ids-btn-classic" 
-                style={{ fontWeight: 700, minWidth: '80px', background: '#DCE6F1' }}
+                style={{ fontWeight: 700, minWidth: '160px', height: '28px', fontSize: '12.5px', background: '#DCE6F1' }}
                 onClick={handleConfirmSellPackage}
               >
                 Confirm & Sell Package
               </button>
-              <button className="ids-btn-classic" onClick={() => setActiveTab('packageMaster')}>Back</button>
-              <button className="ids-btn-classic" onClick={onClose}>Exit</button>
+              <button className="ids-btn-classic" style={{ minWidth: '75px', height: '28px', fontSize: '12px' }} onClick={() => setActiveTab('packageMaster')}>Back</button>
+              <button className="ids-btn-classic" style={{ minWidth: '75px', height: '28px', fontSize: '12px' }} onClick={onClose}>Exit</button>
             </div>
 
           </div>
@@ -631,28 +632,28 @@ export default function IdsPackageRatesModal({
           <div className="ids-modal-overlay" style={{ zIndex: 1600 }} onClick={() => { setPackageLookupOpen(false); setSellPkgLookupOpen(false); }}>
             <div 
               className="ids-dialog-window" 
-              style={{ width: '640px', maxWidth: '94vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.65)' }}
+              style={{ width: '740px', maxWidth: '94vw', background: '#ECE9D8', border: '2px outset #ECE9D8', boxShadow: '0 8px 24px rgba(0,0,0,0.65)' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div 
                 className="ids-dialog-titlebar plain" 
-                style={{ background: '#316AC5', color: '#FFF', padding: '3px 8px', fontWeight: 700, fontSize: '11px', display: 'flex', justifyContent: 'space-between' }}
+                style={{ background: '#316AC5', color: '#FFF', padding: '4px 8px', fontWeight: 700, fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
                 <span>Package Help V6.5.002.1</span>
-                <button className="ids-win-btn close" onClick={() => { setPackageLookupOpen(false); setSellPkgLookupOpen(false); }}>✕</button>
+                <button className="ids-win-btn close" style={{ width: '18px', height: '18px', fontSize: '11px', lineHeight: 1 }} onClick={() => { setPackageLookupOpen(false); setSellPkgLookupOpen(false); }}>✕</button>
               </div>
 
-              <div style={{ padding: '10px 14px', fontSize: '11px' }}>
-                <div style={{ height: '180px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <div style={{ padding: '14px 16px', fontSize: '12.5px' }}>
+                <div style={{ height: '220px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
                     <thead style={{ position: 'sticky', top: 0, background: '#D4D0C8', borderBottom: '1px solid #716F64', fontWeight: 700 }}>
                       <tr>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>PRPCOD</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Pkg No.</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Package Name</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '75px', borderRight: '1px solid #B0AB9A' }}>From</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'left', width: '50px', borderRight: '1px solid #B0AB9A' }}>Room</th>
-                        <th style={{ padding: '3px 6px', textAlign: 'right', width: '70px' }}>Rate</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'left', width: '70px', borderRight: '1px solid #B0AB9A' }}>PRPCOD</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'left', width: '70px', borderRight: '1px solid #B0AB9A' }}>Pkg No.</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'left', borderRight: '1px solid #B0AB9A' }}>Package Name</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'left', width: '90px', borderRight: '1px solid #B0AB9A' }}>From</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'left', width: '70px', borderRight: '1px solid #B0AB9A' }}>Room</th>
+                        <th style={{ padding: '6px 8px', textAlign: 'right', width: '90px' }}>Rate</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -674,20 +675,20 @@ export default function IdsPackageRatesModal({
                           }}
                           style={{ background: idx % 2 === 0 ? '#FFF' : '#F9F9F9', cursor: 'pointer', borderBottom: '1px solid #E0E0E0' }}
                         >
-                          <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{pkg.property}</td>
-                          <td style={{ padding: '3px 6px', fontWeight: 700, color: '#0A246A', borderRight: '1px solid #E0E0E0' }}>{pkg.packageId}</td>
-                          <td style={{ padding: '3px 6px', fontWeight: 700, borderRight: '1px solid #E0E0E0' }}>{pkg.description}</td>
-                          <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{pkg.applicableFrom}</td>
-                          <td style={{ padding: '3px 6px', borderRight: '1px solid #E0E0E0' }}>{pkg.roomType}</td>
-                          <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 700, color: '#137333' }}>₹{pkg.totalPackageAmount.toFixed(2)}</td>
+                          <td style={{ padding: '5px 8px', borderRight: '1px solid #E0E0E0' }}>{pkg.property}</td>
+                          <td style={{ padding: '5px 8px', fontWeight: 700, color: '#0A246A', borderRight: '1px solid #E0E0E0' }}>{pkg.packageId}</td>
+                          <td style={{ padding: '5px 8px', fontWeight: 700, borderRight: '1px solid #E0E0E0' }}>{pkg.description}</td>
+                          <td style={{ padding: '5px 8px', borderRight: '1px solid #E0E0E0' }}>{pkg.applicableFrom}</td>
+                          <td style={{ padding: '5px 8px', borderRight: '1px solid #E0E0E0' }}>{pkg.roomType}</td>
+                          <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: 700, color: '#137333' }}>₹{pkg.totalPackageAmount.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginTop: '10px' }}>
-                  <button className="ids-btn-classic" onClick={() => { setPackageLookupOpen(false); setSellPkgLookupOpen(false); }}>Cancel</button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+                  <button className="ids-btn-classic" style={{ minWidth: '75px', height: '28px', fontSize: '12px' }} onClick={() => { setPackageLookupOpen(false); setSellPkgLookupOpen(false); }}>Cancel</button>
                 </div>
               </div>
             </div>
