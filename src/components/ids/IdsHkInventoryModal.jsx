@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { getHousekeepingCrew } from '../../data/hotelStaffData';
+import { 
+  getFastApiLinenInventory, 
+  createFastApiLinenItem, 
+  createFastApiHousekeepingInspection 
+} from '../../utils/backendApi';
 
 export default function IdsHkInventoryModal({
   isOpen,
   onClose,
-  initialTab = 'master', // 'master' | 'issue' | 'return'
+  initialTab = 'master', // 'master' | 'issue' | 'return' | 'dhobi' | 'assets'
   accountingDate = '27-JAN-2026',
   onOpenMessageBox
 }) {
@@ -61,6 +66,55 @@ export default function IdsHkInventoryModal({
     soiledRet: 10,
     damaged: 0
   });
+
+  // Dhobi / External Laundry Movement State
+  const [dhobiAction, setDhobiAction] = useState('dispatch'); // 'dispatch' | 'receive'
+  const [dhobiItemCode, setDhobiItemCode] = useState('HK-LIN-001');
+  const [dhobiQty, setDhobiQty] = useState(10);
+  const [dhobiVendor, setDhobiVendor] = useState('Rayagada Express Laundry & Dry Cleaners');
+  const [dhobiLogs, setDhobiLogs] = useState([
+    { id: 'DHB-101', date: '26-JAN-2026', type: 'Dispatch', item: 'Bed Sheet King White', qty: 25, vendor: 'Rayagada Express Laundry & Dry Cleaners' },
+    { id: 'DHB-102', date: '27-JAN-2026', type: 'Receive', item: 'Bath Towel 650 GSM', qty: 20, vendor: 'Rayagada Express Laundry & Dry Cleaners' }
+  ]);
+
+  // Room Asset Checklist State
+  const ROOM_ASSET_CHECKLIST = [
+    { id: 'A-01', name: 'Smart LED TV Remote', defaultQty: 1, replacementCost: 450 },
+    { id: 'A-02', name: 'Split AC Remote Control', defaultQty: 1, replacementCost: 650 },
+    { id: 'A-03', name: 'Electric Kettle & Cord', defaultQty: 1, replacementCost: 1200 },
+    { id: 'A-04', name: 'Wooden Coat Hangers', defaultQty: 6, replacementCost: 300 },
+    { id: 'A-05', name: 'Glass Tumblers (Set of 2)', defaultQty: 2, replacementCost: 150 },
+    { id: 'A-06', name: 'Geyser & Electrical Fittings', defaultQty: 1, replacementCost: 2500 }
+  ];
+  const [selectedInspectRoom, setSelectedInspectRoom] = useState('101');
+  const [checklistState, setChecklistState] = useState({
+    'A-01': true, 'A-02': true, 'A-03': true, 'A-04': true, 'A-05': true, 'A-06': true
+  });
+  const [inspectionResult, setInspectionResult] = useState(null);
+
+  // Sync live linen inventory from Railway PostgreSQL
+  useEffect(() => {
+    if (!isOpen) return;
+    getFastApiLinenInventory()
+      .then(apiData => {
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          const mapped = apiData.map(item => ({
+            code: item.item_code || `HK-LIN-${item.id}`,
+            name: item.item_name,
+            category: 'Linen',
+            unit: 'Pcs',
+            parStock: Number(item.par_stock) || 120,
+            currentStock: Number(item.in_store) || 80,
+            soiledStock: Number(item.at_dhobi) || 20
+          }));
+          setInventoryItems(prev => {
+            const nonLinen = prev.filter(p => p.category !== 'Linen');
+            return [...mapped, ...nonLinen];
+          });
+        }
+      })
+      .catch(err => console.warn('[FastAPI] Linen inventory fetch failed:', err));
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -131,12 +185,115 @@ export default function IdsHkInventoryModal({
     }
   };
 
+  const handleDhobiSubmit = () => {
+    const qty = parseInt(dhobiQty, 10);
+    if (isNaN(qty) || qty <= 0) {
+      alert('Please enter a valid quantity!');
+      return;
+    }
+    const selectedItem = inventoryItems.find(i => i.code === dhobiItemCode) || inventoryItems[0];
+    
+    if (dhobiAction === 'dispatch') {
+      if (qty > selectedItem.currentStock) {
+        alert(`Cannot dispatch ${qty} ${selectedItem.unit}. Available clean stock is only ${selectedItem.currentStock}.`);
+        return;
+      }
+      setInventoryItems(prev => prev.map(item => {
+        if (item.code === dhobiItemCode) {
+          return {
+            ...item,
+            currentStock: Math.max(0, item.currentStock - qty),
+            soiledStock: item.soiledStock + qty
+          };
+        }
+        return item;
+      }));
+    } else {
+      setInventoryItems(prev => prev.map(item => {
+        if (item.code === dhobiItemCode) {
+          return {
+            ...item,
+            currentStock: item.currentStock + qty,
+            soiledStock: Math.max(0, item.soiledStock - qty)
+          };
+        }
+        return item;
+      }));
+    }
+
+    const newLog = {
+      id: `DHB-${Date.now().toString().slice(-4)}`,
+      date: accountingDate,
+      type: dhobiAction === 'dispatch' ? 'Dispatch' : 'Receive',
+      item: selectedItem.name,
+      qty,
+      vendor: dhobiVendor
+    };
+    setDhobiLogs([newLog, ...dhobiLogs]);
+
+    // Dispatch update to Railway FastAPI PostgreSQL
+    createFastApiLinenItem({
+      item_name: selectedItem.name,
+      item_code: selectedItem.code,
+      par_stock: selectedItem.parStock,
+      in_rooms: 0,
+      in_store: dhobiAction === 'dispatch' ? Math.max(0, selectedItem.currentStock - qty) : selectedItem.currentStock + qty,
+      at_dhobi: dhobiAction === 'dispatch' ? selectedItem.soiledStock + qty : Math.max(0, selectedItem.soiledStock - qty),
+      damaged: 0
+    }).catch(err => console.warn('[FastAPI] Linen update failed:', err));
+
+    if (onOpenMessageBox) {
+      onOpenMessageBox({
+        title: 'Dhobi Movement Logged',
+        message: `${newLog.type} of ${qty} ${selectedItem.unit} '${selectedItem.name}' recorded with ${dhobiVendor}.`,
+        type: 'info'
+      });
+    }
+  };
+
+  const handleVerifyRoomAssets = () => {
+    const missing = ROOM_ASSET_CHECKLIST.filter(item => !checklistState[item.id]);
+    const penaltyTotal = missing.reduce((acc, curr) => acc + curr.replacementCost, 0);
+
+    const result = {
+      roomNumber: selectedInspectRoom,
+      allIntact: missing.length === 0,
+      missingItems: missing,
+      penaltyTotal,
+      inspectedAt: new Date().toLocaleTimeString()
+    };
+    setInspectionResult(result);
+
+    // Record inspection scorecard in Railway PostgreSQL
+    createFastApiHousekeepingInspection({
+      room_number: selectedInspectRoom,
+      supervisor_name: 'DUTY SUPERVISOR',
+      cleanliness_score: missing.length === 0 ? 100 : 75,
+      linen_freshness_score: 95,
+      amenities_intact: missing.length === 0,
+      fixtures_working: true,
+      status: missing.length === 0 ? 'Passed' : 'Follow-up Needed',
+      notes: missing.length === 0 ? 'All room assets intact' : `Missing: ${missing.map(m => m.name).join(', ')} (Penalty: ₹${penaltyTotal})`
+    }).catch(err => console.warn('[FastAPI] Inspection save error:', err));
+
+    if (onOpenMessageBox) {
+      onOpenMessageBox({
+        title: 'Room Asset Inspection Logged',
+        message: missing.length === 0 
+          ? `Room ${selectedInspectRoom}: All assets verified intact.` 
+          : `Room ${selectedInspectRoom}: ${missing.length} missing asset(s) flagged! Replacement penalty: ₹${penaltyTotal}.`,
+        type: missing.length === 0 ? 'info' : 'warning'
+      });
+    }
+  };
+
   return (
     <div className="ids-modal-backdrop" style={{ zIndex: 1100 }}>
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '780px', 
+          width: '840px', 
+          maxWidth: '96vw',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
@@ -157,16 +314,18 @@ export default function IdsHkInventoryModal({
             fontWeight: 'bold'
           }}
         >
-          <span>Housekeeping Linen & Inventory Suite V6.5.002.1</span>
+          <span>Housekeeping Linen, Laundry & Room Assets Suite V6.5.002.2</span>
           <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
         </div>
 
-        {/* 3 Departmental Sub-Tabs matching Menu Hierarchy */}
-        <div style={{ display: 'flex', background: '#ECE9D8', borderBottom: '2px solid #716F64', padding: '6px 12px 0 12px', gap: '3px' }}>
+        {/* 5 Departmental Sub-Tabs matching Menu Hierarchy */}
+        <div style={{ display: 'flex', background: '#ECE9D8', borderBottom: '2px solid #716F64', padding: '6px 12px 0 12px', gap: '3px', flexWrap: 'wrap' }}>
           {[
             { id: 'master', label: '📦 HK Inventory Master' },
             { id: 'issue', label: '📋 HK Issue Entry' },
-            { id: 'return', label: '🔄 HK Issue Return' }
+            { id: 'return', label: '🔄 HK Issue Return' },
+            { id: 'dhobi', label: '🧺 Dhobi / Laundry Movement' },
+            { id: 'assets', label: '🔍 Room Asset Inspection' }
           ].map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -437,6 +596,176 @@ export default function IdsHkInventoryModal({
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 4: Dhobi / External Laundry Movement */}
+        {activeTab === 'dhobi' && (
+          <div style={{ padding: '14px', fontSize: '11px' }}>
+            <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '12px', marginBottom: '10px' }}>
+              <div style={{ fontWeight: 'bold', color: '#0A246A', marginBottom: '8px' }}>
+                Dhobi Laundry Movement Gate Pass & Voucher [Rayagada Express Laundry]
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <label style={{ width: '90px' }}>Movement Type</label>
+                  <select 
+                    value={dhobiAction} 
+                    onChange={(e) => setDhobiAction(e.target.value)}
+                    style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', fontWeight: 'bold' }}
+                  >
+                    <option value="dispatch">Dispatch to Dhobi (Send Clean/Soiled)</option>
+                    <option value="receive">Receive from Dhobi (Clean Return)</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <label style={{ width: '90px' }}>Laundry Vendor</label>
+                  <input 
+                    type="text" 
+                    value={dhobiVendor} 
+                    onChange={(e) => setDhobiVendor(e.target.value)} 
+                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9' }} 
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gridColumn: 'span 2' }}>
+                  <label style={{ width: '90px' }}>Linen Item</label>
+                  <select 
+                    value={dhobiItemCode} 
+                    onChange={(e) => setDhobiItemCode(e.target.value)}
+                    style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', fontWeight: 'bold' }}
+                  >
+                    {inventoryItems.filter(i => i.category === 'Linen').map(item => (
+                      <option key={item.code} value={item.code}>
+                        {item.name} ({item.code}) - Store: {item.currentStock} | At Dhobi: {item.soiledStock} {item.unit}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <label style={{ width: '90px' }}>Quantity</label>
+                  <input 
+                    type="number" 
+                    value={dhobiQty} 
+                    onChange={(e) => setDhobiQty(e.target.value)} 
+                    style={{ width: '80px', padding: '2px 4px', border: '1px solid #7F9DB9', fontWeight: 'bold' }} 
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button onClick={handleDhobiSubmit} className="ids-btn" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
+                  {dhobiAction === 'dispatch' ? 'Post Dhobi Dispatch Gatepass' : 'Record Dhobi Clean Receipt'}
+                </button>
+              </div>
+            </div>
+
+            {/* Dhobi Movement History */}
+            <div style={{ maxHeight: '130px', overflowY: 'auto', background: '#FFF', border: '1px solid #7F9DB9', marginBottom: '10px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead>
+                  <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Pass #</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Date</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Action</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC' }}>Linen Item</th>
+                    <th style={{ padding: '4px', borderRight: '1px solid #CCC', textAlign: 'right' }}>Qty</th>
+                    <th style={{ padding: '4px' }}>Vendor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dhobiLogs.map((log, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid #EEE' }}>
+                      <td style={{ padding: '4px', fontWeight: 'bold' }}>{log.id}</td>
+                      <td style={{ padding: '4px' }}>{log.date}</td>
+                      <td style={{ padding: '4px', fontWeight: 'bold', color: log.type === 'Dispatch' ? '#003366' : '#008000' }}>{log.type}</td>
+                      <td style={{ padding: '4px' }}>{log.item}</td>
+                      <td style={{ padding: '4px', textAlign: 'right', fontWeight: 'bold' }}>{log.qty}</td>
+                      <td style={{ padding: '4px' }}>{log.vendor}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <button onClick={onClose} className="ids-btn" style={{ minWidth: '70px', padding: '3px 14px' }}>Exit</button>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Room Asset Inspection Checklist */}
+        {activeTab === 'assets' && (
+          <div style={{ padding: '14px', fontSize: '11px' }}>
+            <div style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '12px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontWeight: 'bold', color: '#0A246A' }}>
+                  Housekeeping Supervisor Room Asset Physical Audit Checklist
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <label style={{ fontWeight: 'bold' }}>Room #</label>
+                  <select 
+                    value={selectedInspectRoom} 
+                    onChange={(e) => setSelectedInspectRoom(e.target.value)}
+                    style={{ padding: '2px 8px', border: '1px solid #7F9DB9', fontWeight: 'bold' }}
+                  >
+                    {['101', '102', '103', '104', '105', '106', '107', '108', '109', '201', '202', '203', '204', '205', '206', '207', '301', '302', '303', '304', '305', '306'].map(r => (
+                      <option key={r} value={r}>Room {r}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ border: '1px solid #CCC', borderRadius: '2px', padding: '8px', background: '#F8F9FA', marginBottom: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                  {ROOM_ASSET_CHECKLIST.map(asset => {
+                    const isChecked = !!checklistState[asset.id];
+                    return (
+                      <label 
+                        key={asset.id} 
+                        style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          padding: '4px 6px', 
+                          background: isChecked ? '#E8F5E9' : '#FFEBEE',
+                          border: `1px solid ${isChecked ? '#A5D6A7' : '#EF9A9A'}`,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={isChecked} 
+                          onChange={(e) => setChecklistState({ ...checklistState, [asset.id]: e.target.checked })} 
+                        />
+                        <span style={{ flex: 1, fontWeight: isChecked ? 'normal' : 'bold' }}>{asset.name}</span>
+                        <span style={{ fontSize: '10px', color: '#666' }}>₹{asset.replacementCost}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {inspectionResult && (
+                  <div style={{ fontSize: '11px', fontWeight: 'bold', color: inspectionResult.allIntact ? '#008000' : '#C00' }}>
+                    {inspectionResult.allIntact 
+                      ? `✓ Room ${inspectionResult.roomNumber}: All Assets Intact (Score 100%)` 
+                      : `⚠ Room ${inspectionResult.roomNumber}: Missing ${inspectionResult.missingItems.length} item(s)! Replacement Penalty: ₹${inspectionResult.penaltyTotal}`}
+                  </div>
+                )}
+                <div style={{ marginLeft: 'auto' }}>
+                  <button onClick={handleVerifyRoomAssets} className="ids-btn" style={{ padding: '4px 16px', fontWeight: 'bold' }}>
+                    Record & Post Inspection Scorecard
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'center' }}>
