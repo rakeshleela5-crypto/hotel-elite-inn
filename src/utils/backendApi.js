@@ -2341,12 +2341,12 @@ export async function resolveFastApiDefect(defectId) {
 }
 
 /**
- * Update GST filing status (PATCH /api/gst/filings/{filing_id}/status)
+ * Update GST filing status (PUT /api/gst/filings/{filing_id}/status)
  */
 export async function updateFastApiGstFilingStatus(filingId, newStatus) {
   try {
     const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status`, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ filing_status: newStatus })
     });
