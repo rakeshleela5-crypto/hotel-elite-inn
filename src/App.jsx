@@ -32,7 +32,6 @@ const FloorExplorer3DModal = lazyWithRetry(() => import('./components/FloorExplo
 const VirtualTour360Modal = lazyWithRetry(() => import('./components/VirtualTour360Modal'));
 const IdsWalkInModal = lazyWithRetry(() => import('./components/ids/IdsWalkInModal'));
 const IdsReprintBillModal = lazyWithRetry(() => import('./components/ids/IdsReprintBillModal'));
-const ReceptionAdmin = lazyWithRetry(() => import('./components/ReceptionAdmin'));
 const IdsDesktopShell = lazyWithRetry(() => import('./components/ids/IdsDesktopShell'));
 const FinancialAnalytics = lazyWithRetry(() => import('./components/FinancialAnalytics'));
 const CaFilingStationModal = lazyWithRetry(() => import('./components/CaFilingStationModal'));
