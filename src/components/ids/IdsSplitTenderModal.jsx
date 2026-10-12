@@ -5,6 +5,7 @@ import {
   RotateCcw, DollarSign, Calculator, AlertCircle, ShieldCheck
 } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { settleFastApiSplitTender } from '../../utils/backendApi';
 
 export default function IdsSplitTenderModal({
   isOpen,
@@ -109,6 +110,14 @@ export default function IdsSplitTenderModal({
     };
 
     if (onSettlementComplete) onSettlementComplete(settlementData);
+    
+    // Dispatch split tender settlement asynchronously to Railway PostgreSQL
+    settleFastApiSplitTender(billNo, {
+      total_amount: totalBillAmount,
+      splits: settlementData.splits,
+      accounting_date: accountingDate
+    }).catch(err => console.warn('[FastAPI] Split tender post error:', err));
+
     alert(`✓ Bill No. ${billNo} Successfully Settled via Split Tender!\n• UPI: ₹${tenders.upi.amount.toFixed(2)}\n• Card: ₹${tenders.card.amount.toFixed(2)}\n• Cash: ₹${tenders.cash.amount.toFixed(2)}\n\nRespective Accounts & Cash Drawers credited accurately.`);
     onClose();
   };

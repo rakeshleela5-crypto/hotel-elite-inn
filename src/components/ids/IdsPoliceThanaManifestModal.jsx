@@ -5,6 +5,7 @@ import {
   Send, AlertTriangle, CheckCircle, MapPin, Car, User, Phone
 } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { getFastApiPoliceManifest, createFastApiPoliceManifest } from '../../utils/backendApi';
 
 // Default Authentic In-House & Arrival Manifest for Muniguda Police Station (Thana)
 export const DEFAULT_POLICE_MANIFEST = [
@@ -149,8 +150,41 @@ export default function IdsPoliceThanaManifestModal({
   const [isPrintPreviewOpen, setIsPrintPreviewOpen] = useState(false);
   const [dispatchStatus, setDispatchStatus] = useState(null);
 
-  // New guest entry modal state
   const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
+  const [loadingApi, setLoadingApi] = useState(false);
+
+  // Sync live manifest from Railway FastAPI PostgreSQL backend
+  React.useEffect(() => {
+    if (!isOpen) return;
+    setLoadingApi(true);
+    getFastApiPoliceManifest()
+      .then(apiData => {
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          const mapped = apiData.map(item => ({
+            roomNo: item.room_no || item.roomNo || '',
+            name: item.name || '',
+            mobile: item.mobile || '',
+            age: Number(item.age) || 30,
+            gender: item.gender || 'Male',
+            idProofType: item.id_proof_type || item.idProofType || 'Aadhaar Card',
+            idProofNo: item.id_proof_no || item.idProofNo || '',
+            address: item.address || '',
+            arrivedFrom: item.arrived_from || item.arrivedFrom || '',
+            destination: item.destination || '',
+            purpose: item.purpose || '',
+            vehicleNo: item.vehicle_no || item.vehicleNo || '',
+            checkInTime: item.check_in_time || item.checkInTime || '',
+            expectedCheckOut: item.expected_check_out || item.expectedCheckOut || '',
+            status: item.status || 'In-House',
+            type: item.guest_type || item.type || 'Corporate'
+          }));
+          setManifestList(mapped);
+        }
+      })
+      .catch(err => console.warn('[FastAPI] Police manifest fetch error:', err))
+      .finally(() => setLoadingApi(false));
+  }, [isOpen]);
+
   const [newGuest, setNewGuest] = useState({
     roomNo: '301',
     name: '',
@@ -266,6 +300,26 @@ export default function IdsPoliceThanaManifestModal({
     setManifestList(prev => [entry, ...prev]);
     setIsAddGuestOpen(false);
     playSuccessChime();
+
+    // Persist asynchronously to Railway PostgreSQL
+    createFastApiPoliceManifest({
+      room_no: entry.roomNo,
+      name: entry.name,
+      mobile: entry.mobile,
+      age: entry.age,
+      gender: entry.gender,
+      id_proof_type: entry.idProofType,
+      id_proof_no: entry.idProofNo,
+      address: entry.address,
+      arrived_from: entry.arrivedFrom,
+      destination: entry.destination,
+      purpose: entry.purpose,
+      vehicle_no: entry.vehicleNo,
+      check_in_time: entry.checkInTime,
+      expected_check_out: entry.expectedCheckOut,
+      status: entry.status,
+      guest_type: entry.type
+    }).catch(err => console.warn('[FastAPI] Police manifest save failed:', err));
   };
 
   return (

@@ -4,6 +4,11 @@ import {
   CheckCircle2, Plus, ArrowUpRight, ArrowDownLeft, Trash2, Printer, X
 } from 'lucide-react';
 import { SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
+import { 
+  getFastApiLinenInventory, 
+  createFastApiLinenItem, 
+  createFastApiHousekeepingInspection 
+} from '../utils/backendApi';
 
 const INITIAL_LINEN = [
   { id: 'L-01', item: 'King Bed Sheets (300 TC)', parStock: 160, inRooms: 78, inStore: 45, atDhobi: 32, damaged: 5 },
@@ -44,6 +49,26 @@ export default function LinenRoomAssetsSection({
   const [selectedLinenId, setSelectedLinenId] = useState('L-01');
   const [dhobiQty, setDhobiQty] = useState(10);
   const [dhobiVendor, setDhobiVendor] = useState('Rayagada Express Laundry & Dry Cleaners');
+
+  // Sync live linen inventory from Railway PostgreSQL backend
+  React.useEffect(() => {
+    getFastApiLinenInventory()
+      .then(apiData => {
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          const mapped = apiData.map(item => ({
+            id: item.item_code || `L-${item.id}`,
+            item: item.item_name,
+            parStock: Number(item.par_stock) || 100,
+            inRooms: Number(item.in_rooms) || 0,
+            inStore: Number(item.in_store) || 0,
+            atDhobi: Number(item.at_dhobi) || 0,
+            damaged: Number(item.damaged) || 0
+          }));
+          setLinenData(mapped);
+        }
+      })
+      .catch(err => console.warn('[FastAPI] Linen inventory fetch error:', err));
+  }, []);
 
   // Handle Dhobi Laundry Dispatch & Return
   const handleDhobiSubmit = (e) => {
@@ -118,6 +143,18 @@ export default function LinenRoomAssetsSection({
       penaltyTotal,
       inspectedAt: new Date().toLocaleTimeString()
     });
+
+    // Record inspection scorecard in Railway PostgreSQL
+    createFastApiHousekeepingInspection({
+      room_number: selectedRoom,
+      supervisor_name: 'DUTY SUPERVISOR',
+      cleanliness_score: missing.length === 0 ? 100 : 75,
+      linen_freshness_score: 95,
+      amenities_intact: missing.length === 0,
+      fixtures_working: true,
+      status: missing.length === 0 ? 'Passed' : 'Follow-up Needed',
+      notes: missing.length === 0 ? 'All room assets intact' : `Missing: ${missing.map(m => m.name).join(', ')} (Penalty: ₹${penaltyTotal})`
+    }).catch(err => console.warn('[FastAPI] Inspection save error:', err));
   };
 
   return (

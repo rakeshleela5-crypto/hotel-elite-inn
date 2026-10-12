@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { createFastApiBillAllowance } from '../../utils/backendApi';
 import { 
   DollarSign, Calendar, Check, X, Info, 
   HelpCircle, ChevronDown, ChevronRight, FileText, AlertCircle, ShieldCheck, Printer, RefreshCw
@@ -292,6 +293,22 @@ export default function IdsBillAllowanceDayWiseModal({
         date: accountingDate
       });
     }
+
+    // Persist bill allowance to Railway PostgreSQL
+    createFastApiBillAllowance({
+      room_number: selectedRoomNo,
+      folio_number: String(activeRoom?.folioNo || '1'),
+      allowance_type: allowanceType,
+      revenue_code: selectedRevenueCode,
+      base_allowance: baseAllowance,
+      cgt_rebate: cgtRebate,
+      sgt_rebate: sgtRebate,
+      total_deduction: totalDeduction,
+      auth_reason: authReason,
+      auth_remarks: authRemarks,
+      authorized_by: authorizedBy,
+      accounting_date: accountingDate
+    }).catch(err => console.warn('[FastAPI] Bill allowance save error:', err));
 
     setStatusNotice(`✓ Allowance of ₹${totalDeduction.toFixed(2)} posted successfully with authorization.`);
     setCurrentView('view-folio');

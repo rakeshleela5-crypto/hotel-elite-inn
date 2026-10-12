@@ -3,6 +3,7 @@ import './idsFortuneNext.css';
 import { HOTEL_CONFIG, CORPORATE_PARTNERS } from '../../data/hotelData';
 import { sendDebtorStatementWhatsApp } from '../../utils/whatsappDispatch';
 import { playSuccessChime } from '../../utils/soundAlert';
+import { getFastApiCorporateDebtorsAging, settleFastApiCorporateInvoice } from '../../utils/backendApi';
 
 // Authentic Corporate BTC Partners & Ledger Entries for Hotel Elite Inn (Muniguda / Rayagada)
 export const CORPORATE_BTC_ACCOUNTS = [
@@ -155,6 +156,34 @@ export default function IdsCorporateBtcAgingModal({
   const [settleBank, setSettleBank] = useState('SBI Rayagada Main Branch');
   const [settleNotes, setSettleNotes] = useState('');
 
+  // Sync live debtor aging from Railway PostgreSQL backend
+  React.useEffect(() => {
+    if (!isOpen) return;
+    getFastApiCorporateDebtorsAging()
+      .then(apiData => {
+        if (Array.isArray(apiData) && apiData.length > 0) {
+          // Merge API balances with existing structured accounts
+          setCorporates(prev => prev.map(c => {
+            const match = apiData.find(a => (a.company_name || '').toLowerCase().includes(c.name.toLowerCase()));
+            if (match) {
+              return {
+                ...c,
+                currentBalance: Number(match.total_outstanding) || c.currentBalance,
+                aging: {
+                  days0_30: Number(match.days_0_30) || c.aging.days0_30,
+                  days31_60: Number(match.days_31_60) || c.aging.days31_60,
+                  days61_90: Number(match.days_61_90) || c.aging.days61_90,
+                  days90_plus: Number(match.days_90_plus) || c.aging.days90_plus
+                }
+              };
+            }
+            return c;
+          }));
+        }
+      })
+      .catch(err => console.warn('[FastAPI] Debtor aging fetch error:', err));
+  }, [isOpen]);
+
   const currentCorp = useMemo(() => {
     return corporates.find(c => c.code === selectedCorpCode) || corporates[0];
   }, [corporates, selectedCorpCode]);
@@ -261,6 +290,16 @@ export default function IdsCorporateBtcAgingModal({
     } catch (e) {}
 
     showToast(`✓ Payment of ₹${amt.toLocaleString('en-IN')} successfully credited to ${currentCorp.name} via ${settleMode}!`);
+
+    // Asynchronously dispatch payment settlement to Railway PostgreSQL
+    settleFastApiCorporateInvoice({
+      company_name: currentCorp.name,
+      amount: amt,
+      settlement_mode: settleMode,
+      ref_no: settleRef || `REF-${Date.now()}`,
+      bank_name: settleBank,
+      notes: settleNotes
+    }).catch(err => console.warn('[FastAPI] Corporate settlement error:', err));
   };
 
   // WhatsApp Debtor Statement Dispatch

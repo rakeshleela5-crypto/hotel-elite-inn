@@ -1092,6 +1092,636 @@ export async function setHotelStaticIp(managerPin = '4321', targetIp = null, ena
   }
 }
 
+// =============================================================
+// Category 1: Front Office PMS & Guest Management Connectors
+// =============================================================
+export async function getFastApiPoliceManifest(statusFilter = null) {
+  try {
+    const url = statusFilter
+      ? `${FASTAPI_BASE_URL}/api/pms/police-manifest?status_filter=${encodeURIComponent(statusFilter)}`
+      : `${FASTAPI_BASE_URL}/api/pms/police-manifest`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Police manifest fetch failed:', err.message);
+    return [];
+  }
+}
 
+export async function createFastApiPoliceManifest(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/police-manifest`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Police manifest post failed:', err.message);
+    return null;
+  }
+}
 
+export async function getFastApiForeignerFormC() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Form C fetch failed:', err.message);
+    return [];
+  }
+}
 
+export async function createFastApiForeignerFormC(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Form C post failed:', err.message);
+    return null;
+  }
+}
+
+export async function uploadFastApiGuestKyc(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/guest-kyc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Guest KYC upload failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiCashierShifts(accountingDate = null) {
+  try {
+    const url = accountingDate
+      ? `${FASTAPI_BASE_URL}/api/pms/cashier/shifts?accounting_date=${encodeURIComponent(accountingDate)}`
+      : `${FASTAPI_BASE_URL}/api/pms/cashier/shifts`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Cashier shifts fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function openFastApiCashierShift(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/cashier/shifts/open`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Open cashier shift failed:', err.message);
+    return null;
+  }
+}
+
+export async function closeFastApiCashierShift(shiftId, payload, accountingDate = null) {
+  try {
+    const url = accountingDate
+      ? `${FASTAPI_BASE_URL}/api/pms/cashier/shifts/${encodeURIComponent(shiftId)}/close?accounting_date=${encodeURIComponent(accountingDate)}`
+      : `${FASTAPI_BASE_URL}/api/pms/cashier/shifts/${encodeURIComponent(shiftId)}/close`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Close cashier shift failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiMorningBriefing(accountingDate = null) {
+  try {
+    const url = accountingDate
+      ? `${FASTAPI_BASE_URL}/api/pms/cashier/morning-briefing?accounting_date=${encodeURIComponent(accountingDate)}`
+      : `${FASTAPI_BASE_URL}/api/pms/cashier/morning-briefing`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Morning briefing fetch failed:', err.message);
+    return null;
+  }
+}
+
+// =============================================================
+// Category 2: Folio Accounting & Adjustments Connectors
+// =============================================================
+export async function transferFastApiFolioCharge(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/transfer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Folio transfer failed:', err.message);
+    return null;
+  }
+}
+
+export async function createFastApiBillAllowance(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/bill-allowance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Bill allowance post failed:', err.message);
+    return null;
+  }
+}
+
+export async function createFastApiCorporateSplitBilling(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/split-billing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Corporate split billing post failed:', err.message);
+    return null;
+  }
+}
+
+export async function toggleFastApiStopPosting(roomNumber, stopPosting = true, managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/stop-posting?room_number=${encodeURIComponent(roomNumber)}&stop_posting=${stopPosting}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Stop posting toggle failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiBlockedRooms() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/blocked`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Blocked rooms fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function blockFastApiRoom(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/block`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Room block failed:', err.message);
+    return null;
+  }
+}
+
+export async function bulkClearFastApiRooms(roomNumbers, targetStatus = 'clean', managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/bulk-clear?target_status=${encodeURIComponent(targetStatus)}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(roomNumbers)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Bulk clear rooms failed:', err.message);
+    return null;
+  }
+}
+
+// =============================================================
+// Category 3: POS, F&B & Banquet Connectors
+// =============================================================
+export async function settleFastApiSplitTender(orderId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/split-tender`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Split tender post failed:', err.message);
+    return null;
+  }
+}
+
+export async function applyFastApiPosDiscount(orderId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/discount`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] POS discount post failed:', err.message);
+    return null;
+  }
+}
+
+export async function reclassifyFastApiTender(orderId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/reclassify-tender`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Tender reclassify failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiBanquetEvents() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Banquet events fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiBanquetEvent(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Banquet event create failed:', err.message);
+    return null;
+  }
+}
+
+export async function settleFastApiBanquetEvent(eventId, paymentMode = 'Card', managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events/${encodeURIComponent(eventId)}/settle?payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Banquet settle failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiServers() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/servers`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Servers fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiServer(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/servers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create server failed:', err.message);
+    return null;
+  }
+}
+
+// =============================================================
+// Category 4: Store, Materials & Inventory Connectors
+// =============================================================
+export async function getFastApiPurchaseOrders() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Purchase orders fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiPurchaseOrder(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Purchase order post failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiGoodsReceiptNotes() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GRN fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiGoodsReceiptNote(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GRN post failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiStoreIssueVouchers() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Store issues fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiStoreIssueVoucher(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Store issue voucher post failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiStockLedger() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/stock-ledger`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Stock ledger fetch failed:', err.message);
+    return null;
+  }
+}
+
+// =============================================================
+// Category 5: Housekeeping, Linen & Asset Connectors
+// =============================================================
+export async function getFastApiLinenInventory() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Linen inventory fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createOrUpdateFastApiLinenItem(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Linen item update failed:', err.message);
+    return null;
+  }
+}
+
+export const createFastApiLinenItem = createOrUpdateFastApiLinenItem;
+
+export async function getFastApiRoomAmenities() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/room-amenities`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Room amenities fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiHousekeepingInspection(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Housekeeping inspection post failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiHousekeepingInspections() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Housekeeping inspections fetch failed:', err.message);
+    return [];
+  }
+}
+
+// =============================================================
+// Category 6: Night Audit Engine Connectors
+// =============================================================
+export async function autoPostFastApiRoomRent(auditDate = null, managerPin = '4321') {
+  try {
+    const url = auditDate
+      ? `${FASTAPI_BASE_URL}/api/night-audit/auto-post-room-rent?audit_date=${encodeURIComponent(auditDate)}&manager_pin=${managerPin}`
+      : `${FASTAPI_BASE_URL}/api/night-audit/auto-post-room-rent?manager_pin=${managerPin}`;
+    const res = await fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Auto-post room rent failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiNightAuditTrialBalance(date = null) {
+  try {
+    const url = date
+      ? `${FASTAPI_BASE_URL}/api/night-audit/trial-balance?date=${encodeURIComponent(date)}`
+      : `${FASTAPI_BASE_URL}/api/night-audit/trial-balance`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Trial balance fetch failed:', err.message);
+    return null;
+  }
+}
+
+export async function rolloverFastApiNightAudit(previousDate, newDate, managerPin = '4321') {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/rollover?previous_date=${encodeURIComponent(previousDate)}&new_date=${encodeURIComponent(newDate)}&manager_pin=${managerPin}`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Rollover night audit failed:', err.message);
+    return null;
+  }
+}
+
+// =============================================================
+// Category 7: Corporate BTC, Aging & Statutory Tax Connectors
+// =============================================================
+export async function getFastApiCorporateDebtorsAging() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate/debtors-aging`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Corporate debtors aging fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function settleFastApiCorporateInvoice(companyName, amountPaid, paymentRef = 'NEFT', managerPin = '4321') {
+  try {
+    const url = `${FASTAPI_BASE_URL}/api/corporate/settle-invoice?company_name=${encodeURIComponent(companyName)}&amount_paid=${amountPaid}&payment_ref=${encodeURIComponent(paymentRef)}&manager_pin=${managerPin}`;
+    const res = await fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Settle corporate invoice failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiTdsTcsSummary() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] TDS summary fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiTdsTcsRecord(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] TDS record post failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiBankReconciliations() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Bank reconciliations fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiBankReconciliation(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Bank reconciliation post failed:', err.message);
+    return null;
+  }
+}

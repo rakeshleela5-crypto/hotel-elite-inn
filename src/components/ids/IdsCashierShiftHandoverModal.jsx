@@ -9,6 +9,12 @@ import {
   formatClientMorningBriefing 
 } from '../../data/idsShiftStore';
 import { playSuccessChime, playReceptionChime } from '../../utils/soundAlert';
+import { 
+  getFastApiCashierShifts, 
+  closeFastApiCashierShift, 
+  openFastApiCashierShift, 
+  getFastApiMorningBriefing 
+} from '../../utils/backendApi';
 
 /**
  * IdsCashierShiftHandoverModal - V6.5.008.1
@@ -260,6 +266,36 @@ export default function IdsCashierShiftHandoverModal({
     } catch (e) {}
 
     showToast(`🔒 ${shiftData.shiftName} locked! Drawer Float ₹${Number(drawerFloat).toLocaleString('en-IN')} handed over to ${nextDef?.cashierName}.`);
+
+    // Asynchronously dispatch shift close and open to Railway PostgreSQL
+    closeFastApiCashierShift(shiftData.cashierCode || 'FO-01', {
+      shift_id: activeShiftId,
+      shift_name: shiftData.shiftName,
+      cashier_code: shiftData.cashierCode || 'FO-01',
+      cashier_name: shiftData.cashierName,
+      status: 'LOCKED',
+      drawer_float: Number(drawerFloat) || 0,
+      safe_drop: Number(safeDrop) || 0,
+      physical_cash: totalPhysicalCash,
+      cash_collections: Number(collCash) || 0,
+      upi_collections: Number(collUpi) || 0,
+      card_collections: Number(collCard) || 0,
+      btc_collections: Number(collBtc) || 0,
+      complimentary_collections: Number(collComp) || 0,
+      total_collections: totalCollections,
+      notes: handoverNotes,
+      pin: pinInput,
+      denominations: denoms
+    }, selectedDate).catch(err => console.warn('[FastAPI] Close shift error:', err));
+
+    openFastApiCashierShift({
+      shift_id: nextShiftId,
+      shift_name: nextDef?.name || 'Next Shift',
+      cashier_code: nextDef?.cashierCode || 'FO-02',
+      cashier_name: nextDef?.cashierName || 'Incoming Cashier',
+      accounting_date: selectedDate,
+      opening_drawer_float: Number(drawerFloat) || 2000
+    }).catch(err => console.warn('[FastAPI] Open shift error:', err));
   };
 
   // Copy WhatsApp Formatted Message

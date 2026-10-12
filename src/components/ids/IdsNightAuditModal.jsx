@@ -6,7 +6,12 @@ import {
   NEXT_ACCOUNTING_DATE, 
   getFormattedPmsDate 
 } from '../../data/idsPmsStore';
-import { sealFastApiNightAudit } from '../../utils/backendApi';
+import { 
+  sealFastApiNightAudit, 
+  autoPostFastApiRoomRent, 
+  getFastApiNightAuditTrialBalance, 
+  rolloverFastApiNightAudit 
+} from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 19: NIGHT AUDIT PROCESS IN IDS 6.5 & 7.0 SOFTWARE
@@ -131,6 +136,13 @@ export default function IdsNightAuditModal({
     setStep1Running(true);
     setStep1Log('Deleting old Trn/Tax records for selected room........');
 
+    // Trigger 02:00 AM server-side auto-post room rent in Railway PostgreSQL
+    autoPostFastApiRoomRent(acDate, 12.0)
+      .then(res => {
+        if (res) console.log('[FastAPI] Auto-post room rent success:', res);
+      })
+      .catch(err => console.warn('[FastAPI] Auto-post room rent failed:', err));
+
     const rooms = ['102', '105', '201', '203', '206', '301', '303', '109'];
     let idx = 0;
 
@@ -152,6 +164,13 @@ export default function IdsNightAuditModal({
     setStep2Running(true);
     setStep2Log('Processing Tax Records(Inhouse) For Reg#566');
     setStep2SubLog('From Date: 25/01/22  To Date: 25/01/22');
+
+    // Trigger live trial balance computation on Railway PostgreSQL
+    getFastApiNightAuditTrialBalance(acDate)
+      .then(tb => {
+        if (tb) console.log('[FastAPI] Live Trial Balance status:', tb.status, tb);
+      })
+      .catch(err => console.warn('[FastAPI] Trial balance check failed:', err));
 
     setTimeout(() => {
       setStep2Log('Updating FOM Gst Number.. Invoice No.: 503');
@@ -193,9 +212,11 @@ export default function IdsNightAuditModal({
       setStep4Running(false);
       setStep4Done(true);
 
-      // Persist Night Audit Seal & GL Rollover to Railway PostgreSQL backend (Option A)
+      // Persist Night Audit Seal & GL Rollover to Railway PostgreSQL backend
       sealFastApiNightAudit(acDate, '4321', 'IT ADMIN')
         .catch(err => console.warn('[FastAPI] Seal night audit error:', err));
+      rolloverFastApiNightAudit(acDate, nextDate, '4321')
+        .catch(err => console.warn('[FastAPI] Rollover night audit error:', err));
 
       if (onCompleteNightAudit) {
         onCompleteNightAudit({
