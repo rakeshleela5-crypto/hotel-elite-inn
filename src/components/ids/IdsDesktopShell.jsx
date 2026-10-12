@@ -1458,6 +1458,11 @@ export default function IdsDesktopShell({
         label: 'Add Company Details & GSTN After Check-out (GSTN Change)', 
         videoId: '43', 
         action: () => setGstnChangeModalOpen(true) 
+      },
+      { 
+        label: 'Database Backup & Cloud Disaster Recovery (Cloudflare R2 Vault)', 
+        videoId: 'UTILITY-01', 
+        action: () => setR2BackupModalOpen(true) 
       }
     ],
     'Lookups..': [
