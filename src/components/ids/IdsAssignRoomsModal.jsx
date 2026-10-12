@@ -285,7 +285,7 @@ export function IdsAssignGuestRoomsModal({
             <input className="ids-input" value={booking.departureDate || '17-JAN-2026 12:00'} readOnly />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Group</span>
-            <input className="ids-input" defaultValue="" 
+            <input className="ids-input" defaultValue="" onChange={() => {}} />
           </div>
 
           {/* Filter & Action Buttons Bar */}

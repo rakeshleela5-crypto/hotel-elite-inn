@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { HelpCircle, Check, X, FileText, Printer, CreditCard, DollarSign } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
@@ -89,7 +89,7 @@ export function IdsRateInformationModal({
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={singleTariff} onChange={(e) => setSingleTariff(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Double</td>
@@ -105,8 +105,8 @@ export function IdsRateInformationModal({
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Quadruple</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" onChange={() => {}} /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Adult</td>
@@ -117,8 +117,8 @@ export function IdsRateInformationModal({
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Child</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" onChange={() => {}} /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Tax Struct.</td>
