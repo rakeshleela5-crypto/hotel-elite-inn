@@ -241,12 +241,12 @@ export default function IdsWalkInModal({
           SCREEN 1: ROOM RACK V6.5.002.2 (Video 17 Frames 010–030)
           ========================================================================= */}
       {activeStep === 'rack' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1024px' : '920px', maxWidth: isMaximized ? '1024px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '920px', maxWidth: isMaximized ? '880px' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Room Rack V6.5.002.2</span>
             <div className="ids-window-controls">
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
@@ -517,12 +517,12 @@ export default function IdsWalkInModal({
           SCREEN 2: WALK-INS V6.5002.5 REGISTRATION CONSOLE (Video 17 Frames 035–075)
           ========================================================================= */}
       {activeStep === 'registration' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1024px' : '920px', maxWidth: isMaximized ? '1024px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '920px', maxWidth: isMaximized ? '880px' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Walk-Ins V6.5002.5 — Guest Registration</span>
             <div className="ids-window-controls">
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Back to Rack" onClick={() => setActiveStep('rack')} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
@@ -1395,12 +1395,12 @@ export default function IdsWalkInModal({
           SCREEN 3: GUEST INFORMATION V6.5002.2 (Video 17 Frame 110)
           ========================================================================= */}
       {activeStep === 'guest-info' && (
-        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '1024px' : '940px', maxWidth: isMaximized ? '1024px' : '98vw' }}>
+        <div className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} style={{ width: isMaximized ? '880px' : '940px', maxWidth: isMaximized ? '880px' : '98vw' }}>
           <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontWeight: 700, fontSize: '13px' }}>Guest Information V6.5002.2 — Reservation Profile</span>
             <div className="ids-window-controls">
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Finish & Close" onClick={handleFinishWalkIn} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>

@@ -1551,10 +1551,10 @@ export default function IdsOrderEntryModal({
         <div 
           className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`} 
           style={{ 
-            width: isMaximized ? '1024px' : '920px', 
-            maxWidth: isMaximized ? '1024px' : '98vw', 
-            height: isMaximized ? '768px' : 'auto',
-            maxHeight: isMaximized ? '768px' : '94vh',
+            width: isMaximized ? '880px' : '920px', 
+            maxWidth: isMaximized ? '880px' : '98vw', 
+            height: isMaximized ? '520px' : 'auto',
+            maxHeight: isMaximized ? '520px' : '94vh',
             background: '#ECE9D8', 
             border: '2px solid #808080', 
             boxShadow: '4px 4px 15px rgba(0,0,0,0.6)',
@@ -1567,7 +1567,7 @@ export default function IdsOrderEntryModal({
             <span style={{ fontWeight: 700, fontSize: '12px' }}>Order Entry V6.5.002.4</span>
             <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
               <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+              <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
                 {isMaximized ? '❐' : '□'}
               </button>
               <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ fontSize: '11px', height: '18px', width: '18px', lineHeight: '16px' }}>✕</button>

@@ -426,10 +426,10 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
       <div 
         className={`ids-modal-container ${isMaximized ? 'maximized' : ''}`}
         style={{
-          width: isMaximized ? '1024px' : '780px',
-          maxWidth: isMaximized ? '1024px' : '96vw',
-          height: isMaximized ? '768px' : 'auto',
-          maxHeight: isMaximized ? '768px' : '94vh',
+          width: isMaximized ? '880px' : '780px',
+          maxWidth: isMaximized ? '880px' : '96vw',
+          height: isMaximized ? '520px' : 'auto',
+          maxHeight: isMaximized ? '520px' : '94vh',
           background: '#ECE9D8',
           border: '3px solid #808080',
           boxShadow: '6px 6px 24px rgba(0,0,0,0.85)',
@@ -462,7 +462,7 @@ A/C: 3891002100049281 | IFSC: SBIN0000172`;
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button 

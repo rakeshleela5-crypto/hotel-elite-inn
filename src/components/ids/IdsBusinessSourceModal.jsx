@@ -210,7 +210,7 @@ export default function IdsBusinessSourceModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '1024px' : '860px', 
+          width: isMaximized ? '880px' : '860px', 
           maxWidth: '98vw', 
           boxShadow: '0 14px 44px rgba(0,0,0,0.65), 0 3px 10px rgba(0,0,0,0.4)', 
           border: '2px outset #FFFFFF',
@@ -240,7 +240,7 @@ export default function IdsBusinessSourceModal({
             <button className="ids-win-btn" title="Minimize">_</button>
             <button 
               className="ids-win-btn" 
-              title={isMaximized ? "Restore Down" : "Maximize (15\" 4:3 Workstation)"} 
+              title={isMaximized ? "Restore Down" : "Maximize (Compact Window)"} 
               onClick={() => setIsMaximized(!isMaximized)}
             >
               {isMaximized ? '❐' : '□'}

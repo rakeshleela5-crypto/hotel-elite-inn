@@ -339,10 +339,10 @@ export default function StoreInventoryModal({
       padding: '1rem'
     }}>
       <div className="glass-panel" style={{
-        width: isMaximized ? '1024px' : '100%',
-        maxWidth: isMaximized ? '1024px' : 1180,
-        height: isMaximized ? '768px' : '90vh',
-        maxHeight: isMaximized ? '768px' : '90vh',
+        width: isMaximized ? '880px' : '100%',
+        maxWidth: isMaximized ? '880px' : 1180,
+        height: isMaximized ? '520px' : '90vh',
+        maxHeight: isMaximized ? '520px' : '90vh',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: isMaximized ? '4px' : '16px',
@@ -396,7 +396,7 @@ export default function StoreInventoryModal({
             </button>
             <button
               onClick={() => setIsMaximized(!isMaximized)}
-              title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"}
+              title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"}
               style={{
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.2)',

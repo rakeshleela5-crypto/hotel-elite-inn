@@ -329,10 +329,10 @@ export default function IdsPoliceThanaManifestModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`}
         style={{ 
-          width: isMaximized ? '1024px' : '960px', 
-          maxWidth: isMaximized ? '1024px' : '96vw', 
-          height: isMaximized ? '768px' : '660px', 
-          maxHeight: isMaximized ? '768px' : '92vh',
+          width: isMaximized ? '880px' : '960px', 
+          maxWidth: isMaximized ? '880px' : '96vw', 
+          height: isMaximized ? '520px' : '660px', 
+          maxHeight: isMaximized ? '520px' : '92vh',
           display: 'flex', 
           flexDirection: 'column',
           background: '#ECE9D8',
@@ -350,7 +350,7 @@ export default function IdsPoliceThanaManifestModal({
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" onClick={handlePrint} title="Quick Print (F7)" style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>🖨️</button>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button className="ids-win-btn close" onClick={onClose} title="Close (Esc)" style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>

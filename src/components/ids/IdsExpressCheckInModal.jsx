@@ -256,11 +256,10 @@ export default function IdsExpressCheckInModal({
       <div 
         className={`ids-dialog-window ${isMaximized ? 'maximized' : ''}`} 
         style={{ 
-          width: isMaximized ? '1024px' : '960px', 
-          maxWidth: isMaximized ? '1024px' : '96vw', 
-          height: isMaximized ? '768px' : '580px', 
-          maxHeight: isMaximized ? '768px' : '90vh', 
-          aspectRatio: isMaximized ? '4 / 3' : 'unset',
+          width: isMaximized ? '890px' : '850px', 
+          maxWidth: '94vw', 
+          height: isMaximized ? '520px' : '480px', 
+          maxHeight: '84vh', 
           display: 'flex', 
           flexDirection: 'column' 
         }}
@@ -275,7 +274,7 @@ export default function IdsExpressCheckInModal({
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>
-            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (15\" 4:3 Workstation)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
+            <button className="ids-win-btn" title={isMaximized ? "Restore Window" : "Maximize (Compact Window)"} onClick={() => setIsMaximized(!isMaximized)} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>
               {isMaximized ? '❐' : '□'}
             </button>
             <button className="ids-win-btn close" title="Close Dialog" onClick={onClose} style={{ width: '20px', height: '20px', fontSize: '12px', lineHeight: 1 }}>✕</button>
