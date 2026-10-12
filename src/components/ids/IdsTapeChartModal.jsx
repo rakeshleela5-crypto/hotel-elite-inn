@@ -1082,8 +1082,8 @@ export default function IdsTapeChartModal({
                     <input 
                       type="date"
                       value={bookingDraft.checkOutDate}
-                      readOnly
-                      style={{ width: '100%', padding: '4px', border: '1px solid #B0AB9A', background: '#F0ECE1' }}
+                      onChange={e => setBookingDraft(prev => ({ ...prev, checkOutDate: e.target.value }))}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                     />
                   </div>
 

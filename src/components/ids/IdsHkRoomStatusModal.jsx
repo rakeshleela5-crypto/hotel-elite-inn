@@ -227,8 +227,8 @@ export default function IdsHkRoomStatusModal({
                     <input 
                       type="text" 
                       value={detailsForm.roomNo} 
-                      disabled
-                      style={{ width: '80px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} 
+                      onChange={(e) => setDetailsForm({ ...detailsForm, roomNo: e.target.value })}
+                      style={{ width: '80px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} 
                     />
                   </div>
 

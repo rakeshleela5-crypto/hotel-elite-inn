@@ -127,6 +127,18 @@ export default function IdsForeignExchangeModal({
     { quantity: 20, description: 'Hundred Dollars', denomination: 100.00, amount: 2000.00, localAmount: 155500.00 }
   ]);
 
+  const [accountingDateInput, setAccountingDateInput] = useState(accountingDate || '17-MAR-2026');
+  const [outletCode, setOutletCode] = useState('FO');
+  const [billAmount, setBillAmount] = useState('0.00');
+  const [paidOutAmount, setPaidOutAmount] = useState('0.00');
+  const [manualExgAmount, setManualExgAmount] = useState('');
+  const [manualAmountReceived, setManualAmountReceived] = useState('');
+  const [manualTotalInr, setManualTotalInr] = useState('');
+  const [manualExchangeRate, setManualExchangeRate] = useState('');
+  const [manualGstTax, setManualGstTax] = useState('');
+  const [manualCommission, setManualCommission] = useState('0.00');
+  const [manualNetPaid, setManualNetPaid] = useState('');
+
   // Sub-dialogs
   const [certificateModalOpen, setCertificateModalOpen] = useState(false);
   const [browseModalOpen, setBrowseModalOpen] = useState(false);
@@ -302,7 +314,7 @@ export default function IdsForeignExchangeModal({
 
               <span style={{ fontWeight: 600 }}>Accounting Date</span>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <input className="ids-input" value={accountingDate} readOnly style={{ width: '95px', fontWeight: 700 }} />
+                <input className="ids-input" value={accountingDateInput} onChange={(e) => setAccountingDateInput(e.target.value)} style={{ width: '95px', fontWeight: 700 }} />
                 <button 
                   className="ids-btn-classic" 
                   style={{ background: '#DCE6F1', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -316,10 +328,15 @@ export default function IdsForeignExchangeModal({
               <input className="ids-input" value={particulars} onChange={(e) => setParticulars(e.target.value)} style={{ width: '100%', fontWeight: 600 }} />
 
               <span style={{ fontWeight: 600 }}>Encashment No.</span>
-              <input className="ids-input" value={encashmentNo} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+              <input className="ids-input" value={encashmentNo} onChange={(e) => setEncashmentNo(e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF' }} />
 
               <span style={{ fontWeight: 600 }}>Exg. Amount</span>
-              <input className="ids-input" value={totalForeignAmount.toFixed(2)} readOnly style={{ width: '100px', fontWeight: 900, color: '#0A246A', background: '#FFF7CC' }} />
+              <input 
+                className="ids-input" 
+                value={manualExgAmount !== '' ? manualExgAmount : totalForeignAmount.toFixed(2)} 
+                onChange={(e) => setManualExgAmount(e.target.value)} 
+                style={{ width: '100px', fontWeight: 900, color: '#0A246A', background: '#FFF' }} 
+              />
             </div>
           </div>
 
@@ -343,7 +360,7 @@ export default function IdsForeignExchangeModal({
                 <input className="ids-input" value={passportNo} onChange={(e) => setPassportNo(e.target.value)} style={{ width: '100%', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Outlet</span>
-                <input className="ids-input" value="FO" readOnly style={{ width: '40px' }} />
+                <input className="ids-input" value={outletCode} onChange={(e) => setOutletCode(e.target.value)} style={{ width: '40px' }} />
 
                 <span style={{ fontWeight: 600 }}>Nationality</span>
                 <input className="ids-input" value={nationality} onChange={(e) => setNationality(e.target.value)} style={{ width: '70px', fontWeight: 700 }} />
@@ -352,10 +369,10 @@ export default function IdsForeignExchangeModal({
                 <input className="ids-input" value={address} onChange={(e) => setAddress(e.target.value)} style={{ width: '100%' }} />
 
                 <span style={{ fontWeight: 600 }}>Bill Amount</span>
-                <input className="ids-input" value="0.00" readOnly style={{ width: '80px' }} />
+                <input className="ids-input" value={billAmount} onChange={(e) => setBillAmount(e.target.value)} style={{ width: '80px' }} />
 
                 <span style={{ fontWeight: 600 }}>Paid out</span>
-                <input className="ids-input" value="0.00" readOnly style={{ width: '80px' }} />
+                <input className="ids-input" value={paidOutAmount} onChange={(e) => setPaidOutAmount(e.target.value)} style={{ width: '80px' }} />
               </div>
             </div>
 
@@ -415,22 +432,52 @@ export default function IdsForeignExchangeModal({
           <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '6px 12px', marginBottom: '8px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '100px 110px 100px 120px 90px 1fr', gap: '4px 8px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Amount Received</span>
-              <input className="ids-input" value={`${currentRateObj.symbol}${totalForeignAmount.toFixed(2)}`} readOnly style={{ width: '100px', fontWeight: 900, color: '#0A246A' }} />
+              <input 
+                className="ids-input" 
+                value={manualAmountReceived !== '' ? manualAmountReceived : `${currentRateObj.symbol}${totalForeignAmount.toFixed(2)}`} 
+                onChange={(e) => setManualAmountReceived(e.target.value)} 
+                style={{ width: '100px', fontWeight: 900, color: '#0A246A', background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 600 }}>Total (INR)</span>
-              <input className="ids-input" value={`₹${grossInrValue.toFixed(2)}`} readOnly style={{ width: '110px', fontWeight: 900, color: '#0A246A' }} />
+              <input 
+                className="ids-input" 
+                value={manualTotalInr !== '' ? manualTotalInr : `₹${grossInrValue.toFixed(2)}`} 
+                onChange={(e) => setManualTotalInr(e.target.value)} 
+                style={{ width: '110px', fontWeight: 900, color: '#0A246A', background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 600 }}>Exchange Rate</span>
-              <input className="ids-input" value={exchangeRate.toFixed(6)} readOnly style={{ width: '90px', fontWeight: 700 }} />
+              <input 
+                className="ids-input" 
+                value={manualExchangeRate !== '' ? manualExchangeRate : exchangeRate.toFixed(6)} 
+                onChange={(e) => setManualExchangeRate(e.target.value)} 
+                style={{ width: '90px', fontWeight: 700, background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 600 }}>GST Tax (Rule 32)</span>
-              <input className="ids-input" value={`₹${gstTaxAmount.toFixed(2)}`} readOnly style={{ width: '80px', color: '#C5221F' }} />
+              <input 
+                className="ids-input" 
+                value={manualGstTax !== '' ? manualGstTax : `₹${gstTaxAmount.toFixed(2)}`} 
+                onChange={(e) => setManualGstTax(e.target.value)} 
+                style={{ width: '80px', color: '#C5221F', background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 600 }}>Less Commission</span>
-              <input className="ids-input" value="0.00" readOnly style={{ width: '70px' }} />
+              <input 
+                className="ids-input" 
+                value={manualCommission} 
+                onChange={(e) => setManualCommission(e.target.value)} 
+                style={{ width: '70px', background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 600 }}>Net Paid to Guest</span>
-              <input className="ids-input" value={`₹${netPaidInr.toFixed(2)}`} readOnly style={{ width: '130px', fontWeight: 900, color: '#137333', background: '#FFF7CC', fontSize: '12px' }} />
+              <input 
+                className="ids-input" 
+                value={manualNetPaid !== '' ? manualNetPaid : `₹${netPaidInr.toFixed(2)}`} 
+                onChange={(e) => setManualNetPaid(e.target.value)} 
+                style={{ width: '130px', fontWeight: 900, color: '#137333', background: '#FFF', fontSize: '12px' }} 
+              />
             </div>
           </div>
 

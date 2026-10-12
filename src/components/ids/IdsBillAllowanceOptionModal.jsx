@@ -126,7 +126,34 @@ export default function IdsBillAllowanceOptionModal({
 
   // Room Context
   const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '201');
-  const activeRoom = BATCH_ALLOWANCE_ROOMS.find(r => r.roomNo === selectedRoomNo) || BATCH_ALLOWANCE_ROOMS[0];
+  const [customRoomNo, setCustomRoomNo] = useState('');
+  const [customGuestName, setCustomGuestName] = useState('');
+  const [customFolioNo, setCustomFolioNo] = useState('');
+  const [customClassification, setCustomClassification] = useState('');
+  const [customRegNo, setCustomRegNo] = useState('');
+  const [customNationality, setCustomNationality] = useState('');
+  const [customArrival, setCustomArrival] = useState('');
+  const [customDeparture, setCustomDeparture] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedRoomNo(initialRoomNo || '201');
+      setCustomRoomNo('');
+      setCustomGuestName('');
+      setCustomFolioNo('');
+      setCustomClassification('');
+      setCustomRegNo('');
+      setCustomNationality('');
+      setCustomArrival('');
+      setCustomDeparture('');
+    }
+  }, [isOpen, initialRoomNo]);
+
+  const activeRoom = BATCH_ALLOWANCE_ROOMS.find(r => r.roomNo === (customRoomNo || selectedRoomNo)) || {
+    ...BATCH_ALLOWANCE_ROOMS[0],
+    roomNo: customRoomNo || selectedRoomNo,
+    guestName: customGuestName || BATCH_ALLOWANCE_ROOMS[0].guestName
+  };
 
   // Dialog Visibility states
   const [showSelectRevenue, setShowSelectRevenue] = useState(false);
@@ -537,8 +564,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.roomNo} 
+                    value={customRoomNo !== '' ? customRoomNo : activeRoom.roomNo} 
+                    onChange={(e) => { setCustomRoomNo(e.target.value); setSelectedRoomNo(e.target.value); }}
                     style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '1px 4px', fontWeight: 700 }}
                   />
                   <button 
@@ -555,8 +582,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.guestName} 
+                    value={customGuestName !== '' ? customGuestName : activeRoom.guestName} 
+                    onChange={(e) => setCustomGuestName(e.target.value)}
                     style={{ width: '100%', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>
@@ -566,8 +593,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.folioNo} 
+                    value={customFolioNo !== '' ? customFolioNo : activeRoom.folioNo} 
+                    onChange={(e) => setCustomFolioNo(e.target.value)}
                     style={{ width: '50px', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                   <button 
@@ -583,8 +610,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.classification} 
+                    value={customClassification !== '' ? customClassification : activeRoom.classification} 
+                    onChange={(e) => setCustomClassification(e.target.value)}
                     style={{ width: '100%', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>
@@ -594,8 +621,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.regNo} 
+                    value={customRegNo !== '' ? customRegNo : activeRoom.regNo} 
+                    onChange={(e) => setCustomRegNo(e.target.value)}
                     style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>
@@ -604,8 +631,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.nationality} 
+                    value={customNationality !== '' ? customNationality : activeRoom.nationality} 
+                    onChange={(e) => setCustomNationality(e.target.value)}
                     style={{ width: '100%', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>
@@ -615,8 +642,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
                     value={selectedRevenueCode} 
+                    onChange={(e) => setSelectedRevenueCode(e.target.value)}
                     style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '1px 4px', fontWeight: 700 }}
                   />
                 </div>
@@ -625,8 +652,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.arrival} 
+                    value={customArrival !== '' ? customArrival : activeRoom.arrival} 
+                    onChange={(e) => setCustomArrival(e.target.value)}
                     style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>
@@ -638,8 +665,8 @@ export default function IdsBillAllowanceOptionModal({
                 <div>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeRoom.departure} 
+                    value={customDeparture !== '' ? customDeparture : activeRoom.departure} 
+                    onChange={(e) => setCustomDeparture(e.target.value)}
                     style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '1px 4px' }}
                   />
                 </div>

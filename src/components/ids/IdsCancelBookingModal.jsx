@@ -182,6 +182,15 @@ export function IdsDepositRefundModal({
   const [balanceAmount, setBalanceAmount] = useState(depositAmount);
   const [reason, setReason] = useState('Change Visit Plan');
   const [reference, setReference] = useState('');
+  const [resNo, setResNo] = useState(booking?.resNo || '270');
+  const [guestName, setGuestName] = useState(`${booking?.title || 'Mr'} ${booking?.guestName || ''}`);
+  const [companyCode, setCompanyCode] = useState(booking?.companyCode || 'COM0009');
+  const [companyName, setCompanyName] = useState(booking?.companyName || 'QUALITY PHARMA PRODUCTS PVT LTD.');
+  const [arrivalDate, setArrivalDate] = useState(booking?.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2026');
+  const [departureDate, setDepartureDate] = useState(booking?.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2026');
+  const [paxCount, setPaxCount] = useState(booking?.pax || '1');
+  const [roomsCount, setRoomsCount] = useState('1');
+  const [depositAmt, setDepositAmt] = useState(depositAmount);
 
   if (!isOpen || !booking) return null;
 
@@ -221,10 +230,10 @@ export function IdsDepositRefundModal({
               <input 
                 className="ids-input" 
                 style={{ width: '80px', fontWeight: 700, textAlign: 'center' }} 
-                value={booking.resNo || '270'} 
-                readOnly 
+                value={resNo} 
+                onChange={(e) => setResNo(e.target.value)}
               />
-              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }} onClick={() => { playReceptionChime(); alert(`Lookup Reservation: ${booking.resNo || '270'} (${booking.guestName})`); }}>?</button>
+              <button className="ids-btn-classic" style={{ minWidth: '20px', padding: '1px 5px' }} onClick={() => { playReceptionChime(); alert(`Lookup Reservation: ${resNo} (${guestName})`); }}>?</button>
             </div>
           </div>
 
@@ -234,33 +243,33 @@ export function IdsDepositRefundModal({
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <input 
                 className="ids-input" 
-                value={`${booking.title || 'Mr'} ${booking.guestName}`} 
-                readOnly 
+                value={guestName} 
+                onChange={(e) => setGuestName(e.target.value)}
                 style={{ fontWeight: 600 }}
               />
-              <button className="ids-btn-classic" style={{ padding: '2px 6px' }} onClick={() => { playReceptionChime(); alert(`Booking Details:\nGuest: ${booking.guestName}\nCompany: ${booking.companyName || 'N/A'}\nArrival: ${booking.arrivalDate}\nDeparture: ${booking.departureDate}`); }}>Details...</button>
+              <button className="ids-btn-classic" style={{ padding: '2px 6px' }} onClick={() => { playReceptionChime(); alert(`Booking Details:\nGuest: ${guestName}\nCompany: ${companyName}\nArrival: ${arrivalDate}\nDeparture: ${departureDate}`); }}>Details...</button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 80px 1fr', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Company</span>
-              <input className="ids-input" value={booking.companyCode || 'COM0009'} readOnly style={{ fontWeight: 600 }} />
-              <input className="ids-input" value={booking.companyName || 'QUALITY PHARMA PRODUCTS PVT LTD.'} readOnly />
+              <input className="ids-input" value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} style={{ fontWeight: 600 }} />
+              <input className="ids-input" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 110px 100px 110px', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Arrival Date</span>
-              <input className="ids-input" value={booking.arrivalDate ? booking.arrivalDate.split(' ')[0] : '14-JAN-2026'} readOnly />
+              <input className="ids-input" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} />
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Departure Date</span>
-              <input className="ids-input" value={booking.departureDate ? booking.departureDate.split(' ')[0] : '17-JAN-2026'} readOnly />
+              <input className="ids-input" value={departureDate} onChange={(e) => setDepartureDate(e.target.value)} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 60px 80px 60px 100px 1fr', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Pax</span>
-              <input className="ids-input" value={booking.pax || '1'} readOnly style={{ textAlign: 'center' }} />
+              <input className="ids-input" value={paxCount} onChange={(e) => setPaxCount(e.target.value)} style={{ textAlign: 'center' }} />
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Rooms</span>
-              <input className="ids-input" value="1" readOnly style={{ textAlign: 'center' }} />
+              <input className="ids-input" value={roomsCount} onChange={(e) => setRoomsCount(e.target.value)} style={{ textAlign: 'center' }} />
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Deposit Amount</span>
-              <input className="ids-input" value={depositAmount} readOnly style={{ textAlign: 'right', fontWeight: 700, color: '#0A246A' }} />
+              <input className="ids-input" value={depositAmt} onChange={(e) => setDepositAmt(e.target.value)} style={{ textAlign: 'right', fontWeight: 700, color: '#0A246A' }} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '80px 180px', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
@@ -327,9 +336,9 @@ export function IdsDepositRefundModal({
                 <span style={{ fontWeight: 600 }}>Balance Amount</span>
                 <input 
                   className="ids-input" 
-                  style={{ textAlign: 'right', fontWeight: 700, background: '#EDEAE0' }} 
+                  style={{ textAlign: 'right', fontWeight: 700, background: '#FFF' }} 
                   value={balanceAmount} 
-                  readOnly 
+                  onChange={(e) => setBalanceAmount(e.target.value)} 
                 />
               </div>
 

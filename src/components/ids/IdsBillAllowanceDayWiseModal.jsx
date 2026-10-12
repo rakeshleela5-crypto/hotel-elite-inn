@@ -94,7 +94,32 @@ export default function IdsBillAllowanceDayWiseModal({
 
   // Room Context
   const [selectedRoomNo, setSelectedRoomNo] = useState(initialRoomNo || '102');
-  const activeRoom = BILL_ALLOWANCE_ROOMS.find(r => r.roomNo === selectedRoomNo) || BILL_ALLOWANCE_ROOMS[0];
+  const [customFolioNo, setCustomFolioNo] = useState('');
+  const [customRegNo, setCustomRegNo] = useState('');
+  const [customGuestName, setCustomGuestName] = useState('');
+  const [customClassification, setCustomClassification] = useState('');
+  const [customNationality, setCustomNationality] = useState('');
+  const [customArrival, setCustomArrival] = useState('');
+  const [customDeparture, setCustomDeparture] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedRoomNo(initialRoomNo || '102');
+      setCustomFolioNo('');
+      setCustomRegNo('');
+      setCustomGuestName('');
+      setCustomClassification('');
+      setCustomNationality('');
+      setCustomArrival('');
+      setCustomDeparture('');
+    }
+  }, [isOpen, initialRoomNo]);
+
+  const activeRoom = BILL_ALLOWANCE_ROOMS.find(r => r.roomNo === selectedRoomNo) || {
+    ...BILL_ALLOWANCE_ROOMS[0],
+    roomNo: selectedRoomNo,
+    guestName: customGuestName || BILL_ALLOWANCE_ROOMS[0].guestName
+  };
 
   // Dialog Visibility states
   const [showSelectRevenue, setShowSelectRevenue] = useState(false);
@@ -378,7 +403,12 @@ export default function IdsBillAllowanceDayWiseModal({
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '65px', fontWeight: 600 }}>Folio No.</span>
-                  <input className="ids-input" readOnly value={activeRoom.folioNo} style={{ width: '70px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customFolioNo !== '' ? customFolioNo : activeRoom.folioNo} 
+                    onChange={(e) => setCustomFolioNo(e.target.value)}
+                    style={{ width: '70px', background: '#FFF' }} 
+                  />
                   <button 
                     className="ids-btn-classic" 
                     style={{ fontSize: '10px', height: '20px', padding: '1px 6px' }}
@@ -391,12 +421,22 @@ export default function IdsBillAllowanceDayWiseModal({
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '65px', fontWeight: 600 }}>Reg. No.</span>
-                  <input className="ids-input" readOnly value={activeRoom.regNo} style={{ width: '70px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customRegNo !== '' ? customRegNo : activeRoom.regNo} 
+                    onChange={(e) => setCustomRegNo(e.target.value)}
+                    style={{ width: '70px', background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span style={{ width: '65px', fontWeight: 600 }}>Outlet</span>
-                  <input className="ids-input" readOnly value={selectedRevenueCode} style={{ width: '70px', fontWeight: 700, background: '#FFF' }} />
+                  <input 
+                    className="ids-input" 
+                    value={selectedRevenueCode} 
+                    onChange={(e) => setSelectedRevenueCode(e.target.value)}
+                    style={{ width: '70px', fontWeight: 700, background: '#FFF' }} 
+                  />
                 </div>
               </div>
 
@@ -404,24 +444,49 @@ export default function IdsBillAllowanceDayWiseModal({
               <div>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '85px', fontWeight: 600 }}>Name</span>
-                  <input className="ids-input" readOnly value={activeRoom.guestName} style={{ flex: 1, fontWeight: 700, background: '#FFF' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customGuestName !== '' ? customGuestName : activeRoom.guestName} 
+                    onChange={(e) => setCustomGuestName(e.target.value)}
+                    style={{ flex: 1, fontWeight: 700, background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '85px', fontWeight: 600 }}>Classification</span>
-                  <input className="ids-input" readOnly value={activeRoom.classification} style={{ width: '130px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customClassification !== '' ? customClassification : activeRoom.classification} 
+                    onChange={(e) => setCustomClassification(e.target.value)}
+                    style={{ width: '130px', background: '#FFF' }} 
+                  />
                   <span style={{ width: '70px', fontWeight: 600, textAlign: 'right' }}>Nationality</span>
-                  <input className="ids-input" readOnly value={activeRoom.nationality} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customNationality !== '' ? customNationality : activeRoom.nationality} 
+                    onChange={(e) => setCustomNationality(e.target.value)}
+                    style={{ flex: 1, background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ width: '85px', fontWeight: 600 }}>Arrival</span>
-                  <input className="ids-input" readOnly value={activeRoom.arrival} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customArrival !== '' ? customArrival : activeRoom.arrival} 
+                    onChange={(e) => setCustomArrival(e.target.value)}
+                    style={{ flex: 1, background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span style={{ width: '85px', fontWeight: 600 }}>Departure</span>
-                  <input className="ids-input" readOnly value={activeRoom.departure} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customDeparture !== '' ? customDeparture : activeRoom.departure} 
+                    onChange={(e) => setCustomDeparture(e.target.value)}
+                    style={{ flex: 1, background: '#FFF' }} 
+                  />
                 </div>
               </div>
             </div>

@@ -44,6 +44,7 @@ export default function IdsRoomTransferModal({
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [toRoomNo, setToRoomNo] = useState('201');
   const [toRoomType, setToRoomType] = useState('EXE');
+  const [customFromRoomType, setCustomFromRoomType] = useState('');
   const [showRoomRackPicker, setShowRoomRackPicker] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [rackTab, setRackTab] = useState('Vacant'); // 'Vacant', 'Occupied', 'Dirty', 'All'
@@ -194,9 +195,9 @@ export default function IdsRoomTransferModal({
               </button>
               <input 
                 className="ids-input" 
-                value={selectedGuest?.roomType || 'EXE'} 
-                readOnly 
-                style={{ width: '60px', background: '#EBEBE4', fontWeight: 600 }} 
+                value={customFromRoomType !== '' ? customFromRoomType : (selectedGuest?.roomType || 'EXE')} 
+                onChange={(e) => setCustomFromRoomType(e.target.value)}
+                style={{ width: '60px', background: '#FFF', fontWeight: 600 }} 
               />
 
               <span style={{ fontWeight: 600, marginLeft: '14px' }}>Transfer To</span>
@@ -209,8 +210,8 @@ export default function IdsRoomTransferModal({
               <input 
                 className="ids-input" 
                 value={toRoomType} 
-                readOnly 
-                style={{ width: '60px', background: '#EBEBE4', fontWeight: 600 }} 
+                onChange={(e) => setToRoomType(e.target.value)}
+                style={{ width: '60px', background: '#FFF', fontWeight: 600 }} 
               />
             </div>
 

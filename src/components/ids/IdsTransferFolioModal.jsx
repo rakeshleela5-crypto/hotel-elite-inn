@@ -48,6 +48,13 @@ export default function IdsTransferFolioModal({
   // Rooms Context
   const [fromRoomNo, setFromRoomNo] = useState(initialFromRoom || '201');
   const [toRoomNo, setToRoomNo] = useState(initialToRoom || '205');
+  const [customSourceGuestName, setCustomSourceGuestName] = useState('');
+  const [customSourceFolioNo, setCustomSourceFolioNo] = useState('');
+  const [customSourceRegNo, setCustomSourceRegNo] = useState('');
+  const [customTargetGuestName, setCustomTargetGuestName] = useState('');
+  const [customTargetFolioNo, setCustomTargetFolioNo] = useState('');
+  const [customTargetRegNo, setCustomTargetRegNo] = useState('');
+  const [customTaggedTotal, setCustomTaggedTotal] = useState('');
 
   const sourceGuest = AVAILABLE_GUESTS_FOR_TRANSFER.find(g => g.roomNo === fromRoomNo) || AVAILABLE_GUESTS_FOR_TRANSFER[0];
   const targetGuest = AVAILABLE_GUESTS_FOR_TRANSFER.find(g => g.roomNo === toRoomNo) || AVAILABLE_GUESTS_FOR_TRANSFER[1];
@@ -81,6 +88,13 @@ export default function IdsTransferFolioModal({
     if (isOpen) {
       setFromRoomNo(initialFromRoom || '201');
       setToRoomNo(initialToRoom || '205');
+      setCustomSourceGuestName('');
+      setCustomSourceFolioNo('');
+      setCustomSourceRegNo('');
+      setCustomTargetGuestName('');
+      setCustomTargetFolioNo('');
+      setCustomTargetRegNo('');
+      setCustomTaggedTotal('');
       setTransferMode('Selective');
       setTransactions(INITIAL_ROOM_201_TRANSACTIONS);
       setShowAuthPopup(false);
@@ -372,10 +386,10 @@ export default function IdsTransferFolioModal({
                     <div>
                       <input 
                         type="text" 
-                        value={sourceGuest.guestName} 
-                        readOnly 
+                        value={customSourceGuestName !== '' ? customSourceGuestName : sourceGuest.guestName} 
+                        onChange={(e) => setCustomSourceGuestName(e.target.value)}
                         className="ids-input"
-                        style={{ width: '100%', padding: '1px 4px' }}
+                        style={{ width: '100%', padding: '1px 4px', background: '#FFF' }}
                       />
                     </div>
 
@@ -383,18 +397,18 @@ export default function IdsTransferFolioModal({
                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                       <input 
                         type="text" 
-                        value={sourceGuest.folioNo} 
-                        readOnly 
+                        value={customSourceFolioNo !== '' ? customSourceFolioNo : sourceGuest.folioNo} 
+                        onChange={(e) => setCustomSourceFolioNo(e.target.value)}
                         className="ids-input"
-                        style={{ width: '50px', padding: '1px 4px' }}
+                        style={{ width: '50px', padding: '1px 4px', background: '#FFF' }}
                       />
                       <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
-                        value={sourceGuest.regNo} 
-                        readOnly 
+                        value={customSourceRegNo !== '' ? customSourceRegNo : sourceGuest.regNo} 
+                        onChange={(e) => setCustomSourceRegNo(e.target.value)}
                         className="ids-input"
-                        style={{ width: '70px', padding: '1px 4px' }}
+                        style={{ width: '70px', padding: '1px 4px', background: '#FFF' }}
                       />
                     </div>
                   </div>
@@ -427,10 +441,10 @@ export default function IdsTransferFolioModal({
                     <div>
                       <input 
                         type="text" 
-                        value={targetGuest.guestName} 
-                        readOnly 
+                        value={customTargetGuestName !== '' ? customTargetGuestName : targetGuest.guestName} 
+                        onChange={(e) => setCustomTargetGuestName(e.target.value)}
                         className="ids-input"
-                        style={{ width: '100%', padding: '1px 4px' }}
+                        style={{ width: '100%', padding: '1px 4px', background: '#FFF' }}
                       />
                     </div>
 
@@ -438,18 +452,18 @@ export default function IdsTransferFolioModal({
                     <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
                       <input 
                         type="text" 
-                        value={targetGuest.folioNo} 
-                        readOnly 
+                        value={customTargetFolioNo !== '' ? customTargetFolioNo : targetGuest.folioNo} 
+                        onChange={(e) => setCustomTargetFolioNo(e.target.value)}
                         className="ids-input"
-                        style={{ width: '50px', padding: '1px 4px' }}
+                        style={{ width: '50px', padding: '1px 4px', background: '#FFF' }}
                       />
                       <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
-                        value={targetGuest.regNo} 
-                        readOnly 
+                        value={customTargetRegNo !== '' ? customTargetRegNo : targetGuest.regNo} 
+                        onChange={(e) => setCustomTargetRegNo(e.target.value)}
                         className="ids-input"
-                        style={{ width: '70px', padding: '1px 4px' }}
+                        style={{ width: '70px', padding: '1px 4px', background: '#FFF' }}
                       />
                     </div>
                   </div>
@@ -500,8 +514,8 @@ export default function IdsTransferFolioModal({
                   <span style={{ fontWeight: 600 }}>Transactions Amount</span>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={taggedTotal.toFixed(2)} 
+                    value={customTaggedTotal !== '' ? customTaggedTotal : taggedTotal.toFixed(2)} 
+                    onChange={(e) => setCustomTaggedTotal(e.target.value)}
                     style={{ 
                       width: '110px', 
                       textAlign: 'right', 

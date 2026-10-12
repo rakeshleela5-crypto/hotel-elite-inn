@@ -12,6 +12,7 @@ export function IdsScanBookingModal({
   const [filterMode, setFilterMode] = useState('Arrival Date');
   const [arrivalDate, setArrivalDate] = useState('14/01/2026');
   const [searchQuery, setSearchQuery] = useState('');
+  const [secondarySearchQuery, setSecondarySearchQuery] = useState('');
 
   // Sample or live reservation records matching video Frame 014
   const activeBookings = useMemo(() => {
@@ -95,7 +96,7 @@ export function IdsScanBookingModal({
               <select className="ids-select" style={{ width: '90px' }} defaultValue="None">
                 <option value="None">None</option>
               </select>
-              <input className="ids-input" style={{ width: '110px' }} defaultValue=""  onChange={() => {}}/>
+              <input className="ids-input" style={{ width: '110px' }} value={secondarySearchQuery} onChange={(e) => setSecondarySearchQuery(e.target.value)} />
               <select className="ids-select" style={{ width: '90px' }} defaultValue="None">
                 <option value="None">None</option>
               </select>
@@ -201,6 +202,11 @@ export function IdsAssignGuestRoomsModal({
   const [selectedFloor, setSelectedFloor] = useState('All');
   const [assignedRoom, setAssignedRoom] = useState(booking.roomNo || '');
   const [selectedCell, setSelectedCell] = useState('301');
+  const [groupName, setGroupName] = useState('');
+  const [customResNo, setCustomResNo] = useState('');
+  const [customType, setCustomType] = useState('');
+  const [customArrivalDate, setCustomArrivalDate] = useState('');
+  const [customDepartureDate, setCustomDepartureDate] = useState('');
 
   // Rooms Inventory list organized by Floor for Hotel Elite Inn (Floors 1, 2 & 3)
   const roomInventory = [
@@ -264,7 +270,12 @@ export function IdsAssignGuestRoomsModal({
           <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 80px 110px 60px 140px 65px 140px 50px 1fr', gap: '4px', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Res. No.</span>
             <div style={{ display: 'flex', gap: '2px' }}>
-              <input className="ids-input" style={{ width: '55px', fontWeight: 700 }} value={booking.resNo || '270'} readOnly />
+              <input 
+                className="ids-input" 
+                style={{ width: '55px', fontWeight: 700, background: '#FFF' }} 
+                value={customResNo !== '' ? customResNo : (booking.resNo || '270')} 
+                onChange={(e) => setCustomResNo(e.target.value)}
+              />
               <button 
                 className="ids-btn-classic" 
                 style={{ minWidth: '18px', padding: '1px 4px' }}
@@ -276,16 +287,31 @@ export function IdsAssignGuestRoomsModal({
             </div>
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Room Type</span>
-            <input className="ids-input" value={booking.type || 'EXECUTIVE'} readOnly style={{ fontWeight: 700 }} />
+            <input 
+              className="ids-input" 
+              value={customType !== '' ? customType : (booking.type || 'EXECUTIVE')} 
+              onChange={(e) => setCustomType(e.target.value)}
+              style={{ fontWeight: 700, background: '#FFF' }} 
+            />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Arrival</span>
-            <input className="ids-input" value={booking.arrivalDate || '14-JAN-2026 20:07'} readOnly />
+            <input 
+              className="ids-input" 
+              value={customArrivalDate !== '' ? customArrivalDate : (booking.arrivalDate || '14-JAN-2026 20:07')} 
+              onChange={(e) => setCustomArrivalDate(e.target.value)}
+              style={{ background: '#FFF' }}
+            />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Departure</span>
-            <input className="ids-input" value={booking.departureDate || '17-JAN-2026 12:00'} readOnly />
+            <input 
+              className="ids-input" 
+              value={customDepartureDate !== '' ? customDepartureDate : (booking.departureDate || '17-JAN-2026 12:00')} 
+              onChange={(e) => setCustomDepartureDate(e.target.value)}
+              style={{ background: '#FFF' }}
+            />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Group</span>
-            <input className="ids-input" defaultValue="" onChange={() => {}} />
+            <input className="ids-input" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
           </div>
 
           {/* Filter & Action Buttons Bar */}

@@ -352,12 +352,12 @@ export default function IdsLaundryItemMasterModal({
               <input 
                 type="text" 
                 value={formData.user}
-                disabled
+                onChange={(e) => setFormData({ ...formData, user: e.target.value })}
                 style={{ 
                   width: '140px', 
                   padding: '2px 4px', 
                   border: '1px solid #7F9DB9',
-                  background: '#EBE9ED',
+                  background: '#FFF',
                   color: '#444'
                 }} 
               />
@@ -369,12 +369,12 @@ export default function IdsLaundryItemMasterModal({
               <input 
                 type="text" 
                 value={formData.lastUpdated}
-                disabled
+                onChange={(e) => setFormData({ ...formData, lastUpdated: e.target.value })}
                 style={{ 
                   width: '180px', 
                   padding: '2px 4px', 
                   border: '1px solid #7F9DB9',
-                  background: '#EBE9ED',
+                  background: '#FFF',
                   color: '#444'
                 }} 
               />

@@ -176,6 +176,10 @@ export default function IdsOrderEntryModal({
   const [resOutlet, setResOutlet] = useState('RES');
   const [selectedSession, setSelectedSession] = useState('General');
   const [isMaximized, setIsMaximized] = useState(false);
+  const [activeAccountingDate, setActiveAccountingDate] = useState(accountingDate);
+  useEffect(() => { setActiveAccountingDate(accountingDate); }, [accountingDate]);
+  const [tableDetailsTableNo, setTableDetailsTableNo] = useState('');
+  const [tableDetailsServer, setTableDetailsServer] = useState('');
 
   // Order Header state (Video 01 Frame 015 & 025)
   const [currency, setCurrency] = useState('INR');
@@ -1504,9 +1508,9 @@ export default function IdsOrderEntryModal({
               <label style={{ fontWeight: 600 }}>Accounting Date</label>
               <input 
                 type="text" 
-                readOnly 
-                value={accountingDate} 
-                style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                value={activeAccountingDate} 
+                onChange={e => setActiveAccountingDate(e.target.value)}
+                style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
               />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
@@ -3611,15 +3615,15 @@ export default function IdsOrderEntryModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Source Restaurant</span>
-                    <input type="text" readOnly value={transferSourceOutlet} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                    <input type="text" value={transferSourceOutlet} onChange={e => setTransferSourceOutlet(e.target.value)} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Session</span>
-                    <input type="text" readOnly value={transferSession} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                    <input type="text" value={transferSession} onChange={e => setTransferSession(e.target.value)} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Date</span>
-                    <input type="text" readOnly value={accountingDate} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                    <input type="text" value={activeAccountingDate} onChange={e => setActiveAccountingDate(e.target.value)} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
                   </div>
                 </div>
 
@@ -3627,15 +3631,15 @@ export default function IdsOrderEntryModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Target Restaurant</span>
-                    <input type="text" readOnly value={transferTargetOutlet} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                    <input type="text" value={transferTargetOutlet} onChange={e => setTransferTargetOutlet(e.target.value)} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Session</span>
-                    <input type="text" readOnly value={transferSession} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                    <input type="text" value={transferSession} onChange={e => setTransferSession(e.target.value)} style={{ width: '65px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontWeight: 600 }}>Date</span>
-                    <input type="text" readOnly value={accountingDate} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                    <input type="text" value={activeAccountingDate} onChange={e => setActiveAccountingDate(e.target.value)} style={{ width: '90px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
                   </div>
                 </div>
               </div>
@@ -3964,12 +3968,12 @@ export default function IdsOrderEntryModal({
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', background: '#DDD', padding: '6px', border: '1px solid #BBB' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 600 }}>Table No.</span>
-                    <input type="text" readOnly value={selectedTableForDetails} style={{ width: '45px', fontWeight: 700, textAlign: 'center', background: '#FFF', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={tableDetailsTableNo || selectedTableForDetails} onChange={e => setTableDetailsTableNo(e.target.value)} style={{ width: '45px', fontWeight: 700, textAlign: 'center', background: '#FFF', border: '1px solid #7F9DB9' }} />
                     <span style={{ fontWeight: 700 }}>?</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ fontWeight: 600 }}>Steward Name</span>
-                    <input type="text" readOnly value={activeTableKot?.server || (currentTableItems.length > 0 ? (selectedTableForDetails === '14' ? 'Biren' : server) : '(Vacant)')} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
+                    <input type="text" value={tableDetailsServer || (activeTableKot?.server || (currentTableItems.length > 0 ? (selectedTableForDetails === '14' ? 'Biren' : server) : '(Vacant)'))} onChange={e => setTableDetailsServer(e.target.value)} style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px' }} />
                   </div>
                 </div>
 
@@ -4050,11 +4054,11 @@ export default function IdsOrderEntryModal({
               <div style={{ background: '#F5F4EE', border: '1px solid #CCC', padding: '8px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                  <input type="text" readOnly value={accountingDate} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
+                  <input type="text" value={activeAccountingDate} onChange={e => setActiveAccountingDate(e.target.value)} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px' }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 600 }}>Source Session</span>
-                  <input type="text" readOnly value={sessionSourceSession} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
+                  <input type="text" value={sessionSourceSession} onChange={e => setSessionSourceSession(e.target.value)} style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '1px 4px', fontSize: '11px', fontWeight: 700 }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontWeight: 600 }}>Date</span>
@@ -4251,12 +4255,12 @@ export default function IdsOrderEntryModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                <input type="text" readOnly value={accountingDate} style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
+                <input type="text" value={activeAccountingDate} onChange={e => setActiveAccountingDate(e.target.value)} style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontWeight: 600 }}>Session</span>
-                <input type="text" readOnly value={selectedSession} style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
+                <input type="text" value={selectedSession} onChange={e => setSelectedSession(e.target.value)} style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }} />
               </div>
 
               {/* Subtitle description matching Video 13 Frame 070 */}

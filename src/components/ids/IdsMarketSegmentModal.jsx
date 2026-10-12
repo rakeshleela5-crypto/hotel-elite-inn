@@ -333,16 +333,16 @@ export default function IdsMarketSegmentModal({
               <input 
                 className="ids-input" 
                 value={formData.user || 'MANAGER'} 
-                readOnly 
-                style={{ width: '180px', height: '28px', background: '#F0F0F0' }} 
+                onChange={(e) => handleChange('user', e.target.value)} 
+                style={{ width: '180px', height: '28px', background: '#FFF' }} 
               />
 
               <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>Last Updated</span>
               <input 
                 className="ids-input" 
                 value={formData.lastUpdated || `${accountingDate} 18:01`} 
-                readOnly 
-                style={{ width: '220px', height: '28px', background: '#F0F0F0' }} 
+                onChange={(e) => handleChange('lastUpdated', e.target.value)} 
+                style={{ width: '220px', height: '28px', background: '#FFF' }} 
               />
 
             </div>

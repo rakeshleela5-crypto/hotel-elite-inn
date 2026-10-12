@@ -464,11 +464,11 @@ export default function IdsTouchScreenGroupsModal({
               <span style={{ fontWeight: 600, color: '#000' }}>User</span>
               <input 
                 type="text" 
-                readOnly 
                 value={user} 
+                onChange={(e) => setUser(e.target.value)}
                 style={{ 
                   width: '120px', 
-                  background: '#E0DFE3', 
+                  background: '#FFF', 
                   border: '1px solid #7F9DB9', 
                   padding: '2px 4px', 
                   fontSize: '11px', 
@@ -482,11 +482,11 @@ export default function IdsTouchScreenGroupsModal({
               <span style={{ fontWeight: 600, color: '#000' }}>Last Updated</span>
               <input 
                 type="text" 
-                readOnly 
                 value={lastUpdated} 
+                onChange={(e) => setLastUpdated(e.target.value)}
                 style={{ 
                   width: '140px', 
-                  background: '#E0DFE3', 
+                  background: '#FFF', 
                   border: '1px solid #7F9DB9', 
                   padding: '2px 4px', 
                   fontSize: '11px', 

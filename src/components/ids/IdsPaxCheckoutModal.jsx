@@ -430,8 +430,8 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={formArrival} 
-                readOnly
-                style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
+                onChange={e => setFormArrival(e.target.value)}
+                style={{ width: '140px', background: '#FFF', fontSize: '10px' }}
               />
 
               {/* Row 2: Reg. No. and Departure */}
@@ -439,16 +439,16 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={formRegNo} 
-                readOnly
-                style={{ width: '110px', background: '#EBEBE4' }}
+                onChange={e => setFormRegNo(e.target.value)}
+                style={{ width: '110px', background: '#FFF' }}
               />
               <div />
               <div style={{ textAlign: 'right', paddingRight: '6px', fontWeight: 600 }}>Departure</div>
               <input 
                 className="ids-input" 
                 value={formDeparture} 
-                readOnly
-                style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
+                onChange={e => setFormDeparture(e.target.value)}
+                style={{ width: '140px', background: '#FFF', fontSize: '10px' }}
               />
 
               {/* Row 3: Folio No. */}
@@ -456,8 +456,8 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={formFolioNo} 
-                readOnly
-                style={{ width: '110px', background: '#EBEBE4' }}
+                onChange={e => setFormFolioNo(e.target.value)}
+                style={{ width: '110px', background: '#FFF' }}
               />
               <div colSpan={3} />
 
@@ -467,8 +467,8 @@ export default function IdsPaxCheckoutModal({
                 <input 
                   className="ids-input" 
                   value={formGuestName} 
-                  readOnly
-                  style={{ width: '100%', background: '#EBEBE4', fontWeight: 700, color: '#0A246A' }}
+                  onChange={e => setFormGuestName(e.target.value)}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 700, color: '#0A246A' }}
                 />
               </div>
             </div>
@@ -492,16 +492,16 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={mainRoomNo} 
-                readOnly
-                style={{ width: '110px', background: '#EBEBE4', fontWeight: 700 }}
+                onChange={e => setMainRoomNo(e.target.value)}
+                style={{ width: '110px', background: '#FFF', fontWeight: 700 }}
               />
               <div />
               <div style={{ textAlign: 'right', paddingRight: '6px', fontWeight: 600 }}>Arrival</div>
               <input 
                 className="ids-input" 
                 value={mainArrival} 
-                readOnly
-                style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
+                onChange={e => setMainArrival(e.target.value)}
+                style={{ width: '140px', background: '#FFF', fontSize: '10px' }}
               />
 
               {/* Row 2: Reg. No. and Departure */}
@@ -509,16 +509,16 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={mainRegNo} 
-                readOnly
-                style={{ width: '110px', background: '#EBEBE4' }}
+                onChange={e => setMainRegNo(e.target.value)}
+                style={{ width: '110px', background: '#FFF' }}
               />
               <div />
               <div style={{ textAlign: 'right', paddingRight: '6px', fontWeight: 600 }}>Departure</div>
               <input 
                 className="ids-input" 
                 value={mainDeparture} 
-                readOnly
-                style={{ width: '140px', background: '#EBEBE4', fontSize: '10px' }}
+                onChange={e => setMainDeparture(e.target.value)}
+                style={{ width: '140px', background: '#FFF', fontSize: '10px' }}
               />
 
               {/* Row 3: Folio No. */}
@@ -526,8 +526,8 @@ export default function IdsPaxCheckoutModal({
               <input 
                 className="ids-input" 
                 value={mainFolioNo} 
-                readOnly
-                style={{ width: '110px', background: '#EBEBE4' }}
+                onChange={e => setMainFolioNo(e.target.value)}
+                style={{ width: '110px', background: '#FFF' }}
               />
               <div colSpan={3} />
 
@@ -537,8 +537,8 @@ export default function IdsPaxCheckoutModal({
                 <input 
                   className="ids-input" 
                   value={mainGuestName} 
-                  readOnly
-                  style={{ width: '100%', background: '#EBEBE4', fontWeight: 700, color: '#333' }}
+                  onChange={e => setMainGuestName(e.target.value)}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 700, color: '#333' }}
                 />
               </div>
             </div>

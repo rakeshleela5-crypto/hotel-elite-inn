@@ -177,6 +177,19 @@ export default function IdsRegularGuestWalkInModal({
   const [statusMessage, setStatusMessage] = useState('');
   const [assignedRegNo, setAssignedRegNo] = useState('626');
 
+  // Rate Details Modal State
+  const [ratePlan, setRatePlan] = useState('CP');
+  const [rateCurrency, setRateCurrency] = useState('INR');
+  const [rateRackId, setRateRackId] = useState('1');
+  const [rateReasonFor, setRateReasonFor] = useState('DISCOUNT');
+  const [rateReason, setRateReason] = useState('No Reason / Not applicable');
+  const [rateTax1, setRateTax1] = useState('798');
+  const [rateTax2, setRateTax2] = useState('804');
+
+  const updateField = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   if (!isOpen) return null;
 
   // Trigger F1 History Lookup
@@ -498,33 +511,34 @@ export default function IdsRegularGuestWalkInModal({
                     
                     <span style={{ fontWeight: 600 }}>Title / Name</span>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <input className="ids-input" value={formData.title} readOnly style={{ width: '40px', fontWeight: 700 }} />
-                      <input className="ids-input" value={`${formData.lastName} ${formData.middleName} ${formData.firstName}`.trim()} readOnly style={{ flex: 1, fontWeight: 700, background: '#FFF7CC' }} />
+                      <input className="ids-input" value={formData.title || ''} onChange={(e) => updateField('title', e.target.value)} style={{ width: '40px', fontWeight: 700 }} />
+                      <input className="ids-input" value={formData.firstName || ''} onChange={(e) => updateField('firstName', e.target.value)} placeholder="First" style={{ width: '90px', fontWeight: 700, background: '#FFF' }} />
+                      <input className="ids-input" value={formData.lastName || ''} onChange={(e) => updateField('lastName', e.target.value)} placeholder="Last Name" style={{ flex: 1, fontWeight: 700, background: '#FFF7CC' }} />
                     </div>
 
                     <span style={{ fontWeight: 600 }}>Address</span>
-                    <input className="ids-input" value={formData.address} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.address || ''} onChange={(e) => updateField('address', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>City</span>
-                    <input className="ids-input" value={formData.city} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.city || ''} onChange={(e) => updateField('city', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>State</span>
-                    <input className="ids-input" value={formData.state} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.state || ''} onChange={(e) => updateField('state', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>Country</span>
-                    <input className="ids-input" value={formData.country} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.country || ''} onChange={(e) => updateField('country', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>Zip</span>
-                    <input className="ids-input" value={formData.zip} readOnly style={{ width: '100px', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.zip || ''} onChange={(e) => updateField('zip', e.target.value)} style={{ width: '100px', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>Mobile No.</span>
-                    <input className="ids-input" value={formData.mobile} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.mobile || ''} onChange={(e) => updateField('mobile', e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>Email ID</span>
-                    <input className="ids-input" value={formData.email} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.email || ''} onChange={(e) => updateField('email', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                     <span style={{ fontWeight: 600 }}>GST No</span>
-                    <input className="ids-input" value={formData.gstNo || '12AABCL7890Q1ZX'} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+                    <input className="ids-input" value={formData.gstNo || ''} onChange={(e) => updateField('gstNo', e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF' }} />
 
                   </div>
                 </div>
@@ -534,38 +548,44 @@ export default function IdsRegularGuestWalkInModal({
                   <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '6px 8px', alignItems: 'center' }}>
                     
                     <span style={{ fontWeight: 600 }}>Classification</span>
-                    <input className="ids-input" value={formData.classification || 'Regular'} readOnly style={{ width: '100%', fontWeight: 600 }} />
+                    <input className="ids-input" value={formData.classification || 'Regular'} onChange={(e) => updateField('classification', e.target.value)} style={{ width: '100%', fontWeight: 600 }} />
 
                     <span style={{ fontWeight: 600 }}>Guest Status</span>
-                    <input className="ids-input" value={formData.guestStatus || 'REG'} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                    <input className="ids-input" value={formData.guestStatus || 'REG'} onChange={(e) => updateField('guestStatus', e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                     <span style={{ fontWeight: 600 }}>Nationality</span>
-                    <input className="ids-input" value={formData.nationality || 'IND'} readOnly style={{ width: '80px' }} />
+                    <input className="ids-input" value={formData.nationality || 'IND'} onChange={(e) => updateField('nationality', e.target.value)} style={{ width: '80px' }} />
 
                     <span style={{ fontWeight: 600 }}>Company</span>
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <input className="ids-input" value={formData.companyCode || 'TRA0001'} readOnly style={{ width: '80px', fontWeight: 700 }} />
-                      <input className="ids-input" value={formData.companyName || 'LSR Logistics'} readOnly style={{ flex: 1, background: '#F0F0F0' }} />
+                      <input className="ids-input" value={formData.companyCode || 'TRA0001'} onChange={(e) => updateField('companyCode', e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
+                      <input className="ids-input" value={formData.companyName || ''} onChange={(e) => updateField('companyName', e.target.value)} style={{ flex: 1, background: '#FFF' }} />
                     </div>
 
                     <span style={{ fontWeight: 600 }}>Business Source</span>
-                    <input className="ids-input" value={formData.businessSource || 'WKN'} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                    <input className="ids-input" value={formData.businessSource || 'WKN'} onChange={(e) => updateField('businessSource', e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                     <span style={{ fontWeight: 600 }}>Market Segment</span>
-                    <input className="ids-input" value={formData.marketSegment || 'FIT'} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                    <input className="ids-input" value={formData.marketSegment || 'FIT'} onChange={(e) => updateField('marketSegment', e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                     <span style={{ fontWeight: 600 }}>Plan / Rate</span>
                     <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                      <input className="ids-input" value={formData.planCode || 'CP'} readOnly style={{ width: '40px', fontWeight: 700 }} />
-                      <input className="ids-input" value={`₹${formData.discountAmount || 2800}.00 (Discount)`} readOnly style={{ width: '140px', fontWeight: 900, color: '#0A246A', background: '#FFF7CC' }} />
+                      <input className="ids-input" value={formData.planCode || 'CP'} onChange={(e) => updateField('planCode', e.target.value)} style={{ width: '40px', fontWeight: 700 }} />
+                      <input 
+                        className="ids-input" 
+                        type="number"
+                        value={formData.discountAmount !== undefined ? formData.discountAmount : 2800} 
+                        onChange={(e) => updateField('discountAmount', parseFloat(e.target.value) || 0)}
+                        style={{ width: '100px', fontWeight: 900, color: '#0A246A', background: '#FFF7CC' }} 
+                      />
                       <button className="ids-btn-classic" onClick={handleOpenRateConfirm} style={{ fontWeight: 700 }}>Rate..</button>
                     </div>
 
                     <span style={{ fontWeight: 600 }}>Pay Mode</span>
-                    <input className="ids-input" value={formData.payMode || 'CAS'} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                    <input className="ids-input" value={formData.payMode || 'CAS'} onChange={(e) => updateField('payMode', e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                     <span style={{ fontWeight: 600 }}>Scanty Baggage</span>
-                    <select className="ids-input" value={formData.scantyBaggage || 'No'} readOnly style={{ width: '80px' }}>
+                    <select className="ids-input" value={formData.scantyBaggage || 'No'} onChange={(e) => updateField('scantyBaggage', e.target.value)} style={{ width: '80px' }}>
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
                     </select>
@@ -763,26 +783,29 @@ export default function IdsRegularGuestWalkInModal({
               <div style={{ padding: '12px 14px', fontSize: '11px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '8px 10px', alignItems: 'center', marginBottom: '10px' }}>
                   <span style={{ fontWeight: 600 }}>Plan</span>
-                  <input className="ids-input" value="CP" readOnly style={{ width: '60px', fontWeight: 700 }} />
+                  <input className="ids-input" value={ratePlan} onChange={(e) => setRatePlan(e.target.value)} style={{ width: '60px', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Currency</span>
-                  <input className="ids-input" value="INR" readOnly style={{ width: '60px' }} />
+                  <input className="ids-input" value={rateCurrency} onChange={(e) => setRateCurrency(e.target.value)} style={{ width: '60px' }} />
 
                   <span style={{ fontWeight: 600 }}>Rate / Rack ID</span>
-                  <input className="ids-input" value="1" readOnly style={{ width: '60px' }} />
+                  <input className="ids-input" value={rateRackId} onChange={(e) => setRateRackId(e.target.value)} style={{ width: '60px' }} />
 
                   <span style={{ fontWeight: 600 }}>Reason For</span>
-                  <input className="ids-input" value="DISCOUNT" readOnly style={{ width: '120px', fontWeight: 700 }} />
+                  <input className="ids-input" value={rateReasonFor} onChange={(e) => setRateReasonFor(e.target.value)} style={{ width: '120px', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Reason</span>
-                  <select className="ids-input" value="No Reason / Not applicable" readOnly style={{ width: '100%' }}>
+                  <select className="ids-input" value={rateReason} onChange={(e) => setRateReason(e.target.value)} style={{ width: '100%' }}>
                     <option value="No Reason / Not applicable">No Reason / Not applicable</option>
+                    <option value="Manager Special Approval">Manager Special Approval</option>
+                    <option value="Frequent Regular Stay">Frequent Regular Stay</option>
+                    <option value="Corporate MoA Discount">Corporate MoA Discount</option>
                   </select>
 
                   <span style={{ fontWeight: 600 }}>Tax Structure</span>
                   <div style={{ display: 'flex', gap: '6px' }}>
-                    <input className="ids-input" value="798" readOnly style={{ width: '60px' }} />
-                    <input className="ids-input" value="804" readOnly style={{ width: '60px' }} />
+                    <input className="ids-input" value={rateTax1} onChange={(e) => setRateTax1(e.target.value)} style={{ width: '60px' }} />
+                    <input className="ids-input" value={rateTax2} onChange={(e) => setRateTax2(e.target.value)} style={{ width: '60px' }} />
                   </div>
                 </div>
 

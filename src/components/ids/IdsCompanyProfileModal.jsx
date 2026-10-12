@@ -393,8 +393,8 @@ export default function IdsCompanyProfileModal({
               <span style={{ fontWeight: 600 }}>Holding Comp</span>
               <input 
                 className="ids-input" 
-                value="MakeMyTrip Limited (MMYT)" 
-                readOnly 
+                value={formData.holdingCompany !== undefined ? formData.holdingCompany : 'MakeMyTrip Limited (MMYT)'} 
+                onChange={(e) => handleChange('holdingCompany', e.target.value)} 
               />
 
               <span style={{ fontWeight: 600 }}>Watch List</span>

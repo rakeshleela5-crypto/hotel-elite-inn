@@ -4479,7 +4479,11 @@ export default function IdsDesktopShell({
                     <input 
                       type="checkbox" 
                       checked={item.done} 
-                      onChange={() => {}} 
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        setTodoList(prev => prev.map(t => t.id === item.id ? { ...t, done: !t.done } : t));
+                        playReceptionChime();
+                      }} 
                       style={{ cursor: 'pointer', transform: 'scale(1.2)' }} 
                     />
                     <div style={{ flex: 1, textDecoration: item.done ? 'line-through' : 'none', color: item.done ? '#888' : '#000' }}>

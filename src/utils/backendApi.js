@@ -2345,10 +2345,10 @@ export async function resolveFastApiDefect(defectId) {
  */
 export async function updateFastApiGstFilingStatus(filingId, newStatus) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status?new_status=${encodeURIComponent(newStatus)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ filing_status: newStatus })
+      body: JSON.stringify({ filing_status: newStatus, new_status: newStatus })
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
@@ -2361,4 +2361,119 @@ export async function updateFastApiGstFilingStatus(filingId, newStatus) {
   }
 }
 
+/**
+ * Check-in a reserved guest on Railway PostgreSQL (POST /api/bookings/{booking_id}/check-in)
+ */
+export async function checkInFastApiGuest(bookingId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-in`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`[FastAPI] Check-in guest #${bookingId} failed:`, err.message);
+    return null;
+  }
+}
 
+/**
+ * Create a new physical hotel room on PostgreSQL (POST /api/rooms)
+ */
+export async function createFastApiRoom(roomData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/rooms`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(roomData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create room failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Create or update vendor payable ledger record (POST /api/inventory/vendors)
+ */
+export async function createFastApiVendorPayable(vendorData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(vendorData)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create vendor record failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Staff authentication login (POST /api/auth/staff-login)
+ */
+export async function staffLoginFastApi(loginData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/auth/staff-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(loginData)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Staff login failed:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Verify staff JWT session token (GET /api/auth/verify-session)
+ */
+export async function verifyFastApiSession(token) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/auth/verify-session`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Session verification failed:', err.message);
+    return { valid: false, error: err.message };
+  }
+}
+
+/**
+ * Operations History V1 endpoint connector (GET /api/v1/operations/history)
+ */
+export async function getFastApiOperationsHistoryV1(rangeFilter = 'today', role = 'staff', startDate = null, endDate = null) {
+  try {
+    let url = `${FASTAPI_BASE_URL}/api/v1/operations/history?range_filter=${encodeURIComponent(rangeFilter)}&role=${encodeURIComponent(role)}`;
+    if (startDate) url += `&start_date=${encodeURIComponent(startDate)}`;
+    if (endDate) url += `&end_date=${encodeURIComponent(endDate)}`;
+
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Operations history V1 fetch failed:', err.message);
+    return null;
+  }
+}
+
+export const fetchFastApiOperationsHistoryV1 = getFastApiOperationsHistoryV1;

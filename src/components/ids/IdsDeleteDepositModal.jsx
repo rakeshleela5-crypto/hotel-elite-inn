@@ -88,6 +88,32 @@ export default function IdsDeleteDepositModal({
   const [reasonText, setReasonText] = useState('Guest Cancel');
   const [authorizedBy, setAuthorizedBy] = useState('Manager');
 
+  // Input states for full interactive editing
+  const [roomNoInput, setRoomNoInput] = useState(selectedItem?.roomNo || '202');
+  const [folioNoInput, setFolioNoInput] = useState('1');
+  const [resNoInput, setResNoInput] = useState('-');
+  const [guestNameInput, setGuestNameInput] = useState(selectedItem?.guestName || '');
+  const [companyCodeInput, setCompanyCodeInput] = useState(selectedItem?.company || '-');
+  const [companyNameInput, setCompanyNameInput] = useState(selectedItem?.company || '-');
+  const [currCodeInput, setCurrCodeInput] = useState('INR');
+  const [exgRateInput, setExgRateInput] = useState('0.00');
+  const [receivedAmtInput, setReceivedAmtInput] = useState(selectedItem?.depositAmount?.toFixed(2) || '3000.00');
+  const [receiptNoInput, setReceiptNoInput] = useState(selectedItem?.depositReceiptNo || '2');
+  const [particularsInput, setParticularsInput] = useState(selectedItem?.depositParticulars || 'Advance Deposit');
+  const [accountingDateInput, setAccountingDateInput] = useState(accountingDate || '26-FEB-2026');
+
+  useEffect(() => {
+    if (selectedItem) {
+      setRoomNoInput(selectedItem.roomNo || '');
+      setGuestNameInput(selectedItem.guestName || '');
+      setCompanyCodeInput(selectedItem.company || '-');
+      setCompanyNameInput(selectedItem.company || '-');
+      setReceivedAmtInput(depositMarkedForDelete ? '0.00' : (selectedItem.depositAmount?.toFixed(2) || '0.00'));
+      setReceiptNoInput(selectedItem.depositReceiptNo || '');
+      setParticularsInput(selectedItem.depositParticulars || '');
+    }
+  }, [selectedItem, depositMarkedForDelete]);
+
   if (!isOpen) return null;
 
   // Step 1: Click [ Delete ] in Post Receipts
@@ -236,24 +262,24 @@ export default function IdsDeleteDepositModal({
               
               <div style={{ display: 'grid', gridTemplateColumns: '100px 120px 80px 140px 1fr', gap: '6px 10px', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontWeight: 600 }}>Room No.</span>
-                <input className="ids-input" value={selectedItem.roomNo} readOnly style={{ width: '80px', fontWeight: 700, background: '#FFF7CC' }} />
+                <input className="ids-input" value={roomNoInput} onChange={(e) => setRoomNoInput(e.target.value)} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Folio No.</span>
-                <input className="ids-input" value="1" readOnly style={{ width: '60px' }} />
+                <input className="ids-input" value={folioNoInput} onChange={(e) => setFolioNoInput(e.target.value)} style={{ width: '60px' }} />
 
                 <div></div>
 
                 <span style={{ fontWeight: 600 }}>Reservation No.</span>
-                <input className="ids-input" value="-" readOnly style={{ width: '80px' }} />
+                <input className="ids-input" value={resNoInput} onChange={(e) => setResNoInput(e.target.value)} style={{ width: '80px' }} />
 
                 <span style={{ fontWeight: 600 }}>Guest Name</span>
-                <input className="ids-input" value={selectedItem.guestName} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+                <input className="ids-input" value={guestNameInput} onChange={(e) => setGuestNameInput(e.target.value)} style={{ width: '100%', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Company Code</span>
-                <input className="ids-input" value={selectedItem.company || '-'} readOnly style={{ width: '80px' }} />
+                <input className="ids-input" value={companyCodeInput} onChange={(e) => setCompanyCodeInput(e.target.value)} style={{ width: '80px' }} />
 
                 <span style={{ fontWeight: 600 }}>Company Name</span>
-                <input className="ids-input" value={selectedItem.company || '-'} readOnly style={{ width: '100%' }} />
+                <input className="ids-input" value={companyNameInput} onChange={(e) => setCompanyNameInput(e.target.value)} style={{ width: '100%' }} />
               </div>
 
               {/* Payment Mode Selector Tabs */}
@@ -266,27 +292,27 @@ export default function IdsDeleteDepositModal({
               {/* Currency & Received Amount matching Frame 052 */}
               <div style={{ display: 'grid', gridTemplateColumns: '100px 140px 100px 1fr', gap: '6px 10px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Currency Code</span>
-                <input className="ids-input" value="INR" readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input className="ids-input" value={currCodeInput} onChange={(e) => setCurrCodeInput(e.target.value)} style={{ width: '60px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Exchange Rate</span>
-                <input className="ids-input" value="0.00" readOnly style={{ width: '60px' }} />
+                <input className="ids-input" value={exgRateInput} onChange={(e) => setExgRateInput(e.target.value)} style={{ width: '60px' }} />
 
                 <span style={{ fontWeight: 600 }}>Received Amount</span>
                 <input 
                   className="ids-input" 
-                  value={depositMarkedForDelete ? '0.00' : selectedItem.depositAmount.toFixed(2)} 
-                  readOnly 
+                  value={receivedAmtInput} 
+                  onChange={(e) => setReceivedAmtInput(e.target.value)}
                   style={{ width: '120px', fontWeight: 900, color: depositMarkedForDelete ? '#999' : '#C5221F', background: '#FFF7CC', textDecoration: depositMarkedForDelete ? 'line-through' : 'none' }} 
                 />
 
                 <span style={{ fontWeight: 600 }}>Receipt No.</span>
-                <input className="ids-input" value={selectedItem.depositReceiptNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input className="ids-input" value={receiptNoInput} onChange={(e) => setReceiptNoInput(e.target.value)} style={{ width: '60px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Particulars</span>
-                <input className="ids-input" value={selectedItem.depositParticulars} readOnly style={{ width: '100%' }} />
+                <input className="ids-input" value={particularsInput} onChange={(e) => setParticularsInput(e.target.value)} style={{ width: '100%' }} />
 
                 <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                <input className="ids-input" value={accountingDate} readOnly style={{ width: '100px' }} />
+                <input className="ids-input" value={accountingDateInput} onChange={(e) => setAccountingDateInput(e.target.value)} style={{ width: '100px' }} />
               </div>
 
             </div>

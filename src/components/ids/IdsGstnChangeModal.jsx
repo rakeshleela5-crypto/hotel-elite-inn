@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { 
   Building2, Receipt, CheckCircle2, ShieldCheck, 
@@ -126,6 +126,25 @@ export default function IdsGstnChangeModal({
   // Audit trail fields
   const [reason, setReason] = useState('Guest requested corporate tax invoice post check-out for GST input credit');
   const [approvedBy, setApprovedBy] = useState('MANAGER');
+
+  // OLD Details editable state
+  const [oldGstn, setOldGstn] = useState('');
+  const [oldGuestName, setOldGuestName] = useState('');
+  const [oldAddress, setOldAddress] = useState('');
+  const [oldCity, setOldCity] = useState('');
+  const [oldState, setOldState] = useState('');
+  const [oldCountry, setOldCountry] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setOldGstn('');
+      setOldGuestName('');
+      setOldAddress('');
+      setOldCity('');
+      setOldState('');
+      setOldCountry('');
+    }
+  }, [isOpen, selectedBill]);
 
   // Sub-dialogs
   const [companyLookupOpen, setCompanyLookupOpen] = useState(false);
@@ -288,22 +307,52 @@ export default function IdsGstnChangeModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr', gap: '4px 6px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>GSTIN</span>
-                <input className="ids-input" value={selectedBill.oldGstn || '[ Not Provided ]'} readOnly style={{ width: '100%', color: '#999', fontStyle: 'italic' }} />
+                <input 
+                  className="ids-input" 
+                  value={oldGstn !== '' ? oldGstn : (selectedBill.oldGstn || '[ Not Provided ]')} 
+                  onChange={(e) => setOldGstn(e.target.value)}
+                  style={{ width: '100%', color: '#333', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Name</span>
-                <input className="ids-input" value={selectedBill.guestName} readOnly style={{ width: '100%', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={oldGuestName !== '' ? oldGuestName : selectedBill.guestName} 
+                  onChange={(e) => setOldGuestName(e.target.value)}
+                  style={{ width: '100%', fontWeight: 700, background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Address</span>
-                <input className="ids-input" value={selectedBill.oldAddress} readOnly style={{ width: '100%' }} />
+                <input 
+                  className="ids-input" 
+                  value={oldAddress !== '' ? oldAddress : selectedBill.oldAddress} 
+                  onChange={(e) => setOldAddress(e.target.value)}
+                  style={{ width: '100%', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>City</span>
-                <input className="ids-input" value={selectedBill.oldCity} readOnly style={{ width: '100%' }} />
+                <input 
+                  className="ids-input" 
+                  value={oldCity !== '' ? oldCity : selectedBill.oldCity} 
+                  onChange={(e) => setOldCity(e.target.value)}
+                  style={{ width: '100%', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>State</span>
-                <input className="ids-input" value={selectedBill.oldState} readOnly style={{ width: '100%' }} />
+                <input 
+                  className="ids-input" 
+                  value={oldState !== '' ? oldState : selectedBill.oldState} 
+                  onChange={(e) => setOldState(e.target.value)}
+                  style={{ width: '100%', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Country</span>
-                <input className="ids-input" value={selectedBill.oldCountry} readOnly style={{ width: '100%' }} />
+                <input 
+                  className="ids-input" 
+                  value={oldCountry !== '' ? oldCountry : selectedBill.oldCountry} 
+                  onChange={(e) => setOldCountry(e.target.value)}
+                  style={{ width: '100%', background: '#FFF' }} 
+                />
               </div>
             </div>
 

@@ -483,8 +483,8 @@ export default function IdsNightAuditModal({
                 <input 
                   className="ids-input" 
                   value={acDate} 
-                  readOnly 
-                  style={{ width: '130px', fontWeight: 700, background: '#EBEBE4' }} 
+                  onChange={(e) => setAcDate(e.target.value)} 
+                  style={{ width: '130px', fontWeight: 700, background: '#FFF' }} 
                 />
               </div>
             </div>
@@ -620,8 +620,8 @@ export default function IdsNightAuditModal({
               <input 
                 className="ids-input" 
                 value={acDate} 
-                readOnly 
-                style={{ width: '130px', fontWeight: 700, background: '#EBEBE4' }} 
+                onChange={(e) => setAcDate(e.target.value)} 
+                style={{ width: '130px', fontWeight: 700, background: '#FFF' }} 
               />
             </div>
 
@@ -872,24 +872,24 @@ export default function IdsNightAuditModal({
               <input 
                 className="ids-input" 
                 value={acDate} 
-                readOnly 
-                style={{ width: '130px', fontWeight: 700, background: '#EBEBE4' }} 
+                onChange={(e) => setAcDate(e.target.value)} 
+                style={{ width: '130px', fontWeight: 700, background: '#FFF' }} 
               />
 
               <label style={{ fontWeight: 600 }}>New Date</label>
               <input 
                 className="ids-input" 
                 value={nextDate} 
-                readOnly 
-                style={{ width: '130px', fontWeight: 700, background: '#EBEBE4', color: '#0A246A' }} 
+                onChange={(e) => setNextDate(e.target.value)} 
+                style={{ width: '130px', fontWeight: 700, background: '#FFF', color: '#0A246A' }} 
               />
 
               <label style={{ fontWeight: 600 }}>Confirm New Date</label>
               <input 
                 className="ids-input" 
                 value={confirmNextDate} 
-                readOnly 
-                style={{ width: '130px', fontWeight: 700, background: '#EBEBE4', color: '#0A246A' }} 
+                onChange={(e) => setConfirmNextDate(e.target.value)} 
+                style={{ width: '130px', fontWeight: 700, background: '#FFF', color: '#0A246A' }} 
               />
             </div>
 

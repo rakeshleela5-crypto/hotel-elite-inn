@@ -112,6 +112,13 @@ export default function IdsFolioReinstateModal({
   // Detail popup
   const [activeDetailFolio, setActiveDetailFolio] = useState(null);
 
+  // Housekeeping room clean check state
+  const [hkStaff, setHkStaff] = useState('Sunil Mohapatra');
+  const [hkAuthorizedBy, setHkAuthorizedBy] = useState('SUP');
+  const [hkRemarks, setHkRemarks] = useState('Cleared for folio reinstatement');
+  const [roomStatusValue, setRoomStatusValue] = useState('Clean');
+  const [customRoomNo, setCustomRoomNo] = useState('');
+
   // Synchronize on open
   useEffect(() => {
     if (isOpen) {
@@ -497,29 +504,40 @@ export default function IdsFolioReinstateModal({
               >
                 <div style={{ fontWeight: 600 }}>Room No.</div>
                 <div>
-                  <input type="text" readOnly value={selectedFolio.roomNo} style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700 }} />
+                  <input 
+                    type="text" 
+                    value={customRoomNo !== '' ? customRoomNo : selectedFolio.roomNo} 
+                    onChange={(e) => setCustomRoomNo(e.target.value)}
+                    style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700 }} 
+                  />
                 </div>
 
                 <div style={{ fontWeight: 600 }}>Room Status</div>
                 <div>
-                  <select style={{ width: '120px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700, color: '#006600' }}>
+                  <select 
+                    style={{ width: '120px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700, color: '#006600' }}
+                    value={roomStatusValue}
+                    onChange={(e) => setRoomStatusValue(e.target.value)}
+                  >
                     <option value="Clean">Clean</option>
+                    <option value="Inspected">Inspected</option>
+                    <option value="Occupied">Occupied</option>
                   </select>
                 </div>
 
                 <div style={{ fontWeight: 600 }}>House Keeping Staff</div>
                 <div>
-                  <input type="text" readOnly value="Sunil Mohapatra" style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
+                  <input type="text" value={hkStaff} onChange={(e) => setHkStaff(e.target.value)} style={{ width: '160px', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
                 </div>
 
                 <div style={{ fontWeight: 600 }}>Authorized by</div>
                 <div>
-                  <input type="text" readOnly value="SUP" style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700 }} />
+                  <input type="text" value={hkAuthorizedBy} onChange={(e) => setHkAuthorizedBy(e.target.value)} style={{ width: '80px', background: '#FFF', border: '1px inset #999', padding: '2px 4px', fontWeight: 700 }} />
                 </div>
 
                 <div style={{ fontWeight: 600 }}>Remarks</div>
                 <div style={{ gridColumn: 'span 3' }}>
-                  <input type="text" readOnly value="Cleared for folio reinstatement" style={{ width: '100%', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
+                  <input type="text" value={hkRemarks} onChange={(e) => setHkRemarks(e.target.value)} style={{ width: '100%', background: '#FFF', border: '1px inset #999', padding: '2px 4px' }} />
                 </div>
               </div>
 

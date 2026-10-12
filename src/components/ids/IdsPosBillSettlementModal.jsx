@@ -133,6 +133,17 @@ export default function IdsPosBillSettlementModal({
   const [discPercent, setDiscPercent] = useState('0');
   const [discReason, setDiscReason] = useState('Manager Discretion');
   const [isMaximized, setIsMaximized] = useState(false);
+
+  // Dynamic interactive fields
+  const [currencyCode, setCurrencyCode] = useState('INR');
+  const [manualNettAmount, setManualNettAmount] = useState('');
+  const [serverName, setServerName] = useState('');
+  const [tableRoomNo, setTableRoomNo] = useState('');
+  const [coversCount, setCoversCount] = useState('');
+  const [manualBalance, setManualBalance] = useState('');
+  const [customCardProviderName, setCustomCardProviderName] = useState('');
+  const [manualCashChange, setManualCashChange] = useState('');
+  const [guestAmount, setGuestAmount] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Active Bill Record
@@ -655,8 +666,8 @@ export default function IdsPosBillSettlementModal({
                 <input 
                   type="text" 
                   value={activeNation} 
-                  readOnly 
-                  style={{ width: '85px', background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                  onChange={e => setActiveNation(e.target.value)}
+                  style={{ width: '85px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
                 <span style={{ fontSize: '10px' }}>🇮🇳</span>
               </div>
@@ -669,15 +680,15 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ width: '85px', fontWeight: 600 }}>Nett Amount</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={currentNettAmount.toFixed(2)}
+                  value={manualNettAmount !== '' ? manualNettAmount : currentNettAmount.toFixed(2)}
+                  onChange={e => setManualNettAmount(e.target.value)}
                   style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700, textAlign: 'right' }}
                 />
                 <input 
                   type="text" 
-                  readOnly 
-                  value="INR" 
-                  style={{ width: '45px', background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
+                  value={currencyCode} 
+                  onChange={e => setCurrencyCode(e.target.value)}
+                  style={{ width: '45px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
                 />
               </div>
 
@@ -692,8 +703,8 @@ export default function IdsPosBillSettlementModal({
                 </button>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={discountAmount.toFixed(2)}
+                  value={discountAmount}
+                  onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)}
                   style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'right' }}
                 />
                 <div style={{ width: '45px', background: '#E0DFE3', border: '1px solid #7F9DB9', height: '19px' }}></div>
@@ -704,8 +715,8 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ width: '85px', fontWeight: 600 }}>Server</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={currentBill?.server || steward} 
+                  value={serverName || currentBill?.server || steward} 
+                  onChange={e => setServerName(e.target.value)}
                   style={{ width: '171px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
               </div>
@@ -715,15 +726,15 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ width: '85px', fontWeight: 600 }}>Table/Room No.</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={currentBill?.tableNo || '10'} 
+                  value={tableRoomNo || currentBill?.tableNo || '10'} 
+                  onChange={e => setTableRoomNo(e.target.value)}
                   style={{ width: '55px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
                 />
                 <label style={{ width: '45px', fontWeight: 600, textAlign: 'right' }}>Covers</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={currentBill?.covers || '2'} 
+                  value={coversCount || currentBill?.covers || '2'} 
+                  onChange={e => setCoversCount(e.target.value)}
                   style={{ width: '45px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
                 />
               </div>
@@ -840,8 +851,8 @@ export default function IdsPosBillSettlementModal({
           <label style={{ fontWeight: 700 }}>Balance</label>
           <input 
             type="text" 
-            readOnly 
-            value={currentBalance.toFixed(2)} 
+            value={manualBalance !== '' ? manualBalance : currentBalance.toFixed(2)} 
+            onChange={e => setManualBalance(e.target.value)}
             style={{ 
               width: '120px', 
               background: '#FFF', 
@@ -1218,9 +1229,9 @@ export default function IdsPosBillSettlementModal({
                   </select>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={CARD_PROVIDERS.find(c => c.code === cardProvider)?.name || 'State Bank Of India'}
-                    style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                    value={customCardProviderName || CARD_PROVIDERS.find(c => c.code === cardProvider)?.name || 'State Bank Of India'}
+                    onChange={e => setCustomCardProviderName(e.target.value)}
+                    style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                   />
                 </div>
 
@@ -1259,9 +1270,9 @@ export default function IdsPosBillSettlementModal({
                   <label style={{ fontWeight: 600 }}>Amount</label>
                   <input 
                     type="text" 
-                    readOnly 
-                    value="INR" 
-                    style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
+                    value={currencyCode} 
+                    onChange={e => setCurrencyCode(e.target.value)}
+                    style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
                   />
                   <input 
                     type="number" 
@@ -1276,9 +1287,9 @@ export default function IdsPosBillSettlementModal({
                   <label style={{ fontWeight: 600 }}>Tips</label>
                   <input 
                     type="text" 
-                    readOnly 
-                    value="INR" 
-                    style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
+                    value={currencyCode} 
+                    onChange={e => setCurrencyCode(e.target.value)}
+                    style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', textAlign: 'center' }}
                   />
                   <input 
                     type="number" 
@@ -1391,9 +1402,9 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ fontWeight: 600 }}>Balance</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={Math.max(0, (parseFloat(cashReceived) || 0) - (parseFloat(cashAmount) || 0)).toFixed(2)}
-                  style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                  value={manualCashChange !== '' ? manualCashChange : Math.max(0, (parseFloat(cashReceived) || 0) - (parseFloat(cashAmount) || 0)).toFixed(2)}
+                  onChange={e => setManualCashChange(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
                 />
               </div>
 
@@ -1495,9 +1506,9 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ fontWeight: 600 }}>Guest Name</label>
                 <input 
                   type="text" 
-                  readOnly 
                   value={guestName} 
-                  style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                  onChange={e => setGuestName(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
               </div>
 
@@ -1505,9 +1516,9 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ fontWeight: 600 }}>Folio No.</label>
                 <input 
                   type="text" 
-                  readOnly 
                   value={guestFolioNo} 
-                  style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
+                  onChange={e => setGuestFolioNo(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
                 />
               </div>
 
@@ -1515,9 +1526,9 @@ export default function IdsPosBillSettlementModal({
                 <label style={{ fontWeight: 600 }}>Amount</label>
                 <input 
                   type="text" 
-                  readOnly 
-                  value={`₹${currentBalance.toFixed(2)}`} 
-                  style={{ background: '#E0DFE3', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
+                  value={guestAmount !== '' ? guestAmount : currentBalance.toFixed(2)} 
+                  onChange={e => setGuestAmount(e.target.value)}
+                  style={{ background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px', fontWeight: 700 }}
                 />
               </div>
 

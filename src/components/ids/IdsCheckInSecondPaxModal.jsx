@@ -121,6 +121,11 @@ export default function IdsCheckInSecondPaxModal({
   const [middleName, setMiddleName] = useState(activeRoomData.defaultSecondPax.middleName || '');
   const [firstName, setFirstName] = useState(activeRoomData.defaultSecondPax.firstName || 'Sunita');
   const [regNo, setRegNo] = useState(activeRoomData.defaultSecondPax.regNo || '623');
+  const [guestStatusDisplay, setGuestStatusDisplay] = useState('REG');
+  const [nationalityDisplay, setNationalityDisplay] = useState('India');
+  const [companyDisplay, setCompanyDisplay] = useState(activeRoomData.primaryGuest.company || 'Tata Steel');
+  const [roomInfoId, setRoomInfoId] = useState('FOMN399');
+  const [roomInfoCode, setRoomInfoCode] = useState('W/968');
 
   // Timeline rack tab
   const [activeRackTab, setActiveRackTab] = useState('Occupied'); // 'Vacant' | 'Occupied' | 'Dirty' | 'All'
@@ -576,11 +581,11 @@ export default function IdsCheckInSecondPaxModal({
                       <legend style={{ padding: '0 4px', fontWeight: 600 }}>Room Info</legend>
                       <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: '4px', marginBottom: '4px' }}>
                         <span style={{ color: '#555' }}>Id</span>
-                        <input className="ids-input" readOnly value="FOMN399" style={{ width: '100%', background: '#F5F5F5' }} />
+                        <input className="ids-input" value={roomInfoId} onChange={(e) => setRoomInfoId(e.target.value)} style={{ width: '100%', background: '#FFF' }} />
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr', gap: '4px' }}>
                         <span style={{ color: '#555' }}>Code</span>
-                        <input className="ids-input" readOnly value="W/968" style={{ width: '100%', background: '#F5F5F5' }} />
+                        <input className="ids-input" value={roomInfoCode} onChange={(e) => setRoomInfoCode(e.target.value)} style={{ width: '100%', background: '#FFF' }} />
                       </div>
                     </fieldset>
 
@@ -743,7 +748,7 @@ export default function IdsCheckInSecondPaxModal({
               <div>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ fontWeight: 600, width: '110px' }}>Name/Room No.</span>
-                  <input className="ids-input" readOnly value={selectedRoomNo} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
+                  <input className="ids-input" value={selectedRoomNo} onChange={(e) => setSelectedRoomNo(e.target.value)} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
                   <button className="ids-btn-classic" style={{ width: '22px', height: '20px', padding: 0, fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Selected Room: ${selectedRoomNo}`); }}>?</button>
                 </div>
 
@@ -768,17 +773,17 @@ export default function IdsCheckInSecondPaxModal({
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ fontWeight: 600, width: '110px' }}>Guest Status</span>
-                  <input className="ids-input" readOnly value="REG" style={{ width: '80px', background: '#FFF' }} />
+                  <input className="ids-input" value={guestStatusDisplay} onChange={(e) => setGuestStatusDisplay(e.target.value)} style={{ width: '80px', background: '#FFF' }} />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span style={{ fontWeight: 600, width: '110px' }}>Nationality</span>
-                  <input className="ids-input" readOnly value="India" style={{ width: '120px', background: '#FFF' }} />
+                  <input className="ids-input" value={nationalityDisplay} onChange={(e) => setNationalityDisplay(e.target.value)} style={{ width: '120px', background: '#FFF' }} />
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600, width: '110px' }}>Company</span>
-                  <input className="ids-input" readOnly value={activeRoomData.primaryGuest.company} style={{ width: '160px', background: '#FFF' }} />
+                  <input className="ids-input" value={companyDisplay} onChange={(e) => setCompanyDisplay(e.target.value)} style={{ width: '160px', background: '#FFF' }} />
                 </div>
               </div>
 

@@ -515,16 +515,16 @@ export default function IdsRoomMasterModal({
               <input 
                 className="ids-input" 
                 value={formData.user || 'MANAGER'} 
-                readOnly
-                style={{ width: '100%', background: '#F0F0F0' }}
+                onChange={(e) => setFormData({ ...formData, user: e.target.value })}
+                style={{ width: '100%', background: '#FFF' }}
               />
 
               <span style={{ fontWeight: 600 }}>Last Updated</span>
               <input 
                 className="ids-input" 
                 value={formData.lastUpdated || `${accountingDate} 18:16`} 
-                readOnly
-                style={{ width: '100%', background: '#F0F0F0' }}
+                onChange={(e) => setFormData({ ...formData, lastUpdated: e.target.value })}
+                style={{ width: '100%', background: '#FFF' }}
               />
 
               <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>

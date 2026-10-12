@@ -402,8 +402,8 @@ export default function IdsLaundryReSettlementModal({
                     <input 
                       type="text" 
                       value={cardData.amount} 
-                      disabled
-                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} 
+                      onChange={(e) => setCardData({ ...cardData, amount: e.target.value })}
+                      style={{ flex: 1, padding: '2px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} 
                     />
                   </div>
 

@@ -329,9 +329,9 @@ export default function IdsLaundryBillPrintingModal({
                     <label style={{ width: '100px' }}>Gross Amount</label>
                     <input 
                       type="text" 
-                      value={discountForm.grossAmount.toFixed(2)} 
-                      disabled
-                      style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} 
+                      value={discountForm.grossAmount !== undefined ? (typeof discountForm.grossAmount === 'number' ? discountForm.grossAmount.toFixed(2) : discountForm.grossAmount) : '0.00'} 
+                      onChange={(e) => setDiscountForm({ ...discountForm, grossAmount: parseFloat(e.target.value) || 0 })}
+                      style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} 
                     />
                   </div>
 

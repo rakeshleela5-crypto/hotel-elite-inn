@@ -105,6 +105,13 @@ export default function IdsMultiRateModal({
   const [guestTitle, setGuestTitle] = useState('Mr');
   const [guestName, setGuestName] = useState('Rohit Sharma');
   const [mobileNo, setMobileNo] = useState('09820011223');
+  const [address, setAddress] = useState('Main Road, Muniguda');
+  const [cityState, setCityState] = useState('Rayagada, Odisha');
+  const [roomType, setRoomType] = useState('EXE');
+  const [rackId, setRackId] = useState('1');
+  const [rateType, setRateType] = useState('Discount');
+  const [classification, setClassification] = useState('Regular');
+  const [businessSource, setBusinessSource] = useState('WKN');
 
   // Rate Matrix Grid state
   const [dailyRates, setDailyRates] = useState(INITIAL_MULTI_RATE_DAYS);
@@ -289,13 +296,13 @@ export default function IdsMultiRateModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '80px 110px 80px 110px 70px 1fr', gap: '6px 8px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Room Type</span>
-                <input className="ids-input" value="EXE" readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input className="ids-input" value={roomType} onChange={(e) => setRoomType(e.target.value)} style={{ width: '60px', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Rack ID</span>
-                <input className="ids-input" value="1" readOnly style={{ width: '50px' }} />
+                <input className="ids-input" value={rackId} onChange={(e) => setRackId(e.target.value)} style={{ width: '50px' }} />
 
                 <span style={{ fontWeight: 600 }}>Rate Type</span>
-                <input className="ids-input" value="Discount" readOnly style={{ width: '80px', fontWeight: 700 }} />
+                <input className="ids-input" value={rateType} onChange={(e) => setRateType(e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Meal Plan</span>
                 <select className="ids-input" value={activePlan} onChange={(e) => setActivePlan(e.target.value)} style={{ width: '80px', fontWeight: 700 }}>
@@ -465,19 +472,19 @@ export default function IdsMultiRateModal({
                   <input className="ids-input" value={mobileNo} onChange={(e) => setMobileNo(e.target.value)} style={{ width: '100%', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Address</span>
-                  <input className="ids-input" value="Main Road, Muniguda" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                  <input className="ids-input" value={address} onChange={(e) => setAddress(e.target.value)} style={{ width: '100%' }} />
 
                   <span style={{ fontWeight: 600 }}>City / State</span>
-                  <input className="ids-input" value="Rayagada, Odisha" readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                  <input className="ids-input" value={cityState} onChange={(e) => setCityState(e.target.value)} style={{ width: '100%' }} />
                 </div>
 
                 {/* Right Column */}
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '6px 8px', alignItems: 'center' }}>
                   <span style={{ fontWeight: 600 }}>Classification</span>
-                  <input className="ids-input" value="Regular" readOnly style={{ width: '100%' }} />
+                  <input className="ids-input" value={classification} onChange={(e) => setClassification(e.target.value)} style={{ width: '100%' }} />
 
                   <span style={{ fontWeight: 600 }}>Business Source</span>
-                  <input className="ids-input" value="WKN" readOnly style={{ width: '80px', fontWeight: 700 }} />
+                  <input className="ids-input" value={businessSource} onChange={(e) => setBusinessSource(e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                   <span style={{ fontWeight: 600 }}>Tariff Breakdown</span>
                   <div style={{ fontSize: '10px', color: '#0A246A', fontWeight: 700 }}>

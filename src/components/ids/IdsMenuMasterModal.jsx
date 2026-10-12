@@ -1234,11 +1234,21 @@ export default function IdsMenuMasterModal({
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontWeight: 600 }}>User:</span>
-              <input type="text" readOnly value={user} style={{ width: '70px', background: '#E0DFE3', border: '1px solid #7F9DB9', fontSize: '10px', padding: '1px 3px' }} />
+              <input 
+                type="text" 
+                value={user} 
+                onChange={(e) => setUser(e.target.value)}
+                style={{ width: '70px', background: '#FFF', border: '1px solid #7F9DB9', fontSize: '10px', padding: '1px 3px' }} 
+              />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ fontWeight: 600 }}>Last Updated:</span>
-              <input type="text" readOnly value={lastUpdated} style={{ width: '120px', background: '#E0DFE3', border: '1px solid #7F9DB9', fontSize: '10px', padding: '1px 3px' }} />
+              <input 
+                type="text" 
+                value={lastUpdated} 
+                onChange={(e) => setLastUpdated(e.target.value)}
+                style={{ width: '120px', background: '#FFF', border: '1px solid #7F9DB9', fontSize: '10px', padding: '1px 3px' }} 
+              />
             </div>
           </div>
 

@@ -406,8 +406,8 @@ export default function IdsLinkRatesToCompanyModal({
                 <input 
                   className="ids-input" 
                   value={formData.companyName} 
-                  readOnly
-                  style={{ width: '100%', background: '#F0F0F0', fontWeight: 600 }} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, companyName: e.target.value }))}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 600 }} 
                 />
 
                 <span style={{ fontWeight: 600 }}>Tel No.</span>
@@ -455,8 +455,8 @@ export default function IdsLinkRatesToCompanyModal({
                 <input 
                   className="ids-input" 
                   value={formData.rateDescription} 
-                  readOnly
-                  style={{ width: '100%', background: '#F0F0F0', fontWeight: 600 }} 
+                  onChange={(e) => setFormData(prev => ({ ...prev, rateDescription: e.target.value }))}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 600 }} 
                 />
 
                 <span style={{ fontWeight: 600 }}>Amenities</span>

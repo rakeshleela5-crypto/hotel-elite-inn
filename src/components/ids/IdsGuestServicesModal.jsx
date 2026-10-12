@@ -351,17 +351,35 @@ export default function IdsGuestServicesModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Arrival</label>
-                    <input type="text" value={logFormData.arrival} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.arrival} 
+                      onChange={(e) => setLogFormData({ ...logFormData, arrival: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Departure</label>
-                    <input type="text" value={logFormData.departure} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.departure} 
+                      onChange={(e) => setLogFormData({ ...logFormData, departure: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '110px', fontWeight: 600, fontSize: '13px' }}>Guest Status</label>
-                    <input type="text" value={logFormData.guestStatus} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.guestStatus} 
+                      onChange={(e) => setLogFormData({ ...logFormData, guestStatus: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
                 </div>
               </div>
@@ -381,17 +399,35 @@ export default function IdsGuestServicesModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Received by</label>
-                    <input type="text" value={logFormData.receivedBy} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.receivedBy} 
+                      onChange={(e) => setLogFormData({ ...logFormData, receivedBy: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Date</label>
-                    <input type="text" value={logFormData.date} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.date} 
+                      onChange={(e) => setLogFormData({ ...logFormData, date: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '100px', fontWeight: 600, fontSize: '13px' }}>Time</label>
-                    <input type="text" value={logFormData.time} disabled className="ids-input" style={{ flex: 1, background: '#EBE9ED', fontSize: '13px', height: '28px' }} />
+                    <input 
+                      type="text" 
+                      value={logFormData.time} 
+                      onChange={(e) => setLogFormData({ ...logFormData, time: e.target.value })}
+                      className="ids-input" 
+                      style={{ flex: 1, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                    />
                   </div>
                 </div>
               </div>

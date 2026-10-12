@@ -41,6 +41,13 @@ export default function IdsPostDepositModal({
   const [cardAuthCode, setCardAuthCode] = useState('AUTH9812');
   const [chequeNo, setChequeNo] = useState('CHQ-89021');
   const [bankName, setBankName] = useState('State Bank of India');
+  const [depositDate, setDepositDate] = useState('17-JAN-2026');
+  const [depositUser, setDepositUser] = useState('MANAGER');
+  const [depositLastUpdated, setDepositLastUpdated] = useState('17-JAN-2026 19:13');
+
+  const updateGuestField = (field, val) => {
+    setSelectedGuest(prev => prev ? ({ ...prev, [field]: val }) : { [field]: val });
+  };
 
   // Prompts & Voucher preview state
   const [showPrintPrompt, setShowPrintPrompt] = useState(false);
@@ -196,8 +203,8 @@ export default function IdsPostDepositModal({
                 <input 
                   className="ids-input" 
                   value={selectedGuest?.resNo || '276'} 
-                  readOnly 
-                  style={{ width: '80px', background: '#EBEBE4' }} 
+                  onChange={(e) => updateGuestField('resNo', e.target.value)}
+                  style={{ width: '80px', background: '#FFF' }} 
                 />
                 <button 
                   type="button"
@@ -214,8 +221,8 @@ export default function IdsPostDepositModal({
                 <input 
                   className="ids-input" 
                   value={selectedGuest?.companyCode || 'COM0012'} 
-                  readOnly 
-                  style={{ width: '80px', background: '#EBEBE4' }} 
+                  onChange={(e) => updateGuestField('companyCode', e.target.value)}
+                  style={{ width: '80px', background: '#FFF' }} 
                 />
                 <button 
                   type="button"
@@ -234,9 +241,9 @@ export default function IdsPostDepositModal({
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <input 
                   className="ids-input" 
-                  value={selectedGuest?.folioNo?.split('/')[1]?.trim() || '1'} 
-                  readOnly 
-                  style={{ width: '60px', background: '#EBEBE4', fontWeight: 700 }} 
+                  value={selectedGuest?.folioNo || '1'} 
+                  onChange={(e) => updateGuestField('folioNo', e.target.value)}
+                  style={{ width: '60px', background: '#FFF', fontWeight: 700 }} 
                 />
                 <button 
                   type="button"
@@ -251,17 +258,17 @@ export default function IdsPostDepositModal({
               <span style={{ fontWeight: 600 }}>Guest Name</span>
               <input 
                 className="ids-input" 
-                value={selectedGuest ? (selectedGuest.guestName || `${selectedGuest.title} ${selectedGuest.lastName || ''} ${selectedGuest.firstName || ''}`) : ''} 
-                readOnly 
-                style={{ width: '100%', background: '#EBEBE4', fontWeight: 700, color: '#0A246A' }} 
+                value={selectedGuest ? (selectedGuest.guestName || `${selectedGuest.title || ''} ${selectedGuest.lastName || ''} ${selectedGuest.firstName || ''}`) : ''} 
+                onChange={(e) => updateGuestField('guestName', e.target.value)}
+                style={{ width: '100%', background: '#FFF', fontWeight: 700, color: '#0A246A' }} 
               />
 
               <span style={{ fontWeight: 600 }}>Company Name</span>
               <input 
                 className="ids-input" 
                 value={selectedGuest?.companyName || 'JK Paper Mills Ltd (Mr. Arobin De)'} 
-                readOnly 
-                style={{ width: '100%', background: '#EBEBE4' }} 
+                onChange={(e) => updateGuestField('companyName', e.target.value)}
+                style={{ width: '100%', background: '#FFF' }} 
               />
             </div>
           </div>
@@ -353,8 +360,8 @@ export default function IdsPostDepositModal({
             <input 
               className="ids-input" 
               value={receivedAmount} 
-              readOnly 
-              style={{ width: '85px', textAlign: 'right', background: '#EBEBE4', fontWeight: 700 }} 
+              onChange={(e) => setReceivedAmount(e.target.value)}
+              style={{ width: '85px', textAlign: 'right', background: '#FFF', fontWeight: 700 }} 
             />
           </div>
 
@@ -397,8 +404,8 @@ export default function IdsPostDepositModal({
                   <input 
                     className="ids-input" 
                     value={receiptNo} 
-                    readOnly 
-                    style={{ width: '90px', background: '#EBEBE4', fontWeight: 700 }} 
+                    onChange={(e) => setReceiptNo(e.target.value)}
+                    style={{ width: '90px', background: '#FFF', fontWeight: 700 }} 
                   />
                 </div>
               )}
@@ -518,13 +525,28 @@ export default function IdsPostDepositModal({
               {/* Accounting Metadata */}
               <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                <input className="ids-input" value="17-JAN-2026" readOnly style={{ background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={depositDate} 
+                  onChange={(e) => setDepositDate(e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>User</span>
-                <input className="ids-input" value="MANAGER" readOnly style={{ background: '#EBEBE4', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={depositUser} 
+                  onChange={(e) => setDepositUser(e.target.value)}
+                  style={{ background: '#FFF', fontWeight: 700 }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Last Updated</span>
-                <input className="ids-input" value="17-JAN-2026 19:13" readOnly style={{ background: '#EBEBE4', fontSize: '10px' }} />
+                <input 
+                  className="ids-input" 
+                  value={depositLastUpdated} 
+                  onChange={(e) => setDepositLastUpdated(e.target.value)}
+                  style={{ background: '#FFF', fontSize: '10px' }} 
+                />
               </div>
             </div>
           </div>

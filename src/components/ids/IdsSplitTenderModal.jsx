@@ -318,10 +318,13 @@ export default function IdsSplitTenderModal({
                 <label style={{ display: 'block', fontSize: '10px', color: '#555', marginBottom: '2px' }}>Change Return (₹):</label>
                 <input 
                   type="text" 
-                  readOnly 
                   className="ids-input" 
-                  style={{ width: '100%', background: '#F5F5F5', textAlign: 'right', fontWeight: 700, color: '#C62828' }}
+                  style={{ width: '100%', background: '#FFF', textAlign: 'right', fontWeight: 700, color: '#C62828' }}
                   value={`₹${tenders.cash.changeReturn.toFixed(2)}`} 
+                  onChange={e => {
+                    const cleanVal = e.target.value.replace(/[^0-9.]/g, '');
+                    handleUpdateCash('changeReturn', Number(cleanVal) || 0);
+                  }}
                 />
               </div>
               <div style={{ fontSize: '10px', color: '#666', paddingTop: '14px' }}>

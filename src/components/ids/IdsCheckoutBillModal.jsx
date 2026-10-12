@@ -153,6 +153,13 @@ export default function IdsCheckoutBillModal({
   // Settlements V6.5.008.30 State (Video 15 Frame 035 & Video 16 Frame 055)
   const [settlementBillNo, setSettlementBillNo] = useState(initialMode === 'bulk' ? '502' : '501');
   const [settlementLoaded, setSettlementLoaded] = useState(false);
+  const [settlementUser, setSettlementUser] = useState('MANAGER');
+  const [tipAmount, setTipAmount] = useState('0.00');
+  const [manualBalanceOverride, setManualBalanceOverride] = useState(null);
+
+  const updateBillField = (field, val) => {
+    setBillData(prev => ({ ...prev, [field]: val }));
+  };
   const [settlementOptions, setSettlementOptions] = useState({
     Cash: 0,
     CreditCard: 0,
@@ -236,7 +243,7 @@ export default function IdsCheckoutBillModal({
   // Calculate bill balances
   const totalSettled = Object.values(settlementOptions).reduce((a, b) => a + Number(b || 0), 0);
   const totalBillNet = billData.netAmount;
-  const currentBalance = Math.max(0, totalBillNet - totalSettled);
+  const currentBalance = manualBalanceOverride !== null ? manualBalanceOverride : Math.max(0, totalBillNet - totalSettled);
 
   // Select a room from console
   const handleSelectRoom = (roomNo) => {
@@ -296,6 +303,13 @@ export default function IdsCheckoutBillModal({
     } else {
       setStatusMessage('Already merged.');
     }
+  };
+
+  const toggleSplitItemChecked = (billKey, itemId) => {
+    setSplitItems(prev => ({
+      ...prev,
+      [billKey]: (prev[billKey] || []).map(i => i.id === itemId ? { ...i, checked: !i.checked } : i)
+    }));
   };
 
   const handleConfirmSplit = () => {
@@ -662,46 +676,106 @@ export default function IdsCheckoutBillModal({
               {/* Row 1 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 80px 50px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Room No.</span>
-                <input className="ids-input" readOnly value={billData.roomNo} style={{ background: '#F5F5F5', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.roomNo} 
+                  onChange={(e) => updateBillField('roomNo', e.target.value)}
+                  style={{ background: '#FFF', fontWeight: 700 }} 
+                />
                 <span style={{ color: '#000', textAlign: 'right' }}>Reg. No.</span>
-                <input className="ids-input" readOnly value={billData.regNo} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.regNo} 
+                  onChange={(e) => updateBillField('regNo', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
                 <span style={{ color: '#000', textAlign: 'right' }}>Guest</span>
-                <input className="ids-input" readOnly value={billData.guestName} style={{ background: '#F5F5F5', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.guestName} 
+                  onChange={(e) => updateBillField('guestName', e.target.value)}
+                  style={{ background: '#FFF', fontWeight: 700 }} 
+                />
               </div>
 
               {/* Row 2 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 80px 60px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Folio No.</span>
-                <input className="ids-input" readOnly value={billData.folioNo} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.folioNo} 
+                  onChange={(e) => updateBillField('folioNo', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
                 <span style={{ color: '#000', textAlign: 'right' }}>Company</span>
-                <input className="ids-input" readOnly value={`${billData.companyCode} / ${billData.companyName}`} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.companyName} 
+                  onChange={(e) => updateBillField('companyName', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
               </div>
 
               {/* Row 3 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 220px 24px 70px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Billing</span>
-                <input className="ids-input" readOnly value={billData.billing} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.billing} 
+                  onChange={(e) => updateBillField('billing', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
                 <button className="ids-btn-classic" style={{ padding: '0', height: '20px', width: '20px', fontWeight: 700 }} onClick={() => { playReceptionChime(); alert(`Billing Details: ${billData.billing}\nPay Mode: ${billData.payMode}`); }}>?</button>
                 <span style={{ color: '#000', textAlign: 'right' }}>Pay Mode</span>
-                <input className="ids-input" readOnly value={billData.payMode} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.payMode} 
+                  onChange={(e) => updateBillField('payMode', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
               </div>
 
               {/* Row 4 */}
               <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ color: '#000' }}>Special Ins.</span>
-                <input className="ids-input" readOnly value={billData.specialIns} style={{ background: '#F5F5F5' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.specialIns} 
+                  onChange={(e) => updateBillField('specialIns', e.target.value)}
+                  style={{ background: '#FFF' }} 
+                />
               </div>
 
               {/* Row 5: Arrival / Departure / Rate / Plan */}
               <div style={{ display: 'grid', gridTemplateColumns: '50px 120px 65px 120px 45px 85px 45px 75px', gap: '6px', alignItems: 'center' }}>
                 <span>Arrival</span>
-                <input className="ids-input" readOnly value={billData.arrival} style={{ background: '#F5F5F5', fontSize: '10px' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.arrival} 
+                  onChange={(e) => updateBillField('arrival', e.target.value)}
+                  style={{ background: '#FFF', fontSize: '10px' }} 
+                />
                 <span style={{ textAlign: 'right' }}>Departure</span>
-                <input className="ids-input" readOnly value={billData.departure} style={{ background: '#F5F5F5', fontSize: '10px' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.departure} 
+                  onChange={(e) => updateBillField('departure', e.target.value)}
+                  style={{ background: '#FFF', fontSize: '10px' }} 
+                />
                 <span style={{ textAlign: 'right' }}>Rate</span>
-                <input className="ids-input" readOnly value={billData.rate.toFixed(2)} style={{ background: '#F5F5F5', textAlign: 'right' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.rate} 
+                  onChange={(e) => updateBillField('rate', parseFloat(e.target.value) || 0)}
+                  style={{ background: '#FFF', textAlign: 'right' }} 
+                />
                 <span style={{ textAlign: 'right' }}>Plan</span>
-                <input className="ids-input" readOnly value={billData.plan.toFixed(2)} style={{ background: '#F5F5F5', textAlign: 'right' }} />
+                <input 
+                  className="ids-input" 
+                  value={billData.plan} 
+                  onChange={(e) => updateBillField('plan', parseFloat(e.target.value) || 0)}
+                  style={{ background: '#FFF', textAlign: 'right' }} 
+                />
               </div>
             </div>
 
@@ -856,8 +930,8 @@ export default function IdsCheckoutBillModal({
                 <span style={{ fontWeight: 700 }}>Grand Total</span>
                 <input 
                   className="ids-input" 
-                  readOnly 
-                  value={billData.netAmount.toFixed(2)} 
+                  value={billData.netAmount} 
+                  onChange={(e) => updateBillField('netAmount', parseFloat(e.target.value) || 0)}
                   style={{ width: '90px', textAlign: 'right', fontWeight: 700, background: '#FFF' }} 
                 />
               </div>
@@ -990,27 +1064,52 @@ export default function IdsCheckoutBillModal({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '70px' }}>Room No.</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.roomNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.roomNo || ''} 
+                    onChange={(e) => updateBillField('roomNo', e.target.value)}
+                    style={{ width: '130px', background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '70px' }}>Folio No.</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.folioNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.folioNo || ''} 
+                    onChange={(e) => updateBillField('folioNo', e.target.value)}
+                    style={{ width: '130px', background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '70px' }}>Reg. No.</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.regNo : ''} style={{ width: '130px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.regNo || ''} 
+                    onChange={(e) => updateBillField('regNo', e.target.value)}
+                    style={{ width: '130px', background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '70px' }}>Pay Mode</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.payMode : ''} style={{ width: '130px', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.payMode || ''} 
+                    onChange={(e) => updateBillField('payMode', e.target.value)}
+                    style={{ width: '130px', background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '70px' }}>Company...</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.companyName : ''} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.companyName || ''} 
+                    onChange={(e) => updateBillField('companyName', e.target.value)}
+                    style={{ flex: 1, background: '#FFF' }} 
+                  />
                 </div>
               </div>
 
@@ -1018,20 +1117,30 @@ export default function IdsCheckoutBillModal({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Guest Name</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.guestName : ''} style={{ flex: 1, background: '#F5F5F5', fontWeight: 700 }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.guestName || ''} 
+                    onChange={(e) => updateBillField('guestName', e.target.value)}
+                    style={{ flex: 1, background: '#FFF', fontWeight: 700 }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Net Amount</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? billData.netAmount.toFixed(2) : ''} style={{ width: '120px', background: '#F5F5F5', textAlign: 'right', fontWeight: 700 }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.netAmount || ''} 
+                    onChange={(e) => updateBillField('netAmount', parseFloat(e.target.value) || 0)}
+                    style={{ width: '120px', background: '#FFF', textAlign: 'right', fontWeight: 700 }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Balance</span>
                   <input 
                     className="ids-input" 
-                    readOnly 
-                    value={settlementLoaded ? currentBalance.toFixed(2) : ''} 
+                    value={typeof currentBalance === 'number' ? currentBalance.toFixed(2) : currentBalance} 
+                    onChange={(e) => setManualBalanceOverride(parseFloat(e.target.value) || 0)}
                     style={{ 
                       width: '120px', 
                       background: currentBalance === 0 ? '#E8F5E9' : '#FFF', 
@@ -1044,17 +1153,32 @@ export default function IdsCheckoutBillModal({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Tip Amount</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? '0.00' : ''} style={{ width: '120px', background: '#F5F5F5', textAlign: 'right' }} />
+                  <input 
+                    className="ids-input" 
+                    value={tipAmount} 
+                    onChange={(e) => setTipAmount(e.target.value)}
+                    style={{ width: '120px', background: '#FFF', textAlign: 'right' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '75px' }}>Group</span>
-                  <input className="ids-input" readOnly value={settlementLoaded ? (billData.groupName || 'Direct') : ''} style={{ flex: 1, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={billData.groupName || 'Direct'} 
+                    onChange={(e) => updateBillField('groupName', e.target.value)}
+                    style={{ flex: 1, background: '#FFF' }} 
+                  />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '75px' }}>User</span>
-                  <input className="ids-input" readOnly value="MANAGER" style={{ width: '100px', background: '#F5F5F5', fontWeight: 600 }} />
+                  <input 
+                    className="ids-input" 
+                    value={settlementUser} 
+                    onChange={(e) => setSettlementUser(e.target.value)}
+                    style={{ width: '100px', background: '#FFF', fontWeight: 600 }} 
+                  />
                 </div>
               </div>
             </div>
@@ -1346,7 +1470,12 @@ export default function IdsCheckoutBillModal({
                           <td>{item.refNo}</td>
                           <td>{item.desc}</td>
                           <td style={{ textAlign: 'center' }}>
-                            <input type="checkbox" checked={item.checked} onChange={() => {}} />
+                            <input 
+                              type="checkbox" 
+                              checked={item.checked} 
+                              onChange={() => toggleSplitItemChecked('bill1', item.id)} 
+                              style={{ cursor: 'pointer' }}
+                            />
                           </td>
                           <td style={{ textAlign: 'right' }}>{item.amount.toFixed(2)}</td>
                         </tr>

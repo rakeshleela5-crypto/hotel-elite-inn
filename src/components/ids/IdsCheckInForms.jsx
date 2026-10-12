@@ -174,6 +174,13 @@ export function IdsCheckInRateModal({
   const [extraChild, setExtraChild] = useState('0.00');
   const [tax1, setTax1] = useState('798');
   const [tax2, setTax2] = useState('804');
+  const [planCode, setPlanCode] = useState('CP');
+  const [currencyCode, setCurrencyCode] = useState('INR');
+  const [rackRateId1, setRackRateId1] = useState('1');
+  const [rackRateId2, setRackRateId2] = useState('1');
+  const [exbTax1, setExbTax1] = useState('804');
+  const [exbTax2, setExbTax2] = useState('804');
+  const [discountVal, setDiscountVal] = useState('0');
 
   if (!isOpen) return null;
 
@@ -188,24 +195,24 @@ export function IdsCheckInRateModal({
         <div style={{ padding: '12px 16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '100px 100px 1fr', gap: '6px', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Plan</span>
-            <input className="ids-input" value="CP" readOnly style={{ width: '70px', fontWeight: 700 }} />
+            <input className="ids-input" value={planCode} onChange={e => setPlanCode(e.target.value)} style={{ width: '70px', fontWeight: 700 }} />
             <div style={{ fontSize: '10px', color: '#444', fontStyle: 'italic', lineHeight: 1.2 }}>
               Charges entered here should be as per Total Number of Occupancy.
             </div>
 
             <span style={{ fontWeight: 600 }}>Cur</span>
-            <input className="ids-input" value="INR" readOnly style={{ width: '70px', fontWeight: 700 }} />
+            <input className="ids-input" value={currencyCode} onChange={e => setCurrencyCode(e.target.value)} style={{ width: '70px', fontWeight: 700 }} />
             <div></div>
 
             <span style={{ fontWeight: 600 }}>Rate / Rack ID</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" value="1" readOnly style={{ width: '35px', textAlign: 'center' }} />
-              <input className="ids-input" value="1" readOnly style={{ width: '35px', textAlign: 'center' }} />
+              <input className="ids-input" value={rackRateId1} onChange={e => setRackRateId1(e.target.value)} style={{ width: '35px', textAlign: 'center' }} />
+              <input className="ids-input" value={rackRateId2} onChange={e => setRackRateId2(e.target.value)} style={{ width: '35px', textAlign: 'center' }} />
             </div>
             <div></div>
 
             <span style={{ fontWeight: 600 }}>Discount</span>
-            <input className="ids-input" defaultValue="0" style={{ width: '70px', textAlign: 'center' }}  onChange={() => {}}/>
+            <input className="ids-input" value={discountVal} onChange={(e) => setDiscountVal(e.target.value)} style={{ width: '70px', textAlign: 'center' }} />
             <div></div>
           </div>
 
@@ -240,13 +247,13 @@ export function IdsCheckInRateModal({
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Tax Structure</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax1} readOnly /></td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax2} readOnly /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax1} onChange={e => setTax1(e.target.value)} /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax2} onChange={e => setTax2(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Exb. Tax Struct</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax2} readOnly /></td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tax2} readOnly /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={exbTax1} onChange={e => setExbTax1(e.target.value)} /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={exbTax2} onChange={e => setExbTax2(e.target.value)} /></td>
               </tr>
             </tbody>
           </table>
@@ -335,6 +342,8 @@ export function IdsCheckInRegistrationModal({
   const [rateType, setRateType] = useState('Discount');
   const [scantyBaggage, setScantyBaggage] = useState('No');
   const [regNo, setRegNo] = useState('581');
+  const [customPax, setCustomPax] = useState('');
+  const [customFolioNo, setCustomFolioNo] = useState('');
   const [rateModalOpen, setRateModalOpen] = useState(false);
   const [rateConfirmed, setRateConfirmed] = useState(true);
   const [statusMessage, setStatusMessage] = useState('Writing Guest Extras');
@@ -394,11 +403,11 @@ export function IdsCheckInRegistrationModal({
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontWeight: 600 }}>Pax</span>
-                  <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value={currentGuestIdx + 1} readOnly />
+                  <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value={customPax !== '' ? customPax : currentGuestIdx + 1} onChange={e => setCustomPax(e.target.value)} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontWeight: 600 }}>Folio No.</span>
-                  <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value="1" readOnly />
+                  <input className="ids-input" style={{ width: '35px', textAlign: 'center', fontWeight: 700 }} value={customFolioNo !== '' ? customFolioNo : '1'} onChange={e => setCustomFolioNo(e.target.value)} />
                 </div>
               </div>
             </div>
@@ -1635,9 +1644,9 @@ export function IdsRoomRackConsoleModal({
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <input 
                       className="ids-input" 
-                      value={clearDialogRoom} 
-                      readOnly 
-                      style={{ width: '70px', fontWeight: 700, background: '#EBEBE4' }} 
+                      value={clearDialogRoom || ''} 
+                      onChange={e => setClearDialogRoom(e.target.value)}
+                      style={{ width: '70px', fontWeight: 700, background: '#FFF' }} 
                     />
                     <span style={{ fontWeight: 600, marginLeft: '12px' }}>Room Status</span>
                     <select 

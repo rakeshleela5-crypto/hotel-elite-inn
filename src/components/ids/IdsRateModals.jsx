@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { HelpCircle, Check, X, FileText, Printer, CreditCard, DollarSign } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 
@@ -21,6 +21,18 @@ export function IdsRateInformationModal({
   const [taxStruct1, setTaxStruct1] = useState('798');
   const [taxStruct2, setTaxStruct2] = useState('804');
   const [printRate, setPrintRate] = useState('YES');
+  const [singleDisc, setSingleDisc] = useState('0.00');
+  const [doubleDisc, setDoubleDisc] = useState('0.00');
+  const [tripleTariff, setTripleTariff] = useState('3500.00');
+  const [tripleDisc, setTripleDisc] = useState('0.00');
+  const [quadTariff, setQuadTariff] = useState('4200.00');
+  const [quadDisc, setQuadDisc] = useState('0.00');
+  const [extraAdultDisc, setExtraAdultDisc] = useState('0.00');
+  const [extraChildTariff, setExtraChildTariff] = useState('500.00');
+  const [extraChildDisc, setExtraChildDisc] = useState('0.00');
+  const [rackIdSecondary, setRackIdSecondary] = useState('1');
+  const [taxStruct2A, setTaxStruct2A] = useState('804');
+  const [taxStruct2B, setTaxStruct2B] = useState('804');
 
   if (!isOpen) return null;
 
@@ -62,7 +74,7 @@ export function IdsRateInformationModal({
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <input className="ids-input" style={{ width: '60px' }} value={rackId} onChange={(e) => setRackId(e.target.value)} />
               <button className="ids-btn-classic" style={{ minWidth: '24px', padding: '2px 6px' }} onClick={() => { playReceptionChime(); const r = prompt("Select Rate / Rack ID (1: Rack, 2: Corporate, 3: Promotional):", rackId); if (r) setRackId(r); }}>?</button>
-              <input className="ids-input" style={{ width: '60px' }} defaultValue="1" readOnly />
+              <input className="ids-input" style={{ width: '60px' }} value={rackIdSecondary} onChange={(e) => setRackIdSecondary(e.target.value)} />
             </div>
 
             <span style={{ fontWeight: 600 }}>Disc. %</span>
@@ -89,36 +101,36 @@ export function IdsRateInformationModal({
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={singleTariff} onChange={(e) => setSingleTariff(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={singleDisc} onChange={(e) => setSingleDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Double</td>
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={doubleTariff} onChange={(e) => setDoubleTariff(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={doubleDisc} onChange={(e) => setDoubleDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Triple</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue=""  onChange={() => {}}/></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={tripleTariff} onChange={(e) => setTripleTariff(e.target.value)} /></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={tripleDisc} onChange={(e) => setTripleDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Quadruple</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" onChange={() => {}} /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={quadTariff} onChange={(e) => setQuadTariff(e.target.value)} /></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={quadDisc} onChange={(e) => setQuadDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Adult</td>
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={extraAdult} onChange={(e) => setExtraAdult(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={extraAdultDisc} onChange={(e) => setExtraAdultDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Child</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" onChange={() => {}} /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" onChange={() => {}} /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={extraChildTariff} onChange={(e) => setExtraChildTariff(e.target.value)} /></td>
+                <td><input className="ids-input" style={{ width: '80px', textAlign: 'right' }} value={extraChildDisc} onChange={(e) => setExtraChildDisc(e.target.value)} /></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Tax Struct.</td>
@@ -127,8 +139,8 @@ export function IdsRateInformationModal({
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Tax Struct.</td>
-                <td><input className="ids-input" style={{ width: '90px' }} value={taxStruct2} readOnly /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} value={taxStruct2} readOnly /></td>
+                <td><input className="ids-input" style={{ width: '90px' }} value={taxStruct2A} onChange={(e) => setTaxStruct2A(e.target.value)} /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} value={taxStruct2B} onChange={(e) => setTaxStruct2B(e.target.value)} /></td>
               </tr>
             </tbody>
           </table>
@@ -162,6 +174,7 @@ export function IdsRateInformationModal({
 export function IdsReasonEntryModal({ isOpen, onClose, onConfirm, reasonFor = 'DISCOUNT' }) {
   const [reason, setReason] = useState('Customer changed the dates');
   const [authorizedBy, setAuthorizedBy] = useState('DUTY MANAGER');
+  const [reasonForText, setReasonForText] = useState(reasonFor || 'DISCOUNT');
 
   if (!isOpen) return null;
 
@@ -176,7 +189,7 @@ export function IdsReasonEntryModal({ isOpen, onClose, onConfirm, reasonFor = 'D
         <div style={{ padding: '14px 18px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', rowGap: '10px', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Reason For</span>
-            <input className="ids-input" value={reasonFor} readOnly style={{ background: '#EDEAE0' }} />
+            <input className="ids-input" value={reasonForText} onChange={(e) => setReasonForText(e.target.value)} style={{ background: '#FFF' }} />
 
             <span style={{ fontWeight: 600 }}>Reason</span>
             <select className="ids-select" value={reason} onChange={(e) => setReason(e.target.value)}>
@@ -259,6 +272,7 @@ export function IdsPostSaveDialog({ isOpen, onClose, onOk, reservationNo = '271'
   const [printVoucher, setPrintVoucher] = useState('YES');
   const [assignRooms, setAssignRooms] = useState('YES');
   const [deposits, setDeposits] = useState('YES');
+  const [resNoInput, setResNoInput] = useState(reservationNo || '271');
 
   if (!isOpen) return null;
 
@@ -273,7 +287,7 @@ export function IdsPostSaveDialog({ isOpen, onClose, onOk, reservationNo = '271'
         <div style={{ padding: '14px 18px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', rowGap: '8px', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Reservation No.</span>
-            <input className="ids-input" value={reservationNo} readOnly style={{ fontWeight: 700, width: '100px' }} />
+            <input className="ids-input" value={resNoInput} onChange={(e) => setResNoInput(e.target.value)} style={{ fontWeight: 700, width: '100px' }} />
 
             <span style={{ fontWeight: 600 }}>Print Voucher?</span>
             <select className="ids-select" value={printVoucher} onChange={(e) => setPrintVoucher(e.target.value)}>
@@ -323,7 +337,16 @@ export function IdsPostReceiptsModal({
   const [authNo, setAuthNo] = useState('Nu1090499550mle');
   const [receiptNo, setReceiptNo] = useState('167');
   const [accountingDate, setAccountingDate] = useState('14-JAN-2026');
+  const [folioNo, setFolioNo] = useState('1');
+  const [companyName, setCompanyName] = useState('SBI Corporate Cards');
+  const [exgAmt, setExgAmt] = useState('5000.00');
   const [userName, setUserName] = useState('MANAGER');
+  const [roomNoInput, setRoomNoInput] = useState(roomNo || '');
+  const [resNoInput, setResNoInput] = useState(reservationNo || '271');
+  const [guestNameInput, setGuestNameInput] = useState(guestName || 'Mr Biswakarma Santosh');
+  const [currCode, setCurrCode] = useState('INR');
+  const [exgRate, setExgRate] = useState('1.000000');
+  const [lastUpdated, setLastUpdated] = useState('14-JAN-2026 19:57');
 
   if (!isOpen) return null;
 
@@ -340,33 +363,33 @@ export function IdsPostReceiptsModal({
           <div style={{ display: 'grid', gridTemplateColumns: '90px 140px 80px 1fr', rowGap: '6px', columnGap: '8px', alignItems: 'center' }}>
             <span style={{ fontWeight: 600 }}>Room No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '80px' }} value={roomNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Room Look-up: Room ${roomNo} currently assigned to ${guestName}.`); }}>?</button>
+              <input className="ids-input" style={{ width: '80px' }} value={roomNoInput} onChange={(e) => setRoomNoInput(e.target.value)} />
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Room Look-up: Room ${roomNoInput} currently assigned to ${guestNameInput}.`); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Folio No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '100px' }} defaultValue=""  onChange={() => {}}/>
+              <input className="ids-input" style={{ width: '100px' }} value={folioNo} onChange={(e) => setFolioNo(e.target.value)} />
               <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }} onClick={() => { playReceptionChime(); alert("Folio Detail View:\nMaster Folio: 1\nIncidentals Folio: 2"); }}>More..</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Reservation No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '80px', fontWeight: 700 }} value={reservationNo} readOnly />
-              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Reservation Record ${reservationNo}\nStatus: Confirmed Deposit Transaction`); }}>?</button>
+              <input className="ids-input" style={{ width: '80px', fontWeight: 700 }} value={resNoInput} onChange={(e) => setResNoInput(e.target.value)} />
+              <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Reservation Record ${resNoInput}\nStatus: Confirmed Deposit Transaction`); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Guest Name</span>
-            <input className="ids-input" value={guestName} readOnly style={{ background: '#EDEAE0' }} />
+            <input className="ids-input" value={guestNameInput} onChange={(e) => setGuestNameInput(e.target.value)} style={{ background: '#FFF' }} />
 
             <span style={{ fontWeight: 600 }}>Company Code</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/>
+              <input className="ids-input" style={{ width: '80px' }} value={companyCode} onChange={(e) => setCompanyCode(e.target.value)} />
               <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const c = prompt("Enter Corporate Client Code:", companyCode || "CORP01"); if (c) setCompanyCode(c.toUpperCase()); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Company Name</span>
-            <input className="ids-input" defaultValue=""  onChange={() => {}}/>
+            <input className="ids-input" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
           </div>
 
           {/* Payment Method Selector Strip */}
@@ -397,12 +420,12 @@ export function IdsPostReceiptsModal({
           {/* Currency row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
             <span>Currency Code</span>
-            <input className="ids-input" style={{ width: '50px' }} defaultValue="INR" readOnly />
+            <input className="ids-input" style={{ width: '50px' }} value={currCode} onChange={(e) => setCurrCode(e.target.value)} />
             <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Currency Master:\nINR - Indian Rupee (Base: 1.0)\nUSD - US Dollar (Exg: 86.50)\nEUR - Euro (Exg: 92.20)"); }}>?</button>
             <span style={{ marginLeft: '12px' }}>Exchange Rate</span>
-            <input className="ids-input" style={{ width: '70px' }} defaultValue="1.000000" readOnly />
+            <input className="ids-input" style={{ width: '70px' }} value={exgRate} onChange={(e) => setExgRate(e.target.value)} />
             <span style={{ marginLeft: '12px' }}>Exg. Amt.</span>
-            <input className="ids-input" style={{ width: '70px' }} defaultValue=""  onChange={() => {}}/>
+            <input className="ids-input" style={{ width: '70px' }} value={exgAmt} onChange={(e) => setExgAmt(e.target.value)} />
           </div>
 
           {/* Credit Card / Digital UPI Details Box */}
@@ -435,7 +458,7 @@ export function IdsPostReceiptsModal({
                 <input className="ids-input" value={authNo} onChange={(e) => setAuthNo(e.target.value)} />
 
                 <span>Receipt No.</span>
-                <input className="ids-input" value={receiptNo} readOnly style={{ width: '100px', fontWeight: 700 }} />
+                <input className="ids-input" value={receiptNo} onChange={(e) => setReceiptNo(e.target.value)} style={{ width: '100px', fontWeight: 700 }} />
               </div>
             </div>
 
@@ -443,15 +466,15 @@ export function IdsPostReceiptsModal({
             <div style={{ border: '1px solid #B0AB9A', padding: '10px', background: '#EDEAE0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div>
                 <span style={{ fontSize: '10px', color: '#666' }}>Accounting Date</span>
-                <input className="ids-input" style={{ width: '100%' }} value={accountingDate} readOnly />
+                <input className="ids-input" style={{ width: '100%' }} value={accountingDate} onChange={(e) => setAccountingDate(e.target.value)} />
               </div>
               <div>
                 <span style={{ fontSize: '10px', color: '#666' }}>User</span>
-                <input className="ids-input" style={{ width: '100%' }} value={userName} readOnly />
+                <input className="ids-input" style={{ width: '100%' }} value={userName} onChange={(e) => setUserName(e.target.value)} />
               </div>
               <div>
                 <span style={{ fontSize: '10px', color: '#666' }}>Last Updated</span>
-                <input className="ids-input" style={{ width: '100%' }} defaultValue="14-JAN-2026 19:57" readOnly />
+                <input className="ids-input" style={{ width: '100%' }} value={lastUpdated} onChange={(e) => setLastUpdated(e.target.value)} />
               </div>
             </div>
           </div>

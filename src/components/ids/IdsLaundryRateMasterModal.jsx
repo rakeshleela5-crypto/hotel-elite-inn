@@ -270,8 +270,8 @@ export default function IdsLaundryRateMasterModal({
                 <input 
                   type="text" 
                   value={formData.itemName}
-                  disabled
-                  style={{ flex: 1, padding: '2px 6px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }}
+                  onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
+                  style={{ flex: 1, padding: '2px 6px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }}
                 />
               </div>
             </div>
@@ -431,8 +431,8 @@ export default function IdsLaundryRateMasterModal({
                 <input 
                   type="text" 
                   value={formData.user}
-                  disabled
-                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }}
+                  onChange={(e) => setFormData({ ...formData, user: e.target.value })}
+                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                 />
               </div>
 
@@ -441,8 +441,8 @@ export default function IdsLaundryRateMasterModal({
                 <input 
                   type="text" 
                   value={formData.lastUpdated}
-                  disabled
-                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }}
+                  onChange={(e) => setFormData({ ...formData, lastUpdated: e.target.value })}
+                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                 />
               </div>
             </div>

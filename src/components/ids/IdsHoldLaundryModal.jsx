@@ -126,7 +126,7 @@ export default function IdsHoldLaundryModal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Bag Ref. No.</label>
-                <input type="text" value={formData.refNo} disabled style={{ width: '110px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} />
+                <input type="text" value={formData.refNo} onChange={(e) => setFormData({ ...formData, refNo: e.target.value })} style={{ width: '110px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>

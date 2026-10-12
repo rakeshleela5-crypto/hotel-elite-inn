@@ -30,6 +30,7 @@ export default function IdsLostAndFoundModal({
     fontSize: '10',
     outputFormat: 'Excel'
   });
+  const [excelFormula, setExcelFormula] = useState('');
 
   const currentRecord = records[currentIndex] || records[0] || {
     refNo: 'LF-2026-014',
@@ -224,7 +225,7 @@ export default function IdsLostAndFoundModal({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '80px' }}>Reference</label>
-                  <input type="text" value={formData.refNo} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} />
+                  <input type="text" value={formData.refNo} onChange={(e) => setFormData(prev => ({ ...prev, refNo: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '80px' }}>Date</label>
@@ -257,13 +258,13 @@ export default function IdsLostAndFoundModal({
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '80px' }}>Checked By</label>
-                  <input type="text" value={formData.checkedBy} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                  <input type="text" value={formData.checkedBy} onChange={(e) => setFormData(prev => ({ ...prev, checkedBy: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '80px' }}>Date & Time</label>
                   <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
-                    <input type="text" value={formData.foundDate} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
-                    <input type="text" value={formData.foundTime} disabled style={{ width: '50px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                    <input type="text" value={formData.foundDate} onChange={(e) => setFormData(prev => ({ ...prev, foundDate: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
+                    <input type="text" value={formData.foundTime} onChange={(e) => setFormData(prev => ({ ...prev, foundTime: e.target.value }))} style={{ width: '50px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -433,14 +434,14 @@ export default function IdsLostAndFoundModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <label style={{ width: '100px' }}>Start Page No.</label>
-                    <input type="text" value={reportEngineConfig.startPage} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={reportEngineConfig.startPage} onChange={(e) => setReportEngineConfig(prev => ({ ...prev, startPage: e.target.value }))} style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
                     <label style={{ marginLeft: '12px' }}>End Page No.</label>
-                    <input type="text" value={reportEngineConfig.endPage} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={reportEngineConfig.endPage} onChange={(e) => setReportEngineConfig(prev => ({ ...prev, endPage: e.target.value }))} style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <label style={{ width: '100px' }}>Copies</label>
-                    <input type="text" value={reportEngineConfig.copies} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={reportEngineConfig.copies} onChange={(e) => setReportEngineConfig(prev => ({ ...prev, copies: e.target.value }))} style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -453,9 +454,9 @@ export default function IdsLostAndFoundModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <label style={{ width: '100px' }}>Height</label>
-                    <input type="text" value={reportEngineConfig.height} readOnly style={{ width: '70px', padding: '2px', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={reportEngineConfig.height} onChange={(e) => setReportEngineConfig(prev => ({ ...prev, height: e.target.value }))} style={{ width: '70px', padding: '2px', border: '1px solid #7F9DB9' }} />
                     <label style={{ marginLeft: '12px' }}>Zoom</label>
-                    <input type="text" value={reportEngineConfig.zoom} readOnly style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
+                    <input type="text" value={reportEngineConfig.zoom} onChange={(e) => setReportEngineConfig(prev => ({ ...prev, zoom: e.target.value }))} style={{ width: '40px', padding: '2px', border: '1px solid #7F9DB9' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -529,7 +530,7 @@ export default function IdsLostAndFoundModal({
                 <span style={{ border: '1px solid #CCC', padding: '1px 4px', background: '#FFF', fontStyle: 'italic' }}>I</span>
                 <span style={{ color: '#999' }}>|</span>
                 <span style={{ fontWeight: 'bold', color: '#777' }}>fx</span>
-                <input type="text" readOnly value={`=CONCATENATE("Returned Receipt - ", "${formData.guestName}")`} style={{ flex: 1, padding: '1px 4px', border: '1px solid #CCC', background: '#FFF', fontSize: '11px' }} />
+                <input type="text" value={excelFormula !== '' ? excelFormula : `=CONCATENATE("Returned Receipt - ", "${formData.guestName}")`} onChange={(e) => setExcelFormula(e.target.value)} style={{ flex: 1, padding: '1px 4px', border: '1px solid #CCC', background: '#FFF', fontSize: '11px' }} />
               </div>
 
               {/* Excel Sheet Body Grid matching Frame 067 */}

@@ -64,6 +64,7 @@ export default function IdsReleaseStopPostingModal({
   const [simRevenueCode, setSimRevenueCode] = useState('LAU'); // LAU: Laundry, POS: Restaurant, MIN: Minibar
   const [simBaseAmount, setSimBaseAmount] = useState('500');
   const [simRemarks, setSimRemarks] = useState('2 Shirts Dry Cleaned');
+  const [simDescOverride, setSimDescOverride] = useState(null);
   const [supervisorAlertVisible, setSupervisorAlertVisible] = useState(false);
   const [supervisorAlertMsg, setSupervisorAlertMsg] = useState({
     title: 'Post Charges V6.5.002.1',
@@ -80,10 +81,23 @@ export default function IdsReleaseStopPostingModal({
     { code: 'LAU', desc: 'Laundry', base: 500, sgst: 45, cgst: 45, total: 590, date: `${INITIAL_ACCOUNTING_DATE} 19:02`, ref: '227' }
   ]);
 
-  if (!isOpen) return null;
-
   const currentRoomRecord = stopPostingList.find(r => r.roomNo === selectedRoom) || stopPostingList[0];
   const isRoomLocked = !currentRoomRecord?.released;
+
+  // Interactive inputs state
+  const [folioNo, setFolioNo] = useState('1');
+  const [regNoInput, setRegNoInput] = useState(currentRoomRecord?.regNo || '621');
+  const [guestNameInput, setGuestNameInput] = useState(currentRoomRecord?.guestName || '');
+  const [accountingDateInput, setAccountingDateInput] = useState(accountingDate || '26-MAR-2026');
+
+  useEffect(() => {
+    if (currentRoomRecord) {
+      setRegNoInput(currentRoomRecord.regNo || '');
+      setGuestNameInput(currentRoomRecord.guestName || '');
+    }
+  }, [currentRoomRecord]);
+
+  if (!isOpen) return null;
 
   // Handle Save Release
   const handleSaveRelease = () => {
@@ -416,7 +430,7 @@ export default function IdsReleaseStopPostingModal({
                 <div style={{ display: 'grid', gridTemplateColumns: '120px 180px 100px 1fr', gap: '8px 12px', alignItems: 'center', marginBottom: '8px' }}>
                   <span style={{ fontWeight: 600 }}>Room No.</span>
                   <div style={{ display: 'flex', gap: '4px' }}>
-                    <input className="ids-input" value={selectedRoom} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                    <input className="ids-input" value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)} style={{ width: '80px', fontWeight: 700, background: '#FFF' }} />
                     <button 
                       className="ids-btn-classic" 
                       style={{ width: '22px' }}
@@ -430,16 +444,16 @@ export default function IdsReleaseStopPostingModal({
                   </div>
 
                   <span style={{ fontWeight: 600 }}>Folio No.</span>
-                  <input className="ids-input" value="1" readOnly style={{ width: '60px' }} />
+                  <input className="ids-input" value={folioNo} onChange={(e) => setFolioNo(e.target.value)} style={{ width: '60px' }} />
 
                   <span style={{ fontWeight: 600 }}>Registration No.</span>
-                  <input className="ids-input" value={currentRoomRecord.regNo} readOnly style={{ width: '120px' }} />
+                  <input className="ids-input" value={regNoInput} onChange={(e) => setRegNoInput(e.target.value)} style={{ width: '120px' }} />
 
                   <span style={{ fontWeight: 600 }}>Guest Name</span>
-                  <input className="ids-input" value={currentRoomRecord.guestName} readOnly style={{ width: '220px' }} />
+                  <input className="ids-input" value={guestNameInput} onChange={(e) => setGuestNameInput(e.target.value)} style={{ width: '220px', background: '#FFF' }} />
 
                   <span style={{ fontWeight: 600 }}>Accounting Date</span>
-                  <input className="ids-input" value={accountingDate} readOnly style={{ width: '120px' }} />
+                  <input className="ids-input" value={accountingDateInput} onChange={(e) => setAccountingDateInput(e.target.value)} style={{ width: '120px' }} />
 
                   <span style={{ fontWeight: 600 }}>Posting Status</span>
                   <span style={{ fontWeight: 700, color: currentRoomRecord.released ? '#137333' : '#C5221F' }}>
@@ -474,8 +488,8 @@ export default function IdsReleaseStopPostingModal({
                   <span style={{ fontWeight: 600 }}>Description</span>
                   <input 
                     className="ids-input" 
-                    value={simRevenueCode === 'LAU' ? 'Laundry Service (2 Shirts Dry Cleaned)' : 'Food & Beverage Service'} 
-                    readOnly 
+                    value={simDescOverride !== null ? simDescOverride : (simRevenueCode === 'LAU' ? 'Laundry Service (2 Shirts Dry Cleaned)' : 'Food & Beverage Service')} 
+                    onChange={(e) => setSimDescOverride(e.target.value)}
                     style={{ width: '260px' }} 
                   />
 

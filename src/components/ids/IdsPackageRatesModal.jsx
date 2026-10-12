@@ -154,6 +154,8 @@ export default function IdsPackageRatesModal({
   const [sellMobile, setSellMobile] = useState('09876543210');
   const [sellSelectedPkg, setSellSelectedPkg] = useState(INITIAL_PACKAGES_DATABASE[0]);
   const [sellPkgLookupOpen, setSellPkgLookupOpen] = useState(false);
+  const [propertyCode, setPropertyCode] = useState('DEM');
+  const [customSelectedPkgText, setCustomSelectedPkgText] = useState('');
 
   if (!isOpen) return null;
 
@@ -336,7 +338,12 @@ export default function IdsPackageRatesModal({
               
               <div style={{ display: 'grid', gridTemplateColumns: '120px 140px 120px 1fr', gap: '10px 14px', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontWeight: 600, fontSize: '13px' }}>Property</span>
-                <input className="ids-input" value="DEM" readOnly style={{ width: '80px', fontWeight: 700, fontSize: '13px', height: '28px' }} />
+                <input 
+                  className="ids-input" 
+                  value={propertyCode} 
+                  onChange={(e) => setPropertyCode(e.target.value)}
+                  style={{ width: '80px', fontWeight: 700, fontSize: '13px', height: '28px', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600, fontSize: '13px' }}>Package ID</span>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -517,7 +524,12 @@ export default function IdsPackageRatesModal({
 
                 <span style={{ fontWeight: 600, fontSize: '13px' }}>Selected Package</span>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <input className="ids-input" value={`${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} readOnly style={{ width: '100%', fontWeight: 700, background: '#F0F0F0', fontSize: '13px', height: '28px' }} />
+                  <input 
+                    className="ids-input" 
+                    value={customSelectedPkgText !== '' ? customSelectedPkgText : `${sellSelectedPkg.packageId} - ${sellSelectedPkg.description}`} 
+                    onChange={(e) => setCustomSelectedPkgText(e.target.value)}
+                    style={{ width: '100%', fontWeight: 700, background: '#FFF', fontSize: '13px', height: '28px' }} 
+                  />
                   <button className="ids-btn-classic" onClick={() => setSellPkgLookupOpen(true)} title="Browse Packages" style={{ height: '28px', width: '28px' }}>?</button>
                 </div>
 

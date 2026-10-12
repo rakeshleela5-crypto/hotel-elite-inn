@@ -122,7 +122,7 @@ export default function IdsWalkInModal({
 
   // Step 2: Walk-Ins Registration Form State (Video 17 Frame 035–075)
   const [currentPax, setCurrentPax] = useState(1);
-  const [folioNo] = useState('1');
+  const [folioNo, setFolioNo] = useState('1');
   const [regNo, setRegNo] = useState('621');
 
   // Guest 1 form data
@@ -185,6 +185,20 @@ export default function IdsWalkInModal({
   const [roomFolioSelectOpen, setRoomFolioSelectOpen] = useState(false);
   const [addMorePaxOpen, setAddMorePaxOpen] = useState(false);
   const [isSecondPaxActive, setIsSecondPaxActive] = useState(false);
+  const [purposeOfVisit, setPurposeOfVisit] = useState('Business Trip');
+  const [planExtraAmount, setPlanExtraAmount] = useState('0.00');
+  const [guestBalance, setGuestBalance] = useState('0.00');
+  const [roomTypeDisplay, setRoomTypeDisplay] = useState('DELUXE (DLX)');
+  const [roomUpgradeCode, setRoomUpgradeCode] = useState('DLX');
+  const [totalPaxDisplay, setTotalPaxDisplay] = useState('1 (1/0)');
+  const [rateCurrency, setRateCurrency] = useState('INR');
+  const [rateRackId1, setRateRackId1] = useState('1');
+  const [rateRackId2, setRateRackId2] = useState('1');
+  const [rateReasonFor, setRateReasonFor] = useState('DISCOUNT');
+  const [rateTaxStruct1, setRateTaxStruct1] = useState('798');
+  const [rateTaxStruct2, setRateTaxStruct2] = useState('804');
+  const [rateExbTax1, setRateExbTax1] = useState('804');
+  const [rateExbTax2, setRateExbTax2] = useState('804');
 
   // Status message
   const [statusMessage, setStatusMessage] = useState('');
@@ -654,7 +668,7 @@ export default function IdsWalkInModal({
                   <input 
                     className="ids-input" 
                     value={folioNo} 
-                    readOnly
+                    onChange={(e) => setFolioNo(e.target.value)}
                     title="Folio sequence automatically assigned by PMS"
                     style={{ width: '40px', textAlign: 'center' }} 
                   />
@@ -1029,9 +1043,9 @@ export default function IdsWalkInModal({
                 <span style={{ fontWeight: 700 }}>Registration Number</span>
                 <input 
                   className="ids-input" 
-                  readOnly 
                   value={regNo} 
-                  style={{ width: '80px', textAlign: 'center', fontWeight: 700, background: '#F5F5F5' }} 
+                  onChange={(e) => setRegNo(e.target.value)}
+                  style={{ width: '80px', textAlign: 'center', fontWeight: 700, background: '#FFF' }} 
                 />
               </div>
             </div>
@@ -1125,7 +1139,7 @@ export default function IdsWalkInModal({
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '70px' }}>Plan</span>
-                  <input className="ids-input" readOnly value="CP" style={{ width: '60px', background: '#F5F5F5' }} />
+                  <input className="ids-input" value={planCode} onChange={(e) => setPlanCode(e.target.value)} style={{ width: '60px', background: '#FFF' }} />
                 </div>
                 <div style={{ fontSize: '9px', color: '#555', maxWidth: '160px', fontStyle: 'italic' }}>
                   Charges entered here should be as per Total Number of Occupancy.
@@ -1134,13 +1148,13 @@ export default function IdsWalkInModal({
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                 <span style={{ width: '70px' }}>Cur</span>
-                <input className="ids-input" readOnly value="INR" style={{ width: '60px', background: '#F5F5F5' }} />
+                <input className="ids-input" value={rateCurrency} onChange={(e) => setRateCurrency(e.target.value)} style={{ width: '60px', background: '#FFF' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                 <span style={{ width: '70px' }}>Rate / Rack ID</span>
-                <input className="ids-input" readOnly value="1" style={{ width: '35px', textAlign: 'center' }} />
-                <input className="ids-input" readOnly value="1" style={{ width: '35px', textAlign: 'center' }} />
+                <input className="ids-input" value={rateRackId1} onChange={(e) => setRateRackId1(e.target.value)} style={{ width: '35px', textAlign: 'center' }} />
+                <input className="ids-input" value={rateRackId2} onChange={(e) => setRateRackId2(e.target.value)} style={{ width: '35px', textAlign: 'center' }} />
               </div>
 
               {/* Reason Entry Box matching Frame 065 */}
@@ -1148,7 +1162,7 @@ export default function IdsWalkInModal({
                 <legend style={{ fontWeight: 700, color: '#000' }}>Reason Entry</legend>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '80px' }}>Reason For</span>
-                  <input className="ids-input" readOnly value="DISCOUNT" style={{ width: '130px', fontWeight: 700 }} />
+                  <input className="ids-input" value={rateReasonFor} onChange={(e) => setRateReasonFor(e.target.value)} style={{ width: '130px', fontWeight: 700 }} />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ width: '80px' }}>Reason</span>
@@ -1169,7 +1183,7 @@ export default function IdsWalkInModal({
                     className="ids-input" 
                     style={{ width: '110px' }} 
                     value={rateAuthorizedBy} 
-                    onChange={(e) => setRateAuthorizedBy(e.target.value)}
+                    onChange={(e) => setRateAuthorizedBy(e.target.value)} 
                   />
                   <button 
                     className="ids-btn-classic" 
@@ -1189,15 +1203,15 @@ export default function IdsWalkInModal({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', fontSize: '10px' }}>
                 <span>Tax Structure</span>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <input className="ids-input" readOnly value="798" style={{ width: '45px', textAlign: 'center' }} />
-                  <input className="ids-input" readOnly value="804" style={{ width: '45px', textAlign: 'center' }} />
+                  <input className="ids-input" value={rateTaxStruct1} onChange={(e) => setRateTaxStruct1(e.target.value)} style={{ width: '45px', textAlign: 'center' }} />
+                  <input className="ids-input" value={rateTaxStruct2} onChange={(e) => setRateTaxStruct2(e.target.value)} style={{ width: '45px', textAlign: 'center' }} />
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', fontSize: '10px' }}>
                 <span>Exb. Tax Struct.</span>
                 <div style={{ display: 'flex', gap: '6px' }}>
-                  <input className="ids-input" readOnly value="804" style={{ width: '45px', textAlign: 'center' }} />
-                  <input className="ids-input" readOnly value="804" style={{ width: '45px', textAlign: 'center' }} />
+                  <input className="ids-input" value={rateExbTax1} onChange={(e) => setRateExbTax1(e.target.value)} style={{ width: '45px', textAlign: 'center' }} />
+                  <input className="ids-input" value={rateExbTax2} onChange={(e) => setRateExbTax2(e.target.value)} style={{ width: '45px', textAlign: 'center' }} />
                 </div>
               </div>
 
@@ -1300,9 +1314,9 @@ export default function IdsWalkInModal({
               <div style={{ border: '1px solid #7F9DB9', padding: '6px', background: '#FFF', marginBottom: '6px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 120px 90px 1fr', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                   <span>Room Upgrade</span>
-                  <input className="ids-input" readOnly value="DLX" style={{ background: '#F5F5F5', fontWeight: 700 }} />
+                  <input className="ids-input" value={roomUpgradeCode} onChange={(e) => setRoomUpgradeCode(e.target.value)} style={{ background: '#FFF', fontWeight: 700 }} />
                   <span style={{ textAlign: 'right' }}>Authorized By</span>
-                  <input className="ids-input" defaultValue="DUTY MANAGER"  onChange={() => {}} />
+                  <input className="ids-input" value={rateAuthorizedBy} onChange={(e) => setRateAuthorizedBy(e.target.value)} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 120px 90px 1fr', gap: '6px', alignItems: 'center' }}>
                   <span>Post History</span>
@@ -1311,7 +1325,7 @@ export default function IdsWalkInModal({
                     <option value="No">No</option>
                   </select>
                   <span style={{ textAlign: 'right' }}>Purpose Of Visit</span>
-                  <input className="ids-input" defaultValue="Business Trip"  onChange={() => {}}/>
+                  <input className="ids-input" value={purposeOfVisit} onChange={(e) => setPurposeOfVisit(e.target.value)} />
                 </div>
               </div>
 
@@ -1529,7 +1543,7 @@ export default function IdsWalkInModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Name/Room No.</span>
-                    <input className="ids-input" readOnly value={selectedRoom} style={{ width: '60px', fontWeight: 700, background: '#F5F5F5' }} />
+                    <input className="ids-input" value={selectedRoom} onChange={(e) => setSelectedRoom(e.target.value)} style={{ width: '60px', fontWeight: 700, background: '#FFF' }} />
                     <button 
                       type="button"
                       className="ids-btn-classic" 
@@ -1542,7 +1556,7 @@ export default function IdsWalkInModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Total Pax (ADT/CHD)</span>
-                    <input className="ids-input" readOnly value={isSecondPaxActive ? '2 (2/0)' : '1 (1/0)'} style={{ width: '70px', background: '#F5F5F5' }} />
+                    <input className="ids-input" value={totalPaxDisplay} onChange={(e) => setTotalPaxDisplay(e.target.value)} style={{ width: '70px', background: '#FFF' }} />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1708,25 +1722,25 @@ export default function IdsWalkInModal({
                       <span style={{ width: '70px' }}>Rate</span>
                       <input 
                         className="ids-input" 
-                        value={`${rateAmount.toLocaleString('en-IN')} - ${rateOption}`}
-                        onChange={(e) => {
-                          const val = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
-                          if (!isNaN(val)) setRateAmount(val);
-                        }}
-                        style={{ flex: 1, fontWeight: 700, color: '#0A246A' }} 
+                        type="number"
+                        step="50"
+                        value={rateAmount}
+                        onChange={(e) => setRateAmount(parseFloat(e.target.value) || 0)}
+                        style={{ width: '90px', fontWeight: 700, color: '#0A246A' }} 
                       />
+                      <span style={{ fontSize: '10px', color: '#666', fontWeight: 600 }}>({rateOption})</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ width: '70px' }}>Plan</span>
-                      <input className="ids-input" value="0.00" onChange={() => {}} style={{ width: '80px' }} />
+                      <input className="ids-input" value={planExtraAmount} onChange={(e) => setPlanExtraAmount(e.target.value)} style={{ width: '80px' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ width: '70px' }}>Guest Bal.</span>
-                      <input className="ids-input" value="0.00" onChange={() => {}} style={{ width: '80px' }} />
+                      <input className="ids-input" value={guestBalance} onChange={(e) => setGuestBalance(e.target.value)} style={{ width: '80px' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
                       <span style={{ width: '70px' }}>Room Type</span>
-                      <input className="ids-input" value="DELUXE (DLX)" onChange={() => {}} style={{ flex: 1, fontWeight: 700, color: '#2E7D32' }} />
+                      <input className="ids-input" value={roomTypeDisplay} onChange={(e) => setRoomTypeDisplay(e.target.value)} style={{ flex: 1, fontWeight: 700, color: '#2E7D32' }} />
                     </div>
                   </div>
                 </div>

@@ -154,6 +154,16 @@ export function IdsRateDetailsModal({
   const [reason, setReason] = useState(tariffData?.reason || 'Manager Special Approval');
   const [authorizedBy, setAuthorizedBy] = useState(tariffData?.authorizedBy || 'Manager');
   const [packageSelectionOpen, setPackageSelectionOpen] = useState(false);
+  const [rackId, setRackId] = useState('1');
+  const [totalPax, setTotalPax] = useState('2');
+  const [discountVal, setDiscountVal] = useState('0');
+  const [extraAdultCount, setExtraAdultCount] = useState('0');
+  const [extraChildCount, setExtraChildCount] = useState('0');
+  const [planCode, setPlanCode] = useState(tariffData?.plan || 'CP');
+  const [currencyCode, setCurrencyCode] = useState(tariffData?.currency || 'INR');
+  const [discountTariff, setDiscountTariff] = useState('0.00');
+  const [discountAdult, setDiscountAdult] = useState('0.00');
+  const [discountChild, setDiscountChild] = useState('0.00');
 
   useEffect(() => {
     if (tariffData) {
@@ -165,6 +175,8 @@ export function IdsRateDetailsModal({
       setRemarks(tariffData.remarks || 'Corporate discount applied');
       setReason(tariffData.reason || 'Manager Special Approval');
       setAuthorizedBy(tariffData.authorizedBy || 'Manager');
+      setPlanCode(tariffData.plan || 'CP');
+      setCurrencyCode(tariffData.currency || 'INR');
     }
   }, [tariffData, isOpen]);
 
@@ -238,32 +250,42 @@ export function IdsRateDetailsModal({
             <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 90px 1fr', gap: '4px', alignItems: 'center' }}>
               <span>Plan</span>
               <div style={{ display: 'flex', gap: '2px' }}>
-                <input className="ids-input" value={tariffData.plan} readOnly style={{ width: '45px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={planCode} 
+                  onChange={(e) => setPlanCode(e.target.value)}
+                  style={{ width: '45px', background: '#FFF' }} 
+                />
               </div>
 
               <span>Currency Code</span>
-              <input className="ids-input" value={tariffData.currency} readOnly style={{ width: '45px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={currencyCode} 
+                onChange={(e) => setCurrencyCode(e.target.value)}
+                style={{ width: '45px', background: '#FFF' }} 
+              />
 
               <span>Rate / Rack ID</span>
               <div style={{ display: 'flex', gap: '2px' }}>
-                <input className="ids-input" defaultValue="1" style={{ width: '35px' }}  onChange={() => {}}/>
+                <input className="ids-input" value={rackId} onChange={(e) => setRackId(e.target.value)} style={{ width: '35px' }} />
                 <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Rate / Rack ID master lookup: 1 - Standard Executive Rack"); }}>?</button>
               </div>
 
               <span>Total Pax</span>
-              <input className="ids-input" defaultValue="2" style={{ width: '35px' }}  onChange={() => {}}/>
+              <input className="ids-input" value={totalPax} onChange={(e) => setTotalPax(e.target.value)} style={{ width: '35px' }} />
 
               <span>Discount</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '45px' }}  onChange={() => {}}/>
+              <input className="ids-input" value={discountVal} onChange={(e) => setDiscountVal(e.target.value)} style={{ width: '45px' }} />
 
               <span>Extra Adult</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '35px' }}  onChange={() => {}}/>
+              <input className="ids-input" value={extraAdultCount} onChange={(e) => setExtraAdultCount(e.target.value)} style={{ width: '35px' }} />
 
               <span></span>
               <span></span>
 
               <span>Extra Child</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '35px' }}  onChange={() => {}}/>
+              <input className="ids-input" value={extraChildCount} onChange={(e) => setExtraChildCount(e.target.value)} style={{ width: '35px' }} />
             </div>
 
             {/* Quick Action Badges matching Frame 028 */}
@@ -306,7 +328,12 @@ export function IdsRateDetailsModal({
                     />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
-                    <input className="ids-input" defaultValue="0.00" readOnly style={{ textAlign: 'right', width: '70px', background: '#EBEBE4' }} />
+                    <input 
+                      className="ids-input" 
+                      value={discountTariff} 
+                      onChange={(e) => setDiscountTariff(e.target.value)} 
+                      style={{ textAlign: 'right', width: '70px', background: '#FFF' }} 
+                    />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', color: '#555' }}>
                     * Direct Tariff Override
@@ -323,7 +350,12 @@ export function IdsRateDetailsModal({
                     />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
-                    <input className="ids-input" defaultValue="0.00" readOnly style={{ textAlign: 'right', width: '70px', background: '#EBEBE4' }} />
+                    <input 
+                      className="ids-input" 
+                      value={discountAdult} 
+                      onChange={(e) => setDiscountAdult(e.target.value)} 
+                      style={{ textAlign: 'right', width: '70px', background: '#FFF' }} 
+                    />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                 </tr>
@@ -338,7 +370,12 @@ export function IdsRateDetailsModal({
                     />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px', textAlign: 'right' }}>
-                    <input className="ids-input" defaultValue="0.00" readOnly style={{ textAlign: 'right', width: '70px', background: '#EBEBE4' }} />
+                    <input 
+                      className="ids-input" 
+                      value={discountChild} 
+                      onChange={(e) => setDiscountChild(e.target.value)} 
+                      style={{ textAlign: 'right', width: '70px', background: '#FFF' }} 
+                    />
                   </td>
                   <td style={{ border: '1px solid #CCC', padding: '2px 4px' }}></td>
                 </tr>
@@ -465,6 +502,10 @@ export default function IdsChangeRateModal({
     }
   };
 
+  const updateTariffField = (field, val) => {
+    setTariffData(prev => ({ ...prev, [field]: val }));
+  };
+
   const handleRateDetailsSaved = (updatedData) => {
     setTariffData(prev => ({
       ...prev,
@@ -535,44 +576,104 @@ export default function IdsChangeRateModal({
                 >
                   ?
                 </button>
-                <input className="ids-input" value={tariffData.roomType} readOnly style={{ width: '45px', background: '#EBEBE4', fontWeight: 600 }} />
+                <input 
+                  className="ids-input" 
+                  value={tariffData.roomType} 
+                  onChange={(e) => updateTariffField('roomType', e.target.value)}
+                  style={{ width: '45px', background: '#FFF', fontWeight: 600 }} 
+                />
               </div>
 
               <span>Folio No.</span>
-              <input className="ids-input" value={tariffData.folioNo} readOnly style={{ width: '70px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.folioNo} 
+                onChange={(e) => updateTariffField('folioNo', e.target.value)}
+                style={{ width: '70px', background: '#FFF' }} 
+              />
 
               <span>Reg. No.</span>
-              <input className="ids-input" value={tariffData.regNo} readOnly style={{ width: '70px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.regNo} 
+                onChange={(e) => updateTariffField('regNo', e.target.value)}
+                style={{ width: '70px', background: '#FFF' }} 
+              />
 
               <span>Arrival</span>
-              <input className="ids-input" value={tariffData.arrival} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.arrival} 
+                onChange={(e) => updateTariffField('arrival', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Departure</span>
-              <input className="ids-input" value={tariffData.departure} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.departure} 
+                onChange={(e) => updateTariffField('departure', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Billing Instruction</span>
-              <input className="ids-input" value={tariffData.billingInstruction} readOnly style={{ width: '70px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.billingInstruction} 
+                onChange={(e) => updateTariffField('billingInstruction', e.target.value)}
+                style={{ width: '70px', background: '#FFF' }} 
+              />
             </div>
 
             {/* Right Column */}
             <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', gap: '3px', alignItems: 'center' }}>
               <span>Pax</span>
-              <input className="ids-input" value={tariffData.pax} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.pax} 
+                onChange={(e) => updateTariffField('pax', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Guest Name</span>
-              <input className="ids-input" value={tariffData.guestName} readOnly style={{ fontWeight: 700, color: '#0A246A', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.guestName} 
+                onChange={(e) => updateTariffField('guestName', e.target.value)}
+                style={{ fontWeight: 700, color: '#0A246A', background: '#FFF' }} 
+              />
 
               <span>Nationality</span>
-              <input className="ids-input" value={tariffData.nationality} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.nationality} 
+                onChange={(e) => updateTariffField('nationality', e.target.value)}
+                style={{ width: '50px', background: '#FFF' }} 
+              />
 
               <span>Guest Status</span>
-              <input className="ids-input" value={tariffData.guestStatus} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.guestStatus} 
+                onChange={(e) => updateTariffField('guestStatus', e.target.value)}
+                style={{ width: '60px', background: '#FFF' }} 
+              />
 
               <span>Group</span>
-              <input className="ids-input" value={tariffData.group || ''} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.group || ''} 
+                onChange={(e) => updateTariffField('group', e.target.value)}
+                style={{ width: '60px', background: '#FFF' }} 
+              />
 
               <span>Pay Mode</span>
-              <input className="ids-input" value={tariffData.payMode} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.payMode} 
+                onChange={(e) => updateTariffField('payMode', e.target.value)}
+                style={{ width: '60px', background: '#FFF' }} 
+              />
             </div>
           </div>
 
@@ -583,13 +684,23 @@ export default function IdsChangeRateModal({
             <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '3px', alignItems: 'center' }}>
               <span>Company</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                <input className="ids-input" value={tariffData.companyCode || ''} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={tariffData.companyCode || ''} 
+                  onChange={(e) => updateTariffField('companyCode', e.target.value)}
+                  style={{ width: '60px', background: '#FFF' }} 
+                />
                 <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Company details: ${tariffData.companyName || 'Corporate Account'}`); }}>?</button>
               </div>
 
               <span>Currency</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                <input className="ids-input" value={tariffData.currency} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={tariffData.currency} 
+                  onChange={(e) => updateTariffField('currency', e.target.value)}
+                  style={{ width: '50px', background: '#FFF' }} 
+                />
                 <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Currency: INR (Indian Rupee)"); }}>?</button>
               </div>
 
@@ -608,19 +719,34 @@ export default function IdsChangeRateModal({
               </select>
 
               <span>Room Upgrade</span>
-              <input className="ids-input" value={tariffData.roomUpgrade} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.roomUpgrade} 
+                onChange={(e) => updateTariffField('roomUpgrade', e.target.value)}
+                style={{ width: '60px', background: '#FFF' }} 
+              />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '85px 1fr', gap: '3px', alignItems: 'center' }}>
               <span>Name</span>
-              <input className="ids-input" value={tariffData.companyName || ''} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={tariffData.companyName || ''} 
+                onChange={(e) => updateTariffField('companyName', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span></span>
               <button className="ids-btn-classic" style={{ width: '85px', fontSize: '10px' }} onClick={() => { playReceptionChime(); alert(`Pax Details:\nPrimary: ${tariffData.guestName}\nTotal Pax: 2 Adult(s)`); }}>Pax Details</button>
 
               <span>Plan</span>
               <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-                <input className="ids-input" value={tariffData.plan} readOnly style={{ width: '45px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={tariffData.plan} 
+                  onChange={(e) => updateTariffField('plan', e.target.value)}
+                  style={{ width: '45px', background: '#FFF' }} 
+                />
                 <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert(`Plan details: ${tariffData.plan} (Continental Plan / Bed & Breakfast)`); }}>?</button>
               </div>
 

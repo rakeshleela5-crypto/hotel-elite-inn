@@ -76,6 +76,12 @@ export default function IdsPaidOutModal({
   const [voucherModalOpen, setVoucherModalOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
+  // Interactive input states
+  const [accountingDateInput, setAccountingDateInput] = useState(accountingDate || '26-MAR-2026');
+  const [currCode, setCurrCode] = useState('INR');
+  const [exgRate, setExgRate] = useState('1.000000');
+  const [authorizedUser, setAuthorizedUser] = useState('MANAGER');
+
   if (!isOpen) return null;
 
   // Execute Paid-Out matching Frame 085
@@ -193,16 +199,36 @@ export default function IdsPaidOutModal({
             <div style={{ border: '2px groove #ECE9D8', background: '#ECE9D8', padding: '6px 10px', marginBottom: '8px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '70px 60px 50px 70px 60px 1fr 70px 90px', gap: '6px 8px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Room No.</span>
-                <input className="ids-input" value={roomNo} readOnly style={{ width: '50px', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={roomNo} 
+                  onChange={(e) => setRoomNo(e.target.value)} 
+                  style={{ width: '50px', fontWeight: 700, background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Reg. No.</span>
-                <input className="ids-input" value={regNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input 
+                  className="ids-input" 
+                  value={regNo} 
+                  onChange={(e) => setRegNo(e.target.value)} 
+                  style={{ width: '60px', fontWeight: 700, background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Guest</span>
-                <input className="ids-input" value={guestName} readOnly style={{ width: '100%', fontWeight: 700, color: '#0A246A' }} />
+                <input 
+                  className="ids-input" 
+                  value={guestName} 
+                  onChange={(e) => setGuestName(e.target.value)} 
+                  style={{ width: '100%', fontWeight: 700, color: '#0A246A', background: '#FFF' }} 
+                />
 
                 <span style={{ fontWeight: 600 }}>Accounting</span>
-                <input className="ids-input" value={accountingDate} readOnly style={{ width: '90px' }} />
+                <input 
+                  className="ids-input" 
+                  value={accountingDateInput} 
+                  onChange={(e) => setAccountingDateInput(e.target.value)} 
+                  style={{ width: '90px', background: '#FFF' }} 
+                />
               </div>
             </div>
 
@@ -312,21 +338,21 @@ export default function IdsPaidOutModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '85px 80px 80px 70px 1fr', gap: '6px 8px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Room No.</span>
-                <input className="ids-input" value={roomNo} readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input className="ids-input" value={roomNo} onChange={(e) => setRoomNo(e.target.value)} style={{ width: '60px', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Folio No.</span>
-                <input className="ids-input" value={folioNo} readOnly style={{ width: '40px' }} />
+                <input className="ids-input" value={folioNo} onChange={(e) => setFolioNo(e.target.value)} style={{ width: '40px' }} />
 
                 <div></div>
 
                 <span style={{ fontWeight: 600 }}>Registration No.</span>
-                <input className="ids-input" value={regNo} readOnly style={{ width: '80px', fontWeight: 700 }} />
+                <input className="ids-input" value={regNo} onChange={(e) => setRegNo(e.target.value)} style={{ width: '80px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Guest Name</span>
-                <input className="ids-input" value={guestName} readOnly style={{ width: '100%', fontWeight: 700, gridColumn: 'span 2' }} />
+                <input className="ids-input" value={guestName} onChange={(e) => setGuestName(e.target.value)} style={{ width: '100%', fontWeight: 700, gridColumn: 'span 2', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Accounting</span>
-                <input className="ids-input" value={accountingDate} readOnly style={{ width: '90px' }} />
+                <input className="ids-input" value={accountingDateInput} onChange={(e) => setAccountingDateInput(e.target.value)} style={{ width: '90px' }} />
               </div>
             </div>
 
@@ -345,10 +371,10 @@ export default function IdsPaidOutModal({
 
               <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 100px 110px', gap: '6px 10px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600 }}>Currency Code</span>
-                <input className="ids-input" value="INR" readOnly style={{ width: '60px', fontWeight: 700 }} />
+                <input className="ids-input" value={currCode} onChange={(e) => setCurrCode(e.target.value)} style={{ width: '60px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Exchange Rate</span>
-                <input className="ids-input" value="1.000000" readOnly style={{ width: '80px' }} />
+                <input className="ids-input" value={exgRate} onChange={(e) => setExgRate(e.target.value)} style={{ width: '80px' }} />
 
                 <span style={{ fontWeight: 600, color: '#C5221F' }}>Paid out Amount</span>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
@@ -362,7 +388,7 @@ export default function IdsPaidOutModal({
                 </div>
 
                 <span style={{ fontWeight: 600 }}>User</span>
-                <input className="ids-input" value="MANAGER" readOnly style={{ width: '90px', fontWeight: 700 }} />
+                <input className="ids-input" value={authorizedUser} onChange={(e) => setAuthorizedUser(e.target.value)} style={{ width: '90px', fontWeight: 700 }} />
 
                 <span style={{ fontWeight: 600 }}>Particulars</span>
                 <input className="ids-input" value={particulars} onChange={(e) => setParticulars(e.target.value)} style={{ width: '100%', gridColumn: 'span 3' }} />

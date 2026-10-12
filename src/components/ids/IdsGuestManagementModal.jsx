@@ -724,17 +724,32 @@ export function IdsChangeGuestInfoModal({
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '11px' }}>
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span>Arrival</span>
-                <input className="ids-input" value={formData.arrival || '05-JAN-2026 20:28'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={formData.arrival || '05-JAN-2026 20:28'} 
+                  onChange={(e) => handleChange('arrival', e.target.value)} 
+                  style={{ width: '115px' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span>Departure</span>
-                <input className="ids-input" value={formData.departure || '15-JAN-2026 12:00'} readOnly style={{ width: '115px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={formData.departure || '15-JAN-2026 12:00'} 
+                  onChange={(e) => handleChange('departure', e.target.value)} 
+                  style={{ width: '115px' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                 <span>Reg. No.</span>
-                <input className="ids-input" value={formData.regNo || '580'} readOnly style={{ width: '45px', fontWeight: 700, background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={formData.regNo || '580'} 
+                  onChange={(e) => handleChange('regNo', e.target.value)} 
+                  style={{ width: '45px', fontWeight: 700 }} 
+                />
               </div>
 
               <div style={{ marginLeft: 'auto', display: 'flex', gap: '4px' }}>
@@ -745,7 +760,12 @@ export function IdsChangeGuestInfoModal({
 
             <div style={{ marginTop: '4px', display: 'flex', gap: '4px', alignItems: 'center' }}>
               <span>Room No. / Folio No.</span>
-              <input className="ids-input" value={formData.folioNo || `${formData.roomNo} / 1`} readOnly style={{ width: '70px', fontWeight: 700, background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={formData.folioNo || `${formData.roomNo} / 1`} 
+                onChange={(e) => handleChange('folioNo', e.target.value)} 
+                style={{ width: '70px', fontWeight: 700 }} 
+              />
             </div>
           </div>
 
@@ -794,7 +814,11 @@ export function IdsChangeGuestInfoModal({
                 <input className="ids-input" value={formData.occupation || ''} onChange={(e) => handleChange('occupation', e.target.value)} />
 
                 <span>Guest Classification</span>
-                <input className="ids-input" value={formData.guestClassification || 'Regular'} readOnly style={{ background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={formData.guestClassification || 'Regular'} 
+                  onChange={(e) => handleChange('guestClassification', e.target.value)} 
+                />
 
                 <span>Guest Status</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
@@ -1030,6 +1054,7 @@ export function IdsOtherDetailsModal({ isOpen, onClose }) {
   const [roomUpgrade, setRoomUpgrade] = useState('EXE');
   const [purposeOfVisit, setPurposeOfVisit] = useState('Business');
   const [postHistory, setPostHistory] = useState('Yes');
+  const [authorizedBy, setAuthorizedBy] = useState('Manager');
 
   if (!isOpen) return null;
 
@@ -1096,7 +1121,7 @@ export function IdsOtherDetailsModal({ isOpen, onClose }) {
               <input className="ids-input" value={purposeOfVisit} onChange={(e) => setPurposeOfVisit(e.target.value)} />
 
               <span>Authorized By</span>
-              <input className="ids-input" defaultValue="Manager"  onChange={() => {}}/>
+              <input className="ids-input" value={authorizedBy} onChange={(e) => setAuthorizedBy(e.target.value)} />
             </div>
           </div>
 
@@ -1153,6 +1178,10 @@ export function IdsGuestInformationModal({
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [selectedPaxName, setSelectedPaxName] = useState('');
 
+  const updateGuestField = (field, val) => {
+    setSelectedGuest(prev => prev ? ({ ...prev, [field]: val }) : { [field]: val });
+  };
+
   useEffect(() => {
     if (initialRoomNo) setSearchRoom(String(initialRoomNo));
   }, [initialRoomNo]);
@@ -1175,7 +1204,9 @@ export function IdsGuestInformationModal({
     ? [rawPaxList[0]] // only primary guest remains
     : (hasSecondPaxAdded ? [...rawPaxList, 'Second Guest'] : rawPaxList);
 
-  const totalPaxDisplay = isPaxCheckedOut || activePaxList.length === 1 ? '1 (1/0)' : '2 (2/0)';
+  const totalPaxDisplay = selectedGuest?.totalPax !== undefined 
+    ? selectedGuest.totalPax 
+    : (isPaxCheckedOut || activePaxList.length === 1 ? '1 (1/0)' : '2 (2/0)');
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
@@ -1230,7 +1261,7 @@ export function IdsGuestInformationModal({
                 <input 
                   className="ids-input" 
                   value={totalPaxDisplay} 
-                  readOnly 
+                  onChange={(e) => updateGuestField('totalPax', e.target.value)}
                   style={{ width: '80px', background: isPaxCheckedOut ? '#E8F5E9' : '#FFF', fontWeight: 700, color: isPaxCheckedOut ? '#2E7D32' : '#000' }} 
                 />
                 {isPaxCheckedOut && (
@@ -1240,12 +1271,22 @@ export function IdsGuestInformationModal({
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ fontWeight: 600, width: '90px' }}>Guest Status</span>
-                <input className="ids-input" value={selectedGuest?.guestStatus || 'REG'} readOnly style={{ width: '80px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.guestStatus || 'REG'} 
+                  onChange={(e) => updateGuestField('guestStatus', e.target.value)}
+                  style={{ width: '80px', background: '#FFF' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600, width: '90px' }}>Nationality</span>
-                <input className="ids-input" value={selectedGuest?.nationality || 'India'} readOnly style={{ width: '120px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.nationality || 'India'} 
+                  onChange={(e) => updateGuestField('nationality', e.target.value)}
+                  style={{ width: '120px', background: '#FFF' }} 
+                />
               </div>
             </div>
 
@@ -1299,9 +1340,19 @@ export function IdsGuestInformationModal({
           {/* Company Row */}
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '6px' }}>
             <span style={{ fontWeight: 600, width: '90px' }}>Company</span>
-            <input className="ids-input" value={selectedGuest?.companyName || 'JK Paper Mills Ltd'} readOnly style={{ width: '240px', background: '#EBEBE4' }} />
+            <input 
+              className="ids-input" 
+              value={selectedGuest?.companyName || 'JK Paper Mills Ltd'} 
+              onChange={(e) => updateGuestField('companyName', e.target.value)}
+              style={{ width: '240px', background: '#FFF' }} 
+            />
             <span style={{ fontWeight: 600, marginLeft: '12px', width: '90px' }}>Com. Remarks</span>
-            <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+            <input 
+              className="ids-input" 
+              value={selectedGuest?.companyRemarks || ''} 
+              onChange={(e) => updateGuestField('companyRemarks', e.target.value)}
+              style={{ flex: 1, background: '#FFF' }} 
+            />
           </div>
 
           {/* Main 2-Column Details Grid */}
@@ -1309,77 +1360,193 @@ export function IdsGuestInformationModal({
             {/* Left Details */}
             <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: '4px', alignItems: 'center', fontSize: '10.5px' }}>
               <span>Arrival</span>
-              <input className="ids-input" value={selectedGuest?.arrival || '16-JAN-2026 11:49 SUNDAY'} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.arrival || '16-JAN-2026 11:49 SUNDAY'} 
+                onChange={(e) => updateGuestField('arrival', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Departure</span>
-              <input className="ids-input" value={selectedGuest?.departure || '26-JAN-2026 12:00 WEDNESDAY'} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.departure || '26-JAN-2026 12:00 WEDNESDAY'} 
+                onChange={(e) => updateGuestField('departure', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Room Night(s)</span>
               <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                <input className="ids-input" value={selectedGuest?.roomNights || 10} readOnly style={{ width: '50px', background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.roomNights || 10} 
+                  onChange={(e) => updateGuestField('roomNights', e.target.value)}
+                  style={{ width: '50px', background: '#FFF' }} 
+                />
                 <span style={{ fontWeight: 600 }}>Ref. No.</span>
-                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.refNo || ''} 
+                  onChange={(e) => updateGuestField('refNo', e.target.value)}
+                  style={{ flex: 1, background: '#FFF' }} 
+                />
               </div>
 
               <span>Arrival From</span>
-              <input className="ids-input" value="Rayagada" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.arrivalFrom || 'Rayagada'} 
+                onChange={(e) => updateGuestField('arrivalFrom', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Proceeding To</span>
-              <input className="ids-input" value="Bihar" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.proceedingTo || 'Bihar'} 
+                onChange={(e) => updateGuestField('proceedingTo', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Group</span>
-              <input className="ids-input" value={selectedGuest?.group || 'Anirudh'} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.group || 'Anirudh'} 
+                onChange={(e) => updateGuestField('group', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Plan / Passport No.</span>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <input className="ids-input" value={selectedGuest?.planCode || 'CP'} readOnly style={{ width: '60px', background: '#EBEBE4' }} />
-                <input className="ids-input" value="" readOnly style={{ flex: 1, background: '#EBEBE4' }} placeholder="Passport No." />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.planCode || 'CP'} 
+                  onChange={(e) => updateGuestField('planCode', e.target.value)}
+                  style={{ width: '60px', background: '#FFF' }} 
+                />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.passportNo || ''} 
+                  onChange={(e) => updateGuestField('passportNo', e.target.value)}
+                  style={{ flex: 1, background: '#FFF' }} 
+                  placeholder="Passport No." 
+                />
               </div>
 
               <span>Bill Inst</span>
-              <input className="ids-input" value={selectedGuest?.billInst || 'Direct'} readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.billInst || 'Direct'} 
+                onChange={(e) => updateGuestField('billInst', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Mkt Segment</span>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <input className="ids-input" value="FIT" readOnly style={{ width: '60px', background: '#EBEBE4' }} />
-                <input className="ids-input" value="FIT" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.mktSegmentCode || 'FIT'} 
+                  onChange={(e) => updateGuestField('mktSegmentCode', e.target.value)}
+                  style={{ width: '60px', background: '#FFF' }} 
+                />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.mktSegmentDesc || 'FIT'} 
+                  onChange={(e) => updateGuestField('mktSegmentDesc', e.target.value)}
+                  style={{ flex: 1, background: '#FFF' }} 
+                />
               </div>
 
               <span>Bus Source</span>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <input className="ids-input" value="WKN" readOnly style={{ width: '60px', background: '#EBEBE4' }} />
-                <input className="ids-input" value="WALK IN" readOnly style={{ flex: 1, background: '#EBEBE4' }} />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.busSourceCode || 'WKN'} 
+                  onChange={(e) => updateGuestField('busSourceCode', e.target.value)}
+                  style={{ width: '60px', background: '#FFF' }} 
+                />
+                <input 
+                  className="ids-input" 
+                  value={selectedGuest?.busSourceDesc || 'WALK IN'} 
+                  onChange={(e) => updateGuestField('busSourceDesc', e.target.value)}
+                  style={{ flex: 1, background: '#FFF' }} 
+                />
               </div>
             </div>
 
             {/* Right Financials Box */}
             <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr', gap: '4px', alignItems: 'center', fontSize: '10.5px' }}>
               <span>Rate</span>
-              <input className="ids-input" value={selectedGuest?.rate || '3,500.00 - DISCOUNT'} readOnly style={{ fontWeight: 700, background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.rate || '3,500.00 - DISCOUNT'} 
+                onChange={(e) => updateGuestField('rate', e.target.value)}
+                style={{ fontWeight: 700, background: '#FFF' }} 
+              />
 
               <span>Plan</span>
-              <input className="ids-input" value="0.00" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.planAmt || '0.00'} 
+                onChange={(e) => updateGuestField('planAmt', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>E.BED RATE</span>
-              <input className="ids-input" value="0" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.eBedRate || '0'} 
+                onChange={(e) => updateGuestField('eBedRate', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>E.B.PLAN</span>
-              <input className="ids-input" value="0" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.eBedPlan || '0'} 
+                onChange={(e) => updateGuestField('eBedPlan', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 700, color: '#0A246A' }}>Guest Balance</span>
-              <input className="ids-input" value={selectedGuest?.balance || '11,760.00'} readOnly style={{ fontWeight: 700, background: '#FFF', color: '#0A246A' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.balance || '11,760.00'} 
+                onChange={(e) => updateGuestField('balance', e.target.value)}
+                style={{ fontWeight: 700, background: '#FFF', color: '#0A246A' }} 
+              />
 
               <span>Credit Limit(No)</span>
-              <input className="ids-input" value="0.00" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.creditLimit || '0.00'} 
+                onChange={(e) => updateGuestField('creditLimit', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Card No.</span>
-              <input className="ids-input" value="" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.cardNo || ''} 
+                onChange={(e) => updateGuestField('cardNo', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span>Expiry Date</span>
-              <input className="ids-input" value="" readOnly style={{ background: '#EBEBE4' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.expiryDate || ''} 
+                onChange={(e) => updateGuestField('expiryDate', e.target.value)}
+                style={{ background: '#FFF' }} 
+              />
 
               <span style={{ fontWeight: 700 }}>Room Type</span>
-              <input className="ids-input" value={selectedGuest?.roomType === 'EXE' ? 'EXECUTIVE (EXE)' : (selectedGuest?.roomType === 'SUI' ? 'SUITE (SUI)' : 'DELUXE (DLX)')} readOnly style={{ fontWeight: 700, background: '#EBEBE4', color: '#7B241C' }} />
+              <input 
+                className="ids-input" 
+                value={selectedGuest?.roomTypeDesc || (selectedGuest?.roomType === 'EXE' ? 'EXECUTIVE (EXE)' : (selectedGuest?.roomType === 'SUI' ? 'SUITE (SUI)' : 'DELUXE (DLX)'))} 
+                onChange={(e) => updateGuestField('roomTypeDesc', e.target.value)}
+                style={{ fontWeight: 700, background: '#FFF', color: '#7B241C' }} 
+              />
             </div>
           </div>
 

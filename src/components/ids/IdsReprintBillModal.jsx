@@ -141,6 +141,10 @@ export default function IdsReprintBillModal({
   const [statusMessage, setStatusMessage] = useState('');
   const [isMaximized, setIsMaximized] = useState(false);
 
+  const updateActiveBill = (field, value) => {
+    setActiveBill(prev => ({ ...prev, [field]: value }));
+  };
+
   if (!isOpen) return null;
 
   // Continue to Stage 2
@@ -282,43 +286,43 @@ export default function IdsReprintBillModal({
               <div style={{ display: 'grid', gridTemplateColumns: '80px 140px 90px 1fr', gap: '8px 12px', alignItems: 'center' }}>
                 
                 <span style={{ fontWeight: 600 }}>Bill No.</span>
-                <input className="ids-input" value={activeBill.billNo} readOnly style={{ width: '100px', fontWeight: 700, background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.billNo || ''} onChange={(e) => updateActiveBill('billNo', e.target.value)} style={{ width: '100px', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Bill Date</span>
-                <input className="ids-input" value={activeBill.billDate} readOnly style={{ width: '120px', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.billDate || ''} onChange={(e) => updateActiveBill('billDate', e.target.value)} style={{ width: '120px', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Room No.</span>
-                <input className="ids-input" value={activeBill.roomNo} readOnly style={{ width: '80px', fontWeight: 700, color: '#0A246A', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.roomNo || ''} onChange={(e) => updateActiveBill('roomNo', e.target.value)} style={{ width: '80px', fontWeight: 700, color: '#0A246A', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Reg. No.</span>
-                <input className="ids-input" value={activeBill.regNo} readOnly style={{ width: '100px', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.regNo || ''} onChange={(e) => updateActiveBill('regNo', e.target.value)} style={{ width: '100px', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Folio No.</span>
-                <input className="ids-input" value={activeBill.folioNo} readOnly style={{ width: '80px', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.folioNo || ''} onChange={(e) => updateActiveBill('folioNo', e.target.value)} style={{ width: '80px', background: '#FFF' }} />
 
                 <span></span>
                 <div></div>
 
                 <span style={{ fontWeight: 600 }}>Guest Name</span>
-                <input className="ids-input" value={activeBill.guestName} readOnly style={{ gridColumn: 'span 3', width: '100%', fontWeight: 700, background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.guestName || ''} onChange={(e) => updateActiveBill('guestName', e.target.value)} style={{ gridColumn: 'span 3', width: '100%', fontWeight: 700, background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Company</span>
-                <input className="ids-input" value={activeBill.companyName || '-'} readOnly style={{ gridColumn: 'span 3', width: '100%', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.companyName || ''} onChange={(e) => updateActiveBill('companyName', e.target.value)} style={{ gridColumn: 'span 3', width: '100%', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Arrival Date</span>
-                <input className="ids-input" value={activeBill.arrivalDate} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.arrivalDate || ''} onChange={(e) => updateActiveBill('arrivalDate', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Group</span>
-                <input className="ids-input" value={activeBill.group} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.group || ''} onChange={(e) => updateActiveBill('group', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Departure Date</span>
-                <input className="ids-input" value={activeBill.departureDate} readOnly style={{ width: '100%', background: '#F0F0F0' }} />
+                <input className="ids-input" value={activeBill.departureDate || ''} onChange={(e) => updateActiveBill('departureDate', e.target.value)} style={{ width: '100%', background: '#FFF' }} />
 
                 <span style={{ fontWeight: 600 }}>Net Amount</span>
                 <input 
                   className="ids-input" 
-                  value={activeBill.netAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} 
-                  readOnly 
+                  value={activeBill.netAmount !== undefined ? activeBill.netAmount : ''} 
+                  onChange={(e) => updateActiveBill('netAmount', parseFloat(e.target.value) || 0)} 
                   style={{ width: '120px', fontWeight: 900, color: '#0A246A', background: '#FFF7CC', fontSize: '12px' }} 
                 />
 

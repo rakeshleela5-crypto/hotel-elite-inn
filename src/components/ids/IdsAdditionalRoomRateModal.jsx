@@ -86,6 +86,8 @@ export default function IdsAdditionalRoomRateModal({
   const [description, setDescription] = useState('Previous');
   const [referenceNo, setReferenceNo] = useState('');
   const [roomCount, setRoomCount] = useState('No');
+  const [manualTaxAmt, setManualTaxAmt] = useState('');
+  const [manualDayTotal, setManualDayTotal] = useState('');
 
   // Saved Postings List for this guest
   const [postings, setPostings] = useState(DEFAULT_ADDITIONAL_POSTINGS);
@@ -310,9 +312,9 @@ export default function IdsAdditionalRoomRateModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '60px', background: '#EAE8DE' }}
+                  style={{ width: '60px', background: '#FFF' }}
                   value={regNo}
-                  readOnly
+                  onChange={e => setRegNo(e.target.value)}
                 />
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -333,18 +335,18 @@ export default function IdsAdditionalRoomRateModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '100%', background: '#EAE8DE', fontWeight: 700 }}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 700 }}
                   value={guestName}
-                  readOnly
+                  onChange={e => setGuestName(e.target.value)}
                 />
 
                 <label style={{ fontWeight: 600, textAlign: 'right' }}>Accounting Date</label>
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '110px', background: '#EAE8DE', textAlign: 'center', fontWeight: 700 }}
+                  style={{ width: '110px', background: '#FFF', textAlign: 'center', fontWeight: 700 }}
                   value={acDate}
-                  readOnly
+                  onChange={e => setAcDate(e.target.value)}
                 />
               </div>
 
@@ -380,9 +382,9 @@ export default function IdsAdditionalRoomRateModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '110px', background: '#EAE8DE', textAlign: 'right' }}
+                  style={{ width: '110px', background: '#FFF', textAlign: 'right' }}
                   value={exchangeRate}
-                  readOnly
+                  onChange={e => setExchangeRate(e.target.value)}
                 />
               </div>
 
@@ -399,9 +401,9 @@ export default function IdsAdditionalRoomRateModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '100px', background: '#EAE8DE', textAlign: 'right', color: '#666' }}
-                  value={numericAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  readOnly
+                  style={{ width: '100px', background: '#FFF', textAlign: 'right', color: '#666' }}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
                 />
                 <div />
 
@@ -409,9 +411,9 @@ export default function IdsAdditionalRoomRateModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '110px', background: '#EAE8DE', textAlign: 'right' }}
-                  value={taxAmt.toFixed(2)}
-                  readOnly
+                  style={{ width: '110px', background: '#FFF', textAlign: 'right' }}
+                  value={manualTaxAmt !== '' ? manualTaxAmt : taxAmt.toFixed(2)}
+                  onChange={e => setManualTaxAmt(e.target.value)}
                 />
               </div>
 
@@ -498,9 +500,9 @@ export default function IdsAdditionalRoomRateModal({
               <input 
                 type="text" 
                 className="ids-input" 
-                style={{ width: '120px', background: '#EAE8DE', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
-                value={dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                readOnly
+                style={{ width: '120px', background: '#FFF', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
+                value={manualDayTotal !== '' ? manualDayTotal : dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                onChange={(e) => setManualDayTotal(e.target.value)}
               />
               <div />
 
@@ -519,9 +521,9 @@ export default function IdsAdditionalRoomRateModal({
               <input 
                 type="text" 
                 className="ids-input" 
-                style={{ width: '110px', background: '#EAE8DE', textAlign: 'right', fontWeight: 700 }}
-                value={dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                readOnly
+                style={{ width: '110px', background: '#FFF', textAlign: 'right', fontWeight: 700 }}
+                value={manualDayTotal !== '' ? manualDayTotal : dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                onChange={(e) => setManualDayTotal(e.target.value)}
               />
             </div>
 
@@ -623,7 +625,7 @@ export default function IdsAdditionalRoomRateModal({
                 className="ids-input" 
                 style={{ width: '60px', background: '#FFF' }}
                 value={roomNo}
-                readOnly
+                onChange={(e) => setRoomNo(e.target.value)}
               />
               <button type="button" className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); const r = prompt("Lookup Quick Balance by Room No.: ", roomNo); if (r) setRoomNo(r); }}>?</button>
 

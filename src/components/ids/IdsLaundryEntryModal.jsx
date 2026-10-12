@@ -56,6 +56,9 @@ export default function IdsLaundryEntryModal({
   });
 
   const [lineItems, setLineItems] = useState(currentEntry.items || []);
+  const [laundryArrival, setLaundryArrival] = useState('27-JAN-2026 19:07');
+  const [laundryDeparture, setLaundryDeparture] = useState('01-FEB-2026 12:00');
+  const [laundryBillInst, setLaundryBillInst] = useState('Direct');
 
   useEffect(() => {
     if (isOpen) {
@@ -327,9 +330,9 @@ export default function IdsLaundryEntryModal({
                   </button>
                   <input 
                     type="text" 
-                    value={formData.guestName}
-                    disabled
-                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }}
+                    value={formData.guestName || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, guestName: e.target.value }))}
+                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                   />
                 </div>
               </div>
@@ -352,15 +355,15 @@ export default function IdsLaundryEntryModal({
                 <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
                   <input 
                     type="text" 
-                    value={formData.rcvDate}
-                    disabled={isFormLocked}
-                    style={{ width: '100px', padding: '2px 4px', border: '1px solid #7F9DB9', background: isFormLocked ? '#EBE9ED' : '#FFF' }}
+                    value={formData.rcvDate || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, rcvDate: e.target.value }))}
+                    style={{ width: '100px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                   />
                   <input 
                     type="text" 
-                    value={formData.rcvTime}
-                    disabled={isFormLocked}
-                    style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9', background: isFormLocked ? '#EBE9ED' : '#FFF' }}
+                    value={formData.rcvTime || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, rcvTime: e.target.value }))}
+                    style={{ width: '60px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }}
                   />
                 </div>
               </div>
@@ -370,9 +373,9 @@ export default function IdsLaundryEntryModal({
                 <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
                   <input 
                     type="text" 
-                    value={formData.collectedBy}
-                    disabled
-                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }}
+                    value={formData.collectedBy || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, collectedBy: e.target.value }))}
+                    style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }}
                   />
                   <button 
                     onClick={() => setStaffModalOpen(true)}
@@ -401,32 +404,32 @@ export default function IdsLaundryEntryModal({
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Guest Name</label>
-                <input type="text" value={formData.guestName} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} />
+                <input type="text" value={formData.guestName || ''} onChange={(e) => setFormData(prev => ({ ...prev, guestName: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Guest Type</label>
-                <input type="text" value={formData.guestType || 'Regular'} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value={formData.guestType || 'Regular'} onChange={(e) => setFormData(prev => ({ ...prev, guestType: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Guest Status</label>
-                <input type="text" value={formData.guestStatus || 'In-House'} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value={formData.guestStatus || 'In-House'} onChange={(e) => setFormData(prev => ({ ...prev, guestStatus: e.target.value }))} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Arrival</label>
-                <input type="text" value="27-JAN-2026 19:07" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value={laundryArrival} onChange={(e) => setLaundryArrival(e.target.value)} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Dep Date</label>
-                <input type="text" value="01-FEB-2026 12:00" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value={laundryDeparture} onChange={(e) => setLaundryDeparture(e.target.value)} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '90px' }}>Bill.Inst</label>
-                <input type="text" value="Direct" disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input type="text" value={laundryBillInst} onChange={(e) => setLaundryBillInst(e.target.value)} style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} />
               </div>
             </div>
           </div>

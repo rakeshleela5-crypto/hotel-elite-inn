@@ -76,7 +76,12 @@ export default function IdsLaundryPlantModal({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '150px' }}>Plant Code</label>
-                <input type="text" value={formData.plantCode} disabled style={{ width: '120px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} />
+                <input 
+                  type="text" 
+                  value={formData.plantCode} 
+                  onChange={(e) => setFormData({ ...formData, plantCode: e.target.value })}
+                  style={{ width: '120px', padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -92,7 +97,12 @@ export default function IdsLaundryPlantModal({
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '150px' }}>Department</label>
-                <input type="text" value={formData.department} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED' }} />
+                <input 
+                  type="text" 
+                  value={formData.department} 
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -143,7 +153,12 @@ export default function IdsLaundryPlantModal({
 
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <label style={{ width: '150px' }}>Statutory SAC Code</label>
-                <input type="text" value={formData.sacCode} disabled style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#EBE9ED', fontWeight: 'bold' }} />
+                <input 
+                  type="text" 
+                  value={formData.sacCode} 
+                  onChange={(e) => setFormData({ ...formData, sacCode: e.target.value })}
+                  style={{ flex: 1, padding: '2px 4px', border: '1px solid #7F9DB9', background: '#FFF', fontWeight: 'bold' }} 
+                />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center' }}>

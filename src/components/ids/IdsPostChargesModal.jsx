@@ -84,6 +84,8 @@ export default function IdsPostChargesModal({
   const [exchangeRate, setExchangeRate] = useState('1.000000');
   const [taxInclusive, setTaxInclusive] = useState('No'); // 'No' | 'Yes'
   const [charges, setCharges] = useState('1500.00');
+  const [operatorUser, setOperatorUser] = useState('MANAGER');
+  const [lastUpdated, setLastUpdated] = useState(`${accountingDate || INITIAL_ACCOUNTING_DATE} 16:16`);
 
   // Prompts & Voucher preview state
   const [showPrintPrompt, setShowPrintPrompt] = useState(false);
@@ -361,9 +363,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '100px', background: '#EAE8DE' }}
+                  style={{ width: '100px', background: '#FFF' }}
                   value={regNo}
-                  readOnly
+                  onChange={(e) => setRegNo(e.target.value)}
                 />
                 <div />
 
@@ -371,9 +373,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '100%', background: '#EAE8DE', fontWeight: 700 }}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 700 }}
                   value={guestName}
-                  readOnly
+                  onChange={(e) => setGuestName(e.target.value)}
                 />
               </div>
 
@@ -383,9 +385,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '105px', background: '#EAE8DE', textAlign: 'center' }}
+                  style={{ width: '105px', background: '#FFF', textAlign: 'center' }}
                   value={refDate}
-                  readOnly
+                  onChange={(e) => setRefDate(e.target.value)}
                 />
                 <div />
 
@@ -393,9 +395,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '105px', background: '#EAE8DE', textAlign: 'center', fontWeight: 700 }}
+                  style={{ width: '105px', background: '#FFF', textAlign: 'center', fontWeight: 700 }}
                   value={acDate}
-                  readOnly
+                  onChange={(e) => setAcDate(e.target.value)}
                 />
               </div>
 
@@ -427,9 +429,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '100%', background: '#EAE8DE', fontWeight: 600 }}
+                  style={{ width: '100%', background: '#FFF', fontWeight: 600 }}
                   value={description}
-                  readOnly
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
 
@@ -449,9 +451,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '105px', background: '#EAE8DE', textAlign: 'center', fontWeight: 700, color: '#0A246A' }}
+                  style={{ width: '105px', background: '#FFF', textAlign: 'center', fontWeight: 700, color: '#0A246A' }}
                   value={receiptNo}
-                  readOnly
+                  onChange={(e) => setReceiptNo(e.target.value)}
                 />
               </div>
 
@@ -491,9 +493,9 @@ export default function IdsPostChargesModal({
                     <input 
                       type="text" 
                       className="ids-input" 
-                      style={{ width: '100px', background: '#EAE8DE', textAlign: 'right' }}
+                      style={{ width: '100px', background: '#FFF', textAlign: 'right' }}
                       value={exchangeRate}
-                      readOnly
+                      onChange={(e) => setExchangeRate(e.target.value)}
                     />
                   </div>
 
@@ -526,9 +528,9 @@ export default function IdsPostChargesModal({
                     <input 
                       type="text" 
                       className="ids-input" 
-                      style={{ width: '140px', background: '#EAE8DE', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
-                      value={totalAmount.toFixed(2)}
-                      readOnly
+                      style={{ width: '140px', background: '#FFF', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
+                      value={totalAmount}
+                      onChange={(e) => setCharges(e.target.value)}
                     />
                   </div>
                 </div>
@@ -579,9 +581,9 @@ export default function IdsPostChargesModal({
                     <input 
                       type="text" 
                       className="ids-input" 
-                      style={{ width: '130px', background: '#EAE8DE', textAlign: 'right', fontWeight: 600 }}
-                      value={baseCharges.toFixed(2)}
-                      readOnly
+                      style={{ width: '130px', background: '#FFF', textAlign: 'right', fontWeight: 600 }}
+                      value={baseCharges}
+                      onChange={(e) => setCharges(e.target.value)}
                     />
                   </div>
 
@@ -592,9 +594,9 @@ export default function IdsPostChargesModal({
                     <input 
                       type="text" 
                       className="ids-input" 
-                      style={{ width: '130px', background: '#EAE8DE', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
-                      value={totalAmount.toFixed(2)}
-                      readOnly
+                      style={{ width: '130px', background: '#FFF', textAlign: 'right', fontWeight: 700, color: '#0A246A' }}
+                      value={totalAmount}
+                      onChange={(e) => setCharges(e.target.value)}
                     />
                   </div>
                 </div>
@@ -606,9 +608,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '130px', background: '#EAE8DE', fontWeight: 600 }}
-                  value="MANAGER"
-                  readOnly
+                  style={{ width: '130px', background: '#FFF', fontWeight: 600 }}
+                  value={operatorUser}
+                  onChange={(e) => setOperatorUser(e.target.value)}
                 />
                 <div />
 
@@ -616,9 +618,9 @@ export default function IdsPostChargesModal({
                 <input 
                   type="text" 
                   className="ids-input" 
-                  style={{ width: '135px', background: '#EAE8DE', textAlign: 'center' }}
-                  value={`${acDate} 16:16`}
-                  readOnly
+                  style={{ width: '135px', background: '#FFF', textAlign: 'center' }}
+                  value={lastUpdated}
+                  onChange={(e) => setLastUpdated(e.target.value)}
                 />
               </div>
             </div>
@@ -768,7 +770,7 @@ export default function IdsPostChargesModal({
                 className="ids-input" 
                 style={{ width: '60px', background: '#FFF' }}
                 value={roomNo}
-                readOnly
+                onChange={(e) => setRoomNo(e.target.value)}
               />
               <button 
                 type="button" 

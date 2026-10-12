@@ -150,6 +150,9 @@ export default function IdsPosBillModal({
   const [equalSplitCount, setEqualSplitCount] = useState(2);
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
   const [billDiscounts, setBillDiscounts] = useState({});
+  const [manualSplitTotalQty, setManualSplitTotalQty] = useState('');
+  const [manualViewKotTotalQty, setManualViewKotTotalQty] = useState('');
+  const [customSplitItemQtys, setCustomSplitItemQtys] = useState({});
 
   // Determine active KOT based on selected table
   const activeKot = useMemo(() => {
@@ -471,14 +474,14 @@ export default function IdsPosBillModal({
             <label style={{ width: '50px', fontWeight: 600 }}>Server</label>
             <input 
               type="text" 
-              readOnly 
               value={currentSteward} 
+              onChange={(e) => setCurrentSteward(e.target.value)}
               style={{ width: '100px', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
             />
             <input 
               type="text" 
-              readOnly 
               value={currentSteward.toUpperCase()} 
+              onChange={(e) => setCurrentSteward(e.target.value)}
               style={{ flex: 1, background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontSize: '11px' }}
             />
           </div>
@@ -863,9 +866,9 @@ export default function IdsPosBillModal({
                   <label style={{ fontWeight: 600, fontSize: '11px' }}>Total Quantity</label>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={activeKot.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0).toFixed(3)} 
-                    style={{ width: '60px', textAlign: 'right', background: '#ECE9D8', border: '1px solid #7F9DB9', padding: '2px 4px', fontWeight: 700 }}
+                    value={manualSplitTotalQty !== '' ? manualSplitTotalQty : activeKot.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0).toFixed(3)} 
+                    onChange={(e) => setManualSplitTotalQty(e.target.value)}
+                    style={{ width: '60px', textAlign: 'right', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontWeight: 700 }}
                   />
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -981,9 +984,9 @@ export default function IdsPosBillModal({
                   <label style={{ fontWeight: 600, fontSize: '11px' }}>Total Quantity</label>
                   <input 
                     type="text" 
-                    readOnly 
-                    value={viewKotDisplayItems.totalQty.toFixed(3)} 
-                    style={{ width: '60px', textAlign: 'right', background: '#ECE9D8', border: '1px solid #7F9DB9', padding: '2px 4px', fontWeight: 700 }}
+                    value={manualViewKotTotalQty !== '' ? manualViewKotTotalQty : viewKotDisplayItems.totalQty.toFixed(3)} 
+                    onChange={(e) => setManualViewKotTotalQty(e.target.value)}
+                    style={{ width: '60px', textAlign: 'right', background: '#FFF', border: '1px solid #7F9DB9', padding: '2px 4px', fontWeight: 700 }}
                   />
                 </div>
                 <div style={{ display: 'flex', gap: '6px' }}>
@@ -1218,17 +1221,17 @@ export default function IdsPosBillModal({
                         <td style={{ padding: '3px 6px', textAlign: 'center' }}>
                           <input 
                             type="text" 
-                            readOnly 
-                            value={Number(item.quantity) > 1 ? '1.0' : '1.0'} 
-                            style={{ width: '40px', textAlign: 'center', background: '#F5F5F5', border: '1px solid #BBB' }} 
+                            value={customSplitItemQtys[`${idx}_1`] !== undefined ? customSplitItemQtys[`${idx}_1`] : (Number(item.quantity) > 1 ? '1.0' : '1.0')} 
+                            onChange={(e) => setCustomSplitItemQtys(prev => ({ ...prev, [`${idx}_1`]: e.target.value }))}
+                            style={{ width: '40px', textAlign: 'center', background: '#FFF', border: '1px solid #BBB' }} 
                           />
                         </td>
                         <td style={{ padding: '3px 6px', textAlign: 'center' }}>
                           <input 
                             type="text" 
-                            readOnly 
-                            value={Number(item.quantity) > 1 ? '1.0' : '0.0'} 
-                            style={{ width: '40px', textAlign: 'center', background: '#F5F5F5', border: '1px solid #BBB' }} 
+                            value={customSplitItemQtys[`${idx}_2`] !== undefined ? customSplitItemQtys[`${idx}_2`] : (Number(item.quantity) > 1 ? '1.0' : '0.0')} 
+                            onChange={(e) => setCustomSplitItemQtys(prev => ({ ...prev, [`${idx}_2`]: e.target.value }))}
+                            style={{ width: '40px', textAlign: 'center', background: '#FFF', border: '1px solid #BBB' }} 
                           />
                         </td>
                       </tr>
