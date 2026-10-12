@@ -38,18 +38,21 @@ export default function DexieSyncIndicator({ compact = false }) {
       <>
         <button
           onClick={handleOpenDetails}
+          type="button"
           title="Dexie.js Offline Storage & Cloudflare Sync Status"
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold shadow-xs transition-all border ${
-            !isOnline
-              ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 animate-pulse'
-              : isSyncing
-              ? 'bg-blue-500/15 text-blue-300 border-blue-500/40'
-              : failedCount > 0
-              ? 'bg-rose-500/15 text-rose-300 border-rose-500/40'
-              : pendingCount > 0
-              ? 'bg-amber-500/15 text-amber-300 border-amber-500/40'
-              : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
-          }`}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            padding: '3px 8px',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            border: !isOnline ? '1px solid rgba(245, 158, 11, 0.5)' : (isSyncing ? '1px solid rgba(59, 130, 246, 0.5)' : (failedCount > 0 ? '1px solid rgba(244, 63, 94, 0.5)' : (pendingCount > 0 ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid rgba(16, 185, 129, 0.4)'))),
+            background: !isOnline ? 'rgba(245, 158, 11, 0.18)' : (isSyncing ? 'rgba(59, 130, 246, 0.18)' : (failedCount > 0 ? 'rgba(244, 63, 94, 0.18)' : (pendingCount > 0 ? 'rgba(245, 158, 11, 0.18)' : 'rgba(16, 185, 129, 0.18)'))),
+            color: !isOnline ? '#fcd34d' : (isSyncing ? '#93c5fd' : (failedCount > 0 ? '#fda4af' : (pendingCount > 0 ? '#fcd34d' : '#6ee7b7')))
+          }}
         >
           {!isOnline ? (
             <>
@@ -169,112 +172,164 @@ function SyncDetailsModal({
   retryFailed
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-5 text-slate-200">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-              <Database className="w-5 h-5 text-emerald-400" />
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 999999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: '#0f172a',
+          color: '#f1f5f9',
+          border: '1px solid #334155',
+          borderRadius: '16px',
+          width: '100%',
+          maxWidth: '380px',
+          padding: '20px',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+          fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ padding: '8px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px' }}>
+              <Database size={18} color="#34d399" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-base">Dexie.js Offline Storage</h3>
-              <p className="text-xs text-slate-400">IndexedDB + Cloudflare D1 Synchronization</p>
+              <div style={{ fontWeight: 800, color: '#ffffff', fontSize: '15px' }}>Offline Cache &amp; Cloud Sync</div>
+              <div style={{ fontSize: '11px', color: '#94a3b8' }}>Dexie IndexedDB + Cloudflare D1</div>
             </div>
           </div>
           <button 
+            type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+            style={{
+              background: '#1e293b',
+              border: '1px solid #475569',
+              color: '#f8fafc',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+            title="Close"
           >
             ✕
           </button>
         </div>
 
-        {/* Network & Engine Status */}
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
-            <div className="text-slate-400 mb-1">Network Connection</div>
-            <div className="flex items-center gap-1.5 font-semibold text-white">
-              {isOnline ? (
-                <>
-                  <Wifi className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-300">Online (Connected)</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-4 h-4 text-amber-400" />
-                  <span className="text-amber-300">Offline (Local Only)</span>
-                </>
-              )}
+        {/* Network & Queue Overview */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
+          <div style={{ padding: '10px', background: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div style={{ color: '#94a3b8', marginBottom: '4px' }}>Network Status</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: isOnline ? '#34d399' : '#fbbf24' }}>
+              {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
+              <span>{isOnline ? 'Online' : 'Offline'}</span>
             </div>
           </div>
 
-          <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/50">
-            <div className="text-slate-400 mb-1">Outbox Queue</div>
-            <div className="flex items-center gap-1.5 font-semibold text-white">
-              <HardDrive className="w-4 h-4 text-blue-400" />
+          <div style={{ padding: '10px', background: '#1e293b', borderRadius: '10px', border: '1px solid #334155' }}>
+            <div style={{ color: '#94a3b8', marginBottom: '4px' }}>Outbox Queue</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: '#60a5fa' }}>
+              <HardDrive size={14} />
               <span>{pendingCount} Pending</span>
-              {failedCount > 0 && (
-                <span className="text-rose-400">({failedCount} failed)</span>
-              )}
             </div>
           </div>
         </div>
 
         {/* Local IndexedDB Stores Overview */}
-        <div className="space-y-2">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            IndexedDB Cached Data Sets
+        <div style={{ background: '#090d16', border: '1px solid #1e293b', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11.5px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
+            <span>Cached KOT Orders:</span>
+            <span style={{ fontWeight: 700, color: '#34d399', fontFamily: 'monospace' }}>{stats.kotCount} records</span>
           </div>
-          <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3 space-y-2 text-xs">
-            <div className="flex justify-between items-center text-slate-300">
-              <span>Cached KOT Orders:</span>
-              <span className="font-mono text-emerald-400 font-semibold">{stats.kotCount} records</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-300">
-              <span>Active Table Sessions:</span>
-              <span className="font-mono text-blue-400 font-semibold">{stats.sessionCount} tables</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-300">
-              <span>Offline Menu Catalog:</span>
-              <span className="font-mono text-purple-400 font-semibold">{stats.menuCount} dishes</span>
-            </div>
-            <div className="flex justify-between items-center text-slate-300 pt-1 border-t border-slate-800/60">
-              <span>Last Remote Sync:</span>
-              <span className="text-slate-400">
-                {lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('en-IN') : 'Just now'}
-              </span>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
+            <span>Active Table Sessions:</span>
+            <span style={{ fontWeight: 700, color: '#60a5fa', fontFamily: 'monospace' }}>{stats.sessionCount} tables</span>
           </div>
-        </div>
-
-        {/* Explanation Note */}
-        <div className="p-3 bg-blue-950/30 border border-blue-800/40 rounded-xl text-xs text-blue-200/90 leading-relaxed">
-          💡 <strong>Guaranteed Offline Punching:</strong> Stewards can punch food orders even in dead Wi-Fi zones (gardens, basements). All orders instantly write to Dexie IndexedDB and automatically flush to Cloudflare D1 the moment Wi-Fi reconnects.
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
+            <span>Offline Menu Catalog:</span>
+            <span style={{ fontWeight: 700, color: '#c084fc', fontFamily: 'monospace' }}>{stats.menuCount} dishes</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#94a3b8', borderTop: '1px solid #1e293b', paddingTop: '6px', fontSize: '11px' }}>
+            <span>Last Remote Sync:</span>
+            <span>{lastSyncedAt ? new Date(lastSyncedAt).toLocaleTimeString('en-IN') : 'Just now'}</span>
+          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-2">
+        <div style={{ display: 'flex', gap: '8px', paddingTop: '4px' }}>
           <button
+            type="button"
             onClick={() => {
               triggerManualSync();
               onClose();
             }}
             disabled={isSyncing || !isOnline}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-sm font-semibold transition"
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '10px 14px',
+              background: '#059669',
+              border: 'none',
+              borderRadius: '10px',
+              color: '#ffffff',
+              fontSize: '12.5px',
+              fontWeight: 700,
+              cursor: (isSyncing || !isOnline) ? 'not-allowed' : 'pointer',
+              opacity: (isSyncing || !isOnline) ? 0.6 : 1
+            }}
           >
-            <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
             <span>{isSyncing ? 'Syncing...' : 'Sync Now with Cloudflare D1'}</span>
           </button>
 
           {failedCount > 0 && (
             <button
+              type="button"
               onClick={() => {
                 retryFailed();
                 onClose();
               }}
-              className="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-sm font-semibold transition"
+              style={{
+                padding: '10px 14px',
+                background: '#e11d48',
+                border: 'none',
+                borderRadius: '10px',
+                color: '#ffffff',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
             >
-              Retry Failed ({failedCount})
+              Retry ({failedCount})
             </button>
           )}
         </div>
