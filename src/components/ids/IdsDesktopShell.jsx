@@ -2249,6 +2249,7 @@ export default function IdsDesktopShell({
 
         {/* Bottom Command Strip (Frame 001 & 013) */}
         <div className="ids-bottom-commands">
+          {/* Zone 1: Core Front Office Utilities */}
           <button 
             className="ids-btn-classic"
             onClick={triggerSystemUpdate}
@@ -2305,9 +2306,13 @@ export default function IdsDesktopShell({
           >
             Load Pgm
           </button>
+
+          {/* Win32 Etched Divider */}
+          <div className="ids-btn-divider" />
+
+          {/* Zone 2: Specialized Front Desk & Compliance Operations */}
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#FFF3E0', fontWeight: 700 }}
             onClick={() => setTransitSlotModalOpen(true)}
             title="3-Hour Daytime Transit Slot (Muniguda Jn 6 AM - 6 PM)"
           >
@@ -2315,7 +2320,6 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#E8F5E9', fontWeight: 700 }}
             onClick={() => setPoliceThanaManifestOpen(true)}
             title="Muniguda Police Station Daily Manifest (Form C)"
           >
@@ -2323,7 +2327,6 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#E3F2FD', fontWeight: 700 }}
             onClick={() => setCorporateSplitBillingOpen(true)}
             title="Corporate Split Billing (Vedanta & JK Paper)"
           >
@@ -2331,7 +2334,6 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#F3E5F5', fontWeight: 700 }}
             onClick={() => setSplitTenderModalOpen(true)}
             title="Split-Tender Settlement (Multi-Pay Mode: UPI + Card + Cash)"
           >
@@ -2339,7 +2341,6 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#FFEBEE', color: '#B71C1C', fontWeight: 700 }}
             onClick={() => setTenderReclassificationOpen(true)}
             title="Audited Payment Tender Re-Classification (Manager PIN Authorization)"
           >
@@ -2347,23 +2348,26 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#EDE7F6', color: '#4A148C', fontWeight: 700 }}
             onClick={() => setCorporateBtcModalOpen(true)}
             title="Corporate BTC (Bill to Company) & Outstanding Aging Ledger (Vedanta, JK Paper, RVNL)"
           >
-            🏢 BTC Aging
+            📊 BTC Aging
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#E0F2F1', color: '#004D40', fontWeight: 700 }}
             onClick={() => setCaGstr1ModalOpen(true)}
             title="CA GSTR-1 Portal JSON Export with HSN/SAC Codes"
           >
             🏛️ CA GSTR-1
           </button>
+
+          {/* Win32 Etched Divider */}
+          <div className="ids-btn-divider" />
+
+          {/* Zone 3: System Automation & Exit */}
           <button 
             className="ids-btn-classic" 
-            style={{ background: '#E1F5FE', color: '#01579B', fontWeight: 700 }}
+            style={{ fontWeight: 700, color: '#0A246A' }}
             onClick={() => executeAutomatedMidnightDayClose('MANUAL_BOTTOM_STRIP')}
             title="Automated 12:00 AM Midnight Day Close (Instant Execution)"
           >
@@ -2371,10 +2375,11 @@ export default function IdsDesktopShell({
           </button>
           <button 
             className="ids-btn-classic" 
-            style={{ marginLeft: '12px', background: '#D9534F', color: '#FFF', border: '2px outset #E0706D' }}
+            style={{ background: '#A94442', color: '#FFFFFF', border: '2px outset #D9534F', borderRightColor: '#5B2020', borderBottomColor: '#5B2020', fontWeight: 700, marginLeft: '6px' }}
             onClick={onExitPMS}
+            title="Exit PMS and Return to Elite Inn Portal"
           >
-            Exit to Website
+            🚪 Exit to Website
           </button>
         </div>
       </div>
