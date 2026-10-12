@@ -33,6 +33,7 @@ import TapeChartCalendar from './TapeChartCalendar';
 import D1LiveDatabaseExplorer from './D1LiveDatabaseExplorer';
 import UniversalDateFilterBar from './UniversalDateFilterBar';
 import DateRangeSelectionModal from './DateRangeSelectionModal';
+import CloudflareR2BackupModal from './admin/CloudflareR2BackupModal';
 import { useUniversalInlineEdit, InlineEditorBanner, InlineText, SheetsEditableCell, SheetsColumnHeader, SheetsToolbarLegend } from './UniversalInlineEditor';
 import AutomatedFnbReconciliationStrip from './AutomatedFnbReconciliationStrip';
 import { playOrderAlert } from '../utils/soundAlert';
@@ -89,6 +90,7 @@ export default function ReceptionAdmin({
   const [activeDepartment, setActiveDepartment] = useState('reception'); // 'reception', 'restaurant', 'accounts', 'store', 'housekeeping'
   const [activeTab, setActiveTab] = useState(initialTab || 'tape-chart'); // 'tape-chart', 'd1-database-explorer', 'cashier-audit', etc.
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isCloudBackupModalOpen, setIsCloudBackupModalOpen] = useState(false);
 
   useEffect(() => {
     if (initialTab) {
@@ -3814,6 +3816,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
         onOpenAuditedSalesRegister={onOpenAuditedSalesRegister}
         onOpenAuditedRestaurantRegister={onOpenAuditedRestaurantRegister}
         onOpenQrHub={() => setQrHubOpen(true)}
+        onOpenCloudBackup={() => setIsCloudBackupModalOpen(true)}
         onExitPMS={onExitPMS}
       />
 
@@ -3837,6 +3840,7 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
           }}
           onOpenCaFilingStation={onOpenCaFilingStation}
           onOpenAuditedSalesRegister={onOpenAuditedSalesRegister}
+          onOpenCloudBackup={() => setIsCloudBackupModalOpen(true)}
           onExitPMS={onExitPMS}
         />
 
@@ -11521,6 +11525,12 @@ Enjoy your stay! For 24/7 front desk support or housekeeping, dial 0 or message 
             window.location.reload();
           }
         }}
+      />
+
+      {/* CLOUDFLARE R2 AUTOMATED & ON-DEMAND BACKUP VAULT MODAL */}
+      <CloudflareR2BackupModal
+        isOpen={isCloudBackupModalOpen}
+        onClose={() => setIsCloudBackupModalOpen(false)}
       />
     </section>
       </div>

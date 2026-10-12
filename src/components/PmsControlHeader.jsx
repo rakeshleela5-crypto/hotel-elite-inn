@@ -19,6 +19,7 @@ export default function PmsControlHeader({
   onOpenWalkInModal,
   onOpenCaFilingStation,
   onOpenAuditedSalesRegister,
+  onOpenCloudBackup,
   onExitPMS
 }) {
   const [liveTime, setLiveTime] = useState(() => new Date());
@@ -180,6 +181,32 @@ export default function PmsControlHeader({
 
         {/* Dexie.js Offline Outbox & Cloudflare D1 Synchronization Indicator */}
         <DexieSyncIndicator compact={false} />
+
+        {/* Cloudflare R2 Automated Backup Vault Button */}
+        {onOpenCloudBackup && (
+          <button
+            type="button"
+            onClick={onOpenCloudBackup}
+            title="Cloudflare R2 Automated Backup Vault (Zero-Egress S3)"
+            style={{
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: '16px',
+              padding: '2px 9px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              color: '#fbbf24',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span>☁️</span>
+            <span>R2 Backup</span>
+          </button>
+        )}
 
         {/* Shift Cash Drawer Pill */}
         <div style={{

@@ -28,6 +28,7 @@ export default function PmsSidebar({
   onOpenAuditedSalesRegister,
   onOpenAuditedRestaurantRegister,
   onOpenQrHub,
+  onOpenCloudBackup,
   onExitPMS
 }) {
   const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
@@ -164,6 +165,20 @@ export default function PmsSidebar({
       hotkey: 'F9',
       onClick: () => {
         if (onOpenQrHub) onOpenQrHub();
+      }
+    },
+    {
+      id: 'r2-backup',
+      label: 'Cloudflare R2 Backup Vault',
+      shortLabel: 'R2 Vault',
+      icon: Database,
+      color: '#f59e0b',
+      desc: 'Zero-Egress Automated S3',
+      badge: 'S3 Zero',
+      badgeColor: 'rgba(245, 158, 11, 0.25)',
+      hotkey: 'F10',
+      onClick: () => {
+        if (onOpenCloudBackup) onOpenCloudBackup();
       }
     }
   ];

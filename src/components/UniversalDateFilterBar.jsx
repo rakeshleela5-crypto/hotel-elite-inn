@@ -85,17 +85,18 @@ export default function UniversalDateFilterBar({
       const past = new Date(today);
       past.setDate(past.getDate() - 6);
       f = past.toISOString().slice(0, 10);
-    } else if (type === 'thisMonth') {
-      const first = new Date(today.getFullYear(), today.getMonth(), 1);
-      const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-      f = first.toISOString().slice(0, 10);
-      t = last.toISOString().slice(0, 10);
+    } else if (type === '15days') {
+      const past = new Date(today);
+      past.setDate(past.getDate() - 14);
+      f = past.toISOString().slice(0, 10);
+    } else if (type === '30days' || type === 'thisMonth') {
+      const past = new Date(today);
+      past.setDate(past.getDate() - 29);
+      f = past.toISOString().slice(0, 10);
     } else if (type === 'year') {
-      const first = new Date(today.getFullYear(), 3, 1); // Indian FY starting April
-      if (today.getMonth() < 3) first.setFullYear(today.getFullYear() - 1);
-      const last = new Date(first.getFullYear() + 1, 2, 31);
-      f = first.toISOString().slice(0, 10);
-      t = last.toISOString().slice(0, 10);
+      const past = new Date(today);
+      past.setFullYear(past.getFullYear() - 1);
+      f = past.toISOString().slice(0, 10);
     }
 
     setInternalFrom(f);
@@ -251,8 +252,9 @@ export default function UniversalDateFilterBar({
                 { id: 'today', label: 'Today' },
                 { id: 'yesterday', label: 'Yesterday' },
                 { id: '7days', label: 'Last 7 Days' },
-                { id: 'thisMonth', label: 'This Month' },
-                { id: 'year', label: 'FY Year' }
+                { id: '15days', label: 'Last 15 Days' },
+                { id: '30days', label: 'Last Month (30d)' },
+                { id: 'year', label: 'Past 1 Year' }
               ].map(p => (
                 <button
                   key={p.id}

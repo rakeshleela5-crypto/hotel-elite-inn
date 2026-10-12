@@ -2088,4 +2088,100 @@ export async function resolveFastApiGuestComplaint(complaintId, attendedBy = 'Du
   }
 }
 
+/**
+ * Operations History with Role-Based Slicing & Historical Date Range Filtering
+ * Range: 'today', '7d', '15d', '30d', '1y', 'custom'
+ * Role: 'staff' (up to 15 days, no sensitive financials) vs 'owner' (up to 1 year + full financials)
+ */
+export async function getFastApiOperationsHistory(rangeFilter = 'today', role = 'staff', startDate = null, endDate = null) {
+  try {
+    let url = `${FASTAPI_BASE_URL}/api/operations/history?range_filter=${encodeURIComponent(rangeFilter)}&role=${encodeURIComponent(role)}`;
+    if (startDate) url += `&start_date=${encodeURIComponent(startDate)}`;
+    if (endDate) url += `&end_date=${encodeURIComponent(endDate)}`;
+
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Operations history fetch failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Cloudflare R2 Automated Backup Health & Status
+ */
+export async function getFastApiBackupStatus() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/admin/backup/status`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Backup status fetch failed:', err.message);
+    return {
+      provider: 'Cloudflare R2',
+      is_configured: false,
+      schedule: 'Nightly at 02:00 AM UTC',
+      recent_backups: []
+    };
+  }
+}
+
+/**
+ * Trigger Live Cloud-to-Cloud Database Backup to Cloudflare R2
+ */
+export async function triggerFastApiCloudflareR2Backup() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/admin/backup/cloud-r2`, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Cloudflare R2 backup trigger failed:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Owner Self-Service Export ("Download Today's Data Archive")
+ * Downloads a complete JSON snapshot to the local client PC for immediate peace of mind
+ */
+export async function downloadFastApiDailyArchive(archiveDate = null) {
+  try {
+    const url = archiveDate
+      ? `${FASTAPI_BASE_URL}/api/admin/export/daily-archive?archive_date=${encodeURIComponent(archiveDate)}`
+      : `${FASTAPI_BASE_URL}/api/admin/export/daily-archive`;
+
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    // Trigger browser file download
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `hotel_elite_inn_archive_${data.export_date || 'latest'}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(downloadUrl);
+
+    return { success: true, count: Object.keys(data).length };
+  } catch (err) {
+    console.warn('[FastAPI] Daily archive download failed:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 
