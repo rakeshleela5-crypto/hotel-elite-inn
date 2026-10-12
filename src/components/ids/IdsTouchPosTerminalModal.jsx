@@ -396,7 +396,26 @@ export default function IdsTouchPosTerminalModal({
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
-      if (e.key === 'F2') {
+      if (discountModalOpen || voidModalOpen || thermalKotModalOpen || mergeTableModalOpen || printBillModalOpen || settlementModalOpen) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          if (discountModalOpen) setDiscountModalOpen(false);
+          else if (voidModalOpen) setVoidModalOpen(false);
+          else if (thermalKotModalOpen) setThermalKotModalOpen(false);
+          else if (mergeTableModalOpen) setMergeTableModalOpen(false);
+          else if (printBillModalOpen) setPrintBillModalOpen(false);
+          else if (settlementModalOpen) setSettlementModalOpen(false);
+        }
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose?.();
+      } else if (e.key === 'F1') {
+        e.preventDefault();
+        setSelectedGroup('ALL');
+      } else if (e.key === 'F2') {
         e.preventDefault();
         handlePunchDeltaKot();
       } else if (e.key === 'F3') {
@@ -424,20 +443,11 @@ export default function IdsTouchPosTerminalModal({
       } else if (e.key === 'F9') {
         e.preventDefault();
         setDraftCart([]);
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        if (discountModalOpen) setDiscountModalOpen(false);
-        else if (voidModalOpen) setVoidModalOpen(false);
-        else if (thermalKotModalOpen) setThermalKotModalOpen(false);
-        else if (mergeTableModalOpen) setMergeTableModalOpen(false);
-        else if (printBillModalOpen) setPrintBillModalOpen(false);
-        else if (settlementModalOpen) setSettlementModalOpen(false);
-        else onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, discountModalOpen, dispatchedLineItems, selectedTable]);
+  }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, discountModalOpen, dispatchedLineItems, selectedTable, selectedServer, covers]);
 
   // Bill Discount & Allowance Handlers (5% Cashier Limit, > 5% Manager PIN)
   const handleApplyDiscount = (disc) => {
@@ -610,8 +620,6 @@ export default function IdsTouchPosTerminalModal({
     setVoidModalOpen(false);
     setMessagePrompt(`⚠️ VOID LOGGED: Voucher #${auditRecord.voucherNo} (${targetVoidItem.name} x${voidQtyNum}) voided by Manager. Reason: ${voidReason}. Audit updated.`);
   };
-
-  if (!isOpen) return null;
 
   // Add Item to Draft Cart
   const handleAddItemToDraft = (item) => {
@@ -955,54 +963,9 @@ export default function IdsTouchPosTerminalModal({
     return { text: 'VACANT', color: '#2E8B57', isOccupied: false };
   };
 
-  // Keyboard Shortcut Handler for Authentic POS Terminal (F1-F8, Esc)
-  useEffect(() => {
-    if (isOpen === false) return;
-    const handleKeyDown = (e) => {
-      // Don't intercept if an internal subdialog (Void, Discount, Thermal KOT, Merge, Print, Settlement) is open
-      if (voidModalOpen || discountModalOpen || thermalKotModalOpen || mergeTableModalOpen || printBillModalOpen || settlementModalOpen) {
-        return;
-      }
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onClose?.();
-      } else if (e.key === 'F1') {
-        e.preventDefault();
-        setSelectedGroup('ALL');
-      } else if (e.key === 'F2') {
-        e.preventDefault();
-        handlePunchDeltaKot();
-      } else if (e.key === 'F3') {
-        e.preventDefault();
-        handleViewLatestKotSlip();
-      } else if (e.key === 'F4') {
-        e.preventDefault();
-        setDiscountModalOpen(true);
-      } else if (e.key === 'F5') {
-        e.preventDefault();
-        setMergeTableModalOpen(true);
-      } else if (e.key === 'F6') {
-        e.preventDefault();
-        if (dispatchedLineItems.length > 0) {
-          handleInitiateVoid(dispatchedLineItems[0]);
-        } else {
-          setMessagePrompt(`No dispatched items on ${selectedTable} to void.`);
-        }
-      } else if (e.key === 'F7') {
-        e.preventDefault();
-        setPrintBillModalOpen(true);
-      } else if (e.key === 'F8') {
-        e.preventDefault();
-        setSettlementModalOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, voidModalOpen, discountModalOpen, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, draftCart, dispatchedLineItems, selectedTable, selectedServer, covers]);
-
   const currentTableBadge = getTableOccupancyBadge(selectedTable);
 
-  if (isOpen === false) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
