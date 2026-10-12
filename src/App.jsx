@@ -65,6 +65,7 @@ import { getStoredAccountingDate } from './data/idsPmsStore';
 import { calculateAllTierMicroRates } from './utils/g3RmsEngine';
 import {
   createFastApiBooking,
+  getFastApiBookings,
   postFastApiFolioCharge,
   createFastApiAdvanceDeposit,
   updateFastApiRoomStatus,
@@ -559,7 +560,7 @@ export default function App() {
     guests: '2'
   });
 
-  // Load real-time room inventory from Railway PostgreSQL on mount
+  // Load real-time room inventory and live bookings from Railway PostgreSQL on mount
   useEffect(() => {
     getFastApiRooms()
       .then(data => {
@@ -583,6 +584,70 @@ export default function App() {
       })
       .catch(err => {
         console.warn('[FastAPI-Railway] Initial room fetch:', err);
+      });
+
+    // Sync live reservations from Railway PostgreSQL to IDS Front Desk & Folio
+    getFastApiBookings()
+      .then(data => {
+        if (data && Array.isArray(data) && data.length > 0) {
+          const mappedBookings = data.map(b => {
+            let roomNum = '101';
+            if (b.room_number) {
+              roomNum = String(b.room_number);
+            } else if (b.room_id) {
+              if (b.room_id >= 1 && b.room_id <= 9) roomNum = String(100 + b.room_id);
+              else if (b.room_id >= 10 && b.room_id <= 18) roomNum = String(191 + b.room_id);
+              else if (b.room_id >= 19 && b.room_id <= 27) roomNum = String(282 + b.room_id);
+            }
+            return {
+              bookingId: b.booking_reference || `HEI-RES-${b.id}`,
+              roomNumber: roomNum,
+              tier: b.tier || (roomNum.startsWith('3') ? 'Royal Presidential Suite' : (roomNum.startsWith('2') ? 'Executive Deluxe' : 'Standard Deluxe')),
+              guestName: b.guest_name,
+              guestPhone: b.guest_phone || '9999999999',
+              idProofType: b.guest_id_type || 'Aadhaar',
+              idProofMasked: b.guest_id_number || 'XXXX-XXXX-8821',
+              checkInDate: b.check_in_date ? b.check_in_date.slice(0, 10) : '2026-10-12',
+              checkOutDate: b.check_out_date ? b.check_out_date.slice(0, 10) : '2026-10-13',
+              nights: 1,
+              adults: b.num_pax || 1,
+              children: 0,
+              tariffPerNight: Number(b.total_amount || 2050),
+              baseTotal: Number(b.total_amount || 2050),
+              totalAmount: Number(b.total_amount || 2050),
+              advanceDeposit: Number(b.advance_paid || 0),
+              balanceDue: Number(b.balance_amount !== undefined ? b.balance_amount : ((b.total_amount || 0) - (b.advance_paid || 0))),
+              paymentMode: b.billing_mode || 'Cash',
+              paymentStatus: (b.balance_amount === 0) ? 'Paid' : 'Partial / Due at Check-out',
+              bookingStatus: (b.status === 'confirmed' ? 'Confirmed' : (b.status === 'checked_in' ? 'Checked In' : 'Confirmed')),
+              source: 'Railway Cloud Database'
+            };
+          });
+
+          setBookings(prev => {
+            const existingIds = new Set(prev.map(p => p.bookingId));
+            const fresh = mappedBookings.filter(m => !existingIds.has(m.bookingId));
+            return [...fresh, ...prev];
+          });
+
+          // Sync room occupancy state if booking is confirmed
+          setRooms(prev => prev.map(r => {
+            const activeBooking = mappedBookings.find(m => m.roomNumber === r.roomNumber && (m.bookingStatus === 'Confirmed' || m.bookingStatus === 'Checked In'));
+            if (activeBooking && r.status !== 'Occupied') {
+              return {
+                ...r,
+                status: 'Occupied',
+                currentGuestName: activeBooking.guestName,
+                currentBookingId: activeBooking.bookingId,
+                outstandingBalance: activeBooking.balanceDue
+              };
+            }
+            return r;
+          }));
+        }
+      })
+      .catch(err => {
+        console.warn('[FastAPI-Railway] Initial bookings fetch:', err);
       });
   }, []);
 
