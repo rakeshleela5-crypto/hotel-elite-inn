@@ -117,7 +117,17 @@ export async function createFastApiBooking(bookingData) {
       plan_code: bookingData.mealPlan || bookingData.plan_code || 'EP',
       billing_mode: bookingData.paymentMode || bookingData.billing_mode || 'Cash',
       vehicle_no: bookingData.vehicleNo || null,
-      purpose_of_visit: bookingData.purposeOfVisit || 'Business Visit'
+      purpose_of_visit: bookingData.purposeOfVisit || 'Business Visit',
+      nationality: bookingData.nationality || 'India',
+      arrival_from: bookingData.arrivalFrom || bookingData.arrival_from || null,
+      proceeding_to: bookingData.proceedingTo || bookingData.proceeding_to || null,
+      identification_no: bookingData.identificationNo || bookingData.identification_no || null,
+      company_name: bookingData.companyName || bookingData.company_name || null,
+      rate_authorized_by: bookingData.rateAuthorizedBy || bookingData.rate_authorized_by || 'MANAGER',
+      special_instructions: bookingData.specialInstructions || bookingData.special_instructions || null,
+      guest_status: bookingData.guestStatus || bookingData.guest_status || 'WLK',
+      rate_amount: Number(bookingData.rateAmount || bookingData.rate_amount || 0),
+      rate_option: bookingData.rateOption || bookingData.rate_option || 'DISCOUNT'
     };
 
     const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings`, {
@@ -167,7 +177,7 @@ export async function getFastApiBookings(statusFilter = null) {
  */
 export async function getFastApiTables() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/tables`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -201,7 +211,7 @@ export async function getFastApiInventory() {
  */
 export async function getFastApiCorporateAccounts() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -218,7 +228,7 @@ export async function getFastApiCorporateAccounts() {
  */
 export async function getFastApiRoomDefects() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/defects`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -233,12 +243,12 @@ export async function getFastApiRoomDefects() {
 /**
  * Void an item from an active POS order (Audio 4 requirement)
  */
-export async function voidFastApiOrderItem(orderId, itemCode, reason, pin = '4321') {
+export async function voidFastApiOrderItem(orderId, itemId, reason, pin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/void-item`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/items/${itemId}/void`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ item_code: itemCode, reason, manager_pin: pin })
+      body: JSON.stringify({ reason, manager_pin: pin })
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
@@ -256,7 +266,7 @@ export async function voidFastApiOrderItem(orderId, itemCode, reason, pin = '432
  */
 export async function mergeFastApiTables(sourceTable, targetTable, pin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/merge-tables`, {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/merge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ source_table: sourceTable, target_table: targetTable, manager_pin: pin })
@@ -2260,6 +2270,94 @@ export async function downloadFastApiDailyArchive(archiveDate = null) {
   } catch (err) {
     console.warn('[FastAPI] Daily archive download failed:', err.message);
     return { success: false, error: err.message };
+  }
+}
+
+
+// =============================================================
+// Category 11: Missing Endpoint Connectors (Audit Fix Oct-2026)
+// =============================================================
+
+/**
+ * Adjust inventory stock level for an item (POST /api/inventory/{item_id}/adjust)
+ */
+export async function adjustFastApiInventoryItem(itemId, adjustmentData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/${itemId}/adjust`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(adjustmentData)
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Inventory adjustment failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Record a corporate BTC payment (POST /api/corporate-accounts/{company_id}/payment)
+ */
+export async function recordFastApiCorporatePayment(companyId, paymentData) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}/payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(paymentData)
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Corporate payment recording failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Resolve a room defect / maintenance issue (PATCH /api/housekeeping/defects/{defect_id}/resolve)
+ */
+export async function resolveFastApiDefect(defectId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects/${defectId}/resolve`, {
+      method: 'PATCH',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Defect resolution failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Update GST filing status (PATCH /api/gst/filings/{filing_id}/status)
+ */
+export async function updateFastApiGstFilingStatus(filingId, newStatus) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ filing_status: newStatus })
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `HTTP ${res.status}`);
+    }
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] GST filing status update failed:', err.message);
+    return null;
   }
 }
 

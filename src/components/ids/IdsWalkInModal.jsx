@@ -1302,7 +1302,7 @@ export default function IdsWalkInModal({
                   <span>Room Upgrade</span>
                   <input className="ids-input" readOnly value="DLX" style={{ background: '#F5F5F5', fontWeight: 700 }} />
                   <span style={{ textAlign: 'right' }}>Authorized By</span>
-                  <input className="ids-input" defaultValue="DUTY MANAGER" />
+                  <input className="ids-input" defaultValue="DUTY MANAGER" 
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '90px 120px 90px 1fr', gap: '6px', alignItems: 'center' }}>
                   <span>Post History</span>
@@ -1311,7 +1311,7 @@ export default function IdsWalkInModal({
                     <option value="No">No</option>
                   </select>
                   <span style={{ textAlign: 'right' }}>Purpose Of Visit</span>
-                  <input className="ids-input" defaultValue="Business Trip" />
+                  <input className="ids-input" defaultValue="Business Trip"  onChange={() => {}}/>
                 </div>
               </div>
 

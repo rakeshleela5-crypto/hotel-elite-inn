@@ -246,24 +246,24 @@ export function IdsRateDetailsModal({
 
               <span>Rate / Rack ID</span>
               <div style={{ display: 'flex', gap: '2px' }}>
-                <input className="ids-input" defaultValue="1" style={{ width: '35px' }} />
+                <input className="ids-input" defaultValue="1" style={{ width: '35px' }}  onChange={() => {}}/>
                 <button className="ids-btn-classic" style={{ padding: '0 4px' }} onClick={() => { playReceptionChime(); alert("Rate / Rack ID master lookup: 1 - Standard Executive Rack"); }}>?</button>
               </div>
 
               <span>Total Pax</span>
-              <input className="ids-input" defaultValue="2" style={{ width: '35px' }} />
+              <input className="ids-input" defaultValue="2" style={{ width: '35px' }}  onChange={() => {}}/>
 
               <span>Discount</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '45px' }} />
+              <input className="ids-input" defaultValue="0" style={{ width: '45px' }}  onChange={() => {}}/>
 
               <span>Extra Adult</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '35px' }} />
+              <input className="ids-input" defaultValue="0" style={{ width: '35px' }}  onChange={() => {}}/>
 
               <span></span>
               <span></span>
 
               <span>Extra Child</span>
-              <input className="ids-input" defaultValue="0" style={{ width: '35px' }} />
+              <input className="ids-input" defaultValue="0" style={{ width: '35px' }}  onChange={() => {}}/>
             </div>
 
             {/* Quick Action Badges matching Frame 028 */}

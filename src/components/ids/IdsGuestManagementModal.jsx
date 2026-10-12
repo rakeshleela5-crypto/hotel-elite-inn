@@ -1096,7 +1096,7 @@ export function IdsOtherDetailsModal({ isOpen, onClose }) {
               <input className="ids-input" value={purposeOfVisit} onChange={(e) => setPurposeOfVisit(e.target.value)} />
 
               <span>Authorized By</span>
-              <input className="ids-input" defaultValue="Manager" />
+              <input className="ids-input" defaultValue="Manager"  onChange={() => {}}/>
             </div>
           </div>
 

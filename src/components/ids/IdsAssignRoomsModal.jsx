@@ -95,7 +95,7 @@ export function IdsScanBookingModal({
               <select className="ids-select" style={{ width: '90px' }} defaultValue="None">
                 <option value="None">None</option>
               </select>
-              <input className="ids-input" style={{ width: '110px' }} defaultValue="" />
+              <input className="ids-input" style={{ width: '110px' }} defaultValue=""  onChange={() => {}}/>
               <select className="ids-select" style={{ width: '90px' }} defaultValue="None">
                 <option value="None">None</option>
               </select>
@@ -285,7 +285,7 @@ export function IdsAssignGuestRoomsModal({
             <input className="ids-input" value={booking.departureDate || '17-JAN-2026 12:00'} readOnly />
 
             <span style={{ fontWeight: 600, textAlign: 'right' }}>Group</span>
-            <input className="ids-input" defaultValue="" />
+            <input className="ids-input" defaultValue="" 
           </div>
 
           {/* Filter & Action Buttons Bar */}

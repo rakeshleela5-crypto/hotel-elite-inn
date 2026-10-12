@@ -1302,3 +1302,101 @@ button.ids-win-btn.close:hover {
   color: #111111;
   font-size: 13px;
 }
+
+/* ==========================================================================
+   UNIVERSAL IDS INPUT INTERACTIVITY GUARANTEE (Audit Fix Oct-2026)
+   Ensures every input/select/textarea inside ANY IDS container is always
+   clickable, focusable, and typeable -- regardless of ancestor CSS overrides.
+   This is the definitive fix for the 'cursor shows but typing is blocked' bug.
+   ========================================================================== */
+
+/* 6. Universal input activation -- nuclear specificity */
+.ids-desktop-container input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-modal-overlay input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-modal-backdrop input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-modal-container input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-modal-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-dialog-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-input:not([disabled]) {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 7. Universal select activation */
+.ids-desktop-container select:not([disabled]),
+.ids-modal-overlay select:not([disabled]),
+.ids-modal-backdrop select:not([disabled]),
+.ids-modal-container select:not([disabled]),
+.ids-modal-window select:not([disabled]),
+.ids-dialog-window select:not([disabled]),
+.ids-window select:not([disabled]),
+.ids-select:not([disabled]) {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* 8. Universal textarea activation */
+.ids-desktop-container textarea:not([disabled]),
+.ids-modal-overlay textarea:not([disabled]),
+.ids-modal-backdrop textarea:not([disabled]),
+.ids-modal-container textarea:not([disabled]),
+.ids-modal-window textarea:not([disabled]),
+.ids-dialog-window textarea:not([disabled]),
+.ids-window textarea:not([disabled]) {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text !important;
+  position: relative !important;
+  z-index: 1 !important;
+  resize: vertical !important;
+}
+
+/* 9. Focus state -- universal crisp Win32 blue outline for ALL inputs */
+.ids-desktop-container input:focus,
+.ids-modal-overlay input:focus,
+.ids-modal-backdrop input:focus,
+.ids-modal-container input:focus,
+.ids-modal-window input:focus,
+.ids-dialog-window input:focus,
+.ids-window input:focus,
+.ids-input:focus,
+.ids-desktop-container select:focus,
+.ids-modal-overlay select:focus,
+.ids-modal-backdrop select:focus,
+.ids-modal-container select:focus,
+.ids-modal-window select:focus,
+.ids-dialog-window select:focus,
+.ids-window select:focus,
+.ids-select:focus,
+.ids-desktop-container textarea:focus,
+.ids-modal-overlay textarea:focus,
+.ids-modal-backdrop textarea:focus,
+.ids-modal-container textarea:focus,
+.ids-modal-window textarea:focus,
+.ids-dialog-window textarea:focus,
+.ids-window textarea:focus {
+  outline: 2px solid #0A246A !important;
+  outline-offset: -1px !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 0 5px rgba(10, 36, 106, 0.4) !important;
+  z-index: 2 !important;
+}
+
+/* 10. Prevent overlay backdrop from swallowing input clicks */
+.ids-modal-overlay,
+.ids-modal-backdrop {
+  pointer-events: none !important;
+}
+.ids-modal-overlay > *,
+.ids-modal-backdrop > * {
+  pointer-events: auto !important;
+}

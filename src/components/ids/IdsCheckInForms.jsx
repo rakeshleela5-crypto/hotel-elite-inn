@@ -205,7 +205,7 @@ export function IdsCheckInRateModal({
             <div></div>
 
             <span style={{ fontWeight: 600 }}>Discount</span>
-            <input className="ids-input" defaultValue="0" style={{ width: '70px', textAlign: 'center' }} />
+            <input className="ids-input" defaultValue="0" style={{ width: '70px', textAlign: 'center' }}  onChange={() => {}}/>
             <div></div>
           </div>
 

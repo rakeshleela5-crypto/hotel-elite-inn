@@ -409,7 +409,7 @@ export function IdsQuickReservationModal({
             {/* Booker Info */}
             <div style={{ display: 'grid', gridTemplateColumns: '70px 100px 70px 1fr', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
               <span style={{ fontWeight: 600 }}>Booker Type</span>
-              <input className="ids-input" defaultValue="" />
+              <input className="ids-input" defaultValue="" 
               <span style={{ fontWeight: 600, textAlign: 'right' }}>Booker Code</span>
               <input className="ids-input" value={bookerCode} onChange={(e) => setBookerCode(e.target.value)} />
 

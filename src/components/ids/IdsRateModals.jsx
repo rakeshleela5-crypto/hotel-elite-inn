@@ -89,36 +89,36 @@ export function IdsRateInformationModal({
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={singleTariff} onChange={(e) => setSingleTariff(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Double</td>
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={doubleTariff} onChange={(e) => setDoubleTariff(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Triple</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue=""  onChange={() => {}}/></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Quadruple</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" </td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Adult</td>
                 <td style={{ textAlign: 'right' }}>
                   <input className="ids-input" style={{ width: '90px', textAlign: 'right' }} value={extraAdult} onChange={(e) => setExtraAdult(e.target.value)} />
                 </td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/></td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Extra Child</td>
-                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" /></td>
-                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" /></td>
+                <td style={{ textAlign: 'right' }}><input className="ids-input" style={{ width: '90px', textAlign: 'right' }} defaultValue="" </td>
+                <td><input className="ids-input" style={{ width: '80px' }} defaultValue="" </td>
               </tr>
               <tr>
                 <td style={{ fontWeight: 600 }}>Tax Struct.</td>
@@ -346,7 +346,7 @@ export function IdsPostReceiptsModal({
 
             <span style={{ fontWeight: 600 }}>Folio No.</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '100px' }} defaultValue="" />
+              <input className="ids-input" style={{ width: '100px' }} defaultValue=""  onChange={() => {}}/>
               <button className="ids-btn-classic" style={{ fontSize: '10px', padding: '1px 6px' }} onClick={() => { playReceptionChime(); alert("Folio Detail View:\nMaster Folio: 1\nIncidentals Folio: 2"); }}>More..</button>
             </div>
 
@@ -361,12 +361,12 @@ export function IdsPostReceiptsModal({
 
             <span style={{ fontWeight: 600 }}>Company Code</span>
             <div style={{ display: 'flex', gap: '4px' }}>
-              <input className="ids-input" style={{ width: '80px' }} defaultValue="" />
+              <input className="ids-input" style={{ width: '80px' }} defaultValue=""  onChange={() => {}}/>
               <button className="ids-btn-classic" style={{ minWidth: '22px', padding: '0 4px' }} onClick={() => { playReceptionChime(); const c = prompt("Enter Corporate Client Code:", companyCode || "CORP01"); if (c) setCompanyCode(c.toUpperCase()); }}>?</button>
             </div>
 
             <span style={{ fontWeight: 600 }}>Company Name</span>
-            <input className="ids-input" defaultValue="" />
+            <input className="ids-input" defaultValue=""  onChange={() => {}}/>
           </div>
 
           {/* Payment Method Selector Strip */}
@@ -402,7 +402,7 @@ export function IdsPostReceiptsModal({
             <span style={{ marginLeft: '12px' }}>Exchange Rate</span>
             <input className="ids-input" style={{ width: '70px' }} defaultValue="1.000000" readOnly />
             <span style={{ marginLeft: '12px' }}>Exg. Amt.</span>
-            <input className="ids-input" style={{ width: '70px' }} defaultValue="" />
+            <input className="ids-input" style={{ width: '70px' }} defaultValue=""  onChange={() => {}}/>
           </div>
 
           {/* Credit Card / Digital UPI Details Box */}
