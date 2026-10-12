@@ -5,6 +5,7 @@ import {
   Printer, DollarSign, Calendar, User, Phone, MapPin, X
 } from 'lucide-react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { createFastApiTransitSlot } from '../../utils/backendApi';
 
 // Authentic Train List arriving at Muniguda Junction (Rayagada Line)
 export const MUNIGUDA_JUNCTION_TRAINS = [
@@ -93,6 +94,21 @@ export default function IdsTransitSlotModal({
       destination,
       status: 'Active Transit'
     };
+
+    // Auto-persist to Railway PostgreSQL database
+    createFastApiTransitSlot({
+      room_number: selectedRoom,
+      guest_name: guestName,
+      mobile: mobile,
+      age: parseInt(age, 10) || 30,
+      train_number: arrivedTrain,
+      pnr_number: pnrNumber,
+      destination: destination,
+      rate_bracket: parseFloat(rateBracket),
+      check_in_time: `${accountingDate} ${checkInTimeString}`,
+      expected_check_out: `${accountingDate} ${checkOutTimeString}`,
+      status: 'Occupied'
+    }).catch(err => console.warn('[TransitSlot] Cloud sync failed:', err));
 
     if (onTransitCheckInCompleted) {
       onTransitCheckInCompleted(transitRecord);

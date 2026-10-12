@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
 import { getStoredTouchScreenGroups } from './IdsTouchScreenGroupsModal';
 import { getStoredMenuGroups } from './IdsMenuGroupsModal';
+import { createFastApiMenuItem, deleteFastApiMenuItem } from '../../utils/backendApi';
 
 /**
  * IDS Fortune NEXT 6.5 & 7.0 - Menu Master V6.5.002.3
@@ -427,6 +428,17 @@ export default function IdsMenuMasterModal({
       saveStoredMenuItems(nextItems);
       showNotification(`Item ${itemCode} (${name}) saved successfully.`);
     }
+
+    // Auto-sync menu item to Railway PostgreSQL
+    const mainPortionRate = portions && portions.length > 0 ? (parseFloat(portions[0].rate) || 120.0) : 120.0;
+    createFastApiMenuItem({
+      item_code: itemCode.trim(),
+      name: name.trim(),
+      category: DEFAULT_TOUCH_SCREEN_CLASSIFICATIONS.find(c => c.code === classification)?.name || 'FOOD',
+      price: mainPortionRate,
+      is_veg: itemType !== 'NON-VEG',
+      description: remarks || `${itemCode} - ${name}`
+    }).catch(err => console.warn('[FastAPI] Menu cloud sync failed:', err));
 
     setFormMode('VIEW');
   };

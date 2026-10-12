@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createFastApiTable, deleteFastApiTable } from '../../utils/backendApi';
 
 /**
  * IDS Fortune NEXT 6.5 & 7.0 - Restaurant Table Master V6.5.002.1
@@ -198,6 +199,14 @@ export default function IdsRestaurantTableMasterModal({
 
     setTables(updatedList);
     saveStoredRestaurantTables(updatedList);
+
+    // Auto-sync table master to Railway PostgreSQL
+    createFastApiTable({
+      table_number: cleanTableNo,
+      capacity: coversNum,
+      status: 'available'
+    }).catch(err => console.warn('[FastAPI] Table cloud sync failed:', err));
+
     setFormMode('VIEW');
     showNotification(`Table ${cleanTableNo} saved successfully for ${selectedOutlet}!`);
   };

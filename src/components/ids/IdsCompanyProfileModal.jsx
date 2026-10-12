@@ -5,6 +5,7 @@ import {
   Save, X, FileText, CheckCircle2, ShieldAlert, DollarSign, Percent, 
   HelpCircle, Check, Phone, Mail, Globe, MapPin, CreditCard
 } from 'lucide-react';
+import { createFastApiCorporateAccount } from '../../utils/backendApi';
 
 /* =========================================================================
    VIDEO 28: HOW TO CREATE COMPANY PROFILE IN IDS 6.5 & 7.0 SOFTWARE
@@ -250,6 +251,17 @@ export default function IdsCompanyProfileModal({
     });
 
     setStatusMessage(`Company Profile [${formData.companyCode}] ${formData.name} saved successfully! ${linkRates ? '(Rates Linked to Corporate Profile)' : ''}`);
+    
+    // Auto-sync corporate account to Railway PostgreSQL
+    createFastApiCorporateAccount({
+      company_name: formData.name,
+      gst_number: formData.gstin || null,
+      contact_person: formData.salesExec || null,
+      phone: formData.phone || formData.mobile || null,
+      email: formData.email || null,
+      credit_limit: 100000.0
+    }).catch(err => console.warn('[FastAPI] Corporate cloud sync failed:', err));
+
     if (onSaveCompanyProfile) {
       onSaveCompanyProfile(formData, linkRates);
     }

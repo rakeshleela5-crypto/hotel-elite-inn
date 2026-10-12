@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getStoredMenuItems } from './IdsMenuMasterModal';
 import { DEFAULT_TAX_STRUCTURES } from './IdsMenuMasterModal';
+import { createFastApiPromotion, deleteFastApiPromotion } from '../../utils/backendApi';
 
 /**
  * IDS Fortune NEXT 6.5 & 7.0 - Sales Promotion Master V6.5.002.1
@@ -291,6 +292,19 @@ export default function IdsSalesPromotionMasterModal({
       saveStoredPromotions(nextPromos);
       showNotification(`Promotion ${promotionCode} (${promotionName}) saved successfully.`);
     }
+
+    // Auto-sync promotion to Railway PostgreSQL
+    createFastApiPromotion({
+      promo_code: promotionCode.trim(),
+      description: promotionName.trim(),
+      discount_percentage: 0.0,
+      flat_discount_amount: parseFloat(promotionValue) || 0.0,
+      applicable_outlet: restaurant || 'ALL',
+      min_order_amount: 0.0,
+      valid_from: applicableFrom.trim() || accountingDate,
+      valid_to: '31-DEC-2026',
+      is_active: status === 'Active'
+    }).catch(err => console.warn('[FastAPI] Promotion cloud sync failed:', err));
 
     setFormMode('VIEW');
   };

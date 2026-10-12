@@ -1725,3 +1725,209 @@ export async function createFastApiBankReconciliation(payload) {
     return null;
   }
 }
+
+// =============================================================
+// Category 8: Table Master, Menu Master, Transit & Promotions
+// =============================================================
+export async function createFastApiTable(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create table failed:', err.message);
+    return null;
+  }
+}
+
+export async function updateFastApiTable(tableId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Update table failed:', err.message);
+    return null;
+  }
+}
+
+export async function deleteFastApiTable(tableId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Delete table failed:', err.message);
+    return null;
+  }
+}
+
+export async function createFastApiMenuItem(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create menu item failed:', err.message);
+    return null;
+  }
+}
+
+export async function updateFastApiMenuItem(itemId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Update menu item failed:', err.message);
+    return null;
+  }
+}
+
+export async function deleteFastApiMenuItem(itemId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Delete menu item failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiTransitSlots() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Transit slots fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiTransitSlot(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create transit slot failed:', err.message);
+    return null;
+  }
+}
+
+export async function checkoutFastApiTransitSlot(slotId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots/${slotId}/checkout`, {
+      method: 'PATCH',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Checkout transit slot failed:', err.message);
+    return null;
+  }
+}
+
+export async function getFastApiPromotions() {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Promotions fetch failed:', err.message);
+    return [];
+  }
+}
+
+export async function createFastApiPromotion(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create promotion failed:', err.message);
+    return null;
+  }
+}
+
+export async function deleteFastApiPromotion(promoId) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions/${promoId}`, {
+      method: 'DELETE',
+      headers: { 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Delete promotion failed:', err.message);
+    return null;
+  }
+}
+
+export async function createFastApiCorporateAccount(payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Create corporate account failed:', err.message);
+    return null;
+  }
+}
+
+export async function updateFastApiCorporateAccount(companyId, payload) {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.warn('[FastAPI] Update corporate account failed:', err.message);
+    return null;
+  }
+}
+
