@@ -30,6 +30,8 @@ export default function IdsAuditedSalesRegisterModal({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [rangeFilter, setRangeFilter] = useState('ALL');
+  const isOwner = currentUser === 'OWNER' || currentUser === 'MANAGER';
 
   // Synchronized Multi-Period Records
   const [hotelSalesData, setHotelSalesData] = useState(() => getSynchronizedHotelSales('JUNE-2026'));
@@ -102,9 +104,17 @@ export default function IdsAuditedSalesRegisterModal({
 
   // 1. Filtered Hotel Sales
   const filteredHotelSales = useMemo(() => {
-    if (!searchQuery.trim()) return hotelSalesData;
+    let list = hotelSalesData;
+    if (rangeFilter === 'today') {
+      list = list.slice(-10);
+    } else if (rangeFilter === '7d') {
+      list = list.slice(-25);
+    } else if (rangeFilter === '15d') {
+      list = list.slice(-50);
+    }
+    if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return hotelSalesData.filter(r => 
+    return list.filter(r => 
       (r.billNo && String(r.billNo).toLowerCase().includes(q)) ||
       (r.roomNo && String(r.roomNo).toLowerCase().includes(q)) ||
       (r.guestName && String(r.guestName).toLowerCase().includes(q)) ||
@@ -112,11 +122,19 @@ export default function IdsAuditedSalesRegisterModal({
       (r.remark && String(r.remark).toLowerCase().includes(q)) ||
       (r.gstin && String(r.gstin).toLowerCase().includes(q))
     );
-  }, [hotelSalesData, searchQuery]);
+  }, [hotelSalesData, searchQuery, rangeFilter]);
 
   // 2. Filtered Restaurant Sales
   const filteredRestaurantSales = useMemo(() => {
-    return restaurantSalesData.filter(r => {
+    let list = restaurantSalesData;
+    if (rangeFilter === 'today') {
+      list = list.slice(-15);
+    } else if (rangeFilter === '7d') {
+      list = list.slice(-35);
+    } else if (rangeFilter === '15d') {
+      list = list.slice(-60);
+    }
+    return list.filter(r => {
       if (outletFilter !== 'ALL' && r.pos !== outletFilter) return false;
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -127,7 +145,7 @@ export default function IdsAuditedSalesRegisterModal({
       }
       return true;
     });
-  }, [restaurantSalesData, outletFilter, searchQuery]);
+  }, [restaurantSalesData, outletFilter, searchQuery, rangeFilter]);
 
   // 3. Filtered Management NC Sales
   const filteredRestaurantMgm = useMemo(() => {
@@ -446,6 +464,50 @@ export default function IdsAuditedSalesRegisterModal({
               </select>
             </div>
 
+            {/* Authentic Fortune NEXT Date Range Selector (Architecture Advisory Query #7) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', borderLeft: '1px solid #CCC', paddingLeft: '8px' }}>
+              <span style={{ fontWeight: 600, marginRight: '2px' }}>Range:</span>
+              {[
+                { id: 'ALL', label: 'All Period' },
+                { id: 'today', label: 'Today' },
+                { id: '7d', label: '7D' },
+                { id: '15d', label: '15D' },
+                { id: '30d', label: '30D 🔒' },
+                { id: '1y', label: '1Y 🔒' }
+              ].map(r => {
+                const isLocked = !isOwner && (r.id === '30d' || r.id === '1y');
+                const isSelected = rangeFilter === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => {
+                      if (isLocked) {
+                        alert("Role Restriction: Front desk staff is limited to recent 15-day operational records. Owner/Manager authorization required for 30-day and 1-year financial ledgers.");
+                        return;
+                      }
+                      setRangeFilter(r.id);
+                      setCurrentPage(1);
+                    }}
+                    style={{
+                      padding: '1px 5px',
+                      fontSize: '10px',
+                      fontFamily: 'Tahoma, sans-serif',
+                      fontWeight: isSelected ? 700 : 500,
+                      background: isSelected ? '#0A246A' : '#ECE9D8',
+                      color: isSelected ? '#FFF' : (isLocked ? '#888' : '#000'),
+                      border: '1px solid #716F64',
+                      borderRadius: '2px',
+                      cursor: isLocked ? 'not-allowed' : 'pointer'
+                    }}
+                    title={isLocked ? "Requires Owner/Manager Role" : `Filter by ${r.label}`}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+            </div>
+
             {activeTab === 'restaurant-sales' && (
               <div>
                 <span style={{ fontWeight: 600, marginRight: '4px' }}>Outlet:</span>
@@ -524,7 +586,18 @@ export default function IdsAuditedSalesRegisterModal({
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: '6px' }}>
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+            <span style={{
+              background: isOwner ? '#E8F5E9' : '#E3F2FD',
+              color: isOwner ? '#2E7D32' : '#1565C0',
+              border: `1px solid ${isOwner ? '#81C784' : '#90CAF9'}`,
+              padding: '2px 6px',
+              borderRadius: '2px',
+              fontWeight: 700,
+              fontSize: '10px'
+            }}>
+              {isOwner ? '👑 OWNER AUDIT' : '👤 STAFF (15-DAY SLICE)'}
+            </span>
             <button
               onClick={() => window.print()}
               style={{

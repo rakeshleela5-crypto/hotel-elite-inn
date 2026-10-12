@@ -13,7 +13,8 @@ import {
   getFastApiCashierShifts, 
   closeFastApiCashierShift, 
   openFastApiCashierShift, 
-  getFastApiMorningBriefing 
+  getFastApiMorningBriefing,
+  downloadFastApiDailyArchive
 } from '../../utils/backendApi';
 
 /**
@@ -814,6 +815,18 @@ export default function IdsCashierShiftHandoverModal({
                   style={{ minWidth: '80px', fontWeight: 600 }}
                 >
                   🖨️ Print Voucher
+                </button>
+                <button 
+                  onClick={() => {
+                    downloadFastApiDailyArchive(selectedDate)
+                      .then(() => setToastMessage('✓ Daily Archive (.JSON) downloaded directly to your PC (Downloads)!'))
+                      .catch(err => setToastMessage('Archive error: ' + err.message));
+                  }}
+                  className="ids-btn"
+                  style={{ minWidth: '120px', fontWeight: 700, background: '#FFF3E0', borderColor: '#E65100', color: '#E65100' }}
+                  title="Download today's complete hotel books & shift transactions (.JSON) directly to local PC"
+                >
+                  📥 Export Daily Archive (.JSON)
                 </button>
                 {shiftData.status !== 'LOCKED' ? (
                   <button 

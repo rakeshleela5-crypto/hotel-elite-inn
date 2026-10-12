@@ -10,7 +10,8 @@ import {
   sealFastApiNightAudit, 
   autoPostFastApiRoomRent, 
   getFastApiNightAuditTrialBalance, 
-  rolloverFastApiNightAudit 
+  rolloverFastApiNightAudit,
+  triggerFastApiCloudflareR2Backup
 } from '../../utils/backendApi';
 
 /* =========================================================================
@@ -218,6 +219,11 @@ export default function IdsNightAuditModal({
       rolloverFastApiNightAudit(acDate, nextDate, '4321')
         .catch(err => console.warn('[FastAPI] Rollover night audit error:', err));
 
+      // Automated Cloudflare R2 Cloud Backup post-audit execution (Page 7/10 of Architecture Advisory)
+      triggerFastApiCloudflareR2Backup()
+        .then(res => console.log('[FastAPI] Automated Cloudflare R2 backup vaulted successfully:', res))
+        .catch(err => console.warn('[FastAPI] Cloudflare R2 backup notice:', err));
+
       if (onCompleteNightAudit) {
         onCompleteNightAudit({
           previousDate: acDate,
@@ -272,6 +278,11 @@ export default function IdsNightAuditModal({
             // Persist Night Audit Seal & GL Rollover to Railway PostgreSQL backend
             sealFastApiNightAudit(acDate, '4321', '12AM_AUTO_ROLLOVER_DAEMON')
               .catch(err => console.warn('[FastAPI] Seal night audit error:', err));
+
+            // Automated Cloudflare R2 Cloud Backup post-audit execution (Page 7/10 of Architecture Advisory)
+            triggerFastApiCloudflareR2Backup()
+              .then(res => console.log('[FastAPI] Automated Cloudflare R2 backup vaulted successfully:', res))
+              .catch(err => console.warn('[FastAPI] Cloudflare R2 backup notice:', err));
 
             if (onCompleteNightAudit) {
               onCompleteNightAudit({
@@ -810,6 +821,26 @@ export default function IdsNightAuditModal({
                 readOnly 
                 style={{ width: '130px', fontWeight: 700, background: '#EBEBE4', color: '#0A246A' }} 
               />
+            </div>
+
+            {/* Cloudflare R2 Post-Audit Cloud Vault Notice (Page 7/10 of Architecture Advisory) */}
+            <div style={{
+              background: '#E8F5E9',
+              border: '1px solid #81C784',
+              padding: '6px 10px',
+              fontSize: '11px',
+              marginBottom: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              color: '#1B5E20'
+            }}>
+              <span style={{ fontWeight: 600 }}>
+                ☁️ Cloudflare R2 Cloud Vault: Encrypted daily database backup (.sql.gz) vaults automatically at rollover
+              </span>
+              <span style={{ fontSize: '10px', background: '#2E7D32', color: '#FFF', padding: '1px 6px', borderRadius: '2px', fontWeight: 700 }}>
+                Zero-Egress
+              </span>
             </div>
 
             {/* Activity Status Bar matching Frame 070 & 080 */}
