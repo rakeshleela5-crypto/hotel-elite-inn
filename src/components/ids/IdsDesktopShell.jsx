@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './idsFortuneNext.css';
 import { 
-  Building2, Users, Calendar, DollarSign, Clock, RefreshCw, 
+  Building2, Users, Calendar, CalendarRange, DollarSign, Clock, RefreshCw, 
   Phone, Briefcase, Box, Utensils, Clipboard, Wrench, Settings,
   LogOut, Play, CheckCircle2, AlertCircle, Search, FileText
 } from 'lucide-react';
+import IdsTapeChartModal from './IdsTapeChartModal';
 import { IdsQuickReservationModal } from './IdsReservationForms';
 import { IdsScanBookingModal, IdsAssignGuestRoomsModal } from './IdsAssignRoomsModal';
 import { 
@@ -265,6 +266,7 @@ export default function IdsDesktopShell({
   ]);
 
   // Modals & Navigation
+  const [tapeChartOpen, setTapeChartOpen] = useState(false);
   const [quickReservationOpen, setQuickReservationOpen] = useState(false);
   const [quickReservationCancelOpen, setQuickReservationCancelOpen] = useState(false);
   const [scanBookingModalOpen, setScanBookingModalOpen] = useState(false);
@@ -706,12 +708,15 @@ export default function IdsDesktopShell({
     setCrystalReportModalOpen(true);
   };
 
-  // Global IDS Keyboard Shortcuts (F2 = Quick Scan / Load Pgm)
+  // Global IDS Keyboard Shortcuts (F2 = Quick Scan / Load Pgm, F3 = Tape Chart Matrix)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'F2') {
         e.preventDefault();
         setQuickScanModalOpen(prev => !prev);
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        setTapeChartOpen(prev => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -769,6 +774,11 @@ export default function IdsDesktopShell({
   // Dynamic Submenus for each master category matching 44 videos
   const subMenuMap = {
     'Reservations..': [
+      { 
+        label: 'Tape Chart (Reservation Calendar Matrix)', 
+        videoId: '02', 
+        action: () => setTapeChartOpen(true) 
+      },
       { label: 'Room Booking', videoId: '01', action: () => setQuickReservationOpen(true) },
       { label: 'Group Room Booking', videoId: '07', action: () => setQuickReservationOpen(true) },
       { 
@@ -1996,6 +2006,25 @@ export default function IdsDesktopShell({
             >
               <span>🏛️ CA GSTR-1 JSON</span>
             </button>
+            <button
+              onClick={() => setTapeChartOpen(true)}
+              style={{
+                background: '#1B365D',
+                color: '#FFD700',
+                border: '1px outset #FFF',
+                padding: '1px 8px',
+                borderRadius: '2px',
+                fontWeight: 800,
+                fontSize: '10px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+              title="Open 7/14/30 Day Advance Booking Calendar Matrix & Tape Chart (F3)"
+            >
+              <span>📅 TAPE CHART [F3]</span>
+            </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button 
@@ -2025,6 +2054,13 @@ export default function IdsDesktopShell({
 
         {/* Top Horizontal Icon Toolbar (12 Authentic Modules from Frame 001) */}
         <div className="ids-icon-toolbar">
+          <button 
+            className={`ids-tool-btn ${activeTool === 'tape-chart' ? 'active' : ''}`}
+            title="Room Tape Chart & Advance Reservation Calendar Matrix [F3]"
+            onClick={() => { setActiveTool('tape-chart'); setTapeChartOpen(true); }}
+          >
+            <CalendarRange size={20} />
+          </button>
           <button 
             className={`ids-tool-btn ${activeTool === 'front-office' ? 'active' : ''}`}
             title="Front Office (Reservations & Registrations)"
@@ -4501,6 +4537,45 @@ export default function IdsDesktopShell({
           </div>
         </div>
       )}
+
+      {/* Authentic Win32 Tape Chart & Advance Reservation Calendar Matrix [F3] */}
+      <IdsTapeChartModal
+        isOpen={tapeChartOpen}
+        onClose={() => setTapeChartOpen(false)}
+        rooms={rooms}
+        bookings={bookings}
+        reservations={reservations}
+        onNewBooking={(newB) => {
+          if (onNewBooking) onNewBooking(newB);
+          setReservations(prev => [
+            {
+              resNo: String(newB.booking_reference || newB.bookingId || Date.now()).slice(-4),
+              title: 'Mr',
+              guestName: newB.guestName,
+              companyName: newB.companyName || 'Direct FIT',
+              companyCode: '',
+              roomNo: String(newB.roomNumber),
+              type: newB.tier?.includes('Suite') ? 'SUI' : (newB.tier?.includes('Deluxe') ? 'DLX' : 'EXE'),
+              confirm: '1+0+0',
+              provisional: '0+0+0',
+              pax: `${newB.adults || 1}+0+0`,
+              arrivalDate: `${newB.checkInDate} 12:00`,
+              departureDate: `${newB.checkOutDate} 11:00`,
+              depositAmount: newB.advanceDeposit || 0,
+              rate: `${(newB.tariffPerNight || 2050).toLocaleString('en-IN')}.00`,
+              status: 'Confirmed',
+              blocked: false,
+              isCancelled: false
+            },
+            ...prev
+          ]);
+        }}
+        onOpenFolio={(rNum) => {
+          setSelectedRoomForAdditionalRate(String(rNum));
+          setAdditionalRoomRateInitialMode('quick-balances');
+          setAdditionalRoomRateModalOpen(true);
+        }}
+      />
 
     </div>
   );
