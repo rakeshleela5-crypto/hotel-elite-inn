@@ -1182,7 +1182,8 @@ export function IdsGuestInformationModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '780px', 
+          width: '880px', 
+          minHeight: '560px', 
           maxWidth: '96vw', 
           boxShadow: '0 8px 30px rgba(0,0,0,0.5)', 
           background: '#ECE9D8',

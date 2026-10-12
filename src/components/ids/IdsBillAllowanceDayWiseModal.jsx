@@ -325,7 +325,7 @@ export default function IdsBillAllowanceDayWiseModal({
         <div 
           className="ids-dialog-window" 
           style={{ 
-            width: '820px', 
+            width: '920px', minHeight: '560px', 
             maxWidth: '96vw', 
             background: '#ECE9D8',
             border: '2px solid #FFF',

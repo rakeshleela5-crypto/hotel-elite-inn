@@ -498,7 +498,7 @@ export default function IdsMenuMasterModal({
       <div 
         className="ids-modal-container"
         style={{
-          width: '780px',
+          width: '880px', minHeight: '560px',
           background: '#ECE9D8',
           border: '2px solid #808080',
           boxShadow: '4px 4px 18px rgba(0,0,0,0.7)',

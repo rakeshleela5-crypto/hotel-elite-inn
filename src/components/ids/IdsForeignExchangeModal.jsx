@@ -224,7 +224,7 @@ export default function IdsForeignExchangeModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '820px', 
+          width: '880px', minHeight: '560px', 
           maxWidth: '96vw', 
           boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
           border: '2px outset #ECE9D8',

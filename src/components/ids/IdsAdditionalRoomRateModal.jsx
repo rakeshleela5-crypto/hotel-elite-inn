@@ -187,7 +187,7 @@ export default function IdsAdditionalRoomRateModal({
       {currentView === 'additional-rate' && (
         <div 
           className="ids-dialog-window" 
-          style={{ width: '740px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}
+          style={{ width: '880px', minHeight: '540px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}
         >
           {/* Title Bar */}
           <div className="ids-dialog-titlebar">

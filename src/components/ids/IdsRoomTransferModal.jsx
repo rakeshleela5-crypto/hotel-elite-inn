@@ -139,7 +139,7 @@ export default function IdsRoomTransferModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1240 }}>
       <div 
         className="ids-dialog-window" 
-        style={{ width: '680px', maxWidth: '96vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8', position: 'relative' }}
+        style={{ width: '880px', minHeight: '560px', maxWidth: '96vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8', position: 'relative' }}
       >
         {/* Title Bar matching Frame 009 & Frame 029 */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

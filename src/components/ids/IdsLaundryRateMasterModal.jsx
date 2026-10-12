@@ -180,7 +180,7 @@ export default function IdsLaundryRateMasterModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '720px', 
+          width: '860px', minHeight: '540px', 
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',

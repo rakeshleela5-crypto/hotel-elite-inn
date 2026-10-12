@@ -60,7 +60,7 @@ export function IdsPackageSelectionModal({ isOpen, onClose }) {
     <div className="ids-modal-overlay" style={{ zIndex: 1350 }}>
       <div 
         className="ids-dialog-window" 
-        style={{ width: '480px', maxWidth: '96vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8' }}
+        style={{ width: '780px', minHeight: '500px', maxWidth: '96vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8' }}
       >
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontWeight: 700, fontSize: '11px' }}>Package Selection V6.5.002.1</span>

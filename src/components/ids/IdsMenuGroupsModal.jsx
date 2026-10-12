@@ -210,7 +210,7 @@ export default function IdsMenuGroupsModal({
       {/* Main Win32 Window: Menu Groups V6.5.002.1 */}
       <div 
         className="ids-modal-container" 
-        style={{ width: '560px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
+        style={{ width: '840px', minHeight: '540px', background: '#ECE9D8', border: '2px solid #808080', boxShadow: '4px 4px 16px rgba(0,0,0,0.65)' }}
       >
         {/* Title Bar (Frame 010) */}
         <div 

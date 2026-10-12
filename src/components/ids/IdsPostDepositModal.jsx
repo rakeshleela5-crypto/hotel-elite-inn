@@ -153,7 +153,7 @@ export default function IdsPostDepositModal({
     <div className="ids-modal-overlay" style={{ zIndex: 1250 }}>
       <div 
         className="ids-dialog-window" 
-        style={{ width: '740px', maxWidth: '98vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8', position: 'relative' }}
+        style={{ width: '920px', minHeight: '560px', maxWidth: '98vw', boxShadow: '0 8px 30px rgba(0,0,0,0.5)', background: '#ECE9D8', position: 'relative' }}
       >
         {/* Title Bar matching Frame 012 */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

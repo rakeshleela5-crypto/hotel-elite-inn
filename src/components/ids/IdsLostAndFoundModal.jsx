@@ -163,7 +163,7 @@ export default function IdsLostAndFoundModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '780px', 
+          width: '880px', minHeight: '560px', 
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',

@@ -128,7 +128,7 @@ export default function IdsSplitTenderModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '840px', 
+          width: '940px', minHeight: '560px', 
           maxWidth: '96vw', 
           background: '#ECE9D8',
           boxShadow: '0 8px 30px rgba(0,0,0,0.65)'

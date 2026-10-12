@@ -217,7 +217,7 @@ export default function IdsCheckInSecondPaxModal({
         <div 
           className="ids-dialog-window" 
           style={{ 
-            width: '820px', 
+            width: '880px', minHeight: '560px', 
             maxWidth: '96vw', 
             background: '#ECE9D8',
             border: '2px solid #FFF',

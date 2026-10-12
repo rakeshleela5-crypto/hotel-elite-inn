@@ -101,7 +101,7 @@ export default function IdsLaundryReSettlementModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '680px', 
+          width: '840px', minHeight: '540px', 
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',

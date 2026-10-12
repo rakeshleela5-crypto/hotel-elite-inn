@@ -292,7 +292,7 @@ export default function IdsHkInventoryModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '840px', 
+          width: '920px', minHeight: '560px', 
           maxWidth: '96vw',
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',

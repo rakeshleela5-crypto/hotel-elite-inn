@@ -31,7 +31,7 @@ export function IdsCancelBookingDialog({
 
   return (
     <div className="ids-modal-overlay" style={{ zIndex: 1100 }}>
-      <div className="ids-dialog-window" style={{ width: '640px', maxWidth: '98vw' }}>
+      <div className="ids-dialog-window" style={{ width: '880px', minHeight: '540px', maxWidth: '98vw' }}>
         {/* Title Bar */}
         <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <span style={{ fontWeight: 700 }}>Cancel Booking</span>

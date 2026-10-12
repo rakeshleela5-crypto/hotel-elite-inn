@@ -364,7 +364,7 @@ export default function IdsPaxCheckoutModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '640px', 
+          width: '880px', minHeight: '540px', 
           maxWidth: '96vw', 
           background: '#ECE9D8', 
           boxShadow: '0 8px 30px rgba(0,0,0,0.5)',

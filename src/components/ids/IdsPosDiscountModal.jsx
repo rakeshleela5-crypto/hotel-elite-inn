@@ -183,7 +183,7 @@ export default function IdsPosDiscountModal({
       <div
         className="ids-dialog-window"
         style={{
-          width: '560px',
+          width: '840px', minHeight: '540px',
           maxWidth: '96vw',
           background: '#ECE9D8',
           border: '2px solid #FFF',

@@ -4057,7 +4057,7 @@ export default function IdsDesktopShell({
       {/* 11. HotKey Console Modal (Win32 Keyboard Accelerators) */}
       {hotKeyModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
-          <div className="ids-dialog-window" style={{ width: '680px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+          <div className="ids-dialog-window" style={{ width: '880px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>⌨️ IDS Fortune NEXT - System Keyboard Shortcuts (HotKeys)</span>
               <button className="ids-win-btn close" onClick={() => setHotKeyModalOpen(false)}>✕</button>
@@ -4156,7 +4156,7 @@ export default function IdsDesktopShell({
       {/* 12. Other Utilities Console Modal */}
       {otherUtilitiesModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
-          <div className="ids-dialog-window" style={{ width: '640px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+          <div className="ids-dialog-window" style={{ width: '880px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>🛠️ IDS Fortune NEXT - System Utilities & Operations Console</span>
               <button className="ids-win-btn close" onClick={() => setOtherUtilitiesModalOpen(false)}>✕</button>
@@ -4205,7 +4205,7 @@ export default function IdsDesktopShell({
       {/* 13. Events & Banquet Register Modal */}
       {eventsRegisterModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
-          <div className="ids-dialog-window" style={{ width: '740px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+          <div className="ids-dialog-window" style={{ width: '920px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>📅 IDS Fortune NEXT - Hotel Banquet & Events Register</span>
               <button className="ids-win-btn close" onClick={() => setEventsRegisterModalOpen(false)}>✕</button>
@@ -4322,7 +4322,7 @@ export default function IdsDesktopShell({
       {/* 14. System Audit & Duty Timestamp Log Sheet */}
       {auditLogModalOpen && (
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
-          <div className="ids-dialog-window" style={{ width: '620px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
+          <div className="ids-dialog-window" style={{ width: '840px', minHeight: '540px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontWeight: 700, fontSize: '11px' }}>🕒 IDS Fortune NEXT - System Audit & Duty Timestamp Log</span>
               <button className="ids-win-btn close" onClick={() => setAuditLogModalOpen(false)}>✕</button>

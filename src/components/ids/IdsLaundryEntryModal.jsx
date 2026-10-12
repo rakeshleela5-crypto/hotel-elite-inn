@@ -230,7 +230,7 @@ export default function IdsLaundryEntryModal({
       <div 
         className="ids-modal-window" 
         style={{ 
-          width: '840px', 
+          width: '920px', minHeight: '560px', 
           backgroundColor: '#ECE9D8',
           border: '2px solid #000',
           boxShadow: '4px 4px 10px rgba(0,0,0,0.5)',
