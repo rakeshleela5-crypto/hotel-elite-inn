@@ -241,88 +241,82 @@ export default function IdsPackageRatesModal({
       <div 
         className="ids-dialog-window" 
         style={{ 
-          width: '820px', 
+          width: '780px', 
           maxWidth: '96vw', 
-          boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 24px rgba(56, 189, 248, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          borderRadius: '14px',
-          background: '#0f172a'
+          boxShadow: '0 12px 36px rgba(0,0,0,0.65)', 
+          border: '2px outset #ECE9D8',
+          background: '#ECE9D8'
         }}
       >
-        {/* Modern Luxury Titlebar */}
+        {/* Titlebar matching Video 40 Frame 018 */}
         <div 
           className="ids-dialog-titlebar" 
           style={{ 
-            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', 
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-            color: '#f8fafc', 
-            padding: '14px 20px', 
+            background: 'linear-gradient(90deg, #0A246A 0%, #3A6EA5 100%)', 
+            color: '#FFF', 
+            padding: '4px 8px', 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center' 
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ background: 'rgba(56, 189, 248, 0.15)', padding: '6px', borderRadius: '8px', color: '#38bdf8' }}>
-              <Package size={18} />
-            </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '14px', letterSpacing: '-0.01em', color: '#f8fafc' }}>
-                Room Rate Master & Package Packages
-              </div>
-              <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                IDS Fortune NEXT PMS • Meal Plan Bundling (EP / CP / MAP / AP) & Direct Room Sales
-              </div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
+            <Package size={14} />
+            <span>Room Rate Master V6.5.002.1 — Create / Sell Package Rates</span>
           </div>
           <button 
             className="ids-win-btn close" 
             onClick={onClose}
-            title="Close Dialog"
+            style={{ 
+              background: '#C75050', 
+              color: '#FFF', 
+              border: '1px outset #FFF', 
+              fontWeight: 700, 
+              width: '18px', 
+              height: '18px', 
+              lineHeight: '14px', 
+              cursor: 'pointer' 
+            }}
           >
-            <X size={15} />
+            ✕
           </button>
         </div>
 
         {/* Status notification banner */}
         {statusMessage && (
-          <div style={{ background: 'rgba(16, 185, 129, 0.15)', borderBottom: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle2 size={16} />
+          <div style={{ background: '#E6F4EA', borderBottom: '1px solid #137333', color: '#137333', padding: '4px 12px', fontSize: '11px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CheckCircle2 size={14} />
             <span>{statusMessage}</span>
           </div>
         )}
 
-        {/* Main Mode Navigation Bar */}
-        <div style={{ display: 'flex', gap: '6px', padding: '10px 16px 0 16px', background: '#0f172a', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        {/* Main Mode Navigation Bar matching Frame 018 Tabs */}
+        <div style={{ display: 'flex', gap: '4px', padding: '6px 12px 0 12px', background: '#ECE9D8', borderBottom: '2px solid #716F64' }}>
           <button 
-            className={`ids-tab-btn ${activeTab === 'packageMaster' ? 'active' : ''}`}
+            className="ids-tab-btn" 
             style={{ 
               fontWeight: activeTab === 'packageMaster' ? 700 : 600, 
-              color: activeTab === 'packageMaster' ? '#38bdf8' : '#94a3b8',
-              background: activeTab === 'packageMaster' ? 'rgba(56, 189, 248, 0.1)' : '#1e293b',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderBottom: activeTab === 'packageMaster' ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '8px 8px 0 0',
-              padding: '8px 16px',
-              fontSize: '12px',
-              cursor: 'pointer'
+              color: activeTab === 'packageMaster' ? '#0A246A' : '#1A1A1A',
+              background: activeTab === 'packageMaster' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+              border: '1px solid #716F64',
+              borderBottom: activeTab === 'packageMaster' ? '2px solid #FFFFFF' : '1px solid #716F64',
+              marginBottom: activeTab === 'packageMaster' ? '-2px' : '0px',
+              boxShadow: activeTab === 'packageMaster' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF'
             }}
             onClick={() => setActiveTab('packageMaster')}
           >
             Package Rate Master (Setup)
           </button>
           <button 
-            className={`ids-tab-btn ${activeTab === 'sellPackage' ? 'active' : ''}`}
+            className="ids-tab-btn" 
             style={{ 
               fontWeight: activeTab === 'sellPackage' ? 700 : 600, 
-              color: activeTab === 'sellPackage' ? '#38bdf8' : '#94a3b8',
-              background: activeTab === 'sellPackage' ? 'rgba(56, 189, 248, 0.1)' : '#1e293b',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              borderBottom: activeTab === 'sellPackage' ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderRadius: '8px 8px 0 0',
-              padding: '8px 16px',
-              fontSize: '12px',
-              cursor: 'pointer'
+              color: activeTab === 'sellPackage' ? '#0A246A' : '#1A1A1A',
+              background: activeTab === 'sellPackage' ? '#FFFFFF' : 'linear-gradient(180deg, #F0EFE7 0%, #D8D4C8 100%)',
+              border: '1px solid #716F64',
+              borderBottom: activeTab === 'sellPackage' ? '2px solid #FFFFFF' : '1px solid #716F64',
+              marginBottom: activeTab === 'sellPackage' ? '-2px' : '0px',
+              boxShadow: activeTab === 'sellPackage' ? 'inset 0 2px 0 #316AC5' : 'inset 0 1px 0 #FFFFFF'
             }}
             onClick={() => setActiveTab('sellPackage')}
           >
