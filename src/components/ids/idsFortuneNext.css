@@ -548,6 +548,8 @@
   overflow: hidden;
   box-sizing: border-box;
   transition: width 0.15s ease, height 0.15s ease;
+  user-select: auto !important;
+  pointer-events: auto !important;
 }
 
 /* Full Desktop Maximized State */
@@ -580,7 +582,7 @@
   border-bottom: 1px solid #B0AB9A !important;
 }
 
-/* Inset inputs and tables - Scaled & High-DPI */
+/* Inset inputs and tables - Scaled & High-DPI Interactive */
 .ids-input {
   border: 1px solid #7F9DB9 !important;
   background: #FFFFFF !important;
@@ -590,9 +592,16 @@
   padding: 4px 8px !important;
   height: 28px !important;
   box-sizing: border-box !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
+  cursor: text !important;
 }
 .ids-input:focus {
-  outline: 1px solid #316AC5 !important;
+  outline: 2px solid #0A246A !important;
+  outline-offset: -1px !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 0 4px rgba(10, 36, 106, 0.4) !important;
 }
 
 .ids-select {
@@ -604,6 +613,15 @@
   padding: 3px 6px !important;
   height: 28px !important;
   box-sizing: border-box !important;
+  user-select: auto !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+.ids-select:focus {
+  outline: 2px solid #0A246A !important;
+  outline-offset: -1px !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 0 4px rgba(10, 36, 106, 0.4) !important;
 }
 
 .ids-grid-table {
@@ -788,21 +806,53 @@ button.ids-win-btn.close:hover {
   gap: 2px;
 }
 
-/* 4. Form Inputs, Selects, and Textareas */
+/* 4. Form Inputs, Selects, and Textareas - Universal High-DPI Responsiveness */
 .ids-desktop-container input,
+.ids-desktop-container textarea,
+.ids-desktop-container select,
 .ids-modal-overlay input,
+.ids-modal-overlay textarea,
+.ids-modal-overlay select,
 .ids-modal-backdrop input,
+.ids-modal-backdrop textarea,
+.ids-modal-backdrop select,
 .ids-modal-container input,
+.ids-modal-container textarea,
+.ids-modal-container select,
 .ids-modal-window input,
+.ids-modal-window textarea,
+.ids-modal-window select,
 .ids-dialog-window input,
+.ids-dialog-window textarea,
+.ids-dialog-window select,
 .ids-window input,
-.ids-input {
+.ids-window textarea,
+.ids-window select,
+.ids-input,
+.ids-select {
   color-scheme: light !important;
   color: #000000 !important;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
   font-size: 13px !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
 }
 
+/* Text Inputs: Explicit I-Beam Typing Cursor */
+.ids-desktop-container input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-modal-overlay input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-modal-backdrop input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-dialog-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-modal-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-desktop-container textarea:not([disabled]):not([readonly]),
+.ids-dialog-window textarea:not([disabled]):not([readonly]),
+.ids-input:not([disabled]):not([readonly]) {
+  cursor: text !important;
+}
+
+/* Enabled Inputs: Crisp White Background & Immediate Focus State */
 .ids-desktop-container input:not(:disabled):not([readonly]),
 .ids-modal-overlay input:not(:disabled):not([readonly]),
 .ids-modal-backdrop input:not(:disabled):not([readonly]),
@@ -811,7 +861,19 @@ button.ids-win-btn.close:hover {
 .ids-dialog-window input:not(:disabled):not([readonly]),
 .ids-window input:not(:disabled):not([readonly]),
 .ids-input:not(:disabled):not([readonly]) {
-  background-color: #FFFFFF;
+  background-color: #FFFFFF !important;
+}
+
+.ids-desktop-container input:focus,
+.ids-modal-overlay input:focus,
+.ids-modal-backdrop input:focus,
+.ids-dialog-window input:focus,
+.ids-modal-window input:focus,
+.ids-input:focus {
+  outline: 2px solid #0A246A !important;
+  outline-offset: -1px !important;
+  background-color: #FFFFFF !important;
+  box-shadow: 0 0 5px rgba(10, 36, 106, 0.45) !important;
 }
 
 /* Disabled & Readonly Inputs Preserve Authentic Win32 Grey & Highlight */
@@ -825,8 +887,25 @@ button.ids-win-btn.close:hover {
 .ids-input:disabled {
   background-color: #EBE9ED !important;
   color: #444444 !important;
+  cursor: not-allowed !important;
 }
 
+.ids-desktop-container input[readonly],
+.ids-modal-overlay input[readonly],
+.ids-modal-backdrop input[readonly],
+.ids-modal-container input[readonly],
+.ids-modal-window input[readonly],
+.ids-dialog-window input[readonly],
+.ids-window input[readonly],
+.ids-input[readonly] {
+  background-color: #F0EDE5 !important;
+  color: #333333 !important;
+  cursor: default !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Select Dropdown Elements */
 .ids-desktop-container select,
 .ids-modal-overlay select,
 .ids-modal-backdrop select,
@@ -839,6 +918,8 @@ button.ids-win-btn.close:hover {
   color: #000000 !important;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
   font-size: 13px !important;
+  cursor: pointer !important;
+  user-select: auto !important;
 }
 
 .ids-desktop-container select:disabled,

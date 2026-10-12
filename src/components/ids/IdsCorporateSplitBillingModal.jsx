@@ -69,6 +69,11 @@ export default function IdsCorporateSplitBillingModal({
     return CORPORATE_ENTITIES.find(c => c.code === selectedCorpCode) || CORPORATE_ENTITIES[0];
   }, [selectedCorpCode]);
 
+  const [corporateGstin, setCorporateGstin] = useState(activeCorp.gstin);
+  React.useEffect(() => {
+    setCorporateGstin(activeCorp.gstin);
+  }, [activeCorp]);
+
   // Calculations for Room Accommodation Invoice (SAC 996311)
   const roomTaxableAmount = useMemo(() => roomNights * roomTariffPerNight, [roomNights, roomTariffPerNight]);
   const roomGstPercent = roomTaxableAmount / roomNights > 7500 ? 18 : 12;
@@ -210,10 +215,11 @@ export default function IdsCorporateSplitBillingModal({
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '2px' }}>Corporate GSTIN:</label>
             <input 
               type="text" 
-              readOnly 
               className="ids-input" 
-              style={{ width: '100%', height: '23px', background: '#F5F5F5', fontWeight: 700, fontFamily: 'monospace' }}
-              value={activeCorp.gstin} 
+              style={{ width: '100%', height: '23px', fontWeight: 700, fontFamily: 'monospace' }}
+              value={corporateGstin} 
+              onChange={e => setCorporateGstin(e.target.value)}
+              placeholder="e.g. 21AAACV1234F1Z8"
             />
           </div>
 

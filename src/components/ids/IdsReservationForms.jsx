@@ -549,31 +549,66 @@ export function IdsQuickReservationModal({
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginTop: '8px' }}>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Currency</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.currency} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%' }} 
+                  value={tariffs.currency} 
+                  onChange={(e) => setTariffs({ ...tariffs, currency: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Single</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.single} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%', fontWeight: 700 }} 
+                  value={tariffs.single} 
+                  onChange={(e) => setTariffs({ ...tariffs, single: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Double</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.double} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%', fontWeight: 700 }} 
+                  value={tariffs.double} 
+                  onChange={(e) => setTariffs({ ...tariffs, double: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Triple</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.triple} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%' }} 
+                  value={tariffs.triple} 
+                  onChange={(e) => setTariffs({ ...tariffs, triple: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Qud</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.qud} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%' }} 
+                  value={tariffs.qud} 
+                  onChange={(e) => setTariffs({ ...tariffs, qud: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Ext. Adult</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.extAdult} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%' }} 
+                  value={tariffs.extAdult} 
+                  onChange={(e) => setTariffs({ ...tariffs, extAdult: e.target.value })} 
+                />
               </div>
               <div>
                 <span style={{ fontSize: '9px', color: '#555' }}>Ext. Child</span>
-                <input className="ids-input" style={{ width: '100%' }} value={tariffs.extChild} readOnly />
+                <input 
+                  className="ids-input" 
+                  style={{ width: '100%' }} 
+                  value={tariffs.extChild} 
+                  onChange={(e) => setTariffs({ ...tariffs, extChild: e.target.value })} 
+                />
               </div>
             </div>
 

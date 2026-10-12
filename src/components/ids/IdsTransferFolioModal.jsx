@@ -355,8 +355,9 @@ export default function IdsTransferFolioModal({
                       <input 
                         type="text" 
                         value={fromRoomNo} 
-                        readOnly 
-                        style={{ width: '70px', border: '1px inset #999', padding: '1px 4px', fontWeight: 700, background: '#FFF' }}
+                        onChange={(e) => setFromRoomNo(e.target.value)}
+                        className="ids-input"
+                        style={{ width: '70px', padding: '1px 4px', fontWeight: 700 }}
                       />
                       <button 
                         className="ids-btn-classic" 
@@ -373,7 +374,8 @@ export default function IdsTransferFolioModal({
                         type="text" 
                         value={sourceGuest.guestName} 
                         readOnly 
-                        style={{ width: '100%', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '100%', padding: '1px 4px' }}
                       />
                     </div>
 
@@ -383,14 +385,16 @@ export default function IdsTransferFolioModal({
                         type="text" 
                         value={sourceGuest.folioNo} 
                         readOnly 
-                        style={{ width: '50px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '50px', padding: '1px 4px' }}
                       />
                       <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
                         value={sourceGuest.regNo} 
                         readOnly 
-                        style={{ width: '70px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '70px', padding: '1px 4px' }}
                       />
                     </div>
                   </div>
@@ -406,8 +410,9 @@ export default function IdsTransferFolioModal({
                       <input 
                         type="text" 
                         value={toRoomNo} 
-                        readOnly 
-                        style={{ width: '70px', border: '1px inset #999', padding: '1px 4px', fontWeight: 700, background: '#FFF' }}
+                        onChange={(e) => setToRoomNo(e.target.value)}
+                        className="ids-input"
+                        style={{ width: '70px', padding: '1px 4px', fontWeight: 700 }}
                       />
                       <button 
                         className="ids-btn-classic" 
@@ -424,7 +429,8 @@ export default function IdsTransferFolioModal({
                         type="text" 
                         value={targetGuest.guestName} 
                         readOnly 
-                        style={{ width: '100%', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '100%', padding: '1px 4px' }}
                       />
                     </div>
 
@@ -434,14 +440,16 @@ export default function IdsTransferFolioModal({
                         type="text" 
                         value={targetGuest.folioNo} 
                         readOnly 
-                        style={{ width: '50px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '50px', padding: '1px 4px' }}
                       />
                       <span style={{ fontWeight: 600 }}>Reg. No.</span>
                       <input 
                         type="text" 
                         value={targetGuest.regNo} 
                         readOnly 
-                        style={{ width: '70px', border: '1px inset #999', padding: '1px 4px', background: '#FFF' }}
+                        className="ids-input"
+                        style={{ width: '70px', padding: '1px 4px' }}
                       />
                     </div>
                   </div>

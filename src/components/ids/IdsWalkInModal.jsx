@@ -642,11 +642,22 @@ export default function IdsWalkInModal({
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span>Pax</span>
-                  <input className="ids-input" readOnly value={currentPax} style={{ width: '35px', textAlign: 'center', fontWeight: 700, background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={currentPax} 
+                    onChange={(e) => setCurrentPax(e.target.value)}
+                    style={{ width: '40px', textAlign: 'center', fontWeight: 700 }} 
+                  />
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span>Folio No.</span>
-                  <input className="ids-input" readOnly value={folioNo} style={{ width: '35px', textAlign: 'center', background: '#F5F5F5' }} />
+                  <input 
+                    className="ids-input" 
+                    value={folioNo} 
+                    readOnly
+                    title="Folio sequence automatically assigned by PMS"
+                    style={{ width: '40px', textAlign: 'center' }} 
+                  />
                 </div>
               </div>
             </div>
@@ -1536,22 +1547,43 @@ export default function IdsWalkInModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Guest Status</span>
-                    <input className="ids-input" readOnly value="WLK" style={{ width: '70px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={guestStatus} 
+                      onChange={(e) => setGuestStatus(e.target.value)}
+                      style={{ width: '70px', fontWeight: 700 }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Nationality</span>
-                    <input className="ids-input" readOnly value="India" style={{ width: '180px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={nationality} 
+                      onChange={(e) => setNationality(e.target.value)}
+                      style={{ width: '180px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Company</span>
-                    <input className="ids-input" readOnly value="Pooja Associates (Contract Division)" style={{ flex: 1, background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={companyName} 
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      style={{ flex: 1 }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Com. Remarks</span>
-                    <input className="ids-input" readOnly value="" style={{ flex: 1, background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={specialInstText} 
+                      onChange={(e) => setSpecialInstText(e.target.value)}
+                      placeholder="Special commercial remarks..."
+                      style={{ flex: 1 }} 
+                    />
                   </div>
 
                   {/* Arrival & Departure dates matching Frame 110 */}
@@ -1617,19 +1649,40 @@ export default function IdsWalkInModal({
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Arrival From</span>
-                    <input className="ids-input" readOnly value="Rayagada" style={{ width: '120px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={arrivalFrom} 
+                      onChange={(e) => setArrivalFrom(e.target.value)}
+                      style={{ width: '120px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Proceeding To</span>
-                    <input className="ids-input" readOnly value="Bihar" style={{ width: '120px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={proceedingTo} 
+                      onChange={(e) => setProceedingTo(e.target.value)}
+                      style={{ width: '120px' }} 
+                    />
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ width: '130px' }}>Plan</span>
-                    <input className="ids-input" readOnly value="CP" style={{ width: '50px', background: '#F5F5F5' }} />
-                    <span style={{ marginLeft: '12px' }}>Passport No.</span>
-                    <input className="ids-input" readOnly value="" style={{ width: '100px', background: '#F5F5F5' }} />
+                    <input 
+                      className="ids-input" 
+                      value={planCode} 
+                      onChange={(e) => setPlanCode(e.target.value)}
+                      style={{ width: '50px', fontWeight: 700 }} 
+                    />
+                    <span style={{ marginLeft: '12px' }}>Passport / ID No.</span>
+                    <input 
+                      className="ids-input" 
+                      value={identificationNo} 
+                      onChange={(e) => setIdentificationNo(e.target.value)}
+                      placeholder="ID / Passport #"
+                      style={{ width: '120px' }} 
+                    />
                   </div>
                 </div>
 
@@ -1653,19 +1706,27 @@ export default function IdsWalkInModal({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '11px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ width: '70px' }}>Rate</span>
-                      <input className="ids-input" readOnly value="2,500.00 - DISCOUNT" style={{ flex: 1, background: '#F5F5F5', fontWeight: 700, color: '#0A246A' }} />
+                      <input 
+                        className="ids-input" 
+                        value={`${rateAmount.toLocaleString('en-IN')} - ${rateOption}`}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value.replace(/[^0-9.]/g, ''));
+                          if (!isNaN(val)) setRateAmount(val);
+                        }}
+                        style={{ flex: 1, fontWeight: 700, color: '#0A246A' }} 
+                      />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ width: '70px' }}>Plan</span>
-                      <input className="ids-input" readOnly value="0.00" style={{ width: '80px', background: '#F5F5F5' }} />
+                      <input className="ids-input" value="0.00" onChange={() => {}} style={{ width: '80px' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ width: '70px' }}>Guest Bal.</span>
-                      <input className="ids-input" readOnly value="0.00" style={{ width: '80px', background: '#F5F5F5' }} />
+                      <input className="ids-input" value="0.00" onChange={() => {}} style={{ width: '80px' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
                       <span style={{ width: '70px' }}>Room Type</span>
-                      <input className="ids-input" readOnly value="DELUXE (DLX)" style={{ flex: 1, background: '#E8F5E9', fontWeight: 700, color: '#2E7D32' }} />
+                      <input className="ids-input" value="DELUXE (DLX)" onChange={() => {}} style={{ flex: 1, fontWeight: 700, color: '#2E7D32' }} />
                     </div>
                   </div>
                 </div>
@@ -1675,7 +1736,12 @@ export default function IdsWalkInModal({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '6px', borderTop: '1px solid #CCC' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span>Check in User</span>
-                  <input className="ids-input" readOnly value="MANAGER" style={{ width: '90px', background: '#F5F5F5', fontWeight: 700 }} />
+                  <input 
+                    className="ids-input" 
+                    value={rateAuthorizedBy} 
+                    onChange={(e) => setRateAuthorizedBy(e.target.value)}
+                    style={{ width: '90px', fontWeight: 700 }} 
+                  />
                 </div>
 
                 {/* Bottom Action buttons matching Frame 110 */}
