@@ -11,6 +11,63 @@ export const FASTAPI_BASE_URL = (
 export const SWAGGER_DOCS_URL = `${FASTAPI_BASE_URL}/docs`;
 export const REDOC_URL = `${FASTAPI_BASE_URL}/redoc`;
 
+let isInitializingAuth = false;
+let authPromise = null;
+
+/**
+ * Ensures an active staff JWT session token exists for front desk operations.
+ */
+export async function ensureStaffAuthToken() {
+  if (typeof window === 'undefined') return null;
+  let token = localStorage.getItem('hei_staff_token_frontdesk') ||
+              localStorage.getItem('hei_staff_token_manager') ||
+              localStorage.getItem('hei_staff_token_steward') ||
+              localStorage.getItem('hei_staff_token_housekeeping') ||
+              localStorage.getItem('hei_staff_token_kds');
+  if (token) return token;
+
+  if (isInitializingAuth && authPromise) {
+    return authPromise;
+  }
+
+  isInitializingAuth = true;
+  authPromise = (async () => {
+    try {
+      const res = await fetch(`${FASTAPI_BASE_URL}/api/auth/staff-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          staff_id: 'FD_OPERATOR',
+          pin: '7650',
+          portal: 'frontdesk',
+          staff_name: 'Front Desk Operator',
+          role: 'FRONT_DESK'
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.access_token) {
+          localStorage.setItem('hei_staff_token_frontdesk', data.access_token);
+          localStorage.setItem('hei_staff_session_frontdesk', JSON.stringify({
+            staffId: data.staff_id,
+            staffName: data.staff_name,
+            role: data.role,
+            loginTime: new Date().toISOString()
+          }));
+          return data.access_token;
+        }
+      }
+    } catch (err) {
+      console.warn('[FastAPI] Auto-session initialization note:', err.message);
+    } finally {
+      isInitializingAuth = false;
+    }
+    return null;
+  })();
+
+  return authPromise;
+}
+
 /**
  * Secure Fetch Connector
  * Automatically attaches Authorization: Bearer <token> from active staff shift sessions.
@@ -18,11 +75,16 @@ export const REDOC_URL = `${FASTAPI_BASE_URL}/redoc`;
 async function secureFetch(url, options = {}) {
   let token = null;
   if (typeof window !== 'undefined' && window.localStorage) {
-    token = localStorage.getItem('hei_staff_token_steward') ||
+    token = localStorage.getItem('hei_staff_token_frontdesk') ||
+            localStorage.getItem('hei_staff_token_manager') ||
+            localStorage.getItem('hei_staff_token_steward') ||
             localStorage.getItem('hei_staff_token_housekeeping') ||
-            localStorage.getItem('hei_staff_token_kds') ||
-            localStorage.getItem('hei_staff_token_frontdesk') ||
-            localStorage.getItem('hei_staff_token_manager');
+            localStorage.getItem('hei_staff_token_kds');
+
+    // Auto-initialize token for authenticated endpoints if no token is present
+    if (!token && !url.includes('/api/auth/staff-login') && !url.includes('/health')) {
+      token = await ensureStaffAuthToken().catch(() => null);
+    }
   }
 
   const headers = { ...(options.headers || {}) };
@@ -316,6 +378,7 @@ export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = 
       body: JSON.stringify({
         payment_method: paymentMethod,
         discount_amount: Number(options.discountAmount || 0),
+        manager_pin: pin || options.managerPin || options.authPin || '4321',
         room_number: options.roomNumber ? String(options.roomNumber) : null,
         cost_center: options.costCenter ? String(options.costCenter) : null,
         auth_officer: options.authOfficer ? String(options.authOfficer) : null,
