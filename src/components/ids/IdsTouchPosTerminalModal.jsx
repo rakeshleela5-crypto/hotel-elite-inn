@@ -5,7 +5,8 @@ import { playSuccessChime, playOrderAlert } from '../../utils/soundAlert';
 import { 
   getLiveKots, saveLiveKots, broadcastKotChannel, 
   normalizeKotOrder, KOT_STORAGE_KEY, KDS_CHANNEL_NAME,
-  TABLE_SESSIONS_KEY, recordKotItemVoid
+  TABLE_SESSIONS_KEY, recordKotItemVoid,
+  getStandardPosTableId, getRawTableNumber, findTableSession, mergeKotIntoTableSessions
 } from '../../utils/kotDataSync';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../../db/dexieDb';
 import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
@@ -190,7 +191,17 @@ export default function IdsTouchPosTerminalModal({
   const [tableSessions, setTableSessions] = useState(() => {
     try {
       const saved = localStorage.getItem(TABLE_SESSIONS_KEY);
-      return saved ? JSON.parse(saved) : {};
+      let sessions = saved ? JSON.parse(saved) : {};
+      // Reconcile with any live KOT orders in storage
+      const liveKots = getLiveKots();
+      if (Array.isArray(liveKots) && liveKots.length > 0) {
+        liveKots.forEach(k => {
+          if (k.status !== 'Settled') {
+            sessions = mergeKotIntoTableSessions(sessions, k);
+          }
+        });
+      }
+      return sessions;
     } catch (e) {
       return {};
     }
@@ -267,14 +278,15 @@ export default function IdsTouchPosTerminalModal({
           receivedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         });
 
-        if (event.tableSessions) {
-          setTableSessions(event.tableSessions);
-        } else {
+        // Automatically ingest incoming food items into table sessions and local storage
+        setTableSessions(prev => {
+          const baseSessions = event.tableSessions || prev || {};
+          const merged = mergeKotIntoTableSessions(baseSessions, ord);
           try {
-            const saved = localStorage.getItem(TABLE_SESSIONS_KEY);
-            if (saved) setTableSessions(JSON.parse(saved));
+            localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(merged));
           } catch (e) {}
-        }
+          return merged;
+        });
       }
     });
 
@@ -287,8 +299,7 @@ export default function IdsTouchPosTerminalModal({
 
   // Standardize table numbers (support both '1' and 'T-01')
   const currentSession = useMemo(() => {
-    const rawNum = selectedTable.replace(/\D/g, '');
-    return tableSessions[selectedTable] || tableSessions[rawNum] || null;
+    return findTableSession(tableSessions, selectedTable);
   }, [tableSessions, selectedTable]);
 
   // Dispatched items from all prior KOT batches on this table
@@ -458,10 +469,14 @@ export default function IdsTouchPosTerminalModal({
 
     // Update running table session
     const updatedSessions = { ...tableSessions };
-    const rawNum = selectedTable.replace(/\D/g, '');
-    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+    const stdTableKey = getStandardPosTableId(selectedTable);
+    const rawTableKey = getRawTableNumber(selectedTable);
+    const sess = findTableSession(updatedSessions, selectedTable);
     if (sess) {
       sess.discount = disc;
+      updatedSessions[selectedTable] = sess;
+      updatedSessions[stdTableKey] = sess;
+      updatedSessions[rawTableKey] = sess;
       setTableSessions(updatedSessions);
       try {
         localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
@@ -475,17 +490,23 @@ export default function IdsTouchPosTerminalModal({
   };
 
   const handleRemoveDiscount = () => {
+    const stdTableKey = getStandardPosTableId(selectedTable);
+    const rawTableKey = getRawTableNumber(selectedTable);
     setTableDiscounts(prev => {
       const copy = { ...prev };
       delete copy[selectedTable];
+      delete copy[stdTableKey];
+      delete copy[rawTableKey];
       return copy;
     });
 
     const updatedSessions = { ...tableSessions };
-    const rawNum = selectedTable.replace(/\D/g, '');
-    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+    const sess = findTableSession(updatedSessions, selectedTable);
     if (sess && sess.discount) {
       delete sess.discount;
+      updatedSessions[selectedTable] = sess;
+      updatedSessions[stdTableKey] = sess;
+      updatedSessions[rawTableKey] = sess;
       setTableSessions(updatedSessions);
       try {
         localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
@@ -559,8 +580,9 @@ export default function IdsTouchPosTerminalModal({
 
     // 2. Deduct or remove item from running tableSession
     const updatedSessions = { ...tableSessions };
-    const rawNum = selectedTable.replace(/\D/g, '');
-    const sess = updatedSessions[selectedTable] || updatedSessions[rawNum];
+    const stdTableKey = getStandardPosTableId(selectedTable);
+    const rawTableKey = getRawTableNumber(selectedTable);
+    const sess = findTableSession(updatedSessions, selectedTable);
 
     if (sess && sess.kots) {
       let itemUpdated = false;
@@ -601,7 +623,8 @@ export default function IdsTouchPosTerminalModal({
       }
 
       updatedSessions[selectedTable] = sess;
-      if (rawNum) updatedSessions[rawNum] = sess;
+      updatedSessions[stdTableKey] = sess;
+      updatedSessions[rawTableKey] = sess;
 
       setTableSessions(updatedSessions);
       try {
@@ -689,10 +712,11 @@ export default function IdsTouchPosTerminalModal({
 
     // 2. Update Table Session in Storage & Dexie
     const updatedSessions = { ...tableSessions };
-    const rawNum = selectedTable.replace(/\D/g, '');
-    const currentTab = updatedSessions[selectedTable] || updatedSessions[rawNum] || {
-      sessionId: `SES-${selectedTable}-${Date.now().toString().slice(-4)}`,
-      tableNumber: selectedTable,
+    const stdTableKey = getStandardPosTableId(selectedTable);
+    const rawTableKey = getRawTableNumber(selectedTable);
+    const currentTab = findTableSession(updatedSessions, selectedTable) || {
+      sessionId: `SES-${stdTableKey}-${Date.now().toString().slice(-4)}`,
+      tableNumber: stdTableKey,
       outlet: activeOutlet,
       status: 'OCCUPIED',
       firstKotTime: kotTimeStr,
@@ -724,6 +748,8 @@ export default function IdsTouchPosTerminalModal({
     currentTab.netTotal = Math.round(gross * 1.05);
 
     updatedSessions[selectedTable] = currentTab;
+    updatedSessions[stdTableKey] = currentTab;
+    updatedSessions[rawTableKey] = currentTab;
     setTableSessions(updatedSessions);
 
     try {
@@ -793,8 +819,7 @@ export default function IdsTouchPosTerminalModal({
       return;
     }
 
-    const sourceRaw = mergeSourceTable.replace(/\D/g, '');
-    const sourceSession = tableSessions[mergeSourceTable] || tableSessions[sourceRaw];
+    const sourceSession = findTableSession(tableSessions, mergeSourceTable);
 
     if (!sourceSession || !sourceSession.kots || sourceSession.kots.length === 0) {
       setMessagePrompt(`Table ${mergeSourceTable} has no active KOTs to merge!`);
@@ -802,9 +827,11 @@ export default function IdsTouchPosTerminalModal({
     }
 
     const updatedSessions = { ...tableSessions };
-    const targetTab = updatedSessions[selectedTable] || {
-      sessionId: `SES-${selectedTable}-${Date.now().toString().slice(-4)}`,
-      tableNumber: selectedTable,
+    const stdTarget = getStandardPosTableId(selectedTable);
+    const rawTarget = getRawTableNumber(selectedTable);
+    const targetTab = findTableSession(updatedSessions, selectedTable) || {
+      sessionId: `SES-${stdTarget}-${Date.now().toString().slice(-4)}`,
+      tableNumber: stdTarget,
       outlet: activeOutlet,
       status: 'OCCUPIED',
       firstKotTime: new Date().toLocaleTimeString(),
@@ -839,8 +866,12 @@ export default function IdsTouchPosTerminalModal({
     targetTab.netTotal = Math.round(gross * 1.05);
 
     updatedSessions[selectedTable] = targetTab;
+    updatedSessions[stdTarget] = targetTab;
+    updatedSessions[rawTarget] = targetTab;
+
     delete updatedSessions[mergeSourceTable];
-    if (sourceRaw) delete updatedSessions[sourceRaw];
+    delete updatedSessions[getStandardPosTableId(mergeSourceTable)];
+    delete updatedSessions[getRawTableNumber(mergeSourceTable)];
 
     setTableSessions(updatedSessions);
     try {
@@ -894,9 +925,11 @@ export default function IdsTouchPosTerminalModal({
 
     // 1. Release Table Session
     const updatedSessions = { ...tableSessions };
-    const rawNum = selectedTable.replace(/\D/g, '');
+    const stdKey = getStandardPosTableId(selectedTable);
+    const rawKey = getRawTableNumber(selectedTable);
     delete updatedSessions[selectedTable];
-    delete updatedSessions[rawNum];
+    delete updatedSessions[stdKey];
+    delete updatedSessions[rawKey];
 
     setTableSessions(updatedSessions);
     try {
@@ -904,13 +937,15 @@ export default function IdsTouchPosTerminalModal({
     } catch (e) {}
 
     settleTableSessionInDexie(selectedTable).catch(() => {});
-    if (rawNum) settleTableSessionInDexie(rawNum).catch(() => {});
+    settleTableSessionInDexie(stdKey).catch(() => {});
+    settleTableSessionInDexie(rawKey).catch(() => {});
 
     // Clear discount for settled table
     setTableDiscounts(prev => {
       const copy = { ...prev };
       delete copy[selectedTable];
-      if (rawNum) delete copy[rawNum];
+      delete copy[stdKey];
+      delete copy[rawKey];
       return copy;
     });
 
@@ -955,8 +990,7 @@ export default function IdsTouchPosTerminalModal({
 
   // Determine Table Badge Status
   const getTableOccupancyBadge = (tbl) => {
-    const raw = tbl.replace(/\D/g, '');
-    const sess = tableSessions[tbl] || tableSessions[raw];
+    const sess = findTableSession(tableSessions, tbl);
     if (sess && sess.status === 'OCCUPIED' && sess.kots?.length > 0) {
       return { text: `OCCUPIED (${sess.kots.length} KOTs)`, color: '#A02020', isOccupied: true };
     }
@@ -1034,8 +1068,8 @@ export default function IdsTouchPosTerminalModal({
               <button 
                 onClick={() => {
                   if (incomingKotNotice.tableNumber) {
-                    const raw = incomingKotNotice.tableNumber.replace(/\D/g, '');
-                    setSelectedTable(raw || incomingKotNotice.tableNumber);
+                    const stdTable = getStandardPosTableId(incomingKotNotice.tableNumber);
+                    setSelectedTable(stdTable);
                   }
                   setIncomingKotNotice(null);
                 }}

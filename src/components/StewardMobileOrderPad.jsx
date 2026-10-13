@@ -11,6 +11,7 @@ import { getStaffSession, endStaffShiftSession } from '../utils/staffAuthSession
 import GeofenceSecurityBanner from './GeofenceSecurityBanner';
 import { saveTableSessionToDexie } from '../db/dexieDb';
 import { syncDispatchKotOrder } from '../utils/liveSyncBridge';
+import { getStandardPosTableId, getRawTableNumber } from '../utils/kotDataSync';
 import { RECOGNIZED_STEWARDS } from '../data/hotelStaffData';
 export { RECOGNIZED_STEWARDS };
 
@@ -408,9 +409,13 @@ export default function StewardMobileOrderPad({
       tableSession.gst = Math.round((newGross - tableSession.subtotal) * 100) / 100;
       tableSession.netTotal = newGross;
 
+      const stdTableKey = getStandardPosTableId(tableNumber);
+      const rawTableKey = getRawTableNumber(tableNumber);
       const updatedSessions = {
         ...existingSessions,
-        [tableNumber]: tableSession
+        [tableNumber]: tableSession,
+        [rawTableKey]: tableSession,
+        [stdTableKey]: tableSession
       };
       localStorage.setItem('hotel_elite_inn_table_sessions', JSON.stringify(updatedSessions));
       setRunningTableSessions(updatedSessions);

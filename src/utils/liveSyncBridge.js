@@ -24,7 +24,8 @@ import {
   KDS_CHANNEL_NAME, 
   TABLE_SESSIONS_KEY,
   getLiveKots,
-  saveLiveKots
+  saveLiveKots,
+  mergeKotIntoTableSessions
 } from './kotDataSync';
 import { playOrderAlert, playHousekeepingChime } from './soundAlert';
 
@@ -133,6 +134,17 @@ async function performCloudSyncTick() {
           const existing = getLiveKots();
           saveLiveKots([normalized, ...existing.filter(k => k.id !== normalized.id)].slice(0, 100));
 
+          // Ingest and persist into table sessions so Touch POS and bill terminals update
+          let cloudTableSessions = null;
+          try {
+            const rawSessions = localStorage.getItem(TABLE_SESSIONS_KEY);
+            const currentSessions = rawSessions ? JSON.parse(rawSessions) : {};
+            cloudTableSessions = mergeKotIntoTableSessions(currentSessions, normalized);
+            localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(cloudTableSessions));
+          } catch (e) {
+            console.warn('Error saving cloud table session:', e);
+          }
+
           // Play audible kitchen bell
           playOrderAlert();
 
@@ -140,6 +152,7 @@ async function performCloudSyncTick() {
           notifyListeners({
             type: 'NEW_KOT_ORDER',
             order: normalized,
+            tableSessions: cloudTableSessions,
             source: 'CLOUD_FASTAPI'
           });
         }

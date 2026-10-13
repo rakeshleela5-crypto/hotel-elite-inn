@@ -20,6 +20,131 @@ export const KDS_CHANNEL_NAME = 'hotel_elite_inn_live_kds';
 export const TABLE_SESSIONS_KEY = 'hotel_elite_inn_table_sessions';
 
 /**
+ * Normalizes table representations into standard POS table ID format,
+ * e.g. '1' -> 'T-01', 'T-1' -> 'T-01', 'T-01' -> 'T-01', 'Table 4' -> 'T-04'.
+ */
+export function getStandardPosTableId(tableStr) {
+  if (!tableStr) return 'T-01';
+  const str = String(tableStr).trim();
+  if (str.toLowerCase().startsWith('room') || str.toLowerCase().startsWith('r-')) {
+    return str;
+  }
+  const match = str.match(/\d+/);
+  if (match) {
+    const num = parseInt(match[0], 10);
+    return `T-${String(num).padStart(2, '0')}`;
+  }
+  return str;
+}
+
+/**
+ * Extracts raw table number digits, e.g. 'T-01' -> '1', '1' -> '1', 'Table 4' -> '4'.
+ */
+export function getRawTableNumber(tableStr) {
+  if (!tableStr) return '1';
+  const match = String(tableStr).match(/\d+/);
+  return match ? String(parseInt(match[0], 10)) : String(tableStr);
+}
+
+/**
+ * Resolves a running table session across various table ID formats ('T-01', '1', '01').
+ */
+export function findTableSession(sessions, tableKey) {
+  if (!sessions || typeof sessions !== 'object') return null;
+  if (!tableKey) return null;
+  const stdKey = getStandardPosTableId(tableKey);
+  const rawKey = getRawTableNumber(tableKey);
+  const rawDigits = String(tableKey).replace(/\D/g, '');
+  return sessions[tableKey] || sessions[stdKey] || sessions[rawKey] || sessions[rawDigits] || null;
+}
+
+/**
+ * Merges a newly punched or synced KOT into the global table sessions dictionary.
+ * Ensures the session is indexed under both standard format ('T-01') and raw digit ('1'),
+ * preserves and recalculates cumulative food items, running KOTs, subtotal and GST.
+ */
+export function mergeKotIntoTableSessions(currentSessions, ord) {
+  const sessions = { ...(currentSessions || {}) };
+  if (!ord) return sessions;
+
+  const tableKey = ord.tableNumber || (ord.roomNumber ? `Room ${ord.roomNumber}` : 'T-01');
+  const isRoom = String(tableKey).toLowerCase().startsWith('room') || Boolean(ord.roomNumber);
+  const stdKey = isRoom ? tableKey : getStandardPosTableId(tableKey);
+  const rawKey = isRoom ? tableKey : getRawTableNumber(tableKey);
+
+  const existing = sessions[stdKey] || sessions[rawKey] || sessions[tableKey] || null;
+
+  const targetSession = existing ? { ...existing } : {
+    sessionId: `SES-${stdKey}-${Date.now().toString().slice(-4)}`,
+    tableNumber: stdKey,
+    outlet: ord.outlet || (isRoom ? 'In-Room Dining' : 'Cannon Kitchen'),
+    guestName: ord.guestName || (isRoom ? `Room ${rawKey} Guest` : `Table ${rawKey} Guest`),
+    cover: 2,
+    status: 'OCCUPIED',
+    firstKotTime: ord.timeFormatted || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    captain: ord.steward || ord.captain || 'Floor Steward',
+    kots: [],
+    cumulativeItems: [],
+    subtotal: 0,
+    gst: 0,
+    netTotal: 0
+  };
+
+  targetSession.status = 'OCCUPIED';
+  if (ord.steward) targetSession.captain = ord.steward;
+
+  const kotList = [...(targetSession.kots || [])];
+  const kotExists = kotList.some(k => 
+    (k.id && ord.id && k.id === ord.id) ||
+    (k.kotId && ord.kotId && k.kotId === ord.kotId)
+  );
+
+  if (!kotExists) {
+    kotList.push(ord);
+  }
+  targetSession.kots = kotList;
+
+  // Merge cumulative food items with quantities and rates
+  const cumMap = {};
+  kotList.forEach(k => {
+    (k.items || []).forEach(it => {
+      const itName = it.name || it.dishName || 'Food Item';
+      const itQty = Number(it.quantity !== undefined ? it.quantity : (it.qty || 1));
+      const itRate = Number(it.rate !== undefined ? it.rate : (it.price || 0));
+      const itCode = it.itemCode || it.dishCode || it.code || it.id || '-';
+      if (cumMap[itName]) {
+        cumMap[itName].quantity += itQty;
+      } else {
+        cumMap[itName] = {
+          name: itName,
+          quantity: itQty,
+          price: itRate,
+          rate: itRate,
+          itemCode: itCode,
+          isVeg: it.isVeg !== undefined ? it.isVeg : true,
+          status: k.status || 'Dispatched'
+        };
+      }
+    });
+  });
+  targetSession.cumulativeItems = Object.values(cumMap);
+
+  const newGross = targetSession.cumulativeItems.reduce((acc, it) => acc + (it.quantity * (it.price || it.rate || 0)), 0);
+  targetSession.subtotal = Math.round((newGross / 1.05) * 100) / 100;
+  targetSession.gst = Math.round((newGross - targetSession.subtotal) * 100) / 100;
+  targetSession.netTotal = newGross;
+
+  // Save under BOTH stdKey ('T-01') and rawKey ('1') so all POS lookups succeed immediately
+  sessions[stdKey] = targetSession;
+  sessions[rawKey] = targetSession;
+  if (tableKey && tableKey !== stdKey && tableKey !== rawKey) {
+    sessions[tableKey] = targetSession;
+  }
+
+  return sessions;
+}
+
+/**
  * Normalizes an order from any source (Steward Pad, Guest QR, KDS, POS, Cloudflare D1)
  * into a single unified schema so all UI components render cleanly without undefined errors.
  */
@@ -247,15 +372,27 @@ export async function dispatchKotUnified(newKotOrder, tableSession = null) {
     } catch (e) {}
   }
 
-  // 3. Mirror to localStorage
+  // 3. Mirror live KOTs to localStorage
   const existingKots = getLiveKots();
   const updatedKots = [normalized, ...existingKots.filter(k => k.id !== normalized.id)].slice(0, 100);
   saveLiveKots(updatedKots);
 
-  // 4. Broadcast across tabs (Kitchen KDS, Reception Admin, Bar)
+  // 4. Ingest and persist running table sessions under both 'T-01' and '1'
+  let updatedSessions = null;
+  try {
+    const rawSessions = localStorage.getItem(TABLE_SESSIONS_KEY);
+    const currentSessions = rawSessions ? JSON.parse(rawSessions) : {};
+    updatedSessions = mergeKotIntoTableSessions(currentSessions, normalized);
+    localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updatedSessions));
+  } catch (e) {
+    console.warn('Error updating table sessions in storage:', e);
+  }
+
+  // 5. Broadcast across tabs (Kitchen KDS, Reception Admin, Touch POS, Bar)
   broadcastKotChannel({
     type: 'NEW_KOT_ORDER',
     order: normalized,
+    tableSessions: updatedSessions,
     target: 'DUAL_KOT'
   });
 
