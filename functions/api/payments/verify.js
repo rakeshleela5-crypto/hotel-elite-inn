@@ -66,7 +66,15 @@ async function verifyRazorpaySignature(orderId, paymentId, receivedSignature, ke
     .map(b => b.toString(16).padStart(2, "0"))
     .join("");
 
-  return generatedSignature === receivedSignature;
+  // Constant-time string comparison to prevent timing side-channel attacks
+  if (typeof receivedSignature !== "string" || generatedSignature.length !== receivedSignature.length) {
+    return false;
+  }
+  let mismatch = 0;
+  for (let i = 0; i < generatedSignature.length; i++) {
+    mismatch |= generatedSignature.charCodeAt(i) ^ receivedSignature.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
 
 export async function onRequestPost({ request, env }) {

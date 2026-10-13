@@ -12,11 +12,34 @@ export const SWAGGER_DOCS_URL = `${FASTAPI_BASE_URL}/docs`;
 export const REDOC_URL = `${FASTAPI_BASE_URL}/redoc`;
 
 /**
+ * Secure Fetch Connector
+ * Automatically attaches Authorization: Bearer <token> from active staff shift sessions.
+ */
+async function secureFetch(url, options = {}) {
+  let token = null;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    token = localStorage.getItem('hei_staff_token_steward') ||
+            localStorage.getItem('hei_staff_token_housekeeping') ||
+            localStorage.getItem('hei_staff_token_kds') ||
+            localStorage.getItem('hei_staff_token_frontdesk') ||
+            localStorage.getItem('hei_staff_token_manager');
+  }
+
+  const headers = { ...(options.headers || {}) };
+  if (token && !headers['Authorization'] && !headers['authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return fetch(url, { ...options, headers });
+}
+
+
+/**
  * Check backend API health and connectivity
  */
 export async function checkFastApiHealth() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/health`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/health`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -33,7 +56,7 @@ export async function checkFastApiHealth() {
  */
 export async function getFastApiDashboardStats() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/stats/dashboard`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/stats/dashboard`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -50,7 +73,7 @@ export async function getFastApiDashboardStats() {
  */
 export async function getFastApiRooms() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/rooms`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/rooms`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -67,7 +90,7 @@ export async function getFastApiRooms() {
  */
 export async function updateFastApiRoomStatus(roomId, newStatus) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/rooms/${roomId}/status`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/rooms/${roomId}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ status: newStatus.toLowerCase() })
@@ -130,7 +153,7 @@ export async function createFastApiBooking(bookingData) {
       rate_option: bookingData.rateOption || bookingData.rate_option || 'DISCOUNT'
     };
 
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/bookings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -159,7 +182,7 @@ export async function getFastApiBookings(statusFilter = null) {
     const url = statusFilter
       ? `${FASTAPI_BASE_URL}/api/bookings?status_filter=${encodeURIComponent(statusFilter)}`
       : `${FASTAPI_BASE_URL}/api/bookings`;
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -177,7 +200,7 @@ export async function getFastApiBookings(statusFilter = null) {
  */
 export async function getFastApiTables() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -194,7 +217,7 @@ export async function getFastApiTables() {
  */
 export async function getFastApiInventory() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -211,7 +234,7 @@ export async function getFastApiInventory() {
  */
 export async function getFastApiCorporateAccounts() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -228,7 +251,7 @@ export async function getFastApiCorporateAccounts() {
  */
 export async function getFastApiRoomDefects() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -245,7 +268,7 @@ export async function getFastApiRoomDefects() {
  */
 export async function voidFastApiOrderItem(orderId, itemId, reason, pin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/items/${itemId}/void`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/items/${itemId}/void`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason, manager_pin: pin })
@@ -266,7 +289,7 @@ export async function voidFastApiOrderItem(orderId, itemId, reason, pin = '4321'
  */
 export async function mergeFastApiTables(sourceTable, targetTable, pin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/merge`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/tables/merge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ source_table: sourceTable, target_table: targetTable, manager_pin: pin })
@@ -287,7 +310,7 @@ export async function mergeFastApiTables(sourceTable, targetTable, pin = '4321')
  */
 export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = '4321', options = {}) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/settle`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/settle`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -318,7 +341,7 @@ export async function settleFastApiOrder(orderId, paymentMethod = 'CASH', pin = 
  */
 export async function createFastApiPosOrder(orderData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(orderData)
@@ -342,7 +365,7 @@ export async function getFastApiPosOrders(statusFilter = null) {
     const url = statusFilter
       ? `${FASTAPI_BASE_URL}/api/pos/orders?status_filter=${encodeURIComponent(statusFilter)}`
       : `${FASTAPI_BASE_URL}/api/pos/orders`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -359,7 +382,7 @@ export async function getFastApiPosOrders(statusFilter = null) {
  */
 export async function sealFastApiNightAudit(auditDate, managerPin = '4321', sealedBy = 'IT ADMIN') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/seal`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/night-audit/seal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ audit_date: auditDate, manager_pin: managerPin, sealed_by: sealedBy })
@@ -377,7 +400,7 @@ export async function sealFastApiNightAudit(auditDate, managerPin = '4321', seal
  */
 export async function getFastApiNightAuditLogs() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/logs`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/night-audit/logs`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -391,7 +414,7 @@ export async function getFastApiNightAuditLogs() {
 
 export async function getFastApiPropertyInfo() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/property/info`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/property/info`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -411,7 +434,7 @@ export async function getFastApiMenu(category = null) {
     const url = category 
       ? `${FASTAPI_BASE_URL}/api/restaurant/menu?category=${encodeURIComponent(category)}`
       : `${FASTAPI_BASE_URL}/api/restaurant/menu`;
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -428,7 +451,7 @@ export async function getFastApiMenu(category = null) {
  */
 export async function syncFastApiMasterData() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/sync-master-data`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/system/sync-master-data`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -445,7 +468,7 @@ export async function syncFastApiMasterData() {
  */
 export async function getFastApiSampleThermalReceipt() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/thermal-receipt/sample`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/thermal-receipt/sample`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -465,7 +488,7 @@ export async function getFastApiGstFilings(returnPeriod) {
     const url = returnPeriod 
       ? `${FASTAPI_BASE_URL}/api/gst/filings?return_period=${encodeURIComponent(returnPeriod)}`
       : `${FASTAPI_BASE_URL}/api/gst/filings`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -476,7 +499,7 @@ export async function getFastApiGstFilings(returnPeriod) {
 
 export async function createFastApiGstFiling(filingData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/gst/filings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(filingData)
@@ -491,7 +514,7 @@ export async function createFastApiGstFiling(filingData) {
 
 export async function getFastApiGstr1Summary(returnPeriod = 'OCT-2026') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/summary/${encodeURIComponent(returnPeriod)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/gst/summary/${encodeURIComponent(returnPeriod)}`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -507,7 +530,7 @@ export async function getFastApiGstr1Summary(returnPeriod = 'OCT-2026') {
 // -------------------------------------------------------------
 export async function getFastApiStaffRoster() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/staff/roster`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/staff/roster`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -521,7 +544,7 @@ export async function getFastApiStaffAttendance(date) {
     const url = date 
       ? `${FASTAPI_BASE_URL}/api/staff/attendance?attendance_date=${encodeURIComponent(date)}`
       : `${FASTAPI_BASE_URL}/api/staff/attendance`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -532,7 +555,7 @@ export async function getFastApiStaffAttendance(date) {
 
 export async function punchFastApiStaffAttendance(punchData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/staff/attendance/punch`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/staff/attendance/punch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(punchData)
@@ -550,7 +573,7 @@ export async function punchFastApiStaffAttendance(punchData) {
 // -------------------------------------------------------------
 export async function getFastApiLaundryRates() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/rates`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/laundry/rates`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -565,7 +588,7 @@ export async function getFastApiLaundryOrders(status, roomNumber) {
     if (status) params.append('order_status', status);
     if (roomNumber) params.append('room_number', roomNumber);
     const qs = params.toString() ? `?${params.toString()}` : '';
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders${qs}`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/laundry/orders${qs}`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -576,7 +599,7 @@ export async function getFastApiLaundryOrders(status, roomNumber) {
 
 export async function createFastApiLaundryOrder(orderData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/laundry/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(orderData)
@@ -591,7 +614,7 @@ export async function createFastApiLaundryOrder(orderData) {
 
 export async function updateFastApiLaundryStatus(orderId, newStatus) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/orders/${orderId}/status`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/laundry/orders/${orderId}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ order_status: newStatus })
@@ -613,7 +636,7 @@ export async function updateFastApiLaundryStatus(orderId, newStatus) {
  */
 export async function getFastApiRoomFolio(roomNumber, folioNumber = 1) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}?folio_number=${folioNumber}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}?folio_number=${folioNumber}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -627,7 +650,7 @@ export async function getFastApiRoomFolio(roomNumber, folioNumber = 1) {
 
 export async function postFastApiFolioCharge(chargeData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/post-charge`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/post-charge`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(chargeData)
@@ -642,7 +665,7 @@ export async function postFastApiFolioCharge(chargeData) {
 
 export async function settleFastApiRoomFolio(roomNumber, folioNumber = 1, paymentMode = 'Cash', managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/settle?folio_number=${folioNumber}&payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/settle?folio_number=${folioNumber}&payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -656,7 +679,7 @@ export async function settleFastApiRoomFolio(roomNumber, folioNumber = 1, paymen
 
 export async function reinstateFastApiRoomFolio(roomNumber, folioNumber = 1, managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/reinstate?folio_number=${folioNumber}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/${encodeURIComponent(roomNumber)}/reinstate?folio_number=${folioNumber}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -679,7 +702,7 @@ export async function getFastApiAdvanceDeposits(roomNumber = null, status = null
     if (status) params.push(`status=${encodeURIComponent(status)}`);
     if (params.length > 0) url += `?${params.join('&')}`;
 
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -693,7 +716,7 @@ export async function getFastApiAdvanceDeposits(roomNumber = null, status = null
 
 export async function createFastApiAdvanceDeposit(depositData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/deposits`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/deposits`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(depositData)
@@ -708,7 +731,7 @@ export async function createFastApiAdvanceDeposit(depositData) {
 
 export async function deleteFastApiAdvanceDeposit(receiptNumber, reason = 'Cancellation') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/deposits/${encodeURIComponent(receiptNumber)}?reason=${encodeURIComponent(reason)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/deposits/${encodeURIComponent(receiptNumber)}?reason=${encodeURIComponent(reason)}`, {
       method: 'DELETE',
       headers: { 'Accept': 'application/json' }
     });
@@ -725,7 +748,7 @@ export async function deleteFastApiAdvanceDeposit(receiptNumber, reason = 'Cance
  */
 export async function getFastApiPaidOuts() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -739,7 +762,7 @@ export async function getFastApiPaidOuts() {
 
 export async function createFastApiPaidOut(paidOutData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/paid-outs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(paidOutData)
@@ -757,7 +780,7 @@ export async function createFastApiPaidOut(paidOutData) {
  */
 export async function getFastApiForexList() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -771,7 +794,7 @@ export async function getFastApiForexList() {
 
 export async function createFastApiForex(forexData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/forex`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(forexData)
@@ -792,7 +815,7 @@ export async function getFastApiLostAndFound(status = null) {
     const url = status 
       ? `${FASTAPI_BASE_URL}/api/pms/lost-found?status=${encodeURIComponent(status)}`
       : `${FASTAPI_BASE_URL}/api/pms/lost-found`;
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -806,7 +829,7 @@ export async function getFastApiLostAndFound(status = null) {
 
 export async function createFastApiLostAndFound(itemData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/lost-found`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/lost-found`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(itemData)
@@ -821,7 +844,7 @@ export async function createFastApiLostAndFound(itemData) {
 
 export async function claimFastApiLostAndFound(trackingNo, claimant) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/lost-found/${encodeURIComponent(trackingNo)}/claim`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/lost-found/${encodeURIComponent(trackingNo)}/claim`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ claimed_by: claimant, claim_date: new Date().toLocaleDateString() })
@@ -839,7 +862,7 @@ export async function claimFastApiLostAndFound(trackingNo, claimant) {
  */
 export async function getFastApiRoomTransfers() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -853,7 +876,7 @@ export async function getFastApiRoomTransfers() {
 
 export async function transferFastApiRoom(transferData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/room-transfers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(transferData)
@@ -868,7 +891,7 @@ export async function transferFastApiRoom(transferData) {
 
 export async function amendFastApiStay(amendData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/stay/amend`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/stay/amend`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(amendData)
@@ -886,7 +909,7 @@ export async function amendFastApiStay(amendData) {
  */
 export async function getFastApiContractRates() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -900,7 +923,7 @@ export async function getFastApiContractRates() {
 
 export async function linkFastApiCorporateRate(rateData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/contract-rates`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(rateData)
@@ -918,7 +941,7 @@ export async function linkFastApiCorporateRate(rateData) {
  */
 export async function getFastApiHotelSaleMonthlyReport(month = 'JUNE-2026') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-monthly?month=${encodeURIComponent(month)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-monthly?month=${encodeURIComponent(month)}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -935,7 +958,7 @@ export async function getFastApiRestaurantSaleMonthlyReport(month = 'JUNE-2026',
     const url = outlet && outlet !== 'ALL'
       ? `${FASTAPI_BASE_URL}/api/reports/restaurant-sale-monthly?month=${encodeURIComponent(month)}&pos_outlet=${encodeURIComponent(outlet)}`
       : `${FASTAPI_BASE_URL}/api/reports/restaurant-sale-monthly?month=${encodeURIComponent(month)}`;
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -949,7 +972,7 @@ export async function getFastApiRestaurantSaleMonthlyReport(month = 'JUNE-2026',
 
 export async function getFastApiRestaurantMgmReport(month = 'JUNE-2026') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-mgm-monthly?month=${encodeURIComponent(month)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-mgm-monthly?month=${encodeURIComponent(month)}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -963,7 +986,7 @@ export async function getFastApiRestaurantMgmReport(month = 'JUNE-2026') {
 
 export async function postFastApiHotelSaleRecord(record) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-record`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/hotel-sale-record`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -1006,7 +1029,7 @@ export async function postFastApiHotelSaleRecord(record) {
 
 export async function postFastApiRestaurantSaleRecord(record) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-sale-record`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/restaurant-sale-record`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -1040,7 +1063,7 @@ export async function postFastApiRestaurantSaleRecord(record) {
 
 export async function getFastApiGstr3bStatutorySummary(month = 'JUNE-2026') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/gstr3b-statutory-summary?month=${encodeURIComponent(month)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/gstr3b-statutory-summary?month=${encodeURIComponent(month)}`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -1057,7 +1080,7 @@ export async function getFastApiGstr3bStatutorySummary(month = 'JUNE-2026') {
  */
 export async function checkOutFastApiGuest(bookingId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-out`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-out`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -1074,7 +1097,7 @@ export async function checkOutFastApiGuest(bookingId) {
  */
 export async function getFastApiStorePurchases() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -1088,7 +1111,7 @@ export async function getFastApiStorePurchases() {
 
 export async function postFastApiStorePurchase(purchase) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/purchases`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(purchase)
@@ -1103,7 +1126,7 @@ export async function postFastApiStorePurchase(purchase) {
 
 export async function getFastApiKitchenRequisitions() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -1117,7 +1140,7 @@ export async function getFastApiKitchenRequisitions() {
 
 export async function postFastApiKitchenRequisition(req) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/requisitions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(req)
@@ -1132,7 +1155,7 @@ export async function postFastApiKitchenRequisition(req) {
 
 export async function getFastApiVendorPayables() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -1149,7 +1172,7 @@ export async function getFastApiVendorPayables() {
  */
 export async function getHotelIpStatus() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/ip-status`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/system/ip-status`, {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
     });
@@ -1165,7 +1188,7 @@ export async function getHotelIpStatus() {
  */
 export async function setHotelStaticIp(managerPin = '4321', targetIp = null, enableRestriction = true) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/system/set-hotel-ip`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/system/set-hotel-ip`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -1189,7 +1212,7 @@ export async function getFastApiPoliceManifest(statusFilter = null) {
     const url = statusFilter
       ? `${FASTAPI_BASE_URL}/api/pms/police-manifest?status_filter=${encodeURIComponent(statusFilter)}`
       : `${FASTAPI_BASE_URL}/api/pms/police-manifest`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1200,7 +1223,7 @@ export async function getFastApiPoliceManifest(statusFilter = null) {
 
 export async function createFastApiPoliceManifest(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/police-manifest`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/police-manifest`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1215,7 +1238,7 @@ export async function createFastApiPoliceManifest(payload) {
 
 export async function getFastApiForeignerFormC() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1226,7 +1249,7 @@ export async function getFastApiForeignerFormC() {
 
 export async function createFastApiForeignerFormC(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/foreigner-form-c`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1241,7 +1264,7 @@ export async function createFastApiForeignerFormC(payload) {
 
 export async function uploadFastApiGuestKyc(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/guest-kyc`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/guest-kyc`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1259,7 +1282,7 @@ export async function getFastApiCashierShifts(accountingDate = null) {
     const url = accountingDate
       ? `${FASTAPI_BASE_URL}/api/pms/cashier/shifts?accounting_date=${encodeURIComponent(accountingDate)}`
       : `${FASTAPI_BASE_URL}/api/pms/cashier/shifts`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1270,7 +1293,7 @@ export async function getFastApiCashierShifts(accountingDate = null) {
 
 export async function openFastApiCashierShift(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/cashier/shifts/open`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/cashier/shifts/open`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1288,7 +1311,7 @@ export async function closeFastApiCashierShift(shiftId, payload, accountingDate 
     const url = accountingDate
       ? `${FASTAPI_BASE_URL}/api/pms/cashier/shifts/${encodeURIComponent(shiftId)}/close?accounting_date=${encodeURIComponent(accountingDate)}`
       : `${FASTAPI_BASE_URL}/api/pms/cashier/shifts/${encodeURIComponent(shiftId)}/close`;
-    const res = await fetch(url, {
+    const res = await secureFetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1306,7 +1329,7 @@ export async function getFastApiMorningBriefing(accountingDate = null) {
     const url = accountingDate
       ? `${FASTAPI_BASE_URL}/api/pms/cashier/morning-briefing?accounting_date=${encodeURIComponent(accountingDate)}`
       : `${FASTAPI_BASE_URL}/api/pms/cashier/morning-briefing`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1320,7 +1343,7 @@ export async function getFastApiMorningBriefing(accountingDate = null) {
 // =============================================================
 export async function transferFastApiFolioCharge(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/transfer`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/transfer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1335,7 +1358,7 @@ export async function transferFastApiFolioCharge(payload) {
 
 export async function createFastApiBillAllowance(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/bill-allowance`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/bill-allowance`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1350,7 +1373,7 @@ export async function createFastApiBillAllowance(payload) {
 
 export async function createFastApiCorporateSplitBilling(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/split-billing`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/split-billing`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1365,7 +1388,7 @@ export async function createFastApiCorporateSplitBilling(payload) {
 
 export async function toggleFastApiStopPosting(roomNumber, stopPosting = true, managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/folios/stop-posting?room_number=${encodeURIComponent(roomNumber)}&stop_posting=${stopPosting}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/folios/stop-posting?room_number=${encodeURIComponent(roomNumber)}&stop_posting=${stopPosting}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -1379,7 +1402,7 @@ export async function toggleFastApiStopPosting(roomNumber, stopPosting = true, m
 
 export async function getFastApiBlockedRooms() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/blocked`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/rooms/blocked`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1390,7 +1413,7 @@ export async function getFastApiBlockedRooms() {
 
 export async function blockFastApiRoom(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/block`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/rooms/block`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1405,7 +1428,7 @@ export async function blockFastApiRoom(payload) {
 
 export async function bulkClearFastApiRooms(roomNumbers, targetStatus = 'clean', managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/rooms/bulk-clear?target_status=${encodeURIComponent(targetStatus)}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/rooms/bulk-clear?target_status=${encodeURIComponent(targetStatus)}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(roomNumbers)
@@ -1423,7 +1446,7 @@ export async function bulkClearFastApiRooms(roomNumbers, targetStatus = 'clean',
 // =============================================================
 export async function settleFastApiSplitTender(orderId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/split-tender`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/split-tender`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1438,7 +1461,7 @@ export async function settleFastApiSplitTender(orderId, payload) {
 
 export async function applyFastApiPosDiscount(orderId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/discount`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/discount`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1453,7 +1476,7 @@ export async function applyFastApiPosDiscount(orderId, payload) {
 
 export async function reclassifyFastApiTender(orderId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/reclassify-tender`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/orders/${orderId}/reclassify-tender`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1468,7 +1491,7 @@ export async function reclassifyFastApiTender(orderId, payload) {
 
 export async function getFastApiBanquetEvents() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1479,7 +1502,7 @@ export async function getFastApiBanquetEvents() {
 
 export async function createFastApiBanquetEvent(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1494,7 +1517,7 @@ export async function createFastApiBanquetEvent(payload) {
 
 export async function settleFastApiBanquetEvent(eventId, paymentMode = 'Card', managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events/${encodeURIComponent(eventId)}/settle?payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/banquets/events/${encodeURIComponent(eventId)}/settle?payment_mode=${encodeURIComponent(paymentMode)}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -1508,7 +1531,7 @@ export async function settleFastApiBanquetEvent(eventId, paymentMode = 'Card', m
 
 export async function getFastApiServers() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/servers`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/servers`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1519,7 +1542,7 @@ export async function getFastApiServers() {
 
 export async function createFastApiServer(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/servers`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/servers`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1537,7 +1560,7 @@ export async function createFastApiServer(payload) {
 // =============================================================
 export async function getFastApiPurchaseOrders() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1548,7 +1571,7 @@ export async function getFastApiPurchaseOrders() {
 
 export async function createFastApiPurchaseOrder(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/purchase-orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1563,7 +1586,7 @@ export async function createFastApiPurchaseOrder(payload) {
 
 export async function getFastApiGoodsReceiptNotes() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1574,7 +1597,7 @@ export async function getFastApiGoodsReceiptNotes() {
 
 export async function createFastApiGoodsReceiptNote(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/grn`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1589,7 +1612,7 @@ export async function createFastApiGoodsReceiptNote(payload) {
 
 export async function getFastApiStoreIssueVouchers() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1600,7 +1623,7 @@ export async function getFastApiStoreIssueVouchers() {
 
 export async function createFastApiStoreIssueVoucher(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/store-issues`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1615,7 +1638,7 @@ export async function createFastApiStoreIssueVoucher(payload) {
 
 export async function getFastApiStockLedger() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/stock-ledger`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/stock-ledger`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1629,7 +1652,7 @@ export async function getFastApiStockLedger() {
 // =============================================================
 export async function getFastApiLinenInventory() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1640,7 +1663,7 @@ export async function getFastApiLinenInventory() {
 
 export async function createOrUpdateFastApiLinenItem(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/hk/linen-inventory`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1657,7 +1680,7 @@ export const createFastApiLinenItem = createOrUpdateFastApiLinenItem;
 
 export async function getFastApiRoomAmenities() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/room-amenities`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/hk/room-amenities`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1668,7 +1691,7 @@ export async function getFastApiRoomAmenities() {
 
 export async function createFastApiHousekeepingInspection(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1683,7 +1706,7 @@ export async function createFastApiHousekeepingInspection(payload) {
 
 export async function getFastApiHousekeepingInspections() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/hk/inspections`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1700,7 +1723,7 @@ export async function autoPostFastApiRoomRent(auditDate = null, managerPin = '43
     const url = auditDate
       ? `${FASTAPI_BASE_URL}/api/night-audit/auto-post-room-rent?audit_date=${encodeURIComponent(auditDate)}&manager_pin=${managerPin}`
       : `${FASTAPI_BASE_URL}/api/night-audit/auto-post-room-rent?manager_pin=${managerPin}`;
-    const res = await fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1714,7 +1737,7 @@ export async function getFastApiNightAuditTrialBalance(date = null) {
     const url = date
       ? `${FASTAPI_BASE_URL}/api/night-audit/trial-balance?date=${encodeURIComponent(date)}`
       : `${FASTAPI_BASE_URL}/api/night-audit/trial-balance`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1725,7 +1748,7 @@ export async function getFastApiNightAuditTrialBalance(date = null) {
 
 export async function rolloverFastApiNightAudit(previousDate, newDate, managerPin = '4321') {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/night-audit/rollover?previous_date=${encodeURIComponent(previousDate)}&new_date=${encodeURIComponent(newDate)}&manager_pin=${managerPin}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/night-audit/rollover?previous_date=${encodeURIComponent(previousDate)}&new_date=${encodeURIComponent(newDate)}&manager_pin=${managerPin}`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -1742,7 +1765,7 @@ export async function rolloverFastApiNightAudit(previousDate, newDate, managerPi
 // =============================================================
 export async function getFastApiCorporateDebtorsAging() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate/debtors-aging`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/corporate/debtors-aging`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1754,7 +1777,7 @@ export async function getFastApiCorporateDebtorsAging() {
 export async function settleFastApiCorporateInvoice(companyName, amountPaid, paymentRef = 'NEFT', managerPin = '4321') {
   try {
     const url = `${FASTAPI_BASE_URL}/api/corporate/settle-invoice?company_name=${encodeURIComponent(companyName)}&amount_paid=${amountPaid}&payment_ref=${encodeURIComponent(paymentRef)}&manager_pin=${managerPin}`;
-    const res = await fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { method: 'POST', headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1765,7 +1788,7 @@ export async function settleFastApiCorporateInvoice(companyName, amountPaid, pay
 
 export async function getFastApiTdsTcsSummary() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1776,7 +1799,7 @@ export async function getFastApiTdsTcsSummary() {
 
 export async function createFastApiTdsTcsRecord(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/tds-tcs-summary`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1791,7 +1814,7 @@ export async function createFastApiTdsTcsRecord(payload) {
 
 export async function getFastApiBankReconciliations() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -1802,7 +1825,7 @@ export async function getFastApiBankReconciliations() {
 
 export async function createFastApiBankReconciliation(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/reports/bank-reconciliation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1820,7 +1843,7 @@ export async function createFastApiBankReconciliation(payload) {
 // =============================================================
 export async function createFastApiTable(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/tables`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1835,7 +1858,7 @@ export async function createFastApiTable(payload) {
 
 export async function updateFastApiTable(tableId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1850,7 +1873,7 @@ export async function updateFastApiTable(tableId, payload) {
 
 export async function deleteFastApiTable(tableId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/tables/${tableId}`, {
       method: 'DELETE',
       headers: { 'Accept': 'application/json' }
     });
@@ -1864,7 +1887,7 @@ export async function deleteFastApiTable(tableId) {
 
 export async function createFastApiMenuItem(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/restaurant/menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1879,7 +1902,7 @@ export async function createFastApiMenuItem(payload) {
 
 export async function updateFastApiMenuItem(itemId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1894,7 +1917,7 @@ export async function updateFastApiMenuItem(itemId, payload) {
 
 export async function deleteFastApiMenuItem(itemId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/restaurant/menu/${itemId}`, {
       method: 'DELETE',
       headers: { 'Accept': 'application/json' }
     });
@@ -1908,7 +1931,7 @@ export async function deleteFastApiMenuItem(itemId) {
 
 export async function getFastApiTransitSlots() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1921,7 +1944,7 @@ export async function getFastApiTransitSlots() {
 
 export async function createFastApiTransitSlot(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1936,7 +1959,7 @@ export async function createFastApiTransitSlot(payload) {
 
 export async function checkoutFastApiTransitSlot(slotId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots/${slotId}/checkout`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/transit-slots/${slotId}/checkout`, {
       method: 'PATCH',
       headers: { 'Accept': 'application/json' }
     });
@@ -1950,7 +1973,7 @@ export async function checkoutFastApiTransitSlot(slotId) {
 
 export async function getFastApiPromotions() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1963,7 +1986,7 @@ export async function getFastApiPromotions() {
 
 export async function createFastApiPromotion(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/promotions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -1978,7 +2001,7 @@ export async function createFastApiPromotion(payload) {
 
 export async function deleteFastApiPromotion(promoId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pos/promotions/${promoId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pos/promotions/${promoId}`, {
       method: 'DELETE',
       headers: { 'Accept': 'application/json' }
     });
@@ -1992,7 +2015,7 @@ export async function deleteFastApiPromotion(promoId) {
 
 export async function createFastApiCorporateAccount(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/corporate-accounts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2007,7 +2030,7 @@ export async function createFastApiCorporateAccount(payload) {
 
 export async function updateFastApiCorporateAccount(companyId, payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2025,7 +2048,7 @@ export async function updateFastApiCorporateAccount(companyId, payload) {
 // =============================================================
 export async function getFastApiBusinessSources() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2038,7 +2061,7 @@ export async function getFastApiBusinessSources() {
 
 export async function createFastApiBusinessSource(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/business-sources`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2053,7 +2076,7 @@ export async function createFastApiBusinessSource(payload) {
 
 export async function getFastApiMarketSegments() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2066,7 +2089,7 @@ export async function getFastApiMarketSegments() {
 
 export async function createFastApiMarketSegment(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/market-segments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2081,7 +2104,7 @@ export async function createFastApiMarketSegment(payload) {
 
 export async function getFastApiPackageRates() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2094,7 +2117,7 @@ export async function getFastApiPackageRates() {
 
 export async function createFastApiPackageRate(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/pms/package-rates`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2112,7 +2135,7 @@ export async function getFastApiLaundryRateMaster(serviceType = null) {
     const url = serviceType 
       ? `${FASTAPI_BASE_URL}/api/laundry/rate-master?service_type=${encodeURIComponent(serviceType)}`
       : `${FASTAPI_BASE_URL}/api/laundry/rate-master`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -2123,7 +2146,7 @@ export async function getFastApiLaundryRateMaster(serviceType = null) {
 
 export async function createFastApiLaundryRate(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/laundry/rate-master`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/laundry/rate-master`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2141,7 +2164,7 @@ export async function getFastApiGuestComplaints(statusFilter = null) {
     const url = statusFilter
       ? `${FASTAPI_BASE_URL}/api/guest/complaints?status_filter=${encodeURIComponent(statusFilter)}`
       : `${FASTAPI_BASE_URL}/api/guest/complaints`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -2152,7 +2175,7 @@ export async function getFastApiGuestComplaints(statusFilter = null) {
 
 export async function createFastApiGuestComplaint(payload) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/guest/complaints`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/guest/complaints`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
@@ -2168,7 +2191,7 @@ export async function createFastApiGuestComplaint(payload) {
 export async function resolveFastApiGuestComplaint(complaintId, attendedBy = 'Duty Manager', actionTaken = 'Issue resolved') {
   try {
     const url = `${FASTAPI_BASE_URL}/api/guest/complaints/${encodeURIComponent(complaintId)}/resolve?attended_by=${encodeURIComponent(attendedBy)}&action_taken=${encodeURIComponent(actionTaken)}`;
-    const res = await fetch(url, { method: 'PATCH', headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { method: 'PATCH', headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
@@ -2188,7 +2211,7 @@ export async function getFastApiOperationsHistory(rangeFilter = 'today', role = 
     if (startDate) url += `&start_date=${encodeURIComponent(startDate)}`;
     if (endDate) url += `&end_date=${encodeURIComponent(endDate)}`;
 
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.detail || `HTTP ${res.status}`);
@@ -2205,7 +2228,7 @@ export async function getFastApiOperationsHistory(rangeFilter = 'today', role = 
  */
 export async function getFastApiBackupStatus() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/admin/backup/status`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/admin/backup/status`, {
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2226,7 +2249,7 @@ export async function getFastApiBackupStatus() {
  */
 export async function triggerFastApiCloudflareR2Backup() {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/admin/backup/cloud-r2`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/admin/backup/cloud-r2`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -2251,7 +2274,7 @@ export async function downloadFastApiDailyArchive(archiveDate = null) {
       ? `${FASTAPI_BASE_URL}/api/admin/export/daily-archive?archive_date=${encodeURIComponent(archiveDate)}`
       : `${FASTAPI_BASE_URL}/api/admin/export/daily-archive`;
 
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
 
@@ -2283,7 +2306,7 @@ export async function downloadFastApiDailyArchive(archiveDate = null) {
  */
 export async function adjustFastApiInventoryItem(itemId, adjustmentData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/${itemId}/adjust`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/${itemId}/adjust`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(adjustmentData)
@@ -2304,7 +2327,7 @@ export async function adjustFastApiInventoryItem(itemId, adjustmentData) {
  */
 export async function recordFastApiCorporatePayment(companyId, paymentData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}/payment`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/corporate-accounts/${companyId}/payment`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(paymentData)
@@ -2325,7 +2348,7 @@ export async function recordFastApiCorporatePayment(companyId, paymentData) {
  */
 export async function resolveFastApiDefect(defectId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects/${defectId}/resolve`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/housekeeping/defects/${defectId}/resolve`, {
       method: 'PATCH',
       headers: { 'Accept': 'application/json' }
     });
@@ -2345,7 +2368,7 @@ export async function resolveFastApiDefect(defectId) {
  */
 export async function updateFastApiGstFilingStatus(filingId, newStatus) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status?new_status=${encodeURIComponent(newStatus)}`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/gst/filings/${filingId}/status?new_status=${encodeURIComponent(newStatus)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ filing_status: newStatus, new_status: newStatus })
@@ -2366,7 +2389,7 @@ export async function updateFastApiGstFilingStatus(filingId, newStatus) {
  */
 export async function checkInFastApiGuest(bookingId) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-in`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/bookings/${bookingId}/check-in`, {
       method: 'POST',
       headers: { 'Accept': 'application/json' }
     });
@@ -2383,7 +2406,7 @@ export async function checkInFastApiGuest(bookingId) {
  */
 export async function createFastApiRoom(roomData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/rooms`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/rooms`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(roomData)
@@ -2401,7 +2424,7 @@ export async function createFastApiRoom(roomData) {
  */
 export async function createFastApiVendorPayable(vendorData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/inventory/vendors`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(vendorData)
@@ -2419,7 +2442,7 @@ export async function createFastApiVendorPayable(vendorData) {
  */
 export async function staffLoginFastApi(loginData) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/auth/staff-login`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/auth/staff-login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(loginData)
@@ -2440,7 +2463,7 @@ export async function staffLoginFastApi(loginData) {
  */
 export async function verifyFastApiSession(token) {
   try {
-    const res = await fetch(`${FASTAPI_BASE_URL}/api/auth/verify-session`, {
+    const res = await secureFetch(`${FASTAPI_BASE_URL}/api/auth/verify-session`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -2464,7 +2487,7 @@ export async function getFastApiOperationsHistoryV1(rangeFilter = 'today', role 
     if (startDate) url += `&start_date=${encodeURIComponent(startDate)}`;
     if (endDate) url += `&end_date=${encodeURIComponent(endDate)}`;
 
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await secureFetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.detail || `HTTP ${res.status}`);
