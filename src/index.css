@@ -217,7 +217,25 @@ select[style*="background-color: rgb(255, 255, 255)"],
 select[style*="background: #ECE9D8"],
 select[style*="background: #ece9d8"],
 select[style*="background-color: #ECE9D8"],
-select[style*="background-color: #ece9d8"] {
+select[style*="background-color: #ece9d8"],
+.ids-window select,
+.ids-win32-window select,
+.ids-modal-overlay select,
+.ids-modal-backdrop select,
+.ids-modal-container select,
+.ids-modal-window select,
+.ids-dialog-window select,
+.ids-desktop-container select,
+.ids-select,
+.ids-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-win32-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-modal-overlay input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-modal-backdrop input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-modal-container input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-modal-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-dialog-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-desktop-container input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
+.ids-input {
   color-scheme: light !important;
   color: #000000 !important;
   background-color: #ffffff !important;
@@ -237,7 +255,16 @@ select[style*="background-color: rgb(255, 255, 255)"] option,
 select[style*="background: #ECE9D8"] option,
 select[style*="background: #ece9d8"] option,
 select[style*="background-color: #ECE9D8"] option,
-select[style*="background-color: #ece9d8"] option {
+select[style*="background-color: #ece9d8"] option,
+.ids-window select option,
+.ids-win32-window select option,
+.ids-modal-overlay select option,
+.ids-modal-backdrop select option,
+.ids-modal-container select option,
+.ids-modal-window select option,
+.ids-dialog-window select option,
+.ids-desktop-container select option,
+.ids-select option {
   color-scheme: light !important;
   color: #000000 !important;
   background-color: #ffffff !important;

@@ -591,7 +591,7 @@ export default function IdsTapeChartModal({
             <select 
               value={selectedFloor} 
               onChange={e => setSelectedFloor(e.target.value)}
-              style={{ fontSize: '11px', padding: '3px 6px', border: '1px solid #7F9DB9' }}
+              style={{ fontSize: '11px', padding: '3px 6px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
             >
               <option value="ALL">All Floors (1, 2 & 3)</option>
               <option value="1">Floor 1 (Rooms 101–109)</option>
@@ -603,7 +603,7 @@ export default function IdsTapeChartModal({
             <select 
               value={selectedCategory} 
               onChange={e => setSelectedCategory(e.target.value)}
-              style={{ fontSize: '11px', padding: '3px 6px', border: '1px solid #7F9DB9' }}
+              style={{ fontSize: '11px', padding: '3px 6px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
             >
               <option value="ALL">All Categories (27 Rooms)</option>
               <option value="STD">Standard Deluxe (STD)</option>
@@ -619,7 +619,7 @@ export default function IdsTapeChartModal({
                 placeholder="Search guest / phone / ref..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ padding: '3px 6px 3px 22px', fontSize: '11px', border: '1px solid #7F9DB9', width: '150px' }}
+                style={{ padding: '3px 6px 3px 22px', fontSize: '11px', border: '1px solid #7F9DB9', width: '150px', background: '#FFFFFF', color: '#000000' }}
               />
             </div>
 
@@ -1059,7 +1059,7 @@ export default function IdsTapeChartModal({
                         outD.setDate(outD.getDate() + bookingDraft.nights);
                         setBookingDraft(prev => ({ ...prev, checkInDate: inD, checkOutDate: outD.toISOString().split('T')[0] }));
                       }}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     />
                   </div>
 
@@ -1072,7 +1072,7 @@ export default function IdsTapeChartModal({
                       max="30"
                       value={bookingDraft.nights}
                       onChange={e => handleNightsChange(e.target.value)}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     />
                   </div>
 
@@ -1083,7 +1083,7 @@ export default function IdsTapeChartModal({
                       type="date"
                       value={bookingDraft.checkOutDate}
                       onChange={e => setBookingDraft(prev => ({ ...prev, checkOutDate: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFF' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     />
                   </div>
 
@@ -1093,7 +1093,7 @@ export default function IdsTapeChartModal({
                     <select 
                       value={bookingDraft.source} 
                       onChange={e => setBookingDraft(prev => ({ ...prev, source: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     >
                       <option value="Phone Call Inquiry">📞 Phone Call Inquiry (Reception)</option>
                       <option value="Direct Walk-in Advance">🚶 Walk-in Advance Booking</option>
@@ -1110,7 +1110,7 @@ export default function IdsTapeChartModal({
                     <select 
                       value={bookingDraft.title} 
                       onChange={e => setBookingDraft(prev => ({ ...prev, title: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     >
                       <option value="Mr">Mr.</option>
                       <option value="Mrs">Mrs.</option>
@@ -1127,7 +1127,7 @@ export default function IdsTapeChartModal({
                       placeholder="e.g. Ramesh Patnaik"
                       value={bookingDraft.guestName}
                       onChange={e => setBookingDraft(prev => ({ ...prev, guestName: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     />
                   </div>
 
@@ -1138,7 +1138,7 @@ export default function IdsTapeChartModal({
                       placeholder="e.g. 9437012345"
                       value={bookingDraft.guestPhone}
                       onChange={e => setBookingDraft(prev => ({ ...prev, guestPhone: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     />
                   </div>
                 </div>
@@ -1150,7 +1150,7 @@ export default function IdsTapeChartModal({
                     <select 
                       value={bookingDraft.companyName}
                       onChange={e => setBookingDraft(prev => ({ ...prev, companyName: e.target.value }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     >
                       <option value="">Direct FIT (Individual Guest)</option>
                       <option value="Linde India Ltd">Linde India Ltd (COM0004)</option>
@@ -1166,7 +1166,7 @@ export default function IdsTapeChartModal({
                     <select 
                       value={bookingDraft.adults} 
                       onChange={e => setBookingDraft(prev => ({ ...prev, adults: Number(e.target.value) }))}
-                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                      style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                     >
                       <option value={1}>1 Pax</option>
                       <option value={2}>2 Pax</option>
@@ -1188,7 +1188,7 @@ export default function IdsTapeChartModal({
                         type="number"
                         value={bookingDraft.advanceDeposit}
                         onChange={e => setBookingDraft(prev => ({ ...prev, advanceDeposit: Number(e.target.value) }))}
-                        style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', fontWeight: 700 }}
+                        style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', fontWeight: 700, background: '#FFFFFF', color: '#000000' }}
                       />
                     </div>
                     <div>
@@ -1196,7 +1196,7 @@ export default function IdsTapeChartModal({
                       <select 
                         value={bookingDraft.billingMode} 
                         onChange={e => setBookingDraft(prev => ({ ...prev, billingMode: e.target.value }))}
-                        style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9' }}
+                        style={{ width: '100%', padding: '4px', border: '1px solid #7F9DB9', background: '#FFFFFF', color: '#000000' }}
                       >
                         <option value="Cash">Cash (Front Desk)</option>
                         <option value="UPI">UPI (QR / GooglePay)</option>

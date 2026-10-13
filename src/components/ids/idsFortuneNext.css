@@ -1163,6 +1163,9 @@ button.ids-win-btn.close:hover {
 .ids-dialog-window input,
 .ids-dialog-window textarea,
 .ids-dialog-window select,
+.ids-win32-window input,
+.ids-win32-window textarea,
+.ids-win32-window select,
 .ids-window input,
 .ids-window textarea,
 .ids-window select,
@@ -1183,9 +1186,11 @@ button.ids-win-btn.close:hover {
 .ids-modal-backdrop input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-dialog-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-modal-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
+.ids-win32-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-window input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-desktop-container textarea:not([disabled]):not([readonly]),
 .ids-dialog-window textarea:not([disabled]):not([readonly]),
+.ids-win32-window textarea:not([disabled]):not([readonly]),
 .ids-input:not([disabled]):not([readonly]) {
   cursor: text !important;
 }
@@ -1197,6 +1202,7 @@ button.ids-win-btn.close:hover {
 .ids-modal-container input:not(:disabled):not([readonly]),
 .ids-modal-window input:not(:disabled):not([readonly]),
 .ids-dialog-window input:not(:disabled):not([readonly]),
+.ids-win32-window input:not(:disabled):not([readonly]),
 .ids-window input:not(:disabled):not([readonly]),
 .ids-input:not(:disabled):not([readonly]) {
   background-color: #FFFFFF !important;
@@ -1250,10 +1256,12 @@ button.ids-win-btn.close:hover {
 .ids-modal-container select,
 .ids-modal-window select,
 .ids-dialog-window select,
+.ids-win32-window select,
 .ids-window select,
 .ids-select {
   color-scheme: light !important;
   color: #000000 !important;
+  background-color: #FFFFFF !important;
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif !important;
   font-size: 13px !important;
   cursor: pointer !important;
@@ -1266,6 +1274,7 @@ button.ids-win-btn.close:hover {
 .ids-modal-container select:disabled,
 .ids-modal-window select:disabled,
 .ids-dialog-window select:disabled,
+.ids-win32-window select:disabled,
 .ids-window select:disabled,
 .ids-select:disabled {
   background-color: #EBE9ED !important;
@@ -1278,6 +1287,7 @@ button.ids-win-btn.close:hover {
 .ids-modal-container select option,
 .ids-modal-window select option,
 .ids-dialog-window select option,
+.ids-win32-window select option,
 .ids-window select option,
 .ids-select option {
   color-scheme: light !important;
