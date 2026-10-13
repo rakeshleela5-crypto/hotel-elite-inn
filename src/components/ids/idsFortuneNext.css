@@ -192,14 +192,27 @@
 }
 
 .ids-logo-badge {
-  background: #A02020;
-  color: #FFFFFF;
+  background: #0A192F;
+  color: #F4E29C;
   font-weight: 900;
   font-size: 11px;
   padding: 2px 6px;
   border-radius: 2px;
   letter-spacing: 0.5px;
-  border: 1px solid #FFFFFF;
+  border: 1px solid #D4AF37;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nsai-titlebar-emblem {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #D4AF37;
+  object-fit: cover;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.6);
+  flex-shrink: 0;
 }
 
 .ids-titlebar-buttons {

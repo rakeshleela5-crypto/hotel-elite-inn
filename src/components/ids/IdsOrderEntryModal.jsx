@@ -1747,7 +1747,7 @@ export default function IdsOrderEntryModal({
             {/* HotKey Help (Shift+F1 to Shift+F10 Quick Reference) */}
             <button 
               className="ids-btn" 
-              title="HotKey Help — View All IDS Fortune NEXT POS Shortcut Keys (Shift+F1 to Shift+F10)" 
+              title="HotKey Help — View All NSAIAGENCY PMS Shortcut Keys (Shift+F1 to Shift+F10)" 
               onClick={() => setHotKeyHelpOpen(true)}
               style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '38px', padding: '2px 4px', background: hotKeyHelpOpen ? '#C1D2EE' : undefined }}
             >
@@ -4493,7 +4493,7 @@ export default function IdsOrderEntryModal({
           >
             {/* Titlebar */}
             <div className="ids-modal-titlebar" style={{ background: 'linear-gradient(90deg, #0A246A 0%, #A6CAF0 100%)', color: '#FFF', padding: '3px 6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS Shortcut Keys Help - IDS Fortune NEXT 6.5 &amp; 7.0 (Video 13)</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>POS Shortcut Keys Help - NSAIAGENCY PMS (Shift+F1 to Shift+F10)</span>
               <button className="ids-win-btn close" onClick={() => setHotKeyHelpOpen(false)} style={{ fontSize: '10px', height: '16px', width: '16px', lineHeight: '14px' }}>✕</button>
             </div>
 

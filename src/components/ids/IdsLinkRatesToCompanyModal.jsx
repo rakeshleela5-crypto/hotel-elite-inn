@@ -347,7 +347,7 @@ export default function IdsLinkRatesToCompanyModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
             <Building2 size={14} />
-            <span>Link Rates to Company V6.5.002.1 — IDS Fortune NEXT PMS</span>
+            <span>Link Rates to Company V6.5.002.1 — NSAIAGENCY PMS</span>
           </div>
           <button 
             className="ids-win-btn close" 

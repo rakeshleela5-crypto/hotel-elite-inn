@@ -581,7 +581,7 @@ export default function IdsFolioReinstateModal({
             System Date: <strong>{accountingDate}</strong> | User: <strong>IT ADMIN</strong>
           </div>
           <div>
-            IDS Fortune NEXT V6.5.002.1 • Video 26 (Folio Reinstate Option)
+            NSAIAGENCY PMS V6.5.002.1 • Folio Reinstate Option
           </div>
         </div>
       </div>

@@ -432,7 +432,7 @@ export default function UniversalDateFilterBar({
         }}
       />
 
-      {/* Real-Time IDS NEXT Audited Register Modal */}
+      {/* Real-Time NSAIAGENCY Audited Register Modal */}
       {isAuditModalOpen && (
         <IdsAuditedSalesRegisterModal
           isOpen={isAuditModalOpen}

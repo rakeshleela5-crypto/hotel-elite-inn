@@ -809,7 +809,7 @@ export default function IdsTouchScreenGroupsModal({
           >
             <div style={{ background: '#111', padding: '6px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #444' }}>
               <span style={{ fontWeight: 700, fontSize: '12px', color: '#4CAF50' }}>
-                🖥️ IDS Fortune NEXT Touch Screen POS Terminal View
+                🖥️ NSAIAGENCY Touch Screen POS Terminal View
               </span>
               <button 
                 className="ids-win-btn close" 

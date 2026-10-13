@@ -111,7 +111,7 @@ export default function IdsCaGstr1ExportModal({
  • SAC 996311 (Room Accommodation @ 12%)
  • SAC 996331 (Restaurant & Banquet Dining @ 5%)
 📄 Total Documents Issued: ${stats.totalDocs}
-Official JSON generated & exported from IDS Fortune NEXT PMS. Please upload to gst.gov.in portal.`;
+Official JSON generated & exported from NSAIAGENCY PMS. Please upload to gst.gov.in portal.`;
 
     if (navigator.clipboard) {
       navigator.clipboard.writeText(summaryText);

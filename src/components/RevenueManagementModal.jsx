@@ -847,7 +847,7 @@ export default function RevenueManagementModal({
           )}
 
           {/* =========================================================================
-              TAB 2: QLOAPPS & IDS NEXT SEASONAL PRICE RULES & FESTIVAL MULTIPLIERS
+              TAB 2: NSAIAGENCY ENTERPRISE SEASONAL PRICE RULES & FESTIVAL MULTIPLIERS
              ========================================================================= */}
           {activeTab === 'seasonal-rules' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -873,7 +873,7 @@ export default function RevenueManagementModal({
                         Seasonal Calendar Rate Rules &amp; Regional Event Engine
                       </h3>
                       <p style={{ margin: '0.15rem 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
-                        QloApps &amp; IDS Next Protocol • Automated date-locked rate multipliers, minimum stay (MLOS) restrictions, and pilgrim demand capture.
+                        NSAIAGENCY Enterprise Protocol • Automated date-locked rate multipliers, minimum stay (MLOS) restrictions, and pilgrim demand capture.
                       </p>
                     </div>
                   </div>

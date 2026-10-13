@@ -342,7 +342,10 @@ export default function IdsStaffMasterModal({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', fontSize: '11px' }}>
-            <span style={{ background: '#A02020', padding: '1px 5px', borderRadius: '2px', fontSize: '9px', fontWeight: 900 }}>IDS NEXT</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#0B132B', border: '1px solid #D4AF37', color: '#F3E5AB', padding: '1px 5px', borderRadius: '2px', fontSize: '9px', fontWeight: 900 }}>
+              <img src="/nsai-logo.png" alt="NSAI" style={{ width: '12px', height: '12px', borderRadius: '50%', objectFit: 'cover' }} />
+              NSAIAGENCY
+            </span>
             <span>Staff Directory, Department Rosters & Operational QR Badges — Total Staff: {staffList.length}</span>
           </div>
           <div style={{ display: 'flex', gap: '4px' }}>

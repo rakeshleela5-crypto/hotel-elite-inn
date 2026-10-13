@@ -194,7 +194,7 @@ export default function IdsAdditionalRoomRateModal({
           {/* Title Bar */}
           <div className="ids-dialog-titlebar">
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span className="ids-logo-badge" style={{ fontSize: '9px', padding: '1px 3px' }}>IDS</span>
+              <span className="ids-logo-badge" style={{ fontSize: '9px', padding: '1px 3px' }}>NSAI</span>
               <span>Additional Room Rate V6.5.002.1</span>
             </div>
             <button className="ids-win-btn close" onClick={onClose}>✕</button>
@@ -600,7 +600,7 @@ export default function IdsAdditionalRoomRateModal({
           {/* Title Bar */}
           <div className="ids-dialog-titlebar">
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span className="ids-logo-badge" style={{ fontSize: '9px', padding: '1px 3px' }}>IDS</span>
+              <span className="ids-logo-badge" style={{ fontSize: '9px', padding: '1px 3px' }}>NSAI</span>
               <span>Quick Balances V6.5.002.2</span>
             </div>
             <button className="ids-win-btn close" onClick={onClose}>✕</button>

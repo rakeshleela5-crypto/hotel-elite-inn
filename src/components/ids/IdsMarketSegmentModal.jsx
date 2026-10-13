@@ -237,8 +237,8 @@ export default function IdsMarketSegmentModal({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '13px' }}>
-            <span className="ids-logo-badge">IDS</span>
-            <span>Market Segments V6.5.002.1 — IDS Fortune NEXT PMS</span>
+            <span className="ids-logo-badge">NSAI</span>
+            <span>Market Segments V6.5.002.1 — NSAIAGENCY PMS</span>
           </div>
           <div className="ids-titlebar-buttons">
             <button className="ids-win-btn" title="Minimize">_</button>

@@ -316,7 +316,7 @@ export default function IdsCompanyProfileModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
             <Building2 size={14} />
-            <span>Company Profile V6.5002.4 — IDS Fortune NEXT PMS</span>
+            <span>Company Profile V6.5002.4 — NSAIAGENCY PMS</span>
           </div>
           <button 
             className="ids-win-btn close" 

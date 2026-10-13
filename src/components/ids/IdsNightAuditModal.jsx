@@ -1014,14 +1014,19 @@ export default function IdsNightAuditModal({
 
             <div style={{ padding: '12px 14px', fontSize: '11px', color: '#000' }}>
               <div style={{ display: 'flex', gap: '14px', marginBottom: '12px' }}>
-                {/* Fortune NEXT Logo Badge matching Frame 090 */}
-                <div style={{ width: '120px', flexShrink: 0, textAlign: 'center', paddingTop: '6px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 800, color: '#333', letterSpacing: '0.5px' }}>FORTUNE NEXT</div>
-                  <div style={{ fontSize: '38px', fontWeight: 900, color: '#319795', lineHeight: '1.1', textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}>
-                    6.5
+                {/* NSAIAGENCY Logo Badge matching Frame 090 */}
+                <div style={{ width: '130px', flexShrink: 0, textAlign: 'center', paddingTop: '4px' }}>
+                  <img 
+                    src="/nsai-logo.png" 
+                    alt="NSAIAGENCY" 
+                    style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid #D4AF37', margin: '0 auto 4px auto', display: 'block', objectFit: 'cover' }} 
+                  />
+                  <div style={{ fontSize: '11px', fontWeight: 900, color: '#0A246A', letterSpacing: '0.5px' }}>NSAIAGENCY</div>
+                  <div style={{ fontSize: '20px', fontWeight: 900, color: '#D4AF37', lineHeight: '1.1' }}>
+                    7777
                   </div>
-                  <div style={{ marginTop: '8px', fontSize: '10px', fontWeight: 700, color: '#C0392B' }}>
-                    IDS <span style={{ color: '#27AE60' }}>NEXT</span>
+                  <div style={{ marginTop: '4px', fontSize: '10px', fontWeight: 700, color: '#333' }}>
+                    ENTERPRISE <span style={{ color: '#27AE60' }}>PMS</span>
                   </div>
                 </div>
 
@@ -1048,9 +1053,9 @@ export default function IdsNightAuditModal({
                     <div style={{ fontWeight: 700, color: '#555', marginBottom: '2px' }}>Help Desk:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr' }}>
                       <span>Phone No.</span>
-                      <span style={{ fontWeight: 600 }}>+91 80 6772 0000</span>
+                      <span style={{ fontWeight: 600 }}>+91 63707 57541</span>
                       <span>Email Id</span>
-                      <span style={{ color: '#0066CC' }}>techsupport@idsnext.com</span>
+                      <span style={{ color: '#0066CC' }}>support@nsaiagency.com</span>
                     </div>
                   </div>
                 </div>
@@ -1068,9 +1073,9 @@ export default function IdsNightAuditModal({
                   color: '#666' 
                 }}
               >
-                <span>© IDS Next Business Solutions Pvt. Ltd. All Rights Reserved.</span>
+                <span>© NSAIAGENCY (7777) Enterprise Solutions. All Rights Reserved.</span>
                 <span style={{ color: '#0A246A', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}>
-                  Click here to connect ReizNest
+                  Hotel Elite Inn Enterprise Node
                 </span>
               </div>
 

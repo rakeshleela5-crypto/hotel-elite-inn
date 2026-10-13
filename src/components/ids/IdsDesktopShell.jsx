@@ -551,7 +551,7 @@ export default function IdsDesktopShell({
   // Windows MessageBox System Dialog State
   const [msgBoxOpen, setMsgBoxOpen] = useState(false);
   const [msgBoxConfig, setMsgBoxConfig] = useState({
-    title: 'IDS Fortune NEXT',
+    title: 'NSAIAGENCY PMS',
     message: '',
     type: 'info',
     buttons: 'ok',
@@ -708,13 +708,13 @@ export default function IdsDesktopShell({
         `• Step 3: Shift 3 Night Cashier Float Sealed & KOTs Settled\n` +
         `• Step 4: FOMPURG General Ledger Rolled Over Successfully\n` +
         `• Cloud Status: FastAPI Night Audit Seal Synced to Railway DB`,
-        "Automated Midnight Day Close - IDS Fortune NEXT",
+        "Automated Midnight Day Close - NSAIAGENCY PMS",
         "info"
       );
     }, 1800);
   };
 
-  const showMessageBox = (message, title = 'IDS Fortune NEXT', type = 'info', buttons = 'ok', onOk = null) => {
+  const showMessageBox = (message, title = 'NSAIAGENCY PMS', type = 'info', buttons = 'ok', onOk = null) => {
     setMsgBoxConfig({
       title,
       message,
@@ -1892,8 +1892,13 @@ export default function IdsDesktopShell({
         {/* Title Bar (Frame 001) */}
         <div className="ids-titlebar">
           <div className="ids-titlebar-left">
-            <span className="ids-logo-badge">IDS</span>
-            <span>FORTUNE NEXT V6.5.002.2 - {HOTEL_CONFIG.name}</span>
+            <img 
+              src="/nsai-logo.png" 
+              alt="NSAIAGENCY" 
+              className="nsai-titlebar-emblem" 
+            />
+            <span className="ids-logo-badge">NSAI</span>
+            <span>NSAIAGENCY PMS V6.5.002.2 - {HOTEL_CONFIG.name}</span>
           </div>
           <div className="ids-titlebar-buttons">
             <button 
@@ -2374,7 +2379,7 @@ export default function IdsDesktopShell({
           <button 
             className="ids-btn-classic"
             onClick={() => setHotKeyModalOpen(true)}
-            title="IDS Fortune NEXT Keyboard Shortcuts Console (F1-F12)"
+            title="NSAIAGENCY PMS Keyboard Shortcuts Console (F1-F12)"
           >
             HotKey
           </button>
@@ -4155,7 +4160,7 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>🔄 IDS Fortune NEXT - System Update & Ledger Reconcile</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🔄 NSAIAGENCY PMS - System Update & Ledger Reconcile</span>
               <button className="ids-win-btn close" onClick={() => setSysUpdateModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '14px', fontSize: '11px' }}>
@@ -4216,7 +4221,7 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '880px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>⌨️ IDS Fortune NEXT - System Keyboard Shortcuts (HotKeys)</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>⌨️ NSAIAGENCY PMS - System Keyboard Shortcuts (HotKeys)</span>
               <button className="ids-win-btn close" onClick={() => setHotKeyModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '12px', fontSize: '11px' }}>
@@ -4315,7 +4320,7 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '880px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>🛠️ IDS Fortune NEXT - System Utilities & Operations Console</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🛠️ NSAIAGENCY PMS - System Utilities & Operations Console</span>
               <button className="ids-win-btn close" onClick={() => setOtherUtilitiesModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '14px', fontSize: '11px' }}>
@@ -4364,7 +4369,7 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '920px', minHeight: '560px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>📅 IDS Fortune NEXT - Hotel Banquet & Events Register</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>📅 NSAIAGENCY PMS - Hotel Banquet & Events Register</span>
               <button className="ids-win-btn close" onClick={() => setEventsRegisterModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '12px', fontSize: '11px' }}>
@@ -4481,13 +4486,13 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '840px', minHeight: '540px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>🕒 IDS Fortune NEXT - System Audit & Duty Timestamp Log</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>🕒 NSAIAGENCY PMS - System Audit & Duty Timestamp Log</span>
               <button className="ids-win-btn close" onClick={() => setAuditLogModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '12px', fontSize: '11px' }}>
               <div style={{ background: '#FFF', border: '1px solid #ACA899', padding: '10px', marginBottom: '10px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  <div><strong>Software Build:</strong> IDS Fortune NEXT V6.5.002.2</div>
+                  <div><strong>Software Build:</strong> NSAIAGENCY PMS V6.5.002.2 (Build 7777)</div>
                   <div><strong>Accounting Date:</strong> {accountingDate}</div>
                   <div><strong>Workstation Node:</strong> WS-FRONTDESK-01 (192.168.1.104)</div>
                   <div><strong>Active Terminal Role:</strong> Front Desk Lead Cashier</div>
@@ -4517,7 +4522,7 @@ export default function IdsDesktopShell({
         <div className="ids-modal-overlay" style={{ zIndex: 1500 }}>
           <div className="ids-dialog-window" style={{ width: '640px', maxWidth: '96vw', background: '#ECE9D8', boxShadow: '0 8px 30px rgba(0,0,0,0.65)' }}>
             <div className="ids-dialog-titlebar plain" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: '11px' }}>✅ IDS Fortune NEXT - Front Desk Duty Checklist & Task Register</span>
+              <span style={{ fontWeight: 700, fontSize: '11px' }}>✅ NSAIAGENCY PMS - Front Desk Duty Checklist & Task Register</span>
               <button className="ids-win-btn close" onClick={() => setTodoModalOpen(false)}>✕</button>
             </div>
             <div style={{ padding: '12px', fontSize: '11px' }}>

@@ -768,7 +768,7 @@ export default function IdsServersModal({
               </span>
             </div>
             <div style={{ fontSize: '10px', color: '#444', lineHeight: '1.4' }}>
-              <strong>Video 19 Deactivation Protocol:</strong> Click <strong>Modify</strong> &rarr; Select Waiter &rarr; Change Status to <strong style={{ color: '#8B0000' }}>Passive</strong> &rarr; Click <strong>Save</strong>. In IDS Fortune NEXT, Passive servers remain in historical audit logs but are strictly excluded from live Order Entry.
+              <strong>Server Deactivation Protocol:</strong> Click <strong>Modify</strong> &rarr; Select Waiter &rarr; Change Status to <strong style={{ color: '#8B0000' }}>Passive</strong> &rarr; Click <strong>Save</strong>. In NSAIAGENCY PMS, Passive servers remain in historical audit logs but are strictly excluded from live Order Entry.
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
               <button 

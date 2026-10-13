@@ -888,7 +888,7 @@ export default function IdsTransferFolioModal({
             System Date: <strong>{accountingDate}</strong> | User: <strong>IT ADMIN</strong>
           </div>
           <div>
-            IDS Fortune NEXT V6.5.002.1 • Transfer Folio Transaction
+            NSAIAGENCY PMS V6.5.002.1 • Transfer Folio Transaction
           </div>
         </div>
       </div>

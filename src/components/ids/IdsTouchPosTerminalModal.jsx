@@ -1184,7 +1184,10 @@ export default function IdsTouchPosTerminalModal({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ background: '#A02020', color: '#FFF', padding: '2px 6px', fontSize: '10.5px', borderRadius: '2px', fontWeight: 800, letterSpacing: '0.5px' }}>IDS NEXT</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#0B132B', border: '1px solid #D4AF37', color: '#F3E5AB', padding: '2px 6px', fontSize: '10.5px', borderRadius: '2px', fontWeight: 800, letterSpacing: '0.5px' }}>
+              <img src="/nsai-logo.png" alt="NSAI" style={{ width: '14px', height: '14px', borderRadius: '50%', objectFit: 'cover' }} />
+              NSAIAGENCY
+            </span>
             <span style={{ textShadow: '1px 1px 1px rgba(0,0,0,0.5)' }}>Touch Screen POS Terminal V7.0 — {HOTEL_CONFIG.name} [{activeOutlet}]</span>
           </div>
           <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>

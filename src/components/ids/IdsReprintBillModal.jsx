@@ -194,7 +194,7 @@ export default function IdsReprintBillModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
             <Receipt size={14} />
-            <span>Reprint FO Bill \ FMCRYBL V6.5.002.1 — IDS Fortune NEXT PMS</span>
+            <span>Reprint FO Bill \ FMCRYBL V6.5.002.1 — NSAIAGENCY PMS</span>
           </div>
           <div className="ids-window-controls" style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             <button className="ids-win-btn" title="Minimize to Normal Window" onClick={() => setIsMaximized(false)} style={{ width: '20px', height: '20px', fontSize: '11px', lineHeight: 1 }}>_</button>

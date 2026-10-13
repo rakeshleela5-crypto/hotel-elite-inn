@@ -38,7 +38,7 @@ export default function IdsAuditedSalesRegisterModal({
   const [hotelSalesData, setHotelSalesData] = useState(() => getSynchronizedHotelSales('JUNE-2026'));
   const [restaurantSalesData, setRestaurantSalesData] = useState(() => getSynchronizedRestaurantSales('JUNE-2026', 'ALL'));
   const [restaurantMgmData, setRestaurantMgmData] = useState(() => getSynchronizedNcDining('JUNE-2026'));
-  const [backendSyncStatus, setBackendSyncStatus] = useState('Synchronized with IDS Fortune NEXT Master Ledger');
+  const [backendSyncStatus, setBackendSyncStatus] = useState('Synchronized with NSAIAGENCY Master Ledger');
 
   const syncMonths = useMemo(() => getAvailableSyncMonths(), []);
 
@@ -81,7 +81,7 @@ export default function IdsAuditedSalesRegisterModal({
       if (hasData) {
         setBackendSyncStatus(`Connected to PostgreSQL (Railway API - ${selectedMonth})`);
       } else {
-        setBackendSyncStatus(`Synchronized with Live IDS NEXT Ledger (${selectedMonth})`);
+        setBackendSyncStatus(`Synchronized with Live NSAIAGENCY Ledger (${selectedMonth})`);
       }
     }).catch(() => {
       if (isMounted) setBackendSyncStatus(`Using Verified Edge Seed Cache (${selectedMonth})`);
@@ -764,7 +764,7 @@ export default function IdsAuditedSalesRegisterModal({
                       <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.cc.toFixed(2)}</td>
                       <td style={{ padding: '4px', textAlign: 'right' }}>₹{hotelTotals.online.toFixed(2)}</td>
                       <td colSpan={4} style={{ padding: '4px', textAlign: 'center', fontSize: '9px', fontStyle: 'italic' }}>
-                        Synchronized with IDS Fortune NEXT Master Ledger
+                        Synchronized with NSAIAGENCY Master Ledger
                       </td>
                     </tr>
                   </tfoot>

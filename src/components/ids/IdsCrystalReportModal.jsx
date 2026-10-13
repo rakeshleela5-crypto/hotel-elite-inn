@@ -1342,7 +1342,7 @@ export default function IdsCrystalReportModal({
             </div>
 
             <div style={{ textAlign: 'center', fontSize: '9px', color: '#666', marginTop: '16px' }}>
-              Hotel Elite Inn, Muniguda • IDS Fortune NEXT 6.5/7.0 Enterprise System Report • SAC 996311 / SAC 996331
+              Hotel Elite Inn, Muniguda • NSAIAGENCY Enterprise PMS Report • SAC 996311 / SAC 996331
             </div>
           </div>
         </div>

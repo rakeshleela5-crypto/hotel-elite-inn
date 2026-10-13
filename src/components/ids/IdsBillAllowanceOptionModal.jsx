@@ -1082,7 +1082,7 @@ export default function IdsBillAllowanceOptionModal({
             System Date: <strong>{accountingDate}</strong> | User: <strong>IT ADMIN</strong>
           </div>
           <div>
-            IDS Fortune NEXT V6.5.002.4 • Video 24 (Bill Allowance Batch Option)
+            NSAIAGENCY PMS V6.5.002.4 • Bill Allowance Batch Option
           </div>
         </div>
       </div>

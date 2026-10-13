@@ -200,7 +200,7 @@ export default function IdsReleaseStopPostingModal({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, fontSize: '12px' }}>
             <Unlock size={14} />
-            <span>Release Stop Posting V6.5.002.1 — IDS Fortune NEXT PMS</span>
+            <span>Release Stop Posting V6.5.002.1 — NSAIAGENCY PMS</span>
           </div>
           <button 
             className="ids-win-btn close" 

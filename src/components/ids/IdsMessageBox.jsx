@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 
 export default function IdsMessageBox({
   isOpen,
-  title = 'IDS Fortune NEXT',
+  title = 'NSAIAGENCY PMS',
   message = '',
   type = 'info', // 'info' | 'warning' | 'error' | 'question'
   buttons = 'ok', // 'ok' | 'yesno' | 'okcancel'
