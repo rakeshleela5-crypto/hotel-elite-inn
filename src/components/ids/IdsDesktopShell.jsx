@@ -110,9 +110,9 @@ import IdsTransitSlotModal from './IdsTransitSlotModal';
 import IdsCorporateBtcAgingModal from './IdsCorporateBtcAgingModal';
 import IdsCaGstr1ExportModal from './IdsCaGstr1ExportModal';
 import IdsChangeBusinessDateModal from './IdsChangeBusinessDateModal';
-import { playReceptionChime, playSuccessChime } from '../../utils/soundAlert';
+import { playReceptionChime, playSuccessChime, playHousekeepingChime } from '../../utils/soundAlert';
 import { sealFastApiNightAudit } from '../../utils/backendApi';
-import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
+import { subscribeToLiveSync, getLiveRoomStatuses, syncUpdateRoomStatus } from '../../utils/liveSyncBridge';
 import { 
   INITIAL_COMPANIES, 
   INITIAL_BUSINESS_SOURCES, 
@@ -303,16 +303,42 @@ export default function IdsDesktopShell({
   const [clearRoomsModalOpen, setClearRoomsModalOpen] = useState(false);
   const [quickScanModalOpen, setQuickScanModalOpen] = useState(false);
   const [clearedDirtyRooms, setClearedDirtyRooms] = useState([]);
+  const [roomStatusOverrides, setRoomStatusOverrides] = useState(() => getLiveRoomStatuses());
+  const [recentHkAlert, setRecentHkAlert] = useState(null);
 
   // Multi-Device Real-Time Sync for Room Statuses (Housekeeping Mobile -> IDS Room Rack)
   useEffect(() => {
     const unsubscribe = subscribeToLiveSync((event) => {
       if (event.type === 'ROOM_STATUS_CHANGED' && event.roomNumber) {
         const rNum = String(event.roomNumber);
-        const st = String(event.status).toLowerCase();
-        if (st === 'clean' || st === 'available') {
+        const rawStatus = event.status || 'Clean';
+        const normStatus = event.normalizedStatus || (rawStatus.toLowerCase().includes('disturb') ? 'dnd' : rawStatus.toLowerCase().includes('order') ? 'ooo' : rawStatus.toLowerCase());
+        const staff = event.payload?.cleanedBy || event.payload?.updatedBy || 'HK Attendant';
+
+        setRoomStatusOverrides(prev => ({
+          ...prev,
+          [rNum]: {
+            status: rawStatus,
+            normalizedStatus: normStatus,
+            staffName: staff,
+            inspectedBy: event.payload?.inspectedBy || null,
+            headcount: event.payload?.headcount || null,
+            guest: event.payload?.guestName || null,
+            updatedAt: new Date().toISOString()
+          }
+        }));
+
+        playHousekeepingChime();
+        setRecentHkAlert({
+          roomNo: rNum,
+          status: rawStatus,
+          staffName: staff,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        if (normStatus === 'clean') {
           setClearedDirtyRooms(prev => Array.from(new Set([...prev, rNum])));
-        } else if (st === 'dirty' || st === 'vacant dirty') {
+        } else if (normStatus === 'dirty') {
           setClearedDirtyRooms(prev => prev.filter(r => r !== rNum));
         }
       }
@@ -2027,6 +2053,27 @@ export default function IdsDesktopShell({
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {recentHkAlert && (
+              <button
+                className="ids-btn-classic"
+                style={{
+                  background: recentHkAlert.status === 'Dirty' ? '#FFF9C4' : recentHkAlert.status === 'Do not Disturb' ? '#F3E8FF' : recentHkAlert.status === 'Out of Order' ? '#EFEBE9' : '#E8F5E9',
+                  border: `1px solid ${recentHkAlert.status === 'Dirty' ? '#FBC02D' : recentHkAlert.status === 'Do not Disturb' ? '#7C3AED' : recentHkAlert.status === 'Out of Order' ? '#7A5230' : '#4CAF50'}`,
+                  color: recentHkAlert.status === 'Do not Disturb' ? '#6B21A8' : '#000',
+                  fontWeight: 700,
+                  fontSize: '10px',
+                  padding: '1px 7px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+                onClick={() => setRoomRackConsoleOpen(true)}
+                title="Click to view updated Room Status Rack Console"
+              >
+                <span>🔔 HK: Rm {recentHkAlert.roomNo} → {recentHkAlert.status} ({recentHkAlert.staffName})</span>
+              </button>
+            )}
             <button 
               className="ids-btn-classic"
               style={{
@@ -2715,8 +2762,25 @@ export default function IdsDesktopShell({
         occupiedRoom={checkedInList.length > 0 ? checkedInList[0].roomNo : '201'}
         guestName={checkedInList.length > 0 ? checkedInList[0].guestName.split(' ').pop() : 'Biswakarma'}
         clearedRooms={clearedDirtyRooms}
-        onClearSingleRoom={(roomNo) => {
-          setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
+        roomStatusOverrides={roomStatusOverrides}
+        onClearSingleRoom={(roomNo, clearMeta) => {
+          const rNum = String(roomNo);
+          setClearedDirtyRooms(prev => Array.from(new Set([...prev, rNum])));
+          setRoomStatusOverrides(prev => ({
+            ...prev,
+            [rNum]: {
+              status: 'Clean',
+              normalizedStatus: 'clean',
+              staffName: clearMeta?.hskStaff || 'Sunil Mohapatra',
+              inspectedBy: clearMeta?.authorizedBy || 'HK SUPERVISOR',
+              updatedAt: new Date().toISOString()
+            }
+          }));
+          syncUpdateRoomStatus(rNum, 'Clean', {
+            staffName: clearMeta?.hskStaff || 'Sunil Mohapatra',
+            inspectedBy: clearMeta?.authorizedBy || 'HK SUPERVISOR',
+            remarks: clearMeta?.remarks || 'CLEAN'
+          });
         }}
         onOpenClearRoomsModal={() => setClearRoomsModalOpen(true)}
         onOpenChangeRate={(roomNo) => {
@@ -3730,9 +3794,22 @@ export default function IdsDesktopShell({
           });
           setCrystalReportModalOpen(true);
         }}
-        onUpdateStatus={({ roomNo, status }) => {
+        onUpdateStatus={({ roomNo, status, headcount }) => {
+          const rNum = String(roomNo);
+          const norm = String(status).toLowerCase().includes('disturb') ? 'dnd' : String(status).toLowerCase().includes('order') ? 'ooo' : String(status).toLowerCase();
+          setRoomStatusOverrides(prev => ({
+            ...prev,
+            [rNum]: {
+              status,
+              normalizedStatus: norm,
+              headcount,
+              updatedAt: new Date().toISOString()
+            }
+          }));
           if (status === 'Clean' || status === 'Inspected') {
-            setClearedDirtyRooms(prev => Array.from(new Set([...prev, roomNo])));
+            setClearedDirtyRooms(prev => Array.from(new Set([...prev, rNum])));
+          } else if (status === 'Dirty') {
+            setClearedDirtyRooms(prev => prev.filter(r => r !== rNum));
           }
         }}
       />

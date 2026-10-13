@@ -805,7 +805,17 @@ export default function App() {
       channel = new BroadcastChannel('hotel_elite_inn_housekeeping');
       channel.onmessage = (event) => {
         const { type, payload } = event.data || {};
-        if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
+        if (type === 'ROOM_STATUS_CHANGED' && payload?.roomNumber) {
+          const norm = payload.normalizedStatus || 'clean';
+          let appStatus = 'Available';
+          if (norm === 'dirty') appStatus = 'Vacant Dirty';
+          else if (norm === 'occupied') appStatus = 'Occupied';
+          else if (norm === 'dnd') appStatus = 'Do not Disturb';
+          else if (norm === 'ooo') appStatus = 'Maintenance';
+          else if (norm === 'inspected') appStatus = 'Clean & Inspected';
+          else appStatus = 'Available';
+          handleUpdateRoomStatus(payload.roomNumber, appStatus, payload.guestName || null, null);
+        } else if ((type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') && payload?.roomNumber) {
           handleUpdateRoomStatus(payload.roomNumber, 'Available', null, null);
         } else if (type === 'ROOM_INSPECTED' && payload?.roomNumber) {
           handleUpdateRoomStatus(payload.roomNumber, 'Clean & Inspected', null, null);

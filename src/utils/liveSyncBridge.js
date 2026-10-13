@@ -174,10 +174,28 @@ async function performCloudSyncTick() {
             playHousekeepingChime();
           }
 
+          let displayStatus = 'Clean';
+          if (currentStatus === 'dirty') displayStatus = 'Dirty';
+          else if (currentStatus === 'occupied') displayStatus = 'Occupied';
+          else if (currentStatus === 'maintenance') displayStatus = 'Out of Order';
+          else if (currentStatus === 'dnd') displayStatus = 'Do not Disturb';
+
+          const currentStatuses = getLiveRoomStatuses();
+          currentStatuses[rNum] = {
+            ...(currentStatuses[rNum] || {}),
+            roomNo: rNum,
+            status: displayStatus,
+            normalizedStatus: currentStatus === 'maintenance' ? 'ooo' : currentStatus,
+            updatedAt: new Date().toISOString()
+          };
+          saveLiveRoomStatuses(currentStatuses);
+
           notifyListeners({
             type: 'ROOM_STATUS_CHANGED',
             roomNumber: rNum,
-            status: currentStatus, // 'clean', 'dirty', 'occupied', 'maintenance'
+            status: displayStatus,
+            normalizedStatus: currentStatus === 'maintenance' ? 'ooo' : currentStatus,
+            roomStatuses: currentStatuses,
             source: 'CLOUD_FASTAPI'
           });
         } else if (!previousStatus) {
@@ -266,30 +284,97 @@ export async function syncDispatchKotOrder(newKotOrder, tableSession = null) {
   return normalized;
 }
 
+export const HK_ROOM_STATUSES_KEY = 'hotel_elite_inn_room_statuses';
+
+export function getLiveRoomStatuses() {
+  if (typeof window === 'undefined') return {};
+  try {
+    const saved = localStorage.getItem(HK_ROOM_STATUSES_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+export function saveLiveRoomStatuses(statuses) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(HK_ROOM_STATUSES_KEY, JSON.stringify(statuses));
+  } catch (e) {}
+}
+
 /**
  * 🧹 High-Level Housekeeping Room Status Dispatcher
  * Dispatches a room status change from Housekeeping Mobile:
- * 1. Emits immediately to local tabs (BroadcastChannel)
- * 2. Securely updates PostgreSQL via FastAPI PATCH /api/rooms/{id}/status
+ * 1. Persists to shared localStorage (hotel_elite_inn_room_statuses)
+ * 2. Emits immediately to local tabs (BroadcastChannel)
+ * 3. Securely updates PostgreSQL via FastAPI PATCH /api/rooms/{id}/status
  */
-export async function syncUpdateRoomStatus(roomNumber, status, staffName = 'Housekeeping Staff') {
+export async function syncUpdateRoomStatus(roomNumber, status, optionsOrStaff = 'Housekeeping Staff') {
   initKnownStates();
   const rNumStr = String(roomNumber);
-  const normalizedStatus = String(status).toLowerCase(); // 'clean', 'dirty', 'occupied', 'maintenance'
+  const rawStatus = String(status);
+  const normalizedStatus = rawStatus.toLowerCase();
 
-  knownRoomStatuses.set(rNumStr, normalizedStatus);
+  const staffName = typeof optionsOrStaff === 'string' 
+    ? optionsOrStaff 
+    : (optionsOrStaff?.staffName || optionsOrStaff?.attendant || 'Housekeeping Staff');
+  const inspectedBy = typeof optionsOrStaff === 'object' && optionsOrStaff !== null 
+    ? (optionsOrStaff?.inspectedBy || 'Sunil Mohapatra') 
+    : 'Sunil Mohapatra';
+  const headcount = typeof optionsOrStaff === 'object' && optionsOrStaff !== null && optionsOrStaff.headcount
+    ? optionsOrStaff.headcount
+    : { adult: '0', child: '0', infant: '0' };
 
-  // 1. BroadcastChannel for same-device tabs (Reception desktop, Room Rack)
+  let normalizedCode = 'clean';
+  if (normalizedStatus.includes('disturb') || normalizedStatus === 'dnd') {
+    normalizedCode = 'dnd';
+  } else if (normalizedStatus.includes('order') || normalizedStatus === 'ooo' || normalizedStatus.includes('maint')) {
+    normalizedCode = 'ooo';
+  } else if (normalizedStatus.includes('dirty')) {
+    normalizedCode = 'dirty';
+  } else if (normalizedStatus.includes('occupied')) {
+    normalizedCode = 'occupied';
+  } else if (normalizedStatus.includes('inspect')) {
+    normalizedCode = 'inspected';
+  } else if (normalizedStatus.includes('clean') || normalizedStatus.includes('avail')) {
+    normalizedCode = 'clean';
+  }
+
+  knownRoomStatuses.set(rNumStr, normalizedCode);
+
+  // 1. Mirror into shared localStorage so all open windows, modals and reloads receive it
+  const currentStatuses = getLiveRoomStatuses();
+  const roomEntry = {
+    roomNo: rNumStr,
+    status: rawStatus,
+    normalizedStatus: normalizedCode,
+    attendant: staffName,
+    inspectedBy,
+    headcount,
+    updatedAt: new Date().toISOString()
+  };
+  const updatedStatuses = {
+    ...currentStatuses,
+    [rNumStr]: roomEntry
+  };
+  saveLiveRoomStatuses(updatedStatuses);
+
+  // 2. BroadcastChannel for same-device tabs (Reception desktop, Room Rack)
   try {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       const hkChannel = new BroadcastChannel('hotel_elite_inn_housekeeping');
       hkChannel.postMessage({
-        type: normalizedStatus === 'clean' ? 'ROOM_CLEANED' : 'ROOM_STATUS_UPDATE',
+        type: 'ROOM_STATUS_CHANGED',
         payload: {
           roomNumber: rNumStr,
-          newStatus: normalizedStatus === 'clean' ? 'Available' : normalizedStatus,
+          status: rawStatus,
+          normalizedStatus: normalizedCode,
+          roomEntry,
+          roomStatuses: updatedStatuses,
           cleanedBy: staffName,
           updatedBy: staffName,
+          inspectedBy,
           cleanedAt: new Date().toISOString()
         }
       });
@@ -297,14 +382,21 @@ export async function syncUpdateRoomStatus(roomNumber, status, staffName = 'Hous
     }
   } catch (e) {}
 
-  // 2. Persist to PostgreSQL via FastAPI
+  // 3. Persist to PostgreSQL via FastAPI
   const roomId = ROOM_ID_MAP[rNumStr] || parseInt(rNumStr, 10);
   try {
-    const cloudStatus = (normalizedStatus === 'available' || normalizedStatus === 'clean') ? 'clean' : normalizedStatus;
+    let cloudStatus = 'clean';
+    if (normalizedCode === 'dirty') cloudStatus = 'dirty';
+    else if (normalizedCode === 'occupied' || normalizedCode === 'dnd') cloudStatus = 'occupied';
+    else if (normalizedCode === 'ooo') cloudStatus = 'maintenance';
+    else cloudStatus = 'clean';
+
     await updateFastApiRoomStatus(roomId, cloudStatus);
   } catch (err) {
     console.warn('[LiveSyncBridge] Cloud Room status update queued:', err.message);
   }
+
+  return roomEntry;
 }
 
 /**
@@ -338,7 +430,9 @@ export function subscribeToLiveSync(callback) {
           callback({
             type: 'ROOM_STATUS_CHANGED',
             roomNumber: payload.roomNumber,
-            status: (type === 'ROOM_CLEANED' || type === 'ROOM_AVAILABLE') ? 'clean' : (payload.newStatus || 'dirty'),
+            status: payload.status || (type === 'ROOM_CLEANED' ? 'Clean' : payload.newStatus || 'Dirty'),
+            normalizedStatus: payload.normalizedStatus || 'clean',
+            roomStatuses: payload.roomStatuses,
             payload,
             source: 'LOCAL_BROADCAST'
           });

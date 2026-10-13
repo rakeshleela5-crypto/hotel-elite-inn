@@ -750,6 +750,7 @@ export function IdsRoomRackConsoleModal({
   occupiedRoom = '201', 
   guestName = 'Biswakarma',
   clearedRooms = [],
+  roomStatusOverrides = {},
   onClearSingleRoom,
   onOpenClearRoomsModal,
   onOpenChangeRate,
@@ -853,7 +854,32 @@ export function IdsRoomRackConsoleModal({
     let typeCode = isCleared ? `V/${cat}` : (dirtyCategories[no] ? `D/${cat}` : `V/${cat}`);
     let guestName = undefined;
 
-    if (isBlocked) {
+    // Check dynamic Housekeeping & Cloud overrides first
+    const override = (roomStatusOverrides || {})[no];
+    if (override) {
+      const norm = override.normalizedStatus || (override.status ? override.status.toLowerCase() : '');
+      if (norm === 'dnd' || norm.includes('disturb')) {
+        status = 'dnd';
+        typeCode = `DND/${cat}`;
+        guestName = override.guest || (isCheckedIn ? (guestName || 'Guest') : defaultOccupiedGuests[no] || 'Guest (DND)');
+      } else if (norm === 'dirty') {
+        status = 'dirty';
+        typeCode = `D/${cat}`;
+        guestName = undefined;
+      } else if (norm === 'clean' || norm === 'inspected') {
+        status = 'vacant';
+        typeCode = `V/${cat}`;
+        guestName = undefined;
+      } else if (norm === 'occupied') {
+        status = 'occupied';
+        typeCode = `O/${cat}`;
+        guestName = override.guest || defaultOccupiedGuests[no] || 'Guest';
+      } else if (norm === 'ooo' || norm.includes('order')) {
+        status = 'ooo';
+        typeCode = `OOO/${cat}`;
+        guestName = undefined;
+      }
+    } else if (isBlocked) {
       status = 'ooo';
       typeCode = `OOO/${cat}`;
     } else if (isCheckedIn || walkIn || (!isCheckedOut && defaultOccupiedGuests[no])) {
@@ -893,22 +919,25 @@ export function IdsRoomRackConsoleModal({
   const occupiedCount = roomsMatrix.filter(r => r.status === 'occupied').length;
   const dirtyCount = roomsMatrix.filter(r => r.status === 'dirty').length;
   const oooCount = roomsMatrix.filter(r => r.status === 'ooo').length;
+  const dndCount = roomsMatrix.filter(r => r.status === 'dnd').length;
 
   const getCellBg = (status, roomNo) => {
-    if (roomNo === '102' || roomNo === '206') return '#6A89CC'; // Expected Departure / Corporate
     switch (status) {
       case 'occupied': return '#F15A24'; // Vivid orange/red
       case 'vacant': return '#58B957';   // Vivid green
       case 'dirty': return '#E8E137';    // Vivid yellow
+      case 'dnd': return '#7C3AED';      // Vivid Purple / Do Not Disturb
       case 'ooo': return '#7A5230';      // Authentic Brown Out of Order
       case 'oos': return '#800080';      // Authentic Purple Out of Service
-      default: return '#E0DEC8';
+      default:
+        if (roomNo === '102') return '#6A89CC'; // Expected Departure / Corporate
+        return '#E0DEC8';
     }
   };
 
   const handleRoomClick = (e, r) => {
-    // If dirty room, occupied room, or blocked OOO room, show context menu
-    if (r.status === 'dirty' || dirtyCategories[r.no] || r.status === 'occupied' || r.status === 'ooo') {
+    // If dirty room, occupied room, DND room, or blocked OOO room, show context menu
+    if (r.status === 'dirty' || dirtyCategories[r.no] || r.status === 'occupied' || r.status === 'ooo' || r.status === 'dnd') {
       e.preventDefault();
       const rect = e.currentTarget.getBoundingClientRect();
       setContextMenu({
@@ -1044,6 +1073,8 @@ export function IdsRoomRackConsoleModal({
                 tileBg = '#FFD7D7';
               }
 
+              const isDarkTile = actualStatus === 'occupied' || actualStatus === 'dnd' || actualStatus === 'ooo';
+
               return (
                 <div 
                   key={r.no}
@@ -1052,9 +1083,13 @@ export function IdsRoomRackConsoleModal({
                   title={
                     isDirty 
                       ? `Room ${r.no} is Dirty. Click or Right-click to Clear Room (Video 09)` 
-                      : actualStatus === 'occupied'
-                        ? `Room ${r.no} Occupied (${actualGuest || ''}). ${isCutoff ? '🔒 KEYCARD CUTOFF (30m) - Locked out! Visit reception to pay and extend.' : isExpiring ? '⏳ EXPIRING SOON (<2h). Countdown: ' + stayTimer?.formattedCountdown : 'Active stay.'} Right-click for Audited Stay Extension.`
-                        : undefined
+                      : actualStatus === 'dnd'
+                        ? `Room ${r.no} DO NOT DISTURB (${actualGuest || 'Guest'}). Privacy requested.`
+                        : actualStatus === 'ooo'
+                          ? `Room ${r.no} OUT OF ORDER. Under Maintenance.`
+                          : actualStatus === 'occupied'
+                            ? `Room ${r.no} Occupied (${actualGuest || ''}). ${isCutoff ? '🔒 KEYCARD CUTOFF (30m) - Locked out! Visit reception to pay and extend.' : isExpiring ? '⏳ EXPIRING SOON (<2h). Countdown: ' + stayTimer?.formattedCountdown : 'Active stay.'} Right-click for Audited Stay Extension.`
+                            : `Room ${r.no} Vacant Clean (${r.category})`
                   }
                   style={{
                     background: tileBg,
@@ -1064,9 +1099,9 @@ export function IdsRoomRackConsoleModal({
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    color: '#000',
+                    color: isDarkTile ? '#FFF' : '#000',
                     fontSize: '10px',
-                    cursor: (isDirty || actualStatus === 'occupied') ? 'context-menu' : 'default',
+                    cursor: (isDirty || actualStatus === 'occupied' || actualStatus === 'dnd' || actualStatus === 'ooo') ? 'context-menu' : 'default',
                     userSelect: 'none'
                   }}
                 >
@@ -1123,6 +1158,12 @@ export function IdsRoomRackConsoleModal({
               <span style={{ background: '#F15A24', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{occupiedCount}</span>
               <span>Occupied</span>
             </div>
+            {dndCount > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ background: '#7C3AED', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{dndCount}</span>
+                <span style={{ color: '#7C3AED', fontWeight: 700 }}>Do Not Disturb</span>
+              </div>
+            )}
             {/* Anti-Fraud Live Monitoring Badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <span style={{ background: '#E65100', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>
@@ -1149,7 +1190,7 @@ export function IdsRoomRackConsoleModal({
               onClick={onOpenRoomBlock}
               title="Click to open Room Block V6.5.002.1"
             >
-              <span style={{ background: '#7A5230', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{blockedRooms.length}</span>
+              <span style={{ background: '#7A5230', color: '#FFF', padding: '1px 5px', fontWeight: 700 }}>{oooCount}</span>
               <span style={{ textDecoration: onOpenRoomBlock ? 'underline' : 'none' }}>Out of order</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

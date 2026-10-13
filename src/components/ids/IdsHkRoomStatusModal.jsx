@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './idsFortuneNext.css';
 import { getHousekeepingCrew } from '../../data/hotelStaffData';
+import { syncUpdateRoomStatus, getLiveRoomStatuses, subscribeToLiveSync } from '../../utils/liveSyncBridge';
 
 export default function IdsHkRoomStatusModal({
   isOpen,
@@ -11,24 +12,64 @@ export default function IdsHkRoomStatusModal({
   onOpenRoomVerificationReport
 }) {
   const hkCrew = getHousekeepingCrew();
-  const [roomsList, setRoomsList] = useState([
-    { roomNo: '201', status: 'Do not Disturb', adult: '1', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '203', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '204', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '205', status: 'Occupied', adult: '2', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '206', status: 'Out of Order', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Subrat Patnaik' },
-    { roomNo: '207', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '208', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '209', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '210', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '211', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '301', status: 'Occupied', adult: '1', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '303', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '304', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '305', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '306', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
-    { roomNo: '307', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' }
-  ]);
+  const [roomsList, setRoomsList] = useState(() => {
+    const liveMap = getLiveRoomStatuses();
+    const defaults = [
+      { roomNo: '201', status: 'Do not Disturb', adult: '1', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '203', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '204', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '205', status: 'Occupied', adult: '2', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '206', status: 'Out of Order', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Subrat Patnaik' },
+      { roomNo: '207', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '208', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '209', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '210', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Ramesh Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '211', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Mamata Nayak', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '301', status: 'Occupied', adult: '1', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '303', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '304', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '305', status: 'Dirty', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '306', status: 'Clean', adult: '0', child: '0', infant: '0', attendant: 'Puspalata Biswal', inspectedBy: 'Sunil Mohapatra' },
+      { roomNo: '307', status: 'Inspected', adult: '0', child: '0', infant: '0', attendant: 'Debendra Jena', inspectedBy: 'Sunil Mohapatra' }
+    ];
+
+    return defaults.map(d => {
+      const live = liveMap[d.roomNo];
+      if (live) {
+        return {
+          ...d,
+          status: live.status || d.status,
+          attendant: live.staffName || d.attendant,
+          inspectedBy: live.inspectedBy || d.inspectedBy,
+          adult: live.headcount?.adult !== undefined ? String(live.headcount.adult) : d.adult,
+          child: live.headcount?.child !== undefined ? String(live.headcount.child) : d.child,
+          infant: live.headcount?.infant !== undefined ? String(live.headcount.infant) : d.infant
+        };
+      }
+      return d;
+    });
+  });
+
+  // Subscribe to multi-device real-time sync across Railway PostgreSQL and BroadcastChannel
+  useEffect(() => {
+    const unsubscribe = subscribeToLiveSync((event) => {
+      if (event.type === 'ROOM_STATUS_CHANGED' && event.roomNumber) {
+        const rNum = String(event.roomNumber);
+        setRoomsList(prev => prev.map(rm => {
+          if (rm.roomNo === rNum) {
+            return {
+              ...rm,
+              status: event.status || rm.status,
+              attendant: event.payload?.cleanedBy || event.payload?.updatedBy || rm.attendant,
+              inspectedBy: event.payload?.inspectedBy || rm.inspectedBy
+            };
+          }
+          return rm;
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Sub-Modal: Details (Video 11 Frame 022)
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -59,7 +100,7 @@ export default function IdsHkRoomStatusModal({
     setDetailsModalOpen(true);
   };
 
-  const handleSaveDetails = () => {
+  const handleSaveDetails = async () => {
     const updated = roomsList.map(rm => {
       if (rm.roomNo === detailsForm.roomNo) {
         return {
@@ -77,6 +118,17 @@ export default function IdsHkRoomStatusModal({
 
     setRoomsList(updated);
     setDetailsModalOpen(false);
+
+    // 🚀 DUAL-BUS REAL-TIME BROADCAST & FASTAPI CLOUD PERSISTENCE
+    try {
+      await syncUpdateRoomStatus(detailsForm.roomNo, detailsForm.status, {
+        staffName: detailsForm.attendant,
+        inspectedBy: detailsForm.inspectedBy,
+        headcount: { adult: detailsForm.adult, child: detailsForm.child, infant: detailsForm.infant }
+      });
+    } catch (err) {
+      console.warn('Sync update room status error:', err);
+    }
 
     if (onUpdateStatus) {
       onUpdateStatus({
@@ -121,7 +173,12 @@ export default function IdsHkRoomStatusModal({
             fontWeight: 'bold'
           }}
         >
-          <span>House Keeping Room Status V6.5.002.1</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>House Keeping Room Status V6.5.002.1</span>
+            <span style={{ fontSize: '9px', background: 'rgba(0,128,0,0.85)', color: '#FFF', padding: '1px 6px', borderRadius: '3px', fontWeight: 'normal' }}>
+              🟢 Live Cloud &amp; Front Desk Matrix Active
+            </span>
+          </div>
           <button className="ids-win-btn close" onClick={onClose} style={{ fontSize: '10px', height: '18px', width: '18px', padding: 0 }}>✕</button>
         </div>
 
@@ -141,7 +198,7 @@ export default function IdsHkRoomStatusModal({
               <thead>
                 <tr style={{ background: '#ECE9D8', borderBottom: '1px solid #7F9DB9', textAlign: 'left' }}>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '65px' }}>Room No.</th>
-                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '95px' }}>Status</th>
+                  <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '115px' }}>Status</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '45px', textAlign: 'center' }}>Adult</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '45px', textAlign: 'center' }}>Child</th>
                   <th style={{ padding: '4px 8px', borderRight: '1px solid #CCC', width: '120px' }}>HK Attendant</th>
@@ -154,13 +211,19 @@ export default function IdsHkRoomStatusModal({
                   let statusBg = '#FFF';
                   if (rm.status === 'Clean' || rm.status === 'Inspected') {
                     statusColor = '#008000';
+                    statusBg = '#F0FFF4';
                   } else if (rm.status === 'Dirty') {
                     statusColor = '#C00';
+                    statusBg = '#FFFDF0';
                   } else if (rm.status === 'Occupied') {
                     statusColor = '#0A246A';
                     statusBg = '#F0F4FA';
                   } else if (rm.status === 'Out of Order') {
-                    statusColor = '#8D6E63';
+                    statusColor = '#7A5230';
+                    statusBg = '#FDF6EE';
+                  } else if (rm.status === 'Do not Disturb') {
+                    statusColor = '#7C3AED';
+                    statusBg = '#F5F3FF';
                   }
 
                   return (
