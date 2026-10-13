@@ -9,10 +9,10 @@ import {
   getStandardPosTableId, getRawTableNumber, findTableSession, mergeKotIntoTableSessions
 } from '../../utils/kotDataSync';
 import { saveKotToDexie, saveTableSessionToDexie, settleTableSessionInDexie } from '../../db/dexieDb';
-import { recordLiveRestaurantSale } from '../../utils/idsUnifiedSyncBridge';
 import IdsPosDiscountModal from './IdsPosDiscountModal';
 import { getStewardsList } from '../../data/hotelStaffData';
-import { subscribeToLiveSync } from '../../utils/liveSyncBridge';
+import { subscribeToLiveSync, syncDispatchKotOrder } from '../../utils/liveSyncBridge';
+import { getFastApiPosOrders, settleFastApiOrder } from '../../utils/backendApi';
 
 // Standard IDS Next Void & Cancellation Reason Codes
 export const KOT_VOID_REASONS = [
@@ -287,8 +287,54 @@ export default function IdsTouchPosTerminalModal({
           } catch (e) {}
           return merged;
         });
+      } else if (event.type === 'TABLE_SESSIONS_UPDATE' && event.tableSessions) {
+        setTableSessions(event.tableSessions);
       }
     });
+
+    // Proactively pull running open table orders from Railway PostgreSQL on POS mount
+    getFastApiPosOrders().then(orders => {
+      if (Array.isArray(orders) && orders.length > 0) {
+        const openOrders = orders.filter(o => o.status !== 'settled' && o.status !== 'cancelled');
+        if (openOrders.length > 0) {
+          setTableSessions(prev => {
+            let updated = { ...prev };
+            openOrders.forEach(co => {
+              const convertedItems = (co.items || []).map((it, idx) => ({
+                id: it.id || idx + 1,
+                name: it.item_name,
+                quantity: it.quantity,
+                rate: it.rate,
+                price: it.rate,
+                amount: it.amount || (it.quantity * it.rate),
+                isVeg: true
+              }));
+              const normalized = normalizeKotOrder({
+                id: co.order_number || `KOT-FASTAPI-${co.id}`,
+                orderId: co.order_number || `KOT-FASTAPI-${co.id}`,
+                kotId: co.order_number || `KOT-FASTAPI-${co.id}`,
+                kotNumber: String(co.id || '1'),
+                orderType: co.order_type === 'room_service' ? 'room' : 'dining',
+                tableNumber: co.table_id ? String(co.table_id) : null,
+                roomNumber: co.room_number ? String(co.room_number) : null,
+                totalAmount: co.final_amount || co.subtotal || 0,
+                status: co.status === 'open' ? 'Received' : (co.status || 'Received'),
+                timestamp: co.created_at || new Date().toISOString(),
+                captain: 'STEWARD',
+                steward: 'STEWARD',
+                items: convertedItems,
+                outlet: co.order_type === 'room_service' ? 'In-Room Dining' : 'Cannon Kitchen'
+              });
+              updated = mergeKotIntoTableSessions(updated, normalized);
+            });
+            try {
+              localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(updated));
+            } catch (e) {}
+            return updated;
+          });
+        }
+      }
+    }).catch(err => console.warn('[TouchPOS] Mount cloud order sync error:', err));
 
     return () => {
       window.removeEventListener('storage', handleStorage);
@@ -774,6 +820,11 @@ export default function IdsTouchPosTerminalModal({
       onKotPunched(deltaKotBatch);
     }
 
+    // Also dispatch to Railway PostgreSQL via FastAPI cloud backend
+    syncDispatchKotOrder(deltaKotBatch, currentTab).catch(err => {
+      console.warn('Sync dispatch delta KOT error:', err);
+    });
+
     playSuccessChime();
 
     // 5. Open Thermal KOT Delta Slip Preview
@@ -971,7 +1022,17 @@ export default function IdsTouchPosTerminalModal({
       });
     } catch (e) {}
 
-    // 3. Broadcast Table Release to KDS & Stewards
+    // 3. Broadcast Table Release to KDS & Stewards and sync to Railway PostgreSQL
+    (dispatchedKots || []).forEach(k => {
+      const orderId = k.id || k.kotId;
+      if (orderId) {
+        settleFastApiOrder(orderId, settlePayMode, '4321', {
+          discountAmount: financials.discountAmount,
+          roomNumber: settlePayMode === 'ROOM' ? settleRoomNo : null
+        }).catch(err => console.warn('Cloud settle order err:', err));
+      }
+    });
+
     broadcastKotChannel({
       type: 'TABLE_SETTLED',
       settledTable: selectedTable,

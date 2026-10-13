@@ -61,13 +61,70 @@ function initKnownStates() {
     });
   } catch (e) {}
 
-  // Initial fetch to seed known state without firing false alerts
+  // Initial fetch to seed known state AND ingest active open orders from PostgreSQL
   getFastApiPosOrders().then(orders => {
-    if (Array.isArray(orders)) {
-      orders.forEach(o => {
-        if (o.id) knownOrderIds.add(String(o.id));
-        if (o.order_number) knownOrderIds.add(String(o.order_number));
+    if (Array.isArray(orders) && orders.length > 0) {
+      let currentSessions = {};
+      try {
+        const rawSessions = localStorage.getItem(TABLE_SESSIONS_KEY);
+        currentSessions = rawSessions ? JSON.parse(rawSessions) : {};
+      } catch (e) {}
+
+      const currentKots = getLiveKots();
+      const freshKots = [];
+
+      orders.forEach(co => {
+        if (co.id) knownOrderIds.add(String(co.id));
+        if (co.order_number) knownOrderIds.add(String(co.order_number));
+
+        if (co.status !== 'settled' && co.status !== 'cancelled') {
+          const convertedItems = (co.items || []).map((it, idx) => ({
+            id: it.id || idx + 1,
+            name: it.item_name,
+            quantity: it.quantity,
+            rate: it.rate,
+            price: it.rate,
+            amount: it.amount || (it.quantity * it.rate),
+            isVeg: true
+          }));
+
+          const tableNum = co.table_id ? String(co.table_id) : null;
+          const roomNum = co.room_number ? String(co.room_number) : null;
+
+          const normalized = normalizeKotOrder({
+            id: co.order_number || `KOT-FASTAPI-${co.id}`,
+            orderId: co.order_number || `KOT-FASTAPI-${co.id}`,
+            kotId: co.order_number || `KOT-FASTAPI-${co.id}`,
+            kotNumber: String(co.id || '1'),
+            orderType: co.order_type === 'room_service' ? 'room' : 'dining',
+            tableNumber: tableNum,
+            roomNumber: roomNum,
+            totalAmount: co.final_amount || co.subtotal || 0,
+            status: co.status === 'open' ? 'Received' : (co.status || 'Received'),
+            timestamp: co.created_at || new Date().toISOString(),
+            captain: 'STEWARD',
+            steward: 'STEWARD',
+            items: convertedItems,
+            outlet: co.order_type === 'room_service' ? 'In-Room Dining' : 'Cannon Kitchen'
+          });
+
+          freshKots.push(normalized);
+          currentSessions = mergeKotIntoTableSessions(currentSessions, normalized);
+        }
       });
+
+      if (freshKots.length > 0) {
+        saveLiveKots([...freshKots, ...currentKots.filter(k => !freshKots.some(f => f.id === k.id))].slice(0, 100));
+        try {
+          localStorage.setItem(TABLE_SESSIONS_KEY, JSON.stringify(currentSessions));
+        } catch (e) {}
+
+        notifyListeners({
+          type: 'TABLE_SESSIONS_UPDATE',
+          tableSessions: currentSessions,
+          source: 'CLOUD_FASTAPI_INIT'
+        });
+      }
     }
   }).catch(() => {});
 
