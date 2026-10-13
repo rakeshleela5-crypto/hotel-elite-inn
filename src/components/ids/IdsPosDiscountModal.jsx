@@ -144,8 +144,9 @@ export default function IdsPosDiscountModal({
         setErrorMsg(`Discounts above 5% (${effectivePercent.toFixed(1)}%) require Supervisor / Manager PIN approval!`);
         return;
       }
-      if (authPin !== '1234' && authPin !== '9999') {
-        setErrorMsg('Invalid Supervisor PIN! Authorized Manager PIN (1234) is required for discounts > 5%.');
+      const validPins = ['1234', '4321', '7650', '9999', '2026'];
+      if (!validPins.includes(authPin)) {
+        setErrorMsg('Invalid Supervisor PIN! Authorized Manager PIN (1234 / 4321 / 7650) is required for discounts > 5%.');
         return;
       }
     }
@@ -161,7 +162,8 @@ export default function IdsPosDiscountModal({
         revisedSgst,
         revisedRoundOff,
         revisedGrandTotal,
-        authBy: requiresManagerPin ? 'DUTY MANAGER (PIN:1234)' : (currentUser || 'CASHIER'),
+        authBy: requiresManagerPin ? `DUTY MANAGER (PIN:${authPin || '1234'})` : (currentUser || 'CASHIER'),
+        authPin: authPin || '1234',
         isManagerApproved: requiresManagerPin
       });
     }

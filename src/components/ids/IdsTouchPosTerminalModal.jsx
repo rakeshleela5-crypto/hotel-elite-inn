@@ -399,6 +399,7 @@ export default function IdsTouchPosTerminalModal({
       draftTotal,
       subtotal: grossTotal, // Gross food subtotal
       grossTotal,
+      foodGross: grossTotal,
       discountAmount,
       discountPercent,
       discountReason: discountInfo?.reason || '',
@@ -480,7 +481,7 @@ export default function IdsTouchPosTerminalModal({
         handleViewLatestKotSlip();
       } else if (e.key === 'F4') {
         e.preventDefault();
-        setDiscountModalOpen(true);
+        handleOpenDiscountModal();
       } else if (e.key === 'F5') {
         e.preventDefault();
         setMergeTableModalOpen(true);
@@ -507,6 +508,15 @@ export default function IdsTouchPosTerminalModal({
   }, [isOpen, draftCart, thermalKotModalOpen, mergeTableModalOpen, printBillModalOpen, settlementModalOpen, voidModalOpen, discountModalOpen, dispatchedLineItems, selectedTable, selectedServer, covers]);
 
   // Bill Discount & Allowance Handlers (5% Cashier Limit, > 5% Manager PIN)
+  const handleOpenDiscountModal = () => {
+    const totalGross = financials.grossTotal || financials.foodGross || 0;
+    if (totalGross <= 0) {
+      setMessagePrompt(`Table ${selectedTable} has no billable items. Please add items or punch a KOT before applying a discount.`);
+      return;
+    }
+    setDiscountModalOpen(true);
+  };
+
   const handleApplyDiscount = (disc) => {
     setTableDiscounts(prev => ({
       ...prev,
@@ -1572,7 +1582,7 @@ export default function IdsTouchPosTerminalModal({
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#0A246A', marginTop: '2px', fontSize: '11px' }}>
                       <span>Bill Discount:</span>
                       <button
-                        onClick={() => setDiscountModalOpen(true)}
+                        onClick={handleOpenDiscountModal}
                         style={{ border: 'none', background: 'transparent', color: '#0A246A', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700, padding: 0 }}
                       >
                         + Add Discount [F4]
@@ -1662,7 +1672,7 @@ export default function IdsTouchPosTerminalModal({
           </button>
 
           <button 
-            onClick={() => setDiscountModalOpen(true)}
+            onClick={handleOpenDiscountModal}
             className="ids-btn-classic" 
             style={{ background: financials.isDiscountApplied ? '#B45309' : '#1D4ED8', color: '#FFF', fontWeight: 700, padding: '0 4px', fontSize: '11px', cursor: 'pointer', height: '38px', minHeight: '38px', maxHeight: '38px', borderRadius: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             title="F4: Apply food bill discount (≤ 5% Cashier, > 5% Manager PIN)"
@@ -2015,7 +2025,7 @@ export default function IdsTouchPosTerminalModal({
                   </div>
                 ) : (
                   <div style={{ marginTop: '4px', fontSize: '10px', color: '#BBB' }}>
-                    Gross: ₹{financials.foodGross.toFixed(2)} (No Bill Discount Applied)
+                    Gross: ₹{(financials.foodGross || financials.grossTotal || 0).toFixed(2)} (No Bill Discount Applied)
                   </div>
                 )}
                 <div style={{ marginTop: '6px' }}>
@@ -2023,7 +2033,7 @@ export default function IdsTouchPosTerminalModal({
                     type="button"
                     onClick={() => {
                       setSettlementModalOpen(false);
-                      setDiscountModalOpen(true);
+                      handleOpenDiscountModal();
                     }}
                     className="ids-btn-classic"
                     style={{ fontSize: '10px', padding: '3px 8px', background: '#ECE9D8', color: '#000', cursor: 'pointer', fontWeight: 600 }}
@@ -2315,7 +2325,7 @@ export default function IdsTouchPosTerminalModal({
         onClose={() => setDiscountModalOpen(false)}
         billNo={`RES-B-${selectedTable.replace(/[^0-9]/g, '').padStart(5, '0') || '00101'}`}
         tableNo={selectedTable}
-        grossTotal={financials.foodGross}
+        grossTotal={financials.foodGross || financials.grossTotal || 0}
         taxRate={5.0}
         currentUser="CASHIER"
         currentDiscount={tableDiscounts[selectedTable] || null}
