@@ -1145,6 +1145,9 @@ button.ids-win-btn.close:hover {
 }
 
 /* 4. Form Inputs, Selects, and Textareas - Universal High-DPI Responsiveness */
+[class*="ids-"] input,
+[class*="ids-"] textarea,
+[class*="ids-"] select,
 .ids-desktop-container input,
 .ids-desktop-container textarea,
 .ids-desktop-container select,
@@ -1169,6 +1172,9 @@ button.ids-win-btn.close:hover {
 .ids-window input,
 .ids-window textarea,
 .ids-window select,
+.ids-touch-pos-body input,
+.ids-touch-pos-body textarea,
+.ids-touch-pos-body select,
 .ids-input,
 .ids-select {
   color-scheme: light !important;
@@ -1181,6 +1187,7 @@ button.ids-win-btn.close:hover {
 }
 
 /* Text Inputs: Explicit I-Beam Typing Cursor */
+[class*="ids-"] input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-desktop-container input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-modal-overlay input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
 .ids-modal-backdrop input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([disabled]):not([readonly]),
@@ -1196,6 +1203,7 @@ button.ids-win-btn.close:hover {
 }
 
 /* Enabled Inputs: Crisp White Background & Immediate Focus State */
+[class*="ids-"] input:not(:disabled):not([readonly]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),
 .ids-desktop-container input:not(:disabled):not([readonly]),
 .ids-modal-overlay input:not(:disabled):not([readonly]),
 .ids-modal-backdrop input:not(:disabled):not([readonly]),
@@ -1206,6 +1214,12 @@ button.ids-win-btn.close:hover {
 .ids-window input:not(:disabled):not([readonly]),
 .ids-input:not(:disabled):not([readonly]) {
   background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+[class*="ids-"] textarea:not(:disabled):not([readonly]) {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 .ids-desktop-container input:focus,
@@ -1213,7 +1227,12 @@ button.ids-win-btn.close:hover {
 .ids-modal-backdrop input:focus,
 .ids-dialog-window input:focus,
 .ids-modal-window input:focus,
-.ids-input:focus {
+.ids-win32-window input:focus,
+.ids-window input:focus,
+.ids-input:focus,
+[class*="ids-"] input:focus,
+[class*="ids-"] select:focus,
+[class*="ids-"] textarea:focus {
   outline: 2px solid #0A246A !important;
   outline-offset: -1px !important;
   background-color: #FFFFFF !important;
@@ -1221,12 +1240,14 @@ button.ids-win-btn.close:hover {
 }
 
 /* Disabled & Readonly Inputs Preserve Authentic Win32 Grey & Highlight */
+[class*="ids-"] input:disabled,
 .ids-desktop-container input:disabled,
 .ids-modal-overlay input:disabled,
 .ids-modal-backdrop input:disabled,
 .ids-modal-container input:disabled,
 .ids-modal-window input:disabled,
 .ids-dialog-window input:disabled,
+.ids-win32-window input:disabled,
 .ids-window input:disabled,
 .ids-input:disabled {
   background-color: #EBE9ED !important;
@@ -1234,12 +1255,14 @@ button.ids-win-btn.close:hover {
   cursor: not-allowed !important;
 }
 
+[class*="ids-"] input[readonly],
 .ids-desktop-container input[readonly],
 .ids-modal-overlay input[readonly],
 .ids-modal-backdrop input[readonly],
 .ids-modal-container input[readonly],
 .ids-modal-window input[readonly],
 .ids-dialog-window input[readonly],
+.ids-win32-window input[readonly],
 .ids-window input[readonly],
 .ids-input[readonly] {
   background-color: #F0EDE5 !important;
@@ -1250,6 +1273,7 @@ button.ids-win-btn.close:hover {
 }
 
 /* Select Dropdown Elements */
+[class*="ids-"] select:not([style*="background: #316AC5"]):not([style*="background: rgb(49, 106, 197)"]),
 .ids-desktop-container select,
 .ids-modal-overlay select,
 .ids-modal-backdrop select,
@@ -1258,6 +1282,7 @@ button.ids-win-btn.close:hover {
 .ids-dialog-window select,
 .ids-win32-window select,
 .ids-window select,
+.ids-touch-pos-body select,
 .ids-select {
   color-scheme: light !important;
   color: #000000 !important;
@@ -1268,6 +1293,7 @@ button.ids-win-btn.close:hover {
   user-select: auto !important;
 }
 
+[class*="ids-"] select:disabled,
 .ids-desktop-container select:disabled,
 .ids-modal-overlay select:disabled,
 .ids-modal-backdrop select:disabled,
@@ -1281,6 +1307,7 @@ button.ids-win-btn.close:hover {
   color: #444444 !important;
 }
 
+[class*="ids-"] select option,
 .ids-desktop-container select option,
 .ids-modal-overlay select option,
 .ids-modal-backdrop select option,
@@ -1289,6 +1316,7 @@ button.ids-win-btn.close:hover {
 .ids-dialog-window select option,
 .ids-win32-window select option,
 .ids-window select option,
+.ids-touch-pos-body select option,
 .ids-select option {
   color-scheme: light !important;
   color: #000000 !important;
@@ -1321,12 +1349,14 @@ button.ids-win-btn.close:hover {
    ========================================================================== */
 
 /* 6. Universal input activation -- nuclear specificity */
+[class*="ids-"] input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-desktop-container input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-modal-overlay input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-modal-backdrop input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-modal-container input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-modal-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-dialog-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
+.ids-win32-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-window input:not([disabled]):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']),
 .ids-input:not([disabled]) {
   pointer-events: auto !important;
@@ -1338,12 +1368,14 @@ button.ids-win-btn.close:hover {
 }
 
 /* 7. Universal select activation */
+[class*="ids-"] select:not([disabled]),
 .ids-desktop-container select:not([disabled]),
 .ids-modal-overlay select:not([disabled]),
 .ids-modal-backdrop select:not([disabled]),
 .ids-modal-container select:not([disabled]),
 .ids-modal-window select:not([disabled]),
 .ids-dialog-window select:not([disabled]),
+.ids-win32-window select:not([disabled]),
 .ids-window select:not([disabled]),
 .ids-select:not([disabled]) {
   pointer-events: auto !important;
@@ -1354,12 +1386,14 @@ button.ids-win-btn.close:hover {
 }
 
 /* 8. Universal textarea activation */
+[class*="ids-"] textarea:not([disabled]),
 .ids-desktop-container textarea:not([disabled]),
 .ids-modal-overlay textarea:not([disabled]),
 .ids-modal-backdrop textarea:not([disabled]),
 .ids-modal-container textarea:not([disabled]),
 .ids-modal-window textarea:not([disabled]),
 .ids-dialog-window textarea:not([disabled]),
+.ids-win32-window textarea:not([disabled]),
 .ids-window textarea:not([disabled]) {
   pointer-events: auto !important;
   user-select: text !important;
@@ -1371,12 +1405,16 @@ button.ids-win-btn.close:hover {
 }
 
 /* 9. Focus state -- universal crisp Win32 blue outline for ALL inputs */
+[class*="ids-"] input:focus,
+[class*="ids-"] select:focus,
+[class*="ids-"] textarea:focus,
 .ids-desktop-container input:focus,
 .ids-modal-overlay input:focus,
 .ids-modal-backdrop input:focus,
 .ids-modal-container input:focus,
 .ids-modal-window input:focus,
 .ids-dialog-window input:focus,
+.ids-win32-window input:focus,
 .ids-window input:focus,
 .ids-input:focus,
 .ids-desktop-container select:focus,
@@ -1385,6 +1423,7 @@ button.ids-win-btn.close:hover {
 .ids-modal-container select:focus,
 .ids-modal-window select:focus,
 .ids-dialog-window select:focus,
+.ids-win32-window select:focus,
 .ids-window select:focus,
 .ids-select:focus,
 .ids-desktop-container textarea:focus,
@@ -1393,11 +1432,12 @@ button.ids-win-btn.close:hover {
 .ids-modal-container textarea:focus,
 .ids-modal-window textarea:focus,
 .ids-dialog-window textarea:focus,
+.ids-win32-window textarea:focus,
 .ids-window textarea:focus {
   outline: 2px solid #0A246A !important;
   outline-offset: -1px !important;
   background-color: #FFFFFF !important;
-  box-shadow: 0 0 5px rgba(10, 36, 106, 0.4) !important;
+  box-shadow: 0 0 5px rgba(10, 36, 106, 0.45) !important;
   z-index: 2 !important;
 }
 
